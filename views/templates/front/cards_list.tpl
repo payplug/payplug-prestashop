@@ -59,7 +59,7 @@
             <tbody>
             {foreach from=$payplug_cards item=card name=ppcards}
                 <tr id="id_payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" class="{if $smarty.foreach.ppcards.first}first_item{elseif $smarty.foreach.ppcards.last}last_item{else}item{/if} {if $smarty.foreach.ppcards.index % 2}alternate_item{/if}">
-                    <td class="id_payplug_card bold">{$smarty.foreach.ppcards.index +1}</td>
+                    <td class="id_payplug_card bold">{$smarty.foreach.ppcards.index +1|escape:'htmlall':'UTF-8'}</td>
                     <td class="brand bold">{if $card.brand != 'none'}{$card.brand|escape:'htmlall':'UTF-8'}{else}{l s='card' mod='payplug'}{/if}</td>
                     {*<td class="brand bold">{if $card.brand != 'none'}{$card.brand|escape:'htmlall':'UTF-8'}{else}{l s='card' d='Modules.Payplug.Shop'}{/if}</td>*}
                     <td class="last4 bold">**** **** **** {$card.last4|escape:'htmlall':'UTF-8'}</td>

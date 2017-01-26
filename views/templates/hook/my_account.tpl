@@ -24,7 +24,7 @@
 *}
 
 <!-- MODULE Payplug -->
-    <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" id="savedcards-link" href="{$payplug_cards_url}">
+    <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" id="savedcards-link" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">
           <span class="link-item">
             <i class="material-icons">&#xE870;</i>
               {l s='Saved cards' mod='payplug'}

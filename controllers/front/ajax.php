@@ -44,8 +44,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $context = Context::getContext();
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;
-                    if((int)$id_customer == 0)
+                    if ((int)$id_customer == 0) {
                         die(false);
+                    }
                     $id_payplug_card = Tools::getValue('pc');
                     $valid_key = Payplug::setAPIKey();
                     $deleted = $payplug->deleteCard($id_customer, $id_payplug_card, $valid_key);

@@ -57,13 +57,6 @@
             <a class="green-button popin-button" target="_blank" href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' mod='payplug'}</a>
             {*<a class="green-button popin-button" target="_blank" href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' d='Modules.Payplug.Admin'}</a>*}
         </div>
-{*elseif $type == 'wrong_pwd'}
-        <div class="panel-heading">{l s='LIVE mode' d='Modules.Payplug.Admin'}</div>
-        <span class="ppclose">x</span>
-    </div>
-    <form action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" method="post">
-        <p>{l s='Incorrect password' d='Modules.Payplug.Admin'}</p>
-*}
 {elseif $type == 'premium'}
         <div class="panel-heading">{l s='Enable one-click payments' mod='payplug'}</div>
         {*<div class="panel-heading">{l s='Enable one-click payments' d='Modules.Payplug.Admin'}</div>*}

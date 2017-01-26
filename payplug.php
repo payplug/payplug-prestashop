@@ -25,6 +25,7 @@
  */
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -115,11 +116,7 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         //$this->displayName = $this->trans('PayPlug – Your payment solution', array(), 'Modules.Payplug.Admin');
 
-        $desc = $this->l('The simplest online payment solution: no setup fees,');
-        //$desc = $this->trans('The simplest online payment solution: no setup fees,', array(), 'Modules.Payplug.Admin');
-        $desc .= $this->l(' no fixed fees, and no merchant account required!');
-        //$desc .= $this->trans(' no fixed fees, and no merchant account required!', array(), 'Modules.Payplug.Admin');
-        $this->description = $desc;
+        $this->description = $this->l('The simplest online payment solution: no setup fees, no fixed fees, and no merchant account required!');
 
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
@@ -136,15 +133,14 @@ class Payplug extends PaymentModule
             $this->confirmUninstall .= $this->l('All the registered cards of your customer will be deleted.');
             //$this->confirmUninstall .= $this->trans('All the registered cards of your customer will be deleted.', array(), 'Modules.Payplug.Admin');
         }
-        if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
-            $connected = true;
-        }
+
         $this->email = Configuration::get('PAYPLUG_EMAIL');
         $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
         $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
-        if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test))))
+        if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
             $this->warning = $this->l('In order to accept payments you need to configure your module by connecting your PayPlug account.');
             //$this->warning = $this->trans('In order to accept payments you need to configure your module by connecting your PayPlug account.', array(), 'Modules.Payplug.Admin');
+        }
 
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
@@ -197,21 +193,18 @@ class Payplug extends PaymentModule
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_.$this->name.'/log/install-log.csv');
         $log->info('Starting installation.');
-		$report = $this->checkRequirements();
-        if (!$report['php']['up2date'])
-        {
+        $report = $this->checkRequirements();
+        if (!$report['php']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
             //$this->_errors[] = Tools::displayError($this->trans('Your server must run PHP 5.3 or greater', array(), 'Modules.Payplug.Admin'));
             $log->error('Installation failed: PHP Requirement.');
         }
-        if (!$report['curl']['up2date'])
-        {
+        if (!$report['curl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
             //$this->_errors[] = Tools::displayError($this->trans('PHP cURL extension must be enabled on your server', array(), 'Modules.Payplug.Admin'));
             $log->error('Installation failed: cURL Requirement.');
         }
-        if (!$report['openssl']['up2date'])
-        {
+        if (!$report['openssl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
             //$this->_errors[] = Tools::displayError($this->trans('OpenSSL 1.0.1 or later', array(), 'Modules.Payplug.Admin'));
             $log->error('Installation failed: OpenSSL Requirement.');
@@ -262,7 +255,7 @@ class Payplug extends PaymentModule
         $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
         $log->info('Starting uninstallation.');
 
-        if(!$keep_cards) {
+        if (!$keep_cards) {
             $this->uninstallCards();
         }
 
@@ -310,12 +303,11 @@ class Payplug extends PaymentModule
         $req_all_cards->from('payplug_card', 'pc');
         $res_all_cards = Db::getInstance()->executeS($req_all_cards);
 
-        if(!$res_all_cards) {
+        if (!$res_all_cards) {
             return true;
         } else {
             if (isset($res_all_cards) && !empty($res_all_cards) && sizeof($res_all_cards)) {
-                foreach ($res_all_cards as $card)
-                {
+                foreach ($res_all_cards as $card) {
                     $id_customer = $card['id_customer'];
                     $id_payplug_card = $card['id_payplug_card'];
                     $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
@@ -536,8 +528,8 @@ class Payplug extends PaymentModule
                     } elseif ($lang['iso_code'] == 'it') {
                         $order_state->name[$lang['id_lang']] = $values['name']['it'].' [PayPlug]';
                     } else {
-						$order_state->name[$lang['id_lang']] = $values['name']['en'].' [PayPlug]';
-					}
+                        $order_state->name[$lang['id_lang']] = $values['name']['en'].' [PayPlug]';
+                    }
                 }
                 $order_state->add();
                 $os = (int)$order_state->id;
@@ -574,8 +566,8 @@ class Payplug extends PaymentModule
                     } elseif ($lang['iso_code'] == 'it') {
                         $order_state->name[$lang['id_lang']] = $values['name']['it'].' [TEST]';
                     } else {
-						$order_state->name[$lang['id_lang']] = $values['name']['en'].' [TEST]';
-					}
+                        $order_state->name[$lang['id_lang']] = $values['name']['en'].' [TEST]';
+                    }
                 }
                 $order_state->add();
                 $os_test = (int)$order_state->id;
@@ -599,7 +591,6 @@ class Payplug extends PaymentModule
         if (!is_array($name) || empty($name)) {
             return false;
         } else {
-
             $req_order_state = new DbQuery();
             $req_order_state->select('DISTINCT osl.id_order_state');
             $req_order_state->from('order_state_lang', 'osl');
@@ -776,9 +767,7 @@ class Payplug extends PaymentModule
         $curl_exists = extension_loaded('curl');
         $openssl_exists = extension_loaded('openssl');
         if (Tools::isSubmit('submitAccount')) {
-            if (
-                (
-                    !Validate::isEmail(Tools::getValue('PAYPLUG_EMAIL'))
+            if ((!Validate::isEmail(Tools::getValue('PAYPLUG_EMAIL'))
                     || !Validate::isPasswd(Tools::getValue('PAYPLUG_PASSWORD'))
                 )
                 && (Tools::getValue('PAYPLUG_EMAIL') != false)
@@ -915,8 +904,7 @@ class Payplug extends PaymentModule
      */
     public function treatAccountResponse($json_answer)
     {
-        if (
-            (isset($json_answer->object) && $json_answer->object == 'error')
+        if ((isset($json_answer->object) && $json_answer->object == 'error')
             || empty($json_answer)
         ) {
             return false;
@@ -930,8 +918,7 @@ class Payplug extends PaymentModule
             'max_amounts' => Configuration::get('PAYPLUG_MAX_AMOUNTS'),
         );
         if (isset($json_answer->configuration)) {
-            if (
-                isset($json_answer->configuration->currencies)
+            if (isset($json_answer->configuration->currencies)
                 && !empty($json_answer->configuration->currencies)
                 && sizeof($json_answer->configuration->currencies)
             ) {
@@ -940,8 +927,7 @@ class Payplug extends PaymentModule
                     $configuration['currencies'][] = $value;
                 }
             }
-            if (
-                isset($json_answer->configuration->min_amounts)
+            if (isset($json_answer->configuration->min_amounts)
                 && !empty($json_answer->configuration->min_amounts)
                 && sizeof($json_answer->configuration->min_amounts)
             ) {
@@ -951,8 +937,7 @@ class Payplug extends PaymentModule
                 }
                 $configuration['min_amounts'] = Tools::substr($configuration['min_amounts'], 0, -1);
             }
-            if (
-                isset($json_answer->configuration->max_amounts)
+            if (isset($json_answer->configuration->max_amounts)
                 && !empty($json_answer->configuration->max_amounts)
                 && sizeof($json_answer->configuration->max_amounts)
             ) {
@@ -1054,7 +1039,7 @@ class Payplug extends PaymentModule
 
         if (count($this->validationErrors && !$connected)) {
             $this->context->smarty->assign(array(
-                'validationErrors'	=> $this->validationErrors,
+                'validationErrors' => $this->validationErrors,
             ));
         }
 
@@ -1087,11 +1072,11 @@ class Payplug extends PaymentModule
                 $p_error .= $this->validationErrors['login'];
             }
             $this->context->smarty->assign(array(
-                'p_error'	=> $p_error,
+                'p_error' => $p_error,
             ));
         } else {
             $this->context->smarty->assign(array(
-                'PAYPLUG_EMAIL'	=> $PAYPLUG_EMAIL,
+                'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
             ));
         }
 
@@ -1110,10 +1095,10 @@ class Payplug extends PaymentModule
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
-            'connected'	=> $connected,
-            'verified'	=> $verified,
-            'premium'	=> $premium,
-            'is_active'	=> $is_active,
+            'connected' => $connected,
+            'verified' => $verified,
+            'premium' => $premium,
+            'is_active' => $is_active,
             'payplug_url' => $this->payplug_url,
             'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
             'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
@@ -1208,7 +1193,7 @@ class Payplug extends PaymentModule
 
         if (count($this->validationErrors && !$connected)) {
             $this->context->smarty->assign(array(
-                'validationErrors'	=> $this->validationErrors,
+                'validationErrors' => $this->validationErrors,
             ));
         }
 
@@ -1241,11 +1226,11 @@ class Payplug extends PaymentModule
                 $p_error .= $this->validationErrors['login'];
             }
             $this->context->smarty->assign(array(
-                'p_error'	=> $p_error,
+                'p_error' => $p_error,
             ));
         } else {
             $this->context->smarty->assign(array(
-                'PAYPLUG_EMAIL'	=> $PAYPLUG_EMAIL,
+                'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
             ));
         }
 
@@ -1260,10 +1245,10 @@ class Payplug extends PaymentModule
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
-            'connected'	=> $connected,
-            'verified'	=> $verified,
-            'premium'	=> $premium,
-            'is_active'	=> $is_active,
+            'connected' => $connected,
+            'verified' => $verified,
+            'premium' => $premium,
+            'is_active' => $is_active,
             'payplug_url' => $this->payplug_url,
             'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
             'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
@@ -1276,8 +1261,8 @@ class Payplug extends PaymentModule
 
         return $this->html;
     }
-	
-	public function checkRequirements()
+
+    public function checkRequirements()
     {
         $php_min_version = 50300;
         $curl_min_version = '7.21';
@@ -1342,8 +1327,7 @@ class Payplug extends PaymentModule
             $is_payplug_connected = true;
         }
 
-        if (
-            $report['curl']['installed'] &&
+        if ($report['curl']['installed'] &&
             $report['php']['up2date'] &&
             $report['openssl']['installed'] &&
             $report['openssl']['up2date'] &&
@@ -1912,7 +1896,7 @@ class Payplug extends PaymentModule
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
         curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__).'/cacert.pem')); //work only wiht cURL 7.10+
-        $answer = curl_exec($process);
+        //$answer = curl_exec($process);
         $error_curl = curl_errno($process);
 
         curl_close($process);
@@ -1999,9 +1983,9 @@ class Payplug extends PaymentModule
             }
         } else {
             if ($embedded_mode == 1) {
-                $payment_options = [$this->getEmbeddedPaymentOption((int)$params['cart']->id)];
+                $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id));
             } else {
-                $payment_options = [$this->getRedirectPaymentOption()];
+                $payment_options = array($this->getRedirectPaymentOption());
             }
         }
         return $payment_options;
@@ -2038,11 +2022,11 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
-            $this->context->smarty->assign([
+            $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
                 'api_url' => $this->api_url,
-            ]);
+            ));
         }
 
         $paymentOption = new PaymentOption();
@@ -2052,18 +2036,18 @@ class Payplug extends PaymentModule
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payplug.png'))
             ->setModuleName('payplug')
-            ->setInputs([
-                'lightbox' => [
+            ->setInputs(array(
+                'lightbox' => array(
                     'name' =>'lightbox',
                     'type' =>'hidden',
                     'value' =>'1',
-                ],
-                'disp' => [
+                ),
+                'disp' => array(
                     'name' =>'disp',
                     'type' =>'hidden',
                     'value' =>'1',
-                ],
-            ]);
+                ),
+            ));
         if ($lightbox == 1) {
             $paymentOption->setAdditionalInformation(
                 $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
@@ -2088,53 +2072,51 @@ class Payplug extends PaymentModule
         }
 
         $spinner_url = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/payplug/views/img/admin/spinner.gif';
-        $this->context->smarty->assign([
+        $this->context->smarty->assign(array(
             'spinner_url' => $spinner_url,
             'error' => $error,
-        ]);
+        ));
 
         $options = array();
         if (is_array($payplug_cards)) {
             foreach ($payplug_cards as $card) {
                 $paymentOption = new PaymentOption();
-                $brand = $card['brand'] != 'none' ? ucfirst($card['brand']) : $this->l('Card');
-                //$brand = $card['brand'] != 'none' ? ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
+                $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
                 $paymentOption
                     ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
                     ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
                     //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
-                    ->setInputs([
-                        'pc' => [
+                    ->setInputs(array(
+                        'pc' => array(
                             'name' =>'pc',
                             'type' =>'hidden',
                             'value' =>(int)$card['id_payplug_card'],
-                        ],
-                        'disp' => [
+                        ),
+                        'disp' => array(
                             'name' =>'disp',
                             'type' =>'hidden',
                             'value' =>'1',
-                        ],
-                        'pay' => [
+                        ),
+                        'pay' => array(
                             'name' =>'pay',
                             'type' =>'hidden',
                             'value' =>'1',
-                        ],
-                        'id_cart' => [
+                        ),
+                        'id_cart' => array(
                             'name' =>'id_cart',
                             'type' =>'hidden',
-                            'value' =>$cart = (int)$this->context->cart->id,
-                        ],
-                    ]);
+                            'value' =>(int)$this->context->cart->id,
+                        ),
+                    ));
                 if ($pc == (int)$card['id_payplug_card']) {
                     $paymentOption->setAdditionalInformation(
                         $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
                     );
                 }
-
                 $options[] = $paymentOption;
-
             }
             $paymentOption = new PaymentOption();
             $paymentOption
@@ -2143,28 +2125,28 @@ class Payplug extends PaymentModule
                 //->setCallToActionText($this->trans('Pay with a different card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
-                ->setInputs([
-                    'pc' => [
+                ->setInputs(array(
+                    'pc' => array(
                         'name' =>'pc',
                         'type' =>'hidden',
                         'value' =>'new_card',
-                    ],
-                    'disp' => [
+                    ),
+                    'disp' => array(
                         'name' =>'disp',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'pay' => [
+                    ),
+                    'pay' => array(
                         'name' =>'pay',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'id_cart' => [
+                    ),
+                    'id_cart' => array(
                         'name' =>'id_cart',
                         'type' =>'hidden',
-                        'value' =>$cart = (int)$this->context->cart->id,
-                    ],
-                ]);
+                        'value' =>(int)$this->context->cart->id,
+                    ),
+                ));
             $options[] = $paymentOption;
         } else {
             $paymentOption = new PaymentOption();
@@ -2174,28 +2156,28 @@ class Payplug extends PaymentModule
                 //->setCallToActionText($this->trans('Pay with a credit card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
-                ->setInputs([
-                    'pc' => [
+                ->setInputs(array(
+                    'pc' => array(
                         'name' =>'pc',
                         'type' =>'hidden',
                         'value' =>'new_card',
-                    ],
-                    'disp' => [
+                    ),
+                    'disp' => array(
                         'name' =>'disp',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'pay' => [
+                    ),
+                    'pay' => array(
                         'name' =>'pay',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'id_cart' => [
-                        'name' =>'id_cart',
-                        'type' =>'hidden',
-                        'value' =>$cart = (int)$this->context->cart->id,
-                    ],
-                ]);
+                    ),
+                    'id_cart' => array(
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ),
+                ));
             $options[] = $paymentOption;
         }
         return $options;
@@ -2214,11 +2196,11 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
-            $this->context->smarty->assign([
+            $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
                 'api_url' => $this->api_url,
-            ]);
+            ));
         }
 
         $pc = 0;
@@ -2229,87 +2211,85 @@ class Payplug extends PaymentModule
         }
 
         $spinner_url = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/payplug/views/img/admin/spinner.gif';
-        $this->context->smarty->assign([
+        $this->context->smarty->assign(array(
             'spinner_url' => $spinner_url,
             'error' => $error,
-        ]);
+        ));
 
         $options = array();
         if (is_array($payplug_cards)) {
             foreach ($payplug_cards as $card) {
                 $paymentOption = new PaymentOption();
-                $brand = $card['brand'] != 'none' ? ucfirst($card['brand']) : $this->l('Card');
-                //$brand = $card['brand'] != 'none' ? ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
+                $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
                 $paymentOption
                     ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
                     ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
                     //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
-                    ->setInputs([
-                        'pc' => [
+                    ->setInputs(array(
+                        'pc' => array(
                             'name' =>'pc',
                             'type' =>'hidden',
                             'value' =>(int)$card['id_payplug_card'],
-                        ],
-                        'disp' => [
+                        ),
+                        'disp' => array(
                             'name' =>'disp',
                             'type' =>'hidden',
                             'value' =>'1',
-                        ],
-                        'pay' => [
+                        ),
+                        'pay' => array(
                             'name' =>'pay',
                             'type' =>'hidden',
                             'value' =>'1',
-                        ],
-                        'id_cart' => [
-                            'name' =>'id_cart',
-                            'type' =>'hidden',
-                            'value' =>$cart = (int)$this->context->cart->id,
-                        ],
-                    ]);
+                        ),
+                        'id_cart' => array(
+                            'name' => 'id_cart',
+                            'type' => 'hidden',
+                            'value' => (int)$this->context->cart->id,
+                        ),
+                    ));
                 if ($pc == (int)$card['id_payplug_card']) {
                     $paymentOption->setAdditionalInformation(
                         $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
                     );
                 }
                 $options[] = $paymentOption;
-
             }
             $paymentOption = new PaymentOption();
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/none.png'))
                 ->setCallToActionText($this->l('Pay with a different card'))
-                //->setCallToActionText($this->trans('Pay with a different card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
-                ->setInputs([
-                    'pc' => [
+                ->setInputs(array(
+                    'pc' => array(
                         'name' =>'pc',
                         'type' =>'hidden',
                         'value' =>'new_card',
-                    ],
-                    'disp' => [
+                    ),
+                    'disp' => array(
                         'name' =>'disp',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'pay' => [
+                    ),
+                    'pay' => array(
                         'name' =>'pay',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'id_cart' => [
-                        'name' =>'id_cart',
-                        'type' =>'hidden',
-                        'value' =>$cart = (int)$this->context->cart->id,
-                    ],
-                    'lightbox' => [
+                    ),
+                    'id_cart' => array(
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ),
+                    'lightbox' => array(
                         'name' =>'lightbox',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                ]);
+                    ),
+                ));
             if ($lightbox == 1) {
                 $paymentOption->setAdditionalInformation(
                     $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
@@ -2324,33 +2304,33 @@ class Payplug extends PaymentModule
                 //->setCallToActionText($this->trans('Pay with a credit card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
-                ->setInputs([
-                    'pc' => [
+                ->setInputs(array(
+                    'pc' => array(
                         'name' =>'pc',
                         'type' =>'hidden',
                         'value' =>'new_card',
-                    ],
-                    'disp' => [
+                    ),
+                    'disp' => array(
                         'name' =>'disp',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'pay' => [
+                    ),
+                    'pay' => array(
                         'name' =>'pay',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                    'id_cart' => [
-                        'name' =>'id_cart',
-                        'type' =>'hidden',
-                        'value' =>$cart = (int)$this->context->cart->id,
-                    ],
-                    'lightbox' => [
+                    ),
+                    'id_cart' => array(
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ),
+                    'lightbox' => array(
                         'name' =>'lightbox',
                         'type' =>'hidden',
                         'value' =>'1',
-                    ],
-                ]);
+                    ),
+                ));
             $options[] = $paymentOption;
             if ($lightbox == 1) {
                 $paymentOption->setAdditionalInformation(
@@ -2379,23 +2359,19 @@ class Payplug extends PaymentModule
         $order = new Order($order_id);
         // Check order state to display appropriate message
         $state = null;
-        if (
-            isset($order->current_state)
+        if (isset($order->current_state)
             && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PENDING')
         ) {
             $state = 'pending';
-        } elseif (
-            isset($order->current_state)
+        } elseif (isset($order->current_state)
             && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PAID')
         ) {
             $state = 'paid';
-        } elseif (
-            isset($order->current_state)
+        } elseif (isset($order->current_state)
             && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST')
         ) {
             $state = 'pending_test';
-        } elseif (
-            isset($order->current_state)
+        } elseif (isset($order->current_state)
             && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST')
         ) {
             $state = 'paid_test';
@@ -2634,7 +2610,7 @@ class Payplug extends PaymentModule
         }
 
         $conf = (int)Tools::getValue('conf');
-        if ($conf == 30 || $conf == 31 ) {
+        if ($conf == 30 || $conf == 31) {
             $show_popin = true;
 
             $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
@@ -2806,8 +2782,7 @@ class Payplug extends PaymentModule
                 $this->enable();
                 die(true);
             }
-            if (
-                Tools::getIsset('en')
+            if (Tools::getIsset('en')
                 && (int)Tools::getValue('en') == 0
                 && (int)Configuration::get('PAYPLUG_SHOW') == 1
             ) {
@@ -2903,7 +2878,6 @@ class Payplug extends PaymentModule
                         } else {
                             $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
                         }
-
                     }
 
                     $reload = false;

@@ -45,8 +45,9 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->display_column_left = false;
         parent::initContent();
 
-        if (Tools::getValue('process') == 'cardlist')
+        if (Tools::getValue('process') == 'cardlist') {
             $this->renderCardList();
+        }
     }
 
     public function renderCardList()
