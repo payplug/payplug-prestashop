@@ -29,6 +29,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+
 if (!defined('_PAYPLUG_API_MODE_')) {
     //define('_PAYPLUG_API_MODE_', 'local');
     define('_PAYPLUG_API_MODE_', 'dev');
