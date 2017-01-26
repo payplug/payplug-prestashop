@@ -1,5 +1,5 @@
 {*
-* 2016 PayPlug
+* 2017 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,33 +18,17 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2016 PayPlug SAS
+*  @copyright 2017 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
 <!-- MODULE Payplug -->
-{if $version < 1.5}
-    <li>
-        <a title="{l s='Saved cards' mod='payplug'}" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">
-            <img class="icon" alt="{l s='Saved cards' mod='payplug'}" src="{$payplug_icon_url|escape:'htmlall':'UTF-8'}">
-        </a>
-        <a title="Bons de réduction" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">{l s='Saved cards' mod='payplug'}</a>
-    </li>
-{elseif $version < 1.6}
-    <li>
-        <a title="{l s='Saved cards' mod='payplug'}" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">
-            <img class="icon" alt="{l s='Saved cards' mod='payplug'}" src="{$payplug_icon_url|escape:'htmlall':'UTF-8'}">
-             {l s='Saved cards' mod='payplug'}
-        </a>
-    </li>
-{elseif $version >= 1.6}
-    <li>
-        <a href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}" title="{l s='Saved cards' mod='payplug'}">
-            <i class="icon-credit-card"></i>
-            <span>{l s='Saved cards' mod='payplug'}</span>
-        </a>
-    </li>
-{else}
-    <p>{l s='Your Prestashop version is not compatible' mod='payplug'}</p>
-{/if}
+    <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" id="savedcards-link" href="{$payplug_cards_url}">
+          <span class="link-item">
+            <i class="material-icons">&#xE870;</i>
+              {l s='Saved cards' mod='payplug'}
+              {*{l s='Saved cards' d='Modules.Payplug.Shop'}*}
+          </span>
+    </a>
 <!-- END : MODULE Payplug -->

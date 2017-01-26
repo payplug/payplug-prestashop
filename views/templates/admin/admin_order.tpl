@@ -1,5 +1,5 @@
 {*
-* 2016 PayPlug
+* 2017 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,108 +18,48 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2016 PayPlug SAS
+*  @copyright 2017 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-{if $version < 1.5}
-    <br />
-    <div id="pppanel" style="float: left">
-        <fieldset style="width: 400px">
-            <legend><img src="../img/t/AdminPayment.gif"> {l s='Payplug payment details' mod='payplug'}</legend>
-            <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="74" height="22" />
-            <ul>
-                <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
-                <li><span class="ppbold">{l s='Status' mod='payplug'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>
-                <li><span class="ppbold">{l s='Amount' mod='payplug'} : </span>{displayPrice price=$pay_amount}</li>
-                <li><span class="ppbold">{l s='Paid at' mod='payplug'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>
-                <li><span class="ppbold">{l s='Credit card' mod='payplug'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>
-                <li><span class="ppbold">{l s='Card mask' mod='payplug'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>
-                <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
-                {*<li><span class="ppbold">{l s='Processing fee' mod='payplug'} : </span>{$pay_fees|escape:'htmlall':'UTF-8'}</li>*}
-                <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
-                <span class="ppred">
-                    <span class="ppbold">{$pay_mode|escape:'htmlall':'UTF-8'}</span>
-                    {*$pay_mode_info|escape:'htmlall':'UTF-8'*}
-                </span>
-                </li>
-            </ul>
 
-            {if $show_menu}
-                <hr />
-                {include file='./admin_order_refund.tpl'}
-            {elseif $show_menu_refunded}
-                <hr />
-                {include file='./admin_order_refunded.tpl'}
-            {/if}
+<div class="panel panel-1-6" id="pppanel">
 
-        </fieldset>
+    <div class="panel-heading">
+        <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
+        {*<i class="icon-money"></i> {l s='Payplug payment details' d='Modules.Payplug.Admin'}*}
     </div>
-{elseif $version < 1.6}
-    <br />
-    <fieldset id="pppanel">
-        <legend><img src="../img/admin/money.gif"> {l s='Payplug payment details' mod='payplug'}</legend>
-        <ul>
-            <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Status' mod='payplug'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>
-            <li><span class="ppbold">{l s='Amount' mod='payplug'} : </span>{displayPrice price=$pay_amount}</li>
-            <li><span class="ppbold">{l s='Paid at' mod='payplug'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Credit card' mod='payplug'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Card mask' mod='payplug'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
-            {*<li><span class="ppbold">{l s='Processing fee' mod='payplug'} : </span>{$pay_fees|escape:'htmlall':'UTF-8'}</li>*}
-            <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
-                <span class="ppred">
-                    <span class="ppbold">{$pay_mode|escape:'htmlall':'UTF-8'}</span>
-                    {*$pay_mode_info|escape:'htmlall':'UTF-8'*}
-                </span>
-            </li>
-        </ul>
+    <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="74" height="22" />
 
-        {if $show_menu}
-            <hr />
-            {include file='./admin_order_refund.tpl'}
-        {elseif $show_menu_refunded}
-            <hr />
-            {include file='./admin_order_refunded.tpl'}
-        {/if}
+    <ul>
+        <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
+        {*<li><span class="ppbold">{l s='Payplug Payment ID' d='Modules.Payplug.Admin'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='Status' mod='payplug'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>
+        {*<li><span class="ppbold">{l s='Status' d='Modules.Payplug.Admin'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>*}
+        <li><span class="ppbold">{l s='Amount' mod='payplug'} : </span>{displayPrice price=$pay_amount}</li>
+        {*<li><span class="ppbold">{l s='Amount' d='Modules.Payplug.Admin'} : </span>{displayPrice price=$pay_amount}</li>*}
+        <li><span class="ppbold">{l s='Paid at' mod='payplug'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>
+        {*<li><span class="ppbold">{l s='Paid at' d='Modules.Payplug.Admin'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='Credit card' mod='payplug'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>
+        {*<li><span class="ppbold">{l s='Credit card' d='Modules.Payplug.Admin'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='Card mask' mod='payplug'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>
+        {*<li><span class="ppbold">{l s='Card mask' d='Modules.Payplug.Admin'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
+        {*<li><span class="ppbold">{l s='3-D Secure' d='Modules.Payplug.Admin'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
+        {*<li><span class="ppbold">{l s='Mode' d='Modules.Payplug.Admin'} : </span>*}
+            <span class="ppred">
+                <span class="ppbold">{$pay_mode|escape:'htmlall':'UTF-8'}</span>
+            </span>
+        </li>
+    </ul>
 
-    </fieldset>
-{elseif $version >= 1.6}
-    <div class="panel panel-1-6" id="pppanel">
+    {if $show_menu}
+        <hr />
+        {include file='./admin_order_refund.tpl'}
+    {elseif $show_menu_refunded}
+        <hr />
+        {include file='./admin_order_refunded.tpl'}
+    {/if}
 
-        <div class="panel-heading">
-            <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
-        </div>
-        <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="74" height="22" />
-
-        <ul>
-            <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Status' mod='payplug'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>
-            <li><span class="ppbold">{l s='Amount' mod='payplug'} : </span>{displayPrice price=$pay_amount}</li>
-            <li><span class="ppbold">{l s='Paid at' mod='payplug'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Credit card' mod='payplug'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Card mask' mod='payplug'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
-            <li><span class="ppbold">{l s='Date' mod='payplug'} : </span>{$pay_card_date|escape:'htmlall':'UTF-8'}</li>
-            {*<li><span class="ppbold">{l s='Processing fee' mod='payplug'} : </span>{$pay_fees|escape:'htmlall':'UTF-8'}</li>*}
-            <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
-                <span class="ppred">
-                    <span class="ppbold">{$pay_mode|escape:'htmlall':'UTF-8'}</span>
-                    {*$pay_mode_info|escape:'htmlall':'UTF-8'*}
-                </span>
-            </li>
-        </ul>
-
-        {if $show_menu}
-            <hr />
-            {include file='./admin_order_refund.tpl'}
-        {elseif $show_menu_refunded}
-            <hr />
-            {include file='./admin_order_refunded.tpl'}
-        {/if}
-
-    </div>
-{else}
-    <p>{l s='Your Prestashop version is not compatible' mod='payplug'}</p>
-{/if}
+</div>

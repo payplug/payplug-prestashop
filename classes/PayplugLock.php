@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2017 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2016 PayPlug SAS
+ *  @copyright 2013 - 2017 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -33,14 +33,9 @@ class PayplugLock extends ObjectModel
     /** @var int */
     const MAX_CHECK_TIME = 5;
 
-    /** @var array */
-    public static $definition = array(
-        'table'   => 'payplug_lock',
-        'primary' => 'id_payplug_lock',
-        'fields'  => array(
-            'id_cart' => array('type' => 3, 'validate' => 'isInt', 'required' => true),
-        )
-    );
+    /** @var int */
+    const IPN_PRINT = 777;
+    const VAL_PRINT = 888;
 
     /** @var int */
     public $id_payplug_lock;
@@ -69,6 +64,16 @@ class PayplugLock extends ObjectModel
     /** @var array */
     protected $fieldsValidateLang = array();
 
+    /** @var array */
+    public static $definition = array(
+        'table'   => 'payplug_lock',
+        'primary' => 'id_payplug_lock',
+        'multishop' => true,
+        'fields'  => array(
+            'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
+        )
+    );
+
     /**
      * @see ObjectModel::__construct()
      *
@@ -78,17 +83,6 @@ class PayplugLock extends ObjectModel
      */
     public function __construct($id = null, $id_lang = null)
     {
-        if (version_compare(_PS_VERSION_, 1.5, '<')) {
-            $this->table      = self::$definition['table'];
-            $this->identifier = self::$definition['primary'];
-            foreach (self::$definition['fields'] as $key => $field) {
-                if (isset($field['required']) && $field['required']) {
-                    $this->fieldsRequired[] = $key;
-                }
-
-                $this->fieldsValidate[$key] = $field['validate'];
-            }
-        }
         parent::__construct($id, $id_lang);
     }
 
@@ -118,16 +112,26 @@ class PayplugLock extends ObjectModel
      */
     public static function check($id_cart, $loop_time = 1)
     {
-        $time = 0;
+        //definir le delai
+        $delay = new DateInterval('PT10S');
 
-        while ((self::exists($id_cart)) && $time < PayplugLock::MAX_CHECK_TIME) {
-            if (function_exists('usleep')) {
-                usleep($loop_time * 1000000);
-            } else {
-                self::usleep($loop_time * 1000);
+        //test s'il y a un lock
+        $lock_exists = self::existsLockG2($id_cart);
+        if ($lock_exists) {
+            //definir la date de fin du lock
+            $last_update = new DateTime($lock_exists['date_upd']);
+            $last_check = $last_update->add($delay);
+            $time = new DateTime('now');
+
+            while ((self::existsLockG2($id_cart) !== false) && ($time < $last_check)) {
+                if (function_exists('usleep')) {
+                    usleep($loop_time * 1000000);
+                } else {
+                    self::usleep($loop_time * 1000);
+                }
+
+                $time = new DateTime('now');
             }
-
-            $time++;
         }
     }
 
@@ -156,11 +160,11 @@ class PayplugLock extends ObjectModel
      */
     public static function getInstanceByCart($id_cart)
     {
-        $query = 'SELECT `id_payplug_lock` 
-				FROM `'._DB_PREFIX_.'payplug_lock`
-				WHERE `id_cart` = '.(int)$id_cart.' ';
-
-        $id = (int)Db::getInstance()->getValue($query);
+        $req_lock = new DbQuery();
+        $req_lock->select('pl.id_payplug_lock');
+        $req_lock->from('payplug_lock', 'pl');
+        $req_lock->where('id_cart = '.(int)$id_cart);
+        $id = (int)Db::getInstance()->getValue($req_lock);
 
         if ($id == 0) {
             return false;
@@ -214,5 +218,69 @@ class PayplugLock extends ObjectModel
             // Wait !
             $current = microtime();
         } while (($current - $start) < $seconds);
+    }
+
+    //TODO: check multishop si cart_id identiques ou uniques
+    public static function createLockG2($id_cart, $process_print = 'none')
+    {
+        $req_lock = '
+            INSERT INTO '._DB_PREFIX_.'payplug_lock (              
+                id_cart,
+                id_order,
+                date_add,
+                date_upd
+            )
+            VALUE (
+                '.(int)$id_cart.',
+                IFNULL(
+                    (
+                        SELECT o.id_order 
+                        FROM '._DB_PREFIX_.'orders o 
+                        WHERE o.id_cart = '.(int)$id_cart.' 
+                    ), 
+                    \''.pSQL($process_print).'\'
+                ),
+                \''.date('Y-m-d H:i:s').'\',
+                \''.date('Y-m-d H:i:s').'\'
+            )';
+        $res_lock = Db::getInstance()->execute($req_lock);
+        if (!$res_lock) {
+            return false;
+        } else {
+            $lock = self::existsLockG2($id_cart);
+            if (!$lock) {
+                return false;
+            } else {
+                return $lock['id_order'];
+            }
+        }
+    }
+
+    public static function deleteLockG2($id_cart)
+    {
+        $req_lock = '
+            DELETE 
+            FROM '._DB_PREFIX_.'payplug_lock 
+            WHERE id_cart = '.(int)$id_cart;
+        $res_lock = Db::getInstance()->execute($req_lock);
+        if (!$res_lock) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static function existsLockG2($id_cart)
+    {
+        $req_lock = '
+            SELECT pl.*  
+            FROM '._DB_PREFIX_.'payplug_lock pl 
+            WHERE pl.id_cart = '.(int)$id_cart;
+        $res_lock = Db::getInstance()->getRow($req_lock);
+        if (!$res_lock) {
+            return false;
+        } else {
+            return $res_lock;
+        }
     }
 }

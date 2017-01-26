@@ -1,5 +1,5 @@
 {*
-* 2016 PayPlug
+* 2017 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,26 +18,34 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2016 PayPlug SAS
+*  @copyright 2017 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
 <p><strong>
 {if $state == 'pending'}
     {l s='Your payment is pending, it should validated by Payplug in a few seconds.' mod='payplug'}<br>
+    {*{l s='Your payment is pending, it should validated by Payplug in a few seconds.' d='Modules.Payplug.Shop'}<br>*}
     {l s='An email will be sent to your email address to confirm payment.' mod='payplug'}
+    {*{l s='An email will be sent to your email address to confirm payment.' d='Modules.Payplug.Shop'}*}
 {elseif $state == 'paid'}
     {l s='Your payment has been validated !' mod='payplug'}<br>
+    {*{l s='Your payment has been validated !' d='Modules.Payplug.Shop'}<br>*}
     {l s='An email has been sent to your email address to confirm payment.' mod='payplug'}
+    {*{l s='An email has been sent to your email address to confirm payment.' d='Modules.Payplug.Shop'}*}
 {/if}
 
 </strong></p>
 <p>
 {l s='Order summary :' mod='payplug'}<br>
+{*{l s='Order summary :' d='Modules.Payplug.Shop'}<br>*}
 <ul>
 {if isset($reference)}
     <li>{l s='Reference : ' mod='payplug'}<span id="pp_ref">{$reference|escape:'htmlall':'UTF-8'}</span></li>
+    {*<li>{l s='Reference : ' d='Modules.Payplug.Shop'}<span id="pp_ref">{$reference|escape:'htmlall':'UTF-8'}</span></li>*}
 {/if}
     <li>{l s='Total amount : ' mod='payplug'}<span id="pp_amount">{$totalPaid|escape:'htmlall':'UTF-8'} €</span></li>
+    {*<li>{l s='Total amount : ' d='Modules.Payplug.Shop'}<span id="pp_amount">{$totalPaid|escape:'htmlall':'UTF-8'} €</span></li>*}
 </ul>
 </p>

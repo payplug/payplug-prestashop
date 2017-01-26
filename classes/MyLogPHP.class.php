@@ -1,17 +1,17 @@
 <?php
 /**
- * MyLogPHP 1.2.5
+ * MyLogPHP 1.2.6
  *
  * NOTICE OF LICENSE
  *
  * MyLogPHP is a single PHP class to easily keep log files in CSV format.
  *
- *  @author    Lawrence Lagerlof <llagerlof@gmail.com>
- *  @package   MyLogPHP
- *  @subpackage    Common
- *  @link    http://github.com/llagerlof/MyLogPHP
- *  @copyright 2014 Lawrence Lagerlof
- *  @license   http://opensource.org/licenses/BSD-3-Clause New BSD License
+ * @package    MyLogPHP
+ * @subpackage Common
+ * @author     Lawrence Lagerlof <llagerlof@gmail.com>
+ * @copyright  2014 Lawrence Lagerlof
+ * @link       http://github.com/llagerlof/MyLogPHP
+ * @license    http://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
 class MyLogPHP
@@ -42,7 +42,7 @@ class MyLogPHP
      * @param string $logfilename Path and name of the file log.
      * @param string $separator Character used for separate the field values.
      */
-    public function myLogPHP($logfilename = './_MyLogPHP-1.2.log.csv', $separator = ',')
+    public function __construct($logfilename = './_MyLogPHP-1.2.log.csv', $separator = ',')
     {
         $this->LOGFILENAME = $logfilename;
         $this->SEPARATOR = $separator;
@@ -62,29 +62,27 @@ class MyLogPHP
      * @param string $value The value that will be recorded on log file.
      * @param string $tag Any possible tag to help the developer to find specific log messages.
      */
-    private function log($errorlevel = 'INFO', $value = '', $tag = '')
+    private function log($errorlevel = 'INFO', $value = '', $tag = '', $line_n = null)
     {
         $datetime = @date("Y-m-d H:i:s");
         if (!file_exists($this->LOGFILENAME)) {
             $headers = $this->HEADERS . "\n";
         }
-
         $fd = fopen($this->LOGFILENAME, "a");
-
         if (@$headers) {
             fwrite($fd, $headers);
         }
-
         $debugBacktrace = debug_backtrace();
         $line = $debugBacktrace[1]['line'];
+        if ($line_n === null) {
+            $line = $debugBacktrace[1]['line'];
+        } else {
+            $line = $line_n;
+        }
         $file = $debugBacktrace[1]['file'];
-
         $value = preg_replace('/\s+/', ' ', trim($value));
-
         $entry = array($datetime,$errorlevel,$tag,$value,$line,$file);
-
         fputcsv($fd, $entry, $this->SEPARATOR);
-
         fclose($fd);
     }
 
@@ -94,9 +92,9 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    public function info($value = '', $tag = self::DEFAULT_TAG)
+    function info($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
-        self::log('INFO', $value, $tag);
+        self::log('INFO', $value, $tag, $line_n);
     }
 
     /**
@@ -108,9 +106,9 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    public function warning($value = '', $tag = self::DEFAULT_TAG)
+    function warning($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
-        self::log('WARNING', $value, $tag);
+        self::log('WARNING', $value, $tag, $line_n);
     }
 
     /**
@@ -121,9 +119,9 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    public function error($value = '', $tag = self::DEFAULT_TAG)
+    function error($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
-        self::log('ERROR', $value, $tag);
+        self::log('ERROR', $value, $tag, $line_n);
     }
 
     /**
@@ -134,8 +132,8 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    public function debug($value = '', $tag = self::DEFAULT_TAG)
+    function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
-        self::log('DEBUG', $value, $tag);
+        self::log('DEBUG', $value, $tag, $line_n);
     }
 }

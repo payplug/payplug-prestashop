@@ -1,30 +1,31 @@
 /**
-* 2013 - 2016 PayPlug SAS
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PayPlug SAS
-*  @copyright 2013 - 2016 PayPlug SAS
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PayPlug SAS
-*/
+ * 2013 - 2017 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2017 PayPlug SAS
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
 p.payment_module a.payplug
 {
-	background: url('../img/payplug_en.png') 15px center no-repeat #FBFBFB;
+	background: url('../img/payplug.png') 15px center no-repeat #FBFBFB;
 	padding-left: 197px;
 }
 
@@ -63,13 +64,12 @@ div.payplug-wrapper{
 	position: relative;
 }
 
-
 div.payplug-wrapper .payment_module {
 	letter-spacing: -1px;
 }
 
 div.payplug-wrapper .payment_module span{
-	background: url('../img/payplug_en.png') 15px center no-repeat #FBFBFB;
+	background: url('../img/payplug.png') 15px center no-repeat #FBFBFB;
 	/*padding-left: 197px;*/
 	padding: 33px 40px 34px 197px;
 	display: block;
@@ -80,50 +80,49 @@ div.payplug-wrapper form{
 	position: relative;
 }
 
-div.payplug-wrapper form div.card-wrapper {
+form div.card-wrapper {
 	overflow: hidden;
 	line-height: normal;
 	padding: 0 0 10px 0;
 }
 
-div.payplug-wrapper div:first-child {
+form div.card-wrapper input {
 	float: left;
-	padding: 10px 15px 0 0;
 }
 
 div.info-wrapper div:first-child {
 	padding: 0;
 }
 
-div.payplug-wrapper form input[name=payplug_card] {
-	float: left;
+form input[name=payplug_card] {
+	/*float: left;*/
 	margin: 10px 10px 0 0;
 }
 
-div.payplug-wrapper form div label {
+form div label {
 	float: left;
 }
 
-div.payplug-wrapper form div label img {
+form div label img {
 	float: left;
 	padding: 0 8px 0 0;
 	width: 60px;
 }
 
-div.payplug-wrapper form div label div.info-wrapper {
+form div label div.info-wrapper {
 	float: left;
 }
 
-div.payplug-wrapper label[for=payplug_card_new] {
+label[for=payplug_card_new] {
 	/*padding: 10px 0 0 0;*/
 }
 
 .payplug_expiry_date{
 	display: block;
-	font-size: 0.8em;
+	font-size: 13px;
 	font-weight: normal;
-	/*padding: 0 0 0 19px;*/
-	padding: 0 0 0 0;
+	padding: 0 0 0 19px;
+	text-align: center;
 }
 
 .ppdelete{
@@ -157,33 +156,28 @@ div.payplug-wrapper label[for=payplug_card_new] {
 	min-width: 11em;
 	border: none;
 }
-
 .ppsubmit:hover {
 	background: #a7ce39 none repeat scroll 0 0;
 }
-
 .ppsubmit.disable{
 	background: #dddddd none repeat scroll 0 0;
 }
-
 .ppOneClickStatus{
-	position: absolute;
-	bottom: 1em;
-	right: 1em;
 	font-size: 14px;
+	clear:both;
+}
+.ppfail{
+	margin-bottom: 9px;
 }
 
 .ppOneClickStatus p{
-	bottom: 3em;
-	font-weight: normal;
-	position: absolute;
-	right: 0;
-	text-align: center;
-	width: 325px;
-	display: none;
-	text-align: right;
+	text-align: left;
+	font-weight: bold;
 }
 
+.ppfail .material-icons{
+	margin: 0 19px 0 -4px;
+}
 
 @media (max-width: 700px) {
 	.ppOneClickStatus p {
@@ -195,7 +189,7 @@ div.payplug-wrapper label[for=payplug_card_new] {
 	.card-wrapper,
 	.info-wrapper {
 		font-size: 14px;
-	}
+	}s
 	.ppsubmit {
 		position: relative;
 		display: block;
@@ -241,11 +235,17 @@ div.payplug-wrapper label[for=payplug_card_new] {
 	color: #8fb32a;
 }
 
+p.ppwait{
+	display: none;
+	bottom: 6em;
+	right: 12em;
+}
+
 .ppfail{
 	color: #ff0000;
 }
 
-div.overlay {
+div.ppoverlay {
 	/*background: url('../img/admin/spinner.gif') no-repeat #000000 center;*/
 	background-color: transparent;
 	background-size: 30px 30px;
@@ -260,14 +260,11 @@ div.overlay {
 	/*opacity: 0.5;*/
 }
 
+
 .ppbold {
 	font-weight: bold;
 }
 
-a.ppdeletecard {
-	text-decoration: underline;
-}
-
-#module-payplug-savedCards p.message{
+#module-payplug-cards div.message{
 	display: none;
 }

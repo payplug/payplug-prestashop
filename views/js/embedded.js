@@ -1,4 +1,3 @@
-<?php
 /**
  * 2013 - 2016 PayPlug SAS
  *
@@ -24,30 +23,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-class PayplugTools
-{
-    public static function getPhysicalUri()
-    {
-        if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            return false;
-        } else {
-            $id_shop = (int)Shop::getContextShopID();
-
-            $req_physical = '
-                SELECT su.physical_uri 
-                FROM ' . _DB_PREFIX_ . 'shop_url su 
-                WHERE su.id_shop = ' . (int)$id_shop;
-
-            $res_physical = Db::getInstance()->getValue($req_physical);
-            if (!$res_physical) {
-                return false;
-            } else {
-                return $res_physical;
-            }
-        }
-    }
-}
+$(document).ready(function() {
+    var url = $('#payplug_form_js').data('payment-url');
+    Payplug.showPayment(url);
+});
