@@ -29,10 +29,12 @@ class PayplugAjaxModuleAdminController extends ModuleAdminController
     /**
      * @see FrontController::initContent()
      */
+/*
     public function initContent()
     {
-        dump('PayplugAjaxModuleAdminController');
+
     }
+*/
 }
 
 require_once(dirname(__FILE__).'/../../../../config/config.inc.php');
@@ -47,8 +49,7 @@ if (Tools::getValue('_ajax') == 1) {
         $payplug->enable();
         die(true);
     }
-    if (
-        Tools::getIsset('en')
+    if (Tools::getIsset('en')
         && (int)Tools::getValue('en') == 0
         && (int)Configuration::get('PAYPLUG_SHOW') == 1
     ) {
@@ -144,7 +145,6 @@ if (Tools::getValue('_ajax') == 1) {
                 } else {
                     $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
                 }
-
             }
 
             $reload = false;

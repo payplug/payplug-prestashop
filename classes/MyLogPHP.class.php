@@ -6,12 +6,12 @@
  *
  * MyLogPHP is a single PHP class to easily keep log files in CSV format.
  *
- * @package    MyLogPHP
- * @subpackage Common
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2014 Lawrence Lagerlof
- * @link       http://github.com/llagerlof/MyLogPHP
  * @license    http://opensource.org/licenses/BSD-3-Clause New BSD License
+ * @package    MyLogPHP
+ * @subpackage Common
+ * @link       http://github.com/llagerlof/MyLogPHP
  */
 
 class MyLogPHP
@@ -92,7 +92,7 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    function info($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
+    public function info($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
         self::log('INFO', $value, $tag, $line_n);
     }
@@ -106,7 +106,7 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    function warning($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
+    public function warning($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
         self::log('WARNING', $value, $tag, $line_n);
     }
@@ -119,7 +119,7 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    function error($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
+    public function error($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
         self::log('ERROR', $value, $tag, $line_n);
     }
@@ -132,7 +132,7 @@ class MyLogPHP
      * @param string $value
      * @param string $tag
      */
-    function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
+    public function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
         self::log('DEBUG', $value, $tag, $line_n);
     }
