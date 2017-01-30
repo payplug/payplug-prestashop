@@ -1941,6 +1941,12 @@ class Payplug extends PaymentModule
             return false;
         } else {
             foreach ($res_payplug_card as &$card) {
+                if ((int)$card['exp_year'] < (int)date('Y')
+                    || ((int)$card['exp_year'] == (int)date('Y') && (int)$card['exp_month'] < (int)date('m'))) {
+                    $card['expired'] = true;
+                } else {
+                    $card['expired'] = false;
+                }
                 $card['expiry_date'] = date(
                     'm / y',
                     mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
@@ -1972,7 +1978,6 @@ class Payplug extends PaymentModule
         $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
         $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
         $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer);
-
         if ($one_click == 1 && !empty($payplug_cards)) {
             if ($embedded_mode == 1) {
                 $payment_options = $this->getEmbeddedOneClickPaymentOption(
@@ -2081,43 +2086,45 @@ class Payplug extends PaymentModule
         $options = array();
         if (is_array($payplug_cards)) {
             foreach ($payplug_cards as $card) {
-                $paymentOption = new PaymentOption();
-                $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
-                $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
-                    ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
-                    //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
-                    ->setModuleName('payplug')
-                    ->setInputs(array(
-                        'pc' => array(
-                            'name' =>'pc',
-                            'type' =>'hidden',
-                            'value' =>(int)$card['id_payplug_card'],
-                        ),
-                        'disp' => array(
-                            'name' =>'disp',
-                            'type' =>'hidden',
-                            'value' =>'1',
-                        ),
-                        'pay' => array(
-                            'name' =>'pay',
-                            'type' =>'hidden',
-                            'value' =>'1',
-                        ),
-                        'id_cart' => array(
-                            'name' =>'id_cart',
-                            'type' =>'hidden',
-                            'value' =>(int)$this->context->cart->id,
-                        ),
-                    ));
-                if ($pc == (int)$card['id_payplug_card']) {
-                    $paymentOption->setAdditionalInformation(
-                        $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
-                    );
+                if (!$card['expired']) {
+                    $paymentOption = new PaymentOption();
+                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                    //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
+                    $paymentOption
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
+                        ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
+                        //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setModuleName('payplug')
+                        ->setInputs(array(
+                            'pc' => array(
+                                'name' =>'pc',
+                                'type' =>'hidden',
+                                'value' =>(int)$card['id_payplug_card'],
+                            ),
+                            'disp' => array(
+                                'name' =>'disp',
+                                'type' =>'hidden',
+                                'value' =>'1',
+                            ),
+                            'pay' => array(
+                                'name' =>'pay',
+                                'type' =>'hidden',
+                                'value' =>'1',
+                            ),
+                            'id_cart' => array(
+                                'name' =>'id_cart',
+                                'type' =>'hidden',
+                                'value' =>(int)$this->context->cart->id,
+                            ),
+                        ));
+                    if ($pc == (int)$card['id_payplug_card']) {
+                        $paymentOption->setAdditionalInformation(
+                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
+                        );
+                    }
+                    $options[] = $paymentOption;
                 }
-                $options[] = $paymentOption;
             }
             $paymentOption = new PaymentOption();
             $paymentOption
@@ -2220,43 +2227,45 @@ class Payplug extends PaymentModule
         $options = array();
         if (is_array($payplug_cards)) {
             foreach ($payplug_cards as $card) {
-                $paymentOption = new PaymentOption();
-                $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
-                $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
-                    ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
-                    //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
-                    ->setModuleName('payplug')
-                    ->setInputs(array(
-                        'pc' => array(
-                            'name' =>'pc',
-                            'type' =>'hidden',
-                            'value' =>(int)$card['id_payplug_card'],
-                        ),
-                        'disp' => array(
-                            'name' =>'disp',
-                            'type' =>'hidden',
-                            'value' =>'1',
-                        ),
-                        'pay' => array(
-                            'name' =>'pay',
-                            'type' =>'hidden',
-                            'value' =>'1',
-                        ),
-                        'id_cart' => array(
-                            'name' => 'id_cart',
-                            'type' => 'hidden',
-                            'value' => (int)$this->context->cart->id,
-                        ),
-                    ));
-                if ($pc == (int)$card['id_payplug_card']) {
-                    $paymentOption->setAdditionalInformation(
-                        $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
-                    );
+                if (!$card['expired']) {
+                    $paymentOption = new PaymentOption();
+                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                    //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
+                    $paymentOption
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
+                        ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
+                        //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setModuleName('payplug')
+                        ->setInputs(array(
+                            'pc' => array(
+                                'name' =>'pc',
+                                'type' =>'hidden',
+                                'value' =>(int)$card['id_payplug_card'],
+                            ),
+                            'disp' => array(
+                                'name' =>'disp',
+                                'type' =>'hidden',
+                                'value' =>'1',
+                            ),
+                            'pay' => array(
+                                'name' =>'pay',
+                                'type' =>'hidden',
+                                'value' =>'1',
+                            ),
+                            'id_cart' => array(
+                                'name' => 'id_cart',
+                                'type' => 'hidden',
+                                'value' => (int)$this->context->cart->id,
+                            ),
+                        ));
+                    if ($pc == (int)$card['id_payplug_card']) {
+                        $paymentOption->setAdditionalInformation(
+                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
+                        );
+                    }
+                    $options[] = $paymentOption;
                 }
-                $options[] = $paymentOption;
             }
             $paymentOption = new PaymentOption();
             $paymentOption
