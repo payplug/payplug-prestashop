@@ -104,7 +104,7 @@ class Payplug extends PaymentModule
 
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.8';
+        $this->version = '2.0.9';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
