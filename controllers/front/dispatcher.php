@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2017 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2016 PayPlug SAS
+ *  @copyright 2013 - 2017 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -50,7 +50,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                             )
                         );
                     } else {
-                        Tools::redirect('index.php?controller=order&step=3&error=1');
+                        Tools::redirect('index.php?controller=order&step=3&error=1&pc='.$id_card);
                     }
                 } elseif ((int)Tools::getValue('lightbox') == 1) {
                     Tools::redirect('index.php?controller=order&step=3&lightbox=1');

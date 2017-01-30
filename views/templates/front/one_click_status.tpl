@@ -23,11 +23,19 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<ul>
-    <li>{l s='Amount already refunded with Payplug : ' mod='payplug'}<span id="amount_refunded_payplug">
-    {*<li>{l s='Amount already refunded with Payplug : ' d='Modules.Payplug.Admin'}<span id="amount_refunded_payplug">*}
-            {displayPrice price=$amount_refunded_payplug}</span></li>
-    <li>{l s='Amount still refundable with Payplug : ' mod='payplug'}<span id="amount_available">
-    {*<li>{l s='Amount still refundable with Payplug : ' d='Modules.Payplug.Admin'}<span id="amount_available">*}
-            {displayPrice price=$amount_available}</span></li>
-</ul>
+<div id="pp_error_one_click">
+	<div class="ppOneClickStatus">
+		<p class="ppfail"><i class="material-icons">&#xE5CD;</i>{l s='The transaction was not completed and your card was not charged.' mod='payplug'}</p>
+		{*<p class="ppfail"><i class="material-icons">&#xE5CD;</i>{l s='The transaction was not completed and your card was not charged.' d='Modules.Payplug.Shop'}</p>*}
+	</div>
+</div>
+{if isset($error) && $error == 1}
+{literal}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#payment-confirmation').before($('#pp_error_one_click').html());
+			$('#pp_error_one_click').remove();
+		});
+	</script>
+{/literal}
+{/if}

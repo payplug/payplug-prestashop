@@ -23,11 +23,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<ul>
-    <li>{l s='Amount already refunded with Payplug : ' mod='payplug'}<span id="amount_refunded_payplug">
-    {*<li>{l s='Amount already refunded with Payplug : ' d='Modules.Payplug.Admin'}<span id="amount_refunded_payplug">*}
-            {displayPrice price=$amount_refunded_payplug}</span></li>
-    <li>{l s='Amount still refundable with Payplug : ' mod='payplug'}<span id="amount_available">
-    {*<li>{l s='Amount still refundable with Payplug : ' d='Modules.Payplug.Admin'}<span id="amount_available">*}
-            {displayPrice price=$amount_available}</span></li>
-</ul>
+{if isset($lightbox) && $lightbox == 1}
+	<script id="payplug_form_js" data-payment-url="{$payment_url|escape:'htmlall':'UTF-8'}" type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1.0/form.js"></script>
+{/if}

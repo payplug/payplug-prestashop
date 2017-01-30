@@ -22,6 +22,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 $(document).ready(function() {
     admin_start();
 });
@@ -253,7 +254,7 @@ function login()
             $('div.panel-remove').remove();
             $('p.interpanel').after(result.content);
             admin_start();
-            callFieldset();
+			callFieldset();
         }
     });
 }

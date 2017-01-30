@@ -1,5 +1,5 @@
 {*
-* 2016 PayPlug
+* 2017 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,9 +18,10 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2016 PayPlug SAS
+*  @copyright 2017 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
 <script type="text/javascript" src="{$front_js|escape:'htmlall':'UTF-8'}"></script>
 <link href="{$front_1_3_css|escape:'htmlall':'UTF-8'}" rel="stylesheet" type="text/css" media="all" />

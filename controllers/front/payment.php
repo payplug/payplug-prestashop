@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2017 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,19 +19,13 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2016 PayPlug SAS
+ *  @copyright 2013 - 2017 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(dirname(__FILE__).'./../../../../config/config.inc.php');
-
-/** Call init.php to initialize context */
+require_once(dirname(__FILE__).'/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_.'../init.php');
-
-/** Call to payplug-php API */
-require_once(_PS_MODULE_DIR_.'/payplug/classes/PayplugTools.php');
-require_once(_PS_MODULE_DIR_.'/payplug/classes/PayplugBackward.php');
 require_once(_PS_MODULE_DIR_.'/payplug/payplug.php');
 require_once(_PS_MODULE_DIR_.'/payplug/lib/init.php');
 
@@ -39,20 +33,13 @@ $valid_key = Payplug::setAPIKey();
 \Payplug\Payplug::setSecretKey($valid_key);
 
 $payplug = Module::getInstanceByName('payplug');
-/*
- * risque de doublon
 \Payplug\Core\HttpClient::addDefaultUserAgentProduct(
     'PayPlug-Prestashop',
     $payplug->version,
     'Prestashop/'._PS_VERSION_
 );
-*/
-if (version_compare(_PS_VERSION_, '1.5', '<')) {
-    $context = $payplug->context;
-} else {
-    $context = Context::getContext();
-}
 
+$context = Context::getContext();
 $cookie = $context->cookie;
 
 $result_currency = array();
@@ -60,7 +47,7 @@ $cart = $context->cart;
 
 $payment_url = $payplug->preparePayment($cart->id);
 if (!is_array($payment_url)) {
-    Payplug::redirectForVersion($payment_url);
+    Tools::redirect($payment_url);
 } else {
     die($payment_url['response']);
 }

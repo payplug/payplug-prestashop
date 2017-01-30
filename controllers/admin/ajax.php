@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2017 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,41 +19,48 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2016 PayPlug SAS
+ *  @copyright 2013 - 2017 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(dirname(__FILE__).'./../../../../config/config.inc.php');
+class PayplugAjaxModuleAdminController extends ModuleAdminController
+{
+    /**
+     * @see FrontController::initContent()
+     */
+/*
+    public function initContent()
+    {
 
-/** Call init.php to initialize context */
+    }
+*/
+}
+
+require_once(dirname(__FILE__).'/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_.'../init.php');
 include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/PayplugAdmin.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/PayplugTools.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
 
 $payplug = new Payplug();
 
 if (Tools::getValue('_ajax') == 1) {
-    if ((int)Tools::getValue('en') == 1 && (int)PayplugBackward::getConfiguration('PAYPLUG_SHOW') == 0) {
-        PayplugBackward::updateConfiguration('PAYPLUG_SHOW', 1);
+    if ((int)Tools::getValue('en') == 1 && (int)Configuration::get('PAYPLUG_SHOW') == 0) {
+        Configuration::updateValue('PAYPLUG_SHOW', 1);
         $payplug->enable();
         die(true);
     }
-    if (
-        Tools::getIsset('en')
+    if (Tools::getIsset('en')
         && (int)Tools::getValue('en') == 0
-        && (int)PayplugBackward::getConfiguration('PAYPLUG_SHOW') == 1
+        && (int)Configuration::get('PAYPLUG_SHOW') == 1
     ) {
-        PayplugBackward::updateConfiguration('PAYPLUG_SHOW', 0);
+        Configuration::updateValue('PAYPLUG_SHOW', 0);
         die(true);
     }
     if (Tools::getIsset('db')) {
         if (Tools::getValue('db') == 'on') {
-            PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 1);
+            Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1);
         } elseif (Tools::getValue('db') == 'off') {
-            PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 0);
+            Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
         }
         die(true);
     }
@@ -77,24 +84,24 @@ if (Tools::getValue('_ajax') == 1) {
         $payplug->submitPopinPwd(Tools::getValue('pwd'));
     }
     if (Tools::getValue('submit') == 'submitPopin_confirm') {
-        die(PayplugBackward::jsonEncode(array('content' => 'confirm_ok')));
+        die(json_encode(array('content' => 'confirm_ok')));
     }
     if (Tools::getValue('submit') == 'submitPopin_confirm_a') {
-        die(PayplugBackward::jsonEncode(array('content' => 'confirm_ok_activate')));
+        die(json_encode(array('content' => 'confirm_ok_activate')));
     }
     if (Tools::getValue('submit') == 'submitPopin_desactivate') {
-        die(PayplugBackward::jsonEncode(array('content' => 'confirm_ok_desactivate')));
+        die(json_encode(array('content' => 'confirm_ok_desactivate')));
     }
     if ((int)Tools::getValue('check') == 1) {
         $content = $payplug->getCheckFieldset();
-        die(PayplugBackward::jsonEncode(array('content' => $content)));
+        die(json_encode(array('content' => $content)));
     }
     if ((int)Tools::getValue('log') == 1) {
         $content = $payplug->getLogin();
-        die(PayplugBackward::jsonEncode(array('content' => $content)));
+        die(json_encode(array('content' => $content)));
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
-        $api_key = PayplugBackward::getConfiguration('PAYPLUG_LIVE_API_KEY');
+        $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
         if ($payplug->checkPremium($api_key)) {
             die(true);
         } else {
@@ -103,9 +110,10 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('refund') == 1) {
         if (!$payplug->checkAmountToRefund(Tools::getValue('amount'))) {
-            die(PayplugBackward::jsonEncode(array(
+            die(json_encode(array(
                 'status' => 'error',
                 'data' => $payplug->l('Incorrect amount to refund')
+                //'data' => $this->getTranslator()->trans('Incorrect amount to refund', array(), 'Modules.Payplug.Admin')
             )));
         } else {
             $amount = Tools::getValue('amount');
@@ -121,9 +129,10 @@ if (Tools::getValue('_ajax') == 1) {
         );
         $refund = $payplug->makeRefund($pay_id, $amount, $metadata);
         if ($refund == 'error') {
-            die(PayplugBackward::jsonEncode(array(
+            die(json_encode(array(
                 'status' => 'error',
                 'data' => $payplug->l('Cannot refund that amount.')
+                //'data' => $this->getTranslator()->trans('Cannot refund that amount.', array(), 'Modules.Payplug.Admin')
             )));
         } else {
             $payment = $payplug->retrievePayment($pay_id);
@@ -132,11 +141,10 @@ if (Tools::getValue('_ajax') == 1) {
                 $new_state = (int)Tools::getValue('id_state');
             } elseif ($payment->is_refunded == 1) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int)PayplugBackward::getConfiguration('PAYPLUG_ORDER_STATE_REFUND');
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
                 } else {
-                    $new_state = (int)PayplugBackward::getConfiguration('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
                 }
-
             }
 
             $reload = false;
@@ -161,17 +169,18 @@ if (Tools::getValue('_ajax') == 1) {
                 $amount_refunded_payplug,
                 $amount_available
             );
-            die(PayplugBackward::jsonEncode(array(
+            die(json_encode(array(
                 'status' => 'ok',
                 'data' => $data,
                 'message' => $payplug->l('Amount successfully refunded.'),
+                //'message' => $this->getTranslator()->trans('Amount successfully refunded.', array(), 'Modules.Payplug.Admin'),
                 'reload' => $reload
             )));
         }
     }
     if ((int)Tools::getValue('popinRefund') == 1) {
         $popin = $payplug->displayPopin('refund');
-        die(PayplugBackward::jsonEncode(array('content' => $popin)));
+        die(json_encode(array('content' => $popin)));
     }
 } else {
     exit;

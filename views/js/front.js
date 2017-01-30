@@ -22,9 +22,25 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 $(document).ready(function() {
 
-    $('a.ppdeletecard').unbind('click');
+    var payplug_options = $('input[data-module-name=payplug]');
+    payplug_options.each(function() {
+        var extra = $(this).attr('id') + '-additional-information';
+        $('#'+extra).attr('style', 'margin:0;');
+    });
+    payplug_options.parent().parent().find('img')
+        .css('float', 'left')
+        .css('margin', '0 10px 0 0');
+
+    $('#payment-confirmation button').on('click', function(){
+        $('#checkout-payment-step').css('background-color', '#eeeeee');
+        $('.payment-confirmation button').attr('disabled', 'disabled');
+        $('.ppfail').hide();
+        $('.ppwait').show();
+    });
+
     $('a.ppdeletecard').bind('click', function(e){
         e.preventDefault();
         var id_payplug_card = $(this).parent().parent().attr('id');
@@ -34,7 +50,6 @@ $(document).ready(function() {
         return false;
     });
 
-    $('a.ppdelete').unbind('click');
     $('a.ppdelete').bind('click', function(e){
         e.preventDefault();
         var id_payplug_card = $('input[name=payplug_card]:checked').val()
@@ -43,7 +58,6 @@ $(document).ready(function() {
         return false;
     });
 
-    $('input[name=payplug_card]').unbind('change');
     $('input[name=payplug_card]').bind('change', function(e){
         if ($(this).val() == 'new_card') {
             $('a.ppdelete').hide();
@@ -52,21 +66,9 @@ $(document).ready(function() {
         }
     });
 
-    $('input[name=SubmitPayplugOneClick]').unbind('click');
-    $('input[name=SubmitPayplugOneClick]').bind('click', function(e){
-        e.preventDefault();
-        $('body').append('<div class="overlay"></div>');
-        var id_card = $('input[name=payplug_card]:checked').val()
-        callPayment(id_card);
-        return false;
-    });
-
-    $('a.payplug.call').unbind('click');
-    $('a.payplug.call').bind('click', function(e) {
-        e.preventDefault();
-        $('body').append('<div class="overlay"><img class="loader" src="'+spinner_url+'" /></div>');
-        callPayment('new_card');
-        return false;
+    $('input[name=payplug_card]').bind('change', function(e){
+        id_card = $('input[name=payplug_card]:checked').val()
+        $('input:hidden[name=pc]').val(id_card);
     });
 });
 
@@ -87,8 +89,8 @@ function callDeleteSavedCard(id_card, url)
             if(result)
             {
                 $('#id_payplug_card_'+id_card).remove();
-                $('#module-payplug-savedCards p.message').show();
-                $('#module-payplug-controllers-front-cards p.message').show();
+                $('#module-payplug-cards div.message').show();
+                $('#module-payplug-controllers-front-cards div.message').show();
             }
         }
     });
@@ -116,89 +118,6 @@ function callDeleteCard(id_card)
             if(result)
             {
                 $('.'+id_card).remove();
-                if ($('div.card-wrapper').length <= 1) {
-                    window.location.replace(payment_url);
-                }
-            }
-        }
-    });
-}
-
-function callPayment(id_card)
-{
-    var url = $('input:hidden[name=front_ajax_url]').val();
-    var id_cart = $('input:hidden[name=id_cart]').val();
-    var data = {_ajax: 1, pc: id_card, pay:1, cart: id_cart};
-
-    $.ajax({
-        type: 'POST',
-        url: url,
-        dataType: 'json',
-        data: data,
-        beforeSend: function() {
-            $('.ppwait').show();
-            $('input[name=SubmitPayplugOneClick]').addClass('disable');
-            $('input[name=SubmitPayplugOneClick]').attr('disabled','disabled');
-        },
-        complete: function(){
-            $('.ppwait').hide();
-            if (id_card == 'new_card') {
-                $('input[name=SubmitPayplugOneClick]').removeClass('disable');
-                $('input[name=SubmitPayplugOneClick]').removeAttr('disabled');
-                $('div.overlay').remove();
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CALL PAYMENT');
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
-        },
-        success: function(data)
-        {
-            if(data)
-            {
-                if(data.result == true)
-                {
-                    $('.ppfail').hide();
-                    $('.ppsuccess').fadeIn(500);
-                    var delay = 9000;
-                    setTimeout(function(){
-                            $('.ppsuccess').fadeOut(500);
-                        },
-                        delay
-                    );
-
-                    var validation_url = data.validation_url;
-                    window.location.replace(validation_url);
-                }
-                else
-                {
-                    if(data.result == 'new_card')
-                    {
-                        if(data.embedded_mode == 0)
-                            window.location.replace(data.payment_url);
-                        else
-                        {
-                            Payplug.showPayment(data.payment_url);
-                        }
-                    }
-                    else
-                    {
-                        $('.ppfail').fadeIn(500);
-                        if (id_card != 'new_card') {
-                            $('input[name=SubmitPayplugOneClick]').removeClass('disable');
-                            $('input[name=SubmitPayplugOneClick]').removeAttr('disabled');
-                            $('div.overlay').remove();
-                        }
-                        var delay = 9000;
-                        setTimeout(function(){
-                                $('.ppfail').fadeOut(500);
-                            },
-                            delay
-                        );
-                    }
-                }
             }
         }
     });
