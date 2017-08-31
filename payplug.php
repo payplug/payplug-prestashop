@@ -103,7 +103,7 @@ class Payplug extends PaymentModule
 
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.9';
+        $this->version = '2.3.0';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
@@ -1530,11 +1530,13 @@ class Payplug extends PaymentModule
     {
         $currency_order = new Currency((int)($cart->id_currency));
         $currencies_module = $this->getCurrency((int)$cart->id_currency);
-
         if (is_array($currencies_module)) {
             foreach ($currencies_module as $currency_module) {
                 if ($currency_order->id == $currency_module['id_currency']) {
-                    return true;
+                    $supported_currencies = $this->getSupportedCurrencies();
+                    if (in_array(strtoupper($currency_module['iso_code']), $supported_currencies)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -1584,6 +1586,23 @@ class Payplug extends PaymentModule
         $current_max_amount = $max_amounts[$iso_code];
 
         return array('min_amount' => $current_min_amount, 'max_amount' => $current_max_amount);
+    }
+
+    /**
+     * Get supported currencies
+     *
+     * @return array
+     */
+    public static function getSupportedCurrencies()
+    {
+        $currencies = array();
+        foreach (explode(';', Configuration::get('PAYPLUG_MIN_AMOUNTS')) as $amount_cur) {
+            $cur = array();
+            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+            $currencies[] = strtoupper($cur[1]);
+        }
+
+        return $currencies;
     }
 
     /**
