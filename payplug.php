@@ -103,7 +103,7 @@ class Payplug extends PaymentModule
 
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.0';
+        $this->version = '2.6.0';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
@@ -341,7 +341,7 @@ class Payplug extends PaymentModule
             !Configuration::updateValue('PAYPLUG_EMAIL', null) ||
             !Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 0) ||
             !Configuration::updateValue('PAYPLUG_ONE_CLICK', null) ||
-            !Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0) ||
+            !Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1) ||
             !Configuration::updateValue('PAYPLUG_KEEP_CARDS', 0)
         ) {
             $log->error('Installation failed: configurations failed.');
@@ -801,6 +801,66 @@ class Payplug extends PaymentModule
         }
     }
 
+    /**
+     * Send cURL request to PayPlug to patch a given payment
+     *
+     * @param String $api_key
+     * @param String $pay_id
+     * @param Array $data
+     * @return Array
+     */
+    public function patchPayment($api_key, $pay_id, $data)
+    {
+        $data_string = json_encode($data);
+        $url = $this->api_url.$this->routes['patch'].$pay_id;
+        $curl_version = curl_version();
+        $process = curl_init($url);
+        curl_setopt(
+            $process,
+            CURLOPT_HTTPHEADER,
+            array(
+                'Authorization: Bearer '.$api_key,
+                'Content-Type:application/json',
+                'Content-Length: '.strlen($data_string)
+            )
+        );
+        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($process, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($process, CURLINFO_HEADER_OUT, true);
+        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
+        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
+        curl_setopt(
+            $process,
+            CURLOPT_SSL_VERIFYHOST,
+            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
+        );
+        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__).'/cacert.pem'));
+        $answer = curl_exec($process);
+        $error_curl = curl_errno($process);
+        curl_close($process);
+
+        $result = array(
+            'status' => false,
+            'message' => null,
+        );
+
+        if ($error_curl == 0) {
+            $json_answer = json_decode($answer);
+
+            if (isset($json_answer->object) && $json_answer->object == 'error') {
+                $result['status'] = false;
+                $result['message'] = $json_answer->message;
+            } else {
+                $result['status'] = true;
+            }
+        } else {
+            $result['status'] = false;
+            $result['message'] = $this->l('Error while executing cURL request.');
+        }
+        return $result;
+    }
+    
     /**
      * login to Payplug API
      *
@@ -1603,6 +1663,53 @@ class Payplug extends PaymentModule
         }
 
         return $currencies;
+    }
+
+    /**
+    * Get all country iso-code of ISO 3166-1 alpha-2 norm
+    * Source: DB PayPlug
+    *
+    * @return array | null
+    */
+    public function getIsoCodeList()
+    {
+        $country_list_path = _PS_MODULE_DIR_.'payplug/lib/iso_3166-1_alpha-2/data.csv';
+        $iso_code_list = array();
+        if (($handle = fopen($country_list_path, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                $iso_code_list[] = strtoupper($data[0]);
+            }
+            fclose($handle);
+            return $iso_code_list;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm
+    *
+    * @param int $country_id
+    * @return int | null
+    */
+    public function getIsoCodeByCountryId($country_id)
+    {
+        $iso_code_list = $this->getIsoCodeList();
+        if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
+            return null;
+        }
+        if (!Validate::isInt($country_id)) {
+            return null;
+        }
+        $country = new Country((int)$country_id);
+        if (!Validate::isLoadedObject($country)) {
+            return null;
+        }
+        if (!in_array(strtoupper($country->iso_code), $iso_code_list)) {
+            return null;
+        } else {
+            return strtoupper($country->iso_code);
+        }
     }
 
     /**
