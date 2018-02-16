@@ -1155,6 +1155,7 @@ class Payplug extends PaymentModule
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
+            'pp_version' => $this->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,
@@ -1222,6 +1223,7 @@ class Payplug extends PaymentModule
         $this->context->smarty->assign(array(
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
+            'pp_version' => $this->version,
         ));
         $this->html = $this->fetchTemplateRC('/views/templates/admin/fieldset.tpl');
 
@@ -1750,7 +1752,8 @@ class Payplug extends PaymentModule
         //amount
         $amount = $cart->getOrderTotal(true, Cart::BOTH);
 
-        $amount = round($amount, 2) * 100;
+        //$amount = round($amount, 2) * 100;
+        $amount = intval(round(($amount * 100), PHP_ROUND_HALF_UP));
         $current_amounts = Payplug::getAmountsByCurrency($currency);
         $current_min_amount = $current_amounts['min_amount'];
         $current_max_amount = $current_amounts['max_amount'];

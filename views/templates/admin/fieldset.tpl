@@ -32,6 +32,7 @@
             <p class="ppwarning">{$warning|escape:'quotes':'UTF-8'}</p>
         {/foreach}
     {/if}
+    <p>{l s='Version of PayPlug module:' mod='payplug'} {$pp_version}</p>
     {if isset($check_configuration.success) && !empty($check_configuration.success) && sizeof($check_configuration.success)}
         {foreach from = $check_configuration.success item = success}
             <p class="ppsuccess">{$success|escape:'htmlall':'UTF-8'}</p>

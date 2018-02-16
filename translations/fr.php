@@ -2,8 +2,6 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{payplug}prestashop>payplug_986eb46ca4f93c5dcd461bd7ce4f0fd1'] = 'La solution de paiement en ligne la plus simple : ';
-$_MODULE['<{payplug}prestashop>payplug_445b9de75c5e572970b321b9585c8a85'] = 'inscription gratuite, sans abonnement.';
 $_MODULE['<{payplug}prestashop>payplug_40c60d7d0db191b9cd543745f8ae3679'] = 'Êtes-vous sûr de vouloir désinstaller ce module et supprimer votre configuration ?';
 $_MODULE['<{payplug}prestashop>payplug_8f12e303595a597d598ba5ba2523a77e'] = 'Toutes les cartes enregistrées par vos clients seront conservées.';
 $_MODULE['<{payplug}prestashop>payplug_2a759ac5a7e57ff007ef009406aec89c'] = 'Toutes les cartes enregistrées par vos clients seront supprimées.';
@@ -34,7 +32,6 @@ $_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'Le rem
 $_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'Le montant à été correctement remboursé';
 $_MODULE['<{payplug}prestashop>ipn_070045a43ffc0c954761e803bf7ec0f7'] = 'Le montant recueilli par PayPlug est différent';
 $_MODULE['<{payplug}prestashop>ipn_baad4f460ebbb7b6080ffce28c800b87'] = 'du montant total de la commande';
-$_MODULE['<{payplug}prestashop>validation_e2b7dec8fa4b498156dfee6e4c84b156'] = 'Ce moyen de paiement n\'est pas disponible.';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Montant déjà remboursé avec Payplug :';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Montant disponible pour effectuer un remboursement avec Payplug :';
 $_MODULE['<{payplug}prestashop>admin_order_refunded_4bf290898e0226ffb1041cd114347e4d'] = 'Rembourser avec PayPlug';
@@ -63,7 +60,6 @@ $_MODULE['<{payplug}prestashop>admin_8d002532f8aaa402d78e01b944878379'] = 'Évit
 $_MODULE['<{payplug}prestashop>admin_1d8b5ba4e8dabf85facf6e37c5dbe2e3'] = 'Mise à jour des commandes automatique et confirmation par email';
 $_MODULE['<{payplug}prestashop>admin_0da08d6f9dcebff50b6dc8cc1a7ff3b1'] = 'Interface permettant la gestion des paiements et l\'export CSV des transactions';
 $_MODULE['<{payplug}prestashop>admin_5f183c4202884334e2f48c094ea06ee2'] = 'Disponibilité des fonds sur le compte bancaire sous 2 à 5 jours ouvrés';
-$_MODULE['<{payplug}prestashop>admin_db489888df53692e3d2c6ed266d197b9'] = 'Tarification dégressive: Les frais s\'ajustent à votre volume sans frais de virement ou de remboursement.';
 $_MODULE['<{payplug}prestashop>admin_0e4fefcc7f5461ca828af1703f00c28b'] = 'Pour toute question concernant l\'installation et la configuration du module, vous consultez l\'article disponible sur';
 $_MODULE['<{payplug}prestashop>admin_b862e9f2904096707cab3be27c18aaf0'] = 'la page suivante';
 $_MODULE['<{payplug}prestashop>admin_ec3028a12402ab7f43962a6f3a667b6e'] = 'Mode debug';
@@ -80,6 +76,7 @@ $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976c
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251'] = 'NON';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a'] = 'Mettre à jour les paramètres';
 $_MODULE['<{payplug}prestashop>fieldset_5f241c8c8f985b3c51e05d39cf030f4c'] = 'ÉTAT';
+$_MODULE['<{payplug}prestashop>fieldset_32c0cf92e6d3e45d88748ec32135b289'] = 'Version du module Payplug :';
 $_MODULE['<{payplug}prestashop>fieldset_060bf2d587991d8f090a1309b285291c'] = 'Vérifer';
 $_MODULE['<{payplug}prestashop>login_e205336b3b23c2fa65284333c5f0956f'] = 'Afficher';
 $_MODULE['<{payplug}prestashop>login_b987dc3f2a9c3202e15b0dbd03eb312e'] = 'Connectez-vous ci-dessous à votre compte PayPlug pour pouvoir afficher le module à vos clients.';

@@ -29,7 +29,7 @@
         <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
         {*<i class="icon-money"></i> {l s='Payplug payment details' d='Modules.Payplug.Admin'}*}
     </div>
-    <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="74" height="22" />
+    <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
 
     <ul>
         <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
