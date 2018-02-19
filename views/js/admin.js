@@ -137,7 +137,7 @@ function admin_start()
         if($(this).attr('checked') == true || $(this).attr('checked') == 'checked'){
             $(this).parent().removeClass('ppon');
             $(this).siblings('.switch-selection').css('left', '31px');
-            $('.switch-show').css('background-color', '#8fb32a');
+            $('.switch-show').css('background-color', '#00c29a');
             $(this).attr('checked', false);
             callPopin('desactivate');
         }
@@ -346,7 +346,7 @@ function callPopin(type, args){
     else if(type == 'confirm_ok_activate')
     {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '31px');
-        $('.switch-show').css('background-color', '#8fb32a');
+        $('.switch-show').css('background-color', '#00c29a');
         //$('#payplug_show_on').siblings('.slide-button').css('left', '31px');
         $('#payplug_show_on').attr('checked', true);
         $(this).parent().addClass('ppon');
@@ -361,7 +361,7 @@ function callPopin(type, args){
     else if(type == 'confirm_ok_desactivate')
     {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '2px');
-        $('.switch-show').css('background-color', '#ff0000');
+        $('.switch-show').css('background-color', '#dd2525');
         $('#payplug_show_on').attr('checked', false);
         activate(0);
         $('#payplug_popin').remove();

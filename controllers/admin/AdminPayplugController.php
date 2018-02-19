@@ -130,6 +130,7 @@ class AdminPayplugController extends ModuleAdminController
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $payplug->check_configuration,
+            'pp_version' => $payplug->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,

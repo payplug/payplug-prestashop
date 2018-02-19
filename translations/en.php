@@ -80,6 +80,7 @@ $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976c
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251'] = 'NO';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a'] = 'Update settings';
 $_MODULE['<{payplug}prestashop>fieldset_5f241c8c8f985b3c51e05d39cf030f4c'] = 'STATUS';
+$_MODULE['<{payplug}prestashop>fieldset_32c0cf92e6d3e45d88748ec32135b289'] = 'Version of PayPlug module:';
 $_MODULE['<{payplug}prestashop>fieldset_060bf2d587991d8f090a1309b285291c'] = 'Check';
 $_MODULE['<{payplug}prestashop>login_e205336b3b23c2fa65284333c5f0956f'] = 'Display to customers';
 $_MODULE['<{payplug}prestashop>login_b987dc3f2a9c3202e15b0dbd03eb312e'] = 'Before being able to display PayPlug to your customers you need to connect your PayPlug account below.';
