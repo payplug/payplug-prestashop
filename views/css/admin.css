@@ -310,12 +310,10 @@ label.switch-label {
 }
 
 #payplug_admin_form .ppwarning{
-	background: url("../img/admin/icon-warning.png") no-repeat center left #fff2cc;
+	background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
 	border-left: solid 3px #f7a000;
 	margin: 0 0 1em 0;
-	background-color: #fffbcc;
-	border-color: #f7a000;
-	color: #f7a000;
+	color: #d2a63c;
 	padding: 0.7em 3em;
 }
 
@@ -324,7 +322,7 @@ label.switch-label {
 	margin: 10px auto 20px auto;
 	background: #ddfce8;
 	border-left: 3px solid #00c29a;
-	color: #00c29a;
+	color: #000000;
 	padding: 10px 0 10px 20px;
 }
 
@@ -345,8 +343,8 @@ label.switch-label {
 #payplug_admin_form .ppsuccess{
 	border: none;
 	/*margin-left: 1.5em;*/
-	padding: 0 0 0 1.5em;
-	line-height: normal;
+	padding: 0 0 0 1.8em;
+	line-height: 1.6em;
 }
 
 #payplug_admin_form .pperror{
