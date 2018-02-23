@@ -2772,6 +2772,11 @@ class Payplug extends PaymentModule
         }
 
         $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
+        if ((int)$payment->is_refunded == 1) {
+            $pay_status = $this->l('REFUNDED');
+        } elseif ((int)$payment->amount_refunded > 0) {
+            $pay_status = $this->l('PARTIALLY REFUNDED');
+        }
         //$pay_status = (int)$payment->is_paid == 1 ? $this->trans('PAID', array(), 'Modules.Payplug.Admin') : $this->trans('NOT PAID', array(), 'Modules.Payplug');
         $pay_amount = (int)$payment->amount / 100;
         $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
