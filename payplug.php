@@ -1804,7 +1804,7 @@ class Payplug extends PaymentModule
         //save card
         //$save_card = false;
         $allow_save_card = false;
-        if ($one_click == 1) {
+        if ($one_click == 1 && Cart::isGuestCartByCartId($cart->id) != 1) {
             //$save_card = true;
             $allow_save_card = true;
         }
@@ -2701,8 +2701,6 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $pay_id = '';
-
         $payments = $order->getOrderPaymentCollection();
         if (count($payments) > 1 || !isset($payments[0])) {
             return false;
@@ -2711,7 +2709,19 @@ class Payplug extends PaymentModule
         }
 
         if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-            return false;
+            if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
+                \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    return false;
+                }
+            } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
+                \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    return false;
+                }
+            }
         }
 
         $amount_refunded_presta = $this->getTotalRefunded($order->id);
