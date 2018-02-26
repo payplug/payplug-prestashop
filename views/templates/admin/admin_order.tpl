@@ -46,6 +46,7 @@
         {*<li><span class="ppbold">{l s='Card mask' d='Modules.Payplug.Admin'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>*}
         <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
         {*<li><span class="ppbold">{l s='3-D Secure' d='Modules.Payplug.Admin'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='Expiry Date' mod='payplug'} : </span>{$pay_card_date|escape:'htmlall':'UTF-8'}</li>
         <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
         {*<li><span class="ppbold">{l s='Mode' d='Modules.Payplug.Admin'} : </span>*}
             <span class="ppred">
