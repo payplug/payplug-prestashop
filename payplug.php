@@ -2780,13 +2780,30 @@ class Payplug extends PaymentModule
         //$pay_status = (int)$payment->is_paid == 1 ? $this->trans('PAID', array(), 'Modules.Payplug.Admin') : $this->trans('NOT PAID', array(), 'Modules.Payplug');
         $pay_amount = (int)$payment->amount / 100;
         $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
-        $pay_brand = ($payment->card->brand != '' ? $payment->card->brand : $this->l('Card')).' ('.$payment->card->country.')';
+        if ($payment->card->brand != '') {
+            $pay_brand = $payment->card->brand;
+        } else {
+            $pay_brand = $this->l('Unavailable in test mode');
+        }
+        if ($payment->card->country != '') {
+            $pay_brand .= ' '.$this->l('Card').' ('.$payment->card->country.')';
+        }
         //$pay_brand = ($payment->card->brand != '' ? $payment->card->brand : $this->trans('Card', array(), 'Modules.Payplug.Admin')).' ('.$payment->card->country.')';
-        $pay_card_mask = '**** **** **** '.$payment->card->last4;
+        if ($payment->card->last4 != '') {
+            $pay_card_mask = '**** **** **** '.$payment->card->last4;
+        } else {
+            $pay_card_mask = $this->l('Unavailable in test mode');
+        }
         $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
         //$pay_tds = $payment->is_3ds ? $this->trans('YES', array(), 'Modules.Payplug.Admin') : $this->trans('NO', array(), 'Modules.Payplug.Admin');
         $pay_mode = $payment->is_live ? $this->l('LIVE') : $this->l('TEST');
         //$pay_mode = $payment->is_live ? $this->trans('LIVE', array(), 'Modules.Payplug.Admin') : $this->trans('TEST', array(), 'Modules.Payplug.Admin');
+
+        if ($payment->card->exp_month === null) {
+            $pay_card_date = $this->l('Unavailable in test mode');
+        } else {
+            $pay_card_date = date('m/y', strtotime('01.'.$payment->card->exp_month.'.'.$payment->card->exp_year));
+        }
 
         $this->context->smarty->assign(array(
             'logo_url' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
@@ -2798,6 +2815,7 @@ class Payplug extends PaymentModule
             'pay_card_mask' => $pay_card_mask,
             'pay_tds' => $pay_tds,
             'pay_mode' => $pay_mode,
+            'pay_card_date' => $pay_card_date,
             'show_menu' => $show_menu,
             'show_menu_refunded' => $show_menu_refunded,
         ));
