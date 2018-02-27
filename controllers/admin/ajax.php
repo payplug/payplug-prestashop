@@ -127,7 +127,8 @@ if (Tools::getValue('_ajax') == 1) {
             'ID Client' => (int)Tools::getValue('id_customer'),
             'reason' => 'Refunded with Prestashop'
         );
-        $refund = $payplug->makeRefund($pay_id, $amount, $metadata);
+        $pay_mode = Tools::getValue('pay_mode');
+        $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode);
         if ($refund == 'error') {
             die(json_encode(array(
                 'status' => 'error',

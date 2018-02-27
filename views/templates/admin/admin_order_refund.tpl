@@ -30,6 +30,7 @@
     <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_customer" value="{$order->id_customer|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
+    <input type="hidden" name="pay_mode" value="{$pay_mode|escape:'htmlall':'UTF-8'}" />
     <div class="pp_list">
         {include file='./admin_order_refund_data.tpl' amount_refunded_payplug=$amount_refunded_payplug amount_available=$amount_available}
     </div>

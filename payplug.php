@@ -2555,15 +2555,20 @@ class Payplug extends PaymentModule
      * @param string $pay_id
      * @param int $amount
      * @param string $metadata
+     * @param string $pay_mode
      * @return string
      */
-    public function makeRefund($pay_id, $amount, $metadata)
+    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE')
     {
         $data = array(
             'amount' => $amount,
             'metadata' => $metadata
         );
-        $refund = '';
+        if ($pay_mode == 'TEST') {
+            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+        } else {
+            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+        }
         try {
             $refund = \Payplug\Refund::create($pay_id, $data);
         } catch (Exception $e) {
@@ -3031,7 +3036,8 @@ class Payplug extends PaymentModule
                     'ID Client' => (int)Tools::getValue('id_customer'),
                     'reason' => 'Refunded with Prestashop'
                 );
-                $refund = $this->makeRefund($pay_id, $amount, $metadata);
+                $pay_mode = Tools::getValue('pay_mode');
+                $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode);
                 if ($refund == 'error') {
                     die(json_encode(array(
                         'status' => 'error',
