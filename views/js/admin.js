@@ -244,7 +244,10 @@ function login()
             $('.panel-login .loader').hide();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error LOGIN');
+            alert('An error occurred while trying to login. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -303,7 +306,10 @@ function debug(status)
             db : status,
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error DEBUG');
+            alert('An error occurred while trying to switch debug mode. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -384,7 +390,10 @@ function callPopin(type, args){
             dataType: 'json',
             data: data,
             error: function(jqXHR, textStatus, errorThrown) {
-                alert('error CALLPOPIN');
+                alert('An error occurred while trying to open the popin. ' +
+                    'Maybe you clicked too fast before scripts are fully loaded ' +
+                    'or maybe you have a different back-office url thant expected.' +
+                    'You will find more explanation in JS console.');
                 console.log(jqXHR);
                 console.log(textStatus);
                 console.log(errorThrown);
@@ -427,7 +436,10 @@ function submitPopin(input){
         dataType: 'json',
         data: data,
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error SUBMITPOPIN');
+            alert('An error occurred while trying to submit your settings. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -461,7 +473,10 @@ function callFieldset()
             $('.checkFieldset .loader').hide();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CALLFIELDSET');
+            alert('An error occurred while trying to refresh indicators. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -487,7 +502,10 @@ function checkPremium(go_live)
         dataType: 'json',
         data: data,
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CHECK PREMIUM');
+            alert('An error occurred while trying to checking your premium status. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
