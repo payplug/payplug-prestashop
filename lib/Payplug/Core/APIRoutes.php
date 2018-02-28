@@ -58,17 +58,8 @@ class APIRoutes
 
 //APIRoutes::$API_BASE_URL = 'https://api.payplug.com';
 
-switch(_PAYPLUG_API_MODE_)
-{
-    case 'local':
-        APIRoutes::$API_BASE_URL = 'http://localhost:8080';
-        break;
-    case 'dev':
-        APIRoutes::$API_BASE_URL = 'https://api-dev.payplug.com';
-        break;
-    case 'prod':
-        APIRoutes::$API_BASE_URL = 'https://api.payplug.com';
-        break;
-    default:
-        break;
+if (isset($_SERVER['PAYPLUG_API_URL'])) {
+    APIRoutes::$API_BASE_URL = $_SERVER['PAYPLUG_API_URL'];
+} else {
+    APIRoutes::$API_BASE_URL = 'https://api.payplug.com';
 }

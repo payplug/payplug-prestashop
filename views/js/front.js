@@ -1,5 +1,5 @@
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *

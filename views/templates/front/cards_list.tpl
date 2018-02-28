@@ -1,5 +1,5 @@
 {*
-* 2017 PayPlug
+* 2018 PayPlug
 *
 * NOTICE OF LICENSE
 *
