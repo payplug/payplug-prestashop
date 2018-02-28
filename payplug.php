@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -28,13 +28,6 @@ use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 if (!defined('_PS_VERSION_')) {
     exit;
-}
-
-
-if (!defined('_PAYPLUG_API_MODE_')) {
-    //define('_PAYPLUG_API_MODE_', 'local');
-    define('_PAYPLUG_API_MODE_', 'dev');
-    //define('_PAYPLUG_API_MODE_', 'prod');
 }
 
 include_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
@@ -167,21 +160,16 @@ class Payplug extends PaymentModule
         $this->payplug_url = '';
         $this->premium_url = array();
 
-        switch (_PAYPLUG_API_MODE_) {
-            case 'local':
-                $this->api_url = 'http://localhost:8080';
-                $this->payplug_url = 'http://www.local.payplug.com:9999';
-                break;
-            case 'dev':
-                $this->api_url = 'https://api-dev.payplug.com';
-                $this->payplug_url = 'https://www-dev.payplug.com';
-                break;
-            case 'prod':
-                $this->api_url = 'https://api.payplug.com';
-                $this->payplug_url = 'https://www.payplug.com';
-                break;
-            default:
-                break;
+        if (isset($_SERVER['PAYPLUG_API_URL'])) {
+            $this->api_url = $_SERVER['PAYPLUG_API_URL'];
+        } else {
+            $this->api_url = 'https://api.payplug.com';
+        }
+
+        if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
+            $this->payplug_url = $_SERVER['PAYPLUG_SITE_URL'];
+        } else {
+            $this->payplug_url = 'https://www.payplug.com';
         }
     }
 
