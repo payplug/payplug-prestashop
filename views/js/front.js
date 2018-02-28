@@ -67,7 +67,7 @@ $(document).ready(function() {
     });
 
     $('input[name=payplug_card]').bind('change', function(e){
-        id_card = $('input[name=payplug_card]:checked').val()
+        var id_card = $('input[name=payplug_card]:checked').val()
         $('input:hidden[name=pc]').val(id_card);
     });
 });
