@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2017 PayPlug SAS
+*  @copyright 2018 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -74,7 +74,8 @@
                 <div class="block-right ppemail">
                     <input class="validate validate_email" type="text" placeholder="{l s='E-mail address' mod='payplug'}" name="PAYPLUG_EMAIL" value="{if isset($PAYPLUG_EMAIL)}{$PAYPLUG_EMAIL|escape:'htmlall':'UTF-8'}{/if}" />
                     {*<input class="validate validate_email" type="text" placeholder="{l s='E-mail address' d='Modules.Payplug.Admin'}" name="PAYPLUG_EMAIL" value="{if isset($PAYPLUG_EMAIL)}{$PAYPLUG_EMAIL|escape:'htmlall':'UTF-8'}{/if}" />*}
-                                <span class="input-error">{$p_error|escape:'htmlall':'UTF-8'}
+                                <span class="input-error">
+                                    <span class="error-email-input">{$p_error|escape:'htmlall':'UTF-8'}</span>
                                     <span id="error-email-regexp" class="hide">{l s='E-mail address is not valid.' mod='payplug'}</span>
                                     {*<span id="error-email-regexp" class="hide">{l s='E-mail address is not valid.' d='Modules.Payplug.Admin'}</span>*}
                                 </span>
@@ -86,7 +87,8 @@
                 <div class="block-right pppassword">
                     <input class="validate validate_password" id="pppwd" type="password" placeholder="{l s='Password' mod='payplug'}" name="PAYPLUG_PASSWORD" value="" />
                     {*<input class="validate validate_password" id="pppwd" type="password" placeholder="{l s='Password' d='Modules.Payplug.Admin'}" name="PAYPLUG_PASSWORD" value="" />*}
-                                <span class="input-error">{$p_error|escape:'htmlall':'UTF-8'}
+                                <span class="input-error">
+                                    <span class="error-password-input">{$p_error|escape:'htmlall':'UTF-8'}</span>
                                     <span id="error-password-regexp" class="hide">{l s='Password must be a least 8 caracters long.' mod='payplug'}</span>
                                     {*<span id="error-password-regexp" class="hide">{l s='Password must be a least 8 caracters long.' d='Modules.Payplug.Admin'}</span>*}
                                 </span>

@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2017 PayPlug SAS
+*  @copyright 2018 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -32,7 +32,7 @@
             <p class="ppwarning">{$warning|escape:'quotes':'UTF-8'}</p>
         {/foreach}
     {/if}
-    <p>{l s='Version of PayPlug module:' mod='payplug'} {$pp_version}</p>
+    <p>{l s='Version of PayPlug module:' mod='payplug'} {$pp_version|escape:'htmlall':'UTF-8'}</p>
     {if isset($check_configuration.success) && !empty($check_configuration.success) && sizeof($check_configuration.success)}
         {foreach from = $check_configuration.success item = success}
             <p class="ppsuccess">{$success|escape:'htmlall':'UTF-8'}</p>
