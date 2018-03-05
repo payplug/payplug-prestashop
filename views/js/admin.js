@@ -48,6 +48,8 @@ function validate_isPasswd(s)
 
 function validate_field()
 {
+    $('.error-email-input').addClass('hide');
+    $('.error-password-input').addClass('hide');
     var result = false;
     var flag = true;
     $('#p_error').remove();
