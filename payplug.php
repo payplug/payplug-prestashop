@@ -810,7 +810,7 @@ class Payplug extends PaymentModule
             array(
                 'Authorization: Bearer '.$api_key,
                 'Content-Type:application/json',
-                'Content-Length: '.strlen($data_string)
+                'Content-Length: '.Tools::strlen($data_string)
             )
         );
         curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'PATCH');
@@ -1585,7 +1585,7 @@ class Payplug extends PaymentModule
             foreach ($currencies_module as $currency_module) {
                 if ($currency_order->id == $currency_module['id_currency']) {
                     $supported_currencies = $this->getSupportedCurrencies();
-                    if (in_array(strtoupper($currency_module['iso_code']), $supported_currencies)) {
+                    if (in_array(Tools::strtoupper($currency_module['iso_code']), $supported_currencies)) {
                         return true;
                     }
                 }
@@ -1650,7 +1650,7 @@ class Payplug extends PaymentModule
         foreach (explode(';', Configuration::get('PAYPLUG_MIN_AMOUNTS')) as $amount_cur) {
             $cur = array();
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $currencies[] = strtoupper($cur[1]);
+            $currencies[] = Tools::strtoupper($cur[1]);
         }
 
         return $currencies;
@@ -1668,7 +1668,7 @@ class Payplug extends PaymentModule
         $iso_code_list = array();
         if (($handle = fopen($country_list_path, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $iso_code_list[] = strtoupper($data[0]);
+                $iso_code_list[] = Tools::strtoupper($data[0]);
             }
             fclose($handle);
             return $iso_code_list;
@@ -1696,10 +1696,10 @@ class Payplug extends PaymentModule
         if (!Validate::isLoadedObject($country)) {
             return null;
         }
-        if (!in_array(strtoupper($country->iso_code), $iso_code_list)) {
+        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list)) {
             return null;
         } else {
-            return strtoupper($country->iso_code);
+            return Tools::strtoupper($country->iso_code);
         }
     }
 
@@ -1742,7 +1742,7 @@ class Payplug extends PaymentModule
         $amount = $cart->getOrderTotal(true, Cart::BOTH);
 
         //$amount = round($amount, 2) * 100;
-        $amount = intval(round(($amount * 100), PHP_ROUND_HALF_UP));
+        $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
         $current_amounts = Payplug::getAmountsByCurrency($currency);
         $current_min_amount = $current_amounts['min_amount'];
         $current_max_amount = $current_amounts['max_amount'];

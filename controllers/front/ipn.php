@@ -423,6 +423,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $order_id = Order::getOrderByCartId($cart->id);
                                         $order = new Order($order_id);
                                         $api_key = Payplug::setAPIKey();
+                                        $data = array();
                                         $data['metadata'] = $payment->metadata;
                                         $data['metadata']['Order'] = $order_id;
                                         try {
