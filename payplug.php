@@ -2550,7 +2550,7 @@ class Payplug extends PaymentModule
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE')
     {
         $data = array(
-            'amount' => $amount,
+            'amount' => (int)$amount,
             'metadata' => $metadata
         );
         if ($pay_mode == 'TEST') {
