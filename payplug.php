@@ -2039,9 +2039,10 @@ class Payplug extends PaymentModule
      * Get collection of cards
      *
      * @param int $id_customer
+     * @param bool $active_only
      * @return array OR bool
      */
-    public function getCardsByCustomer($id_customer)
+    public function getCardsByCustomer($id_customer, $active_only = false)
     {
         $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
@@ -2057,16 +2058,20 @@ class Payplug extends PaymentModule
         if (!$res_payplug_card) {
             return false;
         } else {
-            foreach ($res_payplug_card as &$card) {
-                if ((int)$card['exp_year'] < (int)date('Y')
-                    || ((int)$card['exp_year'] == (int)date('Y') && (int)$card['exp_month'] < (int)date('m'))) {
-                    $card['expired'] = true;
+            foreach ($res_payplug_card as $key => &$value) {
+                if ((int)$value['exp_year'] < (int)date('Y')
+                    || ((int)$value['exp_year'] == (int)date('Y') && (int)$value['exp_month'] < (int)date('m'))) {
+                    $value['expired'] = true;
+                    if ($active_only) {
+                        unset($res_payplug_card[$key]);
+                        continue;
+                    }
                 } else {
-                    $card['expired'] = false;
+                    $value['expired'] = false;
                 }
-                $card['expiry_date'] = date(
+                $value['expiry_date'] = date(
                     'm / y',
-                    mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
+                    mktime(0, 0, 0, (int)$value['exp_month'], 1, (int)$value['exp_year'])
                 );
             }
             return $res_payplug_card;
@@ -2094,7 +2099,7 @@ class Payplug extends PaymentModule
 
         $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
         $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
-        $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer);
+        $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
         if ($one_click == 1 && !empty($payplug_cards)) {
             if ($embedded_mode == 1) {
                 $payment_options = $this->getEmbeddedOneClickPaymentOption(
