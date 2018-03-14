@@ -1,5 +1,5 @@
 {*
-* 2017 PayPlug
+* 2018 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2017 PayPlug SAS
+*  @copyright 2018 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -49,14 +49,12 @@
                     {*<li>{l s='Web interface to manage and export transaction history' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Funds available on your bank account within 2 to 5 business days' mod='payplug'}</li>
                     {*<li>{l s='Funds available on your bank account within 2 to 5 business days' d='Modules.Payplug.Admin'}</li>*}
-                    <li>{l s='Our fees adapt to your volume : sell more, pay less. No fees for wire transfer and refunds' mod='payplug'}</li>
-                    {*<li>{l s='Our fees adapt to your volume : sell more, pay less. No fees for wire transfer and refunds' d='Modules.Payplug.Admin'}</li>*}
                 </ul>
             </div>
         </div>
 
         <div class="panel checkFieldset">
-            {include file='./fieldset.tpl' admin_ajax_url=$admin_ajax_url check_configuration=$check_configuration}
+            {include file='./fieldset.tpl' admin_ajax_url=$admin_ajax_url check_configuration=$check_configuration pp_version=$pp_version}
         </div>
 
         <p class="interpanel">{l s='For more information about installing and configuring the plugin, please consult' mod='payplug'} <a href="http://support.payplug.com/customer/portal/articles/2591965" target="_blank">{l s='this support article' mod='payplug'}</a>.</p>

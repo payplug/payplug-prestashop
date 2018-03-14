@@ -1,5 +1,5 @@
 {*
-* 2017 PayPlug
+* 2018 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2017 PayPlug SAS
+*  @copyright 2018 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -30,6 +30,7 @@
     <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_customer" value="{$order->id_customer|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
+    <input type="hidden" name="pay_mode" value="{$pay_mode|escape:'htmlall':'UTF-8'}" />
     <div class="pp_list">
         {include file='./admin_order_refund_data.tpl' amount_refunded_payplug=$amount_refunded_payplug amount_available=$amount_available}
     </div>

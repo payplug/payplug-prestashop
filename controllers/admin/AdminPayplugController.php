@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2017 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -130,6 +130,7 @@ class AdminPayplugController extends ModuleAdminController
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $payplug->check_configuration,
+            'pp_version' => $payplug->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,

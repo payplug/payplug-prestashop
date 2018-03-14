@@ -1,5 +1,5 @@
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2016 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -39,9 +39,10 @@ function callRefund() {
     var pay_id = $('input:hidden[name=pay_id]').val();
     var id_order = $('input:hidden[name=id_order]').val();
     var id_state = $('#pppanel input[name=change_order_state]').val();
-    var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, id_order: id_order};
+    var pay_mode = $('input:hidden[name=pay_mode]').val();
+    var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, id_order: id_order, pay_mode: pay_mode};
     if($('#pppanel input[name=change_order_state]').is(":checked")){
-        var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, id_order: id_order, id_state: id_state};
+        var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, id_order: id_order, pay_mode: pay_mode, id_state: id_state};
     }
 
     $.ajax({
@@ -56,7 +57,10 @@ function callRefund() {
             $('#pppanel .loader').hide();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CALL REFUND');
+            alert('An error occurred while trying to refund. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);

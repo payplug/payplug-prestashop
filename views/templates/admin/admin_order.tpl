@@ -1,5 +1,5 @@
 {*
-* 2017 PayPlug
+* 2018 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2017 PayPlug SAS
+*  @copyright 2018 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -29,7 +29,7 @@
         <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
         {*<i class="icon-money"></i> {l s='Payplug payment details' d='Modules.Payplug.Admin'}*}
     </div>
-    <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="74" height="22" />
+    <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
 
     <ul>
         <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
@@ -46,6 +46,7 @@
         {*<li><span class="ppbold">{l s='Card mask' d='Modules.Payplug.Admin'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>*}
         <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
         {*<li><span class="ppbold">{l s='3-D Secure' d='Modules.Payplug.Admin'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>*}
+        <li><span class="ppbold">{l s='Expiry Date' mod='payplug'} : </span>{$pay_card_date|escape:'htmlall':'UTF-8'}</li>
         <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
         {*<li><span class="ppbold">{l s='Mode' d='Modules.Payplug.Admin'} : </span>*}
             <span class="ppred">

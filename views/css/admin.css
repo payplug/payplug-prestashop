@@ -1,5 +1,5 @@
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2017 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -30,7 +30,7 @@
 }
 
 .separate_pipe {
-	color: #8fb32a;
+	color: #00c29a;
 	margin: 0 0.5em;
 }
 
@@ -126,8 +126,8 @@
 	-webkit-transition: all 0.3s ease-out;
 	-o-transition: all 0.3s ease-out;
 	transition: all 0.3s ease-out;
-	background-color: #8fb32a;
-	border-color: #8fb32a;
+	background-color: #00c29a;
+	border-color: #00c29a;
 }
 
 #payplug_admin_form .prestashop-switch {
@@ -168,7 +168,7 @@ label.switch-label {
 }
 
 #payplug_admin_form a{
-	color: #8fb32a;
+	color: #00c29a;
 }
 
 #payplug_admin_form .hide {
@@ -181,7 +181,7 @@ label.switch-label {
 }
 
 #payplug_admin_form .panel-row > img{
-    margin: -0.2em 0 0 -0.4em;
+    /*margin: -0.2em 0 0 -0.4em;*/
 }
 
 #payplug_admin_form .panel-row > label{
@@ -292,7 +292,7 @@ label.switch-label {
 }
 
 #payplug_admin_form legend {
-	color: #8fb32a;
+	color: #00c29a;
 	background: none;
 	border: none;
 	font-weight: 700;
@@ -310,27 +310,24 @@ label.switch-label {
 }
 
 #payplug_admin_form .ppwarning{
-	color: #000000;
-	background: url("../img/admin/icon-warning.png") no-repeat center left #fff2cc;
-	border-left: solid 3px #fcc94f;
+	background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
+	border-left: solid 3px #f7a000;
 	margin: 0 0 1em 0;
-	background-color: #FFF3D7;
-	border-color: #D2A63C;
-	color: #D2A63C;
+	color: #d2a63c;
 	padding: 0.7em 3em;
 }
 
 #payplug_admin_form .interpanel {
 	max-width: 1010px;
 	margin: 10px auto 20px auto;
-	background: #f7fce8;
-	border-left: 3px solid #accf4a;
-	color: #84a721;
+	background: #ddfce8;
+	border-left: 3px solid #00c29a;
+	color: #000000;
 	padding: 10px 0 10px 20px;
 }
 
 #payplug_admin_form .interpanel a{
-	color: #84a721;
+	color: #00c29a;
 	text-decoration: underline;
 }
 
@@ -338,7 +335,7 @@ label.switch-label {
 #payplug_admin_form .interpanel a:active,
 #payplug_admin_form .interpanel a:visited,
 #payplug_admin_form .interpanel a:focus{
-	color: #84a721;
+	color: #00c29a;
 	text-decoration: none;
 }
 
@@ -346,22 +343,22 @@ label.switch-label {
 #payplug_admin_form .ppsuccess{
 	border: none;
 	/*margin-left: 1.5em;*/
-	padding: 0 0 0 1.5em;
-	line-height: normal;
+	padding: 0 0 0 1.8em;
+	line-height: 1.6em;
 }
 
 #payplug_admin_form .pperror{
-	color: #ff0000;
+	color: #dd2525;
 	background: url("../img/admin/icon-error.png") no-repeat center left;
 }
 
 #payplug_admin_form .ppsuccess{
-	color: #227700;
+	color: #00c29a;
 	background: url("../img/admin/icon-success.png") no-repeat center left;
 }
 
 #payplug_popin p.pperror {
-	color: #ff0000;
+	color: #dd2525;
 	padding: 15px 0 0 0;
 }
 
@@ -392,7 +389,7 @@ label.switch-label {
 #payplug_admin_form #disconnect-button {
 	background: #ffffff none repeat scroll 0 0;
 	border: none;
-	color: #8fb32a;
+	color: #00c29a;
 	text-transform: initial;
 	width: initial;
 	margin: 0;
@@ -420,14 +417,14 @@ label.cb_label b{
 }
 
 #payplug_admin_form input[type="submit"].green-button{
-	background: #8fb32a;
+	background: #00c29a;
 	color: #ffffff;
 	border: none;
 	margin: 15px 0 20px 0;
 }
 
 #payplug_admin_form input[type="submit"].green-button:hover{
-	background: #a7ce39;
+	background: #49a482;
 }
 
 #payplug_admin_form input[type="submit"].ppdisabled,
@@ -464,15 +461,15 @@ p.pptips a {
 }
 
 #payplug_admin_form .form-error input{
-	border-color: #ff0000;
+	border-color: #dd2525;
 }
 
 #payplug_admin_form .form-ok input{
-	border-color: #8fb32a;
+	border-color: #00c29a;
 }
 
 #payplug_admin_form .input-error {
-	color: #ff0000;
+	color: #dd2525;
 	display: block;
 	margin-left: 0.5em;
 	position: absolute;
@@ -497,7 +494,7 @@ p.pptips a {
 }
 
 #payplug_admin_form .ppmailnotvalid {
-	color: #ff0000;
+	color: #dd2525;
 	margin: 0 auto 1em auto;
 	text-align: center;
 	width: 14em;
@@ -513,7 +510,7 @@ p.pptips a {
 }
 
 #payplug_admin_form .ppmail{
-	color: #8fb32a;
+	color: #00c29a;
 	display: block;
 	width: 14em;
 	font-weight: 700;
@@ -526,7 +523,7 @@ p.pptips a {
 }
 
 #payplug_admin_form a.green-button{
-	background: #8fb32a;
+	background: #00c29a;
 	color: #ffffff;
 	border: none;
 	padding: 0.4em 0.5em;
@@ -546,7 +543,7 @@ a.green-button:focus{
 }
 
 #payplug_admin_form  a.green-button:hover{
-	background: #a7ce39;
+	background: #49a482;
 }
 
 #payplug_admin_form .panel-login input[type="submit"].white-button{
@@ -647,7 +644,7 @@ span.ppclose {
 #payplug_popin .green-button {
 	float: right;
 	color: #ffffff;
-	background: #8fb32a none repeat scroll 0 0;
+	background: #00c29a none repeat scroll 0 0;
 	font-weight: 700;
 }
 
@@ -662,7 +659,7 @@ span.ppclose {
 }
 
 #payplug_popin input.green-button:hover{
-	background: #a7ce39;
+	background: #49a482;
 }
 #payplug_popin input.white-button:hover{
 	background: #ccc;
@@ -713,11 +710,11 @@ span.ppclose {
 }
 #payplug_admin_form .panel-show .switch-show {
 	border-radius: 1em;
-	background: #ff0000;
+	background: #dd2525;
 	width: 4em;
 }
 #payplug_admin_form .panel-show .switch-show ~ .switch-input:checked {
-	background: #8fb32a;
+	background: #00c29a;
 }
 
 #payplug_admin_form .panel-show .switch-label {
@@ -793,7 +790,7 @@ span.ppclose {
 }
 
 #payplug_admin_form .panel-show .switch-show.ppon {
-	background: #8fb32a;
+	background: #00c29a;
 }
 
 .ppoverlay {

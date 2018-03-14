@@ -1,5 +1,5 @@
 /**
- * 2013 - 2016 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2016 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -48,6 +48,8 @@ function validate_isPasswd(s)
 
 function validate_field()
 {
+    $('.error-email-input').addClass('hide');
+    $('.error-password-input').addClass('hide');
     var result = false;
     var flag = true;
     $('#p_error').remove();
@@ -137,7 +139,7 @@ function admin_start()
         if($(this).attr('checked') == true || $(this).attr('checked') == 'checked'){
             $(this).parent().removeClass('ppon');
             $(this).siblings('.switch-selection').css('left', '31px');
-            $('.switch-show').css('background-color', '#8fb32a');
+            $('.switch-show').css('background-color', '#00c29a');
             $(this).attr('checked', false);
             callPopin('desactivate');
         }
@@ -244,7 +246,10 @@ function login()
             $('.panel-login .loader').hide();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error LOGIN');
+            alert('An error occurred while trying to login. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -303,7 +308,10 @@ function debug(status)
             db : status,
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error DEBUG');
+            alert('An error occurred while trying to switch debug mode. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -346,7 +354,7 @@ function callPopin(type, args){
     else if(type == 'confirm_ok_activate')
     {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '31px');
-        $('.switch-show').css('background-color', '#8fb32a');
+        $('.switch-show').css('background-color', '#00c29a');
         //$('#payplug_show_on').siblings('.slide-button').css('left', '31px');
         $('#payplug_show_on').attr('checked', true);
         $(this).parent().addClass('ppon');
@@ -361,7 +369,7 @@ function callPopin(type, args){
     else if(type == 'confirm_ok_desactivate')
     {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '2px');
-        $('.switch-show').css('background-color', '#ff0000');
+        $('.switch-show').css('background-color', '#dd2525');
         $('#payplug_show_on').attr('checked', false);
         activate(0);
         $('#payplug_popin').remove();
@@ -384,7 +392,10 @@ function callPopin(type, args){
             dataType: 'json',
             data: data,
             error: function(jqXHR, textStatus, errorThrown) {
-                alert('error CALLPOPIN');
+                alert('An error occurred while trying to open the popin. ' +
+                    'Maybe you clicked too fast before scripts are fully loaded ' +
+                    'or maybe you have a different back-office url thant expected.' +
+                    'You will find more explanation in JS console.');
                 console.log(jqXHR);
                 console.log(textStatus);
                 console.log(errorThrown);
@@ -427,7 +438,10 @@ function submitPopin(input){
         dataType: 'json',
         data: data,
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error SUBMITPOPIN');
+            alert('An error occurred while trying to submit your settings. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -461,7 +475,10 @@ function callFieldset()
             $('.checkFieldset .loader').hide();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CALLFIELDSET');
+            alert('An error occurred while trying to refresh indicators. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
@@ -487,7 +504,10 @@ function checkPremium(go_live)
         dataType: 'json',
         data: data,
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CHECK PREMIUM');
+            alert('An error occurred while trying to checking your premium status. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url thant expected.' +
+                'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);

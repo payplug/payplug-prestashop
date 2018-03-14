@@ -1,5 +1,5 @@
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2017 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -145,7 +145,7 @@ label[for=payplug_card_new] {
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	background: #8fb32a none repeat scroll 0 0;
+	background: #00c29a none repeat scroll 0 0;
 	border-radius: 0.25em;
 	color: #ffffff;
 	font-weight: 700;
@@ -157,7 +157,7 @@ label[for=payplug_card_new] {
 	border: none;
 }
 .ppsubmit:hover {
-	background: #a7ce39 none repeat scroll 0 0;
+	background: #49a482 none repeat scroll 0 0;
 }
 .ppsubmit.disable{
 	background: #dddddd none repeat scroll 0 0;
@@ -189,7 +189,7 @@ label[for=payplug_card_new] {
 	.card-wrapper,
 	.info-wrapper {
 		font-size: 14px;
-	}s
+	}
 	.ppsubmit {
 		position: relative;
 		display: block;
@@ -232,7 +232,7 @@ label[for=payplug_card_new] {
 }
 
 .ppsuccess{
-	color: #8fb32a;
+	color: #00c29a;
 }
 
 p.ppwait{
@@ -242,7 +242,7 @@ p.ppwait{
 }
 
 .ppfail{
-	color: #ff0000;
+	color: #dd2525;
 }
 
 div.ppoverlay {

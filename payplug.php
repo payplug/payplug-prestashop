@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2017 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -28,13 +28,6 @@ use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 if (!defined('_PS_VERSION_')) {
     exit;
-}
-
-
-if (!defined('_PAYPLUG_API_MODE_')) {
-    //define('_PAYPLUG_API_MODE_', 'local');
-    define('_PAYPLUG_API_MODE_', 'dev');
-    //define('_PAYPLUG_API_MODE_', 'prod');
 }
 
 include_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
@@ -104,7 +97,7 @@ class Payplug extends PaymentModule
 
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.0';
+        $this->version = '2.6.0';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
@@ -167,21 +160,16 @@ class Payplug extends PaymentModule
         $this->payplug_url = '';
         $this->premium_url = array();
 
-        switch (_PAYPLUG_API_MODE_) {
-            case 'local':
-                $this->api_url = 'http://localhost:8080';
-                $this->payplug_url = 'http://www.local.payplug.com:9999';
-                break;
-            case 'dev':
-                $this->api_url = 'https://api-dev.payplug.com';
-                $this->payplug_url = 'https://www-dev.payplug.com';
-                break;
-            case 'prod':
-                $this->api_url = 'https://api.payplug.com';
-                $this->payplug_url = 'https://www.payplug.com';
-                break;
-            default:
-                break;
+        if (isset($_SERVER['PAYPLUG_API_URL'])) {
+            $this->api_url = $_SERVER['PAYPLUG_API_URL'];
+        } else {
+            $this->api_url = 'https://api.payplug.com';
+        }
+
+        if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
+            $this->payplug_url = $_SERVER['PAYPLUG_SITE_URL'];
+        } else {
+            $this->payplug_url = 'https://www.payplug.com';
         }
     }
 
@@ -342,7 +330,7 @@ class Payplug extends PaymentModule
             !Configuration::updateValue('PAYPLUG_EMAIL', null) ||
             !Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 0) ||
             !Configuration::updateValue('PAYPLUG_ONE_CLICK', null) ||
-            !Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0) ||
+            !Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1) ||
             !Configuration::updateValue('PAYPLUG_KEEP_CARDS', 0)
         ) {
             $log->error('Installation failed: configurations failed.');
@@ -803,6 +791,66 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Send cURL request to PayPlug to patch a given payment
+     *
+     * @param String $api_key
+     * @param String $pay_id
+     * @param Array $data
+     * @return Array
+     */
+    public function patchPayment($api_key, $pay_id, $data)
+    {
+        $data_string = json_encode($data);
+        $url = $this->api_url.$this->routes['patch'].$pay_id;
+        $curl_version = curl_version();
+        $process = curl_init($url);
+        curl_setopt(
+            $process,
+            CURLOPT_HTTPHEADER,
+            array(
+                'Authorization: Bearer '.$api_key,
+                'Content-Type:application/json',
+                'Content-Length: '.Tools::strlen($data_string)
+            )
+        );
+        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($process, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($process, CURLINFO_HEADER_OUT, true);
+        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
+        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
+        curl_setopt(
+            $process,
+            CURLOPT_SSL_VERIFYHOST,
+            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
+        );
+        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__).'/cacert.pem'));
+        $answer = curl_exec($process);
+        $error_curl = curl_errno($process);
+        curl_close($process);
+
+        $result = array(
+            'status' => false,
+            'message' => null,
+        );
+
+        if ($error_curl == 0) {
+            $json_answer = json_decode($answer);
+
+            if (isset($json_answer->object) && $json_answer->object == 'error') {
+                $result['status'] = false;
+                $result['message'] = $json_answer->message;
+            } else {
+                $result['status'] = true;
+            }
+        } else {
+            $result['status'] = false;
+            $result['message'] = $this->l('Error while executing cURL request.');
+        }
+        return $result;
+    }
+    
+    /**
      * login to Payplug API
      *
      * @param string $email
@@ -1096,6 +1144,7 @@ class Payplug extends PaymentModule
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
+            'pp_version' => $this->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,
@@ -1163,6 +1212,7 @@ class Payplug extends PaymentModule
         $this->context->smarty->assign(array(
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
+            'pp_version' => $this->version,
         ));
         $this->html = $this->fetchTemplateRC('/views/templates/admin/fieldset.tpl');
 
@@ -1535,7 +1585,7 @@ class Payplug extends PaymentModule
             foreach ($currencies_module as $currency_module) {
                 if ($currency_order->id == $currency_module['id_currency']) {
                     $supported_currencies = $this->getSupportedCurrencies();
-                    if (in_array(strtoupper($currency_module['iso_code']), $supported_currencies)) {
+                    if (in_array(Tools::strtoupper($currency_module['iso_code']), $supported_currencies)) {
                         return true;
                     }
                 }
@@ -1600,10 +1650,57 @@ class Payplug extends PaymentModule
         foreach (explode(';', Configuration::get('PAYPLUG_MIN_AMOUNTS')) as $amount_cur) {
             $cur = array();
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $currencies[] = strtoupper($cur[1]);
+            $currencies[] = Tools::strtoupper($cur[1]);
         }
 
         return $currencies;
+    }
+
+    /**
+    * Get all country iso-code of ISO 3166-1 alpha-2 norm
+    * Source: DB PayPlug
+    *
+    * @return array | null
+    */
+    public function getIsoCodeList()
+    {
+        $country_list_path = _PS_MODULE_DIR_.'payplug/lib/iso_3166-1_alpha-2/data.csv';
+        $iso_code_list = array();
+        if (($handle = fopen($country_list_path, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                $iso_code_list[] = Tools::strtoupper($data[0]);
+            }
+            fclose($handle);
+            return $iso_code_list;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm
+    *
+    * @param int $country_id
+    * @return int | null
+    */
+    public function getIsoCodeByCountryId($country_id)
+    {
+        $iso_code_list = $this->getIsoCodeList();
+        if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
+            return null;
+        }
+        if (!Validate::isInt($country_id)) {
+            return null;
+        }
+        $country = new Country((int)$country_id);
+        if (!Validate::isLoadedObject($country)) {
+            return null;
+        }
+        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list)) {
+            return null;
+        } else {
+            return Tools::strtoupper($country->iso_code);
+        }
     }
 
     /**
@@ -1644,7 +1741,8 @@ class Payplug extends PaymentModule
         //amount
         $amount = $cart->getOrderTotal(true, Cart::BOTH);
 
-        $amount = round($amount, 2) * 100;
+        //$amount = round($amount, 2) * 100;
+        $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
         $current_amounts = Payplug::getAmountsByCurrency($currency);
         $current_min_amount = $current_amounts['min_amount'];
         $current_max_amount = $current_amounts['max_amount'];
@@ -1695,7 +1793,7 @@ class Payplug extends PaymentModule
         //save card
         //$save_card = false;
         $allow_save_card = false;
-        if ($one_click == 1) {
+        if ($one_click == 1 && Cart::isGuestCartByCartId($cart->id) != 1) {
             //$save_card = true;
             $allow_save_card = true;
         }
@@ -1941,9 +2039,10 @@ class Payplug extends PaymentModule
      * Get collection of cards
      *
      * @param int $id_customer
+     * @param bool $active_only
      * @return array OR bool
      */
-    public function getCardsByCustomer($id_customer)
+    public function getCardsByCustomer($id_customer, $active_only = false)
     {
         $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
@@ -1959,16 +2058,20 @@ class Payplug extends PaymentModule
         if (!$res_payplug_card) {
             return false;
         } else {
-            foreach ($res_payplug_card as &$card) {
-                if ((int)$card['exp_year'] < (int)date('Y')
-                    || ((int)$card['exp_year'] == (int)date('Y') && (int)$card['exp_month'] < (int)date('m'))) {
-                    $card['expired'] = true;
+            foreach ($res_payplug_card as $key => &$value) {
+                if ((int)$value['exp_year'] < (int)date('Y')
+                    || ((int)$value['exp_year'] == (int)date('Y') && (int)$value['exp_month'] < (int)date('m'))) {
+                    $value['expired'] = true;
+                    if ($active_only) {
+                        unset($res_payplug_card[$key]);
+                        continue;
+                    }
                 } else {
-                    $card['expired'] = false;
+                    $value['expired'] = false;
                 }
-                $card['expiry_date'] = date(
+                $value['expiry_date'] = date(
                     'm / y',
-                    mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
+                    mktime(0, 0, 0, (int)$value['exp_month'], 1, (int)$value['exp_year'])
                 );
             }
             return $res_payplug_card;
@@ -1996,7 +2099,7 @@ class Payplug extends PaymentModule
 
         $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
         $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
-        $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer);
+        $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
         if ($one_click == 1 && !empty($payplug_cards)) {
             if ($embedded_mode == 1) {
                 $payment_options = $this->getEmbeddedOneClickPaymentOption(
@@ -2446,15 +2549,20 @@ class Payplug extends PaymentModule
      * @param string $pay_id
      * @param int $amount
      * @param string $metadata
+     * @param string $pay_mode
      * @return string
      */
-    public function makeRefund($pay_id, $amount, $metadata)
+    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE')
     {
         $data = array(
-            'amount' => $amount,
+            'amount' => (int)$amount,
             'metadata' => $metadata
         );
-        $refund = '';
+        if ($pay_mode == 'TEST') {
+            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+        } else {
+            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+        }
         try {
             $refund = \Payplug\Refund::create($pay_id, $data);
         } catch (Exception $e) {
@@ -2592,8 +2700,6 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $pay_id = '';
-
         $payments = $order->getOrderPaymentCollection();
         if (count($payments) > 1 || !isset($payments[0])) {
             return false;
@@ -2602,7 +2708,19 @@ class Payplug extends PaymentModule
         }
 
         if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-            return false;
+            if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
+                \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    return false;
+                }
+            } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
+                \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    return false;
+                }
+            }
         }
 
         $amount_refunded_presta = $this->getTotalRefunded($order->id);
@@ -2662,16 +2780,38 @@ class Payplug extends PaymentModule
         }
 
         $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
+        if ((int)$payment->is_refunded == 1) {
+            $pay_status = $this->l('REFUNDED');
+        } elseif ((int)$payment->amount_refunded > 0) {
+            $pay_status = $this->l('PARTIALLY REFUNDED');
+        }
         //$pay_status = (int)$payment->is_paid == 1 ? $this->trans('PAID', array(), 'Modules.Payplug.Admin') : $this->trans('NOT PAID', array(), 'Modules.Payplug');
         $pay_amount = (int)$payment->amount / 100;
         $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
-        $pay_brand = ($payment->card->brand != '' ? $payment->card->brand : $this->l('Card')).' ('.$payment->card->country.')';
+        if ($payment->card->brand != '') {
+            $pay_brand = $payment->card->brand;
+        } else {
+            $pay_brand = $this->l('Unavailable in test mode');
+        }
+        if ($payment->card->country != '') {
+            $pay_brand .= ' '.$this->l('Card').' ('.$payment->card->country.')';
+        }
         //$pay_brand = ($payment->card->brand != '' ? $payment->card->brand : $this->trans('Card', array(), 'Modules.Payplug.Admin')).' ('.$payment->card->country.')';
-        $pay_card_mask = '**** **** **** '.$payment->card->last4;
+        if ($payment->card->last4 != '') {
+            $pay_card_mask = '**** **** **** '.$payment->card->last4;
+        } else {
+            $pay_card_mask = $this->l('Unavailable in test mode');
+        }
         $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
         //$pay_tds = $payment->is_3ds ? $this->trans('YES', array(), 'Modules.Payplug.Admin') : $this->trans('NO', array(), 'Modules.Payplug.Admin');
         $pay_mode = $payment->is_live ? $this->l('LIVE') : $this->l('TEST');
         //$pay_mode = $payment->is_live ? $this->trans('LIVE', array(), 'Modules.Payplug.Admin') : $this->trans('TEST', array(), 'Modules.Payplug.Admin');
+
+        if ($payment->card->exp_month === null) {
+            $pay_card_date = $this->l('Unavailable in test mode');
+        } else {
+            $pay_card_date = date('m/y', strtotime('01.'.$payment->card->exp_month.'.'.$payment->card->exp_year));
+        }
 
         $this->context->smarty->assign(array(
             'logo_url' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
@@ -2683,6 +2823,7 @@ class Payplug extends PaymentModule
             'pay_card_mask' => $pay_card_mask,
             'pay_tds' => $pay_tds,
             'pay_mode' => $pay_mode,
+            'pay_card_date' => $pay_card_date,
             'show_menu' => $show_menu,
             'show_menu_refunded' => $show_menu_refunded,
         ));
@@ -2889,7 +3030,8 @@ class Payplug extends PaymentModule
                     'ID Client' => (int)Tools::getValue('id_customer'),
                     'reason' => 'Refunded with Prestashop'
                 );
-                $refund = $this->makeRefund($pay_id, $amount, $metadata);
+                $pay_mode = Tools::getValue('pay_mode');
+                $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode);
                 if ($refund == 'error') {
                     die(json_encode(array(
                         'status' => 'error',

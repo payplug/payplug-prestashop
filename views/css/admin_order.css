@@ -1,5 +1,5 @@
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2017 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -42,7 +42,7 @@
 }
 
 #pppanel input[type="submit"].green-button{
-	background: #8fb32a;
+	background: #00c29a;
 	color: #ffffff;
 	border: none;
 	/*margin: 15px 0 20px 0;*/
@@ -54,7 +54,7 @@
 }
 
 #pppanel input[type="submit"].green-button:hover{
-	background: #a7ce39;
+	background: #49a482;
 }
 
 #pppanel form{
@@ -158,12 +158,12 @@ span.ppclose {
 #payplug_popin .green-button {
 	float: right;
 	color: #ffffff;
-	background: #8fb32a none repeat scroll 0 0;
+	background: #00c29a none repeat scroll 0 0;
 	font-weight: 700;
 }
 
 #payplug_popin input.green-button:hover{
-	background: #a7ce39;
+	background: #49a482;
 }
 #payplug_popin input.white-button:hover{
 	background: #ccc;
@@ -227,7 +227,7 @@ span.ppclose {
 }
 
 #payplug_popin a {
-	color: #8fb32a;
+	color: #00c29a;
 }
 
 #payplug_popin ul {
@@ -247,8 +247,8 @@ span.ppclose {
 }
 
 #pppanel img.logo {
-	width: 74px;
-	height: 22px;
+	width: 79px;
+	height: 28px;
 	margin: 0 0 15px 0;
 }
 
@@ -287,7 +287,7 @@ span.ppclose {
 }
 
 #pppanel .pperror {
-	color: #ff0000;
+	color: #dd2525;
 	padding: 26px 0 0 10px;
 	float: left;
 	margin: 0;
@@ -298,7 +298,7 @@ span.ppclose {
 }
 
 #pppanel .ppsuccess {
-	color: #8fb32a;
+	color: #00c29a;
 	padding: 26px 0 0 10px;
 	float: left;
 	margin: 0;
@@ -322,7 +322,7 @@ span.ppclose {
 }
 
 #pppanel .ppred {
-	color: #b45f06;
+	color: #dd2525;
 }
 
 #pppanel hr {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2017 PayPlug SAS
+ * 2013 - 2018 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2017 PayPlug SAS
+ *  @copyright 2013 - 2018 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -127,7 +127,8 @@ if (Tools::getValue('_ajax') == 1) {
             'ID Client' => (int)Tools::getValue('id_customer'),
             'reason' => 'Refunded with Prestashop'
         );
-        $refund = $payplug->makeRefund($pay_id, $amount, $metadata);
+        $pay_mode = Tools::getValue('pay_mode');
+        $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode);
         if ($refund == 'error') {
             die(json_encode(array(
                 'status' => 'error',
