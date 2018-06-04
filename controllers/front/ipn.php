@@ -114,25 +114,35 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             }
             if ($resource instanceof \Payplug\Resource\Payment) {
 
-                if (!$payment = $this->retrievePayment($resource->id)) {
+                $this->addLog($debug, $log, 'PAYMENT MODE', 'info');
+                $this->addLog($debug, $log, 'Payment ID: '.$resource->id, 'info');
+                $this->addLog($debug, $log, 'Paid (Resource): '.(int)$resource->is_paid, 'info');
+
+                if (!$payment = $payplug->retrievePayment($resource->id)) {
+                    $this->addLog($debug, $log, 'Can\'t retrieve paiement with this API Key.', 'debug');
                     if (PayplugBackward::getConfiguration('PAYPLUG_SANDBOX_MODE') == 1) {
+                        $this->addLog($debug, $log, 'This was test mode.', 'debug');
+                        $this->addLog($debug, $log, 'Trying live mode.', 'debug');
                         \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_LIVE_API_KEY'));
-                        if (!$payment = $this->retrievePayment($resource->id)) {
+                        if (!$payment = $payplug->retrievePayment($resource->id)) {
+                            $this->addLog($debug, $log, 'Can\'t retrieve paiement with LIVE API Key.', 'debug');
                             \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_TEST_API_KEY'));
                             $payment = null;
                         }
                     } elseif (PayplugBackward::getConfiguration('PAYPLUG_SANDBOX_MODE') == 0) {
+                        $this->addLog($debug, $log, 'This was live mode.', 'debug');
+                        $this->addLog($debug, $log, 'Trying test mode.', 'debug');
                         \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_TEST_API_KEY'));
-                        if (!$payment = $this->retrievePayment($resource->id)) {
+                        if (!$payment = $payplug->retrievePayment($resource->id)) {
+                            $this->addLog($debug, $log, 'Can\'t retrieve paiement with the TEST API Key.', 'debug');
                             \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_LIVE_API_KEY'));
                             $payment = null;
                         }
                     }
                 }
 
-                $this->addLog($debug, $log, 'PAYMENT MODE', 'info');
-                $this->addLog($debug, $log, 'Payment ID: '.$payment->id, 'info');
-                $this->addLog($debug, $log, 'Paid: '.(int)$payment->is_paid, 'info');
+                $this->addLog($debug, $log, 'Paid (Payment): '.(int)$payment->is_paid, 'info');
+
                 if (!$payment->is_paid) {
                     $this->addLog($debug, $log, 'The transaction is not paid yet.', 'info');
                     $this->addLog($debug, $log, 'No action will be done.', 'info');
