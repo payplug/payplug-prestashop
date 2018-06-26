@@ -248,7 +248,7 @@ function login()
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to login. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
-                'or maybe you have a different back-office url thant expected.' +
+                'or maybe you have a different back-office url than expected.' +
                 'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
@@ -310,7 +310,7 @@ function debug(status)
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to switch debug mode. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
-                'or maybe you have a different back-office url thant expected.' +
+                'or maybe you have a different back-office url than expected.' +
                 'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
@@ -394,7 +394,7 @@ function callPopin(type, args){
             error: function(jqXHR, textStatus, errorThrown) {
                 alert('An error occurred while trying to open the popin. ' +
                     'Maybe you clicked too fast before scripts are fully loaded ' +
-                    'or maybe you have a different back-office url thant expected.' +
+                    'or maybe you have a different back-office url than expected.' +
                     'You will find more explanation in JS console.');
                 console.log(jqXHR);
                 console.log(textStatus);
@@ -440,7 +440,7 @@ function submitPopin(input){
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to submit your settings. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
-                'or maybe you have a different back-office url thant expected.' +
+                'or maybe you have a different back-office url than expected.' +
                 'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
@@ -477,7 +477,7 @@ function callFieldset()
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to refresh indicators. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
-                'or maybe you have a different back-office url thant expected.' +
+                'or maybe you have a different back-office url than expected.' +
                 'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
@@ -506,7 +506,7 @@ function checkPremium(go_live)
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to checking your premium status. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
-                'or maybe you have a different back-office url thant expected.' +
+                'or maybe you have a different back-office url than expected.' +
                 'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);
