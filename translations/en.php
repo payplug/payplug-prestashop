@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{payplug}prestashop>payplug_8bc3c9271813cb30ad64d959e30ee7e2'] = 'The simplest online payment solution: no setup fees, no fixed fees, and no merchant account required!';
+$_MODULE['<{payplug}prestashop>payplug_68100de5c48889463976e826b5cacf35'] = 'The simple and secure online payment solution for SMEs. No setup fees, no commitment.';
 $_MODULE['<{payplug}prestashop>payplug_40c60d7d0db191b9cd543745f8ae3679'] = 'Are you sure you wish to uninstall this module and delete your settings?';
 $_MODULE['<{payplug}prestashop>payplug_8f12e303595a597d598ba5ba2523a77e'] = 'All the registered cards of your customer will be kept.';
 $_MODULE['<{payplug}prestashop>payplug_2a759ac5a7e57ff007ef009406aec89c'] = 'All the registered cards of your customer will be deleted.';
@@ -32,9 +32,11 @@ $_MODULE['<{payplug}prestashop>payplug_033bd94b1168d7e4f0d644c3c95e35bf'] = 'TES
 $_MODULE['<{payplug}prestashop>payplug_f51396ebc5142204e3d187dd8097b15d'] = 'Incorrect amount to refund';
 $_MODULE['<{payplug}prestashop>payplug_2197bc57f08292482b9ed1e905fb79cb'] = 'Cannot refund that amount.';
 $_MODULE['<{payplug}prestashop>payplug_96fe48f26db5ef9012806cdc0605e74f'] = 'Amount successfully refunded.';
+$_MODULE['<{payplug}prestashop>payplug_018e79acf2129521e285ad211e6b1912'] = 'Order successfully updated.';
 $_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Incorrect amount to refund';
 $_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'Cannot refund that amount.';
 $_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'Amount successfully refunded.';
+$_MODULE['<{payplug}prestashop>ajax_018e79acf2129521e285ad211e6b1912'] = 'Order successfully updated.';
 $_MODULE['<{payplug}prestashop>ipn_070045a43ffc0c954761e803bf7ec0f7'] = 'The amount collected by PayPlug is not the same';
 $_MODULE['<{payplug}prestashop>ipn_baad4f460ebbb7b6080ffce28c800b87'] = ' as the total value of the order';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Amount already refunded with Payplug : ';
@@ -56,6 +58,8 @@ $_MODULE['<{payplug}prestashop>admin_order_c7d4153f748ba1dd21ae002c37c00906'] = 
 $_MODULE['<{payplug}prestashop>admin_order_217c01a08bee4c2fa33d59a6ddc69806'] = '3-D Secure';
 $_MODULE['<{payplug}prestashop>admin_order_5abc7a3ac0ae1545cc801303727f53da'] = 'Expiry Date';
 $_MODULE['<{payplug}prestashop>admin_order_650be61892bf690026089544abbd9d26'] = 'Mode';
+$_MODULE['<{payplug}prestashop>admin_order_update_ee19a5b4e629f12ccab7e31449826748'] = 'Update this order';
+$_MODULE['<{payplug}prestashop>admin_order_update_06933067aafd48425d67bcb01bba5cb6'] = 'Update';
 $_MODULE['<{payplug}prestashop>admin_740819a7dc6b0b1a8a7fa0c871d9b878'] = 'PRESENTATION';
 $_MODULE['<{payplug}prestashop>admin_500f0e02dead20d5160ed144ae2ba846'] = 'The payment solution that increases your sales';
 $_MODULE['<{payplug}prestashop>admin_21316ef9b6abdf52d0dd1ee8ef0549ba'] = 'PayPlug provides merchants all the benefits of a full online payment solution.';

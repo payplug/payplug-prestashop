@@ -110,7 +110,7 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         //$this->displayName = $this->trans('PayPlug – Your payment solution', array(), 'Modules.Payplug.Admin');
 
-        $this->description = $this->l('The simplest online payment solution: no setup fees, no fixed fees, and no merchant account required!');
+        $this->description = $this->l('The simple and secure online payment solution for SMEs. No setup fees, no commitment.');
 
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
@@ -1906,7 +1906,10 @@ class Payplug extends PaymentModule
                 }
             }
             $payment = \Payplug\Payment::create($payment_tab);
-            if ($payment->is_paid == false || ($payment->failure == true && !empty($payment->failure['message']))) {
+            if (
+                ($payment->is_paid == false && $one_click == 1 && $current_card != null && $id_card != 'new_card')
+                || ($payment->failure == true && !empty($payment->failure['message']))
+            ) {
                 $data = array(
                     'result' => false,
                     'response' => $payment->failure['message'],
