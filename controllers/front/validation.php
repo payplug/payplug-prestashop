@@ -104,7 +104,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $this->addLog($debug, $log, 'Retrieving payment...', 'info');
                     if ($payment->failure) {
                         $this->addLog($debug, $log, 'Payment failure : '.$payment->failure->message, 'error');
-                        //Tools::redirect($redirect_url_error);
+                        Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
                 } catch (Exception $e) {
