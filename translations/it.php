@@ -2,6 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
+$_MODULE['<{payplug}prestashop>payplug_68100de5c48889463976e826b5cacf35'] = 'La soluzione di pagamento online semplice e sicura per le piccole e medie imprese. Nessun costo di installazione e nessun vincolo.';
 $_MODULE['<{payplug}prestashop>payplug_40c60d7d0db191b9cd543745f8ae3679'] = 'Sei sicuro di voler disinstallare questo modulo e sopprimere le tue impostazioni?';
 $_MODULE['<{payplug}prestashop>payplug_8f12e303595a597d598ba5ba2523a77e'] = 'Tutte le carte di credito del tuo cliente saranno memorizzate.';
 $_MODULE['<{payplug}prestashop>payplug_2a759ac5a7e57ff007ef009406aec89c'] = 'Tutte le carte di credito del tuo cliente saranno eliminate.';
@@ -31,9 +32,11 @@ $_MODULE['<{payplug}prestashop>payplug_033bd94b1168d7e4f0d644c3c95e35bf'] = 'TES
 $_MODULE['<{payplug}prestashop>payplug_f51396ebc5142204e3d187dd8097b15d'] = 'Importo non corretto da rimborsare.';
 $_MODULE['<{payplug}prestashop>payplug_2197bc57f08292482b9ed1e905fb79cb'] = 'L\'importo non può essere rimborsato.';
 $_MODULE['<{payplug}prestashop>payplug_96fe48f26db5ef9012806cdc0605e74f'] = 'L\'importo é stato rimborsato con successo.';
+$_MODULE['<{payplug}prestashop>payplug_018e79acf2129521e285ad211e6b1912'] = 'Ordine aggiornato correttamente.';
 $_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Importo non corretto da rimborsare.';
 $_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'L\'importo non può essere rimborsato.';
 $_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'L\'importo é stato rimborsato con successo.';
+$_MODULE['<{payplug}prestashop>ajax_018e79acf2129521e285ad211e6b1912'] = 'Ordine aggiornato correttamente.';
 $_MODULE['<{payplug}prestashop>ipn_070045a43ffc0c954761e803bf7ec0f7'] = 'L\'importo raggiunto da PayPlug non é lo stesso';
 $_MODULE['<{payplug}prestashop>ipn_baad4f460ebbb7b6080ffce28c800b87'] = 'come il valore totale dell\'ordine';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Importo già rimborsato con PayPlug:';
@@ -55,6 +58,8 @@ $_MODULE['<{payplug}prestashop>admin_order_c7d4153f748ba1dd21ae002c37c00906'] = 
 $_MODULE['<{payplug}prestashop>admin_order_217c01a08bee4c2fa33d59a6ddc69806'] = '3-D secure';
 $_MODULE['<{payplug}prestashop>admin_order_5abc7a3ac0ae1545cc801303727f53da'] = 'Data di scadenza';
 $_MODULE['<{payplug}prestashop>admin_order_650be61892bf690026089544abbd9d26'] = 'Modalità';
+$_MODULE['<{payplug}prestashop>admin_order_update_ee19a5b4e629f12ccab7e31449826748'] = 'Aggiorna questo ordine';
+$_MODULE['<{payplug}prestashop>admin_order_update_06933067aafd48425d67bcb01bba5cb6'] = 'Aggiorna';
 $_MODULE['<{payplug}prestashop>admin_740819a7dc6b0b1a8a7fa0c871d9b878'] = 'PRESENTAZIONE';
 $_MODULE['<{payplug}prestashop>admin_500f0e02dead20d5160ed144ae2ba846'] = 'La soluzione di pagamento che aumenta le tue vendite';
 $_MODULE['<{payplug}prestashop>admin_21316ef9b6abdf52d0dd1ee8ef0549ba'] = 'PayPlug fornisce ai rivenditori tutti i vantaggi di una soluzione completa di pagamento on line.';
