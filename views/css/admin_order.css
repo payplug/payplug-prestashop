@@ -60,6 +60,7 @@
 #pppanel form{
 	position: relative;
 	overflow: hidden;
+	min-height: 62px;
 }
 
 #pppanel img.loader {

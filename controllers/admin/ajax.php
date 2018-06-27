@@ -183,6 +183,43 @@ if (Tools::getValue('_ajax') == 1) {
         $popin = $payplug->displayPopin('refund');
         die(json_encode(array('content' => $popin)));
     }
+    if ((int)Tools::getValue('update') == 1) {
+        $pay_id = Tools::getValue('pay_id');
+        $payment = $this->retrievePayment($pay_id);
+        $id_order = Tools::getValue('id_order');
+
+        if ((int)$payment->is_paid == 1) {
+            if ($payment->is_live == 1) {
+                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
+            } else {
+                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST');
+            }
+        } elseif ((int)$payment->is_paid == 0) {
+            if ($payment->is_live == 1) {
+                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR');
+            } else {
+                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR_TEST');
+            }
+        }
+
+        $order = new Order((int)$id_order);
+        if (Validate::isLoadedObject($order)) {
+            $current_state = (int)$order->getCurrentState();
+            if ($current_state != 0 && $current_state != $new_state) {
+                $history = new OrderHistory();
+                $history->id_order = (int)$order->id;
+                $history->changeIdOrderState($new_state, (int)$order->id);
+                $history->addWithemail();
+            }
+        }
+
+        //$this->deletePayment($pay_id, $order->id_cart);
+
+        die(json_encode(array(
+            'message' => $this->l('Order successfully updated.'),
+            'reload' => true
+        )));
+    }
 } else {
     exit;
 }

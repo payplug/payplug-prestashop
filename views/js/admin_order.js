@@ -28,6 +28,11 @@ $(document).ready(function() {
         e.preventDefault();
         callRefund();
     })
+
+    $('input[name=submitPPUpdate]').bind('click', function(e) {
+        e.preventDefault();
+        callUpdate();
+    });
 });
 
 function callRefund() {
@@ -59,7 +64,56 @@ function callRefund() {
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to refund. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
-                'or maybe you have a different back-office url thant expected.' +
+                'or maybe you have a different back-office url than expected.' +
+                'You will find more explanation in JS console.');
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+        },
+        success: function(result)
+        {
+            if(result.status == 'error') {
+                $('#pppanel form p.pperror').html(result.data);
+                $('#pppanel form p.pperror').removeClass('hide');
+                $('#pppanel form p.pperror').show();
+            }
+            else {
+                $('#pppanel form p.ppsuccess').html(result.message);
+                $('#pppanel form p.ppsuccess').removeClass('hide');
+                $('#pppanel form p.ppsuccess').show();
+
+                $('#pppanel form div.pp_list').html(result.data);
+                if (result.reload) {
+                    location.reload();
+                }
+            }
+        }
+    });
+}
+
+function callUpdate() {
+    $('#pppanel form p.pperror').hide();
+    $('#pppanel form p.ppsuccess').hide();
+    var url = $('input:hidden[name=admin_ajax_url]').val();
+    var pay_id = $('input:hidden[name=pay_id]').val();
+    var id_order = $('input:hidden[name=id_order]').val();
+    var data = {_ajax: 1, update: 1, pay_id: pay_id, id_order: id_order};
+
+    $.ajax({
+        type: 'POST',
+        url: url,
+        dataType: 'json',
+        data: data,
+        beforeSend: function() {
+            $('#pppanel .loader').show();
+        },
+        complete: function(){
+            $('#pppanel .loader').hide();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('An error occurred while trying to update. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url than expected.' +
                 'You will find more explanation in JS console.');
             console.log(jqXHR);
             console.log(textStatus);

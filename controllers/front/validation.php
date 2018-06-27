@@ -104,7 +104,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $this->addLog($debug, $log, 'Retrieving payment...', 'info');
                     if ($payment->failure) {
                         $this->addLog($debug, $log, 'Payment failure : '.$payment->failure->message, 'error');
-                        Tools::redirect($redirect_url_error);
+                        //Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
                 } catch (Exception $e) {
@@ -120,13 +120,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if (!$res_payplug_card) {
                     $this->addLog($debug, $log, 'Card cannot be saved.', 'error');
                 }
-            }
-
-            $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
-            if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
-                $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
-            } else {
-                $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
             }
 
             $customer = new Customer((int)$cart->id_customer);
@@ -169,8 +162,20 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
                 if ($is_paid) {
                     $order_state = $paid_state;
+                    $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
+                    if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
+                        $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
+                    } else {
+                        $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
+                    }
                 } else {
                     $order_state = $pending_state;
+                    $this->addLog($debug, $log, 'Stored payment become pending.', 'info');
+                    if (!$payplug->registerPendingTransaction((int)$cart_id)) {
+                        $this->addLog($debug, $log, 'Stored payment cannot be pending.', 'error');
+                    } else {
+                        $this->addLog($debug, $log, 'Stored payment successfully set up to pending.', 'info');
+                    }
                 }
                 $this->addLog($debug, $log, 'Order state will be :'.$order_state, 'info');
 
