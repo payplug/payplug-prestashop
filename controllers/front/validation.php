@@ -163,10 +163,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if ($is_paid) {
                     $order_state = $paid_state;
                     $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
-                    if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
-                        $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
+                    if ($payplug->isTransactionPending((int)$cart_id)) {
+                        $this->addLog($debug, $log, 'Transaction is pending so stored payment will not be deleted.', 'info');
                     } else {
-                        $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
+                        if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
+                            $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
+                        } else {
+                            $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
+                        }
                     }
                 } else {
                     $order_state = $pending_state;
