@@ -1906,7 +1906,7 @@ class Payplug extends PaymentModule
                 }
             }
             $payment = \Payplug\Payment::create($payment_tab);
-            if ($payment->failure != null && !empty($payment->failure['message'])) {
+            if ($payment->is_paid == false || ($payment->failure == true && !empty($payment->failure['message']))) {
                 $data = array(
                     'result' => false,
                     'response' => $payment->failure['message'],
@@ -2811,7 +2811,11 @@ class Payplug extends PaymentModule
         $pay_error = '';
 
         if ((int)$payment->is_paid == 0) {
-            $pay_error = '('.$payment->failure->message.')';
+            if (isset($payment->failure) && isset($payment->failure->message)) {
+                $pay_error = '('.$payment->failure->message.')';
+            } else {
+                $pay_error = '';
+            }
             $show_menu = false;
             if ($current_state != 0 && $current_state == $id_pending_order_state) {
                 $show_menu_update = true;
