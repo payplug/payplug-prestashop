@@ -28,7 +28,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_10_0()
+function upgrade_module_2_11_0()
 {
     //sql
     $req_payplug_payment_cart = '
