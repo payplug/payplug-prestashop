@@ -653,7 +653,7 @@ class Payplug extends PaymentModule
             `id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_payment` VARCHAR(255) NOT NULL,
             `id_cart` INT(11) UNSIGNED NOT NULL,
-            `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
+            `is_pending` TINYINT(1) NOT NULL DEFAULT 0
             ) ENGINE='._MYSQL_ENGINE_;
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
 
