@@ -61,6 +61,9 @@
     {elseif $show_menu_refunded}
         <hr />
         {include file='./admin_order_refunded.tpl'}
+    {elseif $show_menu_update}
+        <hr />
+        {include file='./admin_order_update.tpl'}
     {/if}
 
 </div>

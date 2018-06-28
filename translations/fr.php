@@ -2,6 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
+$_MODULE['<{payplug}prestashop>payplug_68100de5c48889463976e826b5cacf35'] = 'La solution de paiement en ligne simple et sécurisé pour les PME. Sans frais d’installation, sans engagement.';
 $_MODULE['<{payplug}prestashop>payplug_40c60d7d0db191b9cd543745f8ae3679'] = 'Êtes-vous sûr de vouloir désinstaller ce module et supprimer votre configuration ?';
 $_MODULE['<{payplug}prestashop>payplug_8f12e303595a597d598ba5ba2523a77e'] = 'Toutes les cartes enregistrées par vos clients seront conservées.';
 $_MODULE['<{payplug}prestashop>payplug_2a759ac5a7e57ff007ef009406aec89c'] = 'Toutes les cartes enregistrées par vos clients seront supprimées.';
@@ -16,7 +17,7 @@ $_MODULE['<{payplug}prestashop>payplug_199d0ec15baf2e0b56e5c1f5968b1525'] = 'La 
 $_MODULE['<{payplug}prestashop>payplug_f1a5a30377d104be7f61a556c2142618'] = 'Une fois les problèmes corrigés, actualisez la page ou cliquez sur Vérifier.';
 $_MODULE['<{payplug}prestashop>payplug_5c2ddd84491205038da9434827513778'] = 'Payer par carte bancaire';
 $_MODULE['<{payplug}prestashop>payplug_1d565b9e5303987bb1b1938d5d458bca'] = 'Carte';
-$_MODULE['<{payplug}prestashop>payplug_95b16127e70e8a90220404fb48343182'] = 'Expire fin :';
+$_MODULE['<{payplug}prestashop>payplug_95b16127e70e8a90220404fb48343182'] = 'Expire fin';
 $_MODULE['<{payplug}prestashop>payplug_a8a99b6d77daaaa9872be789ce786fd2'] = 'Payer avec une autre carte';
 $_MODULE['<{payplug}prestashop>payplug_e78050ca4d78b123d1c9a4b171ca7057'] = 'Payer par carte bancaire';
 $_MODULE['<{payplug}prestashop>payplug_c4812ee2b789226193ad2511495fa559'] = 'PAYÉ';
@@ -31,9 +32,11 @@ $_MODULE['<{payplug}prestashop>payplug_033bd94b1168d7e4f0d644c3c95e35bf'] = 'TES
 $_MODULE['<{payplug}prestashop>payplug_f51396ebc5142204e3d187dd8097b15d'] = 'Le montant à rembourser est erroné. ';
 $_MODULE['<{payplug}prestashop>payplug_2197bc57f08292482b9ed1e905fb79cb'] = 'Impossible de rembourser ce montant.';
 $_MODULE['<{payplug}prestashop>payplug_96fe48f26db5ef9012806cdc0605e74f'] = 'Le montant a été remboursé avec succès.';
+$_MODULE['<{payplug}prestashop>payplug_018e79acf2129521e285ad211e6b1912'] = 'La commande a été mise à jour avec succès.';
 $_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Le montant à rembourser est incorrect';
 $_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'Le remboursement n\'a pas été effectué. Assurez-vous que le montant est correct puis essayez à nouveau.';
 $_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'Le montant à été correctement remboursé';
+$_MODULE['<{payplug}prestashop>ajax_018e79acf2129521e285ad211e6b1912'] = 'La commande a été mise à jour avec succès.';
 $_MODULE['<{payplug}prestashop>ipn_070045a43ffc0c954761e803bf7ec0f7'] = 'Le montant recueilli par PayPlug est différent';
 $_MODULE['<{payplug}prestashop>ipn_baad4f460ebbb7b6080ffce28c800b87'] = 'du montant total de la commande';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Montant déjà remboursé avec Payplug :';
@@ -55,6 +58,8 @@ $_MODULE['<{payplug}prestashop>admin_order_c7d4153f748ba1dd21ae002c37c00906'] = 
 $_MODULE['<{payplug}prestashop>admin_order_217c01a08bee4c2fa33d59a6ddc69806'] = '3-D Secure';
 $_MODULE['<{payplug}prestashop>admin_order_5abc7a3ac0ae1545cc801303727f53da'] = 'Date d\'expiration';
 $_MODULE['<{payplug}prestashop>admin_order_650be61892bf690026089544abbd9d26'] = 'Mode';
+$_MODULE['<{payplug}prestashop>admin_order_update_ee19a5b4e629f12ccab7e31449826748'] = 'Mettre à jour cette commande';
+$_MODULE['<{payplug}prestashop>admin_order_update_06933067aafd48425d67bcb01bba5cb6'] = 'Mettre à jour';
 $_MODULE['<{payplug}prestashop>admin_740819a7dc6b0b1a8a7fa0c871d9b878'] = 'PRESENTATION';
 $_MODULE['<{payplug}prestashop>admin_500f0e02dead20d5160ed144ae2ba846'] = 'La solution de paiement qui augmente vos ventes';
 $_MODULE['<{payplug}prestashop>admin_21316ef9b6abdf52d0dd1ee8ef0549ba'] = 'PayPlug offre aux e-commerçants tous les avantages d’une solution complète de paiement en ligne.';

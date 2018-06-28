@@ -122,13 +122,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
             }
 
-            $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
-            if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
-                $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
-            } else {
-                $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
-            }
-
             $customer = new Customer((int)$cart->id_customer);
             if (!Validate::isLoadedObject($customer)) {
                 $this->addLog($debug, $log, 'Customer cannot be loaded.', 'error');
@@ -169,8 +162,24 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
                 if ($is_paid) {
                     $order_state = $paid_state;
+                    $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
+                    if ($payplug->isTransactionPending((int)$cart_id)) {
+                        $this->addLog($debug, $log, 'Transaction is pending so stored payment will not be deleted.', 'info');
+                    } else {
+                        if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
+                            $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
+                        } else {
+                            $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
+                        }
+                    }
                 } else {
                     $order_state = $pending_state;
+                    $this->addLog($debug, $log, 'Stored payment become pending.', 'info');
+                    if (!$payplug->registerPendingTransaction((int)$cart_id)) {
+                        $this->addLog($debug, $log, 'Stored payment cannot be pending.', 'error');
+                    } else {
+                        $this->addLog($debug, $log, 'Stored payment successfully set up to pending.', 'info');
+                    }
                 }
                 $this->addLog($debug, $log, 'Order state will be :'.$order_state, 'info');
 

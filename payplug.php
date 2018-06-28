@@ -97,7 +97,7 @@ class Payplug extends PaymentModule
 
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.9.0';
+        $this->version = '2.11.0';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
@@ -110,7 +110,7 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         //$this->displayName = $this->trans('PayPlug – Your payment solution', array(), 'Modules.Payplug.Admin');
 
-        $this->description = $this->l('The simplest online payment solution: no setup fees, no fixed fees, and no merchant account required!');
+        $this->description = $this->l('The simple and secure online payment solution for SMEs. No setup fees, no commitment.');
 
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
@@ -652,7 +652,8 @@ class Payplug extends PaymentModule
             CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'payplug_payment_cart` (
             `id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_payment` VARCHAR(255) NOT NULL,
-            `id_cart` INT(11) UNSIGNED NOT NULL
+            `id_cart` INT(11) UNSIGNED NOT NULL,
+            `is_pending` TINYINT(1) NOT NULL DEFAULT 0
             ) ENGINE='._MYSQL_ENGINE_;
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
 
@@ -1551,6 +1552,47 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Register transaction as pending to etablish link with order in case of error
+     *
+     * @param int $id_cart
+     * @return bool
+     */
+    public function registerPendingTransaction($id_cart)
+    {
+        $req_payment_cart = '
+            UPDATE '._DB_PREFIX_.'payplug_payment_cart ppc  
+            SET ppc.is_pending = 1
+            WHERE ppc.id_cart = '.(int)$id_cart;
+        $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
+        if (!$res_payment_cart) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Get id_payment from a pending transaction for a given cart
+     *
+     * @param int $id_cart
+     * @return string id_payment OR bool
+     */
+    public function isTransactionPending($id_cart)
+    {
+        $req_payment_cart = '
+            SELECT ppc.id_payment 
+            FROM '._DB_PREFIX_.'payplug_payment_cart ppc  
+            WHERE ppc.id_cart = '.(int)$id_cart.'
+            AND ppc.is_pending = 1';
+        $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
+        if (!$res_payment_cart) {
+            return false;
+        } else {
+            return $res_payment_cart;
+        }
+    }
+
+    /**
      * Delete stored payment
      *
      * @param string $pay_id
@@ -1864,6 +1906,16 @@ class Payplug extends PaymentModule
                 }
             }
             $payment = \Payplug\Payment::create($payment_tab);
+            if (
+                ($payment->is_paid == false && $one_click == 1 && $current_card != null && $id_card != 'new_card')
+                || ($payment->failure == true && !empty($payment->failure['message']))
+            ) {
+                $data = array(
+                    'result' => false,
+                    'response' => $payment->failure['message'],
+                );
+                return($data);
+            }
         } catch (Exception $e) {
             $data = array(
                 'result' => false,
@@ -2704,11 +2756,13 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $payments = $order->getOrderPaymentCollection();
-        if (count($payments) > 1 || !isset($payments[0])) {
-            return false;
-        } else {
-            $pay_id = $payments[0]->transaction_id;
+        if (!$pay_id = $this->isTransactionPending((int)$order->id_cart)){
+            $payments = $order->getOrderPaymentCollection();
+            if (count($payments) > 1 || !isset($payments[0])) {
+                return false;
+            } else {
+                $pay_id = $payments[0]->transaction_id;
+            }
         }
 
         if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
@@ -2742,18 +2796,34 @@ class Payplug extends PaymentModule
 
         $sandbox = ((int)$payment->is_live == 1 ? false : true);
         $id_new_order_state = 0;
+        $id_pending_order_state = 0;
 
         if ($sandbox) {
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+            $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST');
         } else {
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+            $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING');
         }
+        $current_state = (int)$order->getCurrentState();
 
         $show_popin = false;
         $show_menu = true;
         $show_menu_refunded = false;
+        $show_menu_update = false;
+        $pay_error = '';
 
-        if ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
+        if ((int)$payment->is_paid == 0) {
+            if (isset($payment->failure) && isset($payment->failure->message)) {
+                $pay_error = '('.$payment->failure->message.')';
+            } else {
+                $pay_error = '';
+            }
+            $show_menu = false;
+            if ($current_state != 0 && $current_state == $id_pending_order_state) {
+                $show_menu_update = true;
+            }
+        } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
             $show_menu = true;
         } elseif ((int)$payment->is_refunded == 1) {
             $show_menu_refunded = true;
@@ -2830,6 +2900,8 @@ class Payplug extends PaymentModule
             'pay_card_date' => $pay_card_date,
             'show_menu' => $show_menu,
             'show_menu_refunded' => $show_menu_refunded,
+            'show_menu_update' => $show_menu_update,
+            'pay_error' => $pay_error,
         ));
 
         if ($show_menu) {
@@ -2847,6 +2919,11 @@ class Payplug extends PaymentModule
             $this->context->smarty->assign(array(
                 'amount_refunded_payplug' => $amount_refunded_payplug,
                 'currency' => $currency,
+            ));
+        } elseif ($show_menu_update) {
+            $this->context->smarty->assign(array(
+                'admin_ajax_url' => $admin_ajax_url,
+                'order' => $order,
             ));
         }
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin_order.tpl');
@@ -3089,6 +3166,43 @@ class Payplug extends PaymentModule
             if ((int)Tools::getValue('popinRefund') == 1) {
                 $popin = $this->displayPopin('refund');
                 die(json_encode(array('content' => $popin)));
+            }
+            if ((int)Tools::getValue('update') == 1) {
+                $pay_id = Tools::getValue('pay_id');
+                $payment = $this->retrievePayment($pay_id);
+                $id_order = Tools::getValue('id_order');
+
+                if ((int)$payment->is_paid == 1) {
+                    if ($payment->is_live == 1) {
+                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
+                    } else {
+                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST');
+                    }
+                } elseif ((int)$payment->is_paid == 0) {
+                    if ($payment->is_live == 1) {
+                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR');
+                    } else {
+                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR_TEST');
+                    }
+                }
+
+                $order = new Order((int)$id_order);
+                if (Validate::isLoadedObject($order)) {
+                    $current_state = (int)$order->getCurrentState();
+                    if ($current_state != 0 && $current_state != $new_state) {
+                        $history = new OrderHistory();
+                        $history->id_order = (int)$order->id;
+                        $history->changeIdOrderState($new_state, (int)$order->id);
+                        $history->addWithemail();
+                    }
+                }
+
+                //$this->deletePayment($pay_id, $order->id_cart);
+
+                die(json_encode(array(
+                    'message' => $this->l('Order successfully updated.'),
+                    'reload' => true
+                )));
             }
         } else {
             exit;
