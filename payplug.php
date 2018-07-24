@@ -97,7 +97,7 @@ class Payplug extends PaymentModule
 
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.11.0';
+        $this->version = '2.11.1';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
@@ -3100,9 +3100,10 @@ class Payplug extends PaymentModule
                         //'data' => $this->trans('Incorrect amount to refund', array(), 'Modules.Payplug.Admin')
                     )));
                 } else {
-                    $amount = Tools::getValue('amount');
-                    $amount = str_replace(',', '.', $amount);
-                    $amount = $amount * 100;
+                    $amount = str_replace(',', '.', Tools::getValue('amount'));
+                    $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
+                    $amount = (float)($amount / 10); // unless sometimes 17.90 become 17.89
+                    $amount = (int)$amount;
                 }
 
                 $id_order = Tools::getValue('id_order');
