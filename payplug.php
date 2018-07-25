@@ -1799,6 +1799,8 @@ class Payplug extends PaymentModule
         $address_delivery = new Address((int)$cart->id_address_delivery);
         //$country = new Country((int)$address_invoice->id_country);
         $country = new Country((int)$address_delivery->id_country);
+        $country_iso_code = $this->getIsoCodeByCountryId((int)$country->id);
+
         $payment_customer = array(
             'first_name'        => !empty($customer->firstname) ? $customer->firstname : null,
             'last_name'         => !empty($customer->lastname) ? $customer->lastname : null,
@@ -1807,7 +1809,7 @@ class Payplug extends PaymentModule
             'address2'          => !empty($address_delivery->address2) ? $address_delivery->address2 : null,
             'postcode'          => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,
             'city'              => !empty($address_delivery->city) ? $address_delivery->city : null,
-            'country'           => !empty($country->iso_code) ? $country->iso_code : null,
+            'country'           => $country_iso_code,
         );
 
         //hosted payment
