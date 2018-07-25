@@ -116,9 +116,10 @@ if (Tools::getValue('_ajax') == 1) {
                 //'data' => $this->getTranslator()->trans('Incorrect amount to refund', array(), 'Modules.Payplug.Admin')
             )));
         } else {
-            $amount = Tools::getValue('amount');
-            $amount = str_replace(',', '.', $amount);
-            $amount = $amount * 100;
+            $amount = str_replace(',', '.', Tools::getValue('amount'));
+            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
+            $amount = (float)($amount / 10); // unless sometimes 17.90 become 17.89
+            $amount = (int)$amount;
         }
 
         $id_order = Tools::getValue('id_order');
