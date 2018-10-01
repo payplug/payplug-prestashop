@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{payplug}prestashop>payplug_68100de5c48889463976e826b5cacf35'] = 'La solution de paiement en ligne simple et sécurisé pour les PME. Sans frais d’installation, sans engagement.';
+$_MODULE['<{payplug}prestashop>payplug_1f13848407899d1a6e3b539cb4029ddf'] = 'La solution de paiement en ligne qui combine simplicité et accompagnement pour booster vos ventes.';
 $_MODULE['<{payplug}prestashop>payplug_40c60d7d0db191b9cd543745f8ae3679'] = 'Êtes-vous sûr de vouloir désinstaller ce module et supprimer votre configuration ?';
 $_MODULE['<{payplug}prestashop>payplug_8f12e303595a597d598ba5ba2523a77e'] = 'Toutes les cartes enregistrées par vos clients seront conservées.';
 $_MODULE['<{payplug}prestashop>payplug_2a759ac5a7e57ff007ef009406aec89c'] = 'Toutes les cartes enregistrées par vos clients seront supprimées.';

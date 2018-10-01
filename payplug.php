@@ -110,7 +110,7 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         //$this->displayName = $this->trans('PayPlug – Your payment solution', array(), 'Modules.Payplug.Admin');
 
-        $this->description = $this->l('The simple and secure online payment solution for SMEs. No setup fees, no commitment.');
+        $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
 
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
