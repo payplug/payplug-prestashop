@@ -410,6 +410,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     }
                                     die;
                                 } else {
+                                    $secure_key = isset($customer->secure_key) ? $customer->secure_key : false;
                                     try {
                                         $is_order_validated = $payplug->validateOrder(
                                             $cart->id,
@@ -420,7 +421,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             $extra_vars,
                                             $currency,
                                             false,
-                                            $customer->secure_key
+                                            $secure_key
                                         );
                                     } catch (Exception $exception) {
                                         $this->addLog($debug, $log, 'Order cannot be validated: '.$exception->getMessage(), 'error');

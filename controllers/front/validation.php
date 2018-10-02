@@ -186,7 +186,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $extra_vars = array(
                     'transaction_id' => $payment->id
                 );
-
+                $secure_key = isset($customer->secure_key) ? $customer->secure_key : false;
                 $validateOrder_result = $payplug->validateOrder(
                     $cart->id,
                     $order_state,
@@ -196,7 +196,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $extra_vars,
                     (int)$cart->id_currency,
                     false,
-                    $customer->secure_key
+                    $secure_key
                 );
                 $id_order = $payplug->currentOrder;
 
