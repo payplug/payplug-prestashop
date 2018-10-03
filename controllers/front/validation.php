@@ -186,7 +186,22 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $extra_vars = array(
                     'transaction_id' => $payment->id
                 );
-                $secure_key = isset($customer->secure_key) ? $customer->secure_key : false;
+                /* 
+                 * For some reasons, secure key form cart can differ from secure key from customer
+                 * Maybe due to migration or Prestashop's Update
+                 */
+                $secure_key = false;
+                if (isset($customer->secure_key) && !empty($customer->secure_key)) {
+                    if (isset($cart->secure_key) && !empty($cart->secure_key) && $cart->secure_key !== $customer->secure_key) {
+                        $secure_key = $cart->secure_key;
+                        $this->addLog($debug, $log, 'Secure keys do not match.', 'error');
+                        $this->addLog($debug, $log, 'Customer Secure Key: '.$customer->secure_key, 'error');
+                        $this->addLog($debug, $log, 'Cart Secure Key: '.$cart->secure_key, 'error');
+                    } else {
+                        $secure_key = $customer->secure_key;
+                    }
+                }
+                
                 $validateOrder_result = $payplug->validateOrder(
                     $cart->id,
                     $order_state,
