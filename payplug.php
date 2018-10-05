@@ -222,6 +222,14 @@ class Payplug extends PaymentModule
             return false;
         }
 
+        if (!$this->registerHook('registerGDPRConsent') ||
+            !$this->registerHook('actionDeleteGDPRCustomer') ||
+            !$this->registerHook('actionExportGDPRData')
+        ) {
+            $log->error('Installation failed: hooks GDPR.');
+            return false;
+        }
+
         $log->info('Installation complete.');
 
         return true;
@@ -2090,6 +2098,29 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Delete all cards for a given customer
+     *
+     * @param int $id_customer
+     * @param string $api_key
+     * @return bool
+     */
+    public function deleteCards($id_customer)
+    {
+        $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
+        $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        $cardsToDelete = $this->getCardsByCustomer($id_customer, false);
+        if (!isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
+            foreach ($cardsToDelete as $card) {
+                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
+                if (!$this->deleteCard($id_customer, $card['id_payplug_card'], $api_key)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Get collection of cards
      *
      * @param int $id_customer
@@ -3240,5 +3271,64 @@ class Payplug extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'my_account.tpl');
+    }
+
+    public function hookActionDeleteGDPRCustomer ($customer)
+    {
+        if (!$this->deleteCards((int)$customer['id'])) {
+            return json_encode($this->l('PayPlug : Unable to delete customer saved cards.'));
+        }
+        return json_encode(true);
+    }
+
+    public function hookActionExportGDPRData ($customer)
+    {
+        if (!$cards = $this->gdprCardExport((int)$customer['id'])) {
+            return json_encode($this->l('PayPlug : Unable to export customer saved cards.'));
+        } else {
+            return json_encode($cards);
+        }
+    }
+
+    public function displayGDPRConsent ()
+    {
+        $this->context->smarty->assign(array('id_module' => $this->id));
+        return $this->display(__FILE__, 'gdpr_consent.tpl');
+    }
+
+    public function hookRegisterGDPRConsent () {}
+
+    public function gdprCardExport($id_customer)
+    {
+        if (!is_int($id_customer) || $id_customer === null) {
+            return false;
+        } else {
+            $req_payplug_card = '
+                SELECT pc.last4, pc. exp_month, pc.exp_year, pc.brand, pc.country
+                FROM '._DB_PREFIX_.'payplug_card pc
+                WHERE pc.id_customer = '.(int)$id_customer;
+            $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
+            if (!$res_payplug_card) {
+                $cards = null;
+            } else {
+                $i = 1;
+                $cards = array();
+                foreach ($res_payplug_card as &$card) {
+                    $card['expiry_date'] = date(
+                        'm / y',
+                        mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
+                    );
+                    $cards[] = array(
+                        $this->l('#') => $i,
+                        $this->l('Brand') => $card['brand'],
+                        $this->l('Country') => $card['country'],
+                        $this->l('Card') => '**** **** **** '.$card['last4'],
+                        $this->l('Expiry date') => $card['expiry_date']
+                    );
+                    $i ++;
+                }
+            }
+            return $cards;
+        }
     }
 }
