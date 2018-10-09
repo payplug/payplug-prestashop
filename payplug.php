@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
+require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_.'payplug/lib/init.php');
 
 class Payplug extends PaymentModule
@@ -95,37 +95,33 @@ class Payplug extends PaymentModule
     {
         $this->setEnvironnement();
 
+        $this->_setBasicModuleData();
+
+        /*
         $this->name = 'payplug';
         $this->tab = 'payments_gateways';
-        $this->version = '2.13.0';
+        $this->version = '2.15.0';
         $this->author = 'PayPlug';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->need_instance = true;
         $this->bootstrap = true;
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
-
+*/
         parent::__construct();
 
         $this->displayName = 'PayPlug';
-        //$this->displayName = $this->trans('PayPlug – Your payment solution', array(), 'Modules.Payplug.Admin');
-
         $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
-
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((int)Configuration::get('PAYPLUG_KEEP_CARDS') == 1) {
             $this->confirmUninstall = $this->l('Are you sure you wish to uninstall this module and delete your settings?');
-            //$this->confirmUninstall = $this->trans('Are you sure you wish to uninstall this module and delete your settings?', array(), 'Modules.Payplug.Admin');
             $this->confirmUninstall .= ' ';
             $this->confirmUninstall .= $this->l('All the registered cards of your customer will be kept.');
-            //$this->confirmUninstall .= $this->trans('All the registered cards of your customer will be kept.', array(), 'Modules.Payplug.Admin');
         } else {
             $this->confirmUninstall = $this->l('Are you sure you wish to uninstall this module and delete your settings?');
-            //$this->confirmUninstall = $this->trans('Are you sure you wish to uninstall this module and delete your settings?', array(), 'Modules.Payplug.Admin');
             $this->confirmUninstall .= ' ';
             $this->confirmUninstall .= $this->l('All the registered cards of your customer will be deleted.');
-            //$this->confirmUninstall .= $this->trans('All the registered cards of your customer will be deleted.', array(), 'Modules.Payplug.Admin');
         }
 
         $this->email = Configuration::get('PAYPLUG_EMAIL');
@@ -133,7 +129,6 @@ class Payplug extends PaymentModule
         $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
             $this->warning = $this->l('In order to accept payments you need to configure your module by connecting your PayPlug account.');
-            //$this->warning = $this->trans('In order to accept payments you need to configure your module by connecting your PayPlug account.', array(), 'Modules.Payplug.Admin');
         }
 
         $this->currencies = true;
@@ -147,6 +142,18 @@ class Payplug extends PaymentModule
                 'Prestashop/'._PS_VERSION_
             );
         }
+    }
+
+    private function _setBasicModuleData() {
+        $this->name = 'payplug';
+        $this->tab = 'payments_gateways';
+        $this->version = '2.15.0';
+        $this->author = 'PayPlug';
+        $this->need_instance = 0;
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
+        $this->need_instance = true;
+        $this->bootstrap = true;
+        $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
     }
 
     /**
@@ -185,17 +192,14 @@ class Payplug extends PaymentModule
         $report = $this->checkRequirements();
         if (!$report['php']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
-            //$this->_errors[] = Tools::displayError($this->trans('Your server must run PHP 5.3 or greater', array(), 'Modules.Payplug.Admin'));
             $log->error('Installation failed: PHP Requirement.');
         }
         if (!$report['curl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
-            //$this->_errors[] = Tools::displayError($this->trans('PHP cURL extension must be enabled on your server', array(), 'Modules.Payplug.Admin'));
             $log->error('Installation failed: cURL Requirement.');
         }
         if (!$report['openssl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
-            //$this->_errors[] = Tools::displayError($this->trans('OpenSSL 1.0.1 or later', array(), 'Modules.Payplug.Admin'));
             $log->error('Installation failed: OpenSSL Requirement.');
         }
 
@@ -771,14 +775,12 @@ class Payplug extends PaymentModule
                 && (Tools::getValue('PAYPLUG_EMAIL') != false)
             ) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
-                //$this->validationErrors['username_password'] = $this->trans('The email and/or password was not correct.', array(), 'Modules.Payplug.Admin');
             } elseif ($curl_exists && $openssl_exists) {
                 if ($this->login(Tools::getValue('PAYPLUG_EMAIL'), Tools::getValue('PAYPLUG_PASSWORD'))) {
                     Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
                 } else {
                     $this->validationErrors['username_password']
                         = $this->l('The email and/or password was not correct.');
-                        //= $this->trans('The email and/or password was not correct.', array(), 'Modules.Payplug.Admin');
                 }
             }
         }
@@ -1050,20 +1052,12 @@ class Payplug extends PaymentModule
 
         return true;
     }
-/*
-    public function getContent()
-    {
-        Tools::redirectAdmin(
-            $this->context->link->getAdminLink('AdminPayplug')
-        );
-    }
-//*/
+
     /**
      * @see Module::getContent()
      *
      * @return string
      */
-//*
     public function getContent()
     {
         if (Tools::getValue('_ajax') == 1) {
@@ -1141,7 +1135,6 @@ class Payplug extends PaymentModule
         $this->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
         $this->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
 
-        //$admin_ajax_url = $this->context->link->getAdminLink('PayplugAjaxModuleAdminController', true, array());
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
         $login_infos = array(
@@ -1171,7 +1164,7 @@ class Payplug extends PaymentModule
 
         return $this->html;
     }
-//*/
+
     public function getUninstallContent()
     {
         $this->postProcess();
@@ -1401,7 +1394,6 @@ class Payplug extends PaymentModule
         $this->check_configuration = array('warning' => array(), 'error' => array(), 'success' => array());
 
         $curl_warning = $this->l('PHP cURL extension must be enabled on your server');
-        //$curl_warning = $this->trans('PHP cURL extension must be enabled on your server', array(), 'Modules.Payplug.Admin');
         if ($report['curl']['installed']) {
             $this->check_configuration['success'][] .= $curl_warning;
         } else {
@@ -1409,7 +1401,6 @@ class Payplug extends PaymentModule
         }
 
         $php_warning = $this->l('Your server must run PHP 5.3 or greater');
-        //$php_warning = $this->trans('Your server must run PHP 5.3 or greater', array(), 'Modules.Payplug.Admin');
         if ($report['php']['up2date']) {
             $this->check_configuration['success'][] .= $php_warning;
         } else {
@@ -1424,20 +1415,15 @@ class Payplug extends PaymentModule
         }
 
         $connexion_warning = $this->l('You must connect your Payplug account');
-        //$connexion_warning = $this->trans('You must connect your Payplug account', array(), 'Modules.Payplug.Admin');
         if ($is_payplug_connected) {
             $this->check_configuration['success'][] .= $connexion_warning;
         } else {
             $this->check_configuration['error'][] .= $connexion_warning;
         }
 
-        //$configuration_warning =
         $check_warning = $this->l('Unfortunately at least one issue is preventing you from using Payplug.').' '
-        //$check_warning = $this->trans('Unfortunately at least one issue is preventing you from using Payplug.', array(), 'Modules.Payplug.Admin').' '
             .$this->l('Refresh the page or click "Check" once they are fixed');
-            //.$this->trans('Refresh the page or click "Check" once they are fixed', array(), 'Modules.Payplug.Admin');
         if ($is_payplug_configured) {
-            //$this->check_configuration['success'][] .= $configuration_warning;
         } else {
             Configuration::get('PAYPLUG_SHOW', 0);
             $this->check_configuration['warning'][] .= $check_warning;
@@ -2220,7 +2206,6 @@ class Payplug extends PaymentModule
         $externalOption
             ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
             ->setCallToActionText($this->l('Pay with credit card'))
-            //->setCallToActionText($this->trans('Pay with credit card', array(), 'Modules.Payplug.Shop'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payplug.png'));
 
@@ -2249,7 +2234,6 @@ class Payplug extends PaymentModule
         $paymentOption = new PaymentOption();
         $paymentOption
             ->setCallToActionText($this->l('Pay with credit card'))
-            //->setCallToActionText($this->trans('Pay with credit card', array(), 'Modules.Payplug.Shop'))
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payplug.png'))
             ->setModuleName('payplug')
@@ -2300,11 +2284,9 @@ class Payplug extends PaymentModule
                 if (!$card['expired']) {
                     $paymentOption = new PaymentOption();
                     $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                    //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
                         ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
-                        //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
                         ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
@@ -2341,7 +2323,6 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/none.png'))
                 ->setCallToActionText($this->l('Pay with a different card'))
-                //->setCallToActionText($this->trans('Pay with a different card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
@@ -2372,7 +2353,6 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payplug.png'))
                 ->setCallToActionText($this->l('Pay with a credit card'))
-                //->setCallToActionText($this->trans('Pay with a credit card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
@@ -2441,11 +2421,9 @@ class Payplug extends PaymentModule
                 if (!$card['expired']) {
                     $paymentOption = new PaymentOption();
                     $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                    //$brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->trans('Card', array(), 'Modules.Payplug.Shop');
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$card['brand'].'.png'))
                         ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
-                        //->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->trans('Expiry date', array(), 'Modules.Payplug.Shop').': '.$card['expiry_date'])
                         ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
@@ -2522,7 +2500,6 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payplug.png'))
                 ->setCallToActionText($this->l('Pay with a credit card'))
-                //->setCallToActionText($this->trans('Pay with a credit card', array(), 'Modules.Payplug.Shop'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
@@ -2655,7 +2632,6 @@ class Payplug extends PaymentModule
         try {
             $refund = \Payplug\Refund::create($pay_id, $data);
         } catch (Exception $e) {
-            //d($e);
             return('error');
         }
 
@@ -2892,7 +2868,6 @@ class Payplug extends PaymentModule
         } elseif ((int)$payment->amount_refunded > 0) {
             $pay_status = $this->l('PARTIALLY REFUNDED');
         }
-        //$pay_status = (int)$payment->is_paid == 1 ? $this->trans('PAID', array(), 'Modules.Payplug.Admin') : $this->trans('NOT PAID', array(), 'Modules.Payplug');
         $pay_amount = (int)$payment->amount / 100;
         $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
         if ($payment->card->brand != '') {
@@ -2903,16 +2878,13 @@ class Payplug extends PaymentModule
         if ($payment->card->country != '') {
             $pay_brand .= ' '.$this->l('Card').' ('.$payment->card->country.')';
         }
-        //$pay_brand = ($payment->card->brand != '' ? $payment->card->brand : $this->trans('Card', array(), 'Modules.Payplug.Admin')).' ('.$payment->card->country.')';
         if ($payment->card->last4 != '') {
             $pay_card_mask = '**** **** **** '.$payment->card->last4;
         } else {
             $pay_card_mask = $this->l('Unavailable in test mode');
         }
         $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
-        //$pay_tds = $payment->is_3ds ? $this->trans('YES', array(), 'Modules.Payplug.Admin') : $this->trans('NO', array(), 'Modules.Payplug.Admin');
         $pay_mode = $payment->is_live ? $this->l('LIVE') : $this->l('TEST');
-        //$pay_mode = $payment->is_live ? $this->trans('LIVE', array(), 'Modules.Payplug.Admin') : $this->trans('TEST', array(), 'Modules.Payplug.Admin');
 
         if ($payment->card->exp_month === null) {
             $pay_card_date = $this->l('Unavailable in test mode');
@@ -3130,7 +3102,6 @@ class Payplug extends PaymentModule
                     die(json_encode(array(
                         'status' => 'error',
                         'data' => $this->l('Incorrect amount to refund')
-                        //'data' => $this->trans('Incorrect amount to refund', array(), 'Modules.Payplug.Admin')
                     )));
                 } else {
                     $amount = str_replace(',', '.', Tools::getValue('amount'));
@@ -3151,7 +3122,6 @@ class Payplug extends PaymentModule
                     die(json_encode(array(
                         'status' => 'error',
                         'data' => $this->l('Cannot refund that amount.')
-                        //'data' => $this->trans('Cannot refund that amount.', array(), 'Modules.Payplug.Admin')
                     )));
                 } else {
                     $payment = $this->retrievePayment($pay_id);
@@ -3192,7 +3162,6 @@ class Payplug extends PaymentModule
                         'status' => 'ok',
                         'data' => $data,
                         'message' => $this->l('Amount successfully refunded.'),
-                        //'message' => $this->trans('Amount successfully refunded.', array(), 'Modules.Payplug.Admin'),
                         'reload' => $reload
                     )));
                 }
