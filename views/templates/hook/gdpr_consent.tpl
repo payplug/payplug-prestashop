@@ -22,13 +22,5 @@
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<p><span class="ppbold">{l s='Update this order' mod='payplug'}</p>
-<form method="post" action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
-    <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
-    <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
-    <input class="btn green-button" type="submit" name="submitPPUpdate" value="{l s='Update' mod='payplug'}" >
-    <p class="hide pperror"></p>
-    <p class="hide ppsuccess"></p>
-    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
-</form>
+
+{hook h='displayGDPRConsent' mod='psgdpr' id_module=$id_module}
