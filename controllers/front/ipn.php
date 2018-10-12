@@ -151,7 +151,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 } else {
                     $this->addLog($debug, $log, 'The transaction is paid.', 'info');
                     $this->addLog($debug, $log, 'Payment details:', 'info');
-                    $this->addLog($debug, $log, 'Cart ID: '.(int)$payment->metadata['Cart'], 'debug');
+                    $this->addLog($debug, $log, 'Cart ID: '.(int)$payment->metadata['ID Cart'], 'debug');
                     $this->addLog($debug, $log, 'Is Live: '.(int)$payment->is_live, 'debug');
                     $this->addLog($debug, $log, 'Amount: '.(int)$payment->amount, 'debug');
 
@@ -410,6 +410,22 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     }
                                     die;
                                 } else {
+                                    /* 
+                                     * For some reasons, secure key form cart can differ from secure key from customer
+                                     * Maybe due to migration or Prestashop's Update
+                                     */
+                                    $secure_key = false;
+                                    if (isset($customer->secure_key) && !empty($customer->secure_key)) {
+                                        if (isset($cart->secure_key) && !empty($cart->secure_key) && $cart->secure_key !== $customer->secure_key) {
+                                            $secure_key = $cart->secure_key;
+                                            $this->addLog($debug, $log, 'Secure keys do not match.', 'error');
+                                            $this->addLog($debug, $log, 'Customer Secure Key: '.$customer->secure_key, 'error');
+                                            $this->addLog($debug, $log, 'Cart Secure Key: '.$cart->secure_key, 'error');
+                                        } else {
+                                            $secure_key = $customer->secure_key;
+                                        }
+                                    }
+
                                     try {
                                         $is_order_validated = $payplug->validateOrder(
                                             $cart->id,
@@ -420,7 +436,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             $extra_vars,
                                             $currency,
                                             false,
-                                            $customer->secure_key
+                                            $secure_key
                                         );
                                     } catch (Exception $exception) {
                                         $this->addLog($debug, $log, 'Order cannot be validated: '.$exception->getMessage(), 'error');
