@@ -2273,9 +2273,10 @@ class Payplug extends PaymentModule
             foreach ($payplug_cards as $card) {
                 if (!$card['expired']) {
                     $paymentOption = new PaymentOption();
+                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.strtolower($card['brand']).'.png'))
-                        ->setCallToActionText(' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
+                        ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
                         ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
@@ -2409,9 +2410,10 @@ class Payplug extends PaymentModule
             foreach ($payplug_cards as $card) {
                 if (!$card['expired']) {
                     $paymentOption = new PaymentOption();
+                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.strtolower($card['brand']).'.png'))
-                        ->setCallToActionText(' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
+                        ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
                         ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
