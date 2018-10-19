@@ -94,7 +94,7 @@ class AdminPayplugController extends ModuleAdminController
 
         $is_active = (!empty($PAYPLUG_SHOW) && $PAYPLUG_SHOW == 1) ? true : false;
 
-        $payplug->payplug_url;
+        $payplug->site_url;
 
         $p_error = '';
         if (!$connected) {
@@ -135,7 +135,7 @@ class AdminPayplugController extends ModuleAdminController
             'verified' => $verified,
             'premium' => $premium,
             'is_active' => $is_active,
-            'payplug_url' => $payplug->payplug_url,
+            'site_url' => $payplug->site_url,
             'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
             'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
             'PAYPLUG_ONE_CLICK' => $PAYPLUG_ONE_CLICK,
@@ -228,7 +228,7 @@ class AdminPayplugController extends ModuleAdminController
 
         $is_active = (!empty($PAYPLUG_SHOW) && $PAYPLUG_SHOW == 1) ? true : false;
 
-        $this->payplug_url;
+        $this->site_url;
 
         $p_error = '';
         if (!$connected) {
@@ -268,7 +268,7 @@ class AdminPayplugController extends ModuleAdminController
             'verified'	=> $verified,
             'premium'	=> $premium,
             'is_active'	=> $is_active,
-            'payplug_url' => $this->payplug_url,
+            'site_url' => $this->site_url,
             'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
             'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
             'PAYPLUG_ONE_CLICK' => $PAYPLUG_ONE_CLICK,

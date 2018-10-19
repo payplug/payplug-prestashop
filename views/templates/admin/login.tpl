@@ -59,8 +59,8 @@
                 <div class="block-right">
                     <p class="ppmail">{$PAYPLUG_EMAIL|escape:'htmlall':'UTF-8'}</p>
                     <div class="ppconnectedbuttons">
-                        <a class="" target="_blank" href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal">{l s='Payplug Portal' mod='payplug'}</a>
-                        {*<a class="" target="_blank" href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal">{l s='Payplug Portal' d='Modules.Payplug.Admin'}</a>*}
+                        <a class="" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Payplug Portal' mod='payplug'}</a>
+                        {*<a class="" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Payplug Portal' d='Modules.Payplug.Admin'}</a>*}
                         <span class="separate_pipe">|</span>
                         <input type="submit" id="disconnect-button" name="submitDisconnect" value="{l s='Disconnect' mod='payplug'}">
                         {*<input type="submit" id="disconnect-button" name="submitDisconnect" value="{l s='Disconnect' d='Modules.Payplug.Admin'}">*}
@@ -97,8 +97,8 @@
             <div class="panel-row">
                 <label class="left-block"></label>
                 <div class="block-right">
-                    <a href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" class="forgot_pwd" target="_blank">{l s='Forgot your password?' mod='payplug'}</a>
-                    {*<a href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" class="forgot_pwd" target="_blank">{l s='Forgot your password?' d='Modules.Payplug.Admin'}</a>*}
+                    <a href="{$site_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" class="forgot_pwd" target="_blank">{l s='Forgot your password?' mod='payplug'}</a>
+                    {*<a href="{$site_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" class="forgot_pwd" target="_blank">{l s='Forgot your password?' d='Modules.Payplug.Admin'}</a>*}
                 </div>
             </div>
             <div class="panel-row">
@@ -106,8 +106,8 @@
                 <div class="center-block">
                     <input type="submit" class="green-button" name ="submitAccount" value="{l s='Connect account' mod='payplug'}">
                     {*<input type="submit" class="green-button" name ="submitAccount" value="{l s='Connect account' d='Modules.Payplug.Admin'}">*}
-                    <p class="pptips login">{l s='Don\'t have an account?' mod='payplug'} <a href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" target="_blank">{l s='Sign up' mod='payplug'}</a></p>
-                    {*<p class="pptips login">{l s='Don\'t have an account?' d='Modules.Payplug.Admin'} <a href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" target="_blank">{l s='Sign up' d='Modules.Payplug.Admin'}</a></p>*}
+                    <p class="pptips login">{l s='Don\'t have an account?' mod='payplug'} <a href="{$site_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" target="_blank">{l s='Sign up' mod='payplug'}</a></p>
+                    {*<p class="pptips login">{l s='Don\'t have an account?' d='Modules.Payplug.Admin'} <a href="{$site_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" target="_blank">{l s='Sign up' d='Modules.Payplug.Admin'}</a></p>*}
                 </div>
                 <span class="block-right"><img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" /></span>
             </div>
