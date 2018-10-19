@@ -54,8 +54,8 @@
         <div class="block-button">
             <input type="button" class="popin-button ppcancel white-button" value="{l s='Cancel' mod='payplug'}">
             {*<input type="button" class="popin-button ppcancel white-button" value="{l s='Cancel' d='Modules.Payplug.Admin'}">*}
-            <a class="green-button popin-button" target="_blank" href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' mod='payplug'}</a>
-            {*<a class="green-button popin-button" target="_blank" href="{$payplug_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' d='Modules.Payplug.Admin'}</a>*}
+            <a class="green-button popin-button" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' mod='payplug'}</a>
+            {*<a class="green-button popin-button" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' d='Modules.Payplug.Admin'}</a>*}
         </div>
 {elseif $type == 'premium'}
         <div class="panel-heading">{l s='Enable one-click payments' mod='payplug'}</div>
