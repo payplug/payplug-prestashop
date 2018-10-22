@@ -1310,7 +1310,7 @@ class Payplug extends PaymentModule
     {
         $php_min_version = 50300;
         $curl_min_version = '7.21';
-        $openssl_min_version = 0x009080ff;
+        $openssl_min_version = 0x1000100f;
         $report = array(
             'php' => array(
                 'version' => 0,
