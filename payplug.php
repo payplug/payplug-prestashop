@@ -94,8 +94,8 @@ class Payplug extends PaymentModule
      */
     public function __construct()
     {
-        $this->setLoggers();
         $this->setPrimaryModuleProperties();
+        $this->setLoggers();
         parent::__construct();
         $this->setEnvironnement();
         $this->setConfigurationProperties();
