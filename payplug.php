@@ -2086,7 +2086,7 @@ class Payplug extends PaymentModule
         $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
         $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
         $cardsToDelete = $this->getCardsByCustomer($id_customer, false);
-        if (!isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
+        if (isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
             foreach ($cardsToDelete as $card) {
                 $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
                 if (!$this->deleteCard($id_customer, $card['id_payplug_card'], $api_key)) {
