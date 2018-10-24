@@ -3253,33 +3253,32 @@ class Payplug extends PaymentModule
     {
         if (!is_int($id_customer) || $id_customer === null) {
             return false;
-        } else {
-            $req_payplug_card = '
-                SELECT pc.last4, pc. exp_month, pc.exp_year, pc.brand, pc.country
-                FROM '._DB_PREFIX_.'payplug_card pc
-                WHERE pc.id_customer = '.(int)$id_customer;
-            $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
-            if (!$res_payplug_card) {
-                $cards = null;
-            } else {
-                $i = 1;
-                $cards = array();
-                foreach ($res_payplug_card as &$card) {
-                    $card['expiry_date'] = date(
-                        'm / y',
-                        mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
-                    );
-                    $cards[] = array(
-                        $this->l('#') => $i,
-                        $this->l('Brand') => $card['brand'],
-                        $this->l('Country') => $card['country'],
-                        $this->l('Card') => '**** **** **** '.$card['last4'],
-                        $this->l('Expiry date') => $card['expiry_date']
-                    );
-                    $i ++;
-                }
-            }
-            return $cards;
         }
+        $req_payplug_card = '
+            SELECT pc.last4, pc.exp_month, pc.exp_year, pc.brand, pc.country
+            FROM '._DB_PREFIX_.'payplug_card pc
+            WHERE pc.id_customer = '.(int)$id_customer;
+        $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
+        if (!$res_payplug_card) {
+            $cards = null;
+        } else {
+            $i = 1;
+            $cards = array();
+            foreach ($res_payplug_card as &$card) {
+                $card['expiry_date'] = date(
+                    'm / y',
+                    mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
+                );
+                $cards[] = array(
+                    $this->l('#') => $i,
+                    $this->l('Brand') => $card['brand'],
+                    $this->l('Country') => $card['country'],
+                    $this->l('Card') => '**** **** **** '.$card['last4'],
+                    $this->l('Expiry date') => $card['expiry_date']
+                );
+                $i ++;
+            }
+        }
+        return $cards;
     }
 }
