@@ -101,8 +101,6 @@ class Payplug extends PaymentModule
         $this->setConfigurationProperties();
         $this->setSecretKey();
         $this->setUserAgent();
-
-        $this->img_lang = $this->context->language->iso_code === 'it' ? 'it' : 'default';
     }
 
     private function setLoggers()
@@ -164,6 +162,7 @@ class Payplug extends PaymentModule
 
         $this->current_api_key = $this->getCurrentApiKey();
         $this->email = Configuration::get('PAYPLUG_EMAIL');
+        $this->img_lang = $this->context->language->iso_code === 'it' ? 'it' : 'default';
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
         
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
@@ -980,6 +979,7 @@ class Payplug extends PaymentModule
             }
             if (isset($json_answer->configuration->min_amounts)
                 && !empty($json_answer->configuration->min_amounts)
+                //TODO ce n'est pas un array mais un objet
                 && sizeof($json_answer->configuration->min_amounts)
             ) {
                 $configuration['min_amounts'] = '';
@@ -990,6 +990,7 @@ class Payplug extends PaymentModule
             }
             if (isset($json_answer->configuration->max_amounts)
                 && !empty($json_answer->configuration->max_amounts)
+                //TODO ce n'est pas un array mais un objet
                 && sizeof($json_answer->configuration->max_amounts)
             ) {
                 $configuration['max_amounts'] = '';
