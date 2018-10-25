@@ -25,7 +25,7 @@
 
 p.payment_module a.payplug
 {
-	background: url('../img/payplug.png') 15px center no-repeat #FBFBFB;
+	background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
 	padding-left: 197px;
 }
 
@@ -69,7 +69,7 @@ div.payplug-wrapper .payment_module {
 }
 
 div.payplug-wrapper .payment_module span{
-	background: url('../img/payplug.png') 15px center no-repeat #FBFBFB;
+	background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
 	/*padding-left: 197px;*/
 	padding: 33px 40px 34px 197px;
 	display: block;
