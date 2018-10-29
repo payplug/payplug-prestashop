@@ -101,6 +101,8 @@ class Payplug extends PaymentModule
         $this->setConfigurationProperties();
         $this->setSecretKey();
         $this->setUserAgent();
+
+        $this->img_lang = $this->context->language->iso_code === 'it' ? 'it' : 'default';
     }
 
     private function setLoggers()
@@ -124,7 +126,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.15.1';
+        $this->version = '2.15.0';
     }
 
     /**
@@ -137,13 +139,13 @@ class Payplug extends PaymentModule
         if (isset($_SERVER['PAYPLUG_API_URL'])) {
             $this->api_url = $_SERVER['PAYPLUG_API_URL'];
         } else {
-            $this->api_url = 'https://api.payplug.com';
+            $this->api_url = PAYPLUG_PROD_API_URL;
         }
 
         if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
             $this->site_url = $_SERVER['PAYPLUG_SITE_URL'];
         } else {
-            $this->site_url = 'https://www.payplug.com';
+            $this->site_url = PAYPLUG_PROD_SITE_URL;
         }
     }
 
@@ -162,7 +164,6 @@ class Payplug extends PaymentModule
 
         $this->current_api_key = $this->getCurrentApiKey();
         $this->email = Configuration::get('PAYPLUG_EMAIL');
-        $this->img_lang = $this->context->language->iso_code === 'it' ? 'it' : 'default';
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
         
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
@@ -979,7 +980,6 @@ class Payplug extends PaymentModule
             }
             if (isset($json_answer->configuration->min_amounts)
                 && !empty($json_answer->configuration->min_amounts)
-                //TODO ce n'est pas un array mais un objet
                 && sizeof($json_answer->configuration->min_amounts)
             ) {
                 $configuration['min_amounts'] = '';
@@ -990,7 +990,6 @@ class Payplug extends PaymentModule
             }
             if (isset($json_answer->configuration->max_amounts)
                 && !empty($json_answer->configuration->max_amounts)
-                //TODO ce n'est pas un array mais un objet
                 && sizeof($json_answer->configuration->max_amounts)
             ) {
                 $configuration['max_amounts'] = '';
