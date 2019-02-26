@@ -105,6 +105,12 @@ function admin_start()
         ) {
             checkPremium(true);
             $(this).siblings('.slide-button').css('left', '0%');
+        } else if (
+            ($(this).attr('checked') == 'checked' || $(this).attr('checked') == true)
+            || ($('#payplug_installment_yes').attr('checked') == 'checked' || $('#payplug_installment_yes').attr('checked') == true)
+        ) {
+            checkPremium(true);
+            $(this).siblings('.slide-button').css('left', '0%');
         } else {
             $(this).siblings('.slide-button').css('left', '0%');
         }
@@ -125,10 +131,12 @@ function admin_start()
             var sandbox = $('#payplug_sandbox_mode_on').attr('checked');
             var embedded = $('#payplug_embedded_mode_on').attr('checked');
             var one_click = $('#payplug_one_click_yes').attr('checked');
+            var installment = $('#payplug_installment_yes').attr('checked');
             var args = {
                 sandbox: (sandbox == 'checked' || sandbox == true) ? 1 : 0,
                 embedded: (embedded == 'checked' || embedded == true) ? 1 : 0,
                 one_click: (one_click == 'checked' || one_click == true) ? 1 : 0,
+                installment: (installment == 'checked' || installment == true) ? 1 : 0,
                 activate: 1
             };
             callPopin('confirm', args);
@@ -165,6 +173,27 @@ function admin_start()
             && !$(this).hasClass('premium')
         ){
             e.preventDefault();
+            checkPremium(false, 'oneclick');
+        }
+    });
+
+    $('#payplug_installment_yes').bind('click', function(e) {
+        if (
+            ($('#payplug_sandbox_mode_off').attr('checked') == 'checked' || $('#payplug_sandbox_mode_off').attr('checked') == true)
+            && !$(this).hasClass('premium')
+        ){
+            e.preventDefault();
+            checkPremium(false, 'installment');
+
+        }
+    });
+
+    $('#payplug_installment_yes').bind('click', function(e) {
+        if (
+            ($('#payplug_sandbox_mode_off').attr('checked') == 'checked' || $('#payplug_sandbox_mode_off').attr('checked') == true)
+            && !$(this).hasClass('premium')
+        ){
+            e.preventDefault();
             checkPremium(false);
         }
     });
@@ -195,19 +224,23 @@ function admin_start()
         }
     });
 
-    $('#submitSettings').bind('click', function(e){
-        if($(this).hasClass('is_active')) {
+    $('#submitSettings').bind('click', function(e) {
+        if ($(this).hasClass('is_active') && $('#installment_config_error').hasClass('hide')) {
             var sandbox = $('#payplug_sandbox_mode_on').attr('checked');
             var embedded = $('#payplug_embedded_mode_on').attr('checked');
             var one_click = $('#payplug_one_click_yes').attr('checked');
+            var installment = $('#payplug_installment_yes').attr('checked');
             var args = {
                 sandbox: (sandbox == 'checked' || sandbox == true) ? 1 : 0,
                 embedded: (embedded == 'checked' || embedded == true) ? 1 : 0,
                 one_click: (one_click == 'checked' || one_click == true) ? 1 : 0,
+                installment: (installment == 'checked' || installment == true) ? 1 : 0,
                 activate: 0
             };
             e.preventDefault();
             callPopin('confirm', args);
+            return false;
+        } else {
             return false;
         }
     });
@@ -221,6 +254,47 @@ function admin_start()
         e.preventDefault();
         login();
     });
+
+    if ($('input[name=PAYPLUG_INST]:checked').val() == 0) {
+        $('.ppinstallmentchecked').hide();
+    }
+    $('input[name=PAYPLUG_INST]').bind('change', function(e){
+        if($(this).val() == 1) {
+            $('.ppinstallmentchecked').show();
+        } else {
+            $('.ppinstallmentchecked').hide();
+        }
+    });
+
+    showInstallments($('input[name=PAYPLUG_INST_MODE]:checked').val());
+    $('input[name=PAYPLUG_INST_MODE]').bind('change', function(e){
+        showInstallments(this.value);
+    });
+
+    $('#payplug_installment_min_amount').bind('keyup', function() {
+        if (isNaN($(this).val()) || $(this).val() < 4 || $(this).val() > 20000) {
+            if($('#installment_config_error').hasClass('hide')) {
+                $('#installment_config_error').removeClass('hide');
+            }
+            $('#payplug_admin_form form').bind('submit', disableForm());
+        } else {
+            if(!$('#installment_config_error').hasClass('hide')) {
+                $('#installment_config_error').addClass('hide');
+            }
+            $('#payplug_admin_form form').unbind('submit', disableForm());
+        }
+    });
+
+    $(document).on('keyup keypress', '#payplug_admin_form form', function(e) {
+        if(e.which == 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+}
+
+function disableForm() {
+    return false;
 }
 
 function login()
@@ -383,7 +457,7 @@ function callPopin(type, args){
         var data = {_ajax: 1, popin: 1, type: type};
         if(type == 'confirm')
         {
-            data = {_ajax: 1, popin: 1, type: type, sandbox: args['sandbox'], embedded: args['embedded'], one_click: args['one_click'], activate: args['activate']};
+            data = {_ajax: 1, popin: 1, type: type, sandbox: args['sandbox'], embedded: args['embedded'], one_click: args['one_click'], installment: args['installment'], activate: args['activate']};
         }
 
         $.ajax({
@@ -406,7 +480,7 @@ function callPopin(type, args){
                 if(type == 'pwd') {
                     $('#payplug_popin input[type=password]').focus();
                 }
-                $('span.ppclose, .ppcancel').bind('click', function(){
+                $('span.ppclose, .ppcancel').bind('click', function() {
                     $('#payplug_popin').remove();
                     $('.ppoverlay').remove();
                     if(type == 'wrong_pwd' || type == 'activate') {
@@ -494,7 +568,7 @@ function callFieldset()
     });
 }
 
-function checkPremium(go_live)
+function checkPremium(go_live, type)
 {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     var data = {_ajax: 1, checkPremium: 1};
@@ -515,22 +589,37 @@ function checkPremium(go_live)
         success: function(result)
         {
             if (go_live == false) {
-                if(result == true) {
+                if (result['can_save_cards'] == true && type == 'oneclick') {
                     $('input[name=PAYPLUG_ONE_CLICK]').addClass('premium');
                     $('#payplug_one_click_yes').click();
                     $('#payplug_one_click_yes').siblings('.slide-button').css('left', '0%');
-                } else {
+                }
+                if (result['can_create_installment_plan'] == true && type == 'installment') {
+                    $('input[name=PAYPLUG_INST]').addClass('premium');
+                    $('#payplug_installment_yes').click();
+                    $('#payplug_installment_yes').siblings('.slide-button').css('left', '0%');
+                }
+                if ((result['can_save_cards'] == false && type == 'oneclick')
+                    || (result['can_create_installment_plan'] == false && type == 'installment')) {
                     callPopin('premium');
                 }
             } else {
-                if(result == true) {
-
-                } else {
+                if (result['can_save_cards'] == false) {
                     $('#payplug_one_click_no').click();
                     $('#payplug_one_click_no').siblings('.slide-button').css('left', '50%');
+                }
+                if (result['can_create_installment_plan'] == false) {
+                    $('#payplug_installment_no').click();
+                    $('#payplug_installment_no').siblings('.slide-button').css('left', '50%');
                 }
             }
 
         }
     });
+}
+
+function showInstallments(installment_value)
+{
+    $('.ppinstallments').hide();
+    $('.pp'+installment_value+'installments').show();
 }

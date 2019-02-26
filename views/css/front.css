@@ -268,3 +268,39 @@ div.ppoverlay {
 #module-payplug-cards div.message{
 	display: none;
 }
+
+p.payment_module a.payplug.installment_2 {
+	background: url('../img/logos_schemes_installment_2_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_2.it {
+	background-image: url('../img/logos_schemes_installment_2_it.png');
+}
+
+p.payment_module a.payplug.installment_2.en {
+	background-image: url('../img/logos_schemes_installment_2_en.png');
+}
+
+p.payment_module a.payplug.installment_3 {
+	background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_3.it {
+	background-image: url('../img/logos_schemes_installment_3_it.png');
+}
+
+p.payment_module a.payplug.installment_3.en {
+	background-image: url('../img/logos_schemes_installment_3_en.png');
+}
+
+p.payment_module a.payplug.installment_4 {
+	background: url('../img/logos_schemes_installment_4_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_4.it {
+	background-image: url('../img/logos_schemes_installment_4_it.png');
+}
+
+p.payment_module a.payplug.installment_4.en {
+	background-image: url('../img/logos_schemes_installment_4_en.png');
+}

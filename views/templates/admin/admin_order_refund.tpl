@@ -24,10 +24,13 @@
 *}
 
 <p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' mod='payplug'}</p>
-{*<p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' d='Modules.Payplug.Admin'}</p>*}
 <form method="post" action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
-    <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
+    {if isset($pay_id)}
+        <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
+    {elseif isset($inst_id)}
+        <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
+    {/if}
     <input type="hidden" name="id_customer" value="{$order->id_customer|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="pay_mode" value="{$pay_mode|escape:'htmlall':'UTF-8'}" />

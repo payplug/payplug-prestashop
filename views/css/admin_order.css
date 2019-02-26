@@ -77,6 +77,23 @@
 	background: none;
 }
 
+#pppanel .table-responsive {
+	width: 50%;
+	overflow: hidden;
+}
+
+#pppanel .table-responsive td.actions {
+	width: 100px;
+}
+
+#pppanel .table-responsive .open_payment_information {
+	margin: 0;
+}
+
+#pppanel table {
+	margin: 0 0 15px 0;
+}
+
 .pp_admin_ajax_url{
 	display: none;
 }
@@ -148,6 +165,10 @@ span.ppclose {
 	cursor: pointer;
 	margin: 15px 0 0 0;
 	text-transform: uppercase;
+}
+
+#payplug_popin .popin-button.no-width {
+	width: auto;
 }
 
 #payplug_popin .white-button {
@@ -337,4 +358,22 @@ span.ppclose {
 	border-width: 1px 0 0;
 	margin-bottom: 17px;
 	margin-top: 17px;
+}
+
+#pppanel .pp_fixed_height {
+	height: 38px;
+}
+
+#pppanel td.pp_success {
+	color: #00c29a;
+	font-weight: bold;
+}
+
+#pppanel td.pp_error {
+	color: #dd2525;
+	font-weight: bold;
+}
+
+.pp_inst_status {
+	font-weight: bold;
 }

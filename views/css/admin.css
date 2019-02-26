@@ -441,11 +441,15 @@ a.forgot_pwd{
 	margin-top: 5px;
 }
 
-p.pptips {
+p.pptips, table.pptips {
 	color: #9c9c9c;
 	display: block;
 	margin: 0 auto;
 	padding: 2px 0 0 243px;
+}
+
+#payplug_admin_form .pperror.pptips {
+	margin: 2px 0 0 243px;
 }
 
 p.pptips.login {
@@ -817,4 +821,39 @@ span.ppclose {
 
 .ppbold {
 	font-weight: bold;
+}
+
+#payplug_admin_form .ppinline {
+	display: block;
+}
+
+#payplug_admin_form span.ppinline {
+	margin: 0 0 12px 0;
+}
+
+#payplug_admin_form .ppinline input {
+	display: inline;
+}
+
+#payplug_admin_form input.ppminamount {
+	width: 50px;
+}
+
+#payplug_admin_form  .ppinstallmentchecked input[type="radio"] {
+	margin: 0 0 0 40px;
+	vertical-align: text-bottom;
+}
+
+#payplug_admin_form #payplug_installment_min_amount {
+	width: 75px;
+}
+
+#installment_config_error {
+	color: #dd2525;
+	padding: 0 0 0 10px;
+}
+
+#installment_config_warning {
+	color: #f7a000;
+	padding: 2px 0 0 243px;
 }

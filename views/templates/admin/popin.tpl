@@ -63,7 +63,7 @@
         <span class="ppclose">x</span>
     </div>
     <form action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" method="post">
-        <p class="ppoc">{l s='This option is available only to Premium accounts' mod='payplug'}</p>
+        <p class="ppoc">{l s='You cannot access this feature. For further information please contact our team : support@payplug.com' mod='payplug'}</p>
         {*<p class="ppoc">{l s='This option is available only to Premium accounts' d='Modules.Payplug.Admin'}</p>*}
         <div class="block-button">
             <input class="popin-button green-button center-button ppcancel" type="button" name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Ok' mod='payplug'}">
@@ -84,6 +84,7 @@
             {*<li>{l s='Payment page:' d='Modules.Payplug.Admin'} <span class="ppbold">{if $embedded == 1}{l s='EMBEDDED' d='Modules.Payplug.Admin'}{else}{l s='REDIRECTED' d='Modules.Payplug.Admin'}{/if}</span></li>*}
             <li>{l s='One-click payments:' mod='payplug'} <span class="ppbold">{if $one_click == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
             {*<li>{l s='One-click payments:' d='Modules.Payplug.Admin'} <span class="ppbold">{if $one_click == 1}{l s='ENABLED' d='Modules.Payplug.Admin'}{else}{l s='DISABLED' d='Modules.Payplug.Admin'}{/if}</span></li>*}
+            <li>{l s='Installments:' mod='payplug'} <span class="ppbold">{if $installment == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
         </ul>
         </p>
         <div class="block-button">
@@ -117,6 +118,17 @@
         <div class="block-button">
             <input type="button" class="popin-button center-button ppclose green-button" value="{l s='Ok' mod='payplug'}">
             {*<input type="button" class="popin-button center-button ppclose green-button" value="{l s='Ok' d='Modules.Payplug.Admin'}">*}
+        </div>
+{elseif $type == 'abort'}
+    <div class="panel-heading">{l s='Abort installment' mod='payplug'}</div>
+    <span class="ppclose">x</span>
+    </div>
+    <form action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" method="post">
+        <p>{l s='Do you wish to interrupt the installment plan?' mod='payplug'}</p>
+        <p>{l s='The customer card will not be used for more transactions.' mod='payplug'}</p>
+        <div class="block-button">
+            <input type="button" class="popin-button ppcancel white-button" value="{l s='Cancel' mod='payplug'}">
+            <input class="popin-button green-button no-width" type="submit" name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Abort' mod='payplug'}">
         </div>
 {/if}
     </form>

@@ -70,11 +70,13 @@ if (Tools::getValue('_ajax') == 1) {
             $sandbox = (int)Tools::getValue('sandbox');
             $embedded = (int)Tools::getValue('embedded');
             $one_click = (int)Tools::getValue('one_click');
+            $installment = (int)Tools::getValue('installment');
             $activate = (int)Tools::getValue('activate');
             $args = array(
                 'sandbox' => $sandbox,
                 'embedded' => $embedded,
                 'one_click' => $one_click,
+                'installment' => $installment,
                 'activate' => $activate,
             );
         }
@@ -92,6 +94,9 @@ if (Tools::getValue('_ajax') == 1) {
     if (Tools::getValue('submit') == 'submitPopin_desactivate') {
         die(json_encode(array('content' => 'confirm_ok_desactivate')));
     }
+    if (Tools::getValue('submit') == 'submitPopin_abort') {
+        die(json_encode(array('content' => '')));
+    }
     if ((int)Tools::getValue('check') == 1) {
         $content = $payplug->getCheckFieldset();
         die(json_encode(array('content' => $content)));
@@ -102,11 +107,7 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
         $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        if ($payplug->checkPremium($api_key)) {
-            die(true);
-        } else {
-            die(false);
-        }
+        die(json_encode($payplug->checkPremium($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
         if (!$payplug->checkAmountToRefund(Tools::getValue('amount'))) {
@@ -124,12 +125,13 @@ if (Tools::getValue('_ajax') == 1) {
 
         $id_order = Tools::getValue('id_order');
         $pay_id = Tools::getValue('pay_id');
+        $inst_id = Tools::getValue('inst_id');
         $metadata = array(
             'ID Client' => (int)Tools::getValue('id_customer'),
             'reason' => 'Refunded with Prestashop'
         );
         $pay_mode = Tools::getValue('pay_mode');
-        $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode);
+        $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
             die(json_encode(array(
                 'status' => 'error',

@@ -58,7 +58,11 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     Tools::redirect($this->context->link->getModuleLink('payplug', 'payment', array(), true));
                 }
             } elseif ((int)Tools::getValue('lightbox') == 1) {
-                Tools::redirect('index.php?controller=order&step=3&lightbox=1');
+                if ((int)Tools::getValue('inst') == 1) {
+                    Tools::redirect('index.php?controller=order&step=3&lightbox=1&inst=1');
+                } else {
+                    Tools::redirect('index.php?controller=order&step=3&lightbox=1');
+                }
             }
         } else {
             Tools::redirect('index.php');
