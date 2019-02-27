@@ -37,8 +37,16 @@
 	float: left;
 }
 
+#pppanel .btn.open_installment_information{
+	margin: 0;
+}
+
 #pppanel input[type="submit"].green-button.button{
 	margin-top: 20px;
+}
+
+#pppanel input[type="submit"].green-button.abort-button{
+	margin-top: 0;
 }
 
 #pppanel input[type="submit"].green-button{
@@ -51,6 +59,15 @@
 	margin: 0 0 0 60px;
 	width: 150px;
 	height: 27px;
+}
+
+#pppanel input[type="submit"].green-button.abort-button.btn[disabled]{
+	cursor: not-allowed;
+	pointer-events: none;
+	opacity: 0.65;
+	filter: alpha(opacity=65);
+	-webkit-box-shadow: none;
+	box-shadow: none;
 }
 
 #pppanel input[type="submit"].green-button:hover{
@@ -77,9 +94,8 @@
 	background: none;
 }
 
-#pppanel .table-responsive {
-	width: 50%;
-	overflow: hidden;
+#pppanel .table-responsive.half-width {
+	max-width: 50%;
 }
 
 #pppanel .table-responsive td.actions {

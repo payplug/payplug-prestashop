@@ -3780,12 +3780,6 @@ class Payplug extends PaymentModule
                 ';
             }
 
-            if ($show_popin && $show_menu) {
-                $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
-            }
-            $this->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin_order.js');
-            $this->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin_order.css');
-
             $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
             if ((int)$payment->is_refunded == 1) {
                 $pay_status = $this->l('REFUNDED');
@@ -3874,6 +3868,12 @@ class Payplug extends PaymentModule
             'show_menu_installment' => $show_menu_installment,
             'pay_mode' => $pay_mode,
         ));
+
+        if ($show_popin && $show_menu) {
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+        }
+        $this->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin_order.js');
+        $this->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin_order.css');
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin_order.tpl');
         return $this->html;
