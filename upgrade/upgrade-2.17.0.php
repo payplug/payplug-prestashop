@@ -30,13 +30,12 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_16_0($object)
 {
-    include_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
-    if (!PayplugBackward::updateConfiguration('PAYPLUG_INST', null)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MODE', 3)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MIN_AMOUNT', 150)
+    if (!Configuration::updateValue('PAYPLUG_INST', null)
+        || !Configuration::updateValue('PAYPLUG_INST_MODE', 3)
+        || !Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
     ) {
         $log->error('Fail to add new configuration');
         $flag = false;

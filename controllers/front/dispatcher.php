@@ -54,6 +54,13 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     }
                 } elseif ((int)Tools::getValue('lightbox') == 1) {
                     Tools::redirect('index.php?controller=order&step=3&lightbox=1');
+                } elseif ((int)Tools::getValue('inst') == 1) {
+                    $payplug = new Payplug();
+                    $id_cart = (int)Tools::getValue('id_cart');
+                    //$payment_data = json_decode($payplug->preparePayment($id_cart, null, true));
+                    //Tools::redirect($payment_data->payment_url);
+                    $payment_url = $payplug->preparePayment($id_cart, null, true);
+                    Tools::redirect($payment_url);
                 } else {
                     Tools::redirect($this->context->link->getModuleLink('payplug', 'payment', array(), true));
                 }

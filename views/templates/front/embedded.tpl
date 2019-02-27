@@ -24,5 +24,5 @@
 *}
 
 {if isset($lightbox) && $lightbox == 1}
-	<script id="payplug_form_js" data-payment-url="{$payment_url|escape:'htmlall':'UTF-8'}" type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1.0/form.js"></script>
+	<script id="payplug_form_js" data-payment-url="{$payment_url|escape:'htmlall':'UTF-8'}" type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1.3/form.js"></script>
 {/if}

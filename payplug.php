@@ -1982,7 +1982,6 @@ class Payplug extends PaymentModule
                 'cancel_url'        => $cancel_url
             );
         }
-
         //notification
         $notification_url = $this->context->link->getModuleLink($this->name, 'ipn', array(), true);
 
@@ -2074,7 +2073,6 @@ class Payplug extends PaymentModule
                 'notification_url' => $notification_url,
                 'metadata' => $payment_tab['metadata'],
             );
-
             try {
                 $this->storeInstallment('pending', (int)$cart->id);
                 if (Configuration::get('PAYPLUG_DEBUG_MODE')) {
@@ -2083,7 +2081,6 @@ class Payplug extends PaymentModule
                 }
 
                 $inst = \Payplug\InstallmentPlan::create($installment_options);
-
                 if ($inst->failure != null && !empty($inst->failure['message'])) {
                     $data = array(
                         'result' => false,
@@ -2101,12 +2098,13 @@ class Payplug extends PaymentModule
                     'response' => $e->__toString(),
                 );
                 if (version_compare(_PS_VERSION_, '1.7', '<')) {
+                    dump('return -2');
                     die(json_encode($data));
                 } else {
+                    dump('return -1');
                     return($data);
                 }
             }
-
             $this->storeInstallment($inst->id, (int)$cart->id);
             if ($one_click == 1) {
                 $data = array(
@@ -2434,13 +2432,13 @@ class Payplug extends PaymentModule
         } else {
             if ($embedded_mode == 1) {
                 if ($installment == 1) {
-                    $payment_options = array($this->getEmbeddedInstPaymentOption((int)$params['cart']->id));
+                    $payment_options = $this->getEmbeddedInstPaymentOption((int)$params['cart']->id);
                 } else {
                     $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id));
                 }
             } else {
                 if ($installment == 1) {
-                    $payment_options = array($this->getRedirectInstPaymentOption());
+                    $payment_options = $this->getRedirectInstPaymentOption();
                 } else {
                     $payment_options = array($this->getRedirectPaymentOption());
                 }
@@ -2982,26 +2980,233 @@ class Payplug extends PaymentModule
 
     public function getRedirectOneClickInstPaymentOption($payplug_cards)
     {
+        $pc = 0;
+        $error = 0;
+        if ((int)Tools::getValue('error') == 1) {
+            $pc = (int)Tools::getValue('pc');
+            $error = 1;
+        }
+
+        $spinner_url = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/payplug/views/img/admin/spinner.gif';
+        $this->context->smarty->assign(array(
+            'spinner_url' => $spinner_url,
+            'error' => $error,
+        ));
+
+        $options = array();
+        if (is_array($payplug_cards)) {
+            foreach ($payplug_cards as $card) {
+                if (!$card['expired']) {
+                    $paymentOption = new PaymentOption();
+                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                    $paymentOption
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.strtolower($card['brand']).'.png'))
+                        ->setCallToActionText($brand.' **** **** **** '.$card['last4'].' - '.$this->l('Expiry date').': '.$card['expiry_date'])
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setModuleName('payplug')
+                        ->setInputs(array(
+                            'pc' => array(
+                                'name' =>'pc',
+                                'type' =>'hidden',
+                                'value' =>(int)$card['id_payplug_card'],
+                            ),
+                            'disp' => array(
+                                'name' =>'disp',
+                                'type' =>'hidden',
+                                'value' =>'1',
+                            ),
+                            'pay' => array(
+                                'name' =>'pay',
+                                'type' =>'hidden',
+                                'value' =>'1',
+                            ),
+                            'id_cart' => array(
+                                'name' =>'id_cart',
+                                'type' =>'hidden',
+                                'value' =>(int)$this->context->cart->id,
+                            ),
+                        ));
+                    if ($pc == (int)$card['id_payplug_card']) {
+                        $paymentOption->setAdditionalInformation(
+                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
+                        );
+                    }
+                    $options[] = $paymentOption;
+                }
+            }
+            $paymentOption = new PaymentOption();
+            $paymentOption
+                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/none.png'))
+                ->setCallToActionText($this->l('Pay with a different card'))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setModuleName('payplug')
+                ->setInputs(array(
+                    'pc' => array(
+                        'name' =>'pc',
+                        'type' =>'hidden',
+                        'value' =>'new_card',
+                    ),
+                    'disp' => array(
+                        'name' =>'disp',
+                        'type' =>'hidden',
+                        'value' =>'1',
+                    ),
+                    'pay' => array(
+                        'name' =>'pay',
+                        'type' =>'hidden',
+                        'value' =>'1',
+                    ),
+                    'id_cart' => array(
+                        'name' =>'id_cart',
+                        'type' =>'hidden',
+                        'value' =>(int)$this->context->cart->id,
+                    ),
+                ));
+            $options[] = $paymentOption;
+        } else {
+            $paymentOption = new PaymentOption();
+            $paymentOption
+                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_'.$this->img_lang.'.png'))
+                ->setCallToActionText($this->l('Pay with a credit card'))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setModuleName('payplug')
+                ->setInputs(array(
+                    'pc' => array(
+                        'name' =>'pc',
+                        'type' =>'hidden',
+                        'value' =>'new_card',
+                    ),
+                    'disp' => array(
+                        'name' =>'disp',
+                        'type' =>'hidden',
+                        'value' =>'1',
+                    ),
+                    'pay' => array(
+                        'name' =>'pay',
+                        'type' =>'hidden',
+                        'value' =>'1',
+                    ),
+                    'id_cart' => array(
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ),
+                ));
+            $options[] = $paymentOption;
+        }
+
+        /* inst */
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
-            ->setCallToActionText($this->l('Pay with credit card'))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setCallToActionText($this->l('Installments'))
             ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_'.$this->img_lang.'.png'));
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
+            ->setInputs(array(
+                'disp' => array(
+                    'name' =>'disp',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'pay' => array(
+                    'name' =>'pay',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'pc' => array(
+                    'name' =>'pc',
+                    'type' =>'hidden',
+                    'value' =>'new_card',
+                ),
+                'inst' => array(
+                    'name' =>'inst',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
+            ));
+        $options[] = $externalOption;
 
-        return $externalOption;
+        return $options;
     }
 
-    public function getEmbeddedInstPaymentOption($id_cart)
+    public function getEmbeddedInstPaymentOption($cart_id)
     {
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+        $lightbox = 0;
+        if ((int)Tools::getValue('lightbox') == 1) {
+            $lightbox = 1;
+            if ((int)Tools::getValue('inst') == 1) {
+                $payment_url = $this->preparePayment((int)$cart_id, null, true);
+            } else {
+                $payment_url = $this->preparePayment((int)$cart_id);
+            }
+            $this->context->smarty->assign(array(
+                'lightbox' => 1,
+                'payment_url' => $payment_url,
+                'api_url' => $this->api_url,
+            ));
+        }
+        $options = array();
+        $paymentOption = new PaymentOption();
+        $paymentOption
             ->setCallToActionText($this->l('Pay with credit card'))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_'.$this->img_lang.'.png'))
             ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_'.$this->img_lang.'.png'));
+            ->setInputs(array(
+                'lightbox' => array(
+                    'name' =>'lightbox',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'disp' => array(
+                    'name' =>'disp',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+            ));
+        if ($lightbox == 1) {
+            $paymentOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
+            );
+        }
+        $options[] = $paymentOption;
+        /* inst */
+        $paymentOptionBis = new PaymentOption();
+        $paymentOptionBis
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
+            ->setCallToActionText($this->l('Installments'))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setModuleName('payplug')
+            ->setInputs(array(
+                'disp' => array(
+                    'name' =>'disp',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'inst' => array(
+                    'name' =>'inst',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'lightbox' => array(
+                    'name' =>'lightbox',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+            ));
+        if ($lightbox == 1) {
+            $paymentOptionBis->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
+            );
+        }
+        $options[] = $paymentOptionBis;
 
-        return $externalOption;
+        return $options;
     }
 
     public function getRedirectInstPaymentOption()
@@ -3012,8 +3217,45 @@ class Payplug extends PaymentModule
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_'.$this->img_lang.'.png'));
+        $options[] = $externalOption;
 
-        return $externalOption;
+        /* inst */
+        $paymentOptionBis = new PaymentOption();
+        $paymentOptionBis
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
+            ->setCallToActionText($this->l('Installments'))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setModuleName('payplug')
+            ->setInputs(array(
+                'disp' => array(
+                    'name' =>'disp',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'pay' => array(
+                    'name' =>'pay',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'pc' => array(
+                    'name' =>'pc',
+                    'type' =>'hidden',
+                    'value' =>'new_card',
+                ),
+                'inst' => array(
+                    'name' =>'inst',
+                    'type' =>'hidden',
+                    'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
+            ));
+        $options[] = $paymentOptionBis;
+
+        return $options;
     }
 
     /**
@@ -3335,10 +3577,10 @@ class Payplug extends PaymentModule
                         \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
-                } elseif (PayplugBackward::getConfiguration('PAYPLUG_SANDBOX_MODE') == 0) {
+                } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
                     \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
-                        \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_LIVE_API_KEY'));
+                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
                 }
@@ -3461,9 +3703,9 @@ class Payplug extends PaymentModule
 
             $sandbox = ((int)$installment->is_live == 1 ? false : true);
             if ($sandbox) {
-                $id_new_order_state = (int)PayplugBackward::getConfiguration('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
             } else {
-                $id_new_order_state = (int)PayplugBackward::getConfiguration('PAYPLUG_ORDER_STATE_REFUND');
+                $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
             }
 
             $show_menu = true;
@@ -3929,9 +4171,9 @@ class Payplug extends PaymentModule
                             $new_state = (int)Tools::getValue('id_state');
                         } elseif ($payment->is_refunded == 1) {
                             if ($payment->is_live == 1) {
-                                $new_state = (int)PayplugBackward::getConfiguration('PAYPLUG_ORDER_STATE_REFUND');
+                                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
                             } else {
-                                $new_state = (int)PayplugBackward::getConfiguration('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
                             }
                         }
                         if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
