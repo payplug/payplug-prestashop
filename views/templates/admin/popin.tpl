@@ -1,5 +1,5 @@
 {*
-* 2018 PayPlug
+* 2019 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2018 PayPlug SAS
+*  @copyright 2019 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -84,7 +84,7 @@
             {*<li>{l s='Payment page:' d='Modules.Payplug.Admin'} <span class="ppbold">{if $embedded == 1}{l s='EMBEDDED' d='Modules.Payplug.Admin'}{else}{l s='REDIRECTED' d='Modules.Payplug.Admin'}{/if}</span></li>*}
             <li>{l s='One-click payments:' mod='payplug'} <span class="ppbold">{if $one_click == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
             {*<li>{l s='One-click payments:' d='Modules.Payplug.Admin'} <span class="ppbold">{if $one_click == 1}{l s='ENABLED' d='Modules.Payplug.Admin'}{else}{l s='DISABLED' d='Modules.Payplug.Admin'}{/if}</span></li>*}
-            <li>{l s='Installments:' mod='payplug'} <span class="ppbold">{if $installment == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
+            <li>{l s='Installments :' mod='payplug'} <span class="ppbold">{if $installment == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
         </ul>
         </p>
         <div class="block-button">

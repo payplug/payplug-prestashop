@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2018 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2018 PayPlug SAS
+ *  @copyright 2013 - 2019 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -43,7 +43,6 @@ class AdminPayplugController extends ModuleAdminController
     {
         $payplug = new Payplug();
         if (Tools::getValue('_ajax') == 1) {
-            //dump('contentget');
             $payplug->adminAjaxController();
         }
 
@@ -93,8 +92,6 @@ class AdminPayplugController extends ModuleAdminController
         }
 
         $is_active = (!empty($PAYPLUG_SHOW) && $PAYPLUG_SHOW == 1) ? true : false;
-
-        $payplug->site_url;
 
         $p_error = '';
         if (!$connected) {

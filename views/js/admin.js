@@ -1,5 +1,5 @@
 /**
- * 2013 - 2018 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2018 PayPlug SAS
+ *  @copyright 2013 - 2019 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -272,7 +272,10 @@ function admin_start()
     });
 
     $('#payplug_installment_min_amount').bind('keyup', function() {
-        if (isNaN($(this).val()) || $(this).val() < 4 || $(this).val() > 20000) {
+        var amount = $(this).val();
+        var matches = amount.match(/^[0-9]+([,|\.]?[0-9]+)?$/);
+        var formatedAmount = amount.replace(',', '.');
+        if (matches == null || parseFloat(formatedAmount) < 4 || parseFloat(formatedAmount) > 20000) {
             if($('#installment_config_error').hasClass('hide')) {
                 $('#installment_config_error').removeClass('hide');
             }

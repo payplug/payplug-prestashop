@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2018 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2018 PayPlug SAS
+ *  @copyright 2013 - 2019 PayPlug SAS
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -74,7 +74,7 @@ class Payplug extends PaymentModule
     );
 
     /** @var string */
-    private $site_url;
+    public $site_url;
 
     /** @var bool */
     private $ssl_enable;
@@ -347,7 +347,7 @@ class Payplug extends PaymentModule
             !Configuration::updateValue('PAYPLUG_COMPANY_STATUS', '') ||
             !Configuration::updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0) ||
             !Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 1) ||
-            !Configuration::updateValue('PAYPLUG_SHOW', 1) ||
+            !Configuration::updateValue('PAYPLUG_SHOW', 0) ||
             !Configuration::updateValue('PAYPLUG_EMAIL', null) ||
             !Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 0) ||
             !Configuration::updateValue('PAYPLUG_ONE_CLICK', null) ||
@@ -842,6 +842,7 @@ class Payplug extends PaymentModule
             } elseif ($curl_exists && $openssl_exists) {
                 if ($this->login(Tools::getValue('PAYPLUG_EMAIL'), Tools::getValue('PAYPLUG_PASSWORD'))) {
                     Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
+                    Configuration::updateValue('PAYPLUG_SHOW', 1);
                 } else {
                     $this->validationErrors['username_password']
                         = $this->l('The email and/or password was not correct.');
@@ -851,6 +852,7 @@ class Payplug extends PaymentModule
 
         if (Tools::isSubmit('submitDisconnect')) {
             $this->createConfig();
+            Configuration::updateValue('PAYPLUG_SHOW', 0);
         }
 
         if (Tools::isSubmit('submitSettings')) {
@@ -2098,15 +2100,13 @@ class Payplug extends PaymentModule
                     'response' => $e->__toString(),
                 );
                 if (version_compare(_PS_VERSION_, '1.7', '<')) {
-                    dump('return -2');
                     die(json_encode($data));
                 } else {
-                    dump('return -1');
                     return($data);
                 }
             }
             $this->storeInstallment($inst->id, (int)$cart->id);
-            if ($one_click == 1) {
+            if ($one_click == 1 || (int)$embedded_mode == 1) {
                 $data = array(
                     'result' => 'new_card',
                     'embedded_mode' => (int)$embedded_mode,
@@ -3668,7 +3668,7 @@ class Payplug extends PaymentModule
                     }
                 } else {
                     $payment_list[] = array(
-                        'status' => $inst_status = $installment->is_active ? $this->l('A venir') : $this->l('Suspended'),
+                        'status' => $inst_status = $installment->is_active ? $this->l('Ongoing') : $this->l('Suspended'),
                         'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
                         'amount' => (int)$schedule->amount / 100,
                         'date' => date('d/m/Y', strtotime($schedule->date)),

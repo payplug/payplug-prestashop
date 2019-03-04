@@ -1,5 +1,5 @@
 {*
-* 2018 PayPlug
+* 2019 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -18,14 +18,11 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PayPlug SAS
-*  @copyright 2018 PayPlug SAS
+*  @copyright 2019 PayPlug SAS
 *  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
 <p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' mod='payplug'}</p>
-{*<p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' d='Modules.Payplug.Admin'}</p>*}
 <p>{l s='This transaction was entirely refunded with Payplug' mod='payplug'}</p>
-{*<p>{l s='This transaction was entirely refunded with Payplug' d='Modules.Payplug.Admin'}</p>*}
-<p class="refunded_amount">{l s='Amount refunded:' mod='payplug'} {$amount_refunded_payplug|escape:'htmlall':'UTF-8'} {$currency->name|escape:'htmlall':'UTF-8'}</p>
-{*<p class="refunded_amount">{l s='Amount refunded:' d='Modules.Payplug.Admin'} {$amount_refunded_payplug|escape:'htmlall':'UTF-8'} {$currency->name|escape:'htmlall':'UTF-8'}</p>*}
+<p class="refunded_amount">{l s='Amount refunded:' mod='payplug'} {displayPrice price=$amount_refunded_payplug}</p>
