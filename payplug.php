@@ -2948,7 +2948,7 @@ class Payplug extends PaymentModule
         $paymentOptionBis = new PaymentOption();
         $paymentOptionBis
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
-            ->setCallToActionText($this->l('Installments'))
+            ->setCallToActionText($this->l('Pay by card in').' '.Configuration::get('PAYPLUG_INST_MODE').' '.$this->l('installments'))
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
             ->setModuleName('payplug')
             ->setInputs(array(
@@ -3099,7 +3099,7 @@ class Payplug extends PaymentModule
         $externalOption = new PaymentOption();
         $externalOption
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
-            ->setCallToActionText($this->l('Installments'))
+            ->setCallToActionText($this->l('Pay by card in').' '.Configuration::get('PAYPLUG_INST_MODE').' '.$this->l('installments'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
             ->setInputs(array(
@@ -3179,7 +3179,7 @@ class Payplug extends PaymentModule
         $paymentOptionBis = new PaymentOption();
         $paymentOptionBis
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
-            ->setCallToActionText($this->l('Installments'))
+            ->setCallToActionText($this->l('Pay by card in').' '.Configuration::get('PAYPLUG_INST_MODE').' '.$this->l('installments'))
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
             ->setModuleName('payplug')
             ->setInputs(array(
@@ -3223,7 +3223,7 @@ class Payplug extends PaymentModule
         $paymentOptionBis = new PaymentOption();
         $paymentOptionBis
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logos_schemes_installment_'.Configuration::get('PAYPLUG_INST_MODE').'_'.$this->img_lang.'.png'))
-            ->setCallToActionText($this->l('Installments'))
+            ->setCallToActionText($this->l('Pay by card in').' '.Configuration::get('PAYPLUG_INST_MODE').' '.$this->l('installments'))
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
             ->setModuleName('payplug')
             ->setInputs(array(
