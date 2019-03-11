@@ -279,65 +279,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         );
                                         die(json_encode($response));
                                     }
-                                    if ($current_state == $inst_state) {
-                                        $this->addLog($debug, $log, 'Order is currently pending for installment.', 'info');
-                                        $this->addLog($debug, $log, 'Payment amount: '.$payment->amount, 'debug');
-                                        sleep(5);
-                                        $installment = $payplug->retrieveInstallment($payment->installment_plan_id);
-                                        if ((int)$installment->is_fully_paid == 1) {
-                                            $this->addLog($debug, $log, 'Installment is fully paid.', 'info');
-                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
-                                            sleep(5);
-                                            $new_order_state = $paid_state;
-                                            $order_history = new OrderHistory();
-                                            $order_history->id_order = (int)$order_id;
-                                            try {
-                                                $order_history->changeIdOrderState((int)$new_order_state, $order_id, true);
-                                                $order_history->save();
-                                            } catch (Exception $exception) {
-                                                $this->addLog($debug, $log, 'Order history cannot be saved: '.$exception->getMessage(), 'error');
-                                                $this->addLog($debug, $log, 'Please check if order state '.(int)$new_order_state.' exists.', 'error');
-                                                $response = array(
-                                                    'exception' => $exception->getMessage(),
-                                                );
-                                                header(
-                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
-                                                    true,
-                                                    $exception->getCode()
-                                                );
-                                                die(json_encode($response));
-                                            }
-
-                                            $order->current_state = $order_history->id_order_state;
-                                            try {
-                                                $order->update();
-                                            } catch (Exception $exception) {
-                                                $this->addLog($debug, $log, 'Order cannot be updated: '.$exception->getMessage(), 'error');
-                                                $response = array(
-                                                    'exception' => $exception->getMessage(),
-                                                );
-                                                header(
-                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
-                                                    true,
-                                                    $exception->getCode()
-                                                );
-                                                die(json_encode($response));
-                                            }
-
-                                            echo $this->addLog($debug, $log, 'Order updated.', 'info');
-                                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                                            if (!$cart_unlock) {
-                                                $this->addLog($debug, $log, 'Lock cannot be deleted.', 'error');
-                                            } else {
-                                                $this->addLog($debug, $log, 'Lock deleted.', 'debug');
-                                            }
-                                            header($_SERVER['SERVER_PROTOCOL'].' 200 Order updated.', true, 200);
-                                            die;
-                                        } else {
-                                            $this->addLog($debug, $log, 'Installment still pending.', 'info');
-                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
-                                        }
-                                    } elseif ($current_state == $pending_state) {
+                                    if ($current_state == $pending_state) {
                                         $this->addLog($debug, $log, 'Order is currently pending.', 'info');
                                         $this->addLog($debug, $log, 'Payment amount: '.$payment->amount, 'debug');
                                         if (PayPlug::checkAmountPaidIsCorrect($payment->amount / 100, $order)) {
@@ -424,6 +366,61 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         }
                                         header($_SERVER['SERVER_PROTOCOL'].' 200 Order is already paid.', true, 200);
                                         die;
+                                    } elseif ($installment = $payplug->retrieveInstallment($payment->installment_plan_id)) {
+                                        $this->addLog($debug, $log, 'Order is currently pending for installment.', 'info');
+                                        $this->addLog($debug, $log, 'Payment amount: '.$payment->amount, 'debug');
+                                        if ((int)$installment->is_fully_paid == 1) {
+                                            $this->addLog($debug, $log, 'Installment is fully paid.', 'info');
+                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                                            $new_order_state = $paid_state;
+                                            $order_history = new OrderHistory();
+                                            $order_history->id_order = (int)$order_id;
+                                            try {
+                                                $order_history->changeIdOrderState((int)$new_order_state, $order_id, true);
+                                                $order_history->save();
+                                            } catch (Exception $exception) {
+                                                $this->addLog($debug, $log, 'Order history cannot be saved: '.$exception->getMessage(), 'error');
+                                                $this->addLog($debug, $log, 'Please check if order state '.(int)$new_order_state.' exists.', 'error');
+                                                $response = array(
+                                                    'exception' => $exception->getMessage(),
+                                                );
+                                                header(
+                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
+                                                    true,
+                                                    $exception->getCode()
+                                                );
+                                                die(json_encode($response));
+                                            }
+
+                                            $order->current_state = $order_history->id_order_state;
+                                            try {
+                                                $order->update();
+                                            } catch (Exception $exception) {
+                                                $this->addLog($debug, $log, 'Order cannot be updated: '.$exception->getMessage(), 'error');
+                                                $response = array(
+                                                    'exception' => $exception->getMessage(),
+                                                );
+                                                header(
+                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
+                                                    true,
+                                                    $exception->getCode()
+                                                );
+                                                die(json_encode($response));
+                                            }
+
+                                            echo $this->addLog($debug, $log, 'Order updated.', 'info');
+                                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                                            if (!$cart_unlock) {
+                                                $this->addLog($debug, $log, 'Lock cannot be deleted.', 'error');
+                                            } else {
+                                                $this->addLog($debug, $log, 'Lock deleted.', 'debug');
+                                            }
+                                            header($_SERVER['SERVER_PROTOCOL'].' 200 Order updated.', true, 200);
+                                            die;
+                                        } else {
+                                            $this->addLog($debug, $log, 'Installment still pending.', 'info');
+                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                                        }
                                     } else {
                                         echo $this->addLog(
                                             $debug,
