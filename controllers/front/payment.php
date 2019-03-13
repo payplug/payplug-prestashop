@@ -41,12 +41,8 @@ $cookie = $context->cookie;
 
 $result_currency = array();
 $cart = $context->cart;
-$isInstallment = false;
-if ((int)Tools::getValue('i') === 1) {
-    $isInstallment = true;
-}
 
-$payment_url = $payplug->preparePayment($cart->id, null, $isInstallment);
+$payment_url = $payplug->preparePayment($cart->id, null, false);
 if (!is_array($payment_url)) {
     Tools::redirect($payment_url);
 } else {
