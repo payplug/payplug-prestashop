@@ -1,26 +1,23 @@
 <?php
 /**
- * 2013 - 2018 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2018 PayPlug SAS
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @copyright 2013 - 2019 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -48,6 +45,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
         //Settings
         $debug = Configuration::get('PAYPLUG_DEBUG_MODE');
+        $type = 'payment';
 
         if ($debug) {
             require_once(dirname(__FILE__).'/../../classes/MyLogPHP.class.php');
@@ -91,19 +89,46 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             Tools::redirect($redirect_url_error);
         } else {
             if (!$pay_id = $payplug->getPaymentByCart((int)$cart_id)) {
-                $this->addLog($debug, $log, 'Payment is not stored or is already consumed.', 'error');
-                $id_order = Order::getOrderByCartId($cart->id);
-                $customer = new Customer((int)$cart->id_customer);
-                $link_redirect = __PS_BASE_URI__.$order_confirmation_url.'id_cart='.$cart->id
-                    .'&id_module='.$payplug->id.'&id_order='.$id_order.'&key='.$customer->secure_key;
-                Tools::redirect($link_redirect);
+                if (!$inst_id = $payplug->getInstallmentByCart((int)$cart_id)) {
+                    $this->addLog($debug, $log, 'Payment is not stored or is already consumed.', 'error');
+                    $id_order = Order::getOrderByCartId($cart->id);
+                    $customer = new Customer((int)$cart->id_customer);
+                    $link_redirect = __PS_BASE_URI__.$order_confirmation_url.'id_cart='.$cart->id
+                        .'&id_module='.$payplug->id.'&id_order='.$id_order.'&key='.$customer->secure_key;
+                    Tools::redirect($link_redirect);
+                } elseif ($inst_id = $payplug->getInstallmentByCart((int)$cart_id)) {
+                    $this->addLog($debug, $log, 'Installment is not consumed yet.', 'info');
+                    $amount = 0;
+                    $pay_id = '';
+                    $type = 'installment';
+                    try {
+                        $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                        if (isset($installment->schedule)) {
+                            foreach ($installment->schedule as $schedule) {
+                                if (!empty($schedule->payment_ids)) {
+                                    $amount = (int)$schedule->amount;
+                                    $pay_id = $schedule->payment_ids[0];
+                                    break;
+                                }
+                            }
+                        }
+                        $this->addLog($debug, $log, 'Retrieving installment...', 'info');
+                        if ($installment->failure) {
+                            $this->addLog($debug, $log, 'Installment failure : '.$installment->failure->message, 'error');
+                            Tools::redirect($redirect_url_error);
+                        }
+                    } catch (Exception $e) {
+                        $this->addLog($debug, $log, 'Installment cannot be retrieved.', 'error');
+                        Tools::redirect($redirect_url_error);
+                    }
+                }
             } else {
                 $this->addLog($debug, $log, 'Payment is not consumed yet.', 'info');
                 try {
                     $payment = \Payplug\Payment::retrieve($pay_id);
                     $this->addLog($debug, $log, 'Retrieving payment...', 'info');
                     if ($payment->failure) {
-                        $this->addLog($debug, $log, 'Payment failure : '.$payment->failure->message, 'error');
+                        $this->addLog($debug, $log, 'Payment failure : ' . $payment->failure->message, 'error');
                         Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
@@ -111,14 +136,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $this->addLog($debug, $log, 'Payment cannot be retrieved.', 'error');
                     Tools::redirect($redirect_url_error);
                 }
-            }
 
-            if ($payment->save_card == 1 || ($payment->card->id != '' && $payment->hosted_payment != '')) {
-                $this->addLog($debug, $log, 'Saving card...', 'info');
-                $res_payplug_card = $payplug->saveCard($payment);
+                if ($payment->save_card == 1 || ($payment->card->id != '' && $payment->hosted_payment != '')) {
+                    $this->addLog($debug, $log, 'Saving card...', 'info');
+                    $res_payplug_card = $payplug->saveCard($payment);
 
-                if (!$res_payplug_card) {
-                    $this->addLog($debug, $log, 'Card cannot be saved.', 'error');
+                    if (!$res_payplug_card) {
+                        $this->addLog($debug, $log, 'Card cannot be saved.', 'error');
+                    }
                 }
             }
 
@@ -154,14 +179,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
             if ($id_order) {
                 $this->addLog($debug, $log, 'Order already exists.', 'info');
-            } else {
-                $this->addLog($debug, $log, 'Order does\'nt exists yet.', 'info');
 
-                $state_addons = ($payment->is_live ? '' : '_TEST');
-                $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
-                $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
-                if ($is_paid) {
-                    $order_state = $paid_state;
+                if ($type == 'payment') {
                     $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
                     if ($payplug->isTransactionPending((int)$cart_id)) {
                         $this->addLog($debug, $log, 'Transaction is pending so stored payment will not be deleted.', 'info');
@@ -171,6 +190,29 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         } else {
                             $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
                         }
+                    }
+                }
+            } else {
+                $this->addLog($debug, $log, 'Order already exists.', 'info');
+
+                if ($type == 'payment') {
+                    $state_addons = ($payment->is_live ? '' : '_TEST');
+                } else {
+                    $state_addons = ($installment->is_live ? '' : '_TEST');
+                }
+
+                $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
+                $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
+                $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'.$state_addons);
+                if ($type == 'installment') {
+                    $order_state = $inst_state;
+                } elseif ($is_paid) {
+                    $order_state = $paid_state;
+                    $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
+                    if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
+                        $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
+                    } else {
+                        $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
                     }
                 } else {
                     $order_state = $pending_state;
@@ -183,10 +225,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
                 $this->addLog($debug, $log, 'Order state will be :'.$order_state, 'info');
 
-                $extra_vars = array(
-                    'transaction_id' => $payment->id
-                );
-                /* 
+                if ($type == 'payment') {
+                    $extra_vars = array(
+                        'transaction_id' => $payment->id
+                    );
+                } else {
+                    $extra_vars = array();
+                }
+                /*
                  * For some reasons, secure key form cart can differ from secure key from customer
                  * Maybe due to migration or Prestashop's Update
                  */
@@ -201,7 +247,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $secure_key = $customer->secure_key;
                     }
                 }
-                
+
                 $validateOrder_result = $payplug->validateOrder(
                     $cart->id,
                     $order_state,
@@ -214,6 +260,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $secure_key
                 );
                 $id_order = $payplug->currentOrder;
+                $order = new Order($id_order);
 
                 if (!$validateOrder_result) {
                     $this->addLog($debug, $log, 'Order not validated', 'error');
@@ -226,6 +273,17 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     Tools::redirect($redirect_url_error);
                 } else {
                     $this->addLog($debug, $log, 'Order validated', 'info');
+                    if ($type == 'payment') {
+                        $api_key = Payplug::setAPIKey();
+                        $data = array();
+                        $data['metadata'] = $payment->metadata;
+                        $data['metadata']['Order'] = $id_order;
+                        $payplug->patchPayment($api_key, $payment->id, $data);
+                    }
+                }
+
+                if ($type == 'installment') {
+                    $order->addOrderPayment((float)($amount / 100), null, $pay_id);
                 }
 
                 $this->addLog($debug, $log, 'Checking number of order passed with this id_cart...', 'info');
