@@ -117,15 +117,15 @@
             {*<input type="button" class="popin-button center-button ppclose green-button" value="{l s='Ok' d='Modules.Payplug.Admin'}">*}
         </div>
 {elseif $type == 'abort'}
-    <div class="panel-heading">{l s='Abort installment' mod='payplug'}</div>
+    <div class="panel-heading">{l s='Suspend installment' mod='payplug'}</div>
     <span class="ppclose">x</span>
     </div>
     <form action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" method="post">
-        <p>{l s='Do you wish to interrupt the installment plan?' mod='payplug'}</p>
-        <p>{l s='The customer card will not be used for more transactions.' mod='payplug'}</p>
+        <p>{l s='Are you sure you want to suspend the installment plan on this order?' mod='payplug'}</p>
+        <p>{l s='Your customer won’t be charged on the due dates.' mod='payplug'}</p>
         <div class="block-button">
             <input type="button" class="popin-button ppcancel white-button" value="{l s='Cancel' mod='payplug'}">
-            <input class="popin-button green-button no-width" type="submit" name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Abort' mod='payplug'}">
+            <input class="popin-button green-button no-width" type="submit" name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Suspend' mod='payplug'}">
         </div>
 {/if}
     </form>
