@@ -582,7 +582,11 @@ class Payplug extends PaymentModule
                         $order_state->name[$lang['id_lang']] = $values['name']['en'].' [PayPlug]';
                     }
                 }
-                $order_state->add();
+                if ($order_state->add()) {
+                    $source = _PS_MODULE_DIR_.$this->name.'/views/img/os/'.$key.'.gif';
+                    $destination = _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif';
+                    @copy($source, $destination);
+                }
                 $os = (int)$order_state->id;
                 $log->info('ID: '.$os);
             }
@@ -620,7 +624,11 @@ class Payplug extends PaymentModule
                         $order_state->name[$lang['id_lang']] = $values['name']['en'].' [TEST]';
                     }
                 }
-                $order_state->add();
+                if ($order_state->add()) {
+                    $source = _PS_MODULE_DIR_.$this->name.'/views/img/os/'.$key.'.gif';
+                    $destination = _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif';
+                    @copy($source, $destination);
+                }
                 $os_test = (int)$order_state->id;
                 $log->info('ID: '.$os);
             }
