@@ -3155,10 +3155,12 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             if ((int)Tools::getValue('inst') == 1) {
-                $payment_url = $this->preparePayment((int)$cart_id, null, true);
+                $payment_data = json_decode($this->preparePayment((int)$cart_id, null, true));
+                $payment_url = $payment_data->payment_url;
             } else {
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
+
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
