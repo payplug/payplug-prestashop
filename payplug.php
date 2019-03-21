@@ -582,7 +582,11 @@ class Payplug extends PaymentModule
                         $order_state->name[$lang['id_lang']] = $values['name']['en'].' [PayPlug]';
                     }
                 }
-                $order_state->add();
+                if ($order_state->add()) {
+                    $source = _PS_MODULE_DIR_.$this->name.'/views/img/os/'.$key.'.gif';
+                    $destination = _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif';
+                    @copy($source, $destination);
+                }
                 $os = (int)$order_state->id;
                 $log->info('ID: '.$os);
             }
@@ -620,7 +624,11 @@ class Payplug extends PaymentModule
                         $order_state->name[$lang['id_lang']] = $values['name']['en'].' [TEST]';
                     }
                 }
-                $order_state->add();
+                if ($order_state->add()) {
+                    $source = _PS_MODULE_DIR_.$this->name.'/views/img/os/'.$key.'.gif';
+                    $destination = _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif';
+                    @copy($source, $destination);
+                }
                 $os_test = (int)$order_state->id;
                 $log->info('ID: '.$os);
             }
@@ -2411,7 +2419,8 @@ class Payplug extends PaymentModule
         $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
         $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
         $installment = 0;
-        if ((int)Configuration::get('PAYPLUG_INST') == 1 && $params['cart']->getOrderTotal(true, Cart::BOTH) >= (float)Configuration::get('PAYPLUG_INST_MIN_AMOUNT')) {
+        
+        if ((int)Configuration::get('PAYPLUG_INST') == 1 && $params['cart']->getOrderTotal(true, Cart::BOTH) >= (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'))) {
             $installment = 1;
         }
         $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
