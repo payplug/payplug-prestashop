@@ -388,7 +388,7 @@ function debug(status)
 }
 
 function callPopin(type, args){
-    if(type == 'live_ok' || type == 'live_ok_not_premium')
+    if(type == 'live_ok' || type == 'live_ok_not_premium' || type == 'live_ok_no_inst' || type == 'live_ok_no_oneclick' )
     {
         //essentiel
         $('#payplug_sandbox_mode_off').siblings('.slide-button').css('left', '0%');
@@ -398,10 +398,15 @@ function callPopin(type, args){
         $('.ppwarning.not_verified').remove();
         $('#payplug_sandbox_mode_on').removeAttr('checked');
         $('#payplug_popin').remove();
-        if(type == 'live_ok_not_premium')
+        if(type == 'live_ok_not_premium' || type == 'live_ok_no_oneclick')
         {
             $('#payplug_one_click_yes').attr('checked', '');
             $('#payplug_one_click_no').attr('checked', 'checked');
+        }
+        if(type == 'live_ok_not_premium' || type == 'live_ok_no_inst')
+        {
+            $('#payplug_installment_yes').attr('checked', '');
+            $('#payplug_installment_no').attr('checked', 'checked');
         }
 
         $('#payplug_popin').remove();

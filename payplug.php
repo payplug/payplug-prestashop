@@ -3490,6 +3490,10 @@ class Payplug extends PaymentModule
             die(json_encode(array('content' => 'activate')));
         } elseif ($can_save_cards && $can_create_installment_plan) {
             die(json_encode(array('content' => 'live_ok')));
+        } elseif ($can_save_cards && !$can_create_installment_plan) {
+            die(json_encode(array('content' => 'live_ok_no_inst')));
+        } elseif (!$can_save_cards && $can_create_installment_plan) {
+            die(json_encode(array('content' => 'live_ok_no_oneclick')));
         } else {
             die(json_encode(array('content' => 'live_ok_not_premium')));
         }
