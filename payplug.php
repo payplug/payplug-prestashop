@@ -2419,7 +2419,7 @@ class Payplug extends PaymentModule
         $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
         $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
         $installment = 0;
-        
+
         if ((int)Configuration::get('PAYPLUG_INST') == 1 && $params['cart']->getOrderTotal(true, Cart::BOTH) >= (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'))) {
             $installment = 1;
         }

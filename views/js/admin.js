@@ -185,16 +185,6 @@ function admin_start()
         }
     });
 
-    $('#payplug_installment_yes').bind('click', function(e) {
-        if (
-            ($('#payplug_sandbox_mode_off').attr('checked') == 'checked' || $('#payplug_sandbox_mode_off').attr('checked') == true)
-            && !$(this).hasClass('premium')
-        ){
-            e.preventDefault();
-            checkPremium(false);
-        }
-    });
-
     $('input[name=PAYPLUG_SANDBOX_MODE]').bind('change', function(e){
         // Change tips value of live / sandbox mode selected
         if($(this).val() == 1) { // Live
