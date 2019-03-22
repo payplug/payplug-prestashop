@@ -4172,8 +4172,15 @@ class Payplug extends PaymentModule
                         }
                         $amount_available = (float)($amount_available / 100);
                         $amount_refunded_payplug = (float)($amount_refunded_payplug / 100);
-                        if ((int)Tools::getValue('id_state') != 0) {
+                        if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
                             $new_state = (int)Tools::getValue('id_state');
+                            if ($new_state == 0) {
+                                if ($installment->is_live == 1) {
+                                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                                } else {
+                                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                                }
+                            }
                             $order = new Order((int)$id_order);
                             if (Validate::isLoadedObject($order)) {
                                 $current_state = (int)$order->getCurrentState();
