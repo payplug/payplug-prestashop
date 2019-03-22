@@ -3155,10 +3155,12 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             if ((int)Tools::getValue('inst') == 1) {
-                $payment_url = $this->preparePayment((int)$cart_id, null, true);
+                $payment_data = json_decode($this->preparePayment((int)$cart_id, null, true));
+                $payment_url = $payment_data->payment_url;
             } else {
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
+
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
@@ -4170,8 +4172,15 @@ class Payplug extends PaymentModule
                         }
                         $amount_available = (float)($amount_available / 100);
                         $amount_refunded_payplug = (float)($amount_refunded_payplug / 100);
-                        if ((int)Tools::getValue('id_state') != 0) {
+                        if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
                             $new_state = (int)Tools::getValue('id_state');
+                            if ($new_state == 0) {
+                                if ($installment->is_live == 1) {
+                                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                                } else {
+                                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                                }
+                            }
                             $order = new Order((int)$id_order);
                             if (Validate::isLoadedObject($order)) {
                                 $current_state = (int)$order->getCurrentState();
