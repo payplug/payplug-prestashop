@@ -1,26 +1,23 @@
 <?php
 /**
- * 2013 - 2018 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2018 PayPlug SAS
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @copyright 2013 - 2019 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -46,16 +43,32 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         require_once(_PS_MODULE_DIR_.'payplug/lib/init.php');
 
         //Settings
-        $debug = Configuration::get('PAYPLUG_DEBUG_MODE');
+        $debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
+        $flag = false;
+        $except = null;
+        $resp = array();
+        $payplug = new Payplug();
+        $body = Tools::file_get_contents('php://input');
+
+        try {
+            $resource = \Payplug\Notification::treat($body);
+        } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
+            $flag = true;
+            $except = $exception;
+            $resp = array(
+                'exception' => $exception->getMessage(),
+            );
+        }
 
         if ($debug) {
             require_once(dirname(__FILE__).'/../../classes/MyLogPHP.class.php');
-            $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/ipn-'.date("Y-m-d").'.csv');
+            if ($resource->installment_plan_id != null) {
+                $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/inst_ipn-'.date('Y-m-d').'.csv');
+            } else {
+                $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/ipn-'.date('Y-m-d').'.csv');
+            }
             $log->info('---------------- NEW IPN RECEIVED ----------------');
         }
-
-        $payplug = new Payplug();
-        $body = Tools::file_get_contents('php://input');
 
         //Notification identification
         if (Tools::isSubmit('debug')) {
@@ -98,21 +111,19 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         } else {
             $this->addLog($debug, $log, 'NOTIFICATION MODE', 'info');
             $this->addLog($debug, $log, 'Notification treatment and authenticity verification:', 'info');
-            try {
-                $resource = \Payplug\Notification::treat($body);
-            } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
-                $this->addLog($debug, $log, 'KO: '.$exception->getMessage(), 'error');
-                $response = array(
-                    'exception' => $exception->getMessage(),
-                );
+            if ($flag) {
                 header(
-                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
+                    $_SERVER['SERVER_PROTOCOL'].' '.$except->getCode().' '.$except->getMessage(),
                     true,
-                    $exception->getCode()
+                    $except->getCode()
                 );
-                die(json_encode($response));
+                die(json_encode($resp));
             }
+            $this->addLog($debug, $log, 'OK', 'info');
             if ($resource instanceof \Payplug\Resource\Payment) {
+                if ($resource->installment_plan_id != null) {
+                    $this->addLog($debug, $log, 'Installment ID: '.$resource->installment_plan_id, 'info');
+                }
 
                 $this->addLog($debug, $log, 'PAYMENT MODE', 'info');
                 $this->addLog($debug, $log, 'Payment ID: '.$resource->id, 'info');
@@ -120,22 +131,22 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                 if (!$payment = $payplug->retrievePayment($resource->id)) {
                     $this->addLog($debug, $log, 'Can\'t retrieve payment with this API Key.', 'debug');
-                    if (PayplugBackward::getConfiguration('PAYPLUG_SANDBOX_MODE') == 1) {
+                    if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
                         $this->addLog($debug, $log, 'This was test mode.', 'debug');
                         $this->addLog($debug, $log, 'Trying live mode.', 'debug');
-                        \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_LIVE_API_KEY'));
+                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         if (!$payment = $payplug->retrievePayment($resource->id)) {
                             $this->addLog($debug, $log, 'Can\'t retrieve payment with LIVE API Key.', 'debug');
-                            \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_TEST_API_KEY'));
+                            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                             $payment = null;
                         }
-                    } elseif (PayplugBackward::getConfiguration('PAYPLUG_SANDBOX_MODE') == 0) {
+                    } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
                         $this->addLog($debug, $log, 'This was live mode.', 'debug');
                         $this->addLog($debug, $log, 'Trying test mode.', 'debug');
-                        \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_TEST_API_KEY'));
+                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         if (!$payment = $payplug->retrievePayment($resource->id)) {
                             $this->addLog($debug, $log, 'Can\'t retrieve payment with the TEST API Key.', 'debug');
-                            \Payplug\Payplug::setSecretKey(PayplugBackward::getConfiguration('PAYPLUG_LIVE_API_KEY'));
+                            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                             $payment = null;
                         }
                     }
@@ -151,13 +162,21 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 } else {
                     $this->addLog($debug, $log, 'The transaction is paid.', 'info');
                     $this->addLog($debug, $log, 'Payment details:', 'info');
-                    $this->addLog($debug, $log, 'Cart ID: '.(int)$payment->metadata['ID Cart'], 'debug');
+
+                    if ($resource->installment_plan_id != null) {
+                        $installment = $payplug->retrieveInstallment($resource->installment_plan_id);
+                        $meta = $installment->metadata;
+                    } else {
+                        $meta = $payment->metadata;
+                    }
+
+                    $this->addLog($debug, $log, 'Cart ID: '.(int)$meta['ID Cart'], 'debug');
                     $this->addLog($debug, $log, 'Is Live: '.(int)$payment->is_live, 'debug');
                     $this->addLog($debug, $log, 'Amount: '.(int)$payment->amount, 'debug');
 
                     //Payment treatment
                     try {
-                        $cart = new Cart((int)$payment->metadata['ID Cart']);
+                        $cart = new Cart((int)$meta['ID Cart']);
                     } catch (Exception $exception) {
                         $this->addLog($debug, $log, 'The cart cannot be loaded: '.$exception->getMessage(), 'error');
                         $response = array(
@@ -217,6 +236,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
                             $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
                             $error_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR'.$state_addons);
+                            $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'.$state_addons);
 
                             if ($order_id) {
                                 $this->addLog($debug, $log, 'UPDATE MODE', 'info');
@@ -346,6 +366,61 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         }
                                         header($_SERVER['SERVER_PROTOCOL'].' 200 Order is already paid.', true, 200);
                                         die;
+                                    } elseif ($installment = $payplug->retrieveInstallment($payment->installment_plan_id)) {
+                                        $this->addLog($debug, $log, 'Order is currently pending for installment.', 'info');
+                                        $this->addLog($debug, $log, 'Payment amount: '.$payment->amount, 'debug');
+                                        if ((int)$installment->is_fully_paid == 1) {
+                                            $this->addLog($debug, $log, 'Installment is fully paid.', 'info');
+                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                                            $new_order_state = $paid_state;
+                                            $order_history = new OrderHistory();
+                                            $order_history->id_order = (int)$order_id;
+                                            try {
+                                                $order_history->changeIdOrderState((int)$new_order_state, $order_id, true);
+                                                $order_history->save();
+                                            } catch (Exception $exception) {
+                                                $this->addLog($debug, $log, 'Order history cannot be saved: '.$exception->getMessage(), 'error');
+                                                $this->addLog($debug, $log, 'Please check if order state '.(int)$new_order_state.' exists.', 'error');
+                                                $response = array(
+                                                    'exception' => $exception->getMessage(),
+                                                );
+                                                header(
+                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
+                                                    true,
+                                                    $exception->getCode()
+                                                );
+                                                die(json_encode($response));
+                                            }
+
+                                            $order->current_state = $order_history->id_order_state;
+                                            try {
+                                                $order->update();
+                                            } catch (Exception $exception) {
+                                                $this->addLog($debug, $log, 'Order cannot be updated: '.$exception->getMessage(), 'error');
+                                                $response = array(
+                                                    'exception' => $exception->getMessage(),
+                                                );
+                                                header(
+                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
+                                                    true,
+                                                    $exception->getCode()
+                                                );
+                                                die(json_encode($response));
+                                            }
+
+                                            echo $this->addLog($debug, $log, 'Order updated.', 'info');
+                                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                                            if (!$cart_unlock) {
+                                                $this->addLog($debug, $log, 'Lock cannot be deleted.', 'error');
+                                            } else {
+                                                $this->addLog($debug, $log, 'Lock deleted.', 'debug');
+                                            }
+                                            header($_SERVER['SERVER_PROTOCOL'].' 200 Order updated.', true, 200);
+                                            die;
+                                        } else {
+                                            $this->addLog($debug, $log, 'Installment still pending.', 'info');
+                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                                        }
                                     } else {
                                         echo $this->addLog(
                                             $debug,
@@ -379,7 +454,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             } else {
                                 $this->addLog($debug, $log, 'CREATE MODE', 'info');
 
-                                $order_state = $paid_state;
+                                if ($resource->installment_plan_id != null) {
+                                    $order_state = $inst_state;
+                                } else {
+                                    $order_state = $paid_state;
+                                }
+
                                 $amount = (float)$payment->amount / 100;
                                 $extra_vars = array(
                                     'transaction_id' => $payment->id
@@ -410,7 +490,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     }
                                     die;
                                 } else {
-                                    /* 
+                                    /*
                                      * For some reasons, secure key form cart can differ from secure key from customer
                                      * Maybe due to migration or Prestashop's Update
                                      */
@@ -464,9 +544,14 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         echo $this->addLog($debug, $log, 'Order validated.', 'info');
                                         $order_id = Order::getOrderByCartId($cart->id);
                                         $order = new Order($order_id);
+
+                                        if ($resource->installment_plan_id != null) {
+                                            $order->addOrderPayment($amount, null, $payment->id);
+                                        }
+
                                         $api_key = Payplug::setAPIKey();
                                         $data = array();
-                                        $data['metadata'] = $payment->metadata;
+                                        $data['metadata'] = $meta;
                                         $data['metadata']['Order'] = $order_id;
                                         try {
                                             $payplug->patchPayment($api_key, $payment->id, $data);
@@ -584,11 +669,19 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     );
                     die(json_encode($response));
                 }
+
+                if ($payment->installment_plan_id != null) {
+                    $installment = $payplug->retrieveInstallment($payment->installment_plan_id);
+                    $meta = $installment->metadata;
+                } else {
+                    $meta = $payment->metadata;
+                }
+
                 $is_totaly_refunded = $payment->is_refunded;
                 if ($is_totaly_refunded) {
                     $this->addLog($debug, $log, 'TOTAL REFUND MODE', 'info');
 
-                    $cart_id = (int)$payment->metadata['ID Cart'];
+                    $cart_id = (int)$meta['ID Cart'];
                     $order_id = (int)Order::getOrderByCartId($cart_id);
                     $order = new Order($order_id);
                     $this->addLog($debug, $log, 'Order ID : '.$order_id, 'info');
@@ -628,6 +721,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 } else {
                     $this->addLog($debug, $log, 'PARTIAL REFUND', 'info');
                 }
+            } elseif ($resource instanceof \Payplug\Resource\InstallmentPlan) {
+                $this->addLog($debug, $log, 'INSTALLMENT MODE', 'info');
+                $this->addLog($debug, $log, 'Installment ID: ' . $resource->id, 'info');
+                $this->addLog($debug, $log, 'Active : ' . (int)$resource->is_active, 'info');
             }
         }
     }

@@ -1,25 +1,22 @@
 {*
-* 2018 PayPlug
+* 2019 PayPlug
 *
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
+* This source file is subject to the Open Software License (OSL 3.0).
+* It is available through the world-wide-web at this URL:
+* https://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please send an email
+* to contact@payplug.com so we can send you a copy immediately.
 *
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2018 PayPlug SAS
-*  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @copyright 2019 PayPlug SAS
+*  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel panel-show panel-remove">
@@ -200,22 +197,22 @@
         <label class="left-block">{l s='Enable one-click payments' mod='payplug'}</label>
         {*<label class="left-block">{l s='Enable one-click payments' d='Modules.Payplug.Admin'}</label>*}
         <div class="block-right">
-                    <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" class="switch-input{if !$connected} ppdisabled{/if}{if !$premium} not_premium{/if}" name="PAYPLUG_ONE_CLICK" value="1"
-                               id="payplug_one_click_yes" {if $PAYPLUG_ONE_CLICK}checked="checked"{/if}>
-                        <label title="{l s='Enable one-click payments' mod='payplug'}" for="payplug_one_click_yes"
-                        {*<label title="{l s='Enable one-click payments' d='Modules.Payplug.Admin'}" for="payplug_one_click_yes"*}
-                               class="switch-label switch-label-on{if !$connected} ppdisabled{/if}">{l s='YES' mod='payplug'}</label>
-                               {*class="switch-label switch-label-on{if !$connected} ppdisabled{/if}">{l s='YES' d='Modules.Payplug.Admin'}</label>*}
-                        <input type="radio" class="switch-input{if !$connected} ppdisabled{/if}" name="PAYPLUG_ONE_CLICK" value="0" id="payplug_one_click_no"
-                               {if !$PAYPLUG_ONE_CLICK}checked="checked"{/if}>
-                        <label title="{l s='Disable one-click payments' mod='payplug'}" for="payplug_one_click_no"
-                        {*<label title="{l s='Disable one-click payments' d='Modules.Payplug.Admin'}" for="payplug_one_click_no"*}
-                               class="switch-label switch-label-off{if !$connected} ppdisabled{/if}">{l s='NO' mod='payplug'}</label>
-                               {*class="switch-label switch-label-off{if !$connected} ppdisabled{/if}">{l s='NO' d='Modules.Payplug.Admin'}</label>*}
-                        <span class="switch-selection{if !$connected} ppdisabled{/if}"></span>
-                        <a class="slide-button btn" {if !$PAYPLUG_ONE_CLICK}style="left: 50%"{/if}></a>
-                    </span>
+            <span class="switch prestashop-switch fixed-width-lg">
+                <input type="radio" class="switch-input{if !$connected} ppdisabled{/if}{if !$premium} not_premium{/if}" name="PAYPLUG_ONE_CLICK" value="1"
+                       id="payplug_one_click_yes" {if $PAYPLUG_ONE_CLICK}checked="checked"{/if}>
+                <label title="{l s='Enable one-click payments' mod='payplug'}" for="payplug_one_click_yes"
+                {*<label title="{l s='Enable one-click payments' d='Modules.Payplug.Admin'}" for="payplug_one_click_yes"*}
+                       class="switch-label switch-label-on{if !$connected} ppdisabled{/if}">{l s='YES' mod='payplug'}</label>
+                       {*class="switch-label switch-label-on{if !$connected} ppdisabled{/if}">{l s='YES' d='Modules.Payplug.Admin'}</label>*}
+                <input type="radio" class="switch-input{if !$connected} ppdisabled{/if}" name="PAYPLUG_ONE_CLICK" value="0" id="payplug_one_click_no"
+                       {if !$PAYPLUG_ONE_CLICK}checked="checked"{/if}>
+                <label title="{l s='Disable one-click payments' mod='payplug'}" for="payplug_one_click_no"
+                {*<label title="{l s='Disable one-click payments' d='Modules.Payplug.Admin'}" for="payplug_one_click_no"*}
+                       class="switch-label switch-label-off{if !$connected} ppdisabled{/if}">{l s='NO' mod='payplug'}</label>
+                       {*class="switch-label switch-label-off{if !$connected} ppdisabled{/if}">{l s='NO' d='Modules.Payplug.Admin'}</label>*}
+                <span class="switch-selection{if !$connected} ppdisabled{/if}"></span>
+                <a class="slide-button btn" {if !$PAYPLUG_ONE_CLICK}style="left: 50%"{/if}></a>
+            </span>
         </div>
         <div class="panel-row">
             <div class="block-right">
@@ -224,6 +221,75 @@
                     <a href="http://support.payplug.com/customer/portal/articles/2563975" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                     {*<a href="http://support.payplug.com/customer/portal/articles/2563975" target="_blank">{l s='Learn more.' d='Modules.Payplug.Admin'}</a>*}
                 </p>
+            </div>
+        </div>
+    </div>
+    <div class="panel-row separate_margin_block">
+        <label class="left-block">{l s='Enable payments by installments' mod='payplug'}</label>
+        <div class="block-right">
+            <span class="switch prestashop-switch fixed-width-lg">
+                <input type="radio" class="switch-input{if !$connected} ppdisabled{/if}{if !$premium} not_premium{/if}" name="PAYPLUG_INST" value="1"
+                       id="payplug_installment_yes" {if $PAYPLUG_INST}checked="checked"{/if}>
+                <label title="{l s='Enable payments by installments' mod='payplug'}" for="payplug_installment_yes"
+                       class="switch-label switch-label-on{if !$connected} ppdisabled{/if}">{l s='YES' mod='payplug'}</label>
+                <input type="radio" class="switch-input{if !$connected} ppdisabled{/if}" name="PAYPLUG_INST" value="0" id="payplug_installment_no"
+                       {if !$PAYPLUG_INST}checked="checked"{/if}>
+                <label title="{l s='Disable payments by installments' mod='payplug'}" for="payplug_installment_no"
+                       class="switch-label switch-label-off{if !$connected} ppdisabled{/if}">{l s='NO' mod='payplug'}</label>
+                <span class="switch-selection{if !$connected} ppdisabled{/if}"></span>
+                <a class="slide-button btn" {if !$PAYPLUG_INST}style="left: 50%"{/if}></a>
+            </span>
+        </div>
+        <div class="panel-row">
+            <div class="block-right">
+                <p class="ppinstallmentchecked" id="installment_config_warning">{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</p>
+                <p class="pptips">
+                    <span class="ppinline">
+                        {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
+                        <a href="http://support.payplug.com/customer/{$iso|escape:'htmlall':'UTF-8'}/portal/articles/2966107" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                    </span>
+
+                    <span class="ppinstallmentchecked ppinline">
+                        {l s='Enable payments' mod='payplug'}
+                        <input type="radio" name="PAYPLUG_INST_MODE" value="2" id="payplug_installment_mode_2" {if $PAYPLUG_INST_MODE == 2}checked="checked"{/if}>
+                        <label for="payplug_installment_mode_2">{l s='in 2 installments' mod='payplug'}</label>
+                        <input type="radio" name="PAYPLUG_INST_MODE" value="3" id="payplug_installment_mode_3" {if $PAYPLUG_INST_MODE == 3}checked="checked"{/if}>
+                        <label for="payplug_installment_mode_3">{l s='in 3 installments' mod='payplug'}</label>
+                        <input type="radio" name="PAYPLUG_INST_MODE" value="4" id="payplug_installment_mode_4" {if $PAYPLUG_INST_MODE == 4}checked="checked"{/if}>
+                        <label for="payplug_installment_mode_4">{l s='in 4 installments' mod='payplug'}</label>
+                    </span>
+
+                    <span class="ppinstallmentchecked ppinline">
+                        <label for="payplug_installment_min_amount">{l s='Enable this option from' mod='payplug'}</label>
+                        <input class="ppminamount" type="text" name="PAYPLUG_INST_MIN_AMOUNT" value="{$PAYPLUG_INST_MIN_AMOUNT|escape:'htmlall':'UTF-8'}" id="payplug_installment_min_amount"> €.
+                        <span id="installment_config_error" class="hide">{l s='Amount must be greater than 4€ and lower than 20000€.' mod='payplug'}</span>
+                    </span>
+                </p>
+                <table class="pptips ppinstallmentchecked">
+                    <tbody>
+                    <tr>
+                        <td>{l s='Receive' mod='payplug'} :&nbsp;</td>
+                        <td class="ppinstallments pp2installments">50% {l s='of order amount on the first day' mod='payplug'},</td>
+                        <td class="ppinstallments pp3installments">34% {l s='of order amount on the first day' mod='payplug'},</td>
+                        <td class="ppinstallments pp4installments">25% {l s='of order amount on the first day' mod='payplug'},</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="ppinstallments pp2installments">50% {l s='of order amount after 30 days' mod='payplug'}.</td>
+                        <td class="ppinstallments pp3installments">33% {l s='of order amount after 30 days' mod='payplug'},</td>
+                        <td class="ppinstallments pp4installments">25% {l s='of order amount after 30 days' mod='payplug'},</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="ppinstallments pp3installments">33% {l s='of order amount after 60 days' mod='payplug'}.</td>
+                        <td class="ppinstallments pp4installments">25% {l s='of order amount after 60 days' mod='payplug'},</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="ppinstallments pp4installments">25% {l s='of order amount after 90 days' mod='payplug'}.</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

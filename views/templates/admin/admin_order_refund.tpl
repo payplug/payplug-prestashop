@@ -1,33 +1,33 @@
 {*
-* 2018 PayPlug
+* 2019 PayPlug
 *
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
+* This source file is subject to the Open Software License (OSL 3.0).
+* It is available through the world-wide-web at this URL:
+* https://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please send an email
+* to contact@payplug.com so we can send you a copy immediately.
 *
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2018 PayPlug SAS
-*  @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @copyright 2019 PayPlug SAS
+*  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
 <p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' mod='payplug'}</p>
-{*<p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' d='Modules.Payplug.Admin'}</p>*}
 <form method="post" action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
-    <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
+    {if isset($pay_id)}
+        <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
+    {elseif isset($inst_id)}
+        <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
+    {/if}
     <input type="hidden" name="id_customer" value="{$order->id_customer|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="pay_mode" value="{$pay_mode|escape:'htmlall':'UTF-8'}" />

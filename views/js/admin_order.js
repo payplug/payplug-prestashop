@@ -1,25 +1,22 @@
 /**
- * 2013 - 2018 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2018 PayPlug SAS
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @copyright 2013 - 2019 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -27,7 +24,12 @@ $(document).ready(function() {
     $('input[name=submitPPRefund]').bind('click', function(e) {
         e.preventDefault();
         callRefund();
-    })
+    });
+
+    $('input[name=submitPPAbort]').bind('click', function(e) {
+        e.preventDefault();
+        callAbort();
+    });
 
     $('input[name=submitPPUpdate]').bind('click', function(e) {
         e.preventDefault();
@@ -42,12 +44,13 @@ function callRefund() {
     var amount = $('input[name=pp_amount2refund]').val();
     var id_customer = $('input:hidden[name=id_customer]').val();
     var pay_id = $('input:hidden[name=pay_id]').val();
+    var inst_id = $('input:hidden[name=inst_id]').val();
     var id_order = $('input:hidden[name=id_order]').val();
     var id_state = $('#pppanel input[name=change_order_state]').val();
     var pay_mode = $('input:hidden[name=pay_mode]').val();
-    var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, id_order: id_order, pay_mode: pay_mode};
+    var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, inst_id: inst_id, id_order: id_order, pay_mode: pay_mode};
     if($('#pppanel input[name=change_order_state]').is(":checked")){
-        var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, id_order: id_order, pay_mode: pay_mode, id_state: id_state};
+        var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, inst_id: inst_id, id_order: id_order, pay_mode: pay_mode, id_state: id_state};
     }
 
     $.ajax({
@@ -136,6 +139,64 @@ function callUpdate() {
                     location.reload();
                 }
             }
+        }
+    });
+}
+
+function callAbort() {
+    $('.ppoverlay').remove();
+    $('#payplug_popin').remove();
+    var url = $('input:hidden[name=admin_ajax_url]').val();
+    var data = {_ajax: 1, popin: 1, type: 'abort'};
+    $.ajax({
+        type: 'POST',
+        url: url,
+        dataType: 'json',
+        data: data,
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert('An error occurred while trying to open the popin. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url than expected.' +
+                'You will find more explanation in JS console.');
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+        },
+        success: function (result) {
+            $('body').append(result.content);
+            $('span.ppclose, .ppcancel').bind('click', function () {
+                $('#payplug_popin').remove();
+                $('.ppoverlay').remove();
+            });
+            $('#payplug_popin input[type=submit]').bind('click', function (e) {
+                e.preventDefault();
+                $('#payplug_popin p.pperror').hide();
+                var url = $('input:hidden[name=admin_ajax_url]').val();
+                var inst_id = $('input:hidden[name=inst_id]').val();
+                var id_order = $('input:hidden[name=id_order]').val();
+                var submit = 'submitPopin_abort';
+                var data = {_ajax: 1, submit: submit, inst_id: inst_id, id_order: id_order};
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    data: data,
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert('An error occurred while trying to abort the installment plan. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                    success: function (response) {
+                        if (response.reload) {
+                            location.reload();
+                        }
+                    }
+                });
+            });
         }
     });
 }
