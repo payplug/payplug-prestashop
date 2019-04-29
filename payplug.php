@@ -137,7 +137,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.17.0';
+        $this->version = '2.19.0';
     }
 
     /**
@@ -391,10 +391,6 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_ONE_CLICK')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ERROR')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG_TEST')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PAID')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PENDING')
@@ -488,42 +484,6 @@ class Payplug extends PaymentModule
                     'fr' => 'Paiement échoué',
                     'es' => 'Payment failed',
                     'it' => 'Payment failed',
-                ),
-            ),
-            'inst_pg'    => array(
-                'cfg' => 'NO_EXISTING_OS',
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#4169e1',
-                'name' => array(
-                    'en' => 'Installment ongoing',
-                    'fr' => 'Paiement fractionné en cours',
-                    'es' => '',
-                    'it' => 'Pagamento rateizzato in corso',
-                ),
-            ),
-            'inst_cd'    => array(
-                'cfg' => 'NO_EXISTING_OS',
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#8f0621',
-                'name' => array(
-                    'en' => 'Installment suspended',
-                    'fr' => 'Paiement fractionné interrompu',
-                    'es' => '',
-                    'it' => 'Pagamento rateizzato sospeso',
                 ),
             ),
         );
