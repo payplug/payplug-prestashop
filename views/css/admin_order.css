@@ -390,3 +390,16 @@ span.ppclose {
 .pp_inst_status {
 	font-weight: bold;
 }
+
+#pppanel .ppwarning {
+	width: auto;
+	margin: 0;
+}
+
+#pppanel .ppwarning {
+	background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
+	border-left: solid 3px #f7a000;
+	margin: 0 0 1em 0;
+	color: #d2a63c;
+	padding: 0.7em 3em;
+}
