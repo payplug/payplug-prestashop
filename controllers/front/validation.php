@@ -281,6 +281,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $data['metadata'] = $payment->metadata;
                         $data['metadata']['Order'] = $id_order;
                         $payplug->patchPayment($api_key, $payment->id, $data);
+                    } elseif ($type == 'installment') {
+                        $payplug->addPayplugInstallment($installment, $order);
                     }
                 }
 

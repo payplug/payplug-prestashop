@@ -89,6 +89,8 @@ class Payplug extends PaymentModule
     /** @var array */
     public $validationErrors = array();
 
+    public $payment_status = array();
+
     /**
      * Constructor
      *
@@ -186,6 +188,16 @@ class Payplug extends PaymentModule
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
             $this->warning = $this->l('In order to accept payments you need to configure your module by connecting your PayPlug account.');
         }
+
+        $this->payment_status = array(
+            1 => $this->l('not paid'),
+            2 => $this->l('paid'),
+            3 => $this->l('failed'),
+            4 => $this->l('partially refunded'),
+            5 => $this->l('refunded'),
+            6 => $this->l('on going'),
+            7 => $this->l('cancelled'),
+        );
     }
 
     /**
@@ -244,6 +256,21 @@ class Payplug extends PaymentModule
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
+        $translationsAdminPayPlug = array(
+            'en' => 'PayPlug',
+            'fr' => 'PayPlug'
+        );
+        $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
+        $translationsAdminPayPlugInstallment = array(
+            'en' => 'Installment Plans',
+            'fr' => 'Paiements en plusieurs fois'
+        );
+
+        $adminPayPlugId = Db::getInstance()->getValue(
+            "SELECT `id_tab` FROM " . _DB_PREFIX_ . "tab WHERE `class_name`='AdminPayPlug'"
+        );
+        $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, $adminPayPlugId, $this->name);
+
         if (!parent::install()) {
             $this->log_install->error('Install failed: parent.');
         } elseif (!$this->registerHook('paymentReturn') ||
@@ -265,6 +292,8 @@ class Payplug extends PaymentModule
             $this->log_install->error('Install failed: order states.');
         } elseif (!$this->installSQL()) {
             $this->log_install->error('Install failed: sql.');
+        //} elseif (!$this->installTab()) {
+            //$this->log_install->error('Install failed: tab.');
         } else {
             $this->log_install->info('Install succeeded.');
             return true;
@@ -294,18 +323,108 @@ class Payplug extends PaymentModule
             $this->log_install->info('Cards will be kept.');
         }
 
+        $this->uninstallModuleTab('AdminPayPlug');
+        $this->uninstallModuleTab('AdminPayPlugInstallment');
+
         if (!parent::uninstall()) {
             $this->log_install->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $this->log_install->error('Uninstall failed: configuration.');
         } elseif (!$this->uninstallSQL($keep_cards)) {
             $this->log_install->error('Uninstall failed: sql.');
+        //} elseif (!$this->uninstallTab()) {
+            //$this->log_install->error('Uninstall failed: tab.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;
         }
         return false;
     }
+
+    private function installTab()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = 'AdminPayPlugInstallment';
+        $tab->name = array();
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = $this->l('Installment Plans');
+        }
+
+        $tab->id_parent = 0;
+        $tab->module = $this->name;
+        $tab->position = Tab::getNbTabs(0);
+
+        if (!$tab->add()) {
+            return false;
+        }
+
+        Configuration::updateValue('PAYPLUG_ADMIN_INSTALLMENT_TAB', $tab->id);
+
+        return true;
+    }
+
+    private function uninstallTab() {
+        $id_tab = (int)Configuration::get('PAYPLUG_ADMIN_INSTALLMENT_TAB');
+
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            return $tab->delete();
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+
+    public function installModuleTab($tabClass, $translations, $idTabParent, $moduleName = null)
+    {
+        @copy(_PS_MODULE_DIR_ . $this->name . '/icon.gif', _PS_IMG_DIR_ . 't/' . $tabClass . '.png');
+        /* @var $tab TabCore */
+        $tab = new Tab();
+        foreach (Language::getLanguages(false) as $language) {
+            if (isset($translations[Tools::strtolower($language['iso_code'])])) {
+                $tab->name[(int)$language['id_lang']] = $translations[Tools::strtolower($language['iso_code'])];
+            } else {
+                $tab->name[(int)$language['id_lang']] = $translations['en'];
+            }
+        }
+
+        $tab->class_name = $tabClass;
+        if (is_null($moduleName)) {
+            $moduleName = $this->name;
+        }
+
+        $tab->module = $moduleName;
+        $tab->id_parent = $idTabParent;
+        if (!$tab->save()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function uninstallModuleTab($tabClass)
+    {
+        $idTab = Tab::getIdFromClassName($tabClass);
+        if ($idTab != 0) {
+            $tab = new Tab($idTab);
+            $tab->delete();
+            @unlink(_PS_IMG_DIR . "t/" . $tabClass . ".png");
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
+
 
     /**
      * Delete saved cards when uninstalling module
@@ -718,6 +837,26 @@ class Payplug extends PaymentModule
             return false;
         }
 
+        $req_payplug_installment = '
+            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'payplug_installment` (
+            `id_payplug_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_installment` VARCHAR(255) NOT NULL,
+            `id_payment` VARCHAR(255) NULL,
+            `id_order` INT(11) UNSIGNED NOT NULL,
+            `id_customer` INT(11) UNSIGNED NOT NULL,
+            `order_total` INT(11) UNSIGNED NOT NULL,
+            `step` VARCHAR(11) NOT NULL,
+            `amount` INT(11) UNSIGNED NOT NULL,
+            `status` INT(11) UNSIGNED NOT NULL,
+            `scheduled_date` DATETIME NOT NULL
+            ) ENGINE='._MYSQL_ENGINE_;
+        $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
+
+        if (!$res_payplug_installment) {
+            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENTS.');
+            return false;
+        }
+
 
         $log->info('Installation SQL ended.');
         return true;
@@ -772,6 +911,14 @@ class Payplug extends PaymentModule
             return false;
         }
 
+        $req_payplug_installment = '
+            DROP TABLE IF EXISTS `'._DB_PREFIX_.'payplug_installment`';
+        $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
+
+        if (!$res_payplug_installment) {
+            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENTS.');
+            return false;
+        }
 
         $log->info('Uninstallation SQL ended.');
         return true;
@@ -1190,6 +1337,8 @@ class Payplug extends PaymentModule
             //'p_error'	=> $p_error,
         );
 
+        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token='.Tools::getAdminTokenLite('AdminPayPlugInstallment');
+
         $this->context->smarty->assign(array(
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
@@ -1211,6 +1360,7 @@ class Payplug extends PaymentModule
             'PAYPLUG_INST_MIN_AMOUNT' => $PAYPLUG_INST_MIN_AMOUNT,
             'login_infos' => $login_infos,
             'iso' => $this->context->language->iso_code,
+            'installments_panel_url' => $installments_panel_url,
         ));
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
@@ -1349,6 +1499,8 @@ class Payplug extends PaymentModule
             //'p_error'	=> $p_error,
         );
 
+        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token='.Tools::getAdminTokenLite('AdminPayPlugInstallment');
+
         $this->context->smarty->assign(array(
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
@@ -1368,6 +1520,7 @@ class Payplug extends PaymentModule
             'PAYPLUG_INST_MODE' => $PAYPLUG_INST_MODE,
             'PAYPLUG_INST_MIN_AMOUNT' => $PAYPLUG_INST_MIN_AMOUNT,
             'login_infos' => $login_infos,
+            'installments_panel_url' => $installments_panel_url,
         ));
         $this->html = $this->fetchTemplateRC('/views/templates/admin/login.tpl');
 
@@ -4329,5 +4482,146 @@ class Payplug extends PaymentModule
             }
         }
         return $cards;
+    }
+
+    public function getPaymentStatusById($id_status, $id_lang = null)
+    {
+        if ($id_lang == null) {
+            $id_lang = (int)$this->context->language->id;
+        }
+
+        return $this->payment_status[$id_status];
+    }
+
+    private function getPaymentStatusByPayment($payment)
+    {
+        if (!is_object($payment)) {
+            $payment = \Payplug\Payment::retrieve($payment);
+        }
+
+        $pay_status = (int)$payment->is_paid == 1 ? 2 : 1;
+        if (count($payment->failure) > 0) {
+            $pay_status = 3;
+        }
+        if ((int)$payment->is_refunded == 1) {
+            $pay_status = 5;
+        } elseif ((int)$payment->amount_refunded > 0) {
+            $pay_status = 4;
+        }
+
+        return $pay_status;
+    }
+
+    public function addPayplugInstallment($installment, $order)
+    {
+        if (!is_object($installment)) {
+            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+        }
+
+        if ($this->getStoredInstallment($installment)) {
+            $this->updatePayplugInstallment($installment);
+        } else {
+            if (isset($installment->schedule)) {
+                $step_count = count($installment->schedule);
+                $index = 0;
+                foreach ($installment->schedule as $schedule) {
+                    $index ++;
+                    $pay_id = '';
+                    if (count($schedule->payment_ids) > 0) {
+                        $pay_id = $schedule->payment_ids[0];
+                        $status = $this->getPaymentStatusByPayment($pay_id);
+                    } else {
+                        $status = 6;
+                    }
+                    $amount = (int)$schedule->amount;
+                    $step = $index.'/'.$step_count;
+                    $date = $schedule->date;
+                    $req_insert_installment = '
+                INSERT INTO `'._DB_PREFIX_.'payplug_installment` (
+                    `id_installment`, `id_payment`, `id_order`, `id_customer`, 
+                    `order_total`, `step`, `amount`, `status`, `scheduled_date`
+                ) VALUES (
+                    \''.$installment->id.'\', \''.$pay_id.'\', \''.$order->id.'\', \''.$order->id_customer.'\', 
+                    \''.(int)(($order->total_paid * 1000) / 10).'\', \''.$step.'\', \''.$amount.'\', \''.$status.'\', \''.$date.'\'
+                )';
+                    $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
+
+                    if (!$res_insert_installment) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    public function updatePayplugInstallment($installment)
+    {
+        if (!is_object($installment)) {
+            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+        }
+        if (isset($installment->schedule)) {
+            $step_count = count($installment->schedule);
+            $index = 0;
+            foreach ($installment->schedule as $schedule) {
+                $index ++;
+                $pay_id = '';
+                if (count($schedule->payment_ids) > 0) {
+                    $pay_id = $schedule->payment_ids[0];
+                    $status = $this->getPaymentStatusByPayment($pay_id);
+                } else {
+                    $status = 6;
+                }
+                $step = $index.'/'.$step_count;
+                $step2update = $this->getStoredInstallmentTransaction($installment, $step);
+                $req_insert_installment = '
+                UPDATE `'._DB_PREFIX_.'payplug_installment` 
+                SET `id_payment` = \''.$pay_id.'\', 
+                `status` = \''.$status.'\' 
+                WHERE `id_payplug_installment` = '.$step2update['id_payplug_installment'];
+                $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
+
+                if (!$res_insert_installment) {
+                    return false;
+                }
+            }
+        }
+
+    }
+
+    public function getStoredInstallment($installment)
+    {
+        if (!is_object($installment)) {
+            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+        }
+        $req_installment = '
+            SELECT pi.*
+            FROM `'._DB_PREFIX_.'payplug_installment` pi 
+            WHERE pi.id_installment = \''.$installment->id.'\'';
+        $res_installment = DB::getInstance()->executeS($req_installment);
+
+        if (!$res_installment) {
+            return false;
+        } else {
+            return $res_installment;
+        }
+    }
+
+    public function getStoredInstallmentTransaction($installment, $step)
+    {
+        if (!is_object($installment)) {
+            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+        }
+        $req_installment = '
+            SELECT pi.*
+            FROM `'._DB_PREFIX_.'payplug_installment` pi 
+            WHERE pi.id_installment = \''.$installment->id.'\' 
+            AND pi.step = '.(int)$step;
+        $res_installment = DB::getInstance()->getRow($req_installment);
+
+        if (!$res_installment) {
+            return false;
+        } else {
+            return $res_installment;
+        }
     }
 }
