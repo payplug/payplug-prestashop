@@ -3734,11 +3734,6 @@ class Payplug extends PaymentModule
                     foreach ($schedule->payment_ids as $pay_id) {
                         $p_status_class = 'pp_success';
                         $p = $this->retrievePayment($pay_id);
-                        if ($p->is_paid) {
-                            if (!in_array($p->id, $pps)) {
-                                $order->addOrderPayment($p->amount / 100, null, $p->id);
-                            }
-                        }
                         $p_status = (int)$p->is_paid == 1 ? $this->l('Paid') : $this->l('Not Paid');
                         if ((int)$p->is_refunded == 1) {
                             $p_status = $this->l('Refunded');
