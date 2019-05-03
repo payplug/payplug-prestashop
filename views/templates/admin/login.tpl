@@ -244,6 +244,7 @@
             <div class="block-right">
                 <p class="ppinstallmentchecked" id="installment_config_warning">{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</p>
                 <p class="pptips">
+                    <span class="ppinstallmentchecked">{l s='Attention : vos changements d\'états de commandes dans PrestaShop ne seront pas affectés par l\'activation du paiement en plusieurs fois. Pour suivre les échéances de paiement en plusieurs fois, vous pourrez consulter' mod='payplug'} <a href="{$installments_panel_url|escape:'htmlall':'UTF-8'}">{l s='l\'échéancier PayPlug' mod='payplug'}</a></span>
                     <span class="ppinline">
                         {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
                         <a href="http://support.payplug.com/customer/{$iso|escape:'htmlall':'UTF-8'}/portal/articles/2966107" target="_blank">{l s='Learn more.' mod='payplug'}</a>
