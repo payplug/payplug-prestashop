@@ -4198,9 +4198,9 @@ class Payplug extends PaymentModule
                 } else {
                     $installment = $this->retrieveInstallment($inst_id);
                     if ($installment->is_live == 1) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_CD');
+                        $new_state = (int) Configuration::get('PS_OS_CANCELED');
                     } else {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_CD_TEST');
+                        $new_state = (int) Configuration::get('PS_OS_CANCELED');
                     }
 
                     $order = new Order((int)$id_order);
@@ -4213,6 +4213,7 @@ class Payplug extends PaymentModule
                             $history->addWithemail();
                         }
                     }
+                    $this->updatePayplugInstallment($installment);
                     $reload = true;
 
                     die(json_encode(array('reload' => $reload)));
@@ -4490,18 +4491,34 @@ class Payplug extends PaymentModule
 
     private function getPaymentStatusByPayment($payment)
     {
+        /*
+            1 => 'not paid',
+            2 => 'paid',
+            3 => 'failed',
+            4 => 'partially refunded',
+            5 => 'refunded',
+            6 => 'on going',
+            7 => 'cancelled',
+         */
         if (!is_object($payment)) {
             $payment = \Payplug\Payment::retrieve($payment);
         }
 
-        $pay_status = (int)$payment->is_paid == 1 ? 2 : 1;
+        $pay_status = 1; //not paid
+        if ((int)$payment->is_paid == 1) {
+            $pay_status = 2; //paid
+        } elseif ((int)$payment->is_active == 1) {
+            $pay_status = 6; //ongoing
+        } else {
+            $pay_status = 7; //cancelled
+        }
         if (count($payment->failure) > 0) {
-            $pay_status = 3;
+            $pay_status = 3; //failed
         }
         if ((int)$payment->is_refunded == 1) {
-            $pay_status = 5;
+            $pay_status = 5; //refunded
         } elseif ((int)$payment->amount_refunded > 0) {
-            $pay_status = 4;
+            $pay_status = 4; //partillay refunded
         }
 
         return $pay_status;
@@ -4560,11 +4577,27 @@ class Payplug extends PaymentModule
             foreach ($installment->schedule as $schedule) {
                 $index ++;
                 $pay_id = '';
+                $status = 1; //not paid
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
-                    $status = $this->getPaymentStatusByPayment($pay_id);
+                    $payment = \Payplug\Payment::retrieve($pay_id);
+                    if ((int)$payment->is_paid == 1) {
+                        $status = 2; //paid
+                    }
+                    if (count($payment->failure) > 0) {
+                        $status = 3; //failed
+                    }
+                    if ((int)$payment->is_refunded == 1) {
+                        $status = 5; //refunded
+                    } elseif ((int)$payment->amount_refunded > 0) {
+                        $status = 4; //partillay refunded
+                    }
                 } else {
-                    $status = 6;
+                    if ((int)$installment->is_active == 1) {
+                        $status = 6; //ongoing
+                    } else {
+                        $status = 7; //cancelled
+                    }
                 }
                 $step = $index.'/'.$step_count;
                 $step2update = $this->getStoredInstallmentTransaction($installment, $step);
@@ -4580,7 +4613,6 @@ class Payplug extends PaymentModule
                 }
             }
         }
-
     }
 
     public function getStoredInstallment($installment)
