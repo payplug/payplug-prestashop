@@ -203,7 +203,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
                 $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
-                $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'.$state_addons);
+                $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
                 if ($type == 'installment') {
                     $order_state = $inst_state;
                 } elseif ($is_paid) {
@@ -229,8 +229,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $extra_vars = array(
                         'transaction_id' => $payment->id
                     );
-                } else {
-                    $extra_vars = array();
+                } elseif ($type == 'installment') {
+                    $extra_vars = array(
+                        'transaction_id' => $inst_id
+                    );
                 }
                 /*
                  * For some reasons, secure key form cart can differ from secure key from customer
@@ -279,11 +281,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $data['metadata'] = $payment->metadata;
                         $data['metadata']['Order'] = $id_order;
                         $payplug->patchPayment($api_key, $payment->id, $data);
+                    } elseif ($type == 'installment') {
+                        $payplug->addPayplugInstallment($installment, $order);
                     }
-                }
-
-                if ($type == 'installment') {
-                    $order->addOrderPayment((float)($amount / 100), null, $pay_id);
                 }
 
                 $this->addLog($debug, $log, 'Checking number of order passed with this id_cart...', 'info');
