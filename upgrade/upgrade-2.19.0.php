@@ -55,5 +55,10 @@ function upgrade_module_2_19_0($object)
         $flag = false;
     }
 
+    if (!$object->installTab()) {
+        $this->log_install->error('Fail to add installment tab.');
+        $flag = false;
+    }
+
     return $flag;
 }

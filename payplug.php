@@ -256,21 +256,6 @@ class Payplug extends PaymentModule
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
-        $translationsAdminPayPlug = array(
-            'en' => 'PayPlug',
-            'fr' => 'PayPlug'
-        );
-        $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
-        $translationsAdminPayPlugInstallment = array(
-            'en' => 'Installment Plans',
-            'fr' => 'Paiements en plusieurs fois'
-        );
-
-        $adminPayPlugId = Db::getInstance()->getValue(
-            "SELECT `id_tab` FROM " . _DB_PREFIX_ . "tab WHERE `class_name`='AdminPayPlug'"
-        );
-        $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, $adminPayPlugId, $this->name);
-
         if (!parent::install()) {
             $this->log_install->error('Install failed: parent.');
         } elseif (!$this->registerHook('paymentReturn') ||
@@ -292,8 +277,8 @@ class Payplug extends PaymentModule
             $this->log_install->error('Install failed: order states.');
         } elseif (!$this->installSQL()) {
             $this->log_install->error('Install failed: sql.');
-        //} elseif (!$this->installTab()) {
-            //$this->log_install->error('Install failed: tab.');
+        } elseif (!$this->installTab()) {
+            $this->log_install->error('Install failed: tab.');
         } else {
             $this->log_install->info('Install succeeded.');
             return true;
@@ -323,17 +308,14 @@ class Payplug extends PaymentModule
             $this->log_install->info('Cards will be kept.');
         }
 
-        $this->uninstallModuleTab('AdminPayPlug');
-        $this->uninstallModuleTab('AdminPayPlugInstallment');
-
         if (!parent::uninstall()) {
             $this->log_install->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $this->log_install->error('Uninstall failed: configuration.');
         } elseif (!$this->uninstallSQL($keep_cards)) {
             $this->log_install->error('Uninstall failed: sql.');
-        //} elseif (!$this->uninstallTab()) {
-            //$this->log_install->error('Uninstall failed: tab.');
+        } elseif (!$this->uninstallTab()) {
+            $this->log_install->error('Uninstall failed: tab.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;
@@ -341,50 +323,34 @@ class Payplug extends PaymentModule
         return false;
     }
 
-    private function installTab()
+    public function installTab()
     {
-        $tab = new Tab();
-        $tab->active = 1;
-        $tab->class_name = 'AdminPayPlugInstallment';
-        $tab->name = array();
-        foreach (Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = $this->l('Installment Plans');
-        }
+        $translationsAdminPayPlug = array(
+            'en' => 'PayPlug',
+            'fr' => 'PayPlug'
+        );
+        $flag = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
 
-        $tab->id_parent = 0;
-        $tab->module = $this->name;
-        $tab->position = Tab::getNbTabs(0);
+        $translationsAdminPayPlugInstallment = array(
+            'en' => 'Installment Plans',
+            'fr' => 'Paiements en plusieurs fois'
+        );
 
-        if (!$tab->add()) {
-            return false;
-        }
+        $adminPayPlugId = Db::getInstance()->getValue(
+            "SELECT `id_tab` FROM " . _DB_PREFIX_ . "tab WHERE `class_name`='AdminPayPlug'"
+        );
+        $flag = ($flag && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, $adminPayPlugId, $this->name));
 
-        Configuration::updateValue('PAYPLUG_ADMIN_INSTALLMENT_TAB', $tab->id);
-
-        return true;
+        return $flag;
     }
 
     private function uninstallTab() {
-        $id_tab = (int)Configuration::get('PAYPLUG_ADMIN_INSTALLMENT_TAB');
 
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-            return $tab->delete();
-        }
-
-        return true;
+        return ($this->uninstallModuleTab('AdminPayPlug') && $this->uninstallModuleTab('AdminPayPlugInstallment'));
     }
-
-
-
-
-
-
 
     public function installModuleTab($tabClass, $translations, $idTabParent, $moduleName = null)
     {
-        @copy(_PS_MODULE_DIR_ . $this->name . '/icon.gif', _PS_IMG_DIR_ . 't/' . $tabClass . '.png');
-        /* @var $tab TabCore */
         $tab = new Tab();
         foreach (Language::getLanguages(false) as $language) {
             if (isset($translations[Tools::strtolower($language['iso_code'])])) {
@@ -410,21 +376,15 @@ class Payplug extends PaymentModule
 
     public function uninstallModuleTab($tabClass)
     {
-        $idTab = Tab::getIdFromClassName($tabClass);
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
+        $idTab = $tabRepository->findOneIdByClassName($tabClass);
         if ($idTab != 0) {
             $tab = new Tab($idTab);
             $tab->delete();
-            @unlink(_PS_IMG_DIR . "t/" . $tabClass . ".png");
             return true;
         }
         return false;
     }
-
-
-
-
-
-
 
     /**
      * Delete saved cards when uninstalling module
