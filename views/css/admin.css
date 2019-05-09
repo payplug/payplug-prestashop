@@ -855,3 +855,7 @@ span.ppclose {
 	color: #f7a000;
 	padding: 2px 0 0 243px;
 }
+
+.italic {
+	font-style: italic;
+}
