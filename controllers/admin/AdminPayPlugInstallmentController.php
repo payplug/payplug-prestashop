@@ -151,4 +151,16 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         }
         return parent::postProcess();
     }
+
+    public function initToolbar()
+    {
+        if ($this->allow_export) {
+            $this->toolbar_btn['export'] = array(
+                'href' => self::$currentIndex.'&export'.$this->table.'&token='.$this->token,
+                'desc' => $this->l('Export')
+            );
+        }
+        parent::initToolbar();
+        unset($this->toolbar_btn['new']);
+    }
 }
