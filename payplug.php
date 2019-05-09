@@ -1667,6 +1667,10 @@ class Payplug extends PaymentModule
      */
     private function storePayment($pay_id, $id_cart)
     {
+        if ($inst_id = $this->getInstallmentByCart($id_cart)) {
+            $this->deleteInstallment($inst_id, $id_cart);
+        }
+
         $req_payment_cart_exists = new DbQuery();
         $req_payment_cart_exists->select('*');
         $req_payment_cart_exists->from('payplug_payment_cart', 'ppc');
