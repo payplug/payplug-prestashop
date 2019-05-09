@@ -236,7 +236,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
                             $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
                             $error_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR'.$state_addons);
-                            $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'.$state_addons);
+                            $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
 
                             if ($order_id) {
                                 $this->addLog($debug, $log, 'UPDATE MODE', 'info');
