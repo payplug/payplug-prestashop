@@ -456,14 +456,17 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                                 if ($resource->installment_plan_id != null) {
                                     $order_state = $inst_state;
+                                    $extra_vars = array(
+                                        'transaction_id' => $resource->installment_plan_id
+                                    );
                                 } else {
                                     $order_state = $paid_state;
+                                    $extra_vars = array(
+                                        'transaction_id' => $payment->id
+                                    );
                                 }
 
-                                $amount = (float)$payment->amount / 100;
-                                $extra_vars = array(
-                                    'transaction_id' => $payment->id
-                                );
+                                $amount = (float)($cart->getOrderTotal(true, Cart::BOTH));
                                 $currency = (int)$cart->id_currency;
                                 try {
                                     $customer = new Customer((int)$cart->id_customer);
