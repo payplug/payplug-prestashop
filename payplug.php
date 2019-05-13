@@ -2048,7 +2048,7 @@ class Payplug extends PaymentModule
 
         //customer
         $customer = new Customer((int)$cart->id_customer);
-        //$address_invoice = new Address((int)$cart->id_address_invoice);
+        $address_invoice = new Address((int)$cart->id_address_invoice);
         $address_delivery = new Address((int)$cart->id_address_delivery);
         //$country = new Country((int)$address_invoice->id_country);
         $country = new Country((int)$address_delivery->id_country);
@@ -2109,6 +2109,40 @@ class Payplug extends PaymentModule
             'website'       => $baseurl,
         );
 
+
+        // delivery address fields
+        $shipping = array(
+            'title'         => null,
+            'first_name'    => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
+            'last_name'     => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
+            'email'         => $customer->email,  // required
+            'phone_number'  => !empty($address_delivery->phone) ? $address_delivery->phone : null,  // optional + numéro fixe en plus ?
+            'address1'      => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
+            'address2'      => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
+            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
+            'postcode'      => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
+            'city'          => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
+            'country'       => !empty($address_delivery->id_country) ? $this->getIsoCodeByCountryId((int)$address_delivery->id_country) : null,  // required
+            'language'      => $this->context->language->iso_code,  // optional
+        );
+
+        // invoice address fields
+        $invoice = array(
+            'title'         => null,
+            'first_name'    => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
+            'last_name'     => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
+            'email'         => $customer->email,  // required
+            'phone_number'  => !empty($address_invoice->phone) ? $address_invoice->phone : null,  // optional + numéro fixe en plus ?
+            'address1'      => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
+            'address2'      => !empty($address_invoice->address2) ? $address_invoice->address2 : null,  // optional
+            'company_name'  => !empty($address_invoice->company) ? $address_invoice->company : null,  // optional
+            'postcode'      => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,  // required
+            'city'          => !empty($address_invoice->city) ? $address_invoice->city : null,  // required
+            'country'       => !empty($address_invoice->id_country) ? $this->getIsoCodeByCountryId((int)$address_invoice->id_country) : null,  // required
+            'language'      => $this->context->language->iso_code,  // optional
+        );
+
+
         //payment
         $payment_tab = array(
             'amount'            => $amount,
@@ -2127,8 +2161,10 @@ class Payplug extends PaymentModule
             'force_3ds'         => $force_3ds,
             'metadata'          => array(
                 'ID Client'     => $metadata['customer_id'],
-                'ID Cart'           => $metadata['cart_id'],
-                'Website'           => $metadata['website'],
+                'ID Cart'       => $metadata['cart_id'],
+                'Website'       => $metadata['website'],
+                'shipping'      => json_encode($shipping),
+                'invoice'       => json_encode($invoice),
             )
         );
 
