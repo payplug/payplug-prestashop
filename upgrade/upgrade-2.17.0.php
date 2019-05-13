@@ -25,6 +25,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
+
 function upgrade_module_2_16_0($object)
 {
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');

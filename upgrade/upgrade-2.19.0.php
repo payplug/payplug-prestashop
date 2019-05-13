@@ -25,10 +25,21 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
+
 function upgrade_module_2_19_0($object)
 {
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
+
+    if (!Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD')
+        || Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD_TEST')
+        || Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG')
+        || Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG_TEST')
+    ) {
+        $log->error('Fail to delete old configurations');
+        $flag = false;
+    }
 
     //sql
     $req_payplug_installment = '
