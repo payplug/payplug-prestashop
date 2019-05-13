@@ -488,7 +488,7 @@ class Payplug extends PaymentModule
      * @throws Exception
      * @return bool
      */
-    private function createOrderStates()
+    public function createOrderStates()
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
         $this->log_install->info('Order state creation starting.');
