@@ -47,7 +47,7 @@
 }
 
 #pppanel input[type="submit"].green-button{
-	background: #00c29a;
+	background: #00ab7a;
 	color: #ffffff;
 	border: none;
 	/*margin: 15px 0 20px 0;*/
@@ -193,7 +193,7 @@ span.ppclose {
 #payplug_popin .green-button {
 	float: right;
 	color: #ffffff;
-	background: #00c29a none repeat scroll 0 0;
+	background: #00ab7a none repeat scroll 0 0;
 	font-weight: 700;
 }
 
@@ -262,7 +262,7 @@ span.ppclose {
 }
 
 #payplug_popin a {
-	color: #00c29a;
+	color: #00ab7a;
 }
 
 #payplug_popin ul {
@@ -333,7 +333,7 @@ span.ppclose {
 }
 
 #pppanel .ppsuccess {
-	color: #00c29a;
+	color: #00ab7a;
 	padding: 26px 0 0 10px;
 	float: left;
 	margin: 0;
@@ -378,7 +378,7 @@ span.ppclose {
 }
 
 #pppanel td.pp_success {
-	color: #00c29a;
+	color: #00ab7a;
 	font-weight: bold;
 }
 
