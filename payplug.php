@@ -3493,6 +3493,7 @@ class Payplug extends PaymentModule
                 } catch (Exception $e) {
                     return('error');
                 }
+                $this->updatePayplugInstallment($installment);
             } else {
                 return('error');
             }
