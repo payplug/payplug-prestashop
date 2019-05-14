@@ -236,7 +236,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
                             $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
                             $error_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR'.$state_addons);
-                            $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'.$state_addons);
+                            $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
 
                             if ($order_id) {
                                 $this->addLog($debug, $log, 'UPDATE MODE', 'info');
@@ -456,14 +456,17 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                                 if ($resource->installment_plan_id != null) {
                                     $order_state = $inst_state;
+                                    $extra_vars = array(
+                                        'transaction_id' => $resource->installment_plan_id
+                                    );
                                 } else {
                                     $order_state = $paid_state;
+                                    $extra_vars = array(
+                                        'transaction_id' => $payment->id
+                                    );
                                 }
 
-                                $amount = (float)$payment->amount / 100;
-                                $extra_vars = array(
-                                    'transaction_id' => $payment->id
-                                );
+                                $amount = (float)($cart->getOrderTotal(true, Cart::BOTH));
                                 $currency = (int)$cart->id_currency;
                                 try {
                                     $customer = new Customer((int)$cart->id_customer);

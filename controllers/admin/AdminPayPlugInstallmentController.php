@@ -73,29 +73,29 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 'class' => 'fixed-width-xs'
             ),
             'reference' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Order Reference'),
+                'title' => Context::getContext()->getTranslator()->trans('Order reference'),
             ),
             'customer' => array(
                 'title' => Context::getContext()->getTranslator()->trans('Customer'),
                 'havingFilter' => true,
             ),
             'order_total' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Total Commande'),
+                'title' => Context::getContext()->getTranslator()->trans('Order total'),
                 'type' => 'price',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
             ),
             'step' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Numéro d\'échéance'),
+                'title' => Context::getContext()->getTranslator()->trans('Installment payment #'),
             ),
             'amount' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Montant échéance'),
+                'title' => Context::getContext()->getTranslator()->trans('Installment amount'),
                 'type' => 'price',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
             ),
             'status' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Statut Paiement Payplug'),
+                'title' => Context::getContext()->getTranslator()->trans('PayPlug payment status'),
                 'callback' => 'getPaymentStatusById',
                 'type' => 'select',
                 'list' => $this->payplug->payment_status,
@@ -150,5 +150,17 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
             $this->viewpayplug_installment();
         }
         return parent::postProcess();
+    }
+
+    public function initToolbar()
+    {
+        if ($this->allow_export) {
+            $this->toolbar_btn['export'] = array(
+                'href' => self::$currentIndex.'&export'.$this->table.'&token='.$this->token,
+                'desc' => $this->l('Export')
+            );
+        }
+        parent::initToolbar();
+        unset($this->toolbar_btn['new']);
     }
 }

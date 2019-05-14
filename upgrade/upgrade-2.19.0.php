@@ -25,10 +25,19 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
+
 function upgrade_module_2_19_0($object)
 {
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
+
+    //Configurations may not exist if upgrade is from an old enough version
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD');
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD_TEST');
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG');
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG_TEST');
+
 
     //sql
     $req_payplug_installment = '
@@ -52,6 +61,13 @@ function upgrade_module_2_19_0($object)
         }
     } catch (PrestaShopDatabaseException $e) {
         $log->error('Fail to add new table');
+        $flag = false;
+    }
+
+    $object->uninstallTab();
+    $object->uninstallModuleTab('AdminPayplug');
+    if (!$object->installTab()) {
+        $this->log_install->error('Fail to add installment tab.');
         $flag = false;
     }
 

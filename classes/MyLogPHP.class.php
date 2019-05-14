@@ -69,9 +69,6 @@ class MyLogPHP
             $headers = $this->HEADERS . "\n";
         }
         $fd = fopen($this->LOGFILENAME, "a");
-        if (@$headers) {
-            fwrite($fd, $headers);
-        }
         $debugBacktrace = debug_backtrace();
         $line = $debugBacktrace[1]['line'];
         if ($line_n === null) {

@@ -55,7 +55,7 @@
             {*<a class="green-button popin-button" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' d='Modules.Payplug.Admin'}</a>*}
         </div>
 {elseif $type == 'premium'}
-        <div class="panel-heading">{l s='Enable one-click payments' mod='payplug'}</div>
+        <div class="panel-heading">{l s='Enable advanced feature' mod='payplug'}</div>
         {*<div class="panel-heading">{l s='Enable one-click payments' d='Modules.Payplug.Admin'}</div>*}
         <span class="ppclose">x</span>
     </div>
