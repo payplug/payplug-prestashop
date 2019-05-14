@@ -344,7 +344,7 @@ class Payplug extends PaymentModule
         return $flag;
     }
 
-    private function uninstallTab() {
+    public function uninstallTab() {
 
         return ($this->uninstallModuleTab('AdminPayPlug') && $this->uninstallModuleTab('AdminPayPlugInstallment'));
     }
