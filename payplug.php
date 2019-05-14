@@ -2163,8 +2163,8 @@ class Payplug extends PaymentModule
                 'ID Client'     => $metadata['customer_id'],
                 'ID Cart'       => $metadata['cart_id'],
                 'Website'       => $metadata['website'],
-                'shipping'      => json_encode($shipping),
-                'invoice'       => json_encode($invoice),
+//                 'shipping'      => json_encode($shipping),
+//                 'invoice'       => json_encode($invoice),
             )
         );
 
