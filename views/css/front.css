@@ -142,7 +142,7 @@ label[for=payplug_card_new] {
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	background: #00c29a none repeat scroll 0 0;
+	background: #00ab7a none repeat scroll 0 0;
 	border-radius: 0.25em;
 	color: #ffffff;
 	font-weight: 700;
@@ -229,7 +229,7 @@ label[for=payplug_card_new] {
 }
 
 .ppsuccess{
-	color: #00c29a;
+	color: #00ab7a;
 }
 
 p.ppwait{
