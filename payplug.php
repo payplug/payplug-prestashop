@@ -3810,6 +3810,7 @@ class Payplug extends PaymentModule
 
             $show_menu = true;
             $show_menu_refunded = true;
+            $this->updatePayplugInstallment($installment);
         } else {
             if (!$pay_id = $this->isTransactionPending((int)$order->id_cart)) {
                 $payments = $order->getOrderPaymentCollection();
