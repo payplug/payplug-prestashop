@@ -4636,7 +4636,7 @@ class Payplug extends PaymentModule
      * Check payment method for given cart object
      *
      * @param object Cart
-     * @return string|bool pay_id or inst_id or False
+     * @return array|bool pay_id or inst_id or False
      */
     public function getPaymentMethodByCart($cart){
         if(!is_object($cart)) {
