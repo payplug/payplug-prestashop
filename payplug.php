@@ -2574,9 +2574,11 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -2745,9 +2747,11 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -2900,9 +2904,11 @@ class Payplug extends PaymentModule
             } else {
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -3244,9 +3250,11 @@ class Payplug extends PaymentModule
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
 
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -4622,5 +4630,47 @@ class Payplug extends PaymentModule
         } else {
             return $res_installment;
         }
+    }
+
+    public function checkPaymentByCart($id_cart, $full = false){
+        $cart = new Cart($id_cart);
+
+        if (!Validate::isLoadedObject($cart)) {
+            return false;
+        }
+
+        $pay_id = $this->getPaymentByCart($cart->id);
+        if($pay_id){
+            if ($full) {
+                $payment = $this->retrievePayment($pay_id);
+                die(json_encode($payment));
+            } else {
+                $return_url = $this->context->link->getModuleLink(
+                    $this->name,
+                    'validation',
+                    array('ps' => 1, 'cartid' => (int)$cart->id),
+                    true
+                );
+                die(json_encode(array('exists' => true, 'redirect_url' => $return_url)));
+            }
+        }
+
+        $inst_id = $this->getInstallmentByCart($cart->id);
+        if($inst_id){
+            if ($full) {
+                $installment = $this->retrieveInstallment($inst_id);
+                die(json_encode($installment));
+            } else {
+                $return_url = $this->context->link->getModuleLink(
+                    $this->name,
+                    'validation',
+                    array('ps' => 1, 'cartid' => (int)$cart->id),
+                    true
+                );
+                die(json_encode(array('exists' => true, 'redirect_url' => $return_url)));
+            }
+        }
+
+        die(json_encode(array('result' => false)));
     }
 }

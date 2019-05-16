@@ -53,6 +53,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
+            } elseif ((int)Tools::getValue('retrieve') == 1) {
+                if(Validate::isLoadedObject($this->context->cart)){
+
+                    $payplug = new Payplug();
+                    $payment = $payplug->checkPaymentByCart($this->context->cart->id);
+                    die($payment);
+                }
+                die(false);
             }
         }
     }
