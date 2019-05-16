@@ -3459,7 +3459,9 @@ class Payplug extends PaymentModule
                                     if ($p->is_paid && !$p->is_refunded && $amount > 0) {
                                         $amount_refundable = (int)($p->amount - $p->amount_refunded);
                                         $truly_refundable_amount += $amount_refundable;
-                                        if ($amount >= $amount_refundable) {
+                                        if($truly_refundable_amount < 10) {
+                                            continue;
+                                        } elseif ($amount >= $amount_refundable) {
                                             $data = array(
                                                 'amount' => $amount_refundable,
                                                 'metadata' => $metadata
@@ -3715,9 +3717,10 @@ class Payplug extends PaymentModule
                             $p_status = $this->l('Partially Refunded');
                             $p_status_class = 'pp_error';
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
-                            $amount_available += ($p->amount - $p->amount_refunded) / 100;
+                            $amount_refundable_payment = ($p->amount - $p->amount_refunded);
+                            $amount_available += ($amount_refundable_payment >= 10 ? $amount_refundable_payment / 100 : 0);
                         } else {
-                            $amount_available += ($p->amount) / 100;
+                            $amount_available += ($p->amount >= 10 ? $p->amount / 100 : 0);
                         }
 
                         if ($p->card->brand != '') {
@@ -3838,7 +3841,8 @@ class Payplug extends PaymentModule
             }
 
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
-            $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
+            $amount_available_payment = ($payment->amount - $payment->amount_refunded);
+            $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
             $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
             $sandbox = ((int)$payment->is_live == 1 ? false : true);
 
@@ -4088,7 +4092,7 @@ class Payplug extends PaymentModule
     public function checkAmountToRefund($amount)
     {
         $amount = str_replace(',', '.', $amount);
-        return is_numeric($amount);
+        return is_numeric($amount) && ($amount >= 0.1);
     }
 
     public function adminAjaxController()
