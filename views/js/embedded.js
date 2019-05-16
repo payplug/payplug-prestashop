@@ -32,14 +32,12 @@ $(document).ready(function() {
         var retrieve_url = $('#payplug_form_js').data('retrieve-url');
         $.ajax({
             type: 'POST',
-            //async: false,
             async: true,
             url: retrieve_url,
             dataType: 'json',
             data: {retrieve:1},
-            timeout: 70000,
             error: function(jqXHR, textStatus, errorThrown) {
-                alert('error CALL PAYMENT');
+                alert('error CALL RETRIEVE');
                 console.log(jqXHR);
                 console.log(textStatus);
                 console.log(errorThrown);
@@ -47,7 +45,7 @@ $(document).ready(function() {
             success: function(data)
             {
                 if(data) {
-                    if (typeof data.exists != 'undefined' && data.exists && typeof data.redirect_url != 'undefined' && data.redirect_url){
+                    if (typeof data.redirect_url != 'undefined' && data.redirect_url){
                         window.location.replace(data.redirect_url);
                     }
                 }

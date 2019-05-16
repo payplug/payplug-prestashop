@@ -4673,4 +4673,32 @@ class Payplug extends PaymentModule
 
         die(json_encode(array('result' => false)));
     }
+
+    /**
+     * Check payment method for given id_cart
+     *
+     * @param object Cart
+     * @return mixed
+     */
+    public function getPaymentMethodByCart($cart){
+        if(!is_object($cart)) {
+            $cart = new Cart((int)$cart);
+        }
+
+        if (!Validate::isLoadedObject($cart)) {
+            return false;
+        }
+
+        $pay_id = $this->getPaymentByCart($cart->id);
+        if($pay_id){
+            return array('type' => 'payment', 'id' => $pay_id);
+        }
+
+        $inst_id = $this->getInstallmentByCart($cart->id);
+        if($inst_id){
+            return array('type' => 'installment', 'id' => $inst_id);
+        }
+
+        return false;
+    }
 }
