@@ -421,6 +421,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             $this->addLog($debug, $log, 'Installment still pending.', 'info');
                                             $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                                         }
+                                        $payplug->updatePayplugInstallment($installment);
                                     } else {
                                         echo $this->addLog(
                                             $debug,
