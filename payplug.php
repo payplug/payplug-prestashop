@@ -4649,12 +4649,12 @@ class Payplug extends PaymentModule
 
         $inst_id = $this->getInstallmentByCart($cart->id);
         if($inst_id){
-            return $this->validatePaymentMethod($inst_id,'installment');
+            return array('id' => $inst_id, 'type' => 'installment');
         }
 
         $pay_id = $this->getPaymentByCart($cart->id);
         if($pay_id){
-            return $this->validatePaymentMethod($pay_id);
+            return array('id' => $inst_id, 'type' => 'installment');
         }
 
         return false;
@@ -4665,9 +4665,9 @@ class Payplug extends PaymentModule
      *
      * @param string $payment_id
      * @param string $type  default payment
-     * @return array|bool   return id and type if valid or false
+     * @return bool
      */
-    public function validatePaymentMethod($payment_id, $type = 'payment'){
+    public function isPaidPaymentMethod($payment_id, $type = 'payment'){
         switch($type){
             case 'installment':
                 $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
@@ -4675,9 +4675,9 @@ class Payplug extends PaymentModule
                     $schedules = $installment->schedule;
                     foreach($schedules as $schedule){
                         foreach($schedule->payment_ids as $pay_id){
-                            $payment = $this->validatePaymentMethod($pay_id);
+                            $payment = $this->isPaidPaymentMethod($pay_id);
                             if($payment && $payment->is_paid){
-                                return array('id' => $payment_id, 'type' => $type);
+                                return true;
                             }
                         }
                     }
@@ -4686,10 +4686,10 @@ class Payplug extends PaymentModule
             case 'payment':
             default:
                 $payment = \Payplug\Payment::retrieve($payment_id);
-                if($payment && $payment->is_paid){
-                    return array('id' => $payment_id, 'type' => $type);
-                }
+                return $payment && $payment->is_paid;
                 break;
         }
+
+        return false;
     }
 }
