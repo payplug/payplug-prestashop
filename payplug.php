@@ -4647,16 +4647,52 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $pay_id = $this->getPaymentByCart($cart->id);
-        if($pay_id){
-            return array('type' => 'payment', 'id' => $pay_id);
-        }
-
         $inst_id = $this->getInstallmentByCart($cart->id);
         if($inst_id){
-            return array('type' => 'installment', 'id' => $inst_id);
+            return $this->checkIfValidPaymentMethod($inst_id,'installment');
+        }
+
+        $pay_id = $this->getPaymentByCart($cart->id);
+        if($pay_id){
+            return $this->checkIfValidPaymentMethod($pay_id);
         }
 
         return false;
+    }
+
+    /**
+     * Check if payment method is valid for given id
+     *
+     * @param string $payment_id
+     * @param string $type  default payment
+     * @return array|bool   return id and type if valid or false
+     */
+    public function checkIfValidPaymentMethod($payment_id, $type = 'payment'){
+        $return = false;
+
+        switch($type){
+            case 'installment':
+                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                if($installment && $installment->is_active){
+                    $schedules = $installment->schedule;
+                    $schedule = reset($schedules);
+                    $payment_ids = $schedule->payment_ids;
+                    $pay_id = reset($payment_ids);
+                    $payment = \Payplug\Payment::retrieve($pay_id);
+                    if($payment && $payment->is_paid){
+                        $return = array('id' => $payment_id, 'type' => $type);
+                    }
+                }
+                break;
+            case 'payment':
+            default:
+                $payment = \Payplug\Payment::retrieve($payment_id);
+                if($payment && $payment->is_paid){
+                    $return = array('id' => $payment_id, 'type' => $type);
+                }
+                break;
+        }
+
+        return $return;
     }
 }
