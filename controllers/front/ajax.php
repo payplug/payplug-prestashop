@@ -55,9 +55,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
             }
             elseif ((int)Tools::getValue('retrieve') == 1) {
+                $return_url = false;
                 if(Validate::isLoadedObject($this->context->cart)){
                     $payment_method = $payplug->getPaymentMethodByCart($this->context->cart);
-                    $return_url = false;
                     if($payment_method) {
                         $is_paid = $payplug->isPaidPaymentMethod($payment_method['id'],$payment_method['type']);
                         if ($is_paid) {
@@ -68,9 +68,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                                 true);
                         }
                     }
-                    die(json_encode(array('redirect_url' => $return_url)));
                 }
-                die(false);
+                die(json_encode(array('redirect_url' => $return_url)));
             }
         }
     }
