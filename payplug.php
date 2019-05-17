@@ -4649,12 +4649,12 @@ class Payplug extends PaymentModule
 
         $inst_id = $this->getInstallmentByCart($cart->id);
         if($inst_id){
-            return $this->checkIfValidPaymentMethod($inst_id,'installment');
+            return $this->validatePaymentMethod($inst_id,'installment');
         }
 
         $pay_id = $this->getPaymentByCart($cart->id);
         if($pay_id){
-            return $this->checkIfValidPaymentMethod($pay_id);
+            return $this->validatePaymentMethod($pay_id);
         }
 
         return false;
@@ -4667,20 +4667,19 @@ class Payplug extends PaymentModule
      * @param string $type  default payment
      * @return array|bool   return id and type if valid or false
      */
-    public function checkIfValidPaymentMethod($payment_id, $type = 'payment'){
-        $return = false;
-
+    public function validatePaymentMethod($payment_id, $type = 'payment'){
         switch($type){
             case 'installment':
                 $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
                 if($installment && $installment->is_active){
                     $schedules = $installment->schedule;
-                    $schedule = reset($schedules);
-                    $payment_ids = $schedule->payment_ids;
-                    $pay_id = reset($payment_ids);
-                    $payment = \Payplug\Payment::retrieve($pay_id);
-                    if($payment && $payment->is_paid){
-                        $return = array('id' => $payment_id, 'type' => $type);
+                    foreach($schedules as $schedule){
+                        foreach($schedule->payment_ids as $pay_id){
+                            $payment = $this->validatePaymentMethod($pay_id);
+                            if($payment && $payment->is_paid){
+                                return array('id' => $payment_id, 'type' => $type);
+                            }
+                        }
                     }
                 }
                 break;
@@ -4688,11 +4687,9 @@ class Payplug extends PaymentModule
             default:
                 $payment = \Payplug\Payment::retrieve($payment_id);
                 if($payment && $payment->is_paid){
-                    $return = array('id' => $payment_id, 'type' => $type);
+                    return array('id' => $payment_id, 'type' => $type);
                 }
                 break;
         }
-
-        return $return;
     }
 }
