@@ -4654,7 +4654,7 @@ class Payplug extends PaymentModule
 
         $pay_id = $this->getPaymentByCart($cart->id);
         if($pay_id){
-            return array('id' => $inst_id, 'type' => 'installment');
+            return array('id' => $inst_id, 'type' => 'payment');
         }
 
         return false;
