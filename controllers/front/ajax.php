@@ -55,17 +55,21 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
             }
             elseif ((int)Tools::getValue('retrieve') == 1) {
+                $return_url = false;
                 if(Validate::isLoadedObject($this->context->cart)){
                     $payment_method = $payplug->getPaymentMethodByCart($this->context->cart);
                     if($payment_method) {
-                        $return_url = $this->context->link->getModuleLink('payplug','validation',array('ps' => 1, 'cartid' => (int)$this->context->cart->id),true);
-                        $return = array('redirect_url' => $return_url);
-                    } else {
-                        $return = array('redirect_url' => false);
+                        $is_paid = $payplug->isPaidPaymentMethod($payment_method['id'],$payment_method['type']);
+                        if ($is_paid) {
+                            $return_url = $this->context->link->getModuleLink(
+                                'payplug',
+                                'validation',
+                                array('ps' => 1, 'cartid' => (int)$this->context->cart->id),
+                                true);
+                        }
                     }
-                    die(json_encode($return));
                 }
-                die(false);
+                die(json_encode(array('redirect_url' => $return_url)));
             }
         }
     }
