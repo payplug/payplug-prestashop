@@ -4651,14 +4651,47 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $pay_id = $this->getPaymentByCart($cart->id);
-        if($pay_id){
-            return array('type' => 'payment', 'id' => $pay_id);
-        }
-
         $inst_id = $this->getInstallmentByCart($cart->id);
         if($inst_id){
-            return array('type' => 'installment', 'id' => $inst_id);
+            return array('id' => $inst_id, 'type' => 'installment');
+        }
+
+        $pay_id = $this->getPaymentByCart($cart->id);
+        if($pay_id){
+            return array('id' => $inst_id, 'type' => 'installment');
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if payment method is valid for given id
+     *
+     * @param string $payment_id
+     * @param string $type  default payment
+     * @return bool
+     */
+    public function isPaidPaymentMethod($payment_id, $type = 'payment'){
+        switch($type){
+            case 'installment':
+                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                if($installment && $installment->is_active){
+                    $schedules = $installment->schedule;
+                    foreach($schedules as $schedule){
+                        foreach($schedule->payment_ids as $pay_id){
+                            $payment = $this->isPaidPaymentMethod($pay_id);
+                            if($payment && $payment->is_paid){
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'payment':
+            default:
+                $payment = \Payplug\Payment::retrieve($payment_id);
+                return $payment && $payment->is_paid;
+                break;
         }
 
         return false;
