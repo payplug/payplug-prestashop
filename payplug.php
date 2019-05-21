@@ -2574,11 +2574,9 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
-            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
-                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -2747,11 +2745,9 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
-            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
-                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -2904,11 +2900,9 @@ class Payplug extends PaymentModule
             } else {
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
-            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
-                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -3250,11 +3244,9 @@ class Payplug extends PaymentModule
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
 
-            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
-                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
