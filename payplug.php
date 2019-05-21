@@ -4576,15 +4576,18 @@ class Payplug extends PaymentModule
                     }
                 }
                 $step = $index.'/'.$step_count;
-                $step2update = $this->getStoredInstallmentTransaction($installment, $step);
-                $req_insert_installment = '
-                UPDATE `'._DB_PREFIX_.'payplug_installment` 
-                SET `id_payment` = \''.$pay_id.'\', 
-                `status` = \''.$status.'\' 
-                WHERE `id_payplug_installment` = '.$step2update['id_payplug_installment'];
-                $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
+                if ($step2update = $this->getStoredInstallmentTransaction($installment, $step)) {
+                    $req_insert_installment = '
+                        UPDATE `'._DB_PREFIX_.'payplug_installment` 
+                        SET `id_payment` = \''.pSQL($pay_id).'\', 
+                        `status` = \''.(int)$status.'\' 
+                        WHERE `id_payplug_installment` = '.(int)$step2update['id_payplug_installment'];
+                    $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
 
-                if (!$res_insert_installment) {
+                    if (!$res_insert_installment) {
+                        return false;
+                    }
+                } else {
                     return false;
                 }
             }
