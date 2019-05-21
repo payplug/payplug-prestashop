@@ -4658,7 +4658,7 @@ class Payplug extends PaymentModule
 
         $pay_id = $this->getPaymentByCart($cart->id);
         if($pay_id){
-            return array('id' => $inst_id, 'type' => 'installment');
+            return array('id' => $pay_id, 'type' => 'payment');
         }
 
         return false;
@@ -4679,8 +4679,8 @@ class Payplug extends PaymentModule
                     $schedules = $installment->schedule;
                     foreach($schedules as $schedule){
                         foreach($schedule->payment_ids as $pay_id){
-                            $payment = $this->isPaidPaymentMethod($pay_id);
-                            if($payment && $payment->is_paid){
+                            $inst_payment = \Payplug\Payment::retrieve($pay_id);
+                            if($inst_payment && $inst_payment->is_paid) {
                                 return true;
                             }
                         }
