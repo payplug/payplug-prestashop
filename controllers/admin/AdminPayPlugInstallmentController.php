@@ -135,7 +135,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $req_order = '
             SELECT DISTINCT pi.id_order
             FROM `'._DB_PREFIX_.'payplug_installment` pi 
-            WHERE pi.id_payplug_installment = '.$id_payplug_installment;
+            WHERE pi.id_payplug_installment = '.pSQL($id_payplug_installment);
         $res_order = DB::getInstance()->getValue($req_order);
 
         if (!$res_order) {
