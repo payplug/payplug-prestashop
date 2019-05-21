@@ -30,7 +30,7 @@
 
     {if $show_menu_installment}
         <div>
-            <p>{l s='This order is subjected to an installment plan, whose status is' mod='payplug'} <span class="pp_inst_status">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
+            <p class="ppwarning">{l s='This order is subjected to an installment plan, whose status is' mod='payplug'} <span class="pp_inst_status">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
             <p>{l s='Payment schedule ID' mod='payplug'} : {$inst_id|escape:'htmlall':'UTF-8'}</p>
         </div>
         <div class="table-responsive half-width">

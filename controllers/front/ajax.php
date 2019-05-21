@@ -30,8 +30,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
 
         if (Tools::getValue('_ajax') == 1) {
+            $payplug = new Payplug();
             if (Tools::getIsset('pc')) {
-                $payplug = new Payplug();
                 if ((int)Tools::getValue('pay') == 1) {
                     $id_cart = (int)Tools::getValue('cart');
                     $id_card = Tools::getValue('pc');

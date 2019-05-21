@@ -244,6 +244,12 @@
             <div class="block-right">
                 <p class="ppinstallmentchecked" id="installment_config_warning">{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</p>
                 <p class="pptips">
+                    <span class="ppinstallmentchecked">{l s='You can consult all your past and pending installment payments in' mod='payplug'}
+                        <a href="{$installments_panel_url|escape:'htmlall':'UTF-8'}"> {l s='a dedicated menu' mod='payplug'} </a>
+                        {l s='made accessible from the navigation bar, and in the details of each order within the' mod='payplug'}
+                        <span class="italic"> {l s='Payment with PayPlug' mod='payplug'} </span>
+                        {l s='bloc.' mod='payplug'}
+                    </span>
                     <span class="ppinline">
                         {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
                         <a href="http://support.payplug.com/customer/{$iso|escape:'htmlall':'UTF-8'}/portal/articles/2966107" target="_blank">{l s='Learn more.' mod='payplug'}</a>
