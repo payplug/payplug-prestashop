@@ -550,7 +550,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $order = new Order($order_id);
 
                                         if ($resource->installment_plan_id != null) {
-                                            //$order->addOrderPayment($amount, null, $payment->id);
                                             $payplug->addPayplugInstallment($resource->installment_plan_id, $order);
                                         }
 
