@@ -139,7 +139,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.19.0';
+        $this->version = '2.21.0';
     }
 
     /**
@@ -2574,9 +2574,11 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -2597,6 +2599,11 @@ class Payplug extends PaymentModule
                     'name' =>'disp',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         if ($lightbox == 1) {
@@ -2745,9 +2752,11 @@ class Payplug extends PaymentModule
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
             $payment_url = $this->preparePayment((int)$cart_id);
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -2900,9 +2909,11 @@ class Payplug extends PaymentModule
             } else {
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -3064,6 +3075,11 @@ class Payplug extends PaymentModule
                     'name' =>'lightbox',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         $options[] = $paymentOptionBis;
@@ -3244,9 +3260,11 @@ class Payplug extends PaymentModule
                 $payment_url = $this->preparePayment((int)$cart_id);
             }
 
+            $retrieve_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
+                'retrieve_url' => $retrieve_url,
                 'api_url' => $this->api_url,
             ));
         }
@@ -3267,6 +3285,11 @@ class Payplug extends PaymentModule
                     'name' =>'disp',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         if ($lightbox == 1) {
@@ -3297,6 +3320,11 @@ class Payplug extends PaymentModule
                     'name' =>'lightbox',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         if ($lightbox == 1) {
@@ -4629,5 +4657,66 @@ class Payplug extends PaymentModule
         } else {
             return $res_installment;
         }
+    }
+
+    /**
+     * Check payment method for given cart object
+     *
+     * @param object Cart
+     * @return array|bool pay_id or inst_id or False
+     */
+    public function getPaymentMethodByCart($cart){
+        if(!is_object($cart)) {
+            $cart = new Cart((int)$cart);
+        }
+
+        if (!Validate::isLoadedObject($cart)) {
+            return false;
+        }
+
+        $inst_id = $this->getInstallmentByCart($cart->id);
+        if($inst_id){
+            return array('id' => $inst_id, 'type' => 'installment');
+        }
+
+        $pay_id = $this->getPaymentByCart($cart->id);
+        if($pay_id){
+            return array('id' => $pay_id, 'type' => 'payment');
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if payment method is valid for given id
+     *
+     * @param string $payment_id
+     * @param string $type  default payment
+     * @return bool
+     */
+    public function isPaidPaymentMethod($payment_id, $type = 'payment'){
+        switch($type){
+            case 'installment':
+                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                if($installment && $installment->is_active){
+                    $schedules = $installment->schedule;
+                    foreach($schedules as $schedule){
+                        foreach($schedule->payment_ids as $pay_id){
+                            $inst_payment = \Payplug\Payment::retrieve($pay_id);
+                            if($inst_payment && $inst_payment->is_paid) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'payment':
+            default:
+                $payment = \Payplug\Payment::retrieve($payment_id);
+                return $payment && $payment->is_paid;
+                break;
+        }
+
+        return false;
     }
 }
