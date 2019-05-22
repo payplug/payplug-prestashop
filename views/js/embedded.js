@@ -30,12 +30,13 @@ $(document).ready(function() {
     });
     function retrievePayment(){
         var retrieve_url = $('#payplug_form_js').data('retrieve-url');
+        var id_cart = $('input:hidden[name=id_cart]').val();
         $.ajax({
             type: 'POST',
             async: true,
             url: retrieve_url,
             dataType: 'json',
-            data: {retrieve:1},
+            data: {retrieve:1, cart: id_cart},
             error: function(jqXHR, textStatus, errorThrown) {
                 alert('error CALL RETRIEVE');
                 console.log(jqXHR);

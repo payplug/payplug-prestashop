@@ -2600,6 +2600,11 @@ class Payplug extends PaymentModule
                     'type' =>'hidden',
                     'value' =>'1',
                 ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
             ));
         if ($lightbox == 1) {
             $paymentOption->setAdditionalInformation(
@@ -3071,6 +3076,11 @@ class Payplug extends PaymentModule
                     'type' =>'hidden',
                     'value' =>'1',
                 ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
             ));
         $options[] = $paymentOptionBis;
         if ($lightbox == 1) {
@@ -3276,6 +3286,11 @@ class Payplug extends PaymentModule
                     'type' =>'hidden',
                     'value' =>'1',
                 ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
             ));
         if ($lightbox == 1) {
             $paymentOption->setAdditionalInformation(
@@ -3305,6 +3320,11 @@ class Payplug extends PaymentModule
                     'name' =>'lightbox',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         if ($lightbox == 1) {
