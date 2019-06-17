@@ -2119,13 +2119,13 @@ class Payplug extends PaymentModule
         // delivery address fields
         $shipping = array(
             'title'         => null,
-            'first_name'    => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
-            'last_name'     => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
+            'first_name'    => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
+            'last_name'     => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
+            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
             'email'         => $customer->email,  // required
             'phone_number'  => !empty($address_delivery->phone) ? $address_delivery->phone : null,  // optional + numéro fixe en plus ?
             'address1'      => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
             'address2'      => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
-            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
             'postcode'      => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
             'city'          => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
             'country'       => !empty($address_delivery->id_country) ? $this->getIsoCodeByCountryId((int)$address_delivery->id_country) : null,  // required
@@ -2135,42 +2135,31 @@ class Payplug extends PaymentModule
         // invoice address fields
         $invoice = array(
             'title'         => null,
-            'first_name'    => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
-            'last_name'     => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
+            'first_name'    => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,  // required
+            'last_name'     => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,  // required
+            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,  // optional
             'email'         => $customer->email,  // required
             'phone_number'  => !empty($address_invoice->phone) ? $address_invoice->phone : null,  // optional + numéro fixe en plus ?
             'address1'      => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
             'address2'      => !empty($address_invoice->address2) ? $address_invoice->address2 : null,  // optional
-            'company_name'  => !empty($address_invoice->company) ? $address_invoice->company : null,  // optional
             'postcode'      => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,  // required
             'city'          => !empty($address_invoice->city) ? $address_invoice->city : null,  // required
             'country'       => !empty($address_invoice->id_country) ? $this->getIsoCodeByCountryId((int)$address_invoice->id_country) : null,  // required
             'language'      => $this->context->language->iso_code,  // optional
         );
 
-
         //payment
         $payment_tab = array(
             'amount'            => $amount,
             'currency'          => $currency,
-            'customer'          => array(
-                'email'             => $payment_customer['email'],
-                'first_name'        => $payment_customer['first_name'],
-                'last_name'         => $payment_customer['last_name'],
-                'address1'          => $payment_customer['address1'],
-                'address2'          => $payment_customer['address2'],
-                'postcode'          => $payment_customer['postcode'],
-                'city'              => $payment_customer['city'],
-                'country'           => $payment_customer['country'],
-            ),
+            'shipping'          => $shipping,
+            'invoice'           => $invoice,
             'notification_url'  => $notification_url,
             'force_3ds'         => $force_3ds,
             'metadata'          => array(
                 'ID Client'     => $metadata['customer_id'],
                 'ID Cart'       => $metadata['cart_id'],
                 'Website'       => $metadata['website'],
-//                 'shipping'      => json_encode($shipping),
-//                 'invoice'       => json_encode($invoice),
             )
         );
 
