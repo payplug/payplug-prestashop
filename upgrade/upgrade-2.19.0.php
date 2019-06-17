@@ -32,14 +32,12 @@ function upgrade_module_2_19_0($object)
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
-    if (!Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD')
-        || Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD_TEST')
-        || Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG')
-        || Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG_TEST')
-    ) {
-        $log->error('Fail to delete old configurations');
-        $flag = false;
-    }
+    //Configurations may not exist if upgrade is from an old enough version
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD');
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_CD_TEST');
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG');
+    Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG_TEST');
+
 
     //sql
     $req_payplug_installment = '
@@ -66,6 +64,8 @@ function upgrade_module_2_19_0($object)
         $flag = false;
     }
 
+    $object->uninstallTab();
+    $object->uninstallModuleTab('AdminPayplug');
     if (!$object->installTab()) {
         $this->log_install->error('Fail to add installment tab.');
         $flag = false;

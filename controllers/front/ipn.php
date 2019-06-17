@@ -371,7 +371,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $this->addLog($debug, $log, 'Payment amount: '.$payment->amount, 'debug');
                                         if ((int)$installment->is_fully_paid == 1) {
                                             $this->addLog($debug, $log, 'Installment is fully paid.', 'info');
-                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                                             $new_order_state = $paid_state;
                                             $order_history = new OrderHistory();
                                             $order_history->id_order = (int)$order_id;
@@ -419,8 +418,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             die;
                                         } else {
                                             $this->addLog($debug, $log, 'Installment still pending.', 'info');
-                                            $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                                            header($_SERVER['SERVER_PROTOCOL'].' 200 Order updated.', true, 200);
+                                            die;
                                         }
+                                        $payplug->updatePayplugInstallment($installment);
                                     } else {
                                         echo $this->addLog(
                                             $debug,
@@ -549,7 +550,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $order = new Order($order_id);
 
                                         if ($resource->installment_plan_id != null) {
-                                            //$order->addOrderPayment($amount, null, $payment->id);
                                             $payplug->addPayplugInstallment($resource->installment_plan_id, $order);
                                         }
 
@@ -571,6 +571,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             );
                                             die(json_encode($response));
                                         }
+                                        echo $this->addLog($debug, $log, 'Payment patched', 'info');
                                         if (!Validate::isLoadedObject($order)) {
                                             echo $this->addLog($debug, $log, 'Order cannot be loaded.', 'error');
                                             header($_SERVER['SERVER_PROTOCOL'].' 500 Order cannot be loaded.', true, 500);
@@ -582,23 +583,29 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             }
                                             die;
                                         } else {
-                                            $order_payment = end($order->getOrderPayments());
-                                            $order_payment->transaction_id = $extra_vars['transaction_id'];
-                                            try {
-                                                $order_payment->update();
-                                            } catch (Exception $exception) {
-                                                $this->addLog($debug, $log, 'Payment cannot be updated: '.$exception->getMessage(), 'error');
-                                                $response = array(
-                                                    'exception' => $exception->getMessage(),
-                                                );
-                                                header(
-                                                    $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
-                                                    true,
-                                                    $exception->getCode()
-                                                );
-                                                die(json_encode($response));
+                                            if ($resource->installment_plan_id != null) {
+                                                $this->addLog($debug, $log, 'Installment correctly registered.', 'info');
+                                                header($_SERVER['SERVER_PROTOCOL'].' 200 Installment correctly registered.', true, 200);
+                                                die;
+                                            } else {
+                                                $order_payment = end($order->getOrderPayments());
+                                                $order_payment->transaction_id = $extra_vars['transaction_id'];
+                                                try {
+                                                    $order_payment->update();
+                                                } catch (Exception $exception) {
+                                                    $this->addLog($debug, $log, 'Payment cannot be updated: '.$exception->getMessage(), 'error');
+                                                    $response = array(
+                                                        'exception' => $exception->getMessage(),
+                                                    );
+                                                    header(
+                                                        $_SERVER['SERVER_PROTOCOL'].' '.$exception->getCode().' '.$exception->getMessage(),
+                                                        true,
+                                                        $exception->getCode()
+                                                    );
+                                                    die(json_encode($response));
+                                                }
+                                                $this->addLog($debug, $log, 'Transaction ID added.', 'info');
                                             }
-                                            $this->addLog($debug, $log, 'Transaction ID added.', 'info');
                                         }
                                     }
                                 }

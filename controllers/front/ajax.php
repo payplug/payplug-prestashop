@@ -30,8 +30,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
 
         if (Tools::getValue('_ajax') == 1) {
+            $payplug = new Payplug();
             if (Tools::getIsset('pc')) {
-                $payplug = new Payplug();
                 if ((int)Tools::getValue('pay') == 1) {
                     $id_cart = (int)Tools::getValue('cart');
                     $id_card = Tools::getValue('pc');
@@ -53,6 +53,23 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
+            } elseif ((int)Tools::getValue('retrieve') == 1) {
+                $context = Context::getContext();
+                $id_cart = (int)Tools::getValue('cart');
+                $return_url = false;
+                $payment_method = $payplug->getPaymentMethodByCart($id_cart);
+                if($payment_method) {
+                    $is_paid = $payplug->isPaidPaymentMethod($payment_method['id'],$payment_method['type']);
+                    if ($is_paid) {
+                        $return_url = $context->link->getModuleLink(
+                            'payplug',
+                            'validation',
+                            array('ps' => 1, 'cartid' => (int)$id_cart),
+                            true
+                        );
+                    }
+                }
+                die(json_encode(array('redirect_url' => $return_url)));
             }
         }
     }
