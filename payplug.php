@@ -2116,7 +2116,7 @@ class Payplug extends PaymentModule
         );
 
 
-        // delivery address fields
+        // Shipping address fields
         $shipping = array(
             'title'         => null,
             'first_name'    => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
@@ -2132,8 +2132,8 @@ class Payplug extends PaymentModule
             'language'      => $this->context->language->iso_code,  // optional
         );
 
-        // invoice address fields
-        $invoice = array(
+        // Billing address fields
+        $billing = array(
             'title'         => null,
             'first_name'    => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,  // required
             'last_name'     => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,  // required
@@ -2153,7 +2153,7 @@ class Payplug extends PaymentModule
             'amount'            => $amount,
             'currency'          => $currency,
             'shipping'          => $shipping,
-            'invoice'           => $invoice,
+            'billing'           => $billing,
             'notification_url'  => $notification_url,
             'force_3ds'         => $force_3ds,
             'metadata'          => array(
