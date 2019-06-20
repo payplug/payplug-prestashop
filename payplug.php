@@ -2115,6 +2115,15 @@ class Payplug extends PaymentModule
             'website'       => $baseurl,
         );
 
+        $delivery_type = '';
+        if ($cart->id_address_delivery == $cart->id_address_invoice) {
+            $delivery_type = 'BILLING';
+        }
+        if($address_delivery->isUsed()) {
+            $delivery_type = 'VERIFIED';
+        } else {
+            $delivery_type = 'NEW';
+        }
 
         // Shipping address fields
         $shipping = array(
@@ -2130,6 +2139,7 @@ class Payplug extends PaymentModule
             'city'          => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
             'country'       => !empty($address_delivery->id_country) ? $this->getIsoCodeByCountryId((int)$address_delivery->id_country) : null,  // required
             'language'      => $this->context->language->iso_code,  // optional
+            'delivery_type'      => $delivery_type,  // optional
         );
 
         // Billing address fields
