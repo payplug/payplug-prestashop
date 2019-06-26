@@ -23,34 +23,4 @@
 $(document).ready(function() {
     var url = $('#payplug_form_js').data('payment-url');
     Payplug.showPayment(url);
-    Payplug._listen('message', window, function(e) {
-        if(typeof e.data == 'string' && e.data == 'closePayPlugFrame'){
-            retrievePayment();
-        }
-    });
-    function retrievePayment(){
-        var retrieve_url = $('#payplug_form_js').data('retrieve-url');
-        var id_cart = $('input:hidden[name=id_cart]').val();
-        $.ajax({
-            type: 'POST',
-            async: true,
-            url: retrieve_url,
-            dataType: 'json',
-            data: {retrieve:1, cart: id_cart},
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert('error CALL RETRIEVE');
-                console.log(jqXHR);
-                console.log(textStatus);
-                console.log(errorThrown);
-            },
-            success: function(data)
-            {
-                if(data) {
-                    if (typeof data.redirect_url != 'undefined' && data.redirect_url){
-                        window.location.replace(data.redirect_url);
-                    }
-                }
-            }
-        });
-    }
 });
