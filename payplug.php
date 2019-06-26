@@ -139,7 +139,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.19.0';
+        $this->version = '2.21.0';
     }
 
     /**
@@ -2054,7 +2054,7 @@ class Payplug extends PaymentModule
 
         //customer
         $customer = new Customer((int)$cart->id_customer);
-        //$address_invoice = new Address((int)$cart->id_address_invoice);
+        $address_invoice = new Address((int)$cart->id_address_invoice);
         $address_delivery = new Address((int)$cart->id_address_delivery);
         //$country = new Country((int)$address_invoice->id_country);
         $country = new Country((int)$address_delivery->id_country);
@@ -2115,26 +2115,59 @@ class Payplug extends PaymentModule
             'website'       => $baseurl,
         );
 
+        $delivery_type = 'NEW';
+        if ($cart->id_address_delivery == $cart->id_address_invoice) {
+            $delivery_type = 'BILLING';
+        }
+        elseif($address_delivery->isUsed()) {
+            $delivery_type = 'VERIFIED';
+        }
+
+        // Shipping address fields
+        $shipping = array(
+            'title'         => null,
+            'first_name'    => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
+            'last_name'     => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
+            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
+            'email'         => $customer->email,  // required
+            'phone_number'  => !empty($address_delivery->phone) ? $address_delivery->phone : null,  // optional + numéro fixe en plus ?
+            'address1'      => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
+            'address2'      => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
+            'postcode'      => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
+            'city'          => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
+            'country'       => !empty($address_delivery->id_country) ? $this->getIsoCodeByCountryId((int)$address_delivery->id_country) : null,  // required
+            'language'      => $this->context->language->iso_code,  // optional
+            'delivery_type'      => $delivery_type,  // optional
+        );
+
+        // Billing address fields
+        $billing = array(
+            'title'         => null,
+            'first_name'    => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,  // required
+            'last_name'     => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,  // required
+            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,  // optional
+            'email'         => $customer->email,  // required
+            'phone_number'  => !empty($address_invoice->phone) ? $address_invoice->phone : null,  // optional + numéro fixe en plus ?
+            'address1'      => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
+            'address2'      => !empty($address_invoice->address2) ? $address_invoice->address2 : null,  // optional
+            'postcode'      => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,  // required
+            'city'          => !empty($address_invoice->city) ? $address_invoice->city : null,  // required
+            'country'       => !empty($address_invoice->id_country) ? $this->getIsoCodeByCountryId((int)$address_invoice->id_country) : null,  // required
+            'language'      => $this->context->language->iso_code,  // optional
+        );
+
         //payment
         $payment_tab = array(
             'amount'            => $amount,
             'currency'          => $currency,
-            'customer'          => array(
-                'email'             => $payment_customer['email'],
-                'first_name'        => $payment_customer['first_name'],
-                'last_name'         => $payment_customer['last_name'],
-                'address1'          => $payment_customer['address1'],
-                'address2'          => $payment_customer['address2'],
-                'postcode'          => $payment_customer['postcode'],
-                'city'              => $payment_customer['city'],
-                'country'           => $payment_customer['country'],
-            ),
+            'shipping'          => $shipping,
+            'billing'           => $billing,
             'notification_url'  => $notification_url,
             'force_3ds'         => $force_3ds,
             'metadata'          => array(
                 'ID Client'     => $metadata['customer_id'],
-                'ID Cart'           => $metadata['cart_id'],
-                'Website'           => $metadata['website'],
+                'ID Cart'       => $metadata['cart_id'],
+                'Website'       => $metadata['website'],
             )
         );
 
@@ -2597,6 +2630,11 @@ class Payplug extends PaymentModule
                     'name' =>'disp',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         if ($lightbox == 1) {
@@ -3065,6 +3103,11 @@ class Payplug extends PaymentModule
                     'type' =>'hidden',
                     'value' =>'1',
                 ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
             ));
         $options[] = $paymentOptionBis;
         if ($lightbox == 1) {
@@ -3268,6 +3311,11 @@ class Payplug extends PaymentModule
                     'type' =>'hidden',
                     'value' =>'1',
                 ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ),
             ));
         if ($lightbox == 1) {
             $paymentOption->setAdditionalInformation(
@@ -3297,6 +3345,11 @@ class Payplug extends PaymentModule
                     'name' =>'lightbox',
                     'type' =>'hidden',
                     'value' =>'1',
+                ),
+                'id_cart' => array(
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
                 ),
             ));
         if ($lightbox == 1) {
@@ -4629,5 +4682,66 @@ class Payplug extends PaymentModule
         } else {
             return $res_installment;
         }
+    }
+
+    /**
+     * Check payment method for given cart object
+     *
+     * @param object Cart
+     * @return array|bool pay_id or inst_id or False
+     */
+    public function getPaymentMethodByCart($cart){
+        if(!is_object($cart)) {
+            $cart = new Cart((int)$cart);
+        }
+
+        if (!Validate::isLoadedObject($cart)) {
+            return false;
+        }
+
+        $inst_id = $this->getInstallmentByCart($cart->id);
+        if($inst_id){
+            return array('id' => $inst_id, 'type' => 'installment');
+        }
+
+        $pay_id = $this->getPaymentByCart($cart->id);
+        if($pay_id){
+            return array('id' => $pay_id, 'type' => 'payment');
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if payment method is valid for given id
+     *
+     * @param string $payment_id
+     * @param string $type  default payment
+     * @return bool
+     */
+    public function isPaidPaymentMethod($payment_id, $type = 'payment'){
+        switch($type){
+            case 'installment':
+                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                if($installment && $installment->is_active){
+                    $schedules = $installment->schedule;
+                    foreach($schedules as $schedule){
+                        foreach($schedule->payment_ids as $pay_id){
+                            $inst_payment = \Payplug\Payment::retrieve($pay_id);
+                            if($inst_payment && $inst_payment->is_paid) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'payment':
+            default:
+                $payment = \Payplug\Payment::retrieve($payment_id);
+                return $payment && $payment->is_paid;
+                break;
+        }
+
+        return false;
     }
 }

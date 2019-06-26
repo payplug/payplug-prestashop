@@ -81,4 +81,7 @@ if (!function_exists('curl_init')) {
     require_once(dirname(__FILE__).'/Payplug/Resource/PaymentNotification.php');
     require_once(dirname(__FILE__).'/Payplug/Resource/PaymentPaymentFailure.php');
     require_once(dirname(__FILE__).'/Payplug/Resource/Refund.php');
+    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentAuthorization.php');
+    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentBilling.php');
+    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentShipping.php');
 }
