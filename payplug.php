@@ -2119,7 +2119,7 @@ class Payplug extends PaymentModule
         if ($cart->id_address_delivery == $cart->id_address_invoice) {
             $delivery_type = 'BILLING';
         }
-        if($address_delivery->isUsed()) {
+        elseif($address_delivery->isUsed()) {
             $delivery_type = 'VERIFIED';
         } else {
             $delivery_type = 'NEW';
