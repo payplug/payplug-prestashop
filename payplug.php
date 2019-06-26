@@ -2115,14 +2115,12 @@ class Payplug extends PaymentModule
             'website'       => $baseurl,
         );
 
-        $delivery_type = '';
+        $delivery_type = 'NEW';
         if ($cart->id_address_delivery == $cart->id_address_invoice) {
             $delivery_type = 'BILLING';
         }
         elseif($address_delivery->isUsed()) {
             $delivery_type = 'VERIFIED';
-        } else {
-            $delivery_type = 'NEW';
         }
 
         // Shipping address fields
