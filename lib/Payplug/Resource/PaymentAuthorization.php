@@ -2,20 +2,20 @@
 namespace Payplug\Resource;
 
 /**
- * An installment plan schedule
+ * An Authorization
  */
-class InstallmentPlanSchedule extends APIResource
+class PaymentAuthorization extends APIResource
 {
     /**
      * The factory method that constructs the API resource.
      *
-     * @param   array   $attributes the default attributes.
+     * @param   array $attributes the default attributes.
      *
-     * @return  InstallmentPlanSchedule   The new resource.
+     * @return  PaymentAuthorization The new resource.
      */
     public static function fromAttributes(array $attributes)
     {
-        $object = new InstallmentPlanSchedule();
+        $object = new PaymentAuthorization();
         $object->initialize($attributes);
         return $object;
     }
