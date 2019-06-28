@@ -2125,35 +2125,37 @@ class Payplug extends PaymentModule
 
         // Shipping address fields
         $shipping = array(
-            'title'         => null,
-            'first_name'    => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
-            'last_name'     => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
-            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
-            'email'         => $customer->email,  // required
-            'phone_number'  => !empty($address_delivery->phone) ? $address_delivery->phone : null,  // optional + numéro fixe en plus ?
-            'address1'      => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
-            'address2'      => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
-            'postcode'      => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
-            'city'          => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
-            'country'       => !empty($address_delivery->id_country) ? $this->getIsoCodeByCountryId((int)$address_delivery->id_country) : null,  // required
-            'language'      => $this->context->language->iso_code,  // optional
-            'delivery_type'      => $delivery_type,  // optional
+            'title'                 => null,
+            'first_name'            => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
+            'last_name'             => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
+            'company_name'          => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
+            'email'                 => $customer->email,  // required
+            'landline_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone, $address_delivery->id_country) : null,  // optional
+            'mobile_phone_number'   => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone_mobile, $address_delivery->id_country) : null,  // optional
+            'address1'              => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
+            'address2'              => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
+            'postcode'              => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
+            'city'                  => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
+            'country'               => !empty($address_delivery->id_country) ? $this->getIsoCodeByCountryId((int)$address_delivery->id_country) : null,  // required
+            'language'              => $this->context->language->iso_code,  // optional
+            'delivery_type'         => $delivery_type,  // optional
         );
 
         // Billing address fields
         $billing = array(
-            'title'         => null,
-            'first_name'    => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,  // required
-            'last_name'     => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,  // required
-            'company_name'  => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,  // optional
-            'email'         => $customer->email,  // required
-            'phone_number'  => !empty($address_invoice->phone) ? $address_invoice->phone : null,  // optional + numéro fixe en plus ?
-            'address1'      => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
-            'address2'      => !empty($address_invoice->address2) ? $address_invoice->address2 : null,  // optional
-            'postcode'      => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,  // required
-            'city'          => !empty($address_invoice->city) ? $address_invoice->city : null,  // required
-            'country'       => !empty($address_invoice->id_country) ? $this->getIsoCodeByCountryId((int)$address_invoice->id_country) : null,  // required
-            'language'      => $this->context->language->iso_code,  // optional
+            'title'                 => null,
+            'first_name'            => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,  // required
+            'last_name'             => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,  // required
+            'company_name'          => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,  // optional
+            'email'                 => $customer->email,  // required
+            'landline_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone, $address_invoice->id_country) : null,  // optional
+            'mobile_phone_number'   => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone_mobile, $address_invoice->id_country) : null,  // optional
+            'address1'              => !empty($address_invoice->address1) ? $address_invoice->address1 : null,  // required
+            'address2'              => !empty($address_invoice->address2) ? $address_invoice->address2 : null,  // optional
+            'postcode'              => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,  // required
+            'city'                  => !empty($address_invoice->city) ? $address_invoice->city : null,  // required
+            'country'               => !empty($address_invoice->id_country) ? $this->getIsoCodeByCountryId((int)$address_invoice->id_country) : null,  // required
+            'language'              => $this->context->language->iso_code,  // optional
         );
 
         //payment
@@ -4743,5 +4745,46 @@ class Payplug extends PaymentModule
         }
 
         return false;
+    }
+
+    /**
+     * Return international formated phone number (norm E.164)
+     *
+     * @param $phone_number
+     * @param $country
+     * @return string|null
+     */
+    public function formatPhoneNumber($phone_number, $country)
+    {
+        if (!is_object($country)) {
+            $country = new Country($country);
+        }
+        if (!Validate::isLoadedObject($country)) {
+            return null;
+        }
+
+        // check if already formated
+        $is_international = substr($phone_number, 0, 1) == '+' || substr($phone_number, 0, 2) == '00';
+
+        // clear not number char
+        preg_match_all('!\d+!', $phone_number, $matches);
+        $res = reset($matches);
+        $phone = '';
+        foreach ($res as $number) {
+            $phone .= $number;
+        }
+
+        // cast int to clean 0 char
+        $phone = (int)$phone;
+        $phone = (string)$phone;
+
+        //check if indicator is in field, if not add it;
+        if ((strpos($phone, $country->call_prefix) !== 0 || strlen($phone) <= 10) && !$is_international) {
+            $phone = '+' . $country->call_prefix . $phone;
+        } else {
+            $phone = '+' . $phone;
+        }
+
+        return strlen($phone) > 10 && strlen($phone) < 16 ? $phone : null;
     }
 }
