@@ -1981,7 +1981,7 @@ class Payplug extends PaymentModule
      * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm
      *
      * @param int $country_id
-     * @return int | null
+     * @return int | default 'ZZ'
      */
     private function getIsoCodeByCountryId($country_id)
     {
@@ -1990,14 +1990,14 @@ class Payplug extends PaymentModule
             return null;
         }
         if (!Validate::isInt($country_id)) {
-            return null;
+            return 'ZZ';
         }
         $country = new Country((int)$country_id);
         if (!Validate::isLoadedObject($country)) {
-            return null;
+            return 'ZZ';
         }
         if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list)) {
-            return null;
+            return 'ZZ';
         } else {
             return Tools::strtoupper($country->iso_code);
         }
