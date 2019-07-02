@@ -2203,14 +2203,17 @@ class Payplug extends PaymentModule
                     $schedule[$i]['amount'] = (int)($amount / $installment_mode);
                 }
             }
+
             $installment_options = array(
                 'currency' => $currency,
                 'schedule' => $schedule,
-                'customer' => $payment_tab['customer'],
+                'shipping' => $payment_tab['shipping'],
+                'billing' => $payment_tab['billing'],
                 'hosted_payment' => $hosted_payment,
                 'notification_url' => $notification_url,
                 'metadata' => $payment_tab['metadata'],
             );
+
             try {
                 $this->storeInstallment('pending', (int)$cart->id);
                 if (Configuration::get('PAYPLUG_DEBUG_MODE')) {
