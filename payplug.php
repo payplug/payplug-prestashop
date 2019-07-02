@@ -2053,24 +2053,9 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        //customer
         $customer = new Customer((int)$cart->id_customer);
         $address_invoice = new Address((int)$cart->id_address_invoice);
         $address_delivery = new Address((int)$cart->id_address_delivery);
-        //$country = new Country((int)$address_invoice->id_country);
-        $country = new Country((int)$address_delivery->id_country);
-        $country_iso_code = $this->getIsoCodeByCountryId((int)$country->id);
-
-        $payment_customer = array(
-            'first_name' => !empty($customer->firstname) ? $customer->firstname : null,
-            'last_name' => !empty($customer->lastname) ? $customer->lastname : null,
-            'email' => $customer->email,
-            'address1' => !empty($address_delivery->address1) ? $address_delivery->address1 : null,
-            'address2' => !empty($address_delivery->address2) ? $address_delivery->address2 : null,
-            'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,
-            'city' => !empty($address_delivery->city) ? $address_delivery->city : null,
-            'country' => $country_iso_code,
-        );
 
         //hosted payment
         $return_url = $this->context->link->getModuleLink($this->name, 'validation',
