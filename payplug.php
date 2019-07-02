@@ -2103,21 +2103,6 @@ class Payplug extends PaymentModule
             $allow_save_card = true;
         }
 
-        //meta data
-        $baseurl = Tools::getShopDomainSsl(true, false);
-        /*
-        if (Tools::getShopProtocol() == 'https://') {
-            $baseurl = _PS_BASE_URL_SSL_;
-        } else {
-            $baseurl = Tools::getHttpHost(true);
-        }
-        */
-        $metadata = array(
-            'customer_id' => (int)$customer->id,
-            'cart_id' => (int)$cart->id,
-            'website' => $baseurl,
-        );
-
         $delivery_type = 'NEW';
         if ($cart->id_address_delivery == $cart->id_address_invoice) {
             $delivery_type = 'BILLING';
@@ -2158,10 +2143,8 @@ class Payplug extends PaymentModule
             'last_name' => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
             'company_name' => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
             'email' => $customer->email,  // required
-            'landline_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone,
-                $address_delivery->id_country) : null,  // optional
-            'mobile_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone_mobile,
-                $address_delivery->id_country) : null,  // optional
+            'landline_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone, $address_delivery->id_country) : null,  // optional
+            'mobile_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone_mobile, $address_delivery->id_country) : null,  // optional
             'address1' => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
             'address2' => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
             'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
@@ -2174,39 +2157,28 @@ class Payplug extends PaymentModule
         // Billing address fields
         $billing = array(
             'title' => null,
-            'first_name' => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,
-            // required
-            'last_name' => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,
-            // required
-            'company_name' => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,
-            // optional
-            'email' => $customer->email,
-            // required
-            'landline_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone,
-                $address_invoice->id_country) : null,
-            // optional
-            'mobile_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone_mobile,
-                $address_invoice->id_country) : null,
-            // optional
-            'address1' => !empty($address_invoice->address1) ? $address_invoice->address1 : null,
-            // required
-            'address2' => !empty($address_invoice->address2) ? $address_invoice->address2 : null,
-            // optional
-            'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,
-            // required
-            'city' => !empty($address_invoice->city) ? $address_invoice->city : null,
-            // required
-            'country' => $invoice_country_iso,
-            // required
-            'language' => $this->context->language->iso_code,
-            // optional
+            'first_name' => !empty($address_invoice->firstname) ? $address_invoice->firstname : null, // required
+            'last_name' => !empty($address_invoice->lastname) ? $address_invoice->lastname : null, // required
+            'company_name' => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname, // optional
+            'email' => $customer->email, // required
+            'landline_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone, $address_invoice->id_country) : null, // optional
+            'mobile_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone_mobile, $address_invoice->id_country) : null, // optional
+            'address1' => !empty($address_invoice->address1) ? $address_invoice->address1 : null, // required
+            'address2' => !empty($address_invoice->address2) ? $address_invoice->address2 : null, // optional
+            'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null, // required
+            'city' => !empty($address_invoice->city) ? $address_invoice->city : null, // required
+            'country' => $invoice_country_iso, // required
+            'language' => $this->context->language->iso_code, // optional
         );
 
         //payment
+
+        //meta data
+        $baseurl = Tools::getShopDomainSsl(true, false);
         $metadatas = array(
-            'ID Client' => $metadata['customer_id'],
-            'ID Cart' => $metadata['cart_id'],
-            'Website' => $metadata['website'],
+            'ID Client' => (int)$customer->id,
+            'ID Cart' => (int)$cart->id,
+            'Website' => $baseurl,
         );
 
         $payment_tab = array(
