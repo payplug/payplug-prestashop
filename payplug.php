@@ -4789,16 +4789,30 @@ class Payplug extends PaymentModule
             $phone .= $number;
         }
 
-        // cast int to clean 0 char
-        $phone = (int)$phone;
-        $phone = (string)$phone;
-
-        //check if indicator is in field, if not add it;
-        if ((strpos($phone, $country->call_prefix) !== 0 || strlen($phone) <= 10) && !$is_international) {
-            $phone = '+' . $country->call_prefix . $phone;
-        } else {
-            $phone = '+' . $phone;
+        if($is_international){
+            // if format numeric call prefix replace "00" by "+"
+            if(substr($phone_number, 0, 2) == '00') {
+                return substr_replace($phone, '+', 0, 2);
+            }
+            // else return phone with "+"
+            else {
+                return '+' . $phone;
+            }
         }
+
+        // cast int to clean phone number for given call_prefix
+        $call_prefix_to_format = array(32, 33, 34, 262, 590, 594, 596, 687);
+        if (in_array((int)$country->call_prefix, $call_prefix_to_format)) {
+            $phone = (int)$phone;
+            $phone = (string)$phone;
+        } elseif($country->call_prefix != 39) {
+            return null;
+        }
+
+        // we don't format italian number, this behavior set as default for the other countries: Not enough informqtion
+
+        // add prefix to phone number
+        $phone = '+' . $country->call_prefix . $phone;
 
         return strlen($phone) > 10 && strlen($phone) < 16 ? $phone : null;
     }
