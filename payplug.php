@@ -336,11 +336,8 @@ class Payplug extends PaymentModule
             'fr' => 'Paiements en plusieurs fois'
         );
 
-        $adminPayPlugId = Db::getInstance()->getValue(
-            'SELECT `id_tab` FROM ' . _DB_PREFIX_ . 'tab WHERE `class_name`=\'AdminPayPlug\''
-        );
-        $flag = ($flag && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment,
-                $adminPayPlugId, $this->name));
+        $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
+        $flag = ($flag && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, $adminPayPlugId, $this->name));
 
         return $flag;
     }
