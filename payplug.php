@@ -2231,9 +2231,10 @@ class Payplug extends PaymentModule
                     }
                 }
             } catch (Exception $e) {
+                $messages = $this->catchErrorsFromApi($e->__toString());
                 $data = array(
                     'result' => false,
-                    'response' => $e->__toString(),
+                    'response' => count($messages) > 1 ? $messages : reset($messages),
                 );
                 if (version_compare(_PS_VERSION_, '1.7', '<')) {
                     die(json_encode($data));
@@ -2279,9 +2280,10 @@ class Payplug extends PaymentModule
                 return ($data);
             }
         } catch (Exception $e) {
+            $messages = $this->catchErrorsFromApi($e->__toString());
             $data = array(
                 'result' => false,
-                'response' => $e,
+                'response' => count($messages) > 1 ? $messages : reset($messages),
             );
             return ($data);
         }
@@ -4812,5 +4814,41 @@ class Payplug extends PaymentModule
         $phone = '+' . $country->call_prefix . $phone;
 
         return strlen($phone) > 10 && strlen($phone) < 16 ? $phone : null;
+    }
+
+    /**
+     * Return exeption error form API
+     * @param $str
+     * @return array
+     */
+    public function catchErrorsFromApi($str){
+        $parses = explode(';',$str);
+        $response = null;
+        foreach($parses as $parse) {
+            if(strpos($parse, 'HTTP Response') !== false) {
+                $parse = str_replace('HTTP Response:','',$parse);
+                $parse = trim($parse);
+                $response = Tools::jsonDecode($parse,true);
+            }
+        }
+
+        $errors = array();
+        if(!isset($response['details']) || empty($response['details'])){
+            return $errors;
+        }
+
+        foreach($response['details'] as $key=>$value){
+            // add specific error message
+            switch($key) {
+                default:
+                    $error_key = md5('The transaction was not completed and your card was not charged.');
+                    // push error only if not catched before
+                    if(!array_key_exists($error_key,$errors)) {
+                        $errors[$error_key] = $this->l('The transaction was not completed and your card was not charged.');
+                    }
+            }
+        }
+
+        return $errors;
     }
 }
