@@ -21,6 +21,11 @@
  */
 
 $(document).ready(function() {
+    if(payplug_errors) {
+        // treat errors message
+        console.log(payplug_errors)
+        return false;
+    }
     var url = $('#payplug_form_js').data('payment-url');
     Payplug.showPayment(url);
     Payplug._listen('message', window, function(e) {
