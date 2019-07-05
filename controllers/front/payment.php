@@ -46,5 +46,6 @@ $payment_url = $payplug->preparePayment($cart->id, null, false);
 if (!is_array($payment_url)) {
     Tools::redirect($payment_url);
 } else {
-    die($payment_url['response']);
+    Tools::redirect('index.php?controller=order&step=3&error=1');
+//    die($payment_url['response']);
 }
