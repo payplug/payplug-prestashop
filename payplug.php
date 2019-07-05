@@ -2120,7 +2120,6 @@ class Payplug extends PaymentModule
         }
 
         $shipping = array(
-            'error' => true,
             'title' => null,
             'first_name' => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
             'last_name' => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
