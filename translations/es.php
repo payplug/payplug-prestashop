@@ -159,6 +159,7 @@ $_MODULE['<{payplug}prestashop>cards_list_95b16127e70e8a90220404fb48343182'] = '
 $_MODULE['<{payplug}prestashop>cards_list_f2a6c498fb90ee345d997f888fce3b18'] = 'Borrar';
 $_MODULE['<{payplug}prestashop>cards_list_5dd2199ad68327cc76d583b057aee7d5'] = 'tarjeta';
 $_MODULE['<{payplug}prestashop>cards_list_1069362eee49306ddabce2fbe4411835'] = 'Todavía no estás registrado.';
+$_MODULE['<{payplug}prestashop>errors_cef5ffe1ea30cca7818c988c27467aed'] = 'La transacción no se ha completado y su tarjeta no ha sido cargada.';
 $_MODULE['<{payplug}prestashop>one_click_status_cef5ffe1ea30cca7818c988c27467aed'] = 'La transacción no se ha completado y su tarjeta no ha sido cargada.';
 $_MODULE['<{payplug}prestashop>confirmation_cad582a88fd1c270ee49b3a2f236dcb6'] = 'Pago en proceso, será validado por PayPlug en los próximos segundos.';
 $_MODULE['<{payplug}prestashop>confirmation_1f1c53bb4ba4365de25444cfdbace869'] = 'Se enviará un email a tu dirección de correo para confirmar el pago.';
