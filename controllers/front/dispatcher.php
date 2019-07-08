@@ -55,8 +55,23 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     $payplug = new Payplug();
                     $id_cart = (int)Tools::getValue('id_cart');
                     if ((int)Configuration::get('PAYPLUG_ONE_CLICK') == 1) {
-                        $payment_data = json_decode($payplug->preparePayment($id_cart, null, true));
-                        Tools::redirect($payment_data->payment_url);
+                        $payment = $payplug->preparePayment($id_cart, null, true);
+                        $payment_url = false;
+                        if(is_array($payment)) {
+                            if(!$payment['result']) {
+                                Tools::redirect('index.php?controller=order&step=3&inst=1&error=1');
+                            } else {
+                                $payment_url = $payment['payment_url'];
+                            }
+                        } else {
+                            $payment_data = json_decode($payment);
+                            if(is_object($payment_data)){
+                                $payment_url = $payment_data->payment_url;
+                            }else {
+                                $payment_url = $payment;
+                            }
+                        }
+                        Tools::redirect($payment_url);
                     } else {
                         $payment_url = $payplug->preparePayment($id_cart, null, true);
                         Tools::redirect($payment_url);

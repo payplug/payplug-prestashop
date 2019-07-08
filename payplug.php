@@ -2600,6 +2600,11 @@ class Payplug extends PaymentModule
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
+        if (Tools::getValue('error')) {
+            $externalOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
 
         return $externalOption;
     }
@@ -2939,23 +2944,18 @@ class Payplug extends PaymentModule
     public function getEmbeddedOneClickInstPaymentOption($payplug_cards, $cart_id)
     {
         $lightbox = 0;
+        $error = 0;
+        $is_installment = (int)Tools::getValue('inst');
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
-            if ((int)Tools::getValue('inst') == 1) {
-                $payment_data = json_decode($this->preparePayment((int)$cart_id, null, true));
-                $payment_url = $payment_data->payment_url;
-            } else {
-                $payment_url = $this->preparePayment((int)$cart_id);
+            $payment_options = $this->getInstPaymentOptions($cart_id);
+            $this->context->smarty->assign($payment_options);
+            if ($payment_options['payplug_errors']) {
+                $error = 1;
             }
-            $this->context->smarty->assign(array(
-                'lightbox' => 1,
-                'payment_url' => $payment_url,
-                'api_url' => $this->api_url,
-            ));
         }
 
         $pc = 0;
-        $error = 0;
         if ((int)Tools::getValue('error') == 1) {
             $pc = (int)Tools::getValue('pc');
             $error = 1;
@@ -2969,6 +2969,7 @@ class Payplug extends PaymentModule
 
         $options = array();
         if (is_array($payplug_cards)) {
+            $is_one_click_payment = false;
             foreach ($payplug_cards as $card) {
                 if (!$card['expired']) {
                     $paymentOption = new PaymentOption();
@@ -3004,6 +3005,12 @@ class Payplug extends PaymentModule
                         $paymentOption->setAdditionalInformation(
                             $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
                         );
+                        if ($error == 1) {
+                            $is_one_click_payment = true;
+                            $paymentOption->setAdditionalInformation(
+                                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+                            );
+                        }
                     }
                     $options[] = $paymentOption;
                 }
@@ -3044,6 +3051,11 @@ class Payplug extends PaymentModule
             if ($lightbox == 1) {
                 $paymentOption->setAdditionalInformation(
                     $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
+                );
+            }
+            if ($error == 1 && !$is_installment && !$is_one_click_payment) {
+                $paymentOption->setAdditionalInformation(
+                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
                 );
             }
             $options[] = $paymentOption;
@@ -3087,6 +3099,11 @@ class Payplug extends PaymentModule
                     $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
                 );
             }
+            if ($error == 1 && !$is_installment) {
+                $paymentOption->setAdditionalInformation(
+                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+                );
+            }
         }
 
         /* inst */
@@ -3122,6 +3139,11 @@ class Payplug extends PaymentModule
         if ($lightbox == 1) {
             $paymentOptionBis->setAdditionalInformation(
                 $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
+            );
+        }
+        if ($error == 1 && $is_installment) {
+            $paymentOptionBis->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
             );
         }
 
@@ -3279,6 +3301,11 @@ class Payplug extends PaymentModule
                     'value' => (int)$this->context->cart->id,
                 ),
             ));
+        if ($error == 1) {
+            $externalOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
         $options[] = $externalOption;
 
         return $options;
@@ -3287,21 +3314,17 @@ class Payplug extends PaymentModule
     public function getEmbeddedInstPaymentOption($cart_id)
     {
         $lightbox = 0;
+        $error = 0;
+        $is_installment = (int)Tools::getValue('inst');
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
-            if ((int)Tools::getValue('inst') == 1) {
-                $payment_data = json_decode($this->preparePayment((int)$cart_id, null, true));
-                $payment_url = $payment_data->payment_url;
-            } else {
-                $payment_url = $this->preparePayment((int)$cart_id);
+            $payment_options = $this->getInstPaymentOptions($cart_id);
+            $this->context->smarty->assign($payment_options);
+            if ($payment_options['payplug_errors']) {
+                $error = 1;
             }
-
-            $this->context->smarty->assign(array(
-                'lightbox' => 1,
-                'payment_url' => $payment_url,
-                'api_url' => $this->api_url,
-            ));
         }
+
         $options = array();
         $paymentOption = new PaymentOption();
         $paymentOption
@@ -3329,6 +3352,11 @@ class Payplug extends PaymentModule
         if ($lightbox == 1) {
             $paymentOption->setAdditionalInformation(
                 $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
+            );
+        }
+        if ($error == 1 && !$is_installment) {
+            $paymentOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
             );
         }
         $options[] = $paymentOption;
@@ -3366,6 +3394,11 @@ class Payplug extends PaymentModule
                 $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
             );
         }
+        if ($error == 1 && $is_installment) {
+            $paymentOptionBis->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
         $options[] = $paymentOptionBis;
 
         return $options;
@@ -3373,12 +3406,19 @@ class Payplug extends PaymentModule
 
     public function getRedirectInstPaymentOption()
     {
+        $error = (int)Tools::getValue('error');
+        $is_installment = (int)Tools::getValue('inst');
         $externalOption = new PaymentOption();
         $externalOption
             ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
+        if ($error == 1 && $is_installment) {
+            $externalOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
         $options[] = $externalOption;
 
         /* inst */
@@ -3415,6 +3455,11 @@ class Payplug extends PaymentModule
                     'value' => (int)$this->context->cart->id,
                 ),
             ));
+        if ($error == 1 && $is_installment) {
+            $paymentOptionBis->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
         $options[] = $paymentOptionBis;
 
         return $options;
@@ -4828,7 +4873,7 @@ class Payplug extends PaymentModule
             if(strpos($parse, 'HTTP Response') !== false) {
                 $parse = str_replace('HTTP Response:','',$parse);
                 $parse = trim($parse);
-                $response = Tools::jsonDecode($parse,true);
+                $response = json_decode($parse,true);
             }
         }
 
@@ -4850,5 +4895,52 @@ class Payplug extends PaymentModule
         }
 
         return $errors;
+    }
+
+    private function setError($error_message) {
+        if(!$error_message) {
+            return false;
+        }
+        $error_key = md5($error_message);
+
+        // push error only if not catched before
+        if(!array_key_exists($error_key,$this->errors)) {
+            $this->errors[$error_key] = $this->l($error_message);
+        }
+    }
+
+    private function getInstPaymentOptions($cart_id){
+        $is_installment = (int)Tools::getValue('inst');
+        if ($is_installment == 1) {
+            $payment = $this->preparePayment((int)$cart_id, null, true);
+        } else {
+            $payment = $this->preparePayment((int)$cart_id);
+        }
+        $payment_url = false;
+        if(is_array($payment)) {
+            if(!$payment['result']) {
+                $this->setError($payment['response']);
+            } else {
+                $payment_url = $payment['payment_url'];
+            }
+        } else {
+            $payment_data = json_decode($payment);
+            if(is_object($payment_data)){
+                $payment_url = $payment_data->payment_url;
+            }else {
+                $payment_url = $payment;
+            }
+        }
+
+
+        $payplug_errors = count($this->errors) ? implode('<br/>',$this->errors) : false;
+
+        return array(
+            'payplug_errors' => $payplug_errors,
+            'lightbox' => 1,
+            'is_installment' => $is_installment,
+            'payment_url' => $payment_url,
+            'api_url' => $this->api_url,
+        );
     }
 }
