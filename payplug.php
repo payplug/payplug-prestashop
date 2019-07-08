@@ -2551,35 +2551,35 @@ class Payplug extends PaymentModule
         $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
         if ($one_click == 1 && !empty($payplug_cards)) {
             if ($embedded_mode == 1) {
-                if ($installment == 1) { dump(__LINE__);
+                if ($installment == 1) {
                     $payment_options = $this->getEmbeddedOneClickInstPaymentOption(
                         $payplug_cards,
                         (int)$params['cart']->id
                     );
-                } else { dump(__LINE__);
+                } else {
                     $payment_options = $this->getEmbeddedOneClickPaymentOption(
                         $payplug_cards,
                         (int)$params['cart']->id
                     );
                 }
             } else {
-                if ($installment == 1) { dump(__LINE__);
+                if ($installment == 1) {
                     $payment_options = $this->getRedirectOneClickInstPaymentOption($payplug_cards);
-                } else { dump(__LINE__);
+                } else {
                     $payment_options = $this->getRedirectOneClickPaymentOption($payplug_cards);
                 }
             }
         } else {
             if ($embedded_mode == 1) {
-                if ($installment == 1) { dump(__LINE__);
+                if ($installment == 1) {
                     $payment_options = $this->getEmbeddedInstPaymentOption((int)$params['cart']->id);
-                } else { dump(__LINE__);
+                } else {
                     $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id));
                 }
             } else {
-                if ($installment == 1) { dump(__LINE__);
+                if ($installment == 1) {
                     $payment_options = $this->getRedirectInstPaymentOption();
-                } else { dump(__LINE__);
+                } else {
                     $payment_options = array($this->getRedirectPaymentOption());
                 }
             }
@@ -4873,7 +4873,7 @@ class Payplug extends PaymentModule
             if(strpos($parse, 'HTTP Response') !== false) {
                 $parse = str_replace('HTTP Response:','',$parse);
                 $parse = trim($parse);
-                $response = Tools::jsonDecode($parse,true);
+                $response = json_decode($parse,true);
             }
         }
 
