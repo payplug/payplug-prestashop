@@ -223,6 +223,7 @@ $_MODULE['<{payplug}prestashop>cards_list_95b16127e70e8a90220404fb48343182'] = '
 $_MODULE['<{payplug}prestashop>cards_list_f2a6c498fb90ee345d997f888fce3b18'] = 'Delete';
 $_MODULE['<{payplug}prestashop>cards_list_5dd2199ad68327cc76d583b057aee7d5'] = 'card';
 $_MODULE['<{payplug}prestashop>cards_list_1069362eee49306ddabce2fbe4411835'] = 'You have no card registered yet.';
+$_MODULE['<{payplug}prestashop>errors_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>one_click_status_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Incorrect amount to refund';
 $_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'Cannot refund that amount.';
