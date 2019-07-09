@@ -91,6 +91,8 @@ class Payplug extends PaymentModule
 
     public $payment_status = array();
 
+    public $errors = array();
+
     /**
      * Constructor
      *
