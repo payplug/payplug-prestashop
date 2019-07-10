@@ -3156,6 +3156,7 @@ class Payplug extends PaymentModule
     {
         $pc = 0;
         $error = 0;
+        $is_installment = (int)Tools::getValue('inst');
         if ((int)Tools::getValue('error') == 1) {
             $pc = (int)Tools::getValue('pc');
             $error = 1;
@@ -3169,6 +3170,7 @@ class Payplug extends PaymentModule
 
         $options = array();
         if (is_array($payplug_cards)) {
+            $is_one_click_payment = false;
             foreach ($payplug_cards as $card) {
                 if (!$card['expired']) {
                     $paymentOption = new PaymentOption();
@@ -3204,6 +3206,7 @@ class Payplug extends PaymentModule
                         $paymentOption->setAdditionalInformation(
                             $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
                         );
+                        $is_one_click_payment = true;
                     }
                     $options[] = $paymentOption;
                 }
@@ -3236,6 +3239,11 @@ class Payplug extends PaymentModule
                         'value' => (int)$this->context->cart->id,
                     ),
                 ));
+            if ($error == 1 && !$is_one_click_payment && !$is_installment) {
+                $paymentOption->setAdditionalInformation(
+                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+                );
+            }
             $options[] = $paymentOption;
         } else {
             $paymentOption = new PaymentOption();
@@ -3266,6 +3274,11 @@ class Payplug extends PaymentModule
                         'value' => (int)$this->context->cart->id,
                     ),
                 ));
+            if ($error == 1 && !$is_installment) {
+                $paymentOption->setAdditionalInformation(
+                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+                );
+            }
             $options[] = $paymentOption;
         }
 
@@ -3303,7 +3316,7 @@ class Payplug extends PaymentModule
                     'value' => (int)$this->context->cart->id,
                 ),
             ));
-        if ($error == 1) {
+        if ($error == 1 && $is_installment && !Tools::getValue('pc')) {
             $externalOption->setAdditionalInformation(
                 $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
             );
