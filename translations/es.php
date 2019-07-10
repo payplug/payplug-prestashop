@@ -29,6 +29,7 @@ $_MODULE['<{payplug}prestashop>payplug_033bd94b1168d7e4f0d644c3c95e35bf'] = 'TES
 $_MODULE['<{payplug}prestashop>payplug_f51396ebc5142204e3d187dd8097b15d'] = 'Cuantía incorrecta para reembolsar';
 $_MODULE['<{payplug}prestashop>payplug_2197bc57f08292482b9ed1e905fb79cb'] = 'No se puede reembolsar esa cuantía';
 $_MODULE['<{payplug}prestashop>payplug_96fe48f26db5ef9012806cdc0605e74f'] = 'Cuantía reembolsada exitosamente';
+$_MODULE['<{payplug}prestashop>payplug_cef5ffe1ea30cca7818c988c27467aed'] = 'La transacción no se ha completado y su tarjeta no ha sido cargada.';
 $_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Cuantía incorrecta para reembolsar';
 $_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'No se puede reembolsar esa cuantía';
 $_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'Cuantía reembolsada exitosamente';

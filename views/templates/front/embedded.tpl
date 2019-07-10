@@ -23,3 +23,7 @@
 {if isset($lightbox) && $lightbox == 1}
 	<script id="payplug_form_js" data-payment-url="{$payment_url|escape:'htmlall':'UTF-8'}" type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1/form.latest.js"></script>
 {/if}
+
+<script type="text/javascript">
+	var payplug_errors = '{if isset($payplug_errors) && $payplug_errors}{$payplug_errors}{/if}';
+</script>
