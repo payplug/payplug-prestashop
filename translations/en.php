@@ -57,6 +57,7 @@ $_MODULE['<{payplug}prestashop>payplug_0cd871d76eb947535142f232479aee0a'] = 'Pay
 $_MODULE['<{payplug}prestashop>payplug_01abfc750a0c942167651c40d088531d'] = '#';
 $_MODULE['<{payplug}prestashop>payplug_1be6f9eb563f3bf85c78b4219bf09de9'] = 'Brand';
 $_MODULE['<{payplug}prestashop>payplug_59716c97497eb9694541f7c3d37b1a4d'] = 'Country';
+$_MODULE['<{payplug}prestashop>payplug_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Saved cards';
 $_MODULE['<{payplug}prestashop>confirmation_cad582a88fd1c270ee49b3a2f236dcb6'] = 'Your payment is pending, it should validated by Payplug in a few seconds.';
 $_MODULE['<{payplug}prestashop>confirmation_1f1c53bb4ba4365de25444cfdbace869'] = 'An email will be sent to your email address to confirm payment.';

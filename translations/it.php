@@ -57,6 +57,7 @@ $_MODULE['<{payplug}prestashop>payplug_0cd871d76eb947535142f232479aee0a'] = 'Pay
 $_MODULE['<{payplug}prestashop>payplug_01abfc750a0c942167651c40d088531d'] = '#';
 $_MODULE['<{payplug}prestashop>payplug_1be6f9eb563f3bf85c78b4219bf09de9'] = 'Brand';
 $_MODULE['<{payplug}prestashop>payplug_59716c97497eb9694541f7c3d37b1a4d'] = 'Country';
+$_MODULE['<{payplug}prestashop>payplug_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non é stata completata e la tua carta non é stata addebitata.';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Carte registrate';
 $_MODULE['<{payplug}prestashop>confirmation_cad582a88fd1c270ee49b3a2f236dcb6'] = 'Il tuo pagamento é in attesa, dovrebbe essere confermato da PayPlug in pochi secondi.';
 $_MODULE['<{payplug}prestashop>confirmation_1f1c53bb4ba4365de25444cfdbace869'] = 'Una mail sarà inviata al tuo indirizzo di posta elettronica per confermare il pagamento.';
