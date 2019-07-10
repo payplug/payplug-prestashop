@@ -3429,7 +3429,7 @@ class Payplug extends PaymentModule
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
-        if ($error == 1 && $is_installment) {
+        if ($error == 1 && !$is_installment) {
             $externalOption->setAdditionalInformation(
                 $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
             );
