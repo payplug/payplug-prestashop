@@ -2134,7 +2134,7 @@ class Payplug extends PaymentModule
             'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
             'city' => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
             'country' => $delivery_country_iso,  // required
-            'language' => $this->context->language->iso_code,  // optional
+            'language' => $this->getLangueCode($this->context->language->language_code), // optional
             'delivery_type' => $delivery_type,  // optional
         );
 
@@ -2152,7 +2152,7 @@ class Payplug extends PaymentModule
             'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null, // required
             'city' => !empty($address_invoice->city) ? $address_invoice->city : null, // required
             'country' => $invoice_country_iso, // required
-            'language' => $this->context->language->iso_code, // optional
+            'language' => $this->getLangueCode($this->context->language->language_code), // optional
         );
 
         //payment
@@ -2236,8 +2236,9 @@ class Payplug extends PaymentModule
                 $messages = $this->catchErrorsFromApi($e->__toString());
                 $data = array(
                     'result' => false,
-                    'response' => count($messages) > 1 ? $messages : reset($messages),
+                    'response' => $e->__toString(), //count($messages) > 1 ? $messages : reset($messages),
                 );
+                die(dump($data));
                 if (version_compare(_PS_VERSION_, '1.7', '<')) {
                     die(json_encode($data));
                 } else {
@@ -2285,8 +2286,9 @@ class Payplug extends PaymentModule
             $messages = $this->catchErrorsFromApi($e->__toString());
             $data = array(
                 'result' => false,
-                'response' => count($messages) > 1 ? $messages : reset($messages),
+                'response' => $e->__toString(), //count($messages) > 1 ? $messages : reset($messages),
             );
+            die(dump($data));
             return ($data);
         }
         $this->storePayment($payment->id, (int)$cart->id);
@@ -4957,5 +4959,13 @@ class Payplug extends PaymentModule
             'payment_url' => $payment_url,
             'api_url' => $this->api_url,
         );
+    }
+
+    private function getLangueCode($language_code){
+        if(!$language_code) {
+            return false;
+        }
+        $parse = explode('-',$language_code);
+        return $parse[0];
     }
 }
