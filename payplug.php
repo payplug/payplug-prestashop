@@ -4839,43 +4839,22 @@ class Payplug extends PaymentModule
             return null;
         }
 
-        // check if already formated
-        $is_international = substr($phone_number, 0, 1) == '+' || substr($phone_number, 0, 2) == '00';
+        try {
+            $iso_code = $this->getIsoCodeByCountryId($country->id);
+            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
+            $parsed = $phone_util->parse($phone_number, $iso_code);
 
-        // clear not number char
-        preg_match_all('!\d+!', $phone_number, $matches);
-        $res = reset($matches);
-        $phone = '';
-        foreach ($res as $number) {
-            $phone .= $number;
-        }
-
-        if($is_international){
-            // if format numeric call prefix replace "00" by "+"
-            if(substr($phone_number, 0, 2) == '00') {
-                return substr_replace($phone, '+', 0, 2);
+            if(!$phone_util->isValidNumber($parsed)) {
+                // todo: add log
+                return null;
             }
-            // else return phone with "+"
-            else {
-                return '+' . $phone;
-            }
-        }
 
-        // cast int to clean phone number for given call_prefix
-        $call_prefix_to_format = array(32, 33, 34, 262, 590, 594, 596, 687);
-        if (in_array((int)$country->call_prefix, $call_prefix_to_format)) {
-            $phone = (int)$phone;
-            $phone = (string)$phone;
-        } elseif($country->call_prefix != 39) {
+            $formated = $phone_util->format($parsed, \libphonenumber\PhoneNumberFormat::E164);
+            return $formated;
+        } catch (Exception $e) {
+            // todo: add log
             return null;
         }
-
-        // we don't format italian number, this behavior set as default for the other countries: Not enough informqtion
-
-        // add prefix to phone number
-        $phone = '+' . $country->call_prefix . $phone;
-
-        return strlen($phone) > 10 && strlen($phone) < 16 ? $phone : null;
     }
 
     /**
