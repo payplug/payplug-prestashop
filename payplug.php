@@ -2134,7 +2134,7 @@ class Payplug extends PaymentModule
             'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
             'city' => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
             'country' => $delivery_country_iso,  // required
-            'language' => $this->getLangueCode($this->context->language->language_code), // optional
+            'language' => $this->getIsoFromLanguageCode($this->context->language), // optional
             'delivery_type' => $delivery_type,  // optional
         );
 
@@ -2152,7 +2152,7 @@ class Payplug extends PaymentModule
             'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null, // required
             'city' => !empty($address_invoice->city) ? $address_invoice->city : null, // required
             'country' => $invoice_country_iso, // required
-            'language' => $this->getLangueCode($this->context->language->language_code), // optional
+            'language' => $this->getIsoFromLanguageCode($this->context->language), // optional
         );
 
         //payment
@@ -4961,11 +4961,20 @@ class Payplug extends PaymentModule
         );
     }
 
-    private function getLangueCode($language_code){
-        if(!$language_code) {
+    /**
+     * Get iso code from language code
+     * @param $language
+     * @return string
+     */
+    public function getIsoFromLanguageCode($language){
+
+        if (!is_object($language)) {
+            $language = new Language($language);
+        }
+        if(!Validate::isLoadedObject($language)) {
             return false;
         }
-        $parse = explode('-',$language_code);
+        $parse = explode('-',$language->language_code);
         return $parse[0];
     }
 }
