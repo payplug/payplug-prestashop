@@ -2122,6 +2122,7 @@ class Payplug extends PaymentModule
         }
 
         $shipping = array(
+            'force_error' => true,
             'title' => null,
             'first_name' => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
             'last_name' => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
@@ -2236,9 +2237,8 @@ class Payplug extends PaymentModule
                 $messages = $this->catchErrorsFromApi($e->__toString());
                 $data = array(
                     'result' => false,
-                    'response' => $e->__toString(), //count($messages) > 1 ? $messages : reset($messages),
+                    'response' => count($messages) > 1 ? $messages : reset($messages),
                 );
-                die(dump($data));
                 if (version_compare(_PS_VERSION_, '1.7', '<')) {
                     die(json_encode($data));
                 } else {
@@ -2286,9 +2286,8 @@ class Payplug extends PaymentModule
             $messages = $this->catchErrorsFromApi($e->__toString());
             $data = array(
                 'result' => false,
-                'response' => $e->__toString(), //count($messages) > 1 ? $messages : reset($messages),
+                'response' => count($messages) > 1 ? $messages : reset($messages),
             );
-            die(dump($data));
             return ($data);
         }
         $this->storePayment($payment->id, (int)$cart->id);
