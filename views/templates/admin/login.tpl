@@ -177,9 +177,12 @@
             <div class="block-right">
                 <p class="pptips">
                             <span{if !$PAYPLUG_EMBEDDED_MODE} class="hide"{/if} id="payment_page_embedded_tips">{l s='Payments are performed in an embeddable payment form.' mod='payplug'}<br>{l s='The customers will pay without being redirected.' mod='payplug'}<a href="http://support.payplug.com/customer/portal/articles/2563974" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                            {*<span{if !$PAYPLUG_EMBEDDED_MODE} class="hide"{/if} id="payment_page_embedded_tips">{l s='Payments are performed in an embeddable payment form.' d='Modules.Payplug.Admin'}<br>{l s='The customers will pay without being redirected.' d='Modules.Payplug.Admin'}<a href="http://support.payplug.com/customer/portal/articles/2563974" target="_blank">{l s='Learn more.' d='Modules.Payplug.Shop'}</a>*}
                             </span>
                             <span{if $PAYPLUG_EMBEDDED_MODE} class="hide"{/if} id="payment_page_redirect_tips">{l s='The customers will be redirected to a PayPlug payment page to finalize the transaction.' mod='payplug'}
-                                <a href="http://support.payplug.com/customer/portal/articles/2933281" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                            {*<span{if $PAYPLUG_EMBEDDED_MODE} class="hide"{/if} id="payment_page_redirect_tips">{l s='The customers will be redirected to a PayPlug payment page to finalize the transaction.' d='Modules.Payplug.Admin'}*}
+                                <a href="http://support.payplug.com/customer/portal/articles/2018493" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                                {*<a href="http://support.payplug.com/customer/portal/articles/2018493" target="_blank">{l s='Learn more.' d='Modules.Payplug.Admin'}</a>*}
                             </span>
                 </p>
             </div>
