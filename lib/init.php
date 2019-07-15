@@ -33,55 +33,90 @@ spl_autoload_register(function ($class) {
     }
 });
 */
+$files = array();
+
+// get PHP Payplug Lib
+$payplug_lib_files = array(
+    '/Payplug/Authentication.php',
+    '/Payplug/Card.php',
+    '/Payplug/Customer.php',
+    '/Payplug/InstallmentPlan.php',
+    '/Payplug/Notification.php',
+    '/Payplug/Payment.php',
+    '/Payplug/Payplug.php',
+    '/Payplug/Refund.php',
+    '/Payplug/Core/APIRoutes.php',
+    '/Payplug/Exception/PayplugException.php',
+    '/Payplug/Exception/DependencyException.php',
+    '/Payplug/Core/Config.php',
+    '/Payplug/Core/IHttpRequest.php',
+    '/Payplug/Core/CurlRequest.php',
+    '/Payplug/Core/HttpClient.php',
+    '/Payplug/Exception/HttpException.php',
+    '/Payplug/Exception/BadRequestException.php',
+    '/Payplug/Exception/ConfigurationException.php',
+    '/Payplug/Exception/ConfigurationNotSetException.php',
+    '/Payplug/Exception/ConnectionException.php',
+    '/Payplug/Exception/ForbiddenException.php',
+    '/Payplug/Exception/InvalidPaymentException.php',
+    '/Payplug/Exception/NotAllowedException.php',
+    '/Payplug/Exception/NotFoundException.php',
+    '/Payplug/Exception/PayplugServerException.php',
+    '/Payplug/Exception/PHPVersionException.php',
+    '/Payplug/Exception/UnauthorizedException.php',
+    '/Payplug/Exception/UndefinedAttributeException.php',
+    '/Payplug/Exception/UnexpectedAPIResponseException.php',
+    '/Payplug/Exception/UnknownAPIResourceException.php',
+    '/Payplug/Resource/IAPIResourceFactory.php',
+    '/Payplug/Resource/APIResource.php',
+    '/Payplug/Resource/Card.php',
+    '/Payplug/Resource/Customer.php',
+    '/Payplug/Resource/IVerifiableAPIResource.php',
+    '/Payplug/Resource/InstallmentPlan.php',
+    '/Payplug/Resource/InstallmentPlanSchedule.php',
+    '/Payplug/Resource/Payment.php',
+    '/Payplug/Resource/PaymentCard.php',
+    '/Payplug/Resource/PaymentCustomer.php',
+    '/Payplug/Resource/PaymentHostedPayment.php',
+    '/Payplug/Resource/PaymentNotification.php',
+    '/Payplug/Resource/PaymentPaymentFailure.php',
+    '/Payplug/Resource/Refund.php',
+    '/Payplug/Resource/PaymentAuthorization.php',
+    '/Payplug/Resource/PaymentBilling.php',
+    '/Payplug/Resource/PaymentShipping.php',
+);
+$files = array_merge($files, $payplug_lib_files);
+
+// get PHP Phone Number Libs
+$phonenumber_files = array(
+    '/libphonenumber/CountryCodeSource.php',
+    '/libphonenumber/CountryCodeToRegionCodeMap.php',
+    '/libphonenumber/MetadataLoaderInterface.php',
+    '/libphonenumber/DefaultMetadataLoader.php',
+    '/libphonenumber/Matcher.php',
+    '/libphonenumber/MatcherAPIInterface.php',
+    '/libphonenumber/MetadataSourceInterface.php',
+    '/libphonenumber/MultiFileMetadataSourceImpl.php',
+    '/libphonenumber/NumberFormat.php',
+    '/libphonenumber/NumberParseException.php',
+    '/libphonenumber/PhoneMetadata.php',
+    '/libphonenumber/PhoneNumber.php',
+    '/libphonenumber/PhoneNumberDesc.php',
+    '/libphonenumber/PhoneNumberFormat.php',
+    '/libphonenumber/PhoneNumberType.php',
+    '/libphonenumber/PhoneNumberUtil.php',
+    '/libphonenumber/RegexBasedMatcher.php',
+    '/libphonenumber/ValidationResult.php',
+);
+$files = array_merge($files, $phonenumber_files);
 
 if (!function_exists('curl_init')) {
     throw new Exception('PHP cURL extension must be enabled on your server.');
 } else {
-    require_once(dirname(__FILE__).'/Payplug/Authentication.php');
-    require_once(dirname(__FILE__).'/Payplug/Card.php');
-    require_once(dirname(__FILE__).'/Payplug/Customer.php');
-    require_once(dirname(__FILE__).'/Payplug/InstallmentPlan.php');
-    require_once(dirname(__FILE__).'/Payplug/Notification.php');
-    require_once(dirname(__FILE__).'/Payplug/Payment.php');
-    require_once(dirname(__FILE__).'/Payplug/Payplug.php');
-    require_once(dirname(__FILE__).'/Payplug/Refund.php');
-    require_once(dirname(__FILE__).'/Payplug/Core/APIRoutes.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/PayplugException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/DependencyException.php');
-    require_once(dirname(__FILE__).'/Payplug/Core/Config.php');
-    require_once(dirname(__FILE__).'/Payplug/Core/IHttpRequest.php');
-    require_once(dirname(__FILE__).'/Payplug/Core/CurlRequest.php');
-    require_once(dirname(__FILE__).'/Payplug/Core/HttpClient.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/HttpException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/BadRequestException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/ConfigurationException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/ConfigurationNotSetException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/ConnectionException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/ForbiddenException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/InvalidPaymentException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/NotAllowedException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/NotFoundException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/PayplugServerException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/PHPVersionException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/UnauthorizedException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/UndefinedAttributeException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/UnexpectedAPIResponseException.php');
-    require_once(dirname(__FILE__).'/Payplug/Exception/UnknownAPIResourceException.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/IAPIResourceFactory.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/APIResource.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/Card.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/Customer.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/IVerifiableAPIResource.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/InstallmentPlan.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/InstallmentPlanSchedule.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/Payment.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentCard.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentCustomer.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentHostedPayment.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentNotification.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentPaymentFailure.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/Refund.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentAuthorization.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentBilling.php');
-    require_once(dirname(__FILE__).'/Payplug/Resource/PaymentShipping.php');
+    foreach ($files as $file) {
+        $path = dirname(__FILE__) . $file;
+        if (file_exists($path)) {
+            require_once($path);
+        }
+    }
 }

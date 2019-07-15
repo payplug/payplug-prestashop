@@ -2134,7 +2134,7 @@ class Payplug extends PaymentModule
             'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
             'city' => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
             'country' => $delivery_country_iso,  // required
-            'language' => $this->context->language->iso_code,  // optional
+            'language' => $this->getIsoFromLanguageCode($this->context->language), // optional
             'delivery_type' => $delivery_type,  // optional
         );
 
@@ -2152,7 +2152,7 @@ class Payplug extends PaymentModule
             'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null, // required
             'city' => !empty($address_invoice->city) ? $address_invoice->city : null, // required
             'country' => $invoice_country_iso, // required
-            'language' => $this->context->language->iso_code, // optional
+            'language' => $this->getIsoFromLanguageCode($this->context->language), // optional
         );
 
         //payment
@@ -2236,8 +2236,9 @@ class Payplug extends PaymentModule
                 $messages = $this->catchErrorsFromApi($e->__toString());
                 $data = array(
                     'result' => false,
-                    'response' => count($messages) > 1 ? $messages : reset($messages),
+                    'response' => $e->__toString(), //count($messages) > 1 ? $messages : reset($messages),
                 );
+                die(dump($data));
                 if (version_compare(_PS_VERSION_, '1.7', '<')) {
                     die(json_encode($data));
                 } else {
@@ -2285,8 +2286,9 @@ class Payplug extends PaymentModule
             $messages = $this->catchErrorsFromApi($e->__toString());
             $data = array(
                 'result' => false,
-                'response' => count($messages) > 1 ? $messages : reset($messages),
+                'response' => $e->__toString(), //count($messages) > 1 ? $messages : reset($messages),
             );
+            die(dump($data));
             return ($data);
         }
         $this->storePayment($payment->id, (int)$cart->id);
@@ -4837,43 +4839,22 @@ class Payplug extends PaymentModule
             return null;
         }
 
-        // check if already formated
-        $is_international = substr($phone_number, 0, 1) == '+' || substr($phone_number, 0, 2) == '00';
+        try {
+            $iso_code = $this->getIsoCodeByCountryId($country->id);
+            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
+            $parsed = $phone_util->parse($phone_number, $iso_code);
 
-        // clear not number char
-        preg_match_all('!\d+!', $phone_number, $matches);
-        $res = reset($matches);
-        $phone = '';
-        foreach ($res as $number) {
-            $phone .= $number;
-        }
-
-        if($is_international){
-            // if format numeric call prefix replace "00" by "+"
-            if(substr($phone_number, 0, 2) == '00') {
-                return substr_replace($phone, '+', 0, 2);
+            if(!$phone_util->isValidNumber($parsed)) {
+                // todo: add log
+                return null;
             }
-            // else return phone with "+"
-            else {
-                return '+' . $phone;
-            }
-        }
 
-        // cast int to clean phone number for given call_prefix
-        $call_prefix_to_format = array(32, 33, 34, 262, 590, 594, 596, 687);
-        if (in_array((int)$country->call_prefix, $call_prefix_to_format)) {
-            $phone = (int)$phone;
-            $phone = (string)$phone;
-        } elseif($country->call_prefix != 39) {
+            $formated = $phone_util->format($parsed, \libphonenumber\PhoneNumberFormat::E164);
+            return $formated;
+        } catch (Exception $e) {
+            // todo: add log
             return null;
         }
-
-        // we don't format italian number, this behavior set as default for the other countries: Not enough informqtion
-
-        // add prefix to phone number
-        $phone = '+' . $country->call_prefix . $phone;
-
-        return strlen($phone) > 10 && strlen($phone) < 16 ? $phone : null;
     }
 
     /**
@@ -4957,5 +4938,22 @@ class Payplug extends PaymentModule
             'payment_url' => $payment_url,
             'api_url' => $this->api_url,
         );
+    }
+
+    /**
+     * Get iso code from language code
+     * @param $language
+     * @return string
+     */
+    public function getIsoFromLanguageCode($language){
+
+        if (!is_object($language)) {
+            $language = new Language($language);
+        }
+        if(!Validate::isLoadedObject($language)) {
+            return false;
+        }
+        $parse = explode('-',$language->language_code);
+        return $parse[0];
     }
 }
