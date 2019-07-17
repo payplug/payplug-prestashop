@@ -31,7 +31,12 @@ $(document).ready(function() {
         .css('float', 'left')
         .css('margin', '0 10px 0 0');
 
-    $('#payment-confirmation button').on('click', function(){
+    var pending = false;
+    $('#payment-confirmation button').on('click', function(event){
+        if (pending) {
+            return false;
+        }
+        pending = true;
         $('#checkout-payment-step').css('background-color', '#eeeeee');
         $('.payment-confirmation button').attr('disabled', 'disabled');
         $('.ppfail').hide();
