@@ -587,20 +587,6 @@ class Payplug extends PaymentModule
                 $os = (int)Configuration::get($key_config);
             } elseif ($val = $this->findOrderState($values['name'], false)) {
                 $os = $val;
-            } elseif (defined($values['cfg'])) {
-                //$os = constant($values['cfg']);
-            } elseif ($values['template'] != null) {
-                /*
-                $req_os_by_template = new DbQuery();
-                $req_os_by_template->select('DISTINCT osl.id_order_state');
-                $req_os_by_template->from('order_state_lang', 'osl');
-                $req_os_by_template->where('osl.template = \''.pSQL($values['template'].'\''));
-                $res_os_by_template = Db::getInstance()->getValue($req_os_by_template);
-
-                if ($res_os_by_template) {
-                    $os = $res_os_by_template;
-                }
-                */
             }
             if ((int)$os == 0) {
                 $log->info('Creating new order state.');
@@ -1301,8 +1287,7 @@ class Payplug extends PaymentModule
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
-        $login_infos = array(//'p_error'	=> $p_error,
-        );
+        $login_infos = array();
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
@@ -1462,8 +1447,7 @@ class Payplug extends PaymentModule
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
-        $login_infos = array(//'p_error'	=> $p_error,
-        );
+        $login_infos = array();
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
@@ -2047,8 +2031,6 @@ class Payplug extends PaymentModule
 
         //amount
         $amount = $cart->getOrderTotal(true, Cart::BOTH);
-
-        //$amount = round($amount, 2) * 100;
         $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
         $current_amounts = $this->getAmountsByCurrency($currency);
         $current_min_amount = $current_amounts['min_amount'];
@@ -2086,10 +2068,8 @@ class Payplug extends PaymentModule
         $force_3ds = false;
 
         //save card
-        //$save_card = false;
         $allow_save_card = false;
         if ($one_click == 1 && Cart::isGuestCartByCartId($cart->id) != 1) {
-            //$save_card = true;
             $allow_save_card = true;
         }
 
@@ -2199,14 +2179,12 @@ class Payplug extends PaymentModule
 
         if ($one_click == 1 && $current_card != null && $id_card != 'new_card') {
             $payment_tab['payment_method'] = $payment_method;
-            //$payment_tab['save_card'] = false;
             $payment_tab['allow_save_card'] = false;
         } else {
             $payment_tab['hosted_payment'] = array(
                 'return_url' => $hosted_payment['return_url'],
                 'cancel_url' => $hosted_payment['cancel_url'],
             );
-            //$payment_tab['save_card'] = $save_card;
             $payment_tab['allow_save_card'] = $allow_save_card;
         }
 
@@ -2454,7 +2432,6 @@ class Payplug extends PaymentModule
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
         curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
-        //$answer = curl_exec($process);
         $error_curl = curl_errno($process);
 
         curl_close($process);
@@ -4502,8 +4479,6 @@ class Payplug extends PaymentModule
                     }
                 }
 
-                //$this->deletePayment($pay_id, $order->id_cart);
-
                 die(json_encode(array(
                     'message' => $this->l('Order successfully updated.'),
                     'reload' => true
@@ -4896,6 +4871,9 @@ class Payplug extends PaymentModule
 
         $errors = array();
         if (!isset($response['details']) || empty($response['details'])) {
+            // set a default error message
+            $error_key = md5('The transaction was not completed and your card was not charged.');
+            $errors[$error_key] = $this->l('The transaction was not completed and your card was not charged.');
             return $errors;
         }
 

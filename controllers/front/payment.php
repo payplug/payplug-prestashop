@@ -47,5 +47,4 @@ if (!is_array($payment_url)) {
     Tools::redirect($payment_url);
 } else {
     Tools::redirect('index.php?controller=order&step=3&error=1');
-//    die($payment_url['response']);
 }

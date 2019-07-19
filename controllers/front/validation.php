@@ -61,13 +61,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
 
-        //Cancelling
-        /*
-        if (!$payplug->active) {
-            $this->addLog($debug, $log, 'Payplug module is not enabled.', 'error');
-            Tools::redirect($redirect_url_error);
-        } elseif (!($cart_id = Tools::getValue('cartid'))) {
-        */
+        // Cancelling
         if (!($cart_id = Tools::getValue('cartid'))) {
             $this->addLog($debug, $log, 'No Cart ID.', 'error');
             Tools::redirect($redirect_url_error);
@@ -81,7 +75,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         }
 
 
-        //Treatment
+        // Treatment
         $this->addLog($debug, $log, 'Cart ID : '.(int)$cart_id, 'info');
         $cart = new Cart((int)$cart_id);
         if (!Validate::isLoadedObject($cart)) {
