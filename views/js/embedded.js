@@ -21,6 +21,9 @@
  */
 
 $(document).ready(function() {
+    if(typeof payplug_errors != 'undefined' && payplug_errors) {
+        return false;
+    }
     var url = $('#payplug_form_js').data('payment-url');
     Payplug.showPayment(url);
 });

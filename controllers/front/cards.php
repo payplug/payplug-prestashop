@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2019 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2019 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -30,8 +30,8 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
         $this->context = Context::getContext();
 
-        include_once($this->module->getLocalPath().'payplug.php');
-        include_once($this->module->getLocalPath().'lib/init.php');
+        include_once($this->module->getLocalPath() . 'payplug.php');
+        include_once($this->module->getLocalPath() . 'lib/init.php');
     }
 
     /**
