@@ -141,7 +141,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.21.0';
+        $this->version = '2.21.1';
     }
 
     /**
@@ -339,7 +339,8 @@ class Payplug extends PaymentModule
         );
 
         $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
-        $flag = ($flag && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, $adminPayPlugId, $this->name));
+        $flag = ($flag && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment,
+                $adminPayPlugId, $this->name));
 
         return $flag;
     }
@@ -586,20 +587,6 @@ class Payplug extends PaymentModule
                 $os = (int)Configuration::get($key_config);
             } elseif ($val = $this->findOrderState($values['name'], false)) {
                 $os = $val;
-            } elseif (defined($values['cfg'])) {
-                //$os = constant($values['cfg']);
-            } elseif ($values['template'] != null) {
-                /*
-                $req_os_by_template = new DbQuery();
-                $req_os_by_template->select('DISTINCT osl.id_order_state');
-                $req_os_by_template->from('order_state_lang', 'osl');
-                $req_os_by_template->where('osl.template = \''.pSQL($values['template'].'\''));
-                $res_os_by_template = Db::getInstance()->getValue($req_os_by_template);
-
-                if ($res_os_by_template) {
-                    $os = $res_os_by_template;
-                }
-                */
             }
             if ((int)$os == 0) {
                 $log->info('Creating new order state.');
@@ -1300,8 +1287,7 @@ class Payplug extends PaymentModule
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
-        $login_infos = array(//'p_error'	=> $p_error,
-        );
+        $login_infos = array();
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
@@ -1461,8 +1447,7 @@ class Payplug extends PaymentModule
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
-        $login_infos = array(//'p_error'	=> $p_error,
-        );
+        $login_infos = array();
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
@@ -2046,8 +2031,6 @@ class Payplug extends PaymentModule
 
         //amount
         $amount = $cart->getOrderTotal(true, Cart::BOTH);
-
-        //$amount = round($amount, 2) * 100;
         $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
         $current_amounts = $this->getAmountsByCurrency($currency);
         $current_min_amount = $current_amounts['min_amount'];
@@ -2085,10 +2068,8 @@ class Payplug extends PaymentModule
         $force_3ds = false;
 
         //save card
-        //$save_card = false;
         $allow_save_card = false;
         if ($one_click == 1 && Cart::isGuestCartByCartId($cart->id) != 1) {
-            //$save_card = true;
             $allow_save_card = true;
         }
 
@@ -2132,8 +2113,10 @@ class Payplug extends PaymentModule
             'last_name' => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
             'company_name' => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
             'email' => $customer->email,  // required
-            'landline_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone, $address_delivery->id_country) : null,  // optional
-            'mobile_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone_mobile, $address_delivery->id_country) : null,  // optional
+            'landline_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone,
+                $address_delivery->id_country) : null,  // optional
+            'mobile_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone_mobile,
+                $address_delivery->id_country) : null,  // optional
             'address1' => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
             'address2' => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
             'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
@@ -2146,18 +2129,32 @@ class Payplug extends PaymentModule
         // Billing address fields
         $billing = array(
             'title' => null,
-            'first_name' => !empty($address_invoice->firstname) ? $address_invoice->firstname : null, // required
-            'last_name' => !empty($address_invoice->lastname) ? $address_invoice->lastname : null, // required
-            'company_name' => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname, // optional
-            'email' => $customer->email, // required
-            'landline_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone, $address_invoice->id_country) : null, // optional
-            'mobile_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone_mobile, $address_invoice->id_country) : null, // optional
-            'address1' => !empty($address_invoice->address1) ? $address_invoice->address1 : null, // required
-            'address2' => !empty($address_invoice->address2) ? $address_invoice->address2 : null, // optional
-            'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null, // required
-            'city' => !empty($address_invoice->city) ? $address_invoice->city : null, // required
-            'country' => $invoice_country_iso, // required
-            'language' => $this->getIsoFromLanguageCode($this->context->language), // optional
+            'first_name' => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,
+            // required
+            'last_name' => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,
+            // required
+            'company_name' => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,
+            // optional
+            'email' => $customer->email,
+            // required
+            'landline_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone,
+                $address_invoice->id_country) : null,
+            // optional
+            'mobile_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone_mobile,
+                $address_invoice->id_country) : null,
+            // optional
+            'address1' => !empty($address_invoice->address1) ? $address_invoice->address1 : null,
+            // required
+            'address2' => !empty($address_invoice->address2) ? $address_invoice->address2 : null,
+            // optional
+            'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,
+            // required
+            'city' => !empty($address_invoice->city) ? $address_invoice->city : null,
+            // required
+            'country' => $invoice_country_iso,
+            // required
+            'language' => $this->getIsoFromLanguageCode($this->context->language),
+            // optional
         );
 
         //payment
@@ -2182,14 +2179,12 @@ class Payplug extends PaymentModule
 
         if ($one_click == 1 && $current_card != null && $id_card != 'new_card') {
             $payment_tab['payment_method'] = $payment_method;
-            //$payment_tab['save_card'] = false;
             $payment_tab['allow_save_card'] = false;
         } else {
             $payment_tab['hosted_payment'] = array(
                 'return_url' => $hosted_payment['return_url'],
                 'cancel_url' => $hosted_payment['cancel_url'],
             );
-            //$payment_tab['save_card'] = $save_card;
             $payment_tab['allow_save_card'] = $allow_save_card;
         }
 
@@ -2437,7 +2432,6 @@ class Payplug extends PaymentModule
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
         curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
-        //$answer = curl_exec($process);
         $error_curl = curl_errno($process);
 
         curl_close($process);
@@ -4485,8 +4479,6 @@ class Payplug extends PaymentModule
                     }
                 }
 
-                //$this->deletePayment($pay_id, $order->id_cart);
-
                 die(json_encode(array(
                     'message' => $this->l('Order successfully updated.'),
                     'reload' => true
@@ -4847,7 +4839,7 @@ class Payplug extends PaymentModule
             $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
-            if(!$phone_util->isValidNumber($parsed)) {
+            if (!$phone_util->isValidNumber($parsed)) {
                 // todo: add log
                 return null;
             }
@@ -4865,29 +4857,33 @@ class Payplug extends PaymentModule
      * @param $str
      * @return array
      */
-    public function catchErrorsFromApi($str){
-        $parses = explode(';',$str);
+    public function catchErrorsFromApi($str)
+    {
+        $parses = explode(';', $str);
         $response = null;
-        foreach($parses as $parse) {
-            if(strpos($parse, 'HTTP Response') !== false) {
-                $parse = str_replace('HTTP Response:','',$parse);
+        foreach ($parses as $parse) {
+            if (strpos($parse, 'HTTP Response') !== false) {
+                $parse = str_replace('HTTP Response:', '', $parse);
                 $parse = trim($parse);
-                $response = json_decode($parse,true);
+                $response = json_decode($parse, true);
             }
         }
 
         $errors = array();
-        if(!isset($response['details']) || empty($response['details'])){
+        if (!isset($response['details']) || empty($response['details'])) {
+            // set a default error message
+            $error_key = md5('The transaction was not completed and your card was not charged.');
+            $errors[$error_key] = $this->l('The transaction was not completed and your card was not charged.');
             return $errors;
         }
 
-        foreach($response['details'] as $key=>$value){
+        foreach ($response['details'] as $key => $value) {
             // add specific error message
-            switch($key) {
+            switch ($key) {
                 default:
                     $error_key = md5('The transaction was not completed and your card was not charged.');
                     // push error only if not catched before
-                    if(!array_key_exists($error_key,$errors)) {
+                    if (!array_key_exists($error_key, $errors)) {
                         $errors[$error_key] = $this->l('The transaction was not completed and your card was not charged.');
                     }
             }
@@ -4896,19 +4892,21 @@ class Payplug extends PaymentModule
         return $errors;
     }
 
-    private function setError($error_message) {
-        if(!$error_message) {
+    private function setError($error_message)
+    {
+        if (!$error_message) {
             return false;
         }
         $error_key = md5($error_message);
 
         // push error only if not catched before
-        if(!array_key_exists($error_key,$this->errors)) {
+        if (!array_key_exists($error_key, $this->errors)) {
             $this->errors[$error_key] = $this->l($error_message);
         }
     }
 
-    private function getInstPaymentOptions($cart_id){
+    private function getInstPaymentOptions($cart_id)
+    {
         $is_installment = (int)Tools::getValue('inst');
         if ($is_installment == 1) {
             $payment = $this->preparePayment((int)$cart_id, null, true);
@@ -4916,23 +4914,23 @@ class Payplug extends PaymentModule
             $payment = $this->preparePayment((int)$cart_id);
         }
         $payment_url = false;
-        if(is_array($payment)) {
-            if(!$payment['result']) {
+        if (is_array($payment)) {
+            if (!$payment['result']) {
                 $this->setError($payment['response']);
             } else {
                 $payment_url = $payment['payment_url'];
             }
         } else {
             $payment_data = json_decode($payment);
-            if(is_object($payment_data)){
+            if (is_object($payment_data)) {
                 $payment_url = $payment_data->payment_url;
-            }else {
+            } else {
                 $payment_url = $payment;
             }
         }
 
 
-        $payplug_errors = count($this->errors) ? implode('<br/>',$this->errors) : false;
+        $payplug_errors = count($this->errors) ? implode('<br/>', $this->errors) : false;
 
         return array(
             'payplug_errors' => $payplug_errors,
@@ -4948,15 +4946,12 @@ class Payplug extends PaymentModule
      * @param $language
      * @return string
      */
-    public function getIsoFromLanguageCode($language){
-
-        if (!is_object($language)) {
-            $language = new Language($language);
-        }
-        if(!Validate::isLoadedObject($language)) {
+    public function getIsoFromLanguageCode(Language $language)
+    {
+        if (!Validate::isLoadedObject($language)) {
             return false;
         }
-        $parse = explode('-',$language->language_code);
+        $parse = explode('-', $language->language_code);
         return $parse[0];
     }
 }
