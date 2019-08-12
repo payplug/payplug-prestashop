@@ -2672,6 +2672,7 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
+        $available_options = $this->getAvailableOptions();
         if (!$this->active) {
             return;
         }
@@ -2732,6 +2733,51 @@ class Payplug extends PaymentModule
             }
         }
         return $payment_options;
+    }
+
+    private function getAvailableOptions($cart)
+    {
+        $permissions = $this->getAccountPermissions();
+
+        $available_options = array(
+            'standard' => true,
+            'sandbox' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 1 ? true : false,
+            'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1 ? true : false,
+            'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1 ? true : false,
+            'installment' => (int)Configuration::get('PAYPLUG_INST') === 1 ? true : false,
+            'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1 ? true : false,
+        );
+
+        if (!$this->active
+            || (int)Configuration::get('PAYPLUG_SHOW') === 0
+            || !$this->checkCurrency($cart)
+            || !$this->checkAmount($cart)
+        ) {
+            $available_options['standard'] = false;
+            $available_options['sandbox'] = false;
+            $available_options['embedded'] = false;
+            $available_options['one_click'] = false;
+            $available_options['installment'] = false;
+            $available_options['deferred'] = false;
+        } else {
+            if (!$permissions['can_save_cards']) {
+                $available_options['one_click'] = false;
+            }
+            if (!$permissions['can_create_installment_plan']) {
+                $available_options['installment'] = false;
+            }
+            if (!$permissions['can_create_deferred_payment']) {
+                $available_options['deferred'] = false;
+            }
+        }
+
+        if ((int)Configuration::get('PAYPLUG_INST') == 1 && $params['cart']->getOrderTotal(true,
+                Cart::BOTH) >= (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'))) {
+            $installment = 1;
+        }
+
+
+        return $available_options;
     }
 
     /**
@@ -3860,20 +3906,28 @@ class Payplug extends PaymentModule
      * @param string $api_key
      * @return bool
      */
+    // todo: renommer la fonction en getAccountPermissions() partout ou elle est appelée
     public function checkPremium($api_key = null)
     {
         if ($api_key == null) {
             $api_key = self::setAPIKey();
         }
         $permissions = $this->getAccount($api_key);
-        /*
-        $use_live_mode = $permissions['use_live_mode'];
-        $can_save_cards = $permissions['can_save_cards'];
-        if (!$use_live_mode || !$can_save_cards) {
-            return false;
+        return $permissions;
+    }
+
+    /**
+     * Check if account is premium
+     *
+     * @param string $api_key
+     * @return bool
+     */
+    public function getAccountPermissions($api_key = null)
+    {
+        if ($api_key == null) {
+            $api_key = self::setAPIKey();
         }
-        return true;
-        */
+        $permissions = $this->getAccount($api_key);
         return $permissions;
     }
 
