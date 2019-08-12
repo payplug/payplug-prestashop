@@ -24,28 +24,18 @@
     <form action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
         <div class="panel panel-show">
             <div class="panel-heading">{l s='PRESENTATION' mod='payplug'}</div>
-            {*<div class="panel-heading">{l s='PRESENTATION' d='Modules.Payplug.Admin'}</div>*}
             <div class="panel-row">
                 <img src="{$url_logo|escape:'htmlall':'UTF-8'}" />
                 <p class="block-title">{l s='The payment solution that increases your sales' mod='payplug'}</p>
-                {*<p class="block-title">{l s='The payment solution that increases your sales' d='Modules.Payplug.Admin'}</p>*}
                 <p>{l s='PayPlug provides merchants all the benefits of a full online payment solution.' mod='payplug'}</p>
-                {*<p>{l s='PayPlug provides merchants all the benefits of a full online payment solution.' d='Modules.Payplug.Admin'}</p>*}
                 <ul>
                     <li>{l s='Accept all Visa and MasterCard credit and debit cards' mod='payplug'}</li>
-                    {*<li>{l s='Accept all Visa and MasterCard credit and debit cards' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Display the payment form directly on your website, without redirection' mod='payplug'}</li>
-                    {*<li>{l s='Display the payment form directly on your website, without redirection' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Customise your payment page with your own colours and design' mod='payplug'}</li>
-                    {*<li>{l s='Customise your payment page with your own colours and design' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Avoid fraud by using Verified by Visa and MasterCard Secure Code' mod='payplug'}</li>
-                    {*<li>{l s='Avoid fraud by using Verified by Visa and MasterCard Secure Code' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Automatic order update and email confirmation' mod='payplug'}</li>
-                    {*<li>{l s='Automatic order update and email confirmation' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Web interface to manage and export transaction history' mod='payplug'}</li>
-                    {*<li>{l s='Web interface to manage and export transaction history' d='Modules.Payplug.Admin'}</li>*}
                     <li>{l s='Funds available on your bank account within 2 to 5 business days' mod='payplug'}</li>
-                    {*<li>{l s='Funds available on your bank account within 2 to 5 business days' d='Modules.Payplug.Admin'}</li>*}
                 </ul>
             </div>
         </div>
@@ -58,31 +48,6 @@
 
         {include file='./login.tpl' login_infos=$login_infos}
 
-        <div class="panel">
-            <div class="panel-heading">{l s='Debug mode' mod='payplug'}</div>
-            {*<div class="panel-heading">{l s='Debug mode' d='Modules.Payplug.Admin'}</div>*}
-            <div class="panel-row">
-                <label class="left-block">{l s='Enable debug mode' mod='payplug'}</label>
-                {*<label class="left-block">{l s='Enable debug mode' d='Modules.Payplug.Admin'}</label>*}
-                <div class="block-right">
-                    <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" class="switch-input" name="PAYPLUG_DEBUG_MODE" value="on"
-                               id="payplug_debug_mode_on" {if $PAYPLUG_DEBUG_MODE}checked="checked"{/if}>
-                        <label title="{l s='Enable Debug mode' mod='payplug'}" for="payplug_debug_mode_on"
-                        {*<label title="{l s='Enable Debug mode' d='Modules.Payplug.Admin'}" for="payplug_debug_mode_on"*}
-                               class="switch-label switch-label-on">{l s='YES' mod='payplug'}</label>
-                               {*class="switch-label switch-label-on">{l s='YES' d='Modules.Payplug.Admin'}</label>*}
-                        <input type="radio" class="switch-input" name="PAYPLUG_DEBUG_MODE" value="off" id="payplug_debug_mode_off"
-                               {if !$PAYPLUG_DEBUG_MODE}checked="checked"{/if}>
-                        <label title="{l s='Disable one click payment' mod='payplug'}" for="payplug_debug_mode_off"
-                        {*<label title="{l s='Disable one click payment' d='Modules.Payplug.Admin'}" for="payplug_debug_mode_off"*}
-                               class="switch-label switch-label-off">{l s='NO' mod='payplug'}</label>
-                               {*class="switch-label switch-label-off">{l s='NO' d='Modules.Payplug.Admin'}</label>*}
-                        <span class="switch-selection"></span>
-                        <a class="slide-button btn" {if !$PAYPLUG_DEBUG_MODE}style="left: 50%"{/if}></a>
-                    </span>
-                </div>
-            </div>
-        </div>
+        {include file='./option_debug.tpl'}
     </form>
 </div>

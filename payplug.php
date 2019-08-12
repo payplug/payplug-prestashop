@@ -447,6 +447,9 @@ class Payplug extends PaymentModule
             && Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 1)
             && Configuration::updateValue('PAYPLUG_SHOW', 0)
             && Configuration::updateValue('PAYPLUG_TEST_API_KEY', null)
+            && Configuration::updateValue('PAYPLUG_DEFERRED', 0)
+            && Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', 0)
+            && Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0)
         );
     }
 
@@ -485,6 +488,9 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_SANDBOX_MODE')
             && Configuration::deleteByName('PAYPLUG_SHOW')
             && Configuration::deleteByName('PAYPLUG_TEST_API_KEY')
+            && Configuration::deleteByName('PAYPLUG_DEFERRED')
+            && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO')
+            && Configuration::deleteByName('PAYPLUG_DEFERRED_STATE')
         );
     }
 
@@ -933,13 +939,18 @@ class Payplug extends PaymentModule
             if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
                 $this->displayError($this->l('Settings not updated'));
             } else {
-                Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('PAYPLUG_SANDBOX_MODE'));
-                Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', Tools::getValue('PAYPLUG_EMBEDDED_MODE'));
-                Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('PAYPLUG_ONE_CLICK'));
-                Configuration::updateValue('PAYPLUG_INST', Tools::getValue('PAYPLUG_INST'));
+                Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
+                Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', Tools::getValue('payplug_embedded'));
+                Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
+                Configuration::updateValue('PAYPLUG_INST', Tools::getValue('payplug_inst'));
                 Configuration::updateValue('PAYPLUG_INST_MODE', Tools::getValue('PAYPLUG_INST_MODE'));
                 Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', Tools::getValue('PAYPLUG_INST_MIN_AMOUNT'));
                 Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));
+                Configuration::updateValue('PAYPLUG_DEFERRED', Tools::getValue('payplug_deferred'));
+                Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', Tools::getValue('PAYPLUG_DEFERRED_AUTO'));
+                if ((int)Tools::getValue('PAYPLUG_DEFERRED_AUTO') == 1) {
+                    Configuration::updateValue('PAYPLUG_DEFERRED_STATE', Tools::getValue('PAYPLUG_DEFERRED_STATE'));
+                }
             }
         }
 
@@ -1232,6 +1243,9 @@ class Payplug extends PaymentModule
         $PAYPLUG_INST = Configuration::get('PAYPLUG_INST');
         $PAYPLUG_INST_MODE = Configuration::get('PAYPLUG_INST_MODE');
         $PAYPLUG_INST_MIN_AMOUNT = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
+        $PAYPLUG_DEFERRED = Configuration::get('PAYPLUG_DEFERRED');
+        $PAYPLUG_DEFERRED_AUTO = Configuration::get('PAYPLUG_DEFERRED_AUTO');
+        $PAYPLUG_DEFERRED_STATE = Configuration::get('PAYPLUG_DEFERRED_STATE');
 
         if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
             $connected = true;
@@ -1291,6 +1305,60 @@ class Payplug extends PaymentModule
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
+        $switch_sandbox = array(
+            'name' => 'payplug_sandbox',
+            'label' => $this->l('Mode'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_SANDBOX_MODE,
+            'label_left' => $this->l('test'),
+            'label_right' => $this->l('live'),
+        );
+
+        $switch_embedded = array(
+            'name' => 'payplug_embedded',
+            'label' => $this->l('Payment page'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_EMBEDDED_MODE,
+            'label_left' => $this->l('embedded'),
+            'label_right' => $this->l('redirected'),
+        );
+
+        $switch_one_click = array(
+            'name' => 'payplug_one_click',
+            'label' => $this->l('Enable one-click payments'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_ONE_CLICK,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
+        $switch_installment_plan = array(
+            'name' => 'payplug_inst',
+            'label' => $this->l('Enable payments by installments'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_INST,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
+        $switch_deferred_payment = array(
+            'name' => 'payplug_deferred',
+            'label' => $this->l('Defer the payment capture'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_DEFERRED,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
+        $switch_debug_mode = array(
+            'name' => 'payplug_debug_mode',
+            'label' => $this->l('Enable debug mode'),
+            'active' => true,
+            'checked' => $PAYPLUG_DEBUG_MODE,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
         $this->context->smarty->assign(array(
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
@@ -1310,9 +1378,19 @@ class Payplug extends PaymentModule
             'PAYPLUG_INST' => $PAYPLUG_INST,
             'PAYPLUG_INST_MODE' => $PAYPLUG_INST_MODE,
             'PAYPLUG_INST_MIN_AMOUNT' => $PAYPLUG_INST_MIN_AMOUNT,
+            'PAYPLUG_DEFERRED' => $PAYPLUG_DEFERRED,
+            'PAYPLUG_DEFERRED_AUTO' => $PAYPLUG_DEFERRED_AUTO,
+            'PAYPLUG_DEFERRED_STATE' => $PAYPLUG_DEFERRED_STATE,
             'login_infos' => $login_infos,
             'iso' => $this->context->language->iso_code,
             'installments_panel_url' => $installments_panel_url,
+            'switch_deferred_payment' => $switch_deferred_payment,
+            'switch_installment_plan' => $switch_installment_plan,
+            'switch_one_click' => $switch_one_click,
+            'switch_embedded' => $switch_embedded,
+            'switch_sandbox' => $switch_sandbox,
+            'switch_debug_mode' => $switch_debug_mode,
+            'order_states' => $this->getOrderStates(),
         ));
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
@@ -1395,6 +1473,9 @@ class Payplug extends PaymentModule
         $PAYPLUG_INST = Configuration::get('PAYPLUG_INST');
         $PAYPLUG_INST_MODE = Configuration::get('PAYPLUG_INST_MODE');
         $PAYPLUG_INST_MIN_AMOUNT = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
+        $PAYPLUG_DEFERRED = Configuration::get('PAYPLUG_DEFERRED');
+        $PAYPLUG_DEFERRED_AUTO = Configuration::get('PAYPLUG_DEFERRED_AUTO');
+        $PAYPLUG_DEFERRED_STATE = Configuration::get('PAYPLUG_DEFERRED_STATE');
 
         if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
             $connected = true;
@@ -1451,6 +1532,60 @@ class Payplug extends PaymentModule
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
+        $switch_sandbox = array(
+            'name' => 'payplug_sandbox',
+            'label' => $this->l('Mode'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_SANDBOX_MODE,
+            'label_left' => $this->l('test'),
+            'label_right' => $this->l('live'),
+        );
+
+        $switch_embedded = array(
+            'name' => 'payplug_embedded',
+            'label' => $this->l('Payment page'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_EMBEDDED_MODE,
+            'label_left' => $this->l('embedded'),
+            'label_right' => $this->l('redirected'),
+        );
+
+        $switch_one_click = array(
+            'name' => 'payplug_one_click',
+            'label' => $this->l('Enable one-click payments'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_ONE_CLICK,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
+        $switch_installment_plan = array(
+            'name' => 'payplug_inst',
+            'label' => $this->l('Enable payments by installments'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_INST,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
+        $switch_deferred_payment = array(
+            'name' => 'payplug_deferred',
+            'label' => $this->l('Defer the payment capture'),
+            'active' => $connected,
+            'checked' => $PAYPLUG_DEFERRED,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
+        $switch_debug_mode = array(
+            'name' => 'payplug_debug_mode',
+            'label' => $this->l('Enable debug mode'),
+            'active' => true,
+            'checked' => $PAYPLUG_DEBUG_MODE,
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        );
+
         $this->context->smarty->assign(array(
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
@@ -1469,8 +1604,18 @@ class Payplug extends PaymentModule
             'PAYPLUG_INST' => $PAYPLUG_INST,
             'PAYPLUG_INST_MODE' => $PAYPLUG_INST_MODE,
             'PAYPLUG_INST_MIN_AMOUNT' => $PAYPLUG_INST_MIN_AMOUNT,
+            'PAYPLUG_DEFERRED' => $PAYPLUG_DEFERRED,
+            'PAYPLUG_DEFERRED_AUTO' => $PAYPLUG_DEFERRED_AUTO,
+            'PAYPLUG_DEFERRED_STATE' => $PAYPLUG_DEFERRED_STATE,
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
+            'switch_deferred_payment' => $switch_deferred_payment,
+            'switch_installment_plan' => $switch_installment_plan,
+            'switch_one_click' => $switch_one_click,
+            'switch_embedded' => $switch_embedded,
+            'switch_sandbox' => $switch_sandbox,
+            'switch_debug_mode' => $switch_debug_mode,
+            'order_states' => $this->getOrderStates(),
         ));
         $this->html = $this->fetchTemplateRC('/views/templates/admin/login.tpl');
 
@@ -2009,6 +2154,7 @@ class Payplug extends PaymentModule
         $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
         $installment = (int)Configuration::get('PAYPLUG_INST');
         $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
+        $deferred = (int)Configuration::get('PAYPLUG_DEFERRED');
         $current_card = null;
         if ($id_card != null && $id_card != 'new_card') {
             $current_card = $this->getCardId(
@@ -4953,5 +5099,54 @@ class Payplug extends PaymentModule
         }
         $parse = explode('-', $language->language_code);
         return $parse[0];
+    }
+
+    private function getOrderStates($id_lang = null) {
+        if ($id_lang === null) {
+            $id_lang = $this->context->language->id;
+        }
+        $order_states = OrderState::getOrderStates($id_lang);
+        return $order_states;
+    }
+
+    public function hookActionOrderStatusUpdate($params)
+    {
+        $active = false;
+        $order = new Order((int)$params['id_order']);
+        $active = Module::isEnabled($this->name);
+        if (!$active
+            || !$order->payment == $this->displayName
+            || !$this->isReferredPaymentsActive()
+            || !$this->isReferredAutoActive()
+            || $params['newOrderStatus']->id != Configuration::get('PAYPLUG_DEFERRED_STATE')
+        ) {
+            return;
+        } else {
+            $cart = $params['cart'];
+            $payment_method = $this->getPaymentMethodByCart($cart);
+            if ($payment_method['type'] == 'installment') {
+                $installment = new PPPaymentInstallment($payment_method['id']);
+                $payment = $installment->getFirstPayment();
+            } else {
+                $payment = new PPPayment($payment_method['id']);
+            }
+            if (!$payment->isPaid()) {
+                $payment->capture();
+                $payment->refresh();
+                if ($payment->resource->card->id !== null) {
+                    $this->saveCard($payment->resource);
+                }
+            }
+        }
+    }
+
+    private function isReferredPaymentsActive()
+    {
+        return (int)Configuration::get('PAYPLUG_DEFERRED') == 1;
+    }
+
+    private function isReferredAutoActive()
+    {
+        return (int)Configuration::get('PAYPLUG_DEFERRED_AUTO') == 1;
     }
 }
