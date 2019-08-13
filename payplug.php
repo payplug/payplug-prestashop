@@ -141,7 +141,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.21.2';
+        $this->version = '2.23.0';
     }
 
     /**
@@ -2672,34 +2672,16 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        $available_options = $this->getAvailableOptions();
-        if (!$this->active) {
-            return;
-        }
-        if (Configuration::get('PAYPLUG_SHOW') == 0) {
-            return;
+        $available_options = $this->getAvailableOptions($params['cart']);
+
+        $payplug_cards = array();
+        if ($available_options['one_click']) {
+            $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
         }
 
-        if (!$this->checkCurrency($params['cart'])) {
-            return;
-        }
-
-        if (!$this->checkAmount($params['cart'])) {
-            return;
-        }
-
-        $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
-        $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
-        $installment = 0;
-
-        if ((int)Configuration::get('PAYPLUG_INST') == 1 && $params['cart']->getOrderTotal(true,
-                Cart::BOTH) >= (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'))) {
-            $installment = 1;
-        }
-        $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
-        if ($one_click == 1 && !empty($payplug_cards)) {
-            if ($embedded_mode == 1) {
-                if ($installment == 1) {
+        if ($available_options['one_click'] && !empty($payplug_cards)) {
+            if ($available_options['embedded']) {
+                if ($available_options['installment']) {
                     $payment_options = $this->getEmbeddedOneClickInstPaymentOption(
                         $payplug_cards,
                         (int)$params['cart']->id
@@ -2711,21 +2693,21 @@ class Payplug extends PaymentModule
                     );
                 }
             } else {
-                if ($installment == 1) {
+                if ($available_options['installment']) {
                     $payment_options = $this->getRedirectOneClickInstPaymentOption($payplug_cards);
                 } else {
                     $payment_options = $this->getRedirectOneClickPaymentOption($payplug_cards);
                 }
             }
         } else {
-            if ($embedded_mode == 1) {
-                if ($installment == 1) {
+            if ($available_options['embedded']) {
+                if ($available_options['installment']) {
                     $payment_options = $this->getEmbeddedInstPaymentOption((int)$params['cart']->id);
                 } else {
                     $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id));
                 }
             } else {
-                if ($installment == 1) {
+                if ($available_options['installment']) {
                     $payment_options = $this->getRedirectInstPaymentOption();
                 } else {
                     $payment_options = array($this->getRedirectPaymentOption());
@@ -2738,17 +2720,20 @@ class Payplug extends PaymentModule
     private function getAvailableOptions($cart)
     {
         $permissions = $this->getAccountPermissions();
+        $inst_min_amount = (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'));
 
         $available_options = array(
             'standard' => true,
-            'sandbox' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 1 ? true : false,
+            'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0 ? true : false,
             'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1 ? true : false,
             'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1 ? true : false,
             'installment' => (int)Configuration::get('PAYPLUG_INST') === 1 ? true : false,
             'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1 ? true : false,
+            'deferred' => (int)Configuration::get('PAYPLUG_LIVE_API_KEY') !== null ? true : false,
         );
 
         if (!$this->active
+            || Configuration::get('PAYPLUG_EMAIL') === null
             || (int)Configuration::get('PAYPLUG_SHOW') === 0
             || !$this->checkCurrency($cart)
             || !$this->checkAmount($cart)
@@ -2760,22 +2745,23 @@ class Payplug extends PaymentModule
             $available_options['installment'] = false;
             $available_options['deferred'] = false;
         } else {
+            if ($available_options['live']
+                && Configuration::get('PAYPLUG_LIVE_API_KEY') === null
+            ) {
+                $available_options['live'] = false;
+            }
             if (!$permissions['can_save_cards']) {
                 $available_options['one_click'] = false;
             }
-            if (!$permissions['can_create_installment_plan']) {
+            if (!$permissions['can_create_installment_plan']
+                || $cart->getOrderTotal(true, Cart::BOTH) < $inst_min_amount
+            ) {
                 $available_options['installment'] = false;
             }
             if (!$permissions['can_create_deferred_payment']) {
                 $available_options['deferred'] = false;
             }
         }
-
-        if ((int)Configuration::get('PAYPLUG_INST') == 1 && $params['cart']->getOrderTotal(true,
-                Cart::BOTH) >= (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'))) {
-            $installment = 1;
-        }
-
 
         return $available_options;
     }
