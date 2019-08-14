@@ -22,7 +22,7 @@ class Payplug
     /**
      * @var string The API Version.
      */
-    private $_api_version;
+    private $_apiVersion;
 
     /**
      * Constructor for a authentication.
@@ -32,16 +32,13 @@ class Payplug
      *
      * @throws Exception\ConfigurationException when token is not set
      */
-    public function __construct($token, $api_version)
+    public function __construct($token, $apiVersion = null)
     {
         if (!is_string($token)) {
             throw new Exception\ConfigurationException('Expected string values for token.');
         }
-        if (!is_string($api_version)) {
-            throw new Exception\ConfigurationException('Expected string values for api version.');
-        }
         $this->_token = $token;
-        $this->_api_version = $api_version;
+        $this->_apiVersion = $apiVersion;
     }
 
     /**
@@ -52,46 +49,16 @@ class Payplug
      * @return Payplug
      * @throws ConfigurationException
      */
-    public static function init($props = array())
+    public static function init($props)
     {
-        if (!is_string($props['secretKey'])) {
-            throw new Exception\ConfigurationException('Expected string values for the token.');
-        }
-        if (!is_string($props['apiVersion'])) {
-            throw new Exception\ConfigurationException('Expected string values for the api version.');
-        }
+        $secretKey = isset($props['secretKey']) && $props['secretKey'] ? $props['secretKey'] : null;
+        $apiVersion = isset($props['apiVersion']) && $props['apiVersion'] ? $props['apiVersion'] : null;
 
-        $clientConfiguration = new Payplug($props['secretKey'], $props['apiVersion']);
-
-        self::setDefaultConfiguration($clientConfiguration);
-
-        return $clientConfiguration;
-    }
-
-    /**
-     * Initializes a Authentication and sets it as the new default global authentication.
-     * It also performs some checks before saving the authentication.
-     *
-     * <pre>
-     * Expected array format for argument $authentication :
-     * $authentication['TOKEN'] = 'YOUR TOKEN'
-     * </pre>
-     *
-     * @deprecated 4.0.0
-     *
-     * @param  string   $token  the authentication token
-     *
-     * @return Payplug  the new client authentication
-     *
-     * @throws Exception\ConfigurationException
-     */
-    public static function setSecretKey($token)
-    {
-        if (!is_string($token)) {
+        if (!$secretKey) {
             throw new Exception\ConfigurationException('Expected string values for the token.');
         }
 
-        $clientConfiguration = new Payplug($token, '2019-06-14');
+        $clientConfiguration = new Payplug($secretKey, $apiVersion);
 
         self::setDefaultConfiguration($clientConfiguration);
 
@@ -115,7 +82,7 @@ class Payplug
      */
     public function getApiVersion()
     {
-        return $this->_api_version;
+        return $this->_apiVersion;
     }
 
     /**

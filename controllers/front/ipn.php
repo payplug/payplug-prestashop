@@ -134,19 +134,19 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
                         $this->addLog($debug, $log, 'This was test mode.', 'debug');
                         $this->addLog($debug, $log, 'Trying live mode.', 'debug');
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $payplug->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         if (!$payment = $payplug->retrievePayment($resource->id)) {
                             $this->addLog($debug, $log, 'Can\'t retrieve payment with LIVE API Key.', 'debug');
-                            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                            $payplug->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                             $payment = null;
                         }
                     } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
                         $this->addLog($debug, $log, 'This was live mode.', 'debug');
                         $this->addLog($debug, $log, 'Trying test mode.', 'debug');
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $payplug->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         if (!$payment = $payplug->retrievePayment($resource->id)) {
                             $this->addLog($debug, $log, 'Can\'t retrieve payment with the TEST API Key.', 'debug');
-                            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                            $payplug->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                             $payment = null;
                         }
                     }

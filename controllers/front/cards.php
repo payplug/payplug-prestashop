@@ -49,10 +49,8 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
     public function renderCardList()
     {
-        $valid_key = Payplug::setAPIKey();
-        \Payplug\Payplug::setSecretKey($valid_key);
-
         $payplug = Module::getInstanceByName('payplug');
+        \Payplug\Payplug::init($payplug->current_api_key, $payplug->api_version);
 
         $context = Context::getContext();
 

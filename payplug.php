@@ -91,6 +91,8 @@ class Payplug extends PaymentModule
 
     public $payment_status = array();
 
+    public $api_version = '2019-08-06';
+
     /**
      * Constructor
      *
@@ -206,11 +208,13 @@ class Payplug extends PaymentModule
      * @throws Exception
      * @return void
      */
-    private function setSecretKey()
+    public function setSecretKey($token = false)
     {
-        if ($this->current_api_key != null) {
-            \Payplug\Payplug::setSecretKey($this->current_api_key);
+        if (!$token && $this->current_api_key != null) {
+            $token = $this->current_api_key;
         }
+
+        \Payplug\Payplug::init($token, $this->api_version);
     }
 
     /**
@@ -3440,9 +3444,9 @@ class Payplug extends PaymentModule
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
         if ($pay_mode == 'TEST') {
-            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+            $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
         } else {
-            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+            $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
         }
         if ($pay_id == null) {
             if ($inst_id != null) {
@@ -3679,15 +3683,15 @@ class Payplug extends PaymentModule
             $payment_list = array();
             if (!$inst_id || empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
                 if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
                 }
@@ -3826,15 +3830,15 @@ class Payplug extends PaymentModule
 
             if (!$pay_id || empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
                 if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
                 }
@@ -4156,13 +4160,13 @@ class Payplug extends PaymentModule
                     $abort = \Payplug\InstallmentPlan::abort($inst_id);
                 } catch (Exception $e) {
                     if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         $abort = \Payplug\InstallmentPlan::abort($inst_id);
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         $abort = \Payplug\InstallmentPlan::abort($inst_id);
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     }
                 }
 

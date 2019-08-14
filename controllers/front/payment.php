@@ -26,10 +26,9 @@ require_once(_PS_MODULE_DIR_.'../init.php');
 require_once(_PS_MODULE_DIR_.'/payplug/payplug.php');
 require_once(_PS_MODULE_DIR_.'/payplug/lib/init.php');
 
-$valid_key = Payplug::setAPIKey();
-\Payplug\Payplug::setSecretKey($valid_key);
-
 $payplug = Module::getInstanceByName('payplug');
+\Payplug\Payplug::init($payplug->current_api_key, $payplug->api_version);
+
 \Payplug\Core\HttpClient::addDefaultUserAgentProduct(
     'PayPlug-Prestashop',
     $payplug->version,
