@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2019 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2019 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -30,17 +30,17 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         if ($debug) {
             $log->$level($str, '--', $line_n);
         }
-        return($str);
+        return ($str);
     }
 
     public function postProcess()
     {
         //Inclusions
-        require_once(dirname(__FILE__).'/../../../../config/config.inc.php');
-        require_once(_PS_MODULE_DIR_.'../init.php');
-        require_once(_PS_MODULE_DIR_.'payplug/payplug.php');
-        require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugLock.php');
-        require_once(_PS_MODULE_DIR_.'payplug/lib/init.php');
+        require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
+        require_once(_PS_MODULE_DIR_ . '../init.php');
+        require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
+        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+        require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 
 
         //Settings
@@ -48,8 +48,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $type = 'payment';
 
         if ($debug) {
-            require_once(dirname(__FILE__).'/../../classes/MyLogPHP.class.php');
-            $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/validation-'.date("Y-m-d").'.csv');
+            require_once(dirname(__FILE__) . '/../../classes/MyLogPHP.class.php');
+            $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/validation-' . date("Y-m-d") . '.csv');
             $log->info('Validation Starting.');
         } else {
             $log = false;
@@ -61,13 +61,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
 
-        //Cancelling
-        /*
-        if (!$payplug->active) {
-            $this->addLog($debug, $log, 'Payplug module is not enabled.', 'error');
-            Tools::redirect($redirect_url_error);
-        } elseif (!($cart_id = Tools::getValue('cartid'))) {
-        */
+        // Cancelling
         if (!($cart_id = Tools::getValue('cartid'))) {
             $this->addLog($debug, $log, 'No Cart ID.', 'error');
             Tools::redirect($redirect_url_error);
@@ -75,14 +69,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             if ($ps == 2) {
                 $this->addLog($debug, $log, 'Order has been cancelled on PayPlug page', 'info');
             } else {
-                $this->addLog($debug, $log, 'Wrong GET parameter ps = '.$ps, 'error');
+                $this->addLog($debug, $log, 'Wrong GET parameter ps = ' . $ps, 'error');
             }
             Tools::redirect($redirect_url_error);
         }
 
 
-        //Treatment
-        $this->addLog($debug, $log, 'Cart ID : '.(int)$cart_id, 'info');
+        // Treatment
+        $this->addLog($debug, $log, 'Cart ID : ' . (int)$cart_id, 'info');
         $cart = new Cart((int)$cart_id);
         if (!Validate::isLoadedObject($cart)) {
             $this->addLog($debug, $log, 'Cart cannot be loaded.', 'error');
@@ -93,8 +87,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $this->addLog($debug, $log, 'Payment is not stored or is already consumed.', 'error');
                     $id_order = Order::getOrderByCartId($cart->id);
                     $customer = new Customer((int)$cart->id_customer);
-                    $link_redirect = __PS_BASE_URI__.$order_confirmation_url.'id_cart='.$cart->id
-                        .'&id_module='.$payplug->id.'&id_order='.$id_order.'&key='.$customer->secure_key;
+                    $link_redirect = __PS_BASE_URI__ . $order_confirmation_url . 'id_cart=' . $cart->id
+                        . '&id_module=' . $payplug->id . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
                     Tools::redirect($link_redirect);
                 } elseif ($inst_id = $payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->addLog($debug, $log, 'Installment is not consumed yet.', 'info');
@@ -114,7 +108,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         }
                         $this->addLog($debug, $log, 'Retrieving installment...', 'info');
                         if ($installment->failure) {
-                            $this->addLog($debug, $log, 'Installment failure : '.$installment->failure->message, 'error');
+                            $this->addLog($debug, $log, 'Installment failure : ' . $installment->failure->message,
+                                'error');
                             Tools::redirect($redirect_url_error);
                         }
                     } catch (Exception $e) {
@@ -154,7 +149,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             }
 
             $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-            $this->addLog($debug, $log, 'Total : '.$total, 'info');
+            $this->addLog($debug, $log, 'Total : ' . $total, 'info');
 
             $this->addLog($debug, $log, 'Lock checking start.', 'debug');
             PayplugLock::check($cart->id);
@@ -183,7 +178,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if ($type == 'payment') {
                     $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
                     if ($payplug->isTransactionPending((int)$cart_id)) {
-                        $this->addLog($debug, $log, 'Transaction is pending so stored payment will not be deleted.', 'info');
+                        $this->addLog($debug, $log, 'Transaction is pending so stored payment will not be deleted.',
+                            'info');
                     } else {
                         if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
                             $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
@@ -201,9 +197,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $state_addons = ($installment->is_live ? '' : '_TEST');
                 }
 
-                $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING'.$state_addons);
-                $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
-                $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
+                $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
+                $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+                $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
                 if ($type == 'installment') {
                     $order_state = $inst_state;
                 } elseif ($is_paid) {
@@ -223,7 +219,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $this->addLog($debug, $log, 'Stored payment successfully set up to pending.', 'info');
                     }
                 }
-                $this->addLog($debug, $log, 'Order state will be :'.$order_state, 'info');
+                $this->addLog($debug, $log, 'Order state will be :' . $order_state, 'info');
 
                 if ($type == 'payment') {
                     $extra_vars = array(
@@ -243,8 +239,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     if (isset($cart->secure_key) && !empty($cart->secure_key) && $cart->secure_key !== $customer->secure_key) {
                         $secure_key = $cart->secure_key;
                         $this->addLog($debug, $log, 'Secure keys do not match.', 'error');
-                        $this->addLog($debug, $log, 'Customer Secure Key: '.$customer->secure_key, 'error');
-                        $this->addLog($debug, $log, 'Cart Secure Key: '.$cart->secure_key, 'error');
+                        $this->addLog($debug, $log, 'Customer Secure Key: ' . $customer->secure_key, 'error');
+                        $this->addLog($debug, $log, 'Cart Secure Key: ' . $cart->secure_key, 'error');
                     } else {
                         $secure_key = $customer->secure_key;
                     }
@@ -289,11 +285,11 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $this->addLog($debug, $log, 'Checking number of order passed with this id_cart...', 'info');
                 $req_nb_orders = '
             SELECT o.* 
-            FROM '._DB_PREFIX_.'orders o 
-            WHERE o.id_cart = '.$cart->id;
+            FROM ' . _DB_PREFIX_ . 'orders o 
+            WHERE o.id_cart = ' . $cart->id;
                 $res_nb_orders = Db::getInstance()->executeS($req_nb_orders);
                 if (!$res_nb_orders) {
-                    $this->addLog($debug, $log, 'No order can be found using id_cart '.(int)$cart->id, 'error');
+                    $this->addLog($debug, $log, 'No order can be found using id_cart ' . (int)$cart->id, 'error');
                     $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                     if (!$cart_unlock) {
                         $this->addLog($debug, $log, 'Lock cannot be deleted.', 'error');
@@ -302,9 +298,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                     Tools::redirect($redirect_url_error);
                 } elseif (count($res_nb_orders) > 1) {
-                    $this->addLog($debug, $log, 'There is more than one order using id_cart '.(int)$cart->id, 'error');
+                    $this->addLog($debug, $log, 'There is more than one order using id_cart ' . (int)$cart->id,
+                        'error');
                     foreach ($res_nb_orders as $o) {
-                        $this->addLog($debug, $log, 'Order ID : '.$o['id_order'], 'debug');
+                        $this->addLog($debug, $log, 'Order ID : ' . $o['id_order'], 'debug');
                     }
                 } else {
                     $this->addLog($debug, $log, 'Everything looks good.', 'info');
@@ -315,7 +312,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $payments = $order->getOrderPaymentCollection();
 
                 if (!$payments) {
-                    $this->addLog($debug, $log, 'No transaction can be found using id_order '.(int)$id_order, 'error');
+                    $this->addLog($debug, $log, 'No transaction can be found using id_order ' . (int)$id_order,
+                        'error');
                     $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                     if (!$cart_unlock) {
                         $this->addLog($debug, $log, 'Lock cannot be deleted.', 'error');
@@ -324,7 +322,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                     Tools::redirect($redirect_url_error);
                 } elseif (count($payments) > 1) {
-                    $this->addLog($debug, $log, 'There is more than one transaction using id_order '.(int)$id_order, 'error');
+                    $this->addLog($debug, $log, 'There is more than one transaction using id_order ' . (int)$id_order,
+                        'error');
                 } else {
                     $this->addLog($debug, $log, 'Everything looks good.', 'info');
                 }
@@ -337,9 +336,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $this->addLog($debug, $log, 'Lock deleted.', 'debug');
             }
 
-            $link_redirect = __PS_BASE_URI__.$order_confirmation_url.'id_cart='.$cart->id.'&id_module='.$payplug->id
-                .'&id_order='.$id_order.'&key='.$customer->secure_key;
-            $this->addLog($debug, $log, 'Redirecting to :'.$link_redirect, 'info');
+            $link_redirect = __PS_BASE_URI__ . $order_confirmation_url . 'id_cart=' . $cart->id . '&id_module=' . $payplug->id
+                . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
+            $this->addLog($debug, $log, 'Redirecting to :' . $link_redirect, 'info');
             Tools::redirect($link_redirect);
         }
     }

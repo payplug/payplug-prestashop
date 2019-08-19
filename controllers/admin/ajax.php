@@ -104,7 +104,7 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
         $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        die(json_encode($payplug->checkPremium($api_key)));
+        die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
         if (!$payplug->checkAmountToRefund(Tools::getValue('amount'))) {

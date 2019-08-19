@@ -195,6 +195,16 @@ class HttpClient
     }
 
     /**
+     * Gets the API Version HTTP header sent for each HTTP request.
+     *
+     * @return  string  The current version
+     */
+    public function getVersion()
+    {
+        return Payplug\Core\Config::API_VERSION;
+    }
+
+    /**
      * Performs a request.
      *
      * @param   string  $httpVerb       the HTTP verb (PUT, POST, GET, …)

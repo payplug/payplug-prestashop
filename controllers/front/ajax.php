@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2019 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2019 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -25,9 +25,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        require_once(dirname(__FILE__).'/../../../../config/config.inc.php');
-        require_once(_PS_MODULE_DIR_.'../init.php');
-        include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
+        require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
+        require_once(_PS_MODULE_DIR_ . '../init.php');
+        include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 
         if (Tools::getValue('_ajax') == 1) {
             $payplug = new Payplug();
