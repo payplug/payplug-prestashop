@@ -1170,6 +1170,7 @@ class Payplug extends PaymentModule
             'use_live_mode' => $json_answer->permissions->use_live_mode,
             'can_save_cards' => $json_answer->permissions->can_save_cards,
             'can_create_installment_plan' => $json_answer->permissions->can_create_installment_plan,
+            'can_create_deferred_payment' => $json_answer->permissions->can_create_deferred_payment,
         );
 
         $currencies = implode(';', $configuration['currencies']);
@@ -2673,7 +2674,7 @@ class Payplug extends PaymentModule
     public function hookPaymentOptions($params)
     {
         $available_options = $this->getAvailableOptions($params['cart']);
-
+        Symfony\Component\VarDumper\VarDumper::dump($available_options);
         $payplug_cards = array();
         if ($available_options['one_click']) {
             $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
@@ -2729,7 +2730,6 @@ class Payplug extends PaymentModule
             'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1 ? true : false,
             'installment' => (int)Configuration::get('PAYPLUG_INST') === 1 ? true : false,
             'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1 ? true : false,
-            'deferred' => (int)Configuration::get('PAYPLUG_LIVE_API_KEY') !== null ? true : false,
         );
 
         if (!$this->active
@@ -2745,8 +2745,8 @@ class Payplug extends PaymentModule
             $available_options['installment'] = false;
             $available_options['deferred'] = false;
         } else {
-            if ($available_options['live']
-                && Configuration::get('PAYPLUG_LIVE_API_KEY') === null
+            if (!$permissions['use_live_mode']
+                || Configuration::get('PAYPLUG_LIVE_API_KEY') === null
             ) {
                 $available_options['live'] = false;
             }
@@ -2762,8 +2762,73 @@ class Payplug extends PaymentModule
                 $available_options['deferred'] = false;
             }
         }
-
         return $available_options;
+    }
+
+    /**
+     * get redirect payment option
+     *
+     * @return array
+     */
+    private function StandardPaymentOption($is_live = false, $is_embedded = false, $is_deferred = false)
+    {
+        $externalOption = new PaymentOption();
+        $externalOption
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setCallToActionText($this->l('Pay with credit card'))
+            ->setModuleName('payplug')
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
+        if (Tools::getValue('error')) {
+            $externalOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
+
+        return $externalOption;
+    }
+
+    /**
+     * get redirect payment option
+     *
+     * @return array
+     */
+    private function OneClickPaymentOption($card, $is_live = false, $is_embedded = false, $is_deferred = false)
+    {
+        $externalOption = new PaymentOption();
+        $externalOption
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setCallToActionText($this->l('Pay with credit card'))
+            ->setModuleName('payplug')
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
+        if (Tools::getValue('error')) {
+            $externalOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
+
+        return $externalOption;
+    }
+
+    /**
+     * get redirect payment option
+     *
+     * @return array
+     */
+    private function InstallmentPaymentOption($is_live = false, $is_embedded = false, $is_deferred = false)
+    {
+        $externalOption = new PaymentOption();
+        $externalOption
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setCallToActionText($this->l('Pay with credit card'))
+            ->setModuleName('payplug')
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
+        if (Tools::getValue('error')) {
+            $externalOption->setAdditionalInformation(
+                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+            );
+        }
+
+        return $externalOption;
     }
 
     /**
@@ -4085,18 +4150,6 @@ class Payplug extends PaymentModule
                         'date' => date('d/m/Y', strtotime($schedule->date)),
                     );
                 }
-            }
-
-            $state_addons = ($installment->is_live ? '' : '_TEST');
-            $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-            $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG' . $state_addons);
-
-            if ((int)$installment->is_fully_paid == 1 && (int)$order->getCurrentState() == $inst_state) {
-                $new_order_state = $paid_state;
-                $order_history = new OrderHistory();
-                $order_history->id_order = (int)$order->id;
-                $order_history->changeIdOrderState((int)$new_order_state, (int)$order->id, true);
-                $order_history->save();
             }
 
             $id_currency = (int)Currency::getIdByIsoCode($installment->currency);
