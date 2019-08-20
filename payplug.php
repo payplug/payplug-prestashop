@@ -199,6 +199,8 @@ class Payplug extends PaymentModule
             5 => $this->l('refunded'),
             6 => $this->l('on going'),
             7 => $this->l('cancelled'),
+            8 => $this->l('authorized'),
+            9 => $this->l('authorization expired'),
         );
     }
 
@@ -4063,7 +4065,7 @@ class Payplug extends PaymentModule
         }
 
         $show_popin = false;
-        $show_menu = false;
+        $display_refund = false;
         $show_menu_refunded = false;
         $show_menu_update = false;
         $show_menu_installment = false;
@@ -4105,20 +4107,19 @@ class Payplug extends PaymentModule
                 }
             }
 
+            $payment_list_new = array();
             foreach ($installment->schedule as $schedule) {
                 if ($schedule->payment_ids != null) {
                     foreach ($schedule->payment_ids as $pay_id) {
-                        $p_status_class = 'pp_success';
                         $p = $this->retrievePayment($pay_id);
-                        $p_status = (int)$p->is_paid == 1 ? $this->l('Paid') : $this->l('Not Paid');
-                        if ((int)$p->is_refunded == 1) {
-                            $p_status = $this->l('Refunded');
-                            $p_status_class = 'pp_error';
+                        $payment_list_new[] = $this->buildPaymentDetails($p);
+                        if ((int)$p->is_paid == 0) {
+                            $amount_refunded_payplug += 0;
+                            $amount_available += 0;
+                        } elseif ((int)$p->is_refunded == 1) {
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_available += ($p->amount - $p->amount_refunded) / 100;
                         } elseif ((int)$p->amount_refunded > 0) {
-                            $p_status = $this->l('Partially Refunded');
-                            $p_status_class = 'pp_error';
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_refundable_payment = ($p->amount - $p->amount_refunded);
                             $amount_available += ($amount_refundable_payment >= 10 ? $amount_refundable_payment / 100 : 0);
@@ -4126,58 +4127,26 @@ class Payplug extends PaymentModule
                             $amount_available += ($p->amount >= 10 ? $p->amount / 100 : 0);
                         }
 
-                        if ($p->card->brand != '') {
-                            $p_brand = $p->card->brand;
-                        } else {
-                            $p_brand = $this->l('Unavailable in test mode');
-                        }
-                        if ($p->card->country != '') {
-                            $p_brand .= ' ' . $this->l('Card') . ' (' . $p->card->country . ')';
-                        }
-
-                        if ($p->card->last4 != '') {
-                            $p_mask = '**** **** **** ' . $p->card->last4;
-                        } else {
-                            $p_mask = $this->l('Unavailable in test mode');
-                        }
-
-                        if ($p->card->exp_month === null) {
-                            $p_card_date = $this->l('Unavailable in test mode');
-                        } else {
-                            $p_card_date = date('m/y',
-                                strtotime('01.' . $p->card->exp_month . '.' . $p->card->exp_year));
-                        }
-
-                        $p_error = '';
-                        if ((int)$p->is_paid == 0) {
-                            if (isset($p->failure) && isset($p->failure->message)) {
-                                $p_error = '(' . $p->failure->message . ')';
-                            }
+                        if ($amount_available > 0) {
+                            $display_refund = true;
                         }
 
                         if ($p->amount_refunded > 0) {
-                            $show_menu = true;
+                            $show_menu_refunded = true;
                         }
-
-                        $payment_list[] = array(
-                            'id' => $p->id,
-                            'status' => $p_status,
-                            'status_class' => $p_status_class,
-                            'amount' => (int)$p->amount / 100,
-                            'date' => date('d/m/Y', (int)$p->created_at),
-                            'brand' => $p_brand,
-                            'card_mask' => $p_mask,
-                            'tds' => $p->is_3ds ? $this->l('YES') : $this->l('NO'),
-                            'mode' => $p->is_live ? $this->l('LIVE') : $this->l('TEST'),
-                            'card_date' => $p_card_date,
-                            'error' => $p_error,
-                        );
                     }
                 } else {
-                    $payment_list[] = array(
-                        'status' => $inst_status = $installment->is_active ? $this->l('Ongoing') : $this->l('Suspended'),
-                        'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
+                    $payment_list_new[] = array(
+                        'id' => null,
+                        'status' => $inst_status = $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
                         'amount' => (int)$schedule->amount / 100,
+                        'card_brand' => null,
+                        'card_mask' => null,
+                        'tds' => null,
+                        'card_date' => null,
+                        'mode' => null,
+                        'authorization' => null,
+                        'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
                         'date' => date('d/m/Y', strtotime($schedule->date)),
                     );
                 }
@@ -4187,6 +4156,9 @@ class Payplug extends PaymentModule
             $show_menu_installment = true;
             $inst_status = $installment->is_active ? $this->l('ongoing') : ($installment->is_fully_paid ? $this->l('paid') : $this->l('suspended'));
             $inst_aborted = !$installment->is_active;
+            $ppInstallment = new PPPaymentInstallment($installment->id);
+            $instPaymentOne = $ppInstallment->getFirstPayment();
+            $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
             $inst_paid = $installment->is_fully_paid;
             $this->context->smarty->assign(array(
                 'inst_id' => $inst_id,
@@ -4194,6 +4166,8 @@ class Payplug extends PaymentModule
                 'inst_aborted' => $inst_aborted,
                 'inst_paid' => $inst_paid,
                 'payment_list' => $payment_list,
+                'payment_list_new' => $payment_list_new,
+                'inst_can_be_aborted' => $inst_can_be_aborted,
             ));
 
             $sandbox = ((int)$installment->is_live == 1 ? false : true);
@@ -4203,8 +4177,6 @@ class Payplug extends PaymentModule
                 $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
             }
 
-            $show_menu = true;
-            $show_menu_refunded = true;
             $this->updatePayplugInstallment($installment);
         } else {
             if (!$pay_id = $this->isTransactionPending((int)$order->id_cart)) {
@@ -4232,6 +4204,7 @@ class Payplug extends PaymentModule
                 }
             }
 
+            $single_payment = $this->buildPaymentDetails($payment);
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
@@ -4253,17 +4226,17 @@ class Payplug extends PaymentModule
                 } else {
                     $pay_error = '';
                 }
-                $show_menu = false;
+                $display_refund = false;
                 if ($current_state != 0 && $current_state == $id_pending_order_state) {
                     $show_menu_update = true;
                 }
             } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
-                $show_menu = true;
+                $display_refund = true;
             } elseif ((int)$payment->is_refunded == 1) {
                 $show_menu_refunded = true;
-                $show_menu = false;
+                $display_refund = false;
             } else {
-                $show_menu = true;
+                $display_refund = true;
             }
 
             $conf = (int)Tools::getValue('conf');
@@ -4298,7 +4271,13 @@ class Payplug extends PaymentModule
             } else {
                 $pay_card_mask = $this->l('Unavailable in test mode');
             }
-            $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
+
+            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            if ($payment->is_3ds !== null) {
+                $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
+                $this->context->smarty->assign(array('pay_tds' => $pay_tds));
+            }
+
             $pay_mode = $payment->is_live ? $this->l('LIVE') : $this->l('TEST');
 
             if ($payment->card->exp_month === null) {
@@ -4317,7 +4296,6 @@ class Payplug extends PaymentModule
                 'pay_date' => $pay_date,
                 'pay_brand' => $pay_brand,
                 'pay_card_mask' => $pay_card_mask,
-                'pay_tds' => $pay_tds,
                 'pay_card_date' => $pay_card_date,
                 'pay_error' => $pay_error,
             ));
@@ -4334,7 +4312,7 @@ class Payplug extends PaymentModule
             $amount_suggested = 0;
         }
 
-        if ($show_menu) {
+        if ($display_refund) {
             $this->context->smarty->assign(array(
                 'order' => $order,
                 'amount_refunded_payplug' => $amount_refunded_payplug,
@@ -4356,18 +4334,27 @@ class Payplug extends PaymentModule
             ));
         }
 
+        $display_single_payment = $show_menu_payment;
         $this->context->smarty->assign(array(
             'logo_url' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
+            'display_single_payment' => $display_single_payment,
+            'display_refund' => $display_refund,
             'show_menu_payment' => $show_menu_payment,
-            'show_menu' => $show_menu,
             'show_menu_refunded' => $show_menu_refunded,
             'show_menu_update' => $show_menu_update,
             'show_menu_installment' => $show_menu_installment,
             'pay_mode' => $pay_mode,
+            'order' => $order,
         ));
 
-        if ($show_popin && $show_menu) {
+        if ($display_single_payment) {
+            $this->context->smarty->assign(array(
+                'single_payment' => $single_payment,
+            ));
+        }
+
+        if ($show_popin && $display_refund) {
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
@@ -4869,15 +4856,27 @@ class Payplug extends PaymentModule
             5 => 'refunded',
             6 => 'on going',
             7 => 'cancelled',
-         */
+            8 => 'authorized',
+            9 => 'authorization expired',
+        */
         if (!is_object($payment)) {
             $payment = \Payplug\Payment::retrieve($payment);
+        }
+
+        if ($payment->installment_plan_id !== null) {
+            $installment = \Payplug\InstallmentPlan::retrieve($payment->installment_plan_id);
+        } else {
+            $installment = null;
         }
 
         $pay_status = 1; //not paid
         if ((int)$payment->is_paid == 1) {
             $pay_status = 2; //paid
-        } elseif ((int)$payment->is_active == 1) {
+        } elseif ($payment->authorization !== null && ($payment->authorization->expires_at - time()) > 0) {
+            $pay_status = 8; //authorized
+        } elseif ($payment->authorization !== null && ($payment->authorization->expires_at - time()) <= 0) {
+            $pay_status = 9; //authorization expired
+        } elseif ($payment->installment_plan_id !== null && (int)$installment->is_active == 1) {
             $pay_status = 6; //ongoing
         } else {
             $pay_status = 7; //cancelled
@@ -4888,7 +4887,7 @@ class Payplug extends PaymentModule
         if ((int)$payment->is_refunded == 1) {
             $pay_status = 5; //refunded
         } elseif ((int)$payment->amount_refunded > 0) {
-            $pay_status = 4; //partillay refunded
+            $pay_status = 4; //partially refunded
         }
 
         return $pay_status;
@@ -5272,5 +5271,142 @@ class Payplug extends PaymentModule
     private function isReferredAutoActive()
     {
         return (int)Configuration::get('PAYPLUG_DEFERRED_AUTO') == 1;
+    }
+
+    public function buildPaymentDetails($payment)
+    {
+        if (!is_object($payment)) {
+            try {
+                $payment = \Payplug\Payment::retrieve($payment);
+            } catch (Exception $exception) {
+                return $exception;
+            }
+        }
+        $pay_status = $this->getPaymentStatusByPayment($payment);
+        $status_class = null;
+        switch ($pay_status) {
+            case 1: // not paid
+            case 4: // partially refunded
+            case 5: // refunded
+            case 8: // authorized
+                $status_class = 'pp_warning';
+                break;
+            case 2: // paid
+            case 6: // on going
+                $status_class = 'pp_success';
+                break;
+            case 3: // failed
+            case 7: // cancelled
+            case 9: // authorization expired
+                $status_class = 'pp_error';
+                break;
+            default:
+                $status_class = 'pp_neutral';
+                break;
+        }
+        $pay_status = $this->payment_status[(int)$pay_status];
+
+        $pay_brand = $this->getCardBrandByPayment($payment);
+        if ($payment->card->country != '') {
+            $pay_brand .= ' '.$this->l('Card').' ('.$payment->card->country.')';
+        }
+
+        $payment_details = array(
+            'id' => $payment->id,
+            'status' => $pay_status,
+            'status_class' => $status_class,
+            'amount' => (int)$payment->amount / 100,
+            'card_brand' => $pay_brand,
+            'card_mask' => $this->getCardMaskByPayment($payment),
+            'card_date' => $this->getCardExpiryDateByPayment($payment),
+            'mode' => $payment->is_live ? $this->l('LIVE') : $this->l('TEST'),
+        );
+
+        //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+        if ($payment->is_3ds !== null) {
+            $payment_details['tds'] = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
+        }
+
+        if ($payment->authorization !== null) {
+            $payment_details['authorization'] = true;
+            if ($payment->is_paid) {
+                $payment_details['date'] = date('d/m/Y', (int)$payment->paid_at);
+                $payment_details['can_be_captured'] = false;
+                $payment_details['status_message'] = $this->l('(deferred)');
+            } else {
+                $expiration = date('d/m/Y', (int)$payment->authorization->expires_at);
+                if ($payment->authorization->expires_at - time() > 0) {
+                    $payment_details['can_be_captured'] = true;
+                    $payment_details['status_message'] = sprintf($this->l('(capture authorized before %s)'), $expiration);
+                    $payment_details['date'] = date('d/m/Y', (int)$payment->authorization->authorized_at);
+                    $payment_details['date_expiration'] = $expiration;
+                } else {
+                    $payment_details['can_be_captured'] = false;
+                }
+            }
+        } else {
+            $payment_details['authorization'] = false;
+            $payment_details['date'] = date('d/m/Y', (int)$payment->created_at);
+            $payment_details['can_be_captured'] = false;
+        }
+
+        if (isset($payment->failure) && isset($payment->failure->message)) {
+            $payment_details['error'] = '('.$payment->failure->message.')';
+        }
+        return $payment_details;
+    }
+
+    public function getCardBrandByPayment($payment)
+    {
+        if (!is_object($payment)) {
+            try {
+                $payment = \Payplug\Payment::retrieve($payment);
+            } catch (Exception $exception) {
+                return $exception;
+            }
+        }
+
+        if ($payment->card->brand != '') {
+            $brand = $payment->card->brand;
+        } else {
+            $brand = $this->l('Unavailable');
+        }
+        return $brand;
+    }
+
+    public function getCardMaskByPayment($payment)
+    {
+        if (!is_object($payment)) {
+            try {
+                $payment = \Payplug\Payment::retrieve($payment);
+            } catch (Exception $exception) {
+                return $exception;
+            }
+        }
+
+        if ($payment->card->last4 != '') {
+            $card_mask = '**** **** **** '.$payment->card->last4;
+        } else {
+            $card_mask = $this->l('Unavailable');
+        }
+        return $card_mask;
+    }
+
+    public function getCardExpiryDateByPayment($payment)
+    {
+        if (!is_object($payment)) {
+            try {
+                $payment = \Payplug\Payment::retrieve($payment);
+            } catch (Exception $exception) {
+                return $exception;
+            }
+        }
+
+        if ($payment->card->exp_month === null) {
+            $card_expiry_date = $this->l('Unavailable');
+        } else {
+            $card_expiry_date = date('m/y', strtotime('01.'.$payment->card->exp_month.'.'.$payment->card->exp_year));
+        }
+        return $card_expiry_date;
     }
 }
