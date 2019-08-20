@@ -30,13 +30,14 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
+        $is_deferred = (bool)Tools::getValue('def') === 1;
         if ((int)Tools::getValue('disp') == 1) {
             if ((int)Tools::getValue('pay') == 1) {
                 if (Tools::getValue('pc') != 'new_card') {
                     $payplug = new Payplug();
                     $id_cart = (int)Tools::getValue('id_cart');
                     $id_card = Tools::getValue('pc');
-                    $payment = $payplug->preparePayment($id_cart, $id_card);
+                    $payment = $payplug->preparePayment($id_cart, $id_card, false, $is_deferred);
                     if ($payment['result'] == true) {
                         Tools::redirect(
                             $this->context->link->getModuleLink(
@@ -54,7 +55,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 } elseif ((int)Tools::getValue('inst') == 1) {
                     $payplug = new Payplug();
                     $id_cart = (int)Tools::getValue('id_cart');
-                    $payment = $payplug->preparePayment($id_cart, null, true);
+                    $payment = $payplug->preparePayment($id_cart, null, true, $is_deferred);
                     $payment_url = false;
                     if (is_array($payment)) {
                         if (!$payment['result']) {
