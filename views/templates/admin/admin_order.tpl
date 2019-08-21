@@ -43,7 +43,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {foreach from=$payment_list item=payment}
+                {foreach from=$payment_list_new item=payment}
                     <tr class="pp_fixed_height">
                         <td>{$payment['date']|escape:'htmlall':'UTF-8'}</td>
                         <td>{displayPrice price=$payment['amount']}</td>
