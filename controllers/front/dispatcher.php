@@ -30,64 +30,33 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
-        if ((int)Tools::getValue('disp') == 1) {
-            if ((int)Tools::getValue('pay') == 1) {
-                if (Tools::getValue('pc') != 'new_card') {
-                    $payplug = new Payplug();
-                    $id_cart = (int)Tools::getValue('id_cart');
-                    $id_card = Tools::getValue('pc');
-                    $payment = $payplug->preparePayment($id_cart, $id_card);
+        if($method = Tools::getValue('method')) {
+            $payplug = new Payplug();
+            $id_cart = (int)Tools::getValue('id_cart');
+            $id_card = Tools::getValue('pc');
 
-                    if ($payment['result'] == true) {
-                        if($payment['is_valid']) {
-                            Tools::redirect(
-                                $this->context->link->getModuleLink(
-                                    'payplug',
-                                    'validation',
-                                    array('cartid' => $id_cart, 'ps' => 1),
-                                    true
-                                )
-                            );
-                        } else {
-                            Tools::redirect($payment['return_url']);
-                        }
-                    } else {
-                        Tools::redirect('index.php?controller=order&step=3&error=1&pc=' . $id_card);
-                    }
-                } elseif ((int)Tools::getValue('lightbox') == 1) {
-                    Tools::redirect('index.php?controller=order&step=3&lightbox=1');
-                } elseif ((int)Tools::getValue('inst') == 1) {
-                    $payplug = new Payplug();
-                    $id_cart = (int)Tools::getValue('id_cart');
-                    $payment = $payplug->preparePayment($id_cart, null, true);
-                    $payment_url = false;
-                    if (is_array($payment)) {
-                        if (!$payment['result']) {
-                            Tools::redirect('index.php?controller=order&step=3&inst=1&error=1');
-                        } else {
-                            $payment_url = $payment['payment_url'];
-                        }
-                    } else {
-                        $payment_data = json_decode($payment);
-                        if (is_object($payment_data)) {
-                            $payment_url = $payment_data->payment_url;
-                        } else {
-                            $payment_url = $payment;
-                        }
-                    }
-                    Tools::redirect($payment_url);
+            $cart = new Cart($id_cart);
+            if (!Validate::isLoadedObject($cart)) {
+                return false;
+            }
+
+            $options = $payplug->getAvailableOptions($cart);
+
+            // if the payment is redirect and not a one click payment, prepare the payment and redirect
+            if (!$options['embedded'] && $method != 'one_click') {
+                $payment = $payplug->preparePayment($id_cart, $id_card, $method == 'installment');
+                if(!$payment['result']) {
+                    $error_url = 'index.php?controller=order&step=3&error=1' . ($method == 'installment' ? '&inst=1' : '');
+                    Tools::redirect($error_url);
                 } else {
-                    Tools::redirect($this->context->link->getModuleLink('payplug', 'payment', array(), true));
-                }
-            } elseif ((int)Tools::getValue('lightbox') == 1) {
-                if ((int)Tools::getValue('inst') == 1) {
-                    Tools::redirect('index.php?controller=order&step=3&lightbox=1&inst=1');
-                } else {
-                    Tools::redirect('index.php?controller=order&step=3&lightbox=1');
+                    Tools::redirect($payment['return_url']);
                 }
             }
-        } else {
-            Tools::redirect('index.php');
+            // else reload the page with lightbox arg
+            else {
+                $return_url = 'index.php?controller=order&step=3&lightbox=1' . ($method == 'installment' ? '&inst=1' : '') . ($method == 'one_click' ? '&pc=' . $id_card : '');
+                Tools::redirect($return_url);
+            }
         }
     }
 }
