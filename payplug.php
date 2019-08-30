@@ -2720,34 +2720,34 @@ class Payplug extends PaymentModule
                     $payment_options = $this->getEmbeddedOneClickInstPaymentOption(
                         $payplug_cards,
                         (int)$params['cart']->id,
-                        $available_options['one_click']
+                        $available_options['deferred']
                     );
                 } else {
                     $payment_options = $this->getEmbeddedOneClickPaymentOption(
                         $payplug_cards,
                         (int)$params['cart']->id,
-                        $available_options['one_click']
+                        $available_options['deferred']
                     );
                 }
             } else {
                 if ($available_options['installment']) {
-                    $payment_options = $this->getRedirectOneClickInstPaymentOption($payplug_cards, $available_options['one_click']);
+                    $payment_options = $this->getRedirectOneClickInstPaymentOption($payplug_cards, $available_options['deferred']);
                 } else {
-                    $payment_options = $this->getRedirectOneClickPaymentOption($payplug_cards, $available_options['one_click']);
+                    $payment_options = $this->getRedirectOneClickPaymentOption($payplug_cards, $available_options['deferred']);
                 }
             }
         } else {
             if ($available_options['embedded']) {
                 if ($available_options['installment']) {
-                    $payment_options = $this->getEmbeddedInstPaymentOption((int)$params['cart']->id, $available_options['one_click']);
+                    $payment_options = $this->getEmbeddedInstPaymentOption((int)$params['cart']->id, $available_options['deferred']);
                 } else {
-                    $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id, $available_options['one_click']));
+                    $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id, $available_options['deferred']));
                 }
             } else {
                 if ($available_options['installment']) {
-                    $payment_options = $this->getRedirectInstPaymentOption($available_options['one_click']);
+                    $payment_options = $this->getRedirectInstPaymentOption($available_options['deferred']);
                 } else {
-                    $payment_options = array($this->getRedirectPaymentOption($available_options['one_click']));
+                    $payment_options = array($this->getRedirectPaymentOption($available_options['deferred']));
                 }
             }
         }
@@ -2810,7 +2810,7 @@ class Payplug extends PaymentModule
     {
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
@@ -2832,7 +2832,7 @@ class Payplug extends PaymentModule
     {
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
@@ -2854,7 +2854,7 @@ class Payplug extends PaymentModule
     {
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
@@ -2876,7 +2876,7 @@ class Payplug extends PaymentModule
     {
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
@@ -2911,7 +2911,7 @@ class Payplug extends PaymentModule
         $paymentOption = new PaymentOption();
         $paymentOption
             ->setCallToActionText($this->l('Pay with credit card'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
             ->setModuleName('payplug')
             ->setInputs(array(
@@ -2969,7 +2969,7 @@ class Payplug extends PaymentModule
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
                         ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
                             'pc' => array(
@@ -3005,7 +3005,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
                 ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3035,7 +3035,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
                 ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3106,7 +3106,7 @@ class Payplug extends PaymentModule
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
                         ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
                             'pc' => array(
@@ -3142,7 +3142,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
                 ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3182,7 +3182,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
                 ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3257,7 +3257,7 @@ class Payplug extends PaymentModule
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
                         ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
                             'pc' => array(
@@ -3299,7 +3299,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
                 ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3344,7 +3344,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
                 ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3391,7 +3391,7 @@ class Payplug extends PaymentModule
         $paymentOptionBis
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
             ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
             ->setModuleName('payplug')
             ->setInputs(array(
                 'disp' => array(
@@ -3456,7 +3456,7 @@ class Payplug extends PaymentModule
                     $paymentOption
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
                         ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                         ->setModuleName('payplug')
                         ->setInputs(array(
                             'pc' => array(
@@ -3493,7 +3493,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
                 ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3528,7 +3528,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
                 ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
                 ->setModuleName('payplug')
                 ->setInputs(array(
                     'pc' => array(
@@ -3563,7 +3563,7 @@ class Payplug extends PaymentModule
         /* inst */
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
             ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
@@ -3703,7 +3703,7 @@ class Payplug extends PaymentModule
         $is_installment = (int)Tools::getValue('inst');
         $externalOption = new PaymentOption();
         $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
             ->setCallToActionText($this->l('Pay with credit card'))
             ->setModuleName('payplug')
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
@@ -3719,7 +3719,7 @@ class Payplug extends PaymentModule
         $paymentOptionBis
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
             ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
             ->setModuleName('payplug')
             ->setInputs(array(
                 'disp' => array(

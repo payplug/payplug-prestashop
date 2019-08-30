@@ -41,8 +41,9 @@ $cookie = $context->cookie;
 
 $result_currency = array();
 $cart = $context->cart;
+$is_deferred = (int)Tools::getValue('def');
 
-$payment_url = $payplug->preparePayment($cart->id, null, false);
+$payment_url = $payplug->preparePayment($cart->id, null, false, $is_deferred);
 if (!is_array($payment_url)) {
     Tools::redirect($payment_url);
 } else {
