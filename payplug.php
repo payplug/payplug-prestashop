@@ -4168,6 +4168,6 @@ class Payplug extends PaymentModule
             return false;
         }
         $parse = explode('-', $language->language_code);
-        return $parse[0];
+        return strtolower($parse[0]);
     }
 }
