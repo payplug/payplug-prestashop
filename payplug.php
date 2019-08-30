@@ -267,6 +267,7 @@ class Payplug extends PaymentModule
         } elseif (!$this->registerHook('paymentReturn') ||
             !$this->registerHook('header') ||
             !$this->registerHook('adminOrder') ||
+            !$this->registerHook('actionOrderStatusUpdate') ||
             !$this->registerHook('customerAccount')
         ) {
             $this->log_install->error('Install failed: classics hooks.');
@@ -1780,6 +1781,7 @@ class Payplug extends PaymentModule
                 'embedded' => $args['embedded'],
                 'one_click' => $args['one_click'],
                 'installment' => $args['installment'],
+                'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
             ));
         }
@@ -4628,12 +4630,14 @@ class Payplug extends PaymentModule
                     $embedded = (int)Tools::getValue('embedded');
                     $one_click = (int)Tools::getValue('one_click');
                     $installment = (int)Tools::getValue('installment');
+                    $deferred = (int)Tools::getValue('deferred');
                     $activate = (int)Tools::getValue('activate');
                     $args = array(
                         'sandbox' => $sandbox,
                         'embedded' => $embedded,
                         'one_click' => $one_click,
                         'installment' => $installment,
+                        'deferred' => $deferred,
                         'activate' => $activate,
                     );
                 }

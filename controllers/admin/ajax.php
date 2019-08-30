@@ -68,12 +68,14 @@ if (Tools::getValue('_ajax') == 1) {
             $embedded = (int)Tools::getValue('embedded');
             $one_click = (int)Tools::getValue('one_click');
             $installment = (int)Tools::getValue('installment');
+            $deferred = (int)Tools::getValue('deferred');
             $activate = (int)Tools::getValue('activate');
             $args = array(
                 'sandbox' => $sandbox,
                 'embedded' => $embedded,
                 'one_click' => $one_click,
                 'installment' => $installment,
+                'deferred' => $deferred,
                 'activate' => $activate,
             );
         }
