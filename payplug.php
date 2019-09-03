@@ -971,7 +971,7 @@ class Payplug extends PaymentModule
     public function patchPayment($api_key, $pay_id, $data)
     {
         $data_string = json_encode($data);
-        $url = $this->api_url . $this->routes['patch'] . $pay_id;
+        $url = $this->api_url . $this->routes['patch'] . '/' . $pay_id;
         $curl_version = curl_version();
         $process = curl_init($url);
         curl_setopt(
