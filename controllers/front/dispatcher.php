@@ -30,7 +30,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
-        $is_deferred = (bool)Tools::getValue('def') === 1;
+        $is_deferred = (bool)Tools::getValue('def') == 1;
         if ((int)Tools::getValue('disp') == 1) {
             if ((int)Tools::getValue('pay') == 1) {
                 if (Tools::getValue('pc') != 'new_card') {
@@ -73,7 +73,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     }
                     Tools::redirect($payment_url);
                 } else {
-                    Tools::redirect($this->context->link->getModuleLink('payplug', 'payment', array(), true));
+                    Tools::redirect($this->context->link->getModuleLink('payplug', 'payment', array('def' => (int)$is_deferred), true));
                 }
             } elseif ((int)Tools::getValue('lightbox') == 1) {
                 if ((int)Tools::getValue('inst') == 1) {

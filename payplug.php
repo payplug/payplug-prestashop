@@ -26,6 +26,7 @@
  */
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+use Symfony\Component\VarDumper\VarDumper;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -2900,7 +2901,7 @@ class Payplug extends PaymentModule
         $lightbox = 0;
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
-            $payment_url = $this->preparePayment((int)$cart_id);
+            $payment_url = $this->preparePayment((int)$cart_id, null, false, $is_deferred);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
@@ -3076,7 +3077,7 @@ class Payplug extends PaymentModule
         $lightbox = 0;
         if ((int)Tools::getValue('lightbox') == 1) {
             $lightbox = 1;
-            $payment_url = $this->preparePayment((int)$cart_id);
+            $payment_url = $this->preparePayment((int)$cart_id, null, false, $is_deferred);
             $this->context->smarty->assign(array(
                 'lightbox' => 1,
                 'payment_url' => $payment_url,
