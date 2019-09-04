@@ -26,10 +26,12 @@ require_once(_PS_MODULE_DIR_ . '../init.php');
 require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
 require_once(_PS_MODULE_DIR_ . '/payplug/lib/init.php');
 
-$valid_key = Payplug::setAPIKey();
-\Payplug\Payplug::setSecretKey($valid_key);
-
 $payplug = Module::getInstanceByName('payplug');
+\Payplug\Payplug::init([
+    'secretKey' => $payplug->current_api_key,
+    'apiVersion' => $payplug->api_version
+]);
+
 \Payplug\Core\HttpClient::addDefaultUserAgentProduct(
     'PayPlug-Prestashop',
     $payplug->version,
@@ -43,7 +45,8 @@ $result_currency = array();
 $cart = $context->cart;
 $is_deferred = (int)Tools::getValue('def');
 
-$payment_url = $payplug->preparePayment($cart->id, null, false, $is_deferred);
+$payment_url = $payplug->preparePayment($cart->id, 'new_card', false, $is_deferred);
+
 if (!is_array($payment_url)) {
     Tools::redirect($payment_url);
 } else {

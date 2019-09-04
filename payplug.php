@@ -53,7 +53,7 @@ class Payplug extends PaymentModule
     private $api_url;
 
     /** @var string */
-    private $current_api_key;
+    public $current_api_key;
 
     /** @var string */
     private $email;
@@ -95,6 +95,8 @@ class Payplug extends PaymentModule
     public $payment_status = array();
 
     public $errors = array();
+
+    public $api_version;
 
     /**
      * Constructor
@@ -145,6 +147,7 @@ class Payplug extends PaymentModule
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
         $this->version = '2.23.0';
+        $this->api_version = '2019-08-06';
     }
 
     /**
@@ -213,11 +216,20 @@ class Payplug extends PaymentModule
      * @return void
      * @throws Exception
      */
-    private function setSecretKey()
+    public function setSecretKey($token = false)
     {
-        if ($this->current_api_key != null) {
-            \Payplug\Payplug::setSecretKey($this->current_api_key);
+        if (!$token && $this->current_api_key != null) {
+            $token = $this->current_api_key;
         }
+
+        if (!$token) {
+            return false;
+        }
+
+        \Payplug\Payplug::init([
+            'secretKey' => $token,
+            'apiVersion' => $this->api_version
+        ]);
     }
 
     /**
@@ -996,7 +1008,7 @@ class Payplug extends PaymentModule
     public function patchPayment($api_key, $pay_id, $data)
     {
         $data_string = json_encode($data);
-        $url = $this->api_url . $this->routes['patch'] . $pay_id;
+        $url = $this->api_url . $this->routes['patch'] . '/' . $pay_id;
         $curl_version = curl_version();
         $process = curl_init($url);
         curl_setopt(
@@ -2169,99 +2181,96 @@ class Payplug extends PaymentModule
     /**
      * prepare payment
      *
-     * @param int $id_cart
+     * @param object $cart
      * @param string $id_card
      * @return mixed
      */
-    public function preparePayment($id_cart, $id_card = null, $isInstallment = false, $is_deferred = false)
+    public function preparePayment($cart, $id_card = 'new_card', $is_installment = false, $is_deferred = false)
     {
-        $cart = new Cart((int)$id_cart);
+        if(!is_object($cart)){
+            $cart = new Cart((int)$cart);
+        }
         if (!Validate::isLoadedObject($cart)) {
-            return false;
-        }
-        $one_click = (int)Configuration::get('PAYPLUG_ONE_CLICK');
-        $installment = (int)Configuration::get('PAYPLUG_INST');
-        $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
-        $deferred = (int)Configuration::get('PAYPLUG_DEFERRED');
-        $current_card = null;
-        if ($id_card != null && $id_card != 'new_card') {
-            $current_card = $this->getCardId(
-                (int)$cart->id_customer,
-                $id_card,
-                (int)Configuration::get('PAYPLUG_COMPANY_ID')
-            );
-        }
-        //currency
-        $result_currency = array();
-        $currency = $cart->id_currency;
-        $result_currency = Currency::getCurrency($currency);
-        $supported_currencies = explode(';', Configuration::get('PAYPLUG_CURRENCIES'));
-
-        if (!in_array($result_currency['iso_code'], $supported_currencies)) {
-            return false;
-        }
-
-        $currency = $result_currency['iso_code'];
-
-        //amount
-        $amount = $cart->getOrderTotal(true, Cart::BOTH);
-        $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
-        $current_amounts = $this->getAmountsByCurrency($currency);
-        $current_min_amount = $current_amounts['min_amount'];
-        $current_max_amount = $current_amounts['max_amount'];
-
-        if ($amount < $current_min_amount || $amount > $current_max_amount) {
-            return false;
+            // todo: add error log
+            return [
+                'result' => false,
+                'response' => __LINE__ . $this->l('The transaction was not completed and your card was not charged.')
+            ];
         }
 
         $customer = new Customer((int)$cart->id_customer);
-        $address_invoice = new Address((int)$cart->id_address_invoice);
-        $address_delivery = new Address((int)$cart->id_address_delivery);
+        if (!Validate::isLoadedObject($customer)) {
+            // todo: add error log
+            return [
+                'result' => false,
+                'response' => __LINE__ . $this->l('The transaction was not completed and your card was not charged.')
+            ];
+        }
 
-        //hosted payment
-        $return_url = $this->context->link->getModuleLink($this->name, 'validation',
-            array('ps' => 1, 'cartid' => (int)$cart->id), true);
-        $cancel_url = $this->context->link->getModuleLink($this->name, 'validation',
-            array('ps' => 2, 'cartid' => (int)$cart->id), true);
+        // get the config
+        $config = [
+            'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK'),
+            'installment' => (int)Configuration::get('PAYPLUG_INST'),
+            'company' => (int)Configuration::get('PAYPLUG_COMPANY_ID'),
+            'inst_mode' => (int)Configuration::get('PAYPLUG_INST_MODE'),
+            'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED')
+        ];
 
-        if ($one_click != 1 || ($one_click == 1 && ($id_card == null || $id_card == 'new_card'))) {
-            $hosted_payment = array(
-                'return_url' => $return_url,
-                'cancel_url' => $cancel_url
+        $is_one_click = $id_card != 'new_card' && $config['one_click'];
+        $is_installment = $is_installment && $config['installment'];
+
+        // Build payment Tab
+
+        // Currency
+        $currency = $cart->id_currency;
+        $result_currency = Currency::getCurrency($currency);
+        $supported_currencies = explode(';', Configuration::get('PAYPLUG_CURRENCIES'));
+        $currency = $result_currency['iso_code'];
+        // if unvalid iso code, return false
+        if (!in_array($currency, $supported_currencies)) {
+            // todo: add error log
+            return [
+                'result' => false,
+                'response' => __LINE__ . $this->l('The transaction was not completed and your card was not charged.')
+            ];
+        }
+
+        // Amount
+        $amount = $cart->getOrderTotal(true, Cart::BOTH);
+        $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
+        $current_amounts = $this->getAmountsByCurrency($currency);
+        if ($amount < $current_amounts['min_amount'] || $amount > $current_amounts['max_amount']) {
+            // todo: add error log
+            return array(
+                'result' => false,
+                'response' => $this->l('The transaction was not completed and your card was not charged.')
             );
         }
-        //notification
-        $notification_url = $this->context->link->getModuleLink($this->name, 'ipn', array(), true);
 
-        //payment method
-        if ($one_click == 1 && $current_card != null && $id_card != 'new_card') {
-            $payment_method = $current_card;
-        }
+        // Hosted url
+        $hosted_url = [
+            'return' => $this->context->link->getModuleLink($this->name, 'validation',
+                ['ps' => 1, 'cartid' => (int)$cart->id], true),
+            'cancel' => $this->context->link->getModuleLink($this->name, 'validation',
+                ['ps' => 2, 'cartid' => (int)$cart->id], true),
+            'notification' => $this->context->link->getModuleLink($this->name, 'ipn', [], true)
+        ];
 
-        //force 3ds
-        $force_3ds = false;
+        // Meta data
+        $metadata = [
+            'ID Client' => (int)$customer->id,
+            'ID Cart' => (int)$cart->id,
+            'Website' => Tools::getShopDomainSsl(true, false),
+        ];
 
-        //save card
-        $allow_save_card = false;
-        if ($one_click == 1 && Cart::isGuestCartByCartId($cart->id) != 1) {
-            $allow_save_card = true;
-        }
+        // Addresses
+        $billing_address = new Address((int)$cart->id_address_invoice);
+        $shipping_address = new Address((int)$cart->id_address_delivery);
 
-        $delivery_type = 'NEW';
-        if ($cart->id_address_delivery == $cart->id_address_invoice) {
-            $delivery_type = 'BILLING';
-        } elseif ($address_delivery->isUsed()) {
-            $delivery_type = 'VERIFIED';
-        }
-
-        // Shipping address fields
-
-        // Get address country iso code
-        $delivery_country_iso = $this->getIsoCodeByCountryId((int)$address_delivery->id_country);
-        $invoice_country_iso = $this->getIsoCodeByCountryId((int)$address_invoice->id_country);
-        $additional_metadatas = array();
-
-        if (!$delivery_country_iso || !$invoice_country_iso) {
+        // ISO
+        $billing_iso = $this->getIsoCodeByCountryId((int)$billing_address->id_country);
+        $shipping_iso = $this->getIsoCodeByCountryId((int)$shipping_address->id_country);
+        if (!$shipping_iso || !$billing_iso) {
             $default_language = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->getIsoCodeList();
             if (in_array(Tools::strtoupper($default_language->iso_code), $iso_code_list)) {
@@ -2269,86 +2278,82 @@ class Payplug extends PaymentModule
             } else {
                 $iso_code = 'FR';
             }
-            if (!$delivery_country_iso) {
-                $delivery_country = new Country($address_delivery->id_country);
-                $additional_metadatas['cms_shipping_country'] = $delivery_country->iso_code;
-                $delivery_country_iso = $iso_code;
+            if (!$shipping_iso) {
+                $shipping_country = new Country($shipping_address->id_country);
+                $metadata['cms_shipping_country'] = $shipping_country->iso_code;
+                $shipping_iso = $iso_code;
             }
-            if (!$invoice_country_iso) {
-                $invoice_country = new Country($address_invoice->id_country);
-                $additional_metadatas['cms_billing_country'] = $invoice_country->iso_code;
-                $invoice_country_iso = $iso_code;
+            if (!$billing_iso) {
+                $billing_country = new Country($billing_address->id_country);
+                $metadata['cms_billing_country'] = $billing_country->iso_code;
+                $billing_iso = $iso_code;
             }
         }
 
-        $shipping = array(
+        // Billing
+        $billing = [
             'title' => null,
-            'first_name' => !empty($address_delivery->firstname) ? $address_delivery->firstname : null,  // required
-            'last_name' => !empty($address_delivery->lastname) ? $address_delivery->lastname : null,  // required
-            'company_name' => !empty($address_delivery->company) ? $address_delivery->company : null,  // optional
-            'email' => $customer->email,  // required
-            'landline_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone,
-                $address_delivery->id_country) : null,  // optional
-            'mobile_phone_number' => !empty($address_delivery->phone) ? $this->formatPhoneNumber($address_delivery->phone_mobile,
-                $address_delivery->id_country) : null,  // optional
-            'address1' => !empty($address_delivery->address1) ? $address_delivery->address1 : null,  // required
-            'address2' => !empty($address_delivery->address2) ? $address_delivery->address2 : null,  // optional
-            'postcode' => !empty($address_delivery->postcode) ? $address_delivery->postcode : null,  // required
-            'city' => !empty($address_delivery->city) ? $address_delivery->city : null,  // required
-            'country' => $delivery_country_iso,  // required
-            'language' => $this->getIsoFromLanguageCode($this->context->language), // optional
-            'delivery_type' => $delivery_type,  // optional
-        );
-
-        // Billing address fields
-        $billing = array(
-            'title' => null,
-            'first_name' => !empty($address_invoice->firstname) ? $address_invoice->firstname : null,
-            // required
-            'last_name' => !empty($address_invoice->lastname) ? $address_invoice->lastname : null,
-            // required
-            'company_name' => !empty($address_delivery->company) ? $address_delivery->company : $address_invoice->firstname . ' ' . $address_invoice->lastname,
-            // optional
+            'first_name' => !empty($billing_address->firstname) ? $billing_address->firstname : null,
+            'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
+            'company_name' => !empty($billing_address->company) ? $billing_address->company : $billing_address->firstname . ' ' . $billing_address->lastname,
             'email' => $customer->email,
-            // required
-            'landline_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone,
-                $address_invoice->id_country) : null,
-            // optional
-            'mobile_phone_number' => !empty($address_invoice->phone) ? $this->formatPhoneNumber($address_invoice->phone_mobile,
-                $address_invoice->id_country) : null,
-            // optional
-            'address1' => !empty($address_invoice->address1) ? $address_invoice->address1 : null,
-            // required
-            'address2' => !empty($address_invoice->address2) ? $address_invoice->address2 : null,
-            // optional
-            'postcode' => !empty($address_invoice->postcode) ? $address_invoice->postcode : null,
-            // required
-            'city' => !empty($address_invoice->city) ? $address_invoice->city : null,
-            // required
-            'country' => $invoice_country_iso,
-            // required
+            'landline_phone_number' => $this->formatPhoneNumber($billing_address->phone, $billing_address->id_country),
+            'mobile_phone_number' => $this->formatPhoneNumber($billing_address->phone_mobile,
+                $billing_address->id_country),
+            'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
+            'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
+            'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
+            'city' => !empty($billing_address->city) ? $billing_address->city : null,
+            'country' => $billing_iso,
             'language' => $this->getIsoFromLanguageCode($this->context->language),
-            // optional
-        );
+        ];
 
-        //payment
+        // Shipping
+        $delivery_type = 'NEW';
+        if ($cart->id_address_delivery == $cart->id_address_invoice) {
+            $delivery_type = 'BILLING';
+        } elseif ($shipping_address->isUsed()) {
+            $delivery_type = 'VERIFIED';
+        }
+        $shipping = [
+            'title' => null,
+            'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
+            'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
+            'company_name' => !empty($shipping_address->company) ? $shipping_address->company : null,
+            'email' => $customer->email,
+            'landline_phone_number' => $this->formatPhoneNumber($shipping_address->phone,
+                $shipping_address->id_country),
+            'mobile_phone_number' => $this->formatPhoneNumber($shipping_address->phone_mobile,
+                $shipping_address->id_country),
+            'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
+            'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
+            'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
+            'city' => !empty($shipping_address->city) ? $shipping_address->city : null,
+            'country' => $shipping_iso,
+            'language' => $this->getIsoFromLanguageCode($this->context->language),
+            'delivery_type' => $delivery_type,
+        ];
 
-        //meta data
-        $baseurl = Tools::getShopDomainSsl(true, false);
-        $metadatas = array(
-            'ID Client' => (int)$customer->id,
-            'ID Cart' => (int)$cart->id,
-            'Website' => $baseurl,
-        );
+        // 3ds
+        $force_3ds = false;
 
-        $payment_tab = array(
+        //save card
+        $allow_save_card = $config['one_click'] && Cart::isGuestCartByCartId($cart->id) != 1;
+
+        //
+        $payment_tab = [
             'currency' => $currency,
             'shipping' => $shipping,
             'billing' => $billing,
-            'notification_url' => $notification_url,
+            'notification_url' => $hosted_url['notification'],
             'force_3ds' => $force_3ds,
-            'metadata' => array_merge($metadatas, $additional_metadatas),
-        );
+            'hosted_payment' => [
+                'return_url' => $hosted_url['return'],
+                'cancel_url' => $hosted_url['cancel'],
+            ],
+            'metadata' => $metadata,
+            'allow_save_card' => $allow_save_card
+        ];
 
         if ($is_deferred) {
             $payment_tab['authorized_amount'] = $amount;
@@ -2356,140 +2361,99 @@ class Payplug extends PaymentModule
             $payment_tab['amount'] = $amount;
         }
 
-        if ($one_click == 1 && $current_card != null && $id_card != 'new_card') {
-            $payment_tab['payment_method'] = $payment_method;
-            $payment_tab['allow_save_card'] = false;
-        } else {
-            $payment_tab['hosted_payment'] = array(
-                'return_url' => $hosted_payment['return_url'],
-                'cancel_url' => $hosted_payment['cancel_url'],
-            );
-            $payment_tab['allow_save_card'] = $allow_save_card;
-        }
+        // check payment tab from current payment method
+        if ($is_installment) {
+            // remove useless field from payment table
+            unset($payment_tab['force_3ds']);
+            unset($payment_tab['allow_save_card']);
+            unset($payment_tab['amount']);
 
-        if ($installment == 1 && $isInstallment) {
-            $installment_mode = (int)Configuration::get('PAYPLUG_INST_MODE');
-            $schedule = array();
-            for ($i = 0; $i < $installment_mode; $i++) {
+            // then add schedule
+            $schedule = [];
+            for ($i = 0; $i < $config['inst_mode']; $i++) {
                 if ($i == 0) {
                     $schedule[$i]['date'] = 'TODAY';
-                    $int_part = (int)($amount / $installment_mode);
+                    $int_part = (int)($amount / $config['inst_mode']);
                     if ($is_deferred) {
-                        $schedule[$i]['authorized_amount'] =(int)($int_part + ($amount - ($int_part * $installment_mode)));
+                        $schedule[$i]['authorized_amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
                     } else {
-                        $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $installment_mode)));
+                        $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
                     }
                 } else {
                     $delay = $i * 30;
                     $schedule[$i]['date'] = date('Y-m-d', strtotime("+ $delay days"));
-                    $schedule[$i]['amount'] = (int)($amount / $installment_mode);
+                    $schedule[$i]['amount'] = (int)($amount / $config['inst_mode']);
                 }
             }
-
-            $installment_options = array(
-                'currency' => $currency,
-                'schedule' => $schedule,
-                'shipping' => $payment_tab['shipping'],
-                'billing' => $payment_tab['billing'],
-                'hosted_payment' => $hosted_payment,
-                'notification_url' => $notification_url,
-                'metadata' => $payment_tab['metadata'],
-            );
-
-            try {
-                $this->storeInstallment('pending', (int)$cart->id);
-                if (Configuration::get('PAYPLUG_DEBUG_MODE')) {
-                    $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/prepare_payment.csv');
-                    $log->info('Starting installment.');
-                }
-
-                $inst = \Payplug\InstallmentPlan::create($installment_options);
-                if ($inst->failure != null && !empty($inst->failure['message'])) {
-                    $data = array(
-                        'result' => false,
-                        'response' => $inst->failure['message'],
-                    );
-                    if (version_compare(_PS_VERSION_, '1.7', '<')) {
-                        die(json_encode($data));
-                    } else {
-                        return ($data);
-                    }
-                }
-            } catch (Exception $e) {
-                $messages = $this->catchErrorsFromApi($e->__toString());
-                $data = array(
-                    'result' => false,
-                    'response' => count($messages) > 1 ? $messages : reset($messages),
-                );
-                if (version_compare(_PS_VERSION_, '1.7', '<')) {
-                    die(json_encode($data));
-                } else {
-                    return ($data);
-                }
-            }
-            $this->storeInstallment($inst->id, (int)$cart->id);
-            if ($one_click == 1 || (int)$embedded_mode == 1) {
-                $data = array(
-                    'result' => 'new_card',
-                    'embedded_mode' => (int)$embedded_mode,
-                    'payment_url' => $inst->hosted_payment->payment_url,
-                );
-                $data = json_encode($data);
-            } else {
-                $data = $inst->hosted_payment->payment_url;
-            }
-            return $data;
+            $payment_tab['schedule'] = $schedule;
+        } elseif ($is_one_click) {
+            $payment_tab['initiator'] = 'PAYER';
+            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
         }
-        try {
-            if (Configuration::get('PAYPLUG_DEBUG_MODE')) {
-                $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/prepare_payment.csv');
-                $log->info('Starting payment.');
-                foreach ($payment_tab as $key => $value) {
-                    if (is_array($value)) {
-                        foreach ($value as $n_key => $n_value) {
-                            $log->info($n_key . ' : ' . $n_value);
+
+        // log Payment tab
+        if (Configuration::get('PAYPLUG_DEBUG_MODE')) {
+            $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/prepare_payment.csv');
+            $log->info('Starting ' . ($is_installment ? 'installment.' : 'payment.'));
+            foreach ($payment_tab as $key => $value) {
+                if (is_array($value)) {
+                    foreach ($value as $n_key => $n_value) {
+                        $log->info($n_key . ' : ' . (is_array($n_value) ? '' : $n_value));
+                        if(is_array($n_value)) {
+                            foreach ($n_value as $k => $v) {
+                                $log->info($k . ' : ' . json_encode($v) );
+                            }
                         }
-                    } else {
-                        $log->info($key . ' : ' . $value);
                     }
+                } else {
+                    $log->info($key . ' : ' . $value);
                 }
             }
-            $payment = \Payplug\Payment::create($payment_tab);
-            if (($payment->is_paid == false && $one_click == 1 && $current_card != null && $id_card != 'new_card')
-                || ($payment->failure == true && !empty($payment->failure['message']))
-            ) {
-                $data = array(
-                    'result' => false,
-                    'response' => $payment->failure['message'],
-                );
-                return ($data);
+        }
+
+        // Create payment
+        try {
+            if ($is_installment) {
+                $payment = \Payplug\InstallmentPlan::create($payment_tab);
+                if ($payment->failure != null && !empty($payment->failure['message'])) {
+                    return [
+                        'result' => false,
+                        'response' => __LINE__ . $payment->failure['message'],
+                    ];
+                }
+                $this->storeInstallment($payment->id, (int)$cart->id);
+            } else {
+                $payment = \Payplug\Payment::create($payment_tab);
+                if ($payment->failure == true && !empty($payment->failure['message'])) {
+                    return [
+                        'result' => false,
+                        'response' => __LINE__ . $payment->failure['message'],
+                    ];
+                }
+                $this->storePayment($payment->id, (int)$cart->id);
             }
         } catch (Exception $e) {
             $messages = $this->catchErrorsFromApi($e->__toString());
-            $data = array(
+            return [
                 'result' => false,
+                'payment_tab' => $payment_tab,
                 'response' => count($messages) > 1 ? $messages : reset($messages),
-            );
-            return ($data);
+            ];
         }
-        $this->storePayment($payment->id, (int)$cart->id);
-        if ($one_click == 1 && $current_card != null && $id_card != 'new_card') {
-            $data = array(
+
+        if($is_one_click) {
+            return [
                 'result' => true,
-                'validation_url' => $return_url
-            );
-            return ($data);
-        } elseif (($one_click == 1 && $id_card == 'new_card') || ($one_click != 1 && $id_card == 'new_card')) {
-            $data = array(
-                'result' => 'new_card',
-                'embedded_mode' => (int)$embedded_mode,
-                'payment_url' => $payment->hosted_payment->payment_url,
-            );
-            die(json_encode($data));
-        } else {
-            $payment_url = $payment->hosted_payment->payment_url;
-            return $payment_url;
+                'is_valid' => $payment->is_paid,
+                'return_url' => $payment->is_paid ? $payment_tab['hosted_payment']['return_url'] : $payment->hosted_payment->payment_url
+            ];
         }
+
+        return [
+            'result' => true,
+            'is_valid' => false,
+            'return_url' => $payment->hosted_payment->payment_url
+        ];
     }
 
     /**
@@ -2537,53 +2501,46 @@ class Payplug extends PaymentModule
         $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
         $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
-        $req_last_id_payplug_card = new DbQuery();
-        $req_last_id_payplug_card->select('MAX(pc.id_payplug_card)');
-        $req_last_id_payplug_card->from('payplug_card', 'pc');
-        $req_last_id_payplug_card->where('pc.id_customer = ' . (int)$customer_id);
-        $req_last_id_payplug_card->where('pc.id_company = ' . (int)$company_id);
-        $req_last_id_payplug_card->where('pc.is_sandbox = ' . (int)$is_sandbox);
-        $res_last_id_payplug_card = Db::getInstance()->getValue($req_last_id_payplug_card);
-
-        if (!$res_last_id_payplug_card) {
-            $new_id_payplug_card = 1;
-        } else {
-            $new_id_payplug_card = (int)$res_last_id_payplug_card + 1;
-        }
-
-        $req_payplug_card = '
-            INSERT INTO ' . _DB_PREFIX_ . 'payplug_card (
-                id_customer, 
-                id_payplug_card, 
-                id_company, 
-                is_sandbox, 
-                id_card, 
-                last4, 
-                exp_month, 
-                exp_year, 
-                brand, 
-                country, 
-                metadata
-            ) 
-            VALUE(
-                ' . (int)$customer_id . ', 
-                ' . (int)$new_id_payplug_card . ', 
-                ' . (int)$company_id . ', 
-                ' . (int)$is_sandbox . ', 
-                \'' . pSQL($payment->card->id) . '\', 
-                \'' . pSQL($payment->card->last4) . '\', 
-                \'' . pSQL($payment->card->exp_month) . '\', 
-                \'' . pSQL($payment->card->exp_year) . '\', 
-                \'' . pSQL($brand) . '\', 
-                \'' . pSQL($payment->card->country) . '\', 
-                \'' . serialize($payment->card->metadata) . '\'
-            )';
-        $res_payplug_card = Db::getInstance()->Execute($req_payplug_card);
-        if (!$res_payplug_card) {
+        // if card exists then return false
+        $db = new DbQuery();
+        $db->select('id_card');
+        $db->from('payplug_card');
+        $db->where('id_card = "' . $payment->card->id .'"');
+        $db->where('id_company = ' . (int)$company_id);
+        $db->where('is_sandbox = ' . (int)$is_sandbox);
+        if (Db::getInstance()->getValue($db)) {
             return false;
         }
 
-        return true;
+        // else get next card position
+        $db = new DbQuery();
+        $db->select('COUNT(pc.id_payplug_card)');
+        $db->from('payplug_card', 'pc');
+        $db->where('pc.id_customer = ' . (int)$customer_id);
+        $db->where('pc.id_company = ' . (int)$company_id);
+        $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
+        $card_index = Db::getInstance()->getValue($db);
+
+        $card_index = (int)$card_index + 1;
+
+        // insert the new card in database
+        $card = [
+            'id_customer' => (int)$customer_id,
+            'id_payplug_card' => (int)$card_index + 1,
+            'id_company' => (int)$company_id,
+            'is_sandbox' => (int)$is_sandbox,
+            'id_card' => pSQL($payment->card->id),
+            'last4' => pSQL($payment->card->last4),
+            'exp_month' => pSQL($payment->card->exp_month),
+            'exp_year' => pSQL($payment->card->exp_year),
+            'brand' => pSQL($brand),
+            'country' => pSQL($payment->card->country),
+            'metadata' => serialize($payment->card->metadata),
+        ];
+
+        $return = Db::getInstance()->insert('payplug_card', $card);
+
+        return (bool)$return;
     }
 
     /**
@@ -2709,53 +2666,22 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        $available_options = $this->getAvailableOptions($params['cart']);
-        $payplug_cards = array();
-        if ($available_options['one_click']) {
-            $payplug_cards = $this->getCardsByCustomer((int)$params['cart']->id_customer, true);
+        $cart = $params['cart'];
+        if (!Validate::isLoadedObject($cart)) {
+            return false;
         }
 
-        if ($available_options['one_click'] && !empty($payplug_cards)) {
-            if ($available_options['embedded']) {
-                if ($available_options['installment']) {
-                    $payment_options = $this->getEmbeddedOneClickInstPaymentOption(
-                        $payplug_cards,
-                        (int)$params['cart']->id,
-                        $available_options['deferred']
-                    );
-                } else {
-                    $payment_options = $this->getEmbeddedOneClickPaymentOption(
-                        $payplug_cards,
-                        (int)$params['cart']->id,
-                        $available_options['deferred']
-                    );
-                }
-            } else {
-                if ($available_options['installment']) {
-                    $payment_options = $this->getRedirectOneClickInstPaymentOption($payplug_cards, $available_options['deferred']);
-                } else {
-                    $payment_options = $this->getRedirectOneClickPaymentOption($payplug_cards, $available_options['deferred']);
-                }
-            }
-        } else {
-            if ($available_options['embedded']) {
-                if ($available_options['installment']) {
-                    $payment_options = $this->getEmbeddedInstPaymentOption((int)$params['cart']->id, $available_options['deferred']);
-                } else {
-                    $payment_options = array($this->getEmbeddedPaymentOption((int)$params['cart']->id, $available_options['deferred']));
-                }
-            } else {
-                if ($available_options['installment']) {
-                    $payment_options = $this->getRedirectInstPaymentOption($available_options['deferred']);
-                } else {
-                    $payment_options = array($this->getRedirectPaymentOption($available_options['deferred']));
-                }
-            }
-        }
+        $this->context->smarty->assign(array(
+            'api_url' => $this->api_url,
+        ));
+
+        $payment_options = $this->getPaymentOptions($cart);
+
         return $payment_options;
     }
 
-    private function getAvailableOptions($cart)
+
+    public function getAvailableOptions($cart)
     {
         $permissions = $this->getAccountPermissions();
         $inst_min_amount = (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'));
@@ -2799,964 +2725,144 @@ class Payplug extends PaymentModule
                 $available_options['deferred'] = false;
             }
         }
+
         return $available_options;
     }
 
     /**
-     * get redirect payment option
+     * Get the valid payment options from payplug configuration
      *
+     * @param $cart
      * @return array
      */
-    private function StandardPaymentOption($is_live = false, $is_embedded = false, $is_deferred = false)
+    private function getPaymentOptions($cart)
     {
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
-        if (Tools::getValue('error')) {
-            $externalOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
+        $options = $this->getAvailableOptions($cart);
+
+        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
+
+        $payment_list = [];
+
+        // OneClick Payment
+        if ($options['one_click'] && !empty($payplug_cards)) {
+            foreach ($payplug_cards as $card) {
+                $paymentOption = new PaymentOption();
+                $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                $input_options = array(
+                    'pc' => array(
+                        'name' => 'pc',
+                        'type' => 'hidden',
+                        'value' => (int)$card['id_payplug_card'],
+                    ),
+                    'pay' => array(
+                        'name' => 'pay',
+                        'type' => 'hidden',
+                        'value' => '1',
+                    ),
+                    'id_cart' => array(
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ),
+                    'method' => array(
+                        'name' => 'method',
+                        'type' => 'hidden',
+                        'value' => 'one_click',
+                    ),
+                );
+                $paymentOption
+                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
+                    ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
+                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
+                    ->setModuleName('payplug')
+                    ->setInputs($input_options);
+                $payment_list[] = $paymentOption;
+            }
         }
 
-        return $externalOption;
-    }
+        $is_error = Tools::getValue('error');
+        $is_inst = Tools::getValue('inst');
 
-    /**
-     * get redirect payment option
-     *
-     * @return array
-     */
-    private function OneClickPaymentOption($card, $is_live = false, $is_embedded = false, $is_deferred = false)
-    {
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
-        if (Tools::getValue('error')) {
-            $externalOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-
-        return $externalOption;
-    }
-
-    /**
-     * get redirect payment option
-     *
-     * @return array
-     */
-    private function InstallmentPaymentOption($is_live = false, $is_embedded = false, $is_deferred = false)
-    {
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
-        if (Tools::getValue('error')) {
-            $externalOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-
-        return $externalOption;
-    }
-
-    /**
-     * get redirect payment option
-     *
-     * @return array
-     */
-    private function getRedirectPaymentOption($is_deferred = false)
-    {
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
-        if (Tools::getValue('error')) {
-            $externalOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-
-        return $externalOption;
-    }
-
-    /**
-     * get embedded payment option
-     *
-     * @param int $cart_id
-     * @return array
-     */
-    private function getEmbeddedPaymentOption($cart_id, $is_deferred = false)
-    {
-        $lightbox = 0;
-        if ((int)Tools::getValue('lightbox') == 1) {
-            $lightbox = 1;
-            $payment_url = $this->preparePayment((int)$cart_id, null, false, $is_deferred);
-            $this->context->smarty->assign(array(
-                'lightbox' => 1,
-                'payment_url' => $payment_url,
-                'api_url' => $this->api_url,
-            ));
-        }
-
+        // Standart Payment
         $paymentOption = new PaymentOption();
+        $input_options = array(
+            'pc' => array(
+                'name' => 'pc',
+                'type' => 'hidden',
+                'value' => 'new_card',
+            ),
+            'pay' => array(
+                'name' => 'pay',
+                'type' => 'hidden',
+                'value' => '1',
+            ),
+            'id_cart' => array(
+                'name' => 'id_cart',
+                'type' => 'hidden',
+                'value' => (int)$this->context->cart->id,
+            ),
+            'method' => array(
+                'name' => 'method',
+                'type' => 'hidden',
+                'value' => 'standard',
+            ),
+        );
         $paymentOption
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
+            ->setCallToActionText($this->l('Pay with a credit card'))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
             ->setModuleName('payplug')
-            ->setInputs(array(
-                'lightbox' => array(
-                    'name' => 'lightbox',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'disp' => array(
-                    'name' => 'disp',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'id_cart' => array(
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ),
-            ));
-        if ($lightbox == 1) {
+            ->setInputs($input_options);
+
+        if ($is_error && !$is_inst) {
             $paymentOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-            );
-        }
-        return $paymentOption;
-    }
-
-    /**
-     * get Redirect OneClick Payment Option
-     *
-     * @param array $payplug_cards
-     * @return array
-     */
-    private function getRedirectOneClickPaymentOption($payplug_cards, $is_deferred = false)
-    {
-        $pc = 0;
-        $error = 0;
-        if ((int)Tools::getValue('error') == 1) {
-            $pc = (int)Tools::getValue('pc');
-            $error = 1;
-        }
-
-        $spinner_url = Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif';
-        $this->context->smarty->assign(array(
-            'spinner_url' => $spinner_url,
-            'error' => $error,
-        ));
-
-        $options = array();
-        if (is_array($payplug_cards)) {
-            foreach ($payplug_cards as $card) {
-                if (!$card['expired']) {
-                    $paymentOption = new PaymentOption();
-                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                    $paymentOption
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
-                        ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                        ->setModuleName('payplug')
-                        ->setInputs(array(
-                            'pc' => array(
-                                'name' => 'pc',
-                                'type' => 'hidden',
-                                'value' => (int)$card['id_payplug_card'],
-                            ),
-                            'disp' => array(
-                                'name' => 'disp',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'pay' => array(
-                                'name' => 'pay',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'id_cart' => array(
-                                'name' => 'id_cart',
-                                'type' => 'hidden',
-                                'value' => (int)$this->context->cart->id,
-                            ),
-                        ));
-                    if ($pc == (int)$card['id_payplug_card']) {
-                        $paymentOption->setAdditionalInformation(
-                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
-                        );
-                    }
-                    $options[] = $paymentOption;
-                }
-            }
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
-                ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                ));
-            $options[] = $paymentOption;
-        } else {
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
-                ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                ));
-            $options[] = $paymentOption;
-        }
-        return $options;
-    }
-
-    /**
-     * get Embedded OneClick Payment Option
-     *
-     * @param array $payplug_cards
-     * @param int $cart_id
-     * @return array
-     */
-    private function getEmbeddedOneClickPaymentOption($payplug_cards, $cart_id, $is_deferred = false)
-    {
-        $lightbox = 0;
-        if ((int)Tools::getValue('lightbox') == 1) {
-            $lightbox = 1;
-            $payment_url = $this->preparePayment((int)$cart_id, null, false, $is_deferred);
-            $this->context->smarty->assign(array(
-                'lightbox' => 1,
-                'payment_url' => $payment_url,
-                'api_url' => $this->api_url,
-            ));
-        }
-
-        $pc = 0;
-        $error = 0;
-        if ((int)Tools::getValue('error') == 1) {
-            $pc = (int)Tools::getValue('pc');
-            $error = 1;
-        }
-
-        $spinner_url = Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif';
-        $this->context->smarty->assign(array(
-            'spinner_url' => $spinner_url,
-            'error' => $error,
-        ));
-
-        $options = array();
-        if (is_array($payplug_cards)) {
-            foreach ($payplug_cards as $card) {
-                if (!$card['expired']) {
-                    $paymentOption = new PaymentOption();
-                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                    $paymentOption
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
-                        ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                        ->setModuleName('payplug')
-                        ->setInputs(array(
-                            'pc' => array(
-                                'name' => 'pc',
-                                'type' => 'hidden',
-                                'value' => (int)$card['id_payplug_card'],
-                            ),
-                            'disp' => array(
-                                'name' => 'disp',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'pay' => array(
-                                'name' => 'pay',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'id_cart' => array(
-                                'name' => 'id_cart',
-                                'type' => 'hidden',
-                                'value' => (int)$this->context->cart->id,
-                            ),
-                        ));
-                    if ($pc == (int)$card['id_payplug_card']) {
-                        $paymentOption->setAdditionalInformation(
-                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
-                        );
-                    }
-                    $options[] = $paymentOption;
-                }
-            }
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
-                ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                    'lightbox' => array(
-                        'name' => 'lightbox',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                ));
-            if ($lightbox == 1) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-                );
-            }
-            $options[] = $paymentOption;
-        } else {
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
-                ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                    'lightbox' => array(
-                        'name' => 'lightbox',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                ));
-            $options[] = $paymentOption;
-            if ($lightbox == 1) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-                );
-            }
-        }
-        return $options;
-    }
-
-    public function getEmbeddedOneClickInstPaymentOption($payplug_cards, $cart_id, $is_deferred = false)
-    {
-        $lightbox = 0;
-        $error = 0;
-        $is_installment = (int)Tools::getValue('inst');
-        if ((int)Tools::getValue('lightbox') == 1) {
-            $lightbox = 1;
-            $payment_options = $this->getInstPaymentOptions($cart_id, $is_deferred);
-            $this->context->smarty->assign($payment_options);
-            if ($payment_options['payplug_errors']) {
-                $error = 1;
-            }
-        }
-
-        $pc = 0;
-        if ((int)Tools::getValue('error') == 1) {
-            $pc = (int)Tools::getValue('pc');
-            $error = 1;
-        }
-
-        $spinner_url = Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif';
-        $this->context->smarty->assign(array(
-            'spinner_url' => $spinner_url,
-            'error' => $error,
-        ));
-
-        $options = array();
-        if (is_array($payplug_cards)) {
-            $is_one_click_payment = false;
-            foreach ($payplug_cards as $card) {
-                if (!$card['expired']) {
-                    $paymentOption = new PaymentOption();
-                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                    $paymentOption
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
-                        ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                        ->setModuleName('payplug')
-                        ->setInputs(array(
-                            'pc' => array(
-                                'name' => 'pc',
-                                'type' => 'hidden',
-                                'value' => (int)$card['id_payplug_card'],
-                            ),
-                            'disp' => array(
-                                'name' => 'disp',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'pay' => array(
-                                'name' => 'pay',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'id_cart' => array(
-                                'name' => 'id_cart',
-                                'type' => 'hidden',
-                                'value' => (int)$this->context->cart->id,
-                            ),
-                        ));
-                    if ($pc == (int)$card['id_payplug_card']) {
-                        $paymentOption->setAdditionalInformation(
-                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
-                        );
-                        if ($error == 1) {
-                            $is_one_click_payment = true;
-                            $paymentOption->setAdditionalInformation(
-                                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                            );
-                        }
-                    }
-                    $options[] = $paymentOption;
-                }
-            }
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
-                ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                    'lightbox' => array(
-                        'name' => 'lightbox',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                ));
-            if ($lightbox == 1) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-                );
-            }
-            if ($error == 1 && !$is_installment && !$is_one_click_payment) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                );
-            }
-            $options[] = $paymentOption;
-        } else {
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
-                ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                    'lightbox' => array(
-                        'name' => 'lightbox',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                ));
-            $options[] = $paymentOption;
-            if ($lightbox == 1) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-                );
-            }
-            if ($error == 1 && !$is_installment) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                );
-            }
-        }
-
-        /* inst */
-        $paymentOptionBis = new PaymentOption();
-        $paymentOptionBis
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
-            ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-            ->setModuleName('payplug')
-            ->setInputs(array(
-                'disp' => array(
-                    'name' => 'disp',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'inst' => array(
-                    'name' => 'inst',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'lightbox' => array(
-                    'name' => 'lightbox',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'id_cart' => array(
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ),
-            ));
-        $options[] = $paymentOptionBis;
-        if ($lightbox == 1) {
-            $paymentOptionBis->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-            );
-        }
-        if ($error == 1 && $is_installment) {
-            $paymentOptionBis->setAdditionalInformation(
                 $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
             );
         }
 
-        return $options;
-    }
+        $payment_list[] = $paymentOption;
 
-    public function getRedirectOneClickInstPaymentOption($payplug_cards, $is_deferred = false)
-    {
-        $pc = 0;
-        $error = 0;
-        $is_installment = (int)Tools::getValue('inst');
-        if ((int)Tools::getValue('error') == 1) {
-            $pc = (int)Tools::getValue('pc');
-            $error = 1;
-        }
-
-        $spinner_url = Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif';
-        $this->context->smarty->assign(array(
-            'spinner_url' => $spinner_url,
-            'error' => $error,
-        ));
-
-        $options = array();
-        if (is_array($payplug_cards)) {
-            $is_one_click_payment = false;
-            foreach ($payplug_cards as $card) {
-                if (!$card['expired']) {
-                    $paymentOption = new PaymentOption();
-                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                    $paymentOption
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
-                        ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                        ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                        ->setModuleName('payplug')
-                        ->setInputs(array(
-                            'pc' => array(
-                                'name' => 'pc',
-                                'type' => 'hidden',
-                                'value' => (int)$card['id_payplug_card'],
-                            ),
-                            'disp' => array(
-                                'name' => 'disp',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'pay' => array(
-                                'name' => 'pay',
-                                'type' => 'hidden',
-                                'value' => '1',
-                            ),
-                            'id_cart' => array(
-                                'name' => 'id_cart',
-                                'type' => 'hidden',
-                                'value' => (int)$this->context->cart->id,
-                            ),
-                        ));
-                    if ($pc == (int)$card['id_payplug_card']) {
-                        $paymentOption->setAdditionalInformation(
-                            $this->context->smarty->fetch('module:payplug/views/templates/front/one_click_status.tpl')
-                        );
-                        $is_one_click_payment = true;
-                    }
-                    $options[] = $paymentOption;
-                }
-            }
+        // Installment Payment
+        if ($options['installment']) {
             $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/none.png'))
-                ->setCallToActionText($this->l('Pay with a different card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                ));
-            if ($error == 1 && !$is_one_click_payment && !$is_installment) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                );
-            }
-            $options[] = $paymentOption;
-        } else {
-            $paymentOption = new PaymentOption();
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
-                ->setCallToActionText($this->l('Pay with a credit card'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-                ->setModuleName('payplug')
-                ->setInputs(array(
-                    'pc' => array(
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ),
-                    'disp' => array(
-                        'name' => 'disp',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'pay' => array(
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ),
-                    'id_cart' => array(
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ),
-                ));
-            if ($error == 1 && !$is_installment) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                );
-            }
-            $options[] = $paymentOption;
-        }
-
-        /* inst */
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-            ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-            ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
-            ->setInputs(array(
-                'disp' => array(
-                    'name' => 'disp',
+            $input_options = array(
+                'pc' => array(
+                    'name' => 'pc',
                     'type' => 'hidden',
-                    'value' => '1',
+                    'value' => 'new_card',
                 ),
                 'pay' => array(
                     'name' => 'pay',
                     'type' => 'hidden',
                     'value' => '1',
                 ),
-                'pc' => array(
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ),
-                'inst' => array(
-                    'name' => 'inst',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
                 'id_cart' => array(
                     'name' => 'id_cart',
                     'type' => 'hidden',
                     'value' => (int)$this->context->cart->id,
                 ),
-            ));
-        if ($error == 1 && $is_installment && !Tools::getValue('pc')) {
-            $externalOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+                'method' => array(
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'installment',
+                ),
             );
-        }
-        $options[] = $externalOption;
+            $paymentOption
+                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
+                ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
+                ->setModuleName('payplug')
+                ->setInputs($input_options);
 
-        return $options;
-    }
-
-    public function getEmbeddedInstPaymentOption($cart_id, $is_deferred = false)
-    {
-        $lightbox = 0;
-        $error = 0;
-        $is_installment = (int)Tools::getValue('inst');
-        if ((int)Tools::getValue('lightbox') == 1) {
-            $lightbox = 1;
-            $payment_options = $this->getInstPaymentOptions($cart_id, $is_deferred);
-            $this->context->smarty->assign($payment_options);
-            if ($payment_options['payplug_errors']) {
-                $error = 1;
+            if ($is_error && $is_inst) {
+                $paymentOption->setAdditionalInformation(
+                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
+                );
             }
+            $payment_list[] = $paymentOption;
         }
 
-        $options = array();
-        $paymentOption = new PaymentOption();
-        $paymentOption
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
-            ->setModuleName('payplug')
-            ->setInputs(array(
-                'lightbox' => array(
-                    'name' => 'lightbox',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'disp' => array(
-                    'name' => 'disp',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'id_cart' => array(
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ),
-            ));
-        if ($lightbox == 1) {
-            $paymentOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-            );
-        }
-        if ($error == 1 && !$is_installment) {
-            $paymentOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-        $options[] = $paymentOption;
-        /* inst */
-        $paymentOptionBis = new PaymentOption();
-        $paymentOptionBis
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
-            ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-            ->setModuleName('payplug')
-            ->setInputs(array(
-                'disp' => array(
-                    'name' => 'disp',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'inst' => array(
-                    'name' => 'inst',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'lightbox' => array(
-                    'name' => 'lightbox',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'id_cart' => array(
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ),
-            ));
-        if ($lightbox == 1) {
-            $paymentOptionBis->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/embedded.tpl')
-            );
-        }
-        if ($error == 1 && $is_installment) {
-            $paymentOptionBis->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-        $options[] = $paymentOptionBis;
-
-        return $options;
-    }
-
-    public function getRedirectInstPaymentOption($is_deferred = false)
-    {
-        $error = (int)Tools::getValue('error');
-        $is_installment = (int)Tools::getValue('inst');
-        $externalOption = new PaymentOption();
-        $externalOption
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('def' => (int)$is_deferred), true))
-            ->setCallToActionText($this->l('Pay with credit card'))
-            ->setModuleName('payplug')
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'));
-        if ($error == 1 && !$is_installment) {
-            $externalOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-        $options[] = $externalOption;
-
-        /* inst */
-        $paymentOptionBis = new PaymentOption();
-        $paymentOptionBis
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
-            ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$is_deferred), true))
-            ->setModuleName('payplug')
-            ->setInputs(array(
-                'disp' => array(
-                    'name' => 'disp',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'pay' => array(
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'pc' => array(
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ),
-                'inst' => array(
-                    'name' => 'inst',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'id_cart' => array(
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ),
-            ));
-        if ($error == 1 && $is_installment) {
-            $paymentOptionBis->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
-        $options[] = $paymentOptionBis;
-
-        return $options;
+        return $payment_list;
     }
 
     /**
@@ -3825,7 +2931,34 @@ class Payplug extends PaymentModule
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
 
         if ((int)Tools::getValue('lightbox') == 1) {
+            $cart = $params['cart'];
+            if (!Validate::isLoadedObject($cart)) {
+                return;
+            }
+
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+
+            $id_card = Tools::getValue('pc','new_card');
+            $is_installment = Tools::getValue('inst',null);
+            $payment = $this->preparePayment($cart, $id_card, $is_installment);
+
+            if($payment['result']){
+                // If payment is paid then redirect
+                if($payment['is_valid']) {
+                    Tools::redirect($payment['return_url']);
+                }
+                // else show the popin
+                else {
+                    $this->context->smarty->assign(array(
+                        'payment_url' => $payment['return_url'],
+                        'api_url' => $this->api_url,
+                    ));
+                    return $this->display(__FILE__, 'embedded.tpl');
+                }
+            } else {
+                $error_url = 'index.php?controller=order&step=3&error=1' . ($is_installment ? '&inst=1' : '');
+                Tools::redirect($error_url);
+            }
         }
     }
 
@@ -3841,9 +2974,9 @@ class Payplug extends PaymentModule
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
         if ($pay_mode == 'TEST') {
-            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+            $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
         } else {
-            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+            $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
         }
         if ($pay_id == null) {
             if ($inst_id != null) {
@@ -3994,22 +3127,6 @@ class Payplug extends PaymentModule
      * @param string $api_key
      * @return bool
      */
-    // todo: renommer la fonction en getAccountPermissions() partout ou elle est appelée
-    public function checkPremium($api_key = null)
-    {
-        if ($api_key == null) {
-            $api_key = self::setAPIKey();
-        }
-        $permissions = $this->getAccount($api_key);
-        return $permissions;
-    }
-
-    /**
-     * Check if account is premium
-     *
-     * @param string $api_key
-     * @return bool
-     */
     public function getAccountPermissions($api_key = null)
     {
         if ($api_key == null) {
@@ -4088,15 +3205,15 @@ class Payplug extends PaymentModule
             $payment_list = array();
             if (!$inst_id || empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
                 if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
                 }
@@ -4194,15 +3311,15 @@ class Payplug extends PaymentModule
 
             if (!$pay_id || empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
                 if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                    \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
                 }
@@ -4664,13 +3781,13 @@ class Payplug extends PaymentModule
                     $abort = \Payplug\InstallmentPlan::abort($inst_id);
                 } catch (Exception $e) {
                     if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         $abort = \Payplug\InstallmentPlan::abort($inst_id);
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         $abort = \Payplug\InstallmentPlan::abort($inst_id);
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     }
                 }
 
@@ -4713,7 +3830,7 @@ class Payplug extends PaymentModule
             }
             if ((int)Tools::getValue('checkPremium') == 1) {
                 $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-                die(json_encode($this->checkPremium($api_key)));
+                die(json_encode($this->getAccountPermissions($api_key)));
             }
             if ((int)Tools::getValue('refund') == 1) {
                 if (!$this->checkAmountToRefund(Tools::getValue('amount'))) {
@@ -5262,6 +4379,9 @@ class Payplug extends PaymentModule
      */
     public function formatPhoneNumber($phone_number, $country)
     {
+        if (empty($phone_number)) {
+            return null;
+        }
         if (!is_object($country)) {
             $country = new Country($country);
         }
@@ -5305,6 +4425,7 @@ class Payplug extends PaymentModule
         }
 
         $errors = array();
+        $errors[] = $str;
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
@@ -5387,7 +4508,7 @@ class Payplug extends PaymentModule
             return false;
         }
         $parse = explode('-', $language->language_code);
-        return $parse[0];
+        return strtolower($parse[0]);
     }
 
     private function getOrderStates($id_lang = null) {

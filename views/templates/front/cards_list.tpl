@@ -61,8 +61,7 @@
                     {*<td class="brand bold">{if $card.brand != 'none'}{$card.brand|escape:'htmlall':'UTF-8'}{else}{l s='card' d='Modules.Payplug.Shop'}{/if}</td>*}
                     <td class="last4 bold">**** **** **** {$card.last4|escape:'htmlall':'UTF-8'}</td>
                     <td class="expiry_date bold">{$card.expiry_date|escape:'htmlall':'UTF-8'}</td>
-                    <td class="delete bold"><a class="ppdeletecard" href="{$payplug_delete_card_url|escape:'htmlall':'UTF-8'}" title="{l s='Delete' mod='payplug'}">{l s='Delete' mod='payplug'}</a></td>
-                    {*<td class="delete bold"><a class="ppdeletecard" href="{$payplug_delete_card_url|escape:'htmlall':'UTF-8'}" title="{l s='Delete' d='Modules.Payplug.Shop'}">{l s='Delete' d='Modules.Payplug.Shop'}</a></td>*}
+                    <td class="delete bold"><a class="ppdeletecard" data-id_card="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" href="{$payplug_delete_card_url|escape:'htmlall':'UTF-8'}" title="{l s='Delete' mod='payplug'}">{l s='Delete' mod='payplug'}</a></td>
                 </tr>
             {/foreach}
             </tbody>
