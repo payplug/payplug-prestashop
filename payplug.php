@@ -2338,7 +2338,7 @@ class Payplug extends PaymentModule
         $force_3ds = false;
 
         //save card
-        $allow_save_card = $config['one_click'] && Cart::isGuestCartByCartId($cart->id) != 1;
+        $allow_save_card = $config['one_click'] && Cart::isGuestCartByCartId($cart->id) != 1 && $id_card == 'new_card';
 
         //
         $payment_tab = [
@@ -2355,9 +2355,7 @@ class Payplug extends PaymentModule
             'allow_save_card' => $allow_save_card
         ];
 
-        if ($is_deferred) {
-            $payment_tab['authorized_amount'] = $amount;
-        } else {
+        if (!$is_deferred) {
             $payment_tab['amount'] = $amount;
         }
 
@@ -2636,7 +2634,7 @@ class Payplug extends PaymentModule
         $res_payplug_card = Db::getInstance()->executeS($req_payplug_card);
 
         if (!$res_payplug_card) {
-            return false;
+            return [];
         } else {
             foreach ($res_payplug_card as $key => &$value) {
                 if ((int)$value['exp_year'] < (int)date('Y')
@@ -2740,7 +2738,6 @@ class Payplug extends PaymentModule
         $options = $this->getAvailableOptions($cart);
 
         $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
-
         $payment_list = [];
 
         // OneClick Payment
@@ -2783,7 +2780,7 @@ class Payplug extends PaymentModule
         $is_error = Tools::getValue('error');
         $is_inst = Tools::getValue('inst');
 
-        // Standart Payment
+        // Standart Payment or new card from one-click
         $paymentOption = new PaymentOption();
         $input_options = array(
             'pc' => array(
@@ -2808,8 +2805,10 @@ class Payplug extends PaymentModule
             ),
         );
         $paymentOption
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->img_lang . '.png'))
-            ->setCallToActionText($this->l('Pay with a credit card'))
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'
+                .(count($payplug_cards) > 0 ? 'none' : 'logos_schemes_'.$this->img_lang)
+                .'.png'))
+            ->setCallToActionText(count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card'))
             ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
             ->setModuleName('payplug')
             ->setInputs($input_options);
@@ -2939,8 +2938,9 @@ class Payplug extends PaymentModule
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
 
             $id_card = Tools::getValue('pc','new_card');
-            $is_installment = Tools::getValue('inst',null);
-            $payment = $this->preparePayment($cart, $id_card, $is_installment);
+            $is_installment = (bool)Tools::getValue('inst') == 1;
+            $is_deferred = (bool)Tools::getValue('def') == 1;
+            $payment = $this->preparePayment($cart, $id_card, $is_installment, $is_deferred);
 
             if($payment['result']){
                 // If payment is paid then redirect
