@@ -68,12 +68,14 @@ if (Tools::getValue('_ajax') == 1) {
             $embedded = (int)Tools::getValue('embedded');
             $one_click = (int)Tools::getValue('one_click');
             $installment = (int)Tools::getValue('installment');
+            $deferred = (int)Tools::getValue('deferred');
             $activate = (int)Tools::getValue('activate');
             $args = array(
                 'sandbox' => $sandbox,
                 'embedded' => $embedded,
                 'one_click' => $one_click,
                 'installment' => $installment,
+                'deferred' => $deferred,
                 'activate' => $activate,
             );
         }
@@ -104,7 +106,7 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
         $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        die(json_encode($payplug->checkPremium($api_key)));
+        die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
         if (!$payplug->checkAmountToRefund(Tools::getValue('amount'))) {

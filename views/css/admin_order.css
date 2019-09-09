@@ -403,3 +403,46 @@ span.ppclose {
 	color: #d2a63c;
 	padding: 0.7em 3em;
 }
+
+/*
+* Payment Details
+*/
+.pp_payment_details {
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+}
+.pp_payment_details li {
+	display: flex;
+	flex-direction: row;
+}
+
+.pp_payment_details .pp_col1, .pp_payment_detail .pp_col2 {
+	padding: 0 10px 0 0;
+}
+
+.pp_payment_details .pp_col1 {
+	color: #000000;
+	font-weight: bold;
+	text-align: right;
+	width: 212px;
+}
+
+.pp_payment_details .pp_col2 {
+	flex:1;
+}
+
+#pppanel .pp_success {
+	color: #00ab7a;
+	font-weight: bold;
+}
+
+#pppanel .pp_warning {
+	color: #ff8d34;
+	font-weight: bold;
+}
+
+#pppanel .pp_error {
+	color: #dd2525;
+	font-weight: bold;
+}

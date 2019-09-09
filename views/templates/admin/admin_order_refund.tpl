@@ -36,15 +36,9 @@
     </div>
     <div class="form-group">
         <label class="control-label" for="pp_amount2refund">{l s='Amount to be refunded' mod='payplug'} ({$currency->name|escape:'htmlall':'UTF-8'}) :</label>
-        {*<label class="control-label" for="pp_amount2refund">{l s='Amount to be refunded' d='Modules.Payplug.Admin'} ({$currency->name|escape:'htmlall':'UTF-8'}) :</label>*}
         <input type="text" name="pp_amount2refund" value="{$amount_suggested|escape:'htmlall':'UTF-8'}" />
         <label for="change_order_state">{l s='Change Prestashop order state to "Refunded"' mod='payplug'}</label>
-        {*<label for="change_order_state">{l s='Change Prestashop order state to "Refunded"' d='Modules.Payplug.Admin'}</label>*}
         <input class="control-label" type="checkbox" value="{$id_new_order_state|escape:'htmlall':'UTF-8'}" name="change_order_state" >
     </div>
-    <input class="btn green-button" type="submit" name="submitPPRefund" value="{l s='Refund' mod='payplug'}" >
-    {*<input class="btn green-button" type="submit" name="submitPPRefund" value="{l s='Refund' d='Modules.Payplug.Admin'}" >*}
-    <p class="hide pperror"></p>
-    <p class="hide ppsuccess"></p>
-    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
+    {include file='./button_with_loader.tpl' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
 </form>
