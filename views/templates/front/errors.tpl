@@ -20,7 +20,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-
 <div id="pp_error">
     <p class="ppfail">
         <i class="material-icons">&#xE5CD;</i>

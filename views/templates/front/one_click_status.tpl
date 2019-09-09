@@ -23,7 +23,6 @@
 <div id="pp_error_one_click">
 	<div class="ppOneClickStatus">
 		<p class="ppfail"><i class="material-icons">&#xE5CD;</i>{l s='The transaction was not completed and your card was not charged.' mod='payplug'}</p>
-		{*<p class="ppfail"><i class="material-icons">&#xE5CD;</i>{l s='The transaction was not completed and your card was not charged.' d='Modules.Payplug.Shop'}</p>*}
 	</div>
 </div>
 {if isset($error) && $error == 1}

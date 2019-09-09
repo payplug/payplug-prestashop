@@ -60,7 +60,6 @@ class APIRoutes
 }
 
 //APIRoutes::$API_BASE_URL = 'https://api.payplug.com';
-
 if (isset($_SERVER['PAYPLUG_API_URL'])) {
     APIRoutes::$API_BASE_URL = $_SERVER['PAYPLUG_API_URL'];
 } else {
