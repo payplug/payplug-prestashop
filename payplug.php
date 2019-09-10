@@ -1801,10 +1801,13 @@ class Payplug extends PaymentModule
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
+        $inst_id = $args['inst_id'];
+
         $this->context->smarty->assign(array(
             'type' => $type,
             'admin_ajax_url' => $admin_ajax_url,
             'site_url' => $this->site_url,
+            'inst_id' => $inst_id,
         ));
         $this->html = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
 
@@ -2440,16 +2443,20 @@ class Payplug extends PaymentModule
         }
 
         if($is_one_click) {
+            $redirect = $payment->is_paid;
+            if (!$redirect && $is_deferred) {
+                $redirect = $payment->authorization->authorized_at;
+            }
             return [
                 'result' => true,
-                'is_valid' => $payment->is_paid,
+                'redirect' => $redirect,
                 'return_url' => $payment->is_paid ? $payment_tab['hosted_payment']['return_url'] : $payment->hosted_payment->payment_url
             ];
         }
 
         return [
             'result' => true,
-            'is_valid' => false,
+            'redirect' => false,
             'return_url' => $payment->hosted_payment->payment_url
         ];
     }
@@ -2944,7 +2951,7 @@ class Payplug extends PaymentModule
 
             if($payment['result']){
                 // If payment is paid then redirect
-                if($payment['is_valid']) {
+                if($payment['redirect']) {
                     Tools::redirect($payment['return_url']);
                 }
                 // else show the popin
@@ -4164,7 +4171,7 @@ class Payplug extends PaymentModule
         } else {
             $pay_status = 7; //cancelled
         }
-        if (count($payment->failure) > 0) {
+        if (is_array($payment->failure) && count($payment->failure) > 0) {
             $pay_status = 3; //failed
         }
         if ((int)$payment->is_refunded == 1) {
@@ -4191,7 +4198,7 @@ class Payplug extends PaymentModule
                 foreach ($installment->schedule as $schedule) {
                     $index++;
                     $pay_id = '';
-                    if (count($schedule->payment_ids) > 0) {
+                    if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
                         $pay_id = $schedule->payment_ids[0];
                         $status = $this->getPaymentStatusByPayment($pay_id);
                     } else {
@@ -4236,7 +4243,7 @@ class Payplug extends PaymentModule
                     if ((int)$payment->is_paid == 1) {
                         $status = 2; //paid
                     }
-                    if (count($payment->failure) > 0) {
+                    if (is_array($payment->failure) && count($payment->failure) > 0) {
                         $status = 3; //failed
                     }
                     if ((int)$payment->is_refunded == 1) {
