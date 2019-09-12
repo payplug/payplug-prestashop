@@ -96,6 +96,7 @@
     <span class="ppclose">x</span>
     </div>
     <form action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" method="post">
+        <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
         <p>{l s='Are you sure you want to suspend the installment plan on this order?' mod='payplug'}</p>
         <p>{l s='Your customer won’t be charged on the due dates.' mod='payplug'}</p>
         <div class="block-button">

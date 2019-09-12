@@ -152,7 +152,8 @@ function callAbort() {
     $('.ppoverlay').remove();
     $('#payplug_popin').remove();
     var url = $('input:hidden[name=admin_ajax_url]').val();
-    var data = {_ajax: 1, popin: 1, type: 'abort'};
+    var inst_id = $('input:hidden[name=inst_id]').val();
+    var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
     $.ajax({
         type: 'POST',
         url: url,
