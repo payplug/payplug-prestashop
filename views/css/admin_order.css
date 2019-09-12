@@ -446,3 +446,7 @@ span.ppclose {
 	color: #dd2525;
 	font-weight: bold;
 }
+
+#pppanel.panel-1-6 .ppaction.pperror, #pppanel.panel-1-6 .ppaction.ppsuccess {
+	padding: 25px 0 0 10px;
+}

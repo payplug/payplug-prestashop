@@ -127,7 +127,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
-                    $is_authorized = count($payment->authorization) > 0;
+                    $is_authorized = $payment->authorization->authorized_at > 0;
                 } catch (Exception $e) {
                     $this->addLog($debug, $log, 'Payment cannot be retrieved.', 'error');
                     Tools::redirect($redirect_url_error);

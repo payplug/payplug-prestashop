@@ -71,6 +71,8 @@
                 {if $inst_aborted}
                     <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
                 {else}
+                    <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
+                    <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
                     <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
                 {/if}
                 <br class="clear" />
