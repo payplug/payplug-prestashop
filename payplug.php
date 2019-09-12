@@ -3839,6 +3839,9 @@ class Payplug extends PaymentModule
                 $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
                 die(json_encode($this->getAccountPermissions($api_key)));
             }
+            if (Tools::getValue('has_live_key')) {
+                die(Tools::jsonEncode(['result' => $this->has_live_key()]));
+            }
             if ((int)Tools::getValue('refund') == 1) {
                 if (!$this->checkAmountToRefund(Tools::getValue('amount'))) {
                     die(json_encode(array(
@@ -4702,5 +4705,10 @@ class Payplug extends PaymentModule
             $card_expiry_date = date('m/y', strtotime('01.'.$payment->card->exp_month.'.'.$payment->card->exp_year));
         }
         return $card_expiry_date;
+    }
+
+    public function has_live_key()
+    {
+        return (bool)Configuration::get('PAYPLUG_LIVE_API_KEY');
     }
 }

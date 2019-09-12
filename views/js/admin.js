@@ -117,24 +117,6 @@ function admin_start()
         if (($(this).attr('checked') == 'checked' || $(this).attr('checked') == true)) {
             can_be_live();
             e.preventDefault();
-        } else if (
-            ($(this).attr('checked') == 'checked' || $(this).attr('checked') == true)
-            && ($('#payplug_one_click_left').attr('checked') == 'checked' || $('#payplug_one_click_left').attr('checked') == true)
-        ) {
-            checkPremium(true);
-            $(this).siblings('.slide-button').css('left', '0%');
-        } else if (
-            ($(this).attr('checked') == 'checked' || $(this).attr('checked') == true)
-            || ($('#payplug_inst_left').attr('checked') == 'checked' || $('#payplug_inst_left').attr('checked') == true)
-        ) {
-            checkPremium(true);
-            $(this).siblings('.slide-button').css('left', '0%');
-        } else if (
-            ($(this).attr('checked') == 'checked' || $(this).attr('checked') == true)
-            || ($('#payplug_deferred_left').attr('checked') == 'checked' || $('#payplug_deferred_left').attr('checked') == true)
-        ) {
-            checkPremium(true);
-            $(this).siblings('.slide-button').css('left', '0%');
         } else {
             $(this).siblings('.slide-button').css('left', '0%');
         }
