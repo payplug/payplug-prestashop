@@ -20,6 +20,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <input class="btn green-button button" type="submit" name="{$submitName}" value="{$submitValue}" >
-<p class="hide pperror"></p>
-<p class="hide ppsuccess"></p>
+<p class="hide ppaction pperror"></p>
+<p class="hide ppaction ppsuccess"></p>
 <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
