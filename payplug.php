@@ -2360,6 +2360,8 @@ class Payplug extends PaymentModule
 
         if (!$is_deferred) {
             $payment_tab['amount'] = $amount;
+        } else {
+            $payment_tab['authorized_amount'] = $amount;
         }
 
         // check payment tab from current payment method
@@ -2368,6 +2370,7 @@ class Payplug extends PaymentModule
             unset($payment_tab['force_3ds']);
             unset($payment_tab['allow_save_card']);
             unset($payment_tab['amount']);
+            unset($payment_tab['authorized_amount']);
 
             // then add schedule
             $schedule = [];
@@ -4542,7 +4545,7 @@ class Payplug extends PaymentModule
         ) {
             return;
         } else {
-            $cart = $params['cart'];
+            $cart = new Cart((int)$order->id_cart);
             $payment_method = $this->getPaymentMethodByCart($cart);
             if ($payment_method['type'] == 'installment') {
                 $installment = new PPPaymentInstallment($payment_method['id']);
