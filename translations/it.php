@@ -158,6 +158,7 @@ $_MODULE['<{payplug}prestashop>popin_f1d6f31948ed9b60afa7053156a98cf7'] = 'Pagam
 $_MODULE['<{payplug}prestashop>popin_c8cf6eea8f096ed51160b484d97c5bbd'] = 'ATTIVATO';
 $_MODULE['<{payplug}prestashop>popin_055c1a591abb0e8cd86dc969727bcc0b'] = 'DISATTIVATO';
 $_MODULE['<{payplug}prestashop>popin_ac45fdf2da130887daac4a42b236cfa5'] = 'Pagamento a rate:';
+$_MODULE['<{payplug}prestashop>popin_cc743ea7eb02b8ce4ab9eb35b1da2add'] = 'Pagamenti differiti :';
 $_MODULE['<{payplug}prestashop>popin_03667315cfda61b24a2ae02c6668e10e'] = 'REGISTRA LE IMPOSTAZIONI';
 $_MODULE['<{payplug}prestashop>popin_a9555fd9adb4026033e4ffbb1009df60'] = 'Disattiva';
 $_MODULE['<{payplug}prestashop>popin_97d1a61bc7f96c334b30a88b2f75fde6'] = 'PayPlug non sarà più visualizzato dai suoi clienti come un\'opzione di pagamento.';
@@ -172,6 +173,7 @@ $_MODULE['<{payplug}prestashop>payment_details_88427ec035734b45aae9f7d8859a5008'
 $_MODULE['<{payplug}prestashop>payment_details_ec53a8c4f07baed5d8825072c89799be'] = 'Status';
 $_MODULE['<{payplug}prestashop>payment_details_b2f40690858b404ed10e62bdf422c704'] = 'Montante';
 $_MODULE['<{payplug}prestashop>payment_details_be3ac0cfe96feee34b4e12ac3472494e'] = 'Autorizzato il';
+$_MODULE['<{payplug}prestashop>payment_details_14145b0ac8fa7640b7371bcee02e45d7'] = 'Pagato il';
 $_MODULE['<{payplug}prestashop>payment_details_e7f9e382dc50889098cbe56f2554c77b'] = 'Carta di pagamento';
 $_MODULE['<{payplug}prestashop>payment_details_c7d4153f748ba1dd21ae002c37c00906'] = 'Le ultime 4 cifre della carta';
 $_MODULE['<{payplug}prestashop>payment_details_217c01a08bee4c2fa33d59a6ddc69806'] = '3-D Secure';
