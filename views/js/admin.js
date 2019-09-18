@@ -519,7 +519,7 @@ function callPopin(type, args){
                     $('#payplug_popin').remove();
                     $('.ppoverlay').remove();
                     if(type == 'wrong_pwd' || type == 'activate') {
-                        $('#payplug_sandbox_left').siblings('.slide-button').css('left', '50%');
+                        $('#payplug_sandbox_left').siblings('.slide-button').css('left', '0%');
                     }
                 });
                 $('#payplug_popin input[type=submit]').bind('click', function(e){
@@ -712,9 +712,9 @@ function can_be_live()
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
+        success: function(response)
         {
-            if (result) {
+            if (response.result) {
                 switch_to_live();
             } else {
                 callPopin('pwd');
