@@ -3772,7 +3772,7 @@ class Payplug extends PaymentModule
                 $this->displayPopin(Tools::getValue('type'), $args);
             }
             if (Tools::getValue('submit') == 'submitPopin_pwd') {
-                $this->submitPopinPwd(Tools::getValue('pwd'));
+                $this->submitPopinPwd($_POST['pwd']);
             }
             if (Tools::getValue('submit') == 'submitPopin_confirm') {
                 die(json_encode(array('content' => 'confirm_ok')));
