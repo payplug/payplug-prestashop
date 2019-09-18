@@ -2446,14 +2446,14 @@ class Payplug extends PaymentModule
         }
 
         if($is_one_click) {
-            $redirect = $payment->is_paid;
-            if (!$redirect && $is_deferred) {
-                $redirect = $payment->authorization->authorized_at;
+            $is_paid = $payment->is_paid;
+            if (!$is_paid && $is_deferred) {
+                $is_paid = $payment->authorization->authorized_at;
             }
             return [
                 'result' => true,
-                'redirect' => $redirect,
-                'return_url' => $payment->is_paid ? $payment_tab['hosted_payment']['return_url'] : $payment->hosted_payment->payment_url
+                'is_valid' => $is_paid,
+                'return_url' => $is_paid ? $payment_tab['hosted_payment']['return_url'] : $payment->hosted_payment->payment_url
             ];
         }
 
@@ -2954,7 +2954,7 @@ class Payplug extends PaymentModule
 
             if($payment['result']){
                 // If payment is paid then redirect
-                if($payment['redirect']) {
+                if($payment['is_valid']) {
                     Tools::redirect($payment['return_url']);
                 }
                 // else show the popin
@@ -3772,7 +3772,7 @@ class Payplug extends PaymentModule
                 $this->displayPopin(Tools::getValue('type'), $args);
             }
             if (Tools::getValue('submit') == 'submitPopin_pwd') {
-                $this->submitPopinPwd(Tools::getValue('pwd'));
+                $this->submitPopinPwd($_POST['pwd']);
             }
             if (Tools::getValue('submit') == 'submitPopin_confirm') {
                 die(json_encode(array('content' => 'confirm_ok')));
@@ -4242,21 +4242,10 @@ class Payplug extends PaymentModule
             foreach ($installment->schedule as $schedule) {
                 $index++;
                 $pay_id = '';
-                $status = 1; //not paid
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
                     $payment = \Payplug\Payment::retrieve($pay_id);
-                    if ((int)$payment->is_paid == 1) {
-                        $status = 2; //paid
-                    }
-                    if (is_array($payment->failure) && count($payment->failure) > 0) {
-                        $status = 3; //failed
-                    }
-                    if ((int)$payment->is_refunded == 1) {
-                        $status = 5; //refunded
-                    } elseif ((int)$payment->amount_refunded > 0) {
-                        $status = 4; //partillay refunded
-                    }
+                    $status = $this->getPaymentStatusByPayment($payment);
                 } else {
                     if ((int)$installment->is_active == 1) {
                         $status = 6; //ongoing
@@ -4713,5 +4702,15 @@ class Payplug extends PaymentModule
     public function has_live_key()
     {
         return (bool)Configuration::get('PAYPLUG_LIVE_API_KEY');
+    }
+
+    private function removeBadCategoriesYML()
+    {
+        $file = _PS_ROOT_DIR_ . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'addons/categories.yml';
+        if (!file_exists($file)) {
+            return false;
+        } else {
+            return unlink($file);
+        }
     }
 }
