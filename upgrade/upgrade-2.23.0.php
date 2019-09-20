@@ -37,7 +37,9 @@ function upgrade_module_2_23_0($object)
         || !Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', 0)
         || !Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH', 0)
-        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)) {
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP', 0)
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP_TEST', 0)) {
         $log->error('Fail to add new configuration');
         $flag = false;
     }
