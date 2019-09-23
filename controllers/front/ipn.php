@@ -214,6 +214,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         */
                         $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
                         $auth_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'.$state_addons);
+                        $exp_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'.$state_addons);
 
                         if ($order_id) {
                             $this->addLog($debug, $log, 'UPDATE MODE', 'info');
@@ -258,7 +259,62 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     );
                                     die(json_encode($response));
                                 }
-                                if ($current_state == $pending_state || $current_state == $auth_state) {
+
+                                // if payment is deferred and expired
+                                if ($deferred && $current_state == $auth_state && ($payment->authorization->expires_at - time()) <= 0) {
+                                    $this->addLog($debug, $log,'The payment authorization has expired.', 'info');
+                                    $this->addLog($debug, $log,'Payment amount: ' . $payment->amount, 'debug');
+                                    $this->addLog($debug, $log,'Order new status will be \'Authorization expired\'.','info');
+                                    $new_order_state = $exp_state;
+
+                                    $order_history = new OrderHistory();
+                                    $order_history->id_order = (int)$order_id;
+                                    try {
+                                        $order_history->changeIdOrderState((int)$new_order_state, $order_id);
+                                        $order_history->save();
+                                    } catch (Exception $exception) {
+                                        $this->addLog($debug, $log,
+                                            'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                                        $this->addLog($debug, $log,
+                                            'Please check if order state ' . (int)$new_order_state . ' exists.',
+                                            'error');
+                                        $response = array(
+                                            'exception' => $exception->getMessage(),
+                                        );
+                                        header(
+                                            $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                                            true,
+                                            $exception->getCode()
+                                        );
+                                        die(json_encode($response));
+                                    }
+
+                                    $order->current_state = $order_history->id_order_state;
+                                    try {
+                                        $order->update();
+                                    } catch (Exception $exception) {
+                                        $this->addLog($debug, $log,
+                                            'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                                        $response = array(
+                                            'exception' => $exception->getMessage(),
+                                        );
+                                        header(
+                                            $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                                            true,
+                                            $exception->getCode()
+                                        );
+                                        die(json_encode($response));
+                                    }
+                                    echo $this->addLog($debug, $log, 'Order updated.', 'info');
+                                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                                    if (!$cart_unlock) {
+                                        $this->addLog($debug, $log, 'Lock cannot be deleted.', 'error');
+                                    } else {
+                                        $this->addLog($debug, $log, 'Lock deleted.', 'debug');
+                                    }
+                                    header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
+                                    die;
+                                } elseif ($current_state == $pending_state || $current_state == $auth_state) {
                                     $this->addLog($debug, $log, 'Order is currently pending.', 'info');
                                     $this->addLog($debug, $log, 'Payment amount: ' . $payment->amount, 'debug');
                                     $is_amount_correct = false;
@@ -296,6 +352,22 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             );
                                             die(json_encode($response));
                                         }
+                                    }
+
+                                    if (!$payment->is_paid) {
+                                        echo $this->addLog('The payment is not paid yet.');
+                                        $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                                        if (!$cart_unlock) {
+                                            $this->addLog('Lock cannot be deleted.', 'error');
+                                        } else {
+                                            $this->addLog('Lock deleted.', 'debug');
+                                        }
+                                        header(
+                                            $_SERVER['SERVER_PROTOCOL'] . ' 200 The payment is not paid yet.',
+                                            true,
+                                            200
+                                        );
+                                        die;
                                     }
 
                                     $order_history = new OrderHistory();

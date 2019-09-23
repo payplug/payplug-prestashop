@@ -33,7 +33,11 @@ var $document, payplug = {
     order: {
         init: function () {
             // Styling
-            $('input[data-module-name="payplug"]').parents('.payment-option').addClass('payplug-payment-option')
+            var $options = $('input[data-module-name="payplug"]');
+            $options.each(function() {
+                var optionId = $(this).attr('id') + '-additional-information';
+                $('#'+optionId).attr('style', 'margin:0;');
+            }).parents('.payment-option').addClass('payplug-payment-option')
         }
     },
     card: {

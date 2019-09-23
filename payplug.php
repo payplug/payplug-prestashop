@@ -505,6 +505,8 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
+            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP')
+            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
             && Configuration::deleteByName('PAYPLUG_SANDBOX_MODE')
             && Configuration::deleteByName('PAYPLUG_SHOW')
             && Configuration::deleteByName('PAYPLUG_TEST_API_KEY')
@@ -613,6 +615,23 @@ class Payplug extends PaymentModule
                     'fr' => 'Paiement autorisé',
                     'es' => 'Pago',
                     'it' => 'Pagamento',
+                ),
+            ),
+            'exp' => array(
+                'cfg' => null,
+                'template' => null,
+                'logable' => true,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#8f0621',
+                'name' => array(
+                    'en' => 'Authorization expired',
+                    'fr' => 'Autorisation expirée',
+                    'it' => 'Autorizzazione scaduta',
                 ),
             ),
         );
@@ -950,14 +969,15 @@ class Payplug extends PaymentModule
         $curl_exists = extension_loaded('curl');
         $openssl_exists = extension_loaded('openssl');
         if (Tools::isSubmit('submitAccount')) {
+            $password = isset($_POST['PAYPLUG_PASSWORD']) && $_POST['PAYPLUG_PASSWORD'] ? $_POST['PAYPLUG_PASSWORD'] : false;
             if ((!Validate::isEmail(Tools::getValue('PAYPLUG_EMAIL'))
-                    || !Validate::isPasswd(Tools::getValue('PAYPLUG_PASSWORD'))
+                    || !Validate::isPasswd($password)
                 )
                 && (Tools::getValue('PAYPLUG_EMAIL') != false)
             ) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
             } elseif ($curl_exists && $openssl_exists) {
-                if ($this->login(Tools::getValue('PAYPLUG_EMAIL'), Tools::getValue('PAYPLUG_PASSWORD'))) {
+                if ($this->login(Tools::getValue('PAYPLUG_EMAIL'), $password)) {
                     Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
                     Configuration::updateValue('PAYPLUG_SHOW', 1);
                 } else {
@@ -2452,7 +2472,7 @@ class Payplug extends PaymentModule
             }
             return [
                 'result' => true,
-                'is_valid' => $is_paid,
+                'redirect' => $is_paid,
                 'return_url' => $is_paid ? $payment_tab['hosted_payment']['return_url'] : $payment->hosted_payment->payment_url
             ];
         }
@@ -2954,7 +2974,7 @@ class Payplug extends PaymentModule
 
             if($payment['result']){
                 // If payment is paid then redirect
-                if($payment['is_valid']) {
+                if($payment['redirect']) {
                     Tools::redirect($payment['return_url']);
                 }
                 // else show the popin
