@@ -417,19 +417,25 @@ span.ppclose {
 	flex-direction: row;
 }
 
-.pp_payment_details .pp_col1, .pp_payment_detail .pp_col2 {
-	padding: 0 10px 0 0;
+.pp_payment_details .pp_col1,
+.pp_payment_detail .pp_col2 {
+	display: flex;
 }
 
 .pp_payment_details .pp_col1 {
 	color: #000000;
 	font-weight: bold;
-	text-align: right;
-	width: 212px;
+	width: 215px;
+	justify-content: flex-end;
 }
 
 .pp_payment_details .pp_col2 {
-	flex:1;
+	flex-direction: column;
+	width: calc(100% - 215px);
+	padding: 0 0 0 10px;
+}
+.pp_payment_details .pp_col2 span{
+	display: block;
 }
 
 #pppanel .pp_success {
