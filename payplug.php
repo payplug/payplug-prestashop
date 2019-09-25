@@ -630,6 +630,7 @@ class Payplug extends PaymentModule
                 'color' => '#8f0621',
                 'name' => array(
                     'en' => 'Authorization expired',
+                    'es' => 'Autorización vencida',
                     'fr' => 'Autorisation expirée',
                     'it' => 'Autorizzazione scaduta',
                 ),
