@@ -78,7 +78,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      * Set Config to process the notification
      * @throws Exception
      */
-    private function setConfig(){
+    private function setConfig()
+    {
         $this->debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
 
         $this->getResource();
@@ -102,7 +103,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     /**
      * Set the resource from the notification body
      */
-    private function getResource(){
+    private function getResource()
+    {
         $body = Tools::file_get_contents('php://input');
 
         try {
@@ -119,7 +121,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     /**
      * Set the log method
      */
-    private function setLogger(){
+    private function setLogger()
+    {
         if ($this->debug) {
             require_once(dirname(__FILE__) . '/../../classes/MyLogPHP.class.php');
             if (isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id) {
@@ -144,11 +147,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         if ($this->resource instanceof \Payplug\Resource\Payment) {
             $this->processPayment();
-        }
-        elseif ($this->resource instanceof \Payplug\Resource\Refund) {
+        } elseif ($this->resource instanceof \Payplug\Resource\Refund) {
             $this->processRefund();
-        }
-        elseif ($this->resource instanceof \Payplug\Resource\InstallmentPlan) {
+        } elseif ($this->resource instanceof \Payplug\Resource\InstallmentPlan) {
             $this->processInstallment();
         }
     }
@@ -293,25 +294,22 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     * We keep this $inst_state to give more readability.
                     */
                     $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-                    $auth_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'.$state_addons);
-                    $exp_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'.$state_addons);
+                    $auth_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons);
+                    $exp_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons);
+                    $refund_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
                     if ($order_id) {
                         $this->addLog('UPDATE MODE');
                         try {
                             $order = new Order((int)$order_id);
-                            echo $this->addLog('Order: ' . $order->id);
                         } catch (Exception $exception) {
                             $this->addLog(
                                 'The order cannot be loaded: ' . $exception->getMessage(), 'error');
                             $response = array(
                                 'exception' => $exception->getMessage(),
                             );
-                            header(
-                                $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                                true,
-                                $exception->getCode()
-                            );
+                            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                                true, $exception->getCode());
                             die(json_encode($response));
                         }
                         if (!Validate::isLoadedObject($order)) {
@@ -346,7 +344,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             if ($deferred && $current_state == $auth_state && $is_expired) {
                                 $this->addLog('The payment authorization has expired.');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
-                                $this->addLog('Order new status will be \'Authorization expired\'.','info');
+                                $this->addLog('Order new status will be \'Authorization expired\'.', 'info');
                                 $new_order_state = $exp_state;
 
                                 $order_history = new OrderHistory();
@@ -396,15 +394,15 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                                 die;
-                            }
-                            elseif ($current_state == $pending_state || $current_state == $auth_state) {
+                            } elseif ($current_state == $pending_state || $current_state == $auth_state) {
                                 $this->addLog('Order is currently pending.');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
                                 $is_amount_correct = false;
                                 if ($payment->installment_plan_id !== null) {
                                     $is_amount_correct = (bool)$payment->is_paid;
                                 } else {
-                                    $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($payment->amount / 100, $order);
+                                    $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($payment->amount / 100,
+                                        $order);
                                 }
                                 if ($is_amount_correct) {
                                     $this->addLog('Order new status will be \'paid\'.');
@@ -502,8 +500,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                                 die;
-                            }
-                            elseif ($current_state == $paid_state) {
+                            } elseif ($current_state == $paid_state) {
                                 echo $this->addLog('Order is already paid.');
                                 $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                                 if (!$cart_unlock) {
@@ -513,8 +510,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order is already paid.', true, 200);
                                 die;
-                            }
-                            elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
+                            } elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
                                 $this->addLog('Order is currently pending for installment.',
                                     'info');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
@@ -528,28 +524,29 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     die;
                                 }
                                 $this->payplug->updatePayplugInstallment($installment);
-                            }
-                            else {
+                            } elseif ($current_state == $refund_state) {
+                                echo $this->addLog('Order has been refunded.');
+                                $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                                if (!$cart_unlock) {
+                                    $this->addLog('Lock cannot be deleted.', 'error');
+                                } else {
+                                    $this->addLog('Lock deleted.', 'debug');
+                                }
+                                header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order has been refunded.', true, 200);
+                                die;
+                            } else {
                                 echo $this->addLog(
-                                    $this->debug,
-                                    $this->log,
                                     'Current state: ' . (int)$current_state,
                                     'debug'
                                 );
                                 echo $this->addLog(
-                                    $this->debug,
-                                    $this->log,
                                     'Pending state: ' . (int)$pending_state,
                                     'debug'
                                 );
                                 echo $this->addLog(
-                                    $this->debug,
-                                    $this->log,
-                                    'Paid state: ' . (int)$paid_state,
-                                    'debug'
+                                    'Paid state: ' . (int)$paid_state, 'debug'
                                 );
-                                echo $this->addLog('Current order state is in conflict with IPN.',
-                                    'error');
+                                echo $this->addLog('Current order state is in conflict with IPN.', 'error');
                                 $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                                 if (!$cart_unlock) {
                                     $this->addLog('Lock cannot be deleted.', 'error');
