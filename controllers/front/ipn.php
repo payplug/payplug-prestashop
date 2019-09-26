@@ -193,10 +193,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         $this->addLog('Paid (Payment): ' . (int)$payment->is_paid);
 
-        if ($payment->authorization !== null) {
+        if ($payment->authorization && isset($payment->authorization->expires_at)) {
             $deferred = true;
+            $is_expired = $payment->authorization->expires_at - time() <= 0;
         } else {
             $deferred = false;
+            $is_expired = false;
         }
 
         if (!$payment->is_paid && !$deferred) {
@@ -325,6 +327,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         } else {
                             try {
                                 $current_state = (int)$order->getCurrentState();
+                                echo $this->addLog('Get the current state: ' . $current_state, 'info');
                             } catch (Exception $exception) {
                                 $this->addLog(
                                     'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
@@ -340,7 +343,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                             // if payment is deferred and expired
-                            if ($deferred && $current_state == $auth_state && ($payment->authorization->expires_at - time()) <= 0) {
+                            if ($deferred && $current_state == $auth_state && $is_expired) {
                                 $this->addLog('The payment authorization has expired.');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
                                 $this->addLog('Order new status will be \'Authorization expired\'.','info');
@@ -393,7 +396,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                                 die;
-                            } elseif ($current_state == $pending_state || $current_state == $auth_state) {
+                            }
+                            elseif ($current_state == $pending_state || $current_state == $auth_state) {
                                 $this->addLog('Order is currently pending.');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
                                 $is_amount_correct = false;
@@ -498,7 +502,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                                 die;
-                            } elseif ($current_state == $paid_state) {
+                            }
+                            elseif ($current_state == $paid_state) {
                                 echo $this->addLog('Order is already paid.');
                                 $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                                 if (!$cart_unlock) {
@@ -508,7 +513,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order is already paid.', true, 200);
                                 die;
-                            } elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
+                            }
+                            elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
                                 $this->addLog('Order is currently pending for installment.',
                                     'info');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
@@ -522,7 +528,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     die;
                                 }
                                 $this->payplug->updatePayplugInstallment($installment);
-                            } else {
+                            }
+                            else {
                                 echo $this->addLog(
                                     $this->debug,
                                     $this->log,
