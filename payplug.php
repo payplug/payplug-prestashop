@@ -4724,14 +4724,4 @@ class Payplug extends PaymentModule
     {
         return (bool)Configuration::get('PAYPLUG_LIVE_API_KEY');
     }
-
-    private function removeBadCategoriesYML()
-    {
-        $file = _PS_ROOT_DIR_ . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'addons/categories.yml';
-        if (!file_exists($file)) {
-            return false;
-        } else {
-            return unlink($file);
-        }
-    }
 }
