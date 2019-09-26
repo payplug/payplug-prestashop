@@ -89,5 +89,5 @@
     {/if}
 </ul>
 {if isset($payment.can_be_captured) && $payment.can_be_captured === true}
-    {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/capture.tpl' payment=$payment}
+    {include file='./capture.tpl' payment=$payment}
 {/if}
