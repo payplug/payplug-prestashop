@@ -4651,6 +4651,7 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', (int)$payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                 } else {
+                    $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['can_be_captured'] = false;
                 }
             }
