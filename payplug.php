@@ -4637,6 +4637,7 @@ class Payplug extends PaymentModule
             $payment_details['tds'] = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
         }
 
+        $is_expired = false;
         if ($payment->authorization !== null) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
@@ -4651,6 +4652,7 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', (int)$payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                 } else {
+                    $is_expired = true;
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['can_be_captured'] = false;
                 }
@@ -4661,8 +4663,8 @@ class Payplug extends PaymentModule
             $payment_details['can_be_captured'] = false;
         }
 
-        if (isset($payment->failure) && isset($payment->failure->message)) {
-            $payment_details['error'] = '('.$payment->failure->message.')';
+        if (isset($payment->failure) && isset($payment->failure->message) && !$is_expired) {
+            $payment_details['error'] = $this->l('('.$payment->failure->message.')');
         }
         return $payment_details;
     }

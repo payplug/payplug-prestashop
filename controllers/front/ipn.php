@@ -98,6 +98,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         }
 
         $this->payplug = new Payplug();
+
+        $api_key = (bool)$this->resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
+        $this->payplug->setSecretKey($api_key);
     }
 
     /**
@@ -169,27 +172,21 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         $this->addLog('Payment ID: ' . $this->resource->id);
         $this->addLog('Paid (Resource): ' . (int)$this->resource->is_paid);
 
-        if (!$payment = $this->payplug->retrievePayment($this->resource->id)) {
-            $this->addLog('Can\'t retrieve payment with this API Key.', 'debug');
-            if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                $this->addLog('This was test mode.', 'debug');
-                $this->addLog('Trying live mode.', 'debug');
-                $this->payplug->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                if (!$payment = $this->payplug->retrievePayment($this->resource->id)) {
-                    $this->addLog('Can\'t retrieve payment with LIVE API Key.', 'debug');
-                    $this->payplug->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                    $payment = null;
-                }
-            } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                $this->addLog('This was live mode.', 'debug');
-                $this->addLog('Trying test mode.', 'debug');
-                $this->payplug->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                if (!$payment = $this->payplug->retrievePayment($this->resource->id)) {
-                    $this->addLog('Can\'t retrieve payment with the TEST API Key.', 'debug');
-                    $this->payplug->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                    $payment = null;
-                }
-            }
+
+
+        try {
+            $payment = $this->payplug->retrievePayment($this->resource->id);
+        } catch (ConfigurationNotSetException $exception) {
+            $this->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
+            $response = array(
+                'exception' => $exception->getMessage(),
+            );
+            header(
+                $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                true,
+                $exception->getCode()
+            );
+            die(json_encode($response));
         }
 
         $this->addLog('Paid (Payment): ' . (int)$payment->is_paid);
