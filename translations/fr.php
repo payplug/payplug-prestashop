@@ -69,7 +69,6 @@ $_MODULE['<{payplug}prestashop>payplug_1be6f9eb563f3bf85c78b4219bf09de9'] = 'Bra
 $_MODULE['<{payplug}prestashop>payplug_59716c97497eb9694541f7c3d37b1a4d'] = 'Country';
 $_MODULE['<{payplug}prestashop>payplug_704f2b413bf448e276b93c5199249a0f'] = '(en différé)';
 $_MODULE['<{payplug}prestashop>payplug_687044719e36f482162a3853b88cd2f4'] = '(déclenchement autorisé avant le %s)';
-$_MODULE['<{payplug}prestashop>payplug_687044719e36f482162a3853b88cd2f4'] = '(déclenchement autorisé avant le %s)';
 $_MODULE['<{payplug}prestashop>payplug_453e6aa38d87b28ccae545967c53004f'] = 'Indisponible';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Cartes sauvegardées';
 $_MODULE['<{payplug}prestashop>confirmation_cad582a88fd1c270ee49b3a2f236dcb6'] = 'Votre paiement est en attente, il devrait être validé par PayPlug dans quelques secondes.';
