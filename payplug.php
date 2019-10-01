@@ -226,7 +226,7 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        \Payplug\Payplug::init([
+        return \Payplug\Payplug::init([
             'secretKey' => $token,
             'apiVersion' => $this->api_version
         ]);
