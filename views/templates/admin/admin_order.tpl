@@ -24,7 +24,6 @@
 
     <div class="panel-heading">
         <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
-        {*<i class="icon-money"></i> {l s='Payplug payment details' d='Modules.Payplug.Admin'}*}
     </div>
     <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
 
@@ -44,7 +43,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {foreach from=$payment_list item=payment}
+                {foreach from=$payment_list_new item=payment}
                     <tr class="pp_fixed_height">
                         <td>{$payment['date']|escape:'htmlall':'UTF-8'}</td>
                         <td>{displayPrice price=$payment['amount']}</td>
@@ -61,21 +60,7 @@
                     {if isset($payment['id'])}
                         <tr class="payment_information" style="display: none;">
                             <td colspan="5">
-                                <ul>
-                                    <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$payment['id']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='Status' mod='payplug'} : {$payment['status']|escape:'htmlall':'UTF-8'}</span> {$payment['error']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='Amount' mod='payplug'} : </span>{displayPrice price=$payment['amount']}</li>
-                                    <li><span class="ppbold">{l s='Paid at' mod='payplug'} : </span>{$payment['date']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='Credit card' mod='payplug'} : </span>{$payment['brand']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='Card mask' mod='payplug'} : </span>{$payment['card_mask']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$payment['tds']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='Expiry Date' mod='payplug'} : </span>{$payment['card_date']|escape:'htmlall':'UTF-8'}</li>
-                                    <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
-                                        <span class="ppred">
-                                        <span class="ppbold">{$payment['mode']|escape:'htmlall':'UTF-8'}</span>
-                                    </span>
-                                    </li>
-                                </ul>
+                                {include file='./payment_details.tpl' payment=$payment}
                             </td>
                         </tr>
                     {/if}
@@ -85,40 +70,23 @@
             {if !$inst_paid}
                 {if $inst_aborted}
                     <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
-                {else}
+                {elseif $inst_can_be_aborted}
+                    <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
+                    <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
                     <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
                 {/if}
                 <br class="clear" />
             {/if}
         </div>
     {/if}
-    {if $show_menu_payment}
-    <ul>
-        <li><span class="ppbold">{l s='Payplug Payment ID' mod='payplug'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>
-        {*<li><span class="ppbold">{l s='Payplug Payment ID' d='Modules.Payplug.Admin'} : </span>{$pay_id|escape:'htmlall':'UTF-8'}</li>*}
-        <li><span class="ppbold">{l s='Status' mod='payplug'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>
-        {*<li><span class="ppbold">{l s='Status' d='Modules.Payplug.Admin'} : {$pay_status|escape:'htmlall':'UTF-8'}</span></li>*}
-        <li><span class="ppbold">{l s='Amount' mod='payplug'} : </span>{displayPrice price=$pay_amount}</li>
-        {*<li><span class="ppbold">{l s='Amount' d='Modules.Payplug.Admin'} : </span>{displayPrice price=$pay_amount}</li>*}
-        <li><span class="ppbold">{l s='Paid at' mod='payplug'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>
-        {*<li><span class="ppbold">{l s='Paid at' d='Modules.Payplug.Admin'} : </span>{$pay_date|escape:'htmlall':'UTF-8'}</li>*}
-        <li><span class="ppbold">{l s='Credit card' mod='payplug'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>
-        {*<li><span class="ppbold">{l s='Credit card' d='Modules.Payplug.Admin'} : </span>{$pay_brand|escape:'htmlall':'UTF-8'}</li>*}
-        <li><span class="ppbold">{l s='Card mask' mod='payplug'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>
-        {*<li><span class="ppbold">{l s='Card mask' d='Modules.Payplug.Admin'} : </span>{$pay_card_mask|escape:'htmlall':'UTF-8'}</li>*}
-        <li><span class="ppbold">{l s='3-D Secure' mod='payplug'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>
-        {*<li><span class="ppbold">{l s='3-D Secure' d='Modules.Payplug.Admin'} : </span>{$pay_tds|escape:'htmlall':'UTF-8'}</li>*}
-        <li><span class="ppbold">{l s='Expiry Date' mod='payplug'} : </span>{$pay_card_date|escape:'htmlall':'UTF-8'}</li>
-        <li><span class="ppbold">{l s='Mode' mod='payplug'} : </span>
-        {*<li><span class="ppbold">{l s='Mode' d='Modules.Payplug.Admin'} : </span>*}
-            <span class="ppred">
-                <span class="ppbold">{$pay_mode|escape:'htmlall':'UTF-8'}</span>
-            </span>
-        </li>
-    </ul>
-    {/if}
 
-    {if $show_menu}
+    {if $display_single_payment}
+        {if $single_payment.can_be_captured && isset($single_payment.date)}
+            <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
+        {/if}
+        {include file='./payment_details.tpl' payment=$single_payment}
+    {/if}
+    {if $display_refund}
         <hr />
         {include file='./admin_order_refund.tpl'}
     {elseif $show_menu_refunded}

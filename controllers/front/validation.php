@@ -127,8 +127,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
+                    $is_authorized = isset($payment->authorization->authorized_at) && $payment->authorization->authorized_at > 0;
                 } catch (Exception $e) {
-                    $this->addLog($debug, $log, 'Payment cannot be retrieved.', 'error');
+                    $this->addLog($debug, $log, 'Payment cannot be retrieved payment: ' . $pay_id, 'error');
                     Tools::redirect($redirect_url_error);
                 }
 
@@ -180,16 +181,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     if ($payplug->isTransactionPending((int)$cart_id)) {
                         $this->addLog($debug, $log, 'Transaction is pending so stored payment will not be deleted.',
                             'info');
-                    } else {
-                        if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
-                            $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
-                        } else {
-                            $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
-                        }
                     }
                 }
             } else {
-                $this->addLog($debug, $log, 'Order already exists.', 'info');
+                $this->addLog($debug, $log, 'Order does\'nt exists yet.', 'info');
 
                 if ($type == 'payment') {
                     $state_addons = ($payment->is_live ? '' : '_TEST');
@@ -199,17 +194,24 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
                 $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+                /*
+                * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
+                * We keep this $inst_state to give more readability.
+                */
                 $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+                $auth_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'.$state_addons);
                 if ($type == 'installment') {
-                    $order_state = $inst_state;
+                    $installment = new PPPaymentInstallment($inst_id);
+                    $first_payment = $installment->getFirstPayment();
+                    if ($first_payment->isDeferred()) {
+                        $order_state = $auth_state;
+                    } else {
+                        $order_state = $inst_state;
+                    }
                 } elseif ($is_paid) {
                     $order_state = $paid_state;
-                    $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
-                    if (!$payplug->deletePayment($payment->id, (int)$cart_id)) {
-                        $this->addLog($debug, $log, 'Stored payment cannot be deleted.', 'error');
-                    } else {
-                        $this->addLog($debug, $log, 'Stored payment successfully deleted.', 'info');
-                    }
+                } elseif ($is_authorized) {
+                    $order_state = $auth_state;
                 } else {
                     $order_state = $pending_state;
                     $this->addLog($debug, $log, 'Stored payment become pending.', 'info');
@@ -278,7 +280,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $data['metadata']['Order'] = $id_order;
                         $payplug->patchPayment($api_key, $payment->id, $data);
                     } elseif ($type == 'installment') {
-                        $payplug->addPayplugInstallment($installment, $order);
+                        $payplug->addPayplugInstallment($installment->resource, $order);
                     }
                 }
 

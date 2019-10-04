@@ -19,108 +19,64 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
-$(document).ready(function() {
-
-    var payplug_options = $('input[data-module-name=payplug]');
-    payplug_options.each(function() {
-        var extra = $(this).attr('id') + '-additional-information';
-        $('#'+extra).attr('style', 'margin:0;');
-    });
-    payplug_options.parent().parent().find('img')
-        .css('float', 'left')
-        .css('margin', '0 10px 0 0');
-
-    var pending = false;
-    $('#payment-confirmation button').on('click', function(event){
-        if (pending) {
-            return false;
+var allow_debug = false, debug = function (str) {
+    if (allow_debug) {
+        console.log(str);
+    }
+};
+var $document, payplug = {
+    init: function () {
+        debug('payplug init');
+        this.card.init();
+        this.order.init();
+    },
+    order: {
+        init: function () {
+            // Styling
+            var $options = $('input[data-module-name="payplug"]');
+            $options.each(function() {
+                var optionId = $(this).attr('id') + '-additional-information';
+                $('#'+optionId).attr('style', 'margin:0;');
+            }).parents('.payment-option').addClass('payplug-payment-option')
         }
-        pending = true;
-        $('#checkout-payment-step').css('background-color', '#eeeeee');
-        $('.payment-confirmation button').attr('disabled', 'disabled');
-        $('.ppfail').hide();
-        $('.ppwait').show();
-    });
+    },
+    card: {
+        init: function () {
+            $document.on('click', 'a.ppdeletecard', payplug.card.delete);
+        },
+        delete: function (event) {
+            event.preventDefault();
 
-    $('a.ppdeletecard').bind('click', function(e){
-        e.preventDefault();
-        var id_payplug_card = $(this).parent().parent().attr('id');
-        id_payplug_card = id_payplug_card.replace('id_payplug_card_', '');
-        var url = $(this).attr('href')+'&pc='+id_payplug_card;
-        callDeleteSavedCard(id_payplug_card, url);
-        return false;
-    });
+            var $elem = $(this),
+                id_card = $elem.data('id_card'),
+                url = $(this).attr('href') + '&pc=' + id_card;
 
-    $('a.ppdelete').bind('click', function(e){
-        e.preventDefault();
-        var id_payplug_card = $('input[name=payplug_card]:checked').val()
-        if(id_payplug_card != 'new_card')
-            callDeleteCard(id_payplug_card);
-        return false;
-    });
-
-    $('input[name=payplug_card]').bind('change', function(e){
-        if ($(this).val() == 'new_card') {
-            $('a.ppdelete').hide();
-        } else {
-            $('a.ppdelete').show();
-        }
-    });
-
-    $('input[name=payplug_card]').bind('change', function(e){
-        var id_card = $('input[name=payplug_card]:checked').val()
-        $('input:hidden[name=pc]').val(id_card);
-    });
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: {
+                    delete: 1,
+                    pc: id_card
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('error CALL DELETE CARD');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (result) {
+                    if (result) {
+                        $('#id_payplug_card_' + id_card).remove();
+                        $('#module-payplug-cards div.message').show();
+                        $('#module-payplug-controllers-front-cards div.message').show();
+                    }
+                }
+            });
+        },
+    }
+};
+$(document).ready(function () {
+    $document = $(document);
+    payplug.init();
 });
-
-function callDeleteSavedCard(id_card, url)
-{
-    $.ajax({
-        type: 'POST',
-        url: url,
-        dataType: 'json',
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CALL DELETE CARD');
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
-        },
-        success: function(result)
-        {
-            if(result)
-            {
-                $('#id_payplug_card_'+id_card).remove();
-                $('#module-payplug-cards div.message').show();
-                $('#module-payplug-controllers-front-cards div.message').show();
-            }
-        }
-    });
-}
-
-function callDeleteCard(id_card)
-{
-    var url = $('input:hidden[name=front_ajax_url]').val();
-    var id_cart = $('input:hidden[name=id_cart]').val();
-    var data = {_ajax: 1, pc: id_card, id_cart: id_cart};
-
-    $.ajax({
-        type: 'POST',
-        url: url,
-        dataType: 'json',
-        data: data,
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert('error CALL DELETE CARD');
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
-        },
-        success: function(result)
-        {
-            if(result)
-            {
-                $('.'+id_card).remove();
-            }
-        }
-    });
-}

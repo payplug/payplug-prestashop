@@ -35,6 +35,11 @@ $(document).ready(function() {
         e.preventDefault();
         callUpdate();
     });
+
+    $('input[name=submitPPCapture]').bind('click', function(e) {
+        e.preventDefault();
+        callCapture();
+    });
 });
 
 function callRefund() {
@@ -147,7 +152,8 @@ function callAbort() {
     $('.ppoverlay').remove();
     $('#payplug_popin').remove();
     var url = $('input:hidden[name=admin_ajax_url]').val();
-    var data = {_ajax: 1, popin: 1, type: 'abort'};
+    var inst_id = $('input:hidden[name=inst_id]').val();
+    var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
     $.ajax({
         type: 'POST',
         url: url,
@@ -197,6 +203,59 @@ function callAbort() {
                     }
                 });
             });
+        }
+    });
+}
+
+function callCapture() {
+    $('.pp-capture .pperror').hide();
+    $('.pp-capture .ppsuccess').hide();
+    var url = $('input:hidden[name=admin_ajax_url]').val();
+    var pay_id = $('input:hidden[name=pay_id]').val();
+    var id_order = $('input:hidden[name=id_order]').val();
+    var data = {_ajax: 1, capture: 1, pay_id: pay_id, id_order: id_order};
+    $.ajax({
+        type: 'POST',
+        url: url,
+        dataType: 'json',
+        data: data,
+        beforeSend: function() {
+            $('.pp-capture .loader').show();
+            $('input[name=submitPPCapture]').unbind('click');
+        },
+        complete: function(){
+            $('.pp-capture .loader').hide();
+            $('input[name=submitPPCapture]').bind('click', function(e) {
+                e.preventDefault();
+                callCapture();
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('An error occurred while trying to capture. ' +
+                'Maybe you clicked too fast before scripts are fully loaded ' +
+                'or maybe you have a different back-office url than expected.' +
+                'You will find more explanation in JS console.');
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+        },
+        success: function(result)
+        {
+            if(result.status == 'error') {
+                $('.pp-capture .pperror').html(result.data);
+                $('.pp-capture .pperror').removeClass('hide');
+                $('.pp-capture .pperror').show();
+            }
+            else {
+                $('.pp-capture .ppsuccess').html(result.message);
+                $('.pp-capture .ppsuccess').removeClass('hide');
+                $('.pp-capture .ppsuccess').show();
+
+                $('.pp-capture form div.pp_list').html(result.data);
+                if (result.reload) {
+                    location.reload();
+                }
+            }
         }
     });
 }
