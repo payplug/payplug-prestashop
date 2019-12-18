@@ -64,12 +64,6 @@ class Payplug extends PaymentModule
     /** @var bool */
     private $is_active = 1;
 
-    /** @var MyLogPHP */
-    private $log_general;
-
-    /** @var MyLogPHP */
-    private $log_install;
-
     /** @var array */
     private $routes = array(
         'login' => '/v1/keys',
@@ -122,8 +116,6 @@ class Payplug extends PaymentModule
      */
     private function setLoggers()
     {
-        $this->log_general = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
-        $this->log_install = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
     }
 
     /**
@@ -256,19 +248,15 @@ class Payplug extends PaymentModule
      */
     public function install()
     {
-        $this->log_install->info('Starting to install.');
         $report = $this->checkRequirements();
         if (!$report['php']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
-            $this->log_install->error('Install failed: PHP Requirement.');
         }
         if (!$report['curl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
-            $this->log_install->error('Install failed: cURL Requirement.');
         }
         if (!$report['openssl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
-            $this->log_install->error('Install failed: OpenSSL Requirement.');
         }
 
         if (Shop::isFeatureActive()) {
@@ -276,31 +264,22 @@ class Payplug extends PaymentModule
         }
 
         if (!parent::install()) {
-            $this->log_install->error('Install failed: parent.');
         } elseif (!$this->registerHook('paymentReturn') ||
             !$this->registerHook('header') ||
             !$this->registerHook('adminOrder') ||
             !$this->registerHook('actionOrderStatusUpdate') ||
             !$this->registerHook('customerAccount')
         ) {
-            $this->log_install->error('Install failed: classics hooks.');
         } elseif (!$this->registerHook('paymentOptions')) {
-            $this->log_install->error('Install failed: hook paymentOptions.');
         } elseif (!$this->registerHook('registerGDPRConsent') ||
             !$this->registerHook('actionDeleteGDPRCustomer') ||
             !$this->registerHook('actionExportGDPRData')
         ) {
-            $this->log_install->error('Install failed: hooks GDPR.');
         } elseif (!$this->createConfig()) {
-            $this->log_install->error('Install failed: configuration.');
         } elseif (!$this->createOrderStates()) {
-            $this->log_install->error('Install failed: order states.');
         } elseif (!$this->installSQL()) {
-            $this->log_install->error('Install failed: sql.');
         } elseif (!$this->installTab()) {
-            $this->log_install->error('Install failed: tab.');
         } else {
-            $this->log_install->info('Install succeeded.');
             return true;
         }
         return false;
@@ -313,31 +292,20 @@ class Payplug extends PaymentModule
      */
     public function uninstall()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $this->log_install->info('Starting to uninstall.');
 
         $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
         if (!$keep_cards) {
-            $this->log_install->info('Saved cards will be deleted.');
             if (!$this->uninstallCards()) {
-                $this->log_install->error('Unable to delete saved cards.');
             } else {
-                $this->log_install->error('Saved cards successfully deleted.');
             }
         } else {
-            $this->log_install->info('Cards will be kept.');
         }
 
         if (!parent::uninstall()) {
-            $this->log_install->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
-            $this->log_install->error('Uninstall failed: configuration.');
         } elseif (!$this->uninstallSQL($keep_cards)) {
-            $this->log_install->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
-            $this->log_install->error('Uninstall failed: tab.');
         } else {
-            $log->info('Uninstall succeeded.');
             return true;
         }
         return false;
@@ -524,8 +492,6 @@ class Payplug extends PaymentModule
      */
     public function createOrderStates()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $this->log_install->info('Order state creation starting.');
         $state_key = array(
             'paid' => array(
                 'cfg' => '_PS_OS_PAYMENT_',
@@ -643,17 +609,14 @@ class Payplug extends PaymentModule
             $os = 0;
             $os_test = 0;
 
-            $log->info('Order state: ' . $key);
 
             //LIVE
-            $log->info('Live context.');
             if ((int)Configuration::get($key_config) != 0) {
                 $os = (int)Configuration::get($key_config);
             } elseif ($val = $this->findOrderState($values['name'], false)) {
                 $os = $val;
             }
             if ((int)$os == 0) {
-                $log->info('Creating new order state.');
                 $order_state = new OrderState($os);
                 $order_state->logable = $values['logable'];
                 $order_state->send_email = $values['send_email'];
@@ -683,19 +646,16 @@ class Payplug extends PaymentModule
                     @copy($source, $destination);
                 }
                 $os = (int)$order_state->id;
-                $log->info('ID: ' . $os);
             }
             Configuration::updateValue($key_config, (int)$os);
 
             //TEST
-            $log->info('Test context.');
             if ((int)Configuration::get($key_config_test) != 0) {
                 $os_test = (int)Configuration::get($key_config_test);
             } elseif ($val = $this->findOrderState($values['name'], true)) {
                 $os_test = $val;
             }
             if ((int)$os_test == 0) {
-                $log->info('Creating new order state.');
                 $order_state = new OrderState($os_test);
                 $order_state->logable = $values['logable'];
                 $order_state->send_email = $values['send_email'];
@@ -725,11 +685,9 @@ class Payplug extends PaymentModule
                     @copy($source, $destination);
                 }
                 $os_test = (int)$order_state->id;
-                $log->info('ID: ' . $os);
             }
             Configuration::updateValue($key_config_test, (int)$os_test);
         }
-        $log->info('Order state creation ended.');
         return true;
     }
 
@@ -780,8 +738,6 @@ class Payplug extends PaymentModule
      */
     private function installSQL()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Installation SQL Starting.');
 
         if (!defined('_MYSQL_ENGINE_')) {
             define('_MYSQL_ENGINE_', 'InnoDB');
@@ -798,7 +754,6 @@ class Payplug extends PaymentModule
         $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 
         if (!$res_payplug_lock) {
-            $log->error('Installation SQL failed: PAYPLUG_LOCK.');
             return false;
         }
 
@@ -820,7 +775,6 @@ class Payplug extends PaymentModule
         $res_payplug_card = DB::getInstance()->Execute($req_payplug_card);
 
         if (!$res_payplug_card) {
-            $log->error('Installation SQL failed: PAYPLUG_CARD.');
             return false;
         }
 
@@ -834,7 +788,6 @@ class Payplug extends PaymentModule
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
 
         if (!$res_payplug_payment_cart) {
-            $log->error('Installation SQL failed: PAYPLUG_PAYMENT_CART.');
             return false;
         }
 
@@ -849,7 +802,6 @@ class Payplug extends PaymentModule
         $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
 
         if (!$res_payplug_installment_cart) {
-            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENT_CART.');
             return false;
         }
 
@@ -869,12 +821,10 @@ class Payplug extends PaymentModule
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
 
         if (!$res_payplug_installment) {
-            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENTS.');
             return false;
         }
 
 
-        $log->info('Installation SQL ended.');
         return true;
     }
 
@@ -885,14 +835,11 @@ class Payplug extends PaymentModule
      */
     private function uninstallSQL($keep_cards = false)
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Uninstallation SQL starting.');
         $req_payplug_lock = '
             DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_lock`';
         $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 
         if (!$res_payplug_lock) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_LOCK.');
             return false;
         }
 
@@ -902,11 +849,9 @@ class Payplug extends PaymentModule
             $res_payplug_card = DB::getInstance()->Execute($req_payplug_card);
 
             if (!$res_payplug_card) {
-                $log->error('Uninstallation SQL failed: PAYPLUG_CARD.');
                 return false;
             }
         } else {
-            $log->info('Cards kept in database.');
         }
 
         $req_payplug_payment_cart = '
@@ -914,7 +859,6 @@ class Payplug extends PaymentModule
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
 
         if (!$res_payplug_payment_cart) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_PAYMENT_CART.');
             return false;
         }
 
@@ -923,7 +867,6 @@ class Payplug extends PaymentModule
         $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
 
         if (!$res_payplug_installment_cart) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENT_CART.');
             return false;
         }
 
@@ -932,11 +875,9 @@ class Payplug extends PaymentModule
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
 
         if (!$res_payplug_installment) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENTS.');
             return false;
         }
 
-        $log->info('Uninstallation SQL ended.');
         return true;
     }
 
@@ -2416,25 +2357,6 @@ class Payplug extends PaymentModule
             $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
         }
 
-        // log Payment tab
-        if (Configuration::get('PAYPLUG_DEBUG_MODE')) {
-            $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/prepare_payment.csv');
-            $log->info('Starting ' . ($is_installment ? 'installment.' : 'payment.'));
-            foreach ($payment_tab as $key => $value) {
-                if (is_array($value)) {
-                    foreach ($value as $n_key => $n_value) {
-                        $log->info($n_key . ' : ' . (is_array($n_value) ? '' : $n_value));
-                        if(is_array($n_value)) {
-                            foreach ($n_value as $k => $v) {
-                                $log->info($k . ' : ' . json_encode($v) );
-                            }
-                        }
-                    }
-                } else {
-                    $log->info($key . ' : ' . $value);
-                }
-            }
-        }
 
         // Create payment
         try {

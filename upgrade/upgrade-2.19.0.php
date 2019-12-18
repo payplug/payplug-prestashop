@@ -56,18 +56,15 @@ function upgrade_module_2_19_0($object)
     try {
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
         if (!$res_payplug_installment) {
-            $log->error('Fail to add table payplug_installment');
             $flag = false;
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to add new table');
         $flag = false;
     }
 
     $object->uninstallTab();
     $object->uninstallModuleTab('AdminPayplug');
     if (!$object->installTab()) {
-        $this->log_install->error('Fail to add installment tab.');
         $flag = false;
     }
 
