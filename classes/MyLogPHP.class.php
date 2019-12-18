@@ -134,3 +134,11 @@ class MyLogPHP
         self::log('DEBUG', $value, $tag, $line_n);
     }
 }
+
+function truncateLogfile($glob) {
+    foreach (glob($glob) as $path) {
+        $file = fopen($path, "a+");
+        ftruncate($file, 0);
+        fclose($file);
+    }
+}
