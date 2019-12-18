@@ -450,7 +450,7 @@ class Payplug extends PaymentModule
             && Configuration::updateValue('PAYPLUG_COMPANY_ID', null)
             && Configuration::updateValue('PAYPLUG_COMPANY_STATUS', '')
             && Configuration::updateValue('PAYPLUG_CURRENCIES', 'EUR')
-            && Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1)
+            && Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0)
             && Configuration::updateValue('PAYPLUG_EMAIL', null)
             && Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 0)
             && Configuration::updateValue('PAYPLUG_INST', null)
