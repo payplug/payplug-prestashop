@@ -27,15 +27,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_0_0()
+function upgrade_module_2_25_0()
 {
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/general-log.csv');
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/inst_ipn-*.csv');
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/ipn-*.csv');
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/notification-*.csv');
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/prepare_payment.csv');
-    truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/validation-*.csv');
+    truncateLogFile(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
     Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
     return true;
 }

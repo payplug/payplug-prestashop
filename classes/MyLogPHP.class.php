@@ -118,7 +118,7 @@ class MyLogPHP
     }
 }
 
-function truncateLogfile($glob) {
+function truncateLogFile($glob) {
     foreach (glob($glob) as $path) {
         $file = fopen($path, "a+");
         ftruncate($file, 0);
