@@ -1351,15 +1351,6 @@ class Payplug extends PaymentModule
             'label_right' => $this->l('no'),
         );
 
-        $switch_debug_mode = array(
-            'name' => 'payplug_debug_mode',
-            'label' => $this->l('Enable debug mode'),
-            'active' => true,
-            'checked' => $PAYPLUG_DEBUG_MODE,
-            'label_left' => $this->l('yes'),
-            'label_right' => $this->l('no'),
-        );
-
         $this->context->smarty->assign(array(
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
@@ -1390,7 +1381,6 @@ class Payplug extends PaymentModule
             'switch_one_click' => $switch_one_click,
             'switch_embedded' => $switch_embedded,
             'switch_sandbox' => $switch_sandbox,
-            'switch_debug_mode' => $switch_debug_mode,
             'order_states' => $this->getOrderStates(),
         ));
 
@@ -1578,15 +1568,6 @@ class Payplug extends PaymentModule
             'label_right' => $this->l('no'),
         );
 
-        $switch_debug_mode = array(
-            'name' => 'payplug_debug_mode',
-            'label' => $this->l('Enable debug mode'),
-            'active' => true,
-            'checked' => $PAYPLUG_DEBUG_MODE,
-            'label_left' => $this->l('yes'),
-            'label_right' => $this->l('no'),
-        );
-
         $this->context->smarty->assign(array(
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
@@ -1615,7 +1596,6 @@ class Payplug extends PaymentModule
             'switch_one_click' => $switch_one_click,
             'switch_embedded' => $switch_embedded,
             'switch_sandbox' => $switch_sandbox,
-            'switch_debug_mode' => $switch_debug_mode,
             'order_states' => $this->getOrderStates(),
         ));
         $this->html = $this->fetchTemplateRC('/views/templates/admin/login.tpl');
