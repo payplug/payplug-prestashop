@@ -36,5 +36,6 @@ function upgrade_module_3_0_0()
     truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/notification-*.csv');
     truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/prepare_payment.csv');
     truncateLogfile(_PS_MODULE_DIR_ . 'payplug/log/validation-*.csv');
+    Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
     return true;
 }

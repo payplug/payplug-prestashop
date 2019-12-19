@@ -3666,14 +3666,6 @@ class Payplug extends PaymentModule
                 Configuration::updateValue('PAYPLUG_SHOW', 0);
                 die(true);
             }
-            if (Tools::getIsset('db')) {
-                if (Tools::getValue('db') == 'on') {
-                    Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1);
-                } elseif (Tools::getValue('db') == 'off') {
-                    Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
-                }
-                die(true);
-            }
             if ((int)Tools::getValue('popin') == 1) {
                 $args = null;
                 if (Tools::getValue('type') == 'confirm') {
