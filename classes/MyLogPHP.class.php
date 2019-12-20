@@ -120,7 +120,7 @@ class MyLogPHP
 
 function truncateLogFile($glob) {
     foreach (glob($glob) as $path) {
-        $file = fopen($path, "a+");
+        $file = fopen($path, "w");
         ftruncate($file, 0);
         fclose($file);
     }
