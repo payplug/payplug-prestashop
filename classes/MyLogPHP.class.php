@@ -64,23 +64,6 @@ class MyLogPHP
      */
     private function log($errorlevel = 'INFO', $value = '', $tag = '', $line_n = null)
     {
-        $datetime = @date("Y-m-d H:i:s");
-        if (!file_exists($this->LOGFILENAME)) {
-            $headers = $this->HEADERS . "\n";
-        }
-        $fd = fopen($this->LOGFILENAME, "a");
-        $debugBacktrace = debug_backtrace();
-        $line = $debugBacktrace[1]['line'];
-        if ($line_n === null) {
-            $line = $debugBacktrace[1]['line'];
-        } else {
-            $line = $line_n;
-        }
-        $file = $debugBacktrace[1]['file'];
-        $value = preg_replace('/\s+/', ' ', trim($value));
-        $entry = array($datetime,$errorlevel,$tag,$value,$line,$file);
-        fputcsv($fd, $entry, $this->SEPARATOR);
-        fclose($fd);
     }
 
     /**
@@ -132,5 +115,13 @@ class MyLogPHP
     public function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
         self::log('DEBUG', $value, $tag, $line_n);
+    }
+}
+
+function truncateCSV($glob) {
+    foreach (glob($glob) as $path) {
+        $file = fopen($path, "w");
+        ftruncate($file, 0);
+        fclose($file);
     }
 }
