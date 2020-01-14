@@ -47,7 +47,5 @@
         <p class="interpanel">{l s='For more information about installing and configuring the plugin, please consult' mod='payplug'} <a href="http://support.payplug.com/customer/portal/articles/2933281" target="_blank">{l s='this support article' mod='payplug'}</a>.</p>
 
         {include file='./login.tpl' login_infos=$login_infos}
-
-        {include file='./option_debug.tpl'}
     </form>
 </div>
