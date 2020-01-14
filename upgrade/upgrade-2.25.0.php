@@ -29,7 +29,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_25_0()
 {
-    truncateLogFile(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
+    truncateCSV(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
     Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
     return true;
 }
