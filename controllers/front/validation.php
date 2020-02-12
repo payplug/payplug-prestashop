@@ -82,6 +82,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             $this->addLog($debug, $log, 'Cart cannot be loaded.', 'error');
             Tools::redirect($redirect_url_error);
         } else {
+            $amount = 0;
             if (!$pay_id = $payplug->getPaymentByCart((int)$cart_id)) {
                 if (!$inst_id = $payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->addLog($debug, $log, 'Payment is not stored or is already consumed.', 'error');
@@ -92,17 +93,18 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     Tools::redirect($link_redirect);
                 } elseif ($inst_id = $payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->addLog($debug, $log, 'Installment is not consumed yet.', 'info');
-                    $amount = 0;
-                    $pay_id = '';
+                    $pay_id = false;
                     $type = 'installment';
                     try {
                         $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
                         if (isset($installment->schedule)) {
                             foreach ($installment->schedule as $schedule) {
                                 if (!empty($schedule->payment_ids)) {
-                                    $amount = (int)$schedule->amount;
+                                    $amount += (int)$schedule->amount;
+                                    if ($pay_id) {
+                                        continue;
+                                    }
                                     $pay_id = $schedule->payment_ids[0];
-                                    break;
                                 }
                             }
                         }
@@ -127,6 +129,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
+                    $amount = (int)$payment->amount;
                     $is_authorized = isset($payment->authorization->authorized_at) && $payment->authorization->authorized_at > 0;
                 } catch (Exception $e) {
                     $this->addLog($debug, $log, 'Payment cannot be retrieved payment: ' . $pay_id, 'error');
@@ -143,14 +146,15 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
             }
 
+            $amount = (float)($amount / 100);
+
             $customer = new Customer((int)$cart->id_customer);
             if (!Validate::isLoadedObject($customer)) {
                 $this->addLog($debug, $log, 'Customer cannot be loaded.', 'error');
                 Tools::redirect($redirect_url_error);
             }
 
-            $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-            $this->addLog($debug, $log, 'Total : ' . $total, 'info');
+            $this->addLog($debug, $log, 'Total : ' . $amount, 'info');
 
             $this->addLog($debug, $log, 'Lock checking start.', 'debug');
             PayplugLock::check($cart->id);
@@ -248,17 +252,55 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                 }
 
-                $validateOrder_result = $payplug->validateOrder(
-                    $cart->id,
-                    $order_state,
-                    $total,
-                    $payplug->displayName,
-                    false,
-                    $extra_vars,
-                    (int)$cart->id_currency,
-                    false,
-                    $secure_key
-                );
+                $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
+
+                if ($amount != $total) {
+                    $this->addLog($debug, $log, 'Cart amount is different and may occured an error', 'info');
+                    $this->addLog($debug, $log, 'Order create with amount:' . $total, 'info');
+
+                    $validateOrder_result = $payplug->validateOrder(
+                        $cart->id,
+                        $order_state,
+                        $total,
+                        $payplug->displayName,
+                        false,
+                        $extra_vars,
+                        (int)$cart->id_currency,
+                        false,
+                        $secure_key
+                    );
+
+                    if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
+                        $order = Order::getByCartId($cart->id);
+                    } else {
+                        $id_order = Order::getOrderByCartId($cart->id);
+                        $order = new Order($id_order);
+                    }
+
+                    $this->addLog('Order payment patch with amount:' . $amount, 'info');
+                    $order->total_paid = $amount;
+                    $order->total_paid_real = $amount;
+                    $order->total_paid_tax_incl = $amount;
+                    $order->update();
+
+                    $sql = 'UPDATE `'._DB_PREFIX_.'order_payment` SET `amount` = '.(float)$amount.' WHERE  `transaction_id` = "'.pSQL($pay_id).'"';
+                    Db::getInstance()->execute($sql);
+
+                    $this->addLog('Order amount is patched' . $total, 'info');
+                } else {
+                    $validateOrder_result = $payplug->validateOrder(
+                        $cart->id,
+                        $order_state,
+                        $total,
+                        $payplug->displayName,
+                        false,
+                        $extra_vars,
+                        (int)$cart->id_currency,
+                        false,
+                        $secure_key
+                    );
+                }
+
                 $id_order = $payplug->currentOrder;
                 $order = new Order($id_order);
 
