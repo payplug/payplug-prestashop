@@ -576,6 +576,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     } else {
                         $this->addLog('CREATE MODE');
 
+                        $amount = 0;
+
                         if ($this->resource->installment_plan_id != null) {
                             $installment = new PPPaymentInstallment($this->resource->installment_plan_id);
                             $first_payment = $installment->getFirstPayment();
@@ -587,18 +589,25 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $extra_vars = array(
                                 'transaction_id' => $this->resource->installment_plan_id
                             );
+
+                            $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
+                            foreach ($installment->schedule as $schedule) {
+                                $amount += (int)$schedule->amount;
+                            }
                         } else {
                             if ($deferred) {
                                 $order_state = $auth_state;
                             } else {
                                 $order_state = $paid_state;
                             }
+                            $amount = (int)$payment->amount;
                             $extra_vars = array(
                                 'transaction_id' => $payment->id
                             );
                         }
 
-                        $amount = (float)($cart->getOrderTotal(true, Cart::BOTH));
+                        $amount = $amount / 100;
+
                         $currency = (int)$cart->id_currency;
                         try {
                             $customer = new Customer((int)$cart->id_customer);
@@ -646,17 +655,55 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                             try {
-                                $is_order_validated = $this->payplug->validateOrder(
-                                    $cart->id,
-                                    $order_state,
-                                    $amount,
-                                    $this->payplug->displayName,
-                                    null,
-                                    $extra_vars,
-                                    $currency,
-                                    false,
-                                    $secure_key
-                                );
+                                $cart_amount = (float)($cart->getOrderTotal(true, Cart::BOTH));
+
+                                if ($amount != $cart_amount) {
+                                    $this->addLog('Cart amount is different and may occured an error', 'info');
+                                    $this->addLog('Order create with amount:' . $cart_amount, 'info');
+
+                                    $is_order_validated = $this->payplug->validateOrder(
+                                        $cart->id,
+                                        $order_state,
+                                        $cart_amount,
+                                        $this->payplug->displayName,
+                                        null,
+                                        $extra_vars,
+                                        $currency,
+                                        false,
+                                        $secure_key
+                                    );
+
+                                    if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
+                                        $order = Order::getByCartId($cart->id);
+                                    } else {
+                                        $id_order = Order::getOrderByCartId($cart->id);
+                                        $order = new Order($id_order);
+                                    }
+
+                                    $this->addLog('Order payment patch with amount:' . $amount, 'info');
+                                    $order->total_paid = $amount;
+                                    $order->total_paid_real = $amount;
+                                    $order->total_paid_tax_incl = $amount;
+                                    $order->update();
+
+                                    $sql = 'UPDATE `'._DB_PREFIX_.'order_payment` SET `amount` = '.(float)$amount.' WHERE  `transaction_id` = "'.pSQL($this->resource->id).'"';
+                                    Db::getInstance()->execute($sql);
+
+                                    $this->addLog('Order amount is patched' . $cart_amount, 'info');
+                                } else {
+                                    $is_order_validated = $this->payplug->validateOrder(
+                                        $cart->id,
+                                        $order_state,
+                                        $amount,
+                                        $this->payplug->displayName,
+                                        null,
+                                        $extra_vars,
+                                        $currency,
+                                        false,
+                                        $secure_key
+                                    );
+                                }
+
                             } catch (Exception $exception) {
                                 $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->addLog(
