@@ -54,6 +54,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     }
                 }
             }
+            if (Tools::getIsset('getOneyCta')) {
+                die(json_encode(array(
+                    'result' => true,
+                    'tpl' => $payplug->getOneyCTA(),
+                )));
+            }
         }
     }
 }

@@ -439,7 +439,7 @@ class Payplug extends PaymentModule
                     )));
                 } else {
                     $state_addons = ($payment->resource->is_live ? '' : '_TEST');
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID'.$state_addons);
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
 
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
@@ -543,7 +543,7 @@ class Payplug extends PaymentModule
 
         $pay_brand = $this->getCardBrandByPayment($payment);
         if ($payment->card->country != '') {
-            $pay_brand .= ' '.$this->l('Card').' ('.$payment->card->country.')';
+            $pay_brand .= ' ' . $this->l('Card') . ' (' . $payment->card->country . ')';
         }
 
         $payment_details = array(
@@ -573,7 +573,8 @@ class Payplug extends PaymentModule
                 $expiration = date('d/m/Y', (int)$payment->authorization->expires_at);
                 if ($payment->authorization->expires_at - time() > 0) {
                     $payment_details['can_be_captured'] = true;
-                    $payment_details['status_message'] = sprintf($this->l('(capture authorized before %s)'), $expiration);
+                    $payment_details['status_message'] = sprintf($this->l('(capture authorized before %s)'),
+                        $expiration);
                     $payment_details['date'] = date('d/m/Y', (int)$payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                 } else {
@@ -589,7 +590,7 @@ class Payplug extends PaymentModule
         }
 
         if (isset($payment->failure) && isset($payment->failure->message) && !$is_expired) {
-            $payment_details['error'] = $this->l('('.$payment->failure->message.')');
+            $payment_details['error'] = $this->l('(' . $payment->failure->message . ')');
         }
         return $payment_details;
     }
@@ -1597,7 +1598,6 @@ class Payplug extends PaymentModule
         return $available_options;
     }
 
-
     /**
      * @param $payment
      * @return Exception|string
@@ -1637,7 +1637,8 @@ class Payplug extends PaymentModule
         if ($payment->card->exp_month === null) {
             $card_expiry_date = $this->l('Unavailable');
         } else {
-            $card_expiry_date = date('m/y', strtotime('01.'.$payment->card->exp_month.'.'.$payment->card->exp_year));
+            $card_expiry_date = date('m/y',
+                strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
         }
         return $card_expiry_date;
     }
@@ -1685,7 +1686,7 @@ class Payplug extends PaymentModule
         }
 
         if ($payment->card->last4 != '') {
-            $card_mask = '**** **** **** '.$payment->card->last4;
+            $card_mask = '**** **** **** ' . $payment->card->last4;
         } else {
             $card_mask = $this->l('Unavailable');
         }
@@ -2233,7 +2234,8 @@ class Payplug extends PaymentModule
      * @param null $id_lang
      * @return array
      */
-    private function getOrderStates($id_lang = null) {
+    private function getOrderStates($id_lang = null)
+    {
         if ($id_lang === null) {
             $id_lang = $this->context->language->id;
         }
@@ -2334,7 +2336,8 @@ class Payplug extends PaymentModule
                 $paymentOption
                     ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
                     ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
+                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
+                        array('def' => (int)$options['deferred']), true))
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
                 $payment_list[] = $paymentOption;
@@ -2369,11 +2372,12 @@ class Payplug extends PaymentModule
             ),
         );
         $paymentOption
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'
-                .(count($payplug_cards) > 0 ? 'none' : 'logos_schemes_'.$this->img_lang)
-                .'.png'))
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/'
+                . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang)
+                . '.png'))
             ->setCallToActionText(count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
+                array('def' => (int)$options['deferred']), true))
             ->setModuleName('payplug')
             ->setInputs($input_options);
 
@@ -2413,7 +2417,8 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
                 ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
+                    array('def' => (int)$options['deferred']), true))
                 ->setModuleName('payplug')
                 ->setInputs($input_options);
 
@@ -2627,7 +2632,6 @@ class Payplug extends PaymentModule
             return $amount_refunded_presta;
         }
     }
-
 
     /**
      * @return string
@@ -3217,17 +3221,16 @@ class Payplug extends PaymentModule
 
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
 
-            $id_card = Tools::getValue('pc','new_card');
+            $id_card = Tools::getValue('pc', 'new_card');
             $is_installment = (bool)Tools::getValue('inst') == 1;
             $is_deferred = (bool)Tools::getValue('def') == 1;
             $payment = $this->preparePayment($cart, $id_card, $is_installment, $is_deferred);
 
-            if($payment['result']){
+            if ($payment['result']) {
                 // If payment is paid then redirect
-                if($payment['redirect']) {
+                if ($payment['redirect']) {
                     Tools::redirect($payment['return_url']);
-                }
-                // else show the popin
+                } // else show the popin
                 else {
                     $this->context->smarty->assign(array(
                         'payment_url' => $payment['return_url'],
@@ -3240,6 +3243,18 @@ class Payplug extends PaymentModule
                 Tools::redirect($error_url);
             }
         }
+
+        if (Configuration::get('PAYPLUG_ONEY')) {
+            Media::addJsDef(array(
+                'payplug_oney' => true,
+            ));
+        }
+
+        $payplug_ajax_url = $this->context->link->getModuleLink($this->name, 'ajax', array(),true);
+        Media::addJsDef(array(
+            'payplug_ajax_url' => $payplug_ajax_url,
+        ));
+
     }
 
     /**
@@ -3881,7 +3896,7 @@ class Payplug extends PaymentModule
      */
     public function preparePayment($cart, $id_card = 'new_card', $is_installment = false, $is_deferred = false)
     {
-        if(!is_object($cart)){
+        if (!is_object($cart)) {
             $cart = new Cart((int)$cart);
         }
         if (!Validate::isLoadedObject($cart)) {
@@ -4083,7 +4098,8 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
+            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer,
+                $id_card, $config['company']) : null;
         }
 
 
@@ -4117,7 +4133,7 @@ class Payplug extends PaymentModule
             ];
         }
 
-        if($is_one_click) {
+        if ($is_one_click) {
             $is_paid = $payment->is_paid;
             if (!$is_paid && $is_deferred) {
                 $is_paid = $payment->authorization->authorized_at;
@@ -4210,7 +4226,7 @@ class Payplug extends PaymentModule
         $db = new DbQuery();
         $db->select('id_card');
         $db->from('payplug_card');
-        $db->where('id_card = "' . $payment->card->id .'"');
+        $db->where('id_card = "' . $payment->card->id . '"');
         $db->where('id_company = ' . (int)$company_id);
         $db->where('is_sandbox = ' . (int)$is_sandbox);
         if (Db::getInstance()->getValue($db)) {
@@ -4841,5 +4857,16 @@ class Payplug extends PaymentModule
                 }
             }
         }
+    }
+
+
+    /**
+     *  Get Oney call to action
+     *
+     * @return mixed
+     */
+    public function getOneyCTA()
+    {
+        return $this->display(__FILE__, 'oney/cta.tpl');
     }
 }

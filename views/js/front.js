@@ -19,7 +19,7 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-var allow_debug = false, debug = function (str) {
+var allow_debug = true, debug = function (str) {
     if (allow_debug) {
         console.log(str);
     }
@@ -29,14 +29,15 @@ var $document, payplug = {
         debug('payplug init');
         this.card.init();
         this.order.init();
+        this.oney.init();
     },
     order: {
         init: function () {
             // Styling
             var $options = $('input[data-module-name="payplug"]');
-            $options.each(function() {
+            $options.each(function () {
                 var optionId = $(this).attr('id') + '-additional-information';
-                $('#'+optionId).attr('style', 'margin:0;');
+                $('#' + optionId).attr('style', 'margin:0;');
             }).parents('.payment-option').addClass('payplug-payment-option')
         }
     },
@@ -74,7 +75,75 @@ var $document, payplug = {
                 }
             });
         },
-    }
+    },
+    oney: {
+        props: {
+            buildClass: 'oneyCTA-builder'
+        },
+        init: function () {
+            debug('oney init');
+            if(typeof payplug_oney == 'undefined' || !payplug_oney) {
+                return;
+            }
+
+            this.product.init();
+            this.checkout.init();
+            this.cta.init();
+        },
+        product: {
+            init: function () {
+                debug('oney product init');
+                if(!$('.product-prices').length) {
+                    return;
+                }
+                this.set();
+            },
+            set: function () {
+                $('.product-prices').append('<span class="' + payplug.oney.props.buildClass + '" />')
+            }
+        },
+        checkout: {
+            init: function () {
+                debug('oney checkout init');
+                if(!$('.cart-detailed-totals').length) {
+                    return;
+                }
+                this.set();
+            },
+            set: function () {
+                $('.cart-detailed-totals').append('<span class="' + payplug.oney.props.buildClass + '" />')
+            }
+        },
+        cta: {
+            init: function () {
+                debug('oney cta init');
+                if($('.' + payplug.oney.props.buildClass).length) {
+                    this.get();
+                }
+            },
+            get: function(){
+                $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        getOneyCta: 1,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                    success: function (data) {
+                        if(data.result) {
+                            $('.' + payplug.oney.props.buildClass).replaceWith(data.tpl);
+                        }
+                    }
+                });
+            },
+        },
+    },
 };
 $(document).ready(function () {
     $document = $(document);
