@@ -45,6 +45,7 @@ $payplug_lib_files = array(
     '/Payplug/Payment.php',
     '/Payplug/Payplug.php',
     '/Payplug/Refund.php',
+    '/Payplug/OneySimulation.php',
     '/Payplug/Core/APIRoutes.php',
     '/Payplug/Exception/PayplugException.php',
     '/Payplug/Exception/DependencyException.php',
@@ -84,6 +85,7 @@ $payplug_lib_files = array(
     '/Payplug/Resource/PaymentAuthorization.php',
     '/Payplug/Resource/PaymentBilling.php',
     '/Payplug/Resource/PaymentShipping.php',
+    '/Payplug/Resource/OneySimulationResource.php',
 );
 $files = array_merge($files, $payplug_lib_files);
 
