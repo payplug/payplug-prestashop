@@ -24,7 +24,7 @@ var allow_debug = true, debug = function (str) {
         console.log(str);
     }
 };
-var $document, payplug = {
+var $document, payplugModule = {
     init: function () {
         debug('payplug init');
         this.card.init();
@@ -43,7 +43,7 @@ var $document, payplug = {
     },
     card: {
         init: function () {
-            $document.on('click', 'a.ppdeletecard', payplug.card.delete);
+            $document.on('click', 'a.ppdeletecard', payplugModule.card.delete);
         },
         delete: function (event) {
             event.preventDefault();
@@ -78,7 +78,10 @@ var $document, payplug = {
     },
     oney: {
         props: {
-            buildClass: 'oneyCTA-builder'
+            classes: {
+                build: 'oneyCTA-builder',
+                button: 'oneyCta_button',
+            },
         },
         init: function () {
             debug('oney init');
@@ -99,7 +102,7 @@ var $document, payplug = {
                 this.set();
             },
             set: function () {
-                $('.product-prices').append('<span class="' + payplug.oney.props.buildClass + '" />')
+                $('.product-prices').append('<span class="' + payplugModule.oney.props.classes.build + '" />')
             }
         },
         checkout: {
@@ -111,17 +114,18 @@ var $document, payplug = {
                 this.set();
             },
             set: function () {
-                $('.cart-detailed-totals').append('<span class="' + payplug.oney.props.buildClass + '" />')
+                $('.cart-detailed-totals').append('<span class="' + payplugModule.oney.props.classes.build + '" />')
             }
         },
         cta: {
             init: function () {
                 debug('oney cta init');
-                if($('.' + payplug.oney.props.buildClass).length) {
+                if($('.' + payplugModule.oney.props.classes.build).length) {
                     this.get();
                 }
             },
             get: function(){
+                debug('oney cta get');
                 $.ajax({
                     type: 'POST',
                     url: payplug_ajax_url,
@@ -137,15 +141,168 @@ var $document, payplug = {
                     },
                     success: function (data) {
                         if(data.result) {
-                            $('.' + payplug.oney.props.buildClass).replaceWith(data.tpl);
+                            $('.' + payplugModule.oney.props.classes.build).replaceWith(data.tpl);
+                            payplugModule.oney.cta.load();
+                            payplugModule.oney.popin.init();
                         }
                     }
                 });
+            },
+            load: function () {
+                debug('oney cta load');
+                var oney = payplugModule.oney,
+                    data = {
+                        _ajax: 1,
+                        getOneyPriceAndPaymentOptions: 1
+                    };
+
+                // check if context is product page
+                // if ($('#product_page_product_id').length) {
+                //     var $product_form = $('#add-to-cart-or-refresh'),
+                //         from_data = $product_form.serializeArray();
+                //     from_data.map(function(field){
+                //         data[field.name] = field.value;
+                //     })
+                // }
+
+                oney.popin.setLoader();
+
+                $.ajax({
+                    url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                    headers: {"cache-control": "no-cache"},
+                    type: 'POST',
+                    async: true,
+                    cache: false,
+                    dataType: 'json',
+                    data: data,
+                    success: function (data) {
+                        if(data.result) {
+                            payplugModule.oney.popin.set(data.popin);
+                        } else {
+                            if (typeof data.popin != 'undefined') {
+                                payplugModule.oney.popin.set(data.popin);
+                            } else if (typeof data.error != 'undefined') {
+                                var popin_error = '<span class="oneyPopin"><p class="oneyPopin_error">' + data.error + '</p></span>'
+                                payplugModule.oney.popin.set(popin_error);
+                            }
+
+                            payplugModule.oney.popin.disable();
+                        }
+                    }
+                });
+            },
+        },
+        loader: {
+            set: function (target) {
+                var popin = '<span class="oneyLoader">' +
+                    '<span class="oneyLoader_spinner"><span></span></span>' +
+                    '<span class="oneyLoader_message">' + payplug_oney_loading_msg + ' <i>.</i><i>.</i><i>.</i></span>' +
+                    '</span>';
+                $(target).html(popin);
+            },
+        },
+        popin: {
+            init: function () {
+                var popin = this;
+                $document.on('click', '.oneyCta_button', popin.toggle)
+                    .on('click', '.oneyPopin_close', popin.hide)
+                    .on('click', '.oneyPopin_navigation button', popin.select);
+
+                $document.on('click', function (event) {
+                    var $clicked = $(event.target);
+                    if ((!$clicked.is('.oneyPopin') && !$clicked.parents('.oneyPopin').length) && $('.oneyCta').is('.oneyCta-open')) {
+                        popin.close();
+                    }
+                });
+            },
+            set: function (content) {
+                if (!$('.oneyCta').length) {
+                    return false;
+                }
+                var is_open = $('.oneyCta').is('.oneyCta-open');
+                $('.oneyPopin').replaceWith(content).removeClass('oneyPopin-loading');
+
+                var $button = $('.oneyPopin_navigation button').eq(0);
+                payplugModule.oney.popin.choose($button.data('type'));
+
+                if (is_open) {
+                    setTimeout(payplugModule.oney.popin.open, 0);
+                }
+            },
+            setLoader: function () {
+                var target = '.oneyPopin';
+                if (!$(target).length) {
+                    $('.oneyCta').append('<span class="oneyPopin" />');
+                }
+                payplugModule.oney.loader.set(target);
+                $(target).addClass('oneyPopin-loading');
+            },
+            toggle: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var popin = payplugModule.oney.popin,
+                    is_active = $('.oneyCta').is('.oneyCta-open');
+                if (is_active) {
+                    popin.close();
+                } else {
+                    popin.open();
+                }
+            },
+            enable: function () {
+                $('.oneyCta_button').removeClass('oneyCta_button-disabled');
+                $('.oneyPopin').removeClass('oneyPopin-error');
+            },
+            disable: function () {
+                $('.oneyCta_button').addClass('oneyCta_button-disabled');
+                $('.oneyPopin').addClass('oneyPopin-error');
+            },
+            select: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                var $button = $(this),
+                    $li = $button.parents('li');
+
+                if ($li.is('.selected')) {
+                    return false;
+                }
+
+                payplugModule.oney.popin.choose($button.data('type'));
+            },
+            choose: function (option) {
+                // nav
+                $('.oneyPopin_navigation li').removeClass('selected');
+                $('.oneyPopin_navigation button[data-type=' + option + ']').parent('li').addClass('selected');
+
+                // option
+                $('.oneyPopin_option').removeClass('oneyPopin_option-show');
+                $('.oneyPopin_option[data-type=' + option + ']').addClass('oneyPopin_option-show');
+            },
+            open: function () {
+                $('.oneyCta').addClass('oneyCta-open');
+                $('.oneyPopin').addClass('oneyPopin-open');
+
+                setTimeout(function () {
+                    $('.oneyPopin').addClass('oneyPopin-show');
+                }, 0);
+            },
+            close: function () {
+                $('.oneyPopin').addClass('oneyPopin-show');
+                $('.oneyPopin').removeClass('oneyPopin-open');
+
+                setTimeout(function () {
+                    $('.oneyCta').removeClass('oneyCta-open');
+                }, 400);
+            },
+            hide: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                payplugModule.oney.popin.close();
             },
         },
     },
 };
 $(document).ready(function () {
     $document = $(document);
-    payplug.init();
+    payplugModule.init();
 });

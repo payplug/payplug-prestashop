@@ -53,12 +53,36 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
-            }
-            if (Tools::getIsset('getOneyCta')) {
+            } elseif (Tools::getIsset('getOneyCta')) {
                 die(json_encode(array(
                     'result' => true,
                     'tpl' => $payplug->getOneyCTA(),
                 )));
+            } elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
+                $use_taxes = (bool)Configuration::get('PS_TAX');
+
+                if ($id_product = (int)Tools::getValue('id_product')) {
+                    $id_product_attribute = (int)Product::getIdProductAttributeByIdAttributes(
+                        $id_product,
+                        Tools::getValue('group')
+                    );
+                    $quantity = (int)Tools::getValue('quantity', 1);
+
+                    $product_price = Product::getPriceStatic((int) $id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
+                    $amount = $product_price * $quantity;
+                    $iso_code = false;
+                    $cart = false;
+                } else {
+                    $context = Context::getContext();
+                    $amount = $context->cart->getOrderTotal($use_taxes);
+                    $delivery_address = new Address($context->cart->id_address_delivery);
+                    $delivery_country = new Country($delivery_address->id_country);
+                    $iso_code = $delivery_country->iso_code;
+                    $cart = $context->cart;
+                }
+
+                $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+                die(json_encode($payment_options));
             }
         }
     }
