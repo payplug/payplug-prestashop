@@ -3739,6 +3739,18 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @param $params
+     * @return string|void
+     */
+    public function hookDisplayProductPriceBlock($param)
+    {
+        if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
+            return;
+        }
+        return $this->display(__FILE__, 'oney/cta.tpl');
+    }
+
+    /**
      * @param array $params
      * @return string
      * @see Module::hookHeader()
@@ -3907,7 +3919,8 @@ class Payplug extends PaymentModule
             !$this->registerHook('header') ||
             !$this->registerHook('adminOrder') ||
             !$this->registerHook('actionOrderStatusUpdate') ||
-            !$this->registerHook('customerAccount')
+            !$this->registerHook('customerAccount') ||
+            !$this->registerHook('displayProductPriceBlock')
         ) {
             $this->log_install->error('Install failed: classics hooks.');
         } elseif (!$this->registerHook('paymentOptions')) {

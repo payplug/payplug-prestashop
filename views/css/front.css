@@ -385,13 +385,6 @@ div.ppoverlay {
     background: transparent;
   }
 }
-.oneyCta_wrapper {
-  display: flex !important;
-  justify-content: flex-end;
-}
-.oneyCta_wrapper .oneyCta_button-checkout {
-  display: flex;
-}
 .oneyPopin {
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
@@ -648,6 +641,11 @@ div.ppoverlay {
 .oneyPopin_option p:last-child,
 .oneyPopin_option li:last-child {
   padding: 4px 0;
+}
+.oneyPopin_option p small,
+.oneyPopin_option li small {
+  display: block;
+  width: 100%;
 }
 .oneyPopin_option[data-type="3x"] ul li:last-child {
   padding: 21px 0 4px;

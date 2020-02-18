@@ -66,7 +66,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $id_product,
                         Tools::getValue('group')
                     );
-                    $quantity = (int)Tools::getValue('quantity', 1);
+                    $quantity = (int)Tools::getValue('qty', 1);
 
                     $product_price = Product::getPriceStatic((int) $id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
                     $amount = $product_price * $quantity;
