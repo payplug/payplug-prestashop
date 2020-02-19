@@ -78,11 +78,11 @@ var $document, $window, payplugModule = {
     },
     oney: {
         props: {
-            classes: {
-                build: 'oneyCTA-builder',
-                button: 'oneyCta_button',
-            },
-            query: null
+            query: null,
+            sizes: [
+                {format: 'mobile', limit: 735},
+                {format: 'desktop', limit: 9999},
+            ]
         },
         clear: function () {
             for (i = 0; i < payplugModule.oney.props.queries.length; i++) {
@@ -98,9 +98,7 @@ var $document, $window, payplugModule = {
             }
             var oney = payplugModule.oney;
 
-            if ($('.' + this.cta.props.identifier).length) {
-                this.cta.init();
-            }
+            this.cta.init();
 
             $window.on('load', oney.load);
             prestashop.on('updatedProduct', oney.load);
@@ -176,6 +174,7 @@ var $document, $window, payplugModule = {
             },
             init: function () {
                 var cta = this;
+                debug('oney cta init');
                 cta.props.loaded = true;
                 $document.on('click', '.' + cta.props.identifier + '_button', cta.popin.toggle);
                 cta.popin.init();
@@ -258,11 +257,18 @@ var $document, $window, payplugModule = {
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var is_open = $('.' + payplugModule.oney.cta.popin.props.identifier + '-open').length > 0;
+                    var popin = payplugModule.oney.cta.popin,
+                        identifier = popin.props.identifier;
+
+                    if (!$('.' + identifier).length) {
+                        popin.reset();
+                        payplugModule.oney.load();
+                    }
+                    var is_open = $('.' + identifier + '-open').length > 0;
                     if (is_open) {
-                        payplugModule.oney.cta.popin.close();
+                        popin.close();
                     } else {
-                        payplugModule.oney.cta.popin.open();
+                        popin.open();
                     }
                 },
                 open: function () {
@@ -293,6 +299,11 @@ var $document, $window, payplugModule = {
                     event.stopPropagation();
                     payplugModule.oney.cta.popin.close();
                 },
+            }
+        },
+        address: {
+            init: function () {
+                // editAddress
             }
         }
     },

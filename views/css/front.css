@@ -275,6 +275,9 @@ div.ppoverlay {
   z-index: 3;
   display: inline-block;
 }
+.oneyCta-checkout {
+  margin: 16px 0 0;
+}
 @media (max-width: 767px) {
   .oneyCta {
     align-items: flex-start;
@@ -325,20 +328,6 @@ div.ppoverlay {
 }
 .oneyCta_button-disabled:hover {
   color: #b2b2b2;
-}
-.oneyCta_button-product {
-  max-width: 100%;
-  font-size: 10px;
-}
-@media (max-width: 767px) {
-  .oneyCta_button-product {
-    position: relative;
-    height: 32px;
-    font-size: 13px;
-  }
-}
-.oneyCta_button-checkout {
-  display: none;
 }
 .oneyCta_button span {
   font: inherit;

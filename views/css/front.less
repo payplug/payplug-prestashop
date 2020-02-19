@@ -311,6 +311,10 @@ div.ppoverlay {
     z-index: 3;
     display: inline-block;
 
+    &-checkout{
+      margin: 16px 0 0;
+    }
+
     @media (@mobile) {
       &,
       #order-detail-content #cart_summary & {
@@ -360,21 +364,6 @@ div.ppoverlay {
         &:hover {
           color: #colorMap[grey];
         }
-      }
-
-      &-product {
-        max-width: 100%;
-        font-size: 10px;
-
-        @media (@mobile) {
-          position: relative;
-          height: 32px;
-          font-size: 13px;
-        }
-      }
-
-      &-checkout {
-        display: none;
       }
 
       span {

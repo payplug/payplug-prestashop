@@ -3742,11 +3742,28 @@ class Payplug extends PaymentModule
      * @param $params
      * @return string|void
      */
+    public function hookDisplayExpressCheckout($param)
+    {
+        if (!Configuration::get('PAYPLUG_ONEY')) {
+            return;
+        }
+        $this->smarty->assign(['env'=>'checkout']);
+        return $this->display(__FILE__, 'oney/cta.tpl');
+    }
+
+    /**
+     * @param $params
+     * @return string|void
+     */
     public function hookDisplayProductPriceBlock($param)
     {
+        if (!Configuration::get('PAYPLUG_ONEY')) {
+            return;
+        }
         if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
             return;
         }
+        $this->smarty->assign(['env'=>'product']);
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
@@ -3920,7 +3937,8 @@ class Payplug extends PaymentModule
             !$this->registerHook('adminOrder') ||
             !$this->registerHook('actionOrderStatusUpdate') ||
             !$this->registerHook('customerAccount') ||
-            !$this->registerHook('displayProductPriceBlock')
+            !$this->registerHook('displayProductPriceBlock') ||
+            !$this->registerHook('displayExpressCheckout')
         ) {
             $this->log_install->error('Install failed: classics hooks.');
         } elseif (!$this->registerHook('paymentOptions')) {
