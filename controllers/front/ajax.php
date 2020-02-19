@@ -33,9 +33,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $payplug = new Payplug();
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
-                    $id_cart = (int)Tools::getValue('cart');
-                    $id_card = Tools::getValue('pc');
-                    $payment = $payplug->preparePayment($id_cart, $id_card, false);
+                    $payment = $payplug->preparePayment(['id_card' => Tools::getValue('pc')]);
                     die($payment);
                 } elseif ((int)Tools::getValue('delete') == 1) {
                     $context = Context::getContext();
