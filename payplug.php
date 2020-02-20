@@ -891,15 +891,63 @@ class Payplug extends PaymentModule
         );
     }
 
-    /**
-     * Create an order state according to properties
-     *
-     * @param array $properties
-     * @return bool
-     */
-    private function createOrderState($properties)
+    public function createOrderState($name, $state, $sandbox = true)
     {
-        return true;
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
+
+        $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
+        $os = $this->getConfiguration($key_config);
+
+        if (!$os) {
+            if ($val = $this->findOrderState($state['name'], $sandbox)) {
+                $os = $val;
+            } elseif (!$sandbox && defined($state['cfg'])) {
+                $os = constant($state['cfg']);
+            } elseif (!$sandbox && $state['template'] != null) {
+                $sql = 'SELECT DISTINCT `id_order_state`
+                        FROM `' . _DB_PREFIX_ . 'order_state_lang` 
+                        WHERE `template` = \'' . pSQL($state['template']) . '\'';
+                $os = Db::getInstance()->getValue($sql);
+            }
+        }
+        if (!$os) {
+            $log->info('Creating new order state.');
+            $order_state = new OrderState();
+            $order_state->logable = $state['logable'];
+            $order_state->send_email = $state['send_email'];
+            $order_state->paid = $state['paid'];
+            $order_state->module_name = $state['module_name'];
+            $order_state->hidden = $state['hidden'];
+            $order_state->delivery = $state['delivery'];
+            $order_state->invoice = $state['invoice'];
+            $order_state->color = $state['color'];
+
+            $tag = $sandbox ? ' [TEST]' : ' [PayPlug]';
+            foreach (Language::getLanguages(false) as $lang) {
+                $order_state->template[$lang['id_lang']] = $state['template'];
+                if (in_array($lang['iso_code'], array('en', 'au', 'ca', 'ie', 'gb', 'uk', 'us'))) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['en'] . $tag;
+                } elseif (in_array($lang['iso_code'], array('fr', 'be', 'lu', 'ch'))) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['fr'] . $tag;
+                } elseif (in_array($lang['iso_code'], array('es', 'ar', 'cl', 'co', 'mx', 'py', 'uy', 've'))) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['es'] . $tag;
+                } elseif (in_array($lang['iso_code'], array('it', 'sm', 'va'))) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['it'] . $tag;
+                } else {
+                    $order_state->name[$lang['id_lang']] = $state['name']['en'] . $tag;
+                }
+            }
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_ . $this->name . '/views/img/os/' . $name . '.gif';
+                $destination = _PS_ROOT_DIR_ . '/img/os/' . $order_state->id . '.gif';
+                @copy($source, $destination);
+                $log->info('State created');
+            }
+            $os = $order_state->id;
+            $log->info('ID: ' . $os);
+        }
+        return $this->setConfiguration($key_config, $os);
     }
 
     /**
@@ -4081,6 +4129,99 @@ class Payplug extends PaymentModule
         }
 
         return true;
+    }
+
+    /**
+     * Install Oney feature
+     */
+    public function installOney()
+    {
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $log->info('Install Oney feature');
+        return $this->installOneyHook()
+            && $this->installOneyConfig()
+            && $this->installOneyOrderStates()
+            && $this->installOneySql()
+            && $this->installOneyCarriers();
+    }
+
+    /**
+     * Install Oney Config
+     * @return bool
+     */
+    private function installOneyConfig()
+    {
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $flag = true;
+        if (!$this->setConfiguration('PAYPLUG_ONEY', 0) ||
+            !$this->setConfiguration('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
+            !$this->setConfiguration('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
+            !$this->setConfiguration('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
+            !$this->setConfiguration('PAYPLUG_ONEY_TOS', 0)
+        ) {
+            $log->error('Installation failed: oney configurations failed.');
+            $flag = false;
+        }
+        return $flag;
+    }
+
+    /**
+     * Install Oney Hooks
+     * @return bool
+     */
+    private function installOneyHook()
+    {
+        $hooks = array(
+            'actionObjectCarrierAddAfter',
+            'actionCarrierUpdate',
+            'displayProductPriceBlock',
+            'displayBeforeShoppingCartBlock',
+        );
+
+        $flag = true;
+        foreach ($hooks as $hook) {
+            $flag = $this->registerHook($hook) && $flag;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * Install Oney Order State
+     */
+    private function installOneyOrderStates()
+    {
+        $oney_order_state = array(
+            'oney_pg' => array(
+                'cfg' => null,
+                'template' => null,
+
+                // OS have to be "logable" to register transaction_id
+                'logable' => true,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#a1f8a1',
+                'name' => array(
+                    'en' => 'Oney - Pending',
+                    'fr' => 'Oney - En attente',
+                    'es' => 'Oney - Pending',
+                    'it' => 'Oney - Pending',
+                ),
+            ),
+        );
+
+        $flag = true;
+
+        foreach ($oney_order_state as $key => $state) {
+            $flag = $flag && $this->createOrderState($key, $state, true) && $this->createOrderState($key, $state,
+                    false);
+        }
+
+        return $flag;
     }
 
     /**
