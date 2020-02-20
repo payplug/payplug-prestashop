@@ -51,12 +51,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
-            } elseif (Tools::getIsset('getOneyCta')) {
+            }
+            elseif (Tools::getIsset('getOneyCta')) {
                 die(json_encode(array(
                     'result' => true,
                     'tpl' => $payplug->getOneyCTA(),
                 )));
-            } elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
+            }
+            elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)Configuration::get('PS_TAX');
 
                 if ($id_product = (int)Tools::getValue('id_product')) {
@@ -81,6 +83,16 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 die(json_encode($payment_options));
+            }
+            elseif (Tools::getIsset('getPaymentErrors')) {
+                // check if errors
+                $errors = $payplug->getPaymentErrorsCookie();
+
+                if ($errors) {
+                    die(json_encode(['result' => true, 'template' => $payplug->displayPaymentErrors($errors)]));
+                }
+
+                die(json_encode(['result' => false]));
             }
         }
     }

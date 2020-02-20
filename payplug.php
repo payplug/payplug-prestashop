@@ -310,7 +310,7 @@ class Payplug extends PaymentModule
                 die(json_encode($this->getAccountPermissions($api_key)));
             }
             if (Tools::getValue('has_live_key')) {
-                die(Tools::jsonEncode(['result' => $this->has_live_key()]));
+                die(json_encode(['result' => $this->has_live_key()]));
             }
             if ((int)Tools::getValue('refund') == 1) {
                 if (!$this->checkAmountToRefund(Tools::getValue('amount'))) {
@@ -437,7 +437,7 @@ class Payplug extends PaymentModule
                     $this->saveCard($payment->resource);
                 }
                 if ($capture['code'] >= 300) {
-                    die(Tools::jsonEncode(array(
+                    die(json_encode(array(
                         'status' => 'error',
                         'data' => $this->l('Cannot capture this payment.'),
                         'message' => $capture['message'],
@@ -457,7 +457,7 @@ class Payplug extends PaymentModule
                         }
                     }
 
-                    die(Tools::jsonEncode(array(
+                    die(json_encode(array(
                         'status' => 'ok',
                         'data' => '',
                         'message' => $this->l('Payment successfully captured.'),
@@ -1368,6 +1368,46 @@ class Payplug extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'oney/form.tpl');
+    }
+
+    /**
+     * Display payment errors template
+     *
+     * @param array $errors
+     * @return mixed
+     */
+    public function displayPaymentErrors($errors = array())
+    {
+        if (empty($errors)) {
+            return false;
+        }
+
+        $payment_messages = array();
+        $with_msg_button = false;
+        foreach ($errors as $error) {
+            if ($error == 'oney_required_field') {
+                $this->smarty->assign(['is_popin_tpl' => true]);
+                $fields = $this->getOneyRequiredFields();
+                $this->smarty->assign(['oney_required_fields' => $fields]);
+                $payment_messages[] = [
+                    'type' => 'template',
+                    'value' => 'oney/form.tpl'
+                ];
+            } else {
+                $with_msg_button = true;
+                $payment_messages[] = [
+                    'type' => 'string',
+                    'value' => $error
+                ];
+            }
+        }
+
+        $this->smarty->assign([
+            'payment_messages' => $payment_messages,
+            'with_msg_button' => $with_msg_button
+        ]);
+
+        return $this->display(__FILE__, 'messages.tpl');
     }
 
     /**
@@ -2821,6 +2861,40 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Get payment data from cookie
+     *
+     * @return mixed
+     */
+    public function getPaymentDataCookie()
+    {
+        // get payplug data
+        $payplug_data = !empty($_COOKIE['payplug_data']) ? $_COOKIE['payplug_data'] : false;
+
+        // then flush to avoid repetition
+        setcookie('payplug_data', '', time() - 3600);
+
+        // if no error all good then return true
+        return json_decode($payplug_data, true);
+    }
+
+    /**
+     * Get payment errors from cookie
+     *
+     * @return mixed
+     */
+    public function getPaymentErrorsCookie()
+    {
+        // get payplug error
+        $payplug_errors = !empty($_COOKIE['payplug_errors']) ? $_COOKIE['payplug_errors'] : false;
+
+        // then flush to avoid repetition
+//        setcookie('payplug_errors', '', time() - 3600);
+
+        // if no error all good then return true
+        return json_decode($payplug_errors, true);
+    }
+
+    /**
      * Check payment method for given cart object
      *
      * @param object Cart
@@ -2900,10 +2974,6 @@ class Payplug extends PaymentModule
             }
         }
 
-        $is_error = Tools::getValue('error');
-        $is_inst = Tools::getValue('inst');
-        $is_oney = Tools::getValue('io');
-
         // Standart Payment or new card from one-click
         $paymentOption = new PaymentOption();
         $input_options = array(
@@ -2937,12 +3007,6 @@ class Payplug extends PaymentModule
                 array('def' => (int)$options['deferred']), true))
             ->setModuleName('payplug')
             ->setInputs($input_options);
-
-        if ($is_error && !$is_inst) {
-            $paymentOption->setAdditionalInformation(
-                $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-            );
-        }
 
         $payment_list[] = $paymentOption;
 
@@ -2979,11 +3043,6 @@ class Payplug extends PaymentModule
                 ->setModuleName('payplug')
                 ->setInputs($input_options);
 
-            if ($is_error && $is_inst) {
-                $paymentOption->setAdditionalInformation(
-                    $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                );
-            }
             $payment_list[] = $paymentOption;
         }
 
@@ -3030,11 +3089,6 @@ class Payplug extends PaymentModule
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
 
-                if ($is_error && $is_oney && $is_oney == $split) {
-                    $paymentOption->setAdditionalInformation(
-                        $this->context->smarty->fetch('module:payplug/views/templates/front/errors.tpl')
-                    );
-                }
                 $payment_list[] = $paymentOption;
             }
         }
@@ -3850,6 +3904,10 @@ class Payplug extends PaymentModule
 
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+
+        if (Tools::getValue('error')) {
+            Media::addJsDef(['payment_errors' => true]);
+        }
 
         if ((int)Tools::getValue('lightbox') == 1) {
             $cart = $params['cart'];
@@ -5071,6 +5129,14 @@ class Payplug extends PaymentModule
             $payment_tab['auto_capture'] = true;
             $payment_tab['payment_method'] = 'oney_' . $is_oney;
             $payment_tab['payment_context'] = $this->getOneyPaymentContext();
+
+            // check oney required fields
+            if ($payment_data = $this->getPaymentDataCookie()) {
+                d($payment_data);
+            } elseif($this->getOneyRequiredFields()) {
+                $this->setPaymentErrorsCookie(array('oney_required_field'));
+                return ['result' => false, 'response' => false];
+            }
         }
 
         // Create payment
@@ -5096,8 +5162,6 @@ class Payplug extends PaymentModule
             }
         } catch (Exception $e) {
             $messages = $this->catchErrorsFromApi($e->__toString());
-            d($payment_tab,false);
-            d($e->__toString());
             return [
                 'result' => false,
                 'payment_tab' => $payment_tab,
@@ -5370,6 +5434,38 @@ class Payplug extends PaymentModule
     {
         $this->log_general = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+    }
+
+    /**
+     * Set payment data in cookie
+     *
+     * @return mixed
+     */
+    public function setPaymentDataCookie($payplug_data = array())
+    {
+        if (empty($payplug_data)) {
+            return false;
+        }
+
+        $value = json_encode($payplug_data);
+
+        return setcookie('payplug_data', $value, time() + 120);
+    }
+
+    /**
+     * Set payment errors in cookie
+     *
+     * @return mixed
+     */
+    public function setPaymentErrorsCookie($payplug_errors = array())
+    {
+        if (empty($payplug_errors)) {
+            return false;
+        }
+
+        $value = json_encode($payplug_errors);
+
+        return setcookie('payplug_errors', $value, time() + 12000);
     }
 
     /**

@@ -43,14 +43,11 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $options = $payplug->getAvailableOptions($cart);
 
+            $error_url = 'index.php?controller=order&step=3&error=1';
+
             if($options['oney'] && $method = 'oney' && $oney_type = Tools::getValue('oney_type')) {
                 $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
-
-                $type = explode('_', $oney_type);
-                $split = (int)str_replace('x', '', $type[0]);
-
                 if(!$payment['result']) {
-                    $error_url = 'index.php?controller=order&step=3&error=1&io=' . $split;
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);
@@ -65,7 +62,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 ];
                 $payment = $payplug->preparePayment($payment_options);
                 if(!$payment['result']) {
-                    $error_url = 'index.php?controller=order&step=3&error=1' . ($method == 'installment' ? '&inst=1' : '');
+                    $payplug->setPaymentErrorsCookie([$payplug->l('The transaction was not completed and your card was not charged.')]);
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);

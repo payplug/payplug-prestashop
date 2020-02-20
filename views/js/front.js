@@ -30,6 +30,7 @@ var $document, $window, payplugModule = {
         this.card.init();
         this.order.init();
         this.oney.init();
+        this.popup.init();
     },
     order: {
         init: function () {
@@ -39,7 +40,33 @@ var $document, $window, payplugModule = {
                 var optionId = $(this).attr('id') + '-additional-information';
                 $('#' + optionId).attr('style', 'margin:0;');
             }).parents('.payment-option').addClass('payplug-payment-option')
-        }
+
+            this.checkErrors();
+
+            $document.on('click', '.payplugMsg_button', payplugModule.popup.close);
+        },
+        checkErrors: function () {
+            if (typeof payment_errors == 'undefined' || !payment_errors) {
+                return;
+            }
+
+            var data = {_ajax: 1, getPaymentErrors: 1};
+
+            $.ajax({
+                url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                headers: {"cache-control": "no-cache"},
+                type: 'POST',
+                async: true,
+                cache: false,
+                dataType: 'json',
+                data: data,
+                success: function (data) {
+                    if (data.result) {
+                        payplugModule.popup.set(data.template);
+                    }
+                }
+            });
+        },
     },
     card: {
         init: function () {
@@ -307,6 +334,62 @@ var $document, $window, payplugModule = {
             }
         }
     },
+    popup: {
+        props: {
+            identifier: 'payplugPopin',
+        },
+        init: function () {
+            var popup = this,
+                props = popup.props;
+
+            $document.on('click', '.' + props.identifier + '_close', popup.close)
+                .on('click', function (event) {
+                    var $clicked = $(event.target);
+                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('.' + props.identifier + '-open')) {
+                        popup.close();
+                    }
+                });
+        },
+        set: function (content) {
+            var popup = payplugModule.popup,
+                props = popup.props;
+
+            if ($('.' + props.identifier).length) {
+                popup.close();
+            } else {
+                popup.create();
+            }
+            popup.hydrate(content);
+            popup.open();
+        },
+        open: function () {
+            var props = payplugModule.popup.props;
+            var popin = $('.' + props.identifier);
+            popin.addClass(props.identifier + '-open');
+            window.setTimeout(function(){
+                popin.addClass(props.identifier + '-show');
+            },0);
+        },
+        close: function () {
+            console.log('hey')
+            var props = payplugModule.popup.props;
+            var popin = $('.' + props.identifier);
+
+            popin.removeClass(props.identifier + '-show');
+            window.setTimeout(function(){
+                popin.removeClass(props.identifier + '-open');
+            },500);
+        },
+        create: function () {
+            var props = payplugModule.popup.props,
+                html = '<div class="' + props.identifier + '"><button class="' + props.identifier + '_close"></button><div class="' + props.identifier + '_content"></div></div>';
+            $('body').append(html);
+        },
+        hydrate: function (content) {
+            var props = payplugModule.popup.props;
+            $('.' + props.identifier + '_content').html(content);
+        }
+    }
 };
 $(document).ready(function () {
     $document = $(document);
