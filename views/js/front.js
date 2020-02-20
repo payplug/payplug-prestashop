@@ -126,6 +126,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney;
 
             this.cta.init();
+            this.form.init();
 
             $window.on('load', oney.load);
             prestashop.on('updatedProduct', oney.load);
@@ -328,11 +329,151 @@ var $document, $window, payplugModule = {
                 },
             }
         },
-        address: {
+        form: {
+            props: {
+                identifier: 'oneyForm'
+            },
             init: function () {
-                // editAddress
-            }
-        }
+                var form = this,
+                    identifier = form.props.identifier;
+                $document
+                    .on('click', '.' + identifier + '_close', form.close)
+                    .on('submit', '.' + identifier, form.submit)
+                    .on('keyup focusout', '.' + identifier + ' input', form.check);
+            },
+            check: function () {
+                var is_valid = true,
+                    $fields = $('.oneyForm_input');
+
+                $fields.each(function () {
+                    var $input = $(this),
+                        type = $input.data('type'),
+                        value = $input.val(),
+                        valid_input = value.length;
+
+                    switch (type) {
+                        case 'email' :
+                            var at = value.indexOf('@', 1),
+                                point = value.indexOf('.', at + 1),
+                                plus = value.indexOf('+', 1),
+                                is_email = at > 0 && point > 0 && plus < 0;
+                            valid_input = valid_input && is_email;
+                            break;
+                        case 'mobile_phone_number' :
+                            valid_input = valid_input && value.length < 16 && value.length > 8;
+                            break;
+                        case 'address1' :
+                            valid_input = valid_input && value.length < 129;
+                            break;
+                        case 'postcode' :
+                            valid_input = valid_input && value.length < 6;
+                            break;
+                        case 'city' :
+                        case 'first_name' :
+                        case 'last_name' :
+                            valid_input = valid_input && value.length < 33;
+                            break;
+                        default :
+                            break;
+                    }
+
+                    if (valid_input) {
+                        $input.removeClass('oneyForm_input-error');
+                    } else {
+                        $input.addClass('oneyForm_input-error');
+                    }
+
+                    is_valid = is_valid && valid_input;
+                });
+
+                if (is_valid) {
+                    $('.oneyPayment_button').removeClass('oneyPayment_button-disabled').addClass('oneyPayment_button-validate');
+                } else {
+                    $('.oneyPayment_button').addClass('oneyPayment_button-disabled').removeClass('oneyPayment_button-validate');
+                }
+            },
+            close: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                payplugModule.form.reset();
+                payplugModule.popup.close();
+            },
+            reset: function () {
+                var form = this,
+                    identifier = form.props.identifier;
+                $('.' + identifier).find('input').each(function () {
+                    var $field = $(this);
+                    $field.val('');
+
+                    if ($field.is('.' + identifier + '_input-tocheck')) {
+                        $field.addClass(identifier + '_input-error');
+                    }
+                });
+            },
+            save: function (payment_data) {
+                var form = this,
+                    identifier = form.props.identifier,
+                    data = {
+                        _ajax: 1,
+                        savePaymentData: 1,
+                        payment_data: payment_data
+                    };
+
+                $('.' + identifier + '_message').removeClass(identifier + '_message-success').removeClass(identifier + '_message-error');
+
+                $.ajax({
+                    url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                    headers: {"cache-control": "no-cache"},
+                    type: 'POST',
+                    async: true,
+                    cache: false,
+                    dataType: 'json',
+                    data: data,
+                    success: function (data) {
+                        if (data.result) {
+                            $('.' + identifier + '_validation').addClass(identifier + '_validation-show');
+                            window.setTimeout(function () {
+                                $('.' + identifier + '_validation').addClass(identifier + '_validation-appear');
+                            });
+                            window.setTimeout(function () {
+                                payplugModule.popup.close();
+                            }, 5000);
+                        } else {
+                            var errors = '';
+                            for (var error in data.message)
+                                if (error !== 'indexOf')
+                                    errors += $('<p />').html(data.message[error]).text() + "\n";
+
+                            $('.' + identifier + '_message').addClass(identifier + '_message-error').html(errors);
+                        }
+                    }
+                });
+            },
+            submit: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                var payment_data = {},
+                    $form = $('.oneyForm'),
+                    $fields = $form.find('input');
+
+                $fields.each(function () {
+                    var $el = $(this), name = $el.attr('name'), value = null;
+                    if ($el.is('input[type=radio]')) {
+                        value = $('input[name="' + name + '"]:selected').val();
+                    } else if ($el.is('input[type=checkbox]')) {
+                        value = $('input[name="' + name + '"]:checked').val();
+                    } else {
+                        value = $el.val()
+                    }
+                    if (value) {
+                        payment_data[name] = value;
+                    }
+                });
+
+                return payplugModule.oney.form.save(payment_data);
+            },
+        },
     },
     popup: {
         props: {
@@ -366,19 +507,18 @@ var $document, $window, payplugModule = {
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
             popin.addClass(props.identifier + '-open');
-            window.setTimeout(function(){
+            window.setTimeout(function () {
                 popin.addClass(props.identifier + '-show');
-            },0);
+            }, 0);
         },
         close: function () {
-            console.log('hey')
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
 
             popin.removeClass(props.identifier + '-show');
-            window.setTimeout(function(){
+            window.setTimeout(function () {
                 popin.removeClass(props.identifier + '-open');
-            },500);
+            }, 500);
         },
         create: function () {
             var props = payplugModule.popup.props,

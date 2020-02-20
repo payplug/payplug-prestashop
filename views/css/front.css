@@ -248,9 +248,15 @@ div.ppoverlay {
 #module-payplug-cards div.message {
   display: none;
 }
-.payplug-payment-option img {
-  float: left;
-  margin: 0 10px 0 0;
+body#checkout section.checkout-step .payment-options .payplug-payment-option label {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0;
+}
+body#checkout section.checkout-step .payment-options .payplug-payment-option img {
+  margin: 0 12px 0 0;
 }
 .payplugPopin {
   -webkit-transform: translate(-50%, -50%);
@@ -346,11 +352,6 @@ div.ppoverlay {
   -ms-transform: translate(-50%, -50%) rotate(-45deg);
   -o-transform: translate(-50%, -50%) rotate(-45deg);
   transform: translate(-50%, -50%) rotate(-45deg);
-}
-@media (max-width: 767px) {
-  .payplugPopin_close {
-    display: none;
-  }
 }
 .payplugPopin-open {
   display: block;

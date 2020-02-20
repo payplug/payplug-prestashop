@@ -785,6 +785,84 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * todo: to clean or update
+     * @return array
+     */
+    public function checkOneyRequiredFields($payment_data)
+    {
+        $errors = array();
+
+        if (!$payment_data) {
+            return array($this->l('Please fill in the required fields'));
+        }
+
+        foreach ($payment_data as $key => $data) {
+            $parsed = explode('-', $key);
+            $type = $parsed[0];
+            $field = $parsed[1];
+            switch ($field) {
+                case 'email' :
+                    if (strlen($data) > 100 && strpos($data, '+') !== false) {
+                        $text = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
+                        $errors[] = $text;
+                    } elseif (strlen($data) > 100) {
+                        $text = $this->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
+                        $errors[] = $text;
+                    } elseif (strpos($data, '+') !== false) {
+                        $text = $this->l('The + character is not valid. Please change your email address (100 characters max).');
+                        $errors[] = $text;
+                    }
+                    break;
+                case 'mobile_phone_number' :
+                    $id_address = $type == 'shipping' ? $this->context->cart->id_address_delivery : $this->context->cart->id_address_invoice;
+                    $address = new Address($id_address);
+                    $country = new Country($address->id_country);
+                    $valid = $this->isValidMobilePhoneNumber($data, $country->iso_code);
+                    if (!$valid) {
+                        $errors[] = $this->l('Please enter your mobile phone number.');
+                    }
+                    break;
+                case 'first_name' :
+                    if (!Validate::isPostCode($data)) {
+                        $text = $type == 'shipping' ? $this->l('Please enter your shipping firstname.') : $this->l('Please enter your billing firstname.');
+                        $errors[] = $text;
+                    }
+                    break;
+                case 'last_name' :
+                    if (!Validate::isPostCode($data)) {
+                        $text = $type == 'shipping' ? $this->l('Please enter your shipping lastname.') : $this->l('Please enter your billing lastname.');
+                        $errors[] = $text;
+                    }
+                    break;
+                case 'address1' :
+                    if (!Validate::isPostCode($data)) {
+                        $text = $type == 'shipping' ? $this->l('Please enter your shipping address.') : $this->l('Please enter your billing address.');
+                        $errors[] = $text;
+                    }
+                    break;
+                case 'postcode' :
+                    if (!Validate::isPostCode($data)) {
+                        $text = $type == 'shipping' ? $this->l('Please enter your shipping postcode.') : $this->l('Please enter your billing postcode.');
+                        $errors[] = $text;
+                    }
+                    break;
+                case 'city' :
+                    if (!Validate::isCityName($data)) {
+                        $text = $type == 'shipping' ? $this->l('Please enter your shipping city.') : $this->l('Please enter your billing city.');
+                        $errors[] = $text;
+                    } elseif (strlen($data) > 32) {
+                        $text = $this->l('Your city name is too long (max 32 characters). ')
+                            . $this->l('Please change it to another one or select another payment method.');
+                        $errors[] = $text;
+                    }
+                    break;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * @return array
      */
     private function checkRequirements()
@@ -2888,7 +2966,7 @@ class Payplug extends PaymentModule
         $payplug_errors = !empty($_COOKIE['payplug_errors']) ? $_COOKIE['payplug_errors'] : false;
 
         // then flush to avoid repetition
-//        setcookie('payplug_errors', '', time() - 3600);
+        setcookie('payplug_errors', '', time() - 3600);
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
@@ -3047,6 +3125,13 @@ class Payplug extends PaymentModule
         }
 
         if ($options['oney'] && isset($this->available_oney_payments) && $this->available_oney_payments) {
+
+            $is_elligible = $this->isOneyElligible($this->context->cart);
+            $is_valid_carrier = $this->isValidOneyCarrier($this->context->cart);
+
+            $error = $is_elligible['result'] ? ($is_valid_carrier['result'] ? false : $is_valid_carrier['error_type']) : $is_elligible['error_type'];
+
+
             foreach ($this->available_oney_payments as $oney_payment) {
                 $paymentOption = new PaymentOption();
                 $input_options = array(
@@ -3077,13 +3162,32 @@ class Payplug extends PaymentModule
                     ),
                 );
 
+                if($error) {
+                    switch($is_elligible['error_type']) {
+                        case 'invalid_addresses':
+                            $err_label = $this->l('Available for France only');
+                            break;
+                        case 'invalid_amount_bottom':
+                        case 'invalid_amount_top':
+                            $err_label = $this->l('Between 100€ and 3000€ only');
+                            break;
+                        case 'invalid_carrier' :
+                            $err_label = $this->l('Unavailable for this shipping method');
+                            break;
+                        default:
+                        case 'invalid_cart' :
+                            $err_label = $this->l('Your cart is unavailable');
+                            break;
+                    }
+                }
+
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
-                $label = sprintf($this->l('Pay by card in %sx with Oney'), $split);
+                $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
 
                 $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . '.png'))
+                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . (!$error ?: '-alt'). '.png'))
                     ->setCallToActionText($label)
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
@@ -3171,7 +3275,7 @@ class Payplug extends PaymentModule
     public function getPayplugInstallmentCart($id_cart)
     {
         $req_cart_installment = '
-            SELECT pic.id_installment 
+            SELECT pic.id_installment
             FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
             WHERE pic.id_cart = ' . (int)$id_cart;
         $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
@@ -3211,7 +3315,7 @@ class Payplug extends PaymentModule
         }
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
+            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
             WHERE pi.id_installment = \'' . $installment->id . '\'';
         $res_installment = DB::getInstance()->executeS($req_installment);
 
@@ -3938,7 +4042,8 @@ class Payplug extends PaymentModule
                     return $this->display(__FILE__, 'embedded.tpl');
                 }
             } else {
-                $error_url = 'index.php?controller=order&step=3&error=1' . ($is_installment ? '&inst=1' : '');
+                $this->setPaymentErrorsCookie([$this->l('The transaction was not completed and your card was not charged.')]);
+                $error_url = 'index.php?controller=order&step=3&error=1';
                 Tools::redirect($error_url);
             }
         }
@@ -5110,6 +5215,24 @@ class Payplug extends PaymentModule
 
         // check payment tab from current payment method
         if ($is_oney) {
+            // check if oney was elligible then return if not
+            $is_elligible = $this->isOneyElligible($this->context->cart);
+            if(!$is_elligible['result']) {
+                $this->setPaymentErrorsCookie([$is_elligible['error']]);
+                return ['result' => false, 'response' => $is_elligible['error']];
+            }
+
+            $is_elligible = $this->isValidOneyCarrier($this->context->cart);
+            if(!$is_elligible['result']) {
+                $this->setPaymentErrorsCookie([$is_elligible['error']]);
+                return ['result' => false, 'response' => $is_elligible['error']];
+            }
+
+            if($this->getOneyRequiredFields()) {
+                $this->setPaymentErrorsCookie(array('oney_required_field'));
+                return ['result' => false, 'response' => false];
+            }
+
             unset($payment_tab['allow_save_card']);
 
             // check billing phonenumber
@@ -5133,9 +5256,6 @@ class Payplug extends PaymentModule
             // check oney required fields
             if ($payment_data = $this->getPaymentDataCookie()) {
                 d($payment_data);
-            } elseif($this->getOneyRequiredFields()) {
-                $this->setPaymentErrorsCookie(array('oney_required_field'));
-                return ['result' => false, 'response' => false];
             }
         }
 

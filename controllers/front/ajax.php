@@ -51,14 +51,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
-            }
-            elseif (Tools::getIsset('getOneyCta')) {
+            } elseif (Tools::getIsset('getOneyCta')) {
                 die(json_encode(array(
                     'result' => true,
                     'tpl' => $payplug->getOneyCTA(),
                 )));
-            }
-            elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
+            } elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)Configuration::get('PS_TAX');
 
                 if ($id_product = (int)Tools::getValue('id_product')) {
@@ -68,7 +66,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     );
                     $quantity = (int)Tools::getValue('qty', 1);
 
-                    $product_price = Product::getPriceStatic((int) $id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
+                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,
+                        null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $iso_code = false;
                     $cart = false;
@@ -83,8 +82,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 die(json_encode($payment_options));
-            }
-            elseif (Tools::getIsset('getPaymentErrors')) {
+            } elseif (Tools::getIsset('getPaymentErrors')) {
                 // check if errors
                 $errors = $payplug->getPaymentErrorsCookie();
 
@@ -93,6 +91,26 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode(['result' => false]));
+            } elseif (Tools::getIsset('savePaymentData')) {
+                $payment_data = Tools::getValue('payment_data');
+
+                if (empty($payment_data)) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $payplug->l('Empty payment data')
+                    ]));
+                } elseif ($payplug->checkOneyRequiredFields($payment_data)) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $payplug->l('At least one of the fields is not correctly completed.')
+                    ]));
+                }
+
+                $result = $payplug->setPaymentDataCookie($payment_data);
+                die(json_encode([
+                    'result' => $result,
+                    'message' => $result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')
+                ]));
             }
         }
     }

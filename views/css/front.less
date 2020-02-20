@@ -274,12 +274,16 @@ div.ppoverlay {
 
 }
 
-.payplug-payment-option img{
-  float: left;
-  margin: 0 10px 0 0;
+body#checkout section.checkout-step .payment-options .payplug-payment-option label{
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0;
 }
-
-
+body#checkout section.checkout-step .payment-options .payplug-payment-option img{
+  margin: 0 12px 0 0;
+}
 
 .payplug {
   &Popin {
@@ -359,10 +363,6 @@ div.ppoverlay {
 
       &:after {
         .transform(translate(-50%, -50%) rotate(-45deg));
-      }
-
-      @media (@mobile) {
-        display: none;
       }
     }
 
