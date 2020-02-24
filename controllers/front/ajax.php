@@ -60,10 +60,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $use_taxes = (bool)Configuration::get('PS_TAX');
 
                 if ($id_product = (int)Tools::getValue('id_product')) {
-                    $id_product_attribute = (int)Product::getIdProductAttributeByIdAttributes(
-                        $id_product,
-                        Tools::getValue('group')
-                    );
+                    $group = Tools::getValue('group');
+                    $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes(
+                        $id_product, $group) : 0;
                     $quantity = (int)Tools::getValue('qty', 1);
 
                     $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,

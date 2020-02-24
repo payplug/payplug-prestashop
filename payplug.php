@@ -3131,7 +3131,6 @@ class Payplug extends PaymentModule
 
             $error = $is_elligible['result'] ? ($is_valid_carrier['result'] ? false : $is_valid_carrier['error_type']) : $is_elligible['error_type'];
 
-
             foreach ($this->available_oney_payments as $oney_payment) {
                 $paymentOption = new PaymentOption();
                 $input_options = array(
@@ -3162,6 +3161,7 @@ class Payplug extends PaymentModule
                     ),
                 );
 
+
                 if($error) {
                     switch($is_elligible['error_type']) {
                         case 'invalid_addresses':
@@ -3179,15 +3179,15 @@ class Payplug extends PaymentModule
                             $err_label = $this->l('Your cart is unavailable');
                             break;
                     }
+                } else {
+                    $err_label = '';
                 }
 
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
-
-
                 $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . (!$error ?: '-alt'). '.png'))
+                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png'))
                     ->setCallToActionText($label)
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
