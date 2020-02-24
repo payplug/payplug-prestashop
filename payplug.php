@@ -108,6 +108,117 @@ class Payplug extends PaymentModule
         'x4_with_fees',
     );
 
+    private $order_states = array(
+        'paid' => array(
+            'cfg' => '_PS_OS_PAYMENT_',
+            'template' => 'payment',
+            'logable' => true,
+            'send_email' => true,
+            'paid' => true,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#04b404',
+            'name' => array(
+                'en' => 'Payment successful',
+                'fr' => 'Paiement effectué',
+                'es' => 'Pago efectuado',
+                'it' => 'Pagamento effettuato',
+            ),
+        ),
+        'refund' => array(
+            'cfg' => '_PS_OS_REFUND_',
+            'template' => 'refund',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#ea3737',
+            'name' => array(
+                'en' => 'Refunded',
+                'fr' => 'Remboursé',
+                'es' => 'Reembolsado',
+                'it' => 'Rimborsato',
+            ),
+        ),
+        'pending' => array(
+            'cfg' => '_PS_OS_PENDING_',
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#a1f8a1',
+            'name' => array(
+                'en' => 'Payment in progress',
+                'fr' => 'Paiement en cours',
+                'es' => 'Pago en curso',
+                'it' => 'Pagamento in corso',
+            ),
+        ),
+        'error' => array(
+            'cfg' => '_PS_OS_ERROR_',
+            'template' => 'payment_error',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#8f0621',
+            'name' => array(
+                'en' => 'Payment failed',
+                'fr' => 'Paiement échoué',
+                'es' => 'Payment failed',
+                'it' => 'Payment failed',
+            ),
+        ),
+        'auth' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => true,
+            'send_email' => false,
+            'paid' => true,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#04b404',
+            'name' => array(
+                'en' => 'Payment authorised',
+                'fr' => 'Paiement autorisé',
+                'es' => 'Pago',
+                'it' => 'Pagamento',
+            ),
+        ),
+        'exp' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => true,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#8f0621',
+            'name' => array(
+                'en' => 'Authorization expired',
+                'fr' => 'Autorisation expirée',
+                'es' => 'Autorización vencida',
+                'it' => 'Autorizzazione scaduta',
+            ),
+        ),
+    );
+
     /**
      * Constructor
      *
@@ -960,209 +1071,12 @@ class Payplug extends PaymentModule
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $this->log_install->info('Order state creation starting.');
-        $state_key = array(
-            'paid' => array(
-                'cfg' => '_PS_OS_PAYMENT_',
-                'template' => 'payment',
-                'logable' => true,
-                'send_email' => true,
-                'paid' => true,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#04b404',
-                'name' => array(
-                    'en' => 'Payment successful',
-                    'fr' => 'Paiement effectué',
-                    'es' => 'Pago efectuado',
-                    'it' => 'Pagamento effettuato',
-                ),
-            ),
-            'refund' => array(
-                'cfg' => '_PS_OS_REFUND_',
-                'template' => 'refund',
-                'logable' => false,
-                'send_email' => true,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#ea3737',
-                'name' => array(
-                    'en' => 'Refunded',
-                    'fr' => 'Remboursé',
-                    'es' => 'Reembolsado',
-                    'it' => 'Rimborsato',
-                ),
-            ),
-            'pending' => array(
-                'cfg' => '_PS_OS_PENDING_',
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#a1f8a1',
-                'name' => array(
-                    'en' => 'Payment in progress',
-                    'fr' => 'Paiement en cours',
-                    'es' => 'Pago en curso',
-                    'it' => 'Pagamento in corso',
-                ),
-            ),
-            'error' => array(
-                'cfg' => '_PS_OS_ERROR_',
-                'template' => 'payment_error',
-                'logable' => false,
-                'send_email' => true,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#8f0621',
-                'name' => array(
-                    'en' => 'Payment failed',
-                    'fr' => 'Paiement échoué',
-                    'es' => 'Payment failed',
-                    'it' => 'Payment failed',
-                ),
-            ),
-            'auth' => array(
-                'cfg' => null,
-                'template' => null,
-                'logable' => true,
-                'send_email' => false,
-                'paid' => true,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#04b404',
-                'name' => array(
-                    'en' => 'Payment authorised',
-                    'fr' => 'Paiement autorisé',
-                    'es' => 'Pago',
-                    'it' => 'Pagamento',
-                ),
-            ),
-            'exp' => array(
-                'cfg' => null,
-                'template' => null,
-                'logable' => true,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#8f0621',
-                'name' => array(
-                    'en' => 'Authorization expired',
-                    'es' => 'Autorización vencida',
-                    'fr' => 'Autorisation expirée',
-                    'it' => 'Autorizzazione scaduta',
-                ),
-            ),
-        );
 
-        foreach ($state_key as $key => $values) {
-            $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
-            $key_config_test = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key . '_test');
-            $os = 0;
-            $os_test = 0;
-
-            $log->info('Order state: ' . $key);
-
-            //LIVE
-            $log->info('Live context.');
-            if ((int)Configuration::get($key_config) != 0) {
-                $os = (int)Configuration::get($key_config);
-            } elseif ($val = $this->findOrderState($values['name'], false)) {
-                $os = $val;
-            }
-            if ((int)$os == 0) {
-                $log->info('Creating new order state.');
-                $order_state = new OrderState($os);
-                $order_state->logable = $values['logable'];
-                $order_state->send_email = $values['send_email'];
-                $order_state->paid = $values['paid'];
-                $order_state->module_name = $values['module_name'];
-                $order_state->hidden = $values['hidden'];
-                $order_state->delivery = $values['delivery'];
-                $order_state->invoice = $values['invoice'];
-                $order_state->color = $values['color'];
-                foreach (Language::getLanguages(false) as $lang) {
-                    $order_state->template[$lang['id_lang']] = $values['template'];
-                    if ($lang['iso_code'] == 'en') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['en'] . ' [PayPlug]';
-                    } elseif ($lang['iso_code'] == 'fr') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['fr'] . ' [PayPlug]';
-                    } elseif ($lang['iso_code'] == 'es') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['es'] . ' [PayPlug]';
-                    } elseif ($lang['iso_code'] == 'it') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['it'] . ' [PayPlug]';
-                    } else {
-                        $order_state->name[$lang['id_lang']] = $values['name']['en'] . ' [PayPlug]';
-                    }
-                }
-                if ($order_state->add()) {
-                    $source = _PS_MODULE_DIR_ . $this->name . '/views/img/os/' . $key . '.gif';
-                    $destination = _PS_ROOT_DIR_ . '/img/os/' . (int)$order_state->id . '.gif';
-                    @copy($source, $destination);
-                }
-                $os = (int)$order_state->id;
-                $log->info('ID: ' . $os);
-            }
-            Configuration::updateValue($key_config, (int)$os);
-
-            //TEST
-            $log->info('Test context.');
-            if ((int)Configuration::get($key_config_test) != 0) {
-                $os_test = (int)Configuration::get($key_config_test);
-            } elseif ($val = $this->findOrderState($values['name'], true)) {
-                $os_test = $val;
-            }
-            if ((int)$os_test == 0) {
-                $log->info('Creating new order state.');
-                $order_state = new OrderState($os_test);
-                $order_state->logable = $values['logable'];
-                $order_state->send_email = $values['send_email'];
-                $order_state->paid = $values['paid'];
-                $order_state->module_name = $values['module_name'];
-                $order_state->hidden = $values['hidden'];
-                $order_state->delivery = $values['delivery'];
-                $order_state->invoice = $values['invoice'];
-                $order_state->color = $values['color'];
-                foreach (Language::getLanguages(false) as $lang) {
-                    $order_state->template[$lang['id_lang']] = $values['template'];
-                    if ($lang['iso_code'] == 'en') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['en'] . ' [TEST]';
-                    } elseif ($lang['iso_code'] == 'fr') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['fr'] . ' [TEST]';
-                    } elseif ($lang['iso_code'] == 'es') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['es'] . ' [TEST]';
-                    } elseif ($lang['iso_code'] == 'it') {
-                        $order_state->name[$lang['id_lang']] = $values['name']['it'] . ' [TEST]';
-                    } else {
-                        $order_state->name[$lang['id_lang']] = $values['name']['en'] . ' [TEST]';
-                    }
-                }
-                if ($order_state->add()) {
-                    $source = _PS_MODULE_DIR_ . $this->name . '/views/img/os/' . $key . '.gif';
-                    $destination = _PS_ROOT_DIR_ . '/img/os/' . (int)$order_state->id . '.gif';
-                    @copy($source, $destination);
-                }
-                $os_test = (int)$order_state->id;
-                $log->info('ID: ' . $os);
-            }
-            Configuration::updateValue($key_config_test, (int)$os_test);
+        foreach ($this->order_states as $key => $state) {
+            $this->createOrderState($key, $state, true);
+            $this->createOrderState($key, $state, false);
         }
+
         $log->info('Order state creation ended.');
         return true;
     }
@@ -4146,6 +4060,20 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Install Oney Carriers
+     * @return bool
+     */
+    public function installOneyCarriers()
+    {
+        $carriers = PayPlugCarrier::getActiveCarriers($this->context->language->id);
+        $flag = true;
+        foreach ($carriers as $carrier) {
+            $flag = $flag && $carrier->save();
+        }
+        return $flag;
+    }
+
+    /**
      * Install Oney Config
      * @return bool
      */
@@ -4222,6 +4150,37 @@ class Payplug extends PaymentModule
         }
 
         return $flag;
+    }
+
+    /**
+     * Install Oney SQL
+     * @return bool
+     */
+    private function installOneySql()
+    {
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+
+        // install payplug carrier db
+        $requests = array(
+            'PAYPLUG_CARRIER' => 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_carrier` (
+                `id_payplug_carrier` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                `id_carrier` INT(11) UNSIGNED NOT NULL,
+                `delay` INT(11) UNSIGNED NOT NULL DEFAULT 3,
+                `delivery_type` VARCHAR(250) NOT NULL DEFAULT \'carrier\',
+                `date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
+                `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'
+                ) ENGINE=' . _MYSQL_ENGINE_,
+        );
+
+        foreach ($requests as $key => $request) {
+            $result = Db::getInstance()->Execute($request);
+            if (!$result) {
+                $log->error('Installation SQL failed: ' . $key);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
