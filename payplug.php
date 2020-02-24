@@ -107,6 +107,135 @@ class Payplug extends PaymentModule
         'x4_with_fees',
     );
 
+    public $state_key = array(
+        'paid' => array(
+            'cfg' => '_PS_OS_PAYMENT_',
+            'template' => 'payment',
+            'logable' => true,
+            'send_email' => true,
+            'paid' => true,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#04b404',
+            'name' => array(
+                'en' => 'Payment successful',
+                'fr' => 'Paiement effectué',
+                'es' => 'Pago efectuado',
+                'it' => 'Pagamento effettuato',
+            ),
+        ),
+        'refund' => array(
+            'cfg' => '_PS_OS_REFUND_',
+            'template' => 'refund',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#ea3737',
+            'name' => array(
+                'en' => 'Refunded',
+                'fr' => 'Remboursé',
+                'es' => 'Reembolsado',
+                'it' => 'Rimborsato',
+            ),
+        ),
+        'pending' => array(
+            'cfg' => '_PS_OS_PENDING_',
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#a1f8a1',
+            'name' => array(
+                'en' => 'Payment in progress',
+                'fr' => 'Paiement en cours',
+                'es' => 'Pago en curso',
+                'it' => 'Pagamento in corso',
+            ),
+        ),
+        'error' => array(
+            'cfg' => '_PS_OS_ERROR_',
+            'template' => 'payment_error',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#8f0621',
+            'name' => array(
+                'en' => 'Payment failed',
+                'fr' => 'Paiement échoué',
+                'es' => 'Payment failed',
+                'it' => 'Payment failed',
+            ),
+        ),
+        'auth' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => true,
+            'send_email' => false,
+            'paid' => true,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#04b404',
+            'name' => array(
+                'en' => 'Payment authorised',
+                'fr' => 'Paiement autorisé',
+                'es' => 'Pago',
+                'it' => 'Pagamento',
+            ),
+        ),
+        'exp' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => true,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#8f0621',
+            'name' => array(
+                'en' => 'Authorization expired',
+                'es' => 'Autorización vencida',
+                'fr' => 'Autorisation expirée',
+                'it' => 'Autorizzazione scaduta',
+            ),
+        ),
+        'oney_pg' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => true,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#a1f8a1',
+            'name' => array(
+                'en' => 'Oney - Pending',
+                'fr' => 'Oney - En attente',
+                'es' => 'Oney - Pending',
+                'it' => 'Oney - Pending',
+            ),
+        ),
+    );
+
     /**
      * Constructor
      *
@@ -988,118 +1117,8 @@ class Payplug extends PaymentModule
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $this->log_install->info('Order state creation starting.');
-        $state_key = array(
-            'paid' => array(
-                'cfg' => '_PS_OS_PAYMENT_',
-                'template' => 'payment',
-                'logable' => true,
-                'send_email' => true,
-                'paid' => true,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#04b404',
-                'name' => array(
-                    'en' => 'Payment successful',
-                    'fr' => 'Paiement effectué',
-                    'es' => 'Pago efectuado',
-                    'it' => 'Pagamento effettuato',
-                ),
-            ),
-            'refund' => array(
-                'cfg' => '_PS_OS_REFUND_',
-                'template' => 'refund',
-                'logable' => false,
-                'send_email' => true,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#ea3737',
-                'name' => array(
-                    'en' => 'Refunded',
-                    'fr' => 'Remboursé',
-                    'es' => 'Reembolsado',
-                    'it' => 'Rimborsato',
-                ),
-            ),
-            'pending' => array(
-                'cfg' => '_PS_OS_PENDING_',
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#a1f8a1',
-                'name' => array(
-                    'en' => 'Payment in progress',
-                    'fr' => 'Paiement en cours',
-                    'es' => 'Pago en curso',
-                    'it' => 'Pagamento in corso',
-                ),
-            ),
-            'error' => array(
-                'cfg' => '_PS_OS_ERROR_',
-                'template' => 'payment_error',
-                'logable' => false,
-                'send_email' => true,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#8f0621',
-                'name' => array(
-                    'en' => 'Payment failed',
-                    'fr' => 'Paiement échoué',
-                    'es' => 'Payment failed',
-                    'it' => 'Payment failed',
-                ),
-            ),
-            'auth' => array(
-                'cfg' => null,
-                'template' => null,
-                'logable' => true,
-                'send_email' => false,
-                'paid' => true,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#04b404',
-                'name' => array(
-                    'en' => 'Payment authorised',
-                    'fr' => 'Paiement autorisé',
-                    'es' => 'Pago',
-                    'it' => 'Pagamento',
-                ),
-            ),
-            'exp' => array(
-                'cfg' => null,
-                'template' => null,
-                'logable' => true,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#8f0621',
-                'name' => array(
-                    'en' => 'Authorization expired',
-                    'es' => 'Autorización vencida',
-                    'fr' => 'Autorisation expirée',
-                    'it' => 'Autorizzazione scaduta',
-                ),
-            ),
-        );
 
-        foreach ($state_key as $key => $values) {
+        foreach ($this->state_key as $key => $values) {
             $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
             $key_config_test = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key . '_test');
             $os = 0;
@@ -1303,6 +1322,13 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP')
             && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
+            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
+            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
+            && Configuration::deleteByName('PAYPLUG_ONEY')
+            && Configuration::deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
+            && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
+            && Configuration::deleteByName('PAYPLUG_ONEY_TOS')
             && Configuration::deleteByName('PAYPLUG_SANDBOX_MODE')
             && Configuration::deleteByName('PAYPLUG_SHOW')
             && Configuration::deleteByName('PAYPLUG_TEST_API_KEY')
@@ -2468,12 +2494,13 @@ class Payplug extends PaymentModule
      * Get Oney payment Context
      * @return array
      */
-    public function getOneyPaymentContext(){
+    public function getOneyPaymentContext()
+    {
         $cart_context = [];
         $products = $this->context->cart->getProducts();
         $delivery_context = $this->getOneyDeliveryContext();
 
-        foreach($products as $product) {
+        foreach ($products as $product) {
             $unit_price = $this->convertAmount($product['price_wt']);
             $item = array(
                 'merchant_item_id' => $product['id_product'],
@@ -2494,8 +2521,9 @@ class Payplug extends PaymentModule
      * Get Oney Delivery Context
      * @return array
      */
-    public function getOneyDeliveryContext(){
-        if($this->context->cart->isVirtualCart()) {
+    public function getOneyDeliveryContext()
+    {
+        if ($this->context->cart->isVirtualCart()) {
             return [
                 'delivery_label' => Configuration::get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date('Y-m-d'),
@@ -3162,8 +3190,8 @@ class Payplug extends PaymentModule
                 );
 
 
-                if($error) {
-                    switch($is_elligible['error_type']) {
+                if ($error) {
+                    switch ($is_elligible['error_type']) {
                         case 'invalid_addresses':
                             $err_label = $this->l('Available for France only');
                             break;
@@ -5217,18 +5245,18 @@ class Payplug extends PaymentModule
         if ($is_oney) {
             // check if oney was elligible then return if not
             $is_elligible = $this->isOneyElligible($this->context->cart);
-            if(!$is_elligible['result']) {
+            if (!$is_elligible['result']) {
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
 
             $is_elligible = $this->isValidOneyCarrier($this->context->cart);
-            if(!$is_elligible['result']) {
+            if (!$is_elligible['result']) {
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
 
-            if($this->getOneyRequiredFields()) {
+            if ($this->getOneyRequiredFields()) {
                 $this->setPaymentErrorsCookie(array('oney_required_field'));
                 return ['result' => false, 'response' => false];
             }
@@ -5236,14 +5264,18 @@ class Payplug extends PaymentModule
             unset($payment_tab['allow_save_card']);
 
             // check billing phonenumber
-            if(!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'], $payment_tab['billing']['country'])) {
-                if($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'], $payment_tab['billing']['country'])) {
+            if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
+                $payment_tab['billing']['country'])) {
+                if ($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'],
+                    $payment_tab['billing']['country'])) {
                     $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
                 }
             }
             // check shipping phonenumber
-            if(!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'], $payment_tab['shipping']['country'])) {
-                if($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'], $payment_tab['shipping']['country'])) {
+            if (!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'],
+                $payment_tab['shipping']['country'])) {
+                if ($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'],
+                    $payment_tab['shipping']['country'])) {
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
             }
