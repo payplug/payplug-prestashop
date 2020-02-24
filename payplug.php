@@ -1862,166 +1862,7 @@ class Payplug extends PaymentModule
         $this->postProcess();
 
         $this->assignContentVar();
-/*
-        if (Tools::getValue('uninstall_config') == 1) {
-            return $this->getUninstallContent();
-        }
 
-        $this->html = '';
-
-        $this->checkConfiguration();
-
-        $PAYPLUG_SHOW = Configuration::get('PAYPLUG_SHOW');
-        $PAYPLUG_EMAIL = Configuration::get('PAYPLUG_EMAIL');
-        $PAYPLUG_SANDBOX_MODE = Configuration::get('PAYPLUG_SANDBOX_MODE');
-        $PAYPLUG_EMBEDDED_MODE = Configuration::get('PAYPLUG_EMBEDDED_MODE');
-        $PAYPLUG_ONE_CLICK = Configuration::get('PAYPLUG_ONE_CLICK');
-        $PAYPLUG_TEST_API_KEY = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $PAYPLUG_LIVE_API_KEY = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        $PAYPLUG_DEBUG_MODE = Configuration::get('PAYPLUG_DEBUG_MODE');
-        $PAYPLUG_INST = Configuration::get('PAYPLUG_INST');
-        $PAYPLUG_INST_MODE = Configuration::get('PAYPLUG_INST_MODE');
-        $PAYPLUG_INST_MIN_AMOUNT = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
-        $PAYPLUG_DEFERRED = Configuration::get('PAYPLUG_DEFERRED');
-        $PAYPLUG_DEFERRED_AUTO = Configuration::get('PAYPLUG_DEFERRED_AUTO');
-        $PAYPLUG_DEFERRED_STATE = Configuration::get('PAYPLUG_DEFERRED_STATE');
-
-        if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
-            $connected = true;
-        } else {
-            $connected = false;
-        }
-
-        if (count($this->validationErrors) && !$connected) {
-            $this->context->smarty->assign(array(
-                'validationErrors' => $this->validationErrors,
-            ));
-        }
-
-        $valid_key = self::setAPIKey();
-        if (!empty($valid_key)) {
-            $permissions = $this->getAccount($valid_key);
-            $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
-        } else {
-            $verified = false;
-            $premium = false;
-        }
-        if (!empty($PAYPLUG_LIVE_API_KEY)) {
-            $verified = true;
-        } else {
-            $verified = false;
-        }
-
-        $is_active = (!empty($PAYPLUG_SHOW) && $PAYPLUG_SHOW == 1) ? true : false;
-
-        $this->site_url;
-
-        $p_error = '';
-        if (!$connected) {
-            if (isset($this->validationErrors['username_password'])) {
-                $p_error .= $this->validationErrors['username_password'];
-            } elseif (isset($this->validationErrors['login'])) {
-                if (isset($this->validationErrors['username_password'])) {
-                    $p_error .= ' ';
-                }
-                $p_error .= $this->validationErrors['login'];
-            }
-            $this->context->smarty->assign(array(
-                'p_error' => $p_error,
-            ));
-        } else {
-            $this->context->smarty->assign(array(
-                'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
-            ));
-        }
-
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
-
-        $admin_ajax_url = $this->getAdminAjaxUrl();
-
-        $login_infos = array();
-
-        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
-
-        $switch_sandbox = array(
-            'name' => 'payplug_sandbox',
-            'label' => $this->l('Mode'),
-            'active' => $connected,
-            'checked' => $PAYPLUG_SANDBOX_MODE,
-            'label_left' => $this->l('test'),
-            'label_right' => $this->l('live'),
-        );
-
-        $switch_embedded = array(
-            'name' => 'payplug_embedded',
-            'label' => $this->l('Payment page'),
-            'active' => $connected,
-            'checked' => $PAYPLUG_EMBEDDED_MODE,
-            'label_left' => $this->l('embedded'),
-            'label_right' => $this->l('redirected'),
-        );
-
-        $switch_one_click = array(
-            'name' => 'payplug_one_click',
-            'label' => $this->l('Enable one-click payments'),
-            'active' => $connected,
-            'checked' => $PAYPLUG_ONE_CLICK,
-            'label_left' => $this->l('yes'),
-            'label_right' => $this->l('no'),
-        );
-
-        $switch_installment_plan = array(
-            'name' => 'payplug_inst',
-            'label' => $this->l('Enable payments by installments'),
-            'active' => $connected,
-            'checked' => $PAYPLUG_INST,
-            'label_left' => $this->l('yes'),
-            'label_right' => $this->l('no'),
-        );
-
-        $switch_deferred_payment = array(
-            'name' => 'payplug_deferred',
-            'label' => $this->l('Defer the payment capture'),
-            'active' => $connected,
-            'checked' => $PAYPLUG_DEFERRED,
-            'label_left' => $this->l('yes'),
-            'label_right' => $this->l('no'),
-        );
-
-        $this->context->smarty->assign(array(
-            'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
-            'admin_ajax_url' => $admin_ajax_url,
-            'check_configuration' => $this->check_configuration,
-            'pp_version' => $this->version,
-            'connected' => $connected,
-            'verified' => $verified,
-            'premium' => $premium,
-            'is_active' => $is_active,
-            'site_url' => $this->site_url,
-            'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
-            'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
-            'PAYPLUG_ONE_CLICK' => $PAYPLUG_ONE_CLICK,
-            'PAYPLUG_SHOW' => $PAYPLUG_SHOW,
-            'PAYPLUG_DEBUG_MODE' => $PAYPLUG_DEBUG_MODE,
-            'PAYPLUG_INST' => $PAYPLUG_INST,
-            'PAYPLUG_INST_MODE' => $PAYPLUG_INST_MODE,
-            'PAYPLUG_INST_MIN_AMOUNT' => $PAYPLUG_INST_MIN_AMOUNT,
-            'PAYPLUG_DEFERRED' => $PAYPLUG_DEFERRED,
-            'PAYPLUG_DEFERRED_AUTO' => $PAYPLUG_DEFERRED_AUTO,
-            'PAYPLUG_DEFERRED_STATE' => $PAYPLUG_DEFERRED_STATE,
-            'login_infos' => $login_infos,
-            'iso' => $this->context->language->iso_code,
-            'installments_panel_url' => $installments_panel_url,
-            'switch_deferred_payment' => $switch_deferred_payment,
-            'switch_installment_plan' => $switch_installment_plan,
-            'switch_one_click' => $switch_one_click,
-            'switch_embedded' => $switch_embedded,
-            'switch_sandbox' => $switch_sandbox,
-            'order_states' => $this->getOrderStates(),
-        ));
-*/
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
 
         return $this->html;
@@ -2315,6 +2156,7 @@ class Payplug extends PaymentModule
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
+            'pp_version' => $this->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,
@@ -2346,6 +2188,8 @@ class Payplug extends PaymentModule
             'carriers' => $carriers,
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
+            'faq_links' => $faq_links,
+            'iso' => $this->context->language->iso_code,
         ));
 
         return $this->html;

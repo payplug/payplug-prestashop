@@ -21,7 +21,7 @@
 *}
 {if isset($switch_oney) && $switch_oney}
     <div class="panel-row separate_margin_block">
-        {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/switch.tpl' switch=$switch_oney}
+        {include file='./switch.tpl' switch=$switch_oney}
 
         <div class="panel-row">
             <div class="block-right">
