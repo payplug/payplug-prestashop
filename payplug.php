@@ -2132,6 +2132,9 @@ class Payplug extends PaymentModule
             ));
         }
 
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
         $login_infos = array();
