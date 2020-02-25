@@ -696,13 +696,28 @@ class Payplug extends PaymentModule
             $payment_details['tds'] = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
         }
 
+        if (isset($payment->payment_method['type'])) {
+            switch ($payment->payment_method['type']) {
+                case 'oney_x3_with_fees':
+                    $payment_details['type'] = 'Oney 3x';
+                    break;
+                case 'oney_x4_with_fees':
+                    $payment_details['type'] = 'Oney 4x';
+                    break;
+                default:
+                    $payment_details['type'] = $payment->payment_method['type'];
+            }
+        }
+
         $is_expired = false;
         if ($payment->authorization !== null) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
                 $payment_details['date'] = date('d/m/Y', (int)$payment->paid_at);
                 $payment_details['can_be_captured'] = false;
-                $payment_details['status_message'] = $this->l('(deferred)');
+                if (!isset($payment_details['type'])) {
+                    $payment_details['status_message'] = $this->l('(deferred)');
+                }
             } else {
                 $expiration = date('d/m/Y', (int)$payment->authorization->expires_at);
                 if ($payment->authorization->expires_at - time() > 0) {
@@ -726,6 +741,13 @@ class Payplug extends PaymentModule
         if (isset($payment->failure) && isset($payment->failure->message) && !$is_expired) {
             $payment_details['error'] = $this->l('(' . $payment->failure->message . ')');
         }
+
+        if (isset($payment_details['type']) && in_array($payment_details['type'], array('Oney 3x', 'Oney 4x'))) {
+            unset($payment_details['card_brand']);
+            unset($payment_details['card_mask']);
+            unset($payment_details['card_date']);
+        }
+
         return $payment_details;
     }
 

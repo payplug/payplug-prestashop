@@ -26,6 +26,12 @@
             <span class="pp_col2">{$payment.id|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
+    {if isset($payment.type)}
+        <li>
+            <span class="pp_col1">{l s='Type' mod='payplug'} :</span>
+            <span class="pp_col2">{$payment.type|escape:'htmlall':'UTF-8'}</span>
+        </li>
+    {/if}
     {if isset($payment.status)}
         <li>
             <span class="pp_col1">{l s='Status' mod='payplug'} :</span>
