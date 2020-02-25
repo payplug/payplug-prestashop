@@ -4164,6 +4164,56 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Hydrate Oney Payment Tab from Cookie Payment Data
+     * @param array $payment_tab
+     * @param array $payment_data
+     * @return array
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    private function hydratePaymentTabFromPaymentData($payment_tab, $payment_data)
+    {
+        if (empty($payment_data) || !is_array($payment_data) || !is_array($payment_tab)) {
+            return $payment_tab;
+        }
+
+        foreach ($payment_data as $k => $field) {
+            $keys = explode('-', $k);
+            $type = $keys[0];
+            $field_name = $keys[1];
+
+            if (strpos($field_name, 'phone') != false) {
+                switch ($type) {
+                    case 'billing' :
+                        $id_country = Country::getByIso($payment_tab['billing']['country']);
+                        $country = new Country($id_country);
+                        $field = $this->formatPhoneNumber($field, $country);
+                        break;
+                    case 'same' :
+                    case 'shipping' :
+                    default:
+                        $id_country = Country::getByIso($payment_tab['shipping']['country']);
+                        $country = new Country($id_country);
+                        $field = $this->formatPhoneNumber($field, $country);
+                        break;
+                }
+            }
+
+            if ($field_name == 'email') {
+                $payment_tab['billing']['email'] = $field;
+                $payment_tab['shipping']['email'] = $field;
+            } elseif ($type == 'same') {
+                $payment_tab['billing'][$field_name] = $field;
+                $payment_tab['shipping'][$field_name] = $field;
+            } else {
+                $payment_tab[$type][$field_name] = $field;
+            }
+        }
+
+        return $payment_tab;
+    }
+
+    /**
      * @return bool
      * @throws Exception
      * @see Module::install()
@@ -5257,8 +5307,14 @@ class Payplug extends PaymentModule
             }
 
             if ($this->getOneyRequiredFields()) {
-                $this->setPaymentErrorsCookie(array('oney_required_field'));
-                return ['result' => false, 'response' => false];
+
+                // check oney required fields
+                if ($payment_data = $this->getPaymentDataCookie()) {
+                    $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
+                } else {
+                    $this->setPaymentErrorsCookie(array('oney_required_field'));
+                    return ['result' => false, 'response' => false];
+                }
             }
 
             unset($payment_tab['allow_save_card']);
@@ -5285,10 +5341,10 @@ class Payplug extends PaymentModule
             $payment_tab['payment_method'] = 'oney_' . $is_oney;
             $payment_tab['payment_context'] = $this->getOneyPaymentContext();
 
-            // check oney required fields
-            if ($payment_data = $this->getPaymentDataCookie()) {
-                d($payment_data);
-            }
+            $return_url_params = ['ps' => 1, 'cartid' => (int)$cart->id, 'isoney' => $is_oney];
+            $return_url = $this->context->link->getModuleLink($this->name, 'validation', $return_url_params,
+                true);
+            $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
         // Create payment
