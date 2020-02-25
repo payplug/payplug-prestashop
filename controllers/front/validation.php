@@ -129,8 +129,13 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         Tools::redirect($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
+
+                    $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+                    $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+                            $oney_payment_methods);
+                    $is_authorized = count($payment->authorization) > 0;
+
                     $amount = (int)$payment->amount;
-                    $is_authorized = isset($payment->authorization->authorized_at) && $payment->authorization->authorized_at > 0;
                 } catch (Exception $e) {
                     $this->addLog($debug, $log, 'Payment cannot be retrieved payment: ' . $pay_id, 'error');
                     Tools::redirect($redirect_url_error);
@@ -203,7 +208,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 * We keep this $inst_state to give more readability.
                 */
                 $inst_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-                $auth_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'.$state_addons);
+                $auth_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons);
+                $oney_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
                 if ($type == 'installment') {
                     $installment = new PPPaymentInstallment($inst_id);
                     $first_payment = $installment->getFirstPayment();
@@ -214,6 +220,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                 } elseif ($is_paid) {
                     $order_state = $paid_state;
+                } elseif ($is_oney) {
+                    $order_state = $oney_state;
+                    $this->addLog($debug, $log, 'Deleting stored payment.', 'info');
                 } elseif ($is_authorized) {
                     $order_state = $auth_state;
                 } else {
@@ -254,6 +263,20 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
+                switch(Tools::getValue('isoney')) {
+                    case 'x3_with_fees' :
+                    case 'x3_without_fees' :
+                        $module_name = $payplug->l('Oney 3x');
+                        break;
+                    case 'x4_with_fees' :
+                    case 'x4_without_fees' :
+                        $module_name = $payplug->l('Oney 4x');
+                        break;
+                    default:
+                        $module_name = $payplug->displayName;
+                        break;
+                }
+
                 if ($amount != $total) {
                     $this->addLog($debug, $log, 'Cart amount is different and may occured an error', 'info');
                     $this->addLog($debug, $log, 'Order create with amount:' . $total, 'info');
@@ -262,7 +285,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $cart->id,
                         $order_state,
                         $total,
-                        $payplug->displayName,
+                        $module_name,
                         false,
                         $extra_vars,
                         (int)$cart->id_currency,
@@ -283,7 +306,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $order->total_paid_tax_incl = $amount;
                     $order->update();
 
-                    $sql = 'UPDATE `'._DB_PREFIX_.'order_payment` SET `amount` = '.(float)$amount.' WHERE  `transaction_id` = "'.pSQL($pay_id).'"';
+                    $sql = 'UPDATE `' . _DB_PREFIX_ . 'order_payment` SET `amount` = ' . (float)$amount . ' WHERE  `transaction_id` = "' . pSQL($pay_id) . '"';
                     Db::getInstance()->execute($sql);
 
                     $this->addLog('Order amount is patched' . $total, 'info');
@@ -292,7 +315,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $cart->id,
                         $order_state,
                         $total,
-                        $payplug->displayName,
+                        $module_name,
                         false,
                         $extra_vars,
                         (int)$cart->id_currency,

@@ -34,7 +34,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $payplug = new Payplug();
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
-            $is_deferred = (bool)Tools::getValue('def') == 1;
+            $is_deferred = (bool)Tools::getValue('def');
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -43,11 +43,26 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $options = $payplug->getAvailableOptions($cart);
 
-            // if the payment is redirect and not a one click payment, prepare the payment and redirect
-            if (!$options['embedded'] && $method != 'one_click') {
-                $payment = $payplug->preparePayment($id_cart, $id_card, $method == 'installment', $is_deferred);
+            $error_url = 'index.php?controller=order&step=3&error=1';
+
+            if($options['oney'] && $method = 'oney' && $oney_type = Tools::getValue('oney_type')) {
+                $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
                 if(!$payment['result']) {
-                    $error_url = 'index.php?controller=order&step=3&error=1' . ($method == 'installment' ? '&inst=1' : '');
+                    Tools::redirect($error_url);
+                } else {
+                    Tools::redirect($payment['return_url']);
+                }
+            }
+            // if the payment is redirect and not a one click payment, prepare the payment and redirect
+            elseif (!$options['embedded'] && $method != 'one_click') {
+                $payment_options = [
+                    'id_card' => $id_card,
+                    'is_installment' => $method == 'installment',
+                    'is_deferred' => $is_deferred,
+                ];
+                $payment = $payplug->preparePayment($payment_options);
+                if(!$payment['result']) {
+                    $payplug->setPaymentErrorsCookie([$payplug->l('The transaction was not completed and your card was not charged.')]);
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);
