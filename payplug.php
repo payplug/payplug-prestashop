@@ -1662,6 +1662,11 @@ class Payplug extends PaymentModule
         }
 
         try {
+            //load libphonenumber
+            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
+                include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
+            }
+
             $iso_code = $this->getIsoCodeByCountryId($country->id);
             $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
@@ -3019,8 +3024,8 @@ class Payplug extends PaymentModule
 
             $error = $is_elligible['result'] ? ($is_valid_carrier['result'] ? false : $is_valid_carrier['error_type']) : $is_elligible['error_type'];
             $payment_schedule = false;
-
-            if(!$error) {
+            $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && !$error;
+            if ($optimized) {
                 $use_taxes = (bool)Configuration::get('PS_TAX');
                 $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
                 $delivery_address = new Address($this->context->cart->id_address_delivery);
@@ -3092,7 +3097,7 @@ class Payplug extends PaymentModule
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
 
-                if(!$error && Tools::getValue('optimized')) {
+                if ($optimized) {
                     $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption->setAdditionalInformation($schedules);
                 }
@@ -5101,9 +5106,8 @@ class Payplug extends PaymentModule
         $openssl_exists = extension_loaded('openssl');
         if (Tools::isSubmit('submitAccount')) {
             $password = isset($_POST['PAYPLUG_PASSWORD']) && $_POST['PAYPLUG_PASSWORD'] ? $_POST['PAYPLUG_PASSWORD'] : false;
-            if ((!Validate::isEmail(Tools::getValue('PAYPLUG_EMAIL'))
-                    || !Validate::isPasswd($password)
-                )
+            if (
+                (!Validate::isEmail(Tools::getValue('PAYPLUG_EMAIL')) || !Validate::isPlaintextPassword($password))
                 && (Tools::getValue('PAYPLUG_EMAIL') != false)
             ) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
@@ -5124,22 +5128,37 @@ class Payplug extends PaymentModule
         }
 
         if (Tools::isSubmit('submitSettings')) {
-
             if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
                 $this->displayError($this->l('Settings not updated'));
             } else {
-                Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
-                Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', Tools::getValue('payplug_embedded'));
-                Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
-                Configuration::updateValue('PAYPLUG_INST', Tools::getValue('payplug_inst'));
-                Configuration::updateValue('PAYPLUG_INST_MODE', Tools::getValue('PAYPLUG_INST_MODE'));
-                Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', Tools::getValue('PAYPLUG_INST_MIN_AMOUNT'));
-                Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));
                 Configuration::updateValue('PAYPLUG_DEFERRED', Tools::getValue('payplug_deferred'));
                 Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', Tools::getValue('PAYPLUG_DEFERRED_AUTO'));
-                if ((int)Tools::getValue('PAYPLUG_DEFERRED_AUTO') == 1) {
+                Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));
+                if (Tools::getValue('PAYPLUG_DEFERRED_AUTO')) {
                     Configuration::updateValue('PAYPLUG_DEFERRED_STATE', Tools::getValue('PAYPLUG_DEFERRED_STATE'));
                 }
+                Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', Tools::getValue('payplug_embedded'));
+                Configuration::updateValue('PAYPLUG_INST', Tools::getValue('payplug_inst'));
+                Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', Tools::getValue('PAYPLUG_INST_MIN_AMOUNT'));
+                Configuration::updateValue('PAYPLUG_INST_MODE', Tools::getValue('PAYPLUG_INST_MODE'));
+                Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
+                Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
+                if ((int)Tools::getValue('payplug_oney') == 1) {
+                    $carriers = PayPlugCarrier::getAll();
+                    foreach ($carriers as $carrier) {
+                        if ((int)(Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay')) < 0) {
+                            $this->displayError($this->l('Settings not updated'));
+                        }
+                        $carrier->delivery_type = Tools::getValue(
+                            'payplug_carrier_' . (int)$carrier->id . '_delivery_type'
+                        );
+                        $carrier->delay = (int)Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay');
+                        $carrier->save();
+                    }
+                }
+                Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
+                Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
+                Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
             }
         }
 
@@ -6091,7 +6110,7 @@ class Payplug extends PaymentModule
             $this->log_install->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $this->log_install->error('Uninstall failed: tab.');
-        }  elseif (!$this->uninstallOney()) {
+        } elseif (!$this->uninstallOney()) {
             $this->log_install->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
@@ -6148,7 +6167,7 @@ class Payplug extends PaymentModule
             'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_carrier`'
         ];
 
-        foreach($queries as $query) {
+        foreach ($queries as $query) {
             $flag = $flag && Db::getInstance()->execute($query);
         }
 
@@ -6199,7 +6218,7 @@ class Payplug extends PaymentModule
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
 
-        foreach($queries as $query) {
+        foreach ($queries as $query) {
             $flag = $flag && Db::getInstance()->execute($query);
         }
 
