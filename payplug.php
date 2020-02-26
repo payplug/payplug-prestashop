@@ -4256,6 +4256,8 @@ class Payplug extends PaymentModule
             $this->log_install->error('Install failed: sql.');
         } elseif (!$this->installTab()) {
             $this->log_install->error('Install failed: tab.');
+        } elseif (!$this->installOney()) {
+            $this->log_install->error('Install failed: Oney.');
         } else {
             $this->log_install->info('Install succeeded.');
             return true;
