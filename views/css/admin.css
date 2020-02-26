@@ -137,7 +137,7 @@
 	box-shadow: rgba(0,0,0,0.15) 0 1px 4px 1px inset;
 }
 
-#payplug_admin_form .prestashop-switch>span {
+#payplug_admin_form .prestashop-switch > span {
 	color: #666;
 	text-transform: uppercase;
 	cursor: pointer;
@@ -191,7 +191,8 @@ label.switch-label {
 }
 
 #payplug_admin_form label.left-block {
-	padding: 7px 0.5em 0 0
+	padding: 7px 0.5em 0 0;
+	color: #555555;
 }
 
 #payplug_admin_form .panel-row ul{
@@ -243,7 +244,9 @@ label.switch-label {
 	font-family: "Ubuntu Condensed",Helvetica,Arial,sans-serif;
 	font-weight: 400;
 }
-
+#payplug_admin_form .block-head {
+	color: #555555;
+}
 #payplug_admin_form .block-head,
 #payplug_admin_form .block-button,
 #payplug_popin .block-button {
@@ -268,12 +271,14 @@ label.switch-label {
 #payplug_admin_form .block-title {
 	font-size: 1.5em;
 }
-
 #payplug_admin_form .panel {
-	margin: 10px auto 20px auto;
+	margin: 10px auto;
 	max-width: 1010px;
+}
+#payplug_admin_form .panel {
 	position: relative;
 	padding: 20px;
+	margin-bottom: 20px;
 	border: solid 1px #d3d8db;
 	background-color: #fff;
 	-webkit-border-radius: 5px;
@@ -336,7 +341,14 @@ label.switch-label {
 	color: #00ab7a;
 	text-decoration: none;
 }
-
+#content .module_confirmation {
+	max-width: 960px;
+	margin: 0 auto;
+}
+#content .bootstrap .module_confirmation {
+	max-width: 1010px;
+}
+#payplug_admin_form .ppwarn,
 #payplug_admin_form .pperror,
 #payplug_admin_form .ppsuccess{
 	border: none;
@@ -354,7 +366,10 @@ label.switch-label {
 	color: #00ab7a;
 	background: url("../img/admin/icon-success.png") no-repeat center left;
 }
-
+#payplug_admin_form .ppwarn {
+	color: #d2a63c;
+	background: url("../img/admin/icon-warn.png") no-repeat center left;
+}
 #payplug_popin p.pperror {
 	color: #dd2525;
 	padding: 15px 0 0 0;
@@ -363,7 +378,7 @@ label.switch-label {
 #payplug_admin_form input{
 	width: auto;
 	border-radius: 3px;
-	background: #fffbcc;
+	background: #f5f8f9;
 	border: 0.1em solid #cccccc;
 	margin: 0 auto;
 	display: block;
@@ -431,7 +446,9 @@ label.cb_label b{
 	border: 1px solid #b3b3b3;
 	color: #ffffff;
 }
-
+.ppsettings {
+	color: #777777;
+}
 a.forgot_pwd{
 	color: #aaaaaa;
 	display: block;
@@ -440,12 +457,15 @@ a.forgot_pwd{
 }
 
 p.pptips, table.pptips {
-	color: #9c9c9c;
+	color: #777777;
 	display: block;
 	margin: 0 auto;
 	padding: 2px 0 0 243px;
 }
-
+p.pptips.desc,
+table.pptips.desc {
+	color: #555555;
+}
 #payplug_admin_form .pperror.pptips {
 	margin: 2px 0 0 243px;
 }
@@ -556,7 +576,19 @@ a.green-button:focus{
 	background: #ccc;
 	color: #ffffff;
 }
-
+span.ppclose {
+	position: absolute;
+	right: 11px;
+	top: 10px;
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+	opacity: 0.4;
+	filter: alpha(opacity=50);
+	text-transform: initial;
+	font-size: 14px;
+	line-height: 17px;
+}
 #payplug_popin {
 	background: #fff;
 	border: 1px solid rgba(0,0,0,0.2);
@@ -585,19 +617,6 @@ a.green-button:focus{
 	padding: 10px 0 10px 20px;
 }
 
-span.ppclose {
-	position: absolute;
-	right: 11px;
-	top: 10px;
-	color: #000;
-	text-decoration: none;
-	cursor: pointer;
-	opacity: 0.4;
-	filter: alpha(opacity=50);
-	text-transform: initial;
-	font-size: 14px;
-}
-
 #payplug_popin form {
 	padding: 20px 20px 15px 20px;
 	text-align: center;
@@ -609,7 +628,44 @@ span.ppclose {
 	padding: 0;
 	margin: 0;
 }
-
+#payplug_popin confirm .popin-button {
+	width: 120px;
+}
+#payplug_popin .popin-button {
+	min-width: 6.5em;
+	height: 2.5em;
+	border-radius: 0.25em;
+	border: 0.1em solid #bbbbbb;
+	display: inline-block;
+	cursor: pointer;
+	margin: 15px 0 0 0;
+	text-transform: uppercase;
+}
+#payplug_popin .white-button {
+	float: left;
+	background-color: #fff;
+	font-weight: normal;
+}
+#payplug_popin .green-button {
+	float: right;
+	color: #ffffff;
+	background: #00ab7a none repeat scroll 0 0;
+	font-weight: 700;
+}
+#payplug_popin .red-button {
+	float: right;
+	color: #ffffff;
+	background: #ff2400 none repeat scroll 0 0;
+	font-weight: 700;
+}
+#payplug_popin a.green-button {
+	height: auto;
+	text-decoration: none;
+	width: 145px;
+}
+#payplug_popin .center-button {
+	float: initial;
+}
 #payplug_popin input {
 	border: 0.1em solid #bbbbbb;
 	border-radius: 0;
@@ -622,46 +678,11 @@ span.ppclose {
 	margin: 15px auto 20px;
 }
 
-#payplug_popin .popin-button {
-	width: 6.5em;
-	height: 2.5em;
-	border-radius: 0.25em;
-	border: 0.1em solid #bbbbbb;
-	display: inline-block;
-	cursor: pointer;
-	margin: 15px 0 0 0;
-	text-transform: uppercase;
-}
-
-#payplug_popin.confirm .popin-button {
-	width: 120px;
-}
-
-#payplug_popin .white-button {
-	float: left;
-	background-color: #fff;
-	font-weight: normal;
-}
-
-#payplug_popin .green-button {
-	float: right;
-	color: #ffffff;
-	background: #00ab7a none repeat scroll 0 0;
-	font-weight: 700;
-}
-
-#payplug_popin a.green-button {
-	height: auto;
-	text-decoration: none;
-	width: 145px;
-}
-
-#payplug_popin .center-button {
-	float: initial;
-}
-
 #payplug_popin input.green-button:hover{
 	background: #49a482;
+}
+#payplug_popin input.red-button:hover {
+	background: #ff695e;
 }
 #payplug_popin input.white-button:hover{
 	background: #ccc;
@@ -706,20 +727,34 @@ span.ppclose {
 
 /**** Switch ****/
 
-#payplug_admin_form .panel-show .switch {
+#payplug_admin_form .panel-show .switch,
+#payplug_admin_form .panel-oney .switch {
 	position: relative;
 	height: 1.7em;
+}
+#payplug_admin_form .panel-oney .switch {
+	margin-top: 6px;
+	margin-right: 6px;
 }
 #payplug_admin_form .panel-show .switch-show {
 	border-radius: 1em;
 	background: #dd2525;
 	width: 4em;
 }
-#payplug_admin_form .panel-show .switch-show ~ .switch-input:checked {
+#payplug_admin_form .panel-oney .switch-oney-tos,
+#payplug_admin_form .panel-oney .switch-oney-optimized {
+	border-radius: 1em;
+	background: #bbbbbb;
+	width: 4em;
+}
+#payplug_admin_form .panel-show .switch-show ~ .switch-input:checked,
+#payplug_admin_form .panel-oney .switch-oney-tos ~ .switch-input:checked,
+#payplug_admin_form .panel-oney .switch-oney-optimized ~ .switch-input:checked {
 	background: #00ab7a;
 }
 
-#payplug_admin_form .panel-show .switch-label {
+#payplug_admin_form .panel-show .switch-label,
+#payplug_admin_form .panel-oney .switch-label {
 	position: relative;
 	z-index: 2;
 	float: left;
@@ -733,23 +768,28 @@ span.ppclose {
 	padding: 0 0 0 0;
 }
 
-#payplug_admin_form .panel-show .switch-label:active {
+#payplug_admin_form .panel-show .switch-label:active,
+#payplug_admin_form .panel-oney .switch-label:active {
 	font-weight: bold;
 }
 
-#payplug_admin_form .panel-show .switch-label-off {
+#payplug_admin_form .panel-show .switch-label-off,
+#payplug_admin_form .panel-oney .switch-label-off {
 	padding-left: 0.5em;
 }
 
-#payplug_admin_form .panel-show .switch-label-on {
+#payplug_admin_form .panel-show .switch-label-on,
+#payplug_admin_form .panel-oney .switch-label-on {
 	padding-right: 0.5em;
 }
 
-#payplug_admin_form .panel-show input.switch-input {
+#payplug_admin_form .panel-show input.switch-input,
+#payplug_admin_form .panel-oney input.switch-input {
 	display: none;
 }
 
-#payplug_admin_form .panel-show .switch-input:checked + .switch-label {
+#payplug_admin_form .panel-show .switch-input:checked + .switch-label,
+#payplug_admin_form .panel-oney .switch-input:checked + .switch-label {
 	font-weight: bold;
 	color: #ffffff;
 	-webkit-transition: 0.15s ease-out;
@@ -758,11 +798,14 @@ span.ppclose {
 	transition: 0.15s ease-out;
 }
 
-#payplug_admin_form .panel-show .switch-show .switch-input:checked + .switch-label-on ~ .switch-selection {
+#payplug_admin_form .panel-show .switch-show .switch-input:checked + .switch-label-on ~ .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-tos .switch-input:checked + .switch-label-on ~ .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-optimized .switch-input:checked + .switch-label-on ~ .switch-selection {
 	left: 31px;
 }
 
-#payplug_admin_form .panel-show .switch-selection {
+#payplug_admin_form .panel-show .switch-selection,
+#payplug_admin_form .panel-oney .switch-selection {
 	display: block;
 	position: absolute;
 	z-index: 1;
@@ -773,7 +816,9 @@ span.ppclose {
 	-o-transition: left 0.15s ease-out;
 	transition: left 0.15s ease-out;
 }
-#payplug_admin_form .panel-show .switch-show .switch-selection {
+#payplug_admin_form .panel-show .switch-show .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-tos .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-optimized .switch-selection {
 	border-radius: 1em;
 	background: #ffffff;
 	height: 1.3em;
@@ -786,15 +831,34 @@ span.ppclose {
 	box-shadow: 0 -1px 0 #b3b3b3 inset;
 }
 
-#payplug_admin_form .panel-show .switch-show.ppdisabled,
-#payplug_admin_form .panel-show .switch-show.ppdisabled.ppon {
+#payplug_admin_form .panela-show .switch-show.ppdisabled,
+#payplug_admin_form .panel-show .switch-show.ppdisabled.ppon,
+#payplug_admin_form .panela-oney .switch-oney-tos.ppdisabled,
+#payplug_admin_form .panel-oney .switch-oney-tos.ppdisabled.ppon,
+#payplug_admin_form .panela-oney .switch-oney-optimized.ppdisabled,
+#payplug_admin_form .panel-oney .switch-oney-optimized.ppdisabled.ppon {
 	background: #ffaaaa;
 }
 
-#payplug_admin_form .panel-show .switch-show.ppon {
+#payplug_admin_form .panel-show .switch-show.ppon,
+#payplug_admin_form .panel-oney .switch-oney-tos.ppon,
+#payplug_admin_form .panel-oney .switch-oney-optimized.ppon {
 	background: #00ab7a;
 }
-
+#payplug_admin_form .switch.switch-oney-tos,
+#payplug_admin_form .switch.switch-oney-optimized {
+	display: inline-block;
+}
+#payplug_admin_form .switch.switch-oney-optimized {
+	margin: 0 0 0 242px;
+}
+#payplug_admin_form span.oney-optimized {
+	max-width: calc(95% - 48px);
+	display: inline-block;
+}
+#payplug_admin_form span.oney-optimized strong {
+	font-weight: bold;
+}
 .ppoverlay {
 	background: #000000 none repeat scroll 0 0;
 	height: 100%;
@@ -820,7 +884,9 @@ span.ppclose {
 .ppbold {
 	font-weight: bold;
 }
-
+.pphide {
+	display: none;
+}
 #payplug_admin_form .ppinline {
 	display: block;
 }
@@ -846,7 +912,9 @@ span.ppclose {
 	width: 75px;
 }
 
-#installment_config_error {
+#installment_config_error,
+#oney_config_error,
+#deferred_config_error {
 	color: #dd2525;
 	padding: 0 0 0 10px;
 }
@@ -855,7 +923,58 @@ span.ppclose {
 	color: #f7a000;
 	padding: 2px 0 0 243px;
 }
-
+#payplug_deferred_state {
+	width: 300px;
+	display: inline;
+}
+#payplug_admin_form #payplug_deferred_auto,
+#payplug_admin_form #payplug_oney_tos {
+	margin: 0;
+}
+label.vertical-top {
+	vertical-align: top;
+}
 .italic {
 	font-style: italic;
+}
+#payplug_admin_form .payplug_carrier_delay {
+	text-align: center;
+}
+#payplug_admin_form .payplug_carrier_delay input {
+	width: 50px;
+	display: inline-block;
+}
+#payplug_admin_form .oney_carrier {
+	display: none;
+}
+#payplug_admin_form .panel-row .pponeychecked {
+	margin: 0 0 16px;
+}
+#payplug_admin_form .panel-row .panel-oney {
+	display: flex;
+	align-items: start;
+	padding-bottom: 13px;
+	margin: 0;
+}
+#payplug_admin_form .panel-row .panel-oney .left-block {
+	padding: 0 6px 0 0;
+	line-height: 20px;
+	margin: 0;
+	font-weight: normal;
+	color: #777777;
+}
+#payplug_admin_form .panel-row .panel-oney .block-right {
+	width: 75%;
+	display: flex;
+	align-items: start;
+	padding: 0;
+	margin: 0;
+	line-height: 20px;
+}
+#payplug_admin_form .panel-row .panel-oney .block-right .switch {
+	width: 48px;
+	margin: 0 10px;
+}
+#payplug_admin_form .panel-row .panel-oney:nth-child(2) {
+	padding-top: 8px;
 }
