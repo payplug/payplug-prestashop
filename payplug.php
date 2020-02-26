@@ -217,24 +217,6 @@ class Payplug extends PaymentModule
                 'it' => 'Autorizzazione scaduta',
             ),
         ),
-        'oney_pg' => array(
-            'cfg' => null,
-            'template' => null,
-            'logable' => true,
-            'send_email' => false,
-            'paid' => false,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => true,
-            'color' => '#a1f8a1',
-            'name' => array(
-                'en' => 'Oney - Pending',
-                'fr' => 'Oney - En attente',
-                'es' => 'Oney - Pending',
-                'it' => 'Oney - Pending',
-            ),
-        ),
     );
 
     /**
@@ -4318,7 +4300,7 @@ class Payplug extends PaymentModule
             'actionObjectCarrierAddAfter',
             'actionCarrierUpdate',
             'displayProductPriceBlock',
-            'displayBeforeShoppingCartBlock',
+            'displayExpressCheckout',
         );
 
         $flag = true;
