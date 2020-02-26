@@ -112,6 +112,8 @@
 
     {include file='./option_one_click.tpl'}
 
+    {include file='./option_oney.tpl'}
+
     {include file='./option_installment_plan.tpl'}
 
     {include file='./option_deferred_payment.tpl'}
