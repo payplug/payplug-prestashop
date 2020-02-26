@@ -1436,6 +1436,25 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Display
+     * @param $oney_payment
+     * @param $amount
+     * @return string
+     * @throws \PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException
+     */
+    public function displayOneySchedule($oney_payment, $amount)
+    {
+        $this->smarty->assign(array(
+            'oney_payment_option' => $oney_payment,
+            'payplug_oney_amount' => [
+                'amount' => $amount,
+                'value' => Tools::displayPrice($amount),
+            ],
+        ));
+        return $this->display(__FILE__, 'oney/schedule.tpl');
+    }
+
+    /**
      * Display Oney popin payment option
      *
      * @return mixed
@@ -3180,6 +3199,16 @@ class Payplug extends PaymentModule
             $is_valid_carrier = $this->isValidOneyCarrier($this->context->cart);
 
             $error = $is_elligible['result'] ? ($is_valid_carrier['result'] ? false : $is_valid_carrier['error_type']) : $is_elligible['error_type'];
+            $payment_schedule = false;
+
+            if(!$error) {
+                $use_taxes = (bool)Configuration::get('PS_TAX');
+                $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
+                $delivery_address = new Address($this->context->cart->id_address_delivery);
+                $delivery_country = new Country($delivery_address->id_country);
+                $iso_code = $delivery_country->iso_code;
+                $payment_schedule = $this->getOneyPaymentOptionsList($cart_amount, $iso_code);
+            }
 
             foreach ($this->available_oney_payments as $oney_payment) {
                 $paymentOption = new PaymentOption();
@@ -3236,12 +3265,18 @@ class Payplug extends PaymentModule
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
+
                 $paymentOption
                     ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png'))
                     ->setCallToActionText($label)
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
+
+                if(!$error && Tools::getValue('optimized')) {
+                    $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
+                    $paymentOption->setAdditionalInformation($schedules);
+                }
 
                 $payment_list[] = $paymentOption;
             }

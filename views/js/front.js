@@ -36,10 +36,7 @@ var $document, $window, payplugModule = {
         init: function () {
             // Styling
             var $options = $('input[data-module-name="payplug"]');
-            $options.each(function () {
-                var optionId = $(this).attr('id') + '-additional-information';
-                $('#' + optionId).attr('style', 'margin:0;');
-            }).parents('.payment-option').addClass('payplug-payment-option')
+            $options.parents('.payment-option').addClass('payplug-payment-option')
 
             this.checkErrors();
 

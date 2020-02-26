@@ -863,382 +863,55 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     }
   }
 
-  // Oney payment
-  &Payment {
-    .borderRadius(4px);
-    .Poppins();
-    .transition(~"max-height @{dur}");
-    border: 1px solid #d6d4d4;
-    background: #fbfbfb;
-    max-height: 90px;
-    overflow: hidden;
+  &Schedule {
+    .border(#colorMap[oney], tb);
+    position: relative;
+    font-size: 12px;
+    line-height: 17px;
+    width: 100%;
+    margin: -10px 0 20px -8px;
 
-    &-disabled {
-      max-height: none;
-    }
-
-    &-open {
-      max-height: 10000vh;
-    }
-
-    &_trigger {
-      position: relative;
-      display: flex;
-      width: 100%;
-      height: 88px;
-      align-items: center;
-      border: none;
-      background: none;
-      text-align: left;
-      color: #333;
-      font-size: 17px;
-      font-weight: bold;
-      padding: 0 15px;
-      letter-spacing: -1px;
-
-      .oneyPayment-disabled & {
-        color: #colorMap[grey];
-        cursor: default;
-
-        &:hover {
-          background: #fbfbfb;
-        }
-
-        .oneyPayment-mobile& {
-          padding: 8px 15px;
-          height: auto;
-        }
-      }
-
-      &:hover {
-        background: #f6f6f6;
-
-        .oneyPayment-open & {
-          background: #fbfbfb;
-        }
-      }
-
-      &:focus {
-        outline: 0;
-      }
-
-      &:after {
-        .transition(~"transform @{dur}");
-        .transform(translateY(-50%));
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        content: "\f054";
-        position: absolute;
-        right: 7px;
-        top: 50%;
-        font-family: "FontAwesome";
-        font-size: 25px;
-        height: 30px;
-        width: 30px;
-        color: #777;
-
-        .oneyPayment-open & {
-          .transform(translateY(-50%) rotate(90deg));
-        }
-
-        .oneyPayment-disabled & {
-          display: none;
-        }
-      }
-
-      .oneyPayment-mobile & {
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-      }
-    }
-
-    &_label {
+    // Oney Detail
+    ul {
       display: flex;
       flex-direction: column;
-      line-height: 1.3em;
-    }
-
-    &_error {
-      font-size: 14px;
-      font-style: italic;
-      font-weight: 400;
-
-      &-invalidCarrier {
-        padding: 0 15px;
-        color: #colorMap[error];
-        font-size: 13px;
-        font-style: normal;
-        margin: 0 0 16px;
-      }
-    }
-
-    &_logo {
-      display: block;
-      width: 165px;
-      height: 45px;
-      background-size: 110%;
-      max-width: 100%;
-      margin: 0 15px 0 0;
-
-      .oneyPayment-disabled & {
-        background-image: url(~"@{img_oney}3x4x-alt.svg");
-      }
-    }
-
-    &_cta {
-      display: flex;
-      justify-content: center;
+      font-weight: 600;
+      font-size: 13px;
+      color: #2F2930;
       width: 100%;
-      margin: 0 0 30px;
-    }
+      height: 100%;
+      margin: 0;
 
-    &_button {
-      background: #colorMap[oney];
-      width: 254px;
-      height: 50px;
-      color: #fff;
-      border: none;
-      font-size: 15px;
-      .borderRadius(2px);
+      li {
+        display: flex;
+        justify-content: space-between;
+        line-height: 21px;
+        padding: 12px 0;
+        flex-wrap: wrap;
 
-      &-disabled,
-      .oneyPayment-invalidCarrier & {
-        background: #colorMap[grey];
-        cursor: default;
-        outline: none;
-      }
-    }
-  }
+        & + li {
+          .border(#dce0e8, t);
+        }
 
-  // Oney payment option
-  &Option {
-    .transition();
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    width: calc(50% - 16px);
-    border: 1px solid #dce0e8;
-    padding: 30px;
-    cursor: pointer;
-    margin: 0 8px 50px;
-    position: relative;
+        span {
+          display: flex;
+          font-weight: 600;
 
-    &:after {
-      .transition(~"opacity @{dur}");
-      content: "";
-      position: absolute;
-      display: block;
-      bottom: -14px;
-      right: 0;
-      left: 0;
-      height: 13px;
-      background: #colorMap[oney];
-      opacity: 0;
-      -webkit-box-shadow: 0px -5px 10px 5px #fff inset;
-      -moz-box-shadow: 0px -5px 10px 5px #fff inset;
-      box-shadow: 0px -5px 10px 5px #fff inset;
+          &:first-child {
+            font-weight: 500;
+          }
+        }
 
-      .oneyPayment-mobile & {
-        display: none;
-      }
-    }
-
-    &:hover {
-      border-color: #colorMap[oney];
-
-      &:after {
-        opacity: 1;
-      }
-    }
-
-    &-selected {
-      border-color: #colorMap[oney];
-      background: fade(#colorMap[oney], 15);
-
-      &:after {
-        opacity: 1;
-      }
-
-      .oneyPayment-mobile & {
-        border: none;
-        background: none;
-      }
-    }
-
-    &_wrapper {
-      display: flex;
-      justify-content: center;
-      padding: 0 8px;
-      flex-wrap: wrap;
-      position: relative;
-
-      .oneyPayment-mobile & {
-        padding: 89px 0 0;
-        position: relative;
-      }
-
-      &-loading {
-        justify-content: center;
-        padding: 16px;
-
-        & + .oneyPayment_cta {
-          display: none;
+        small {
+          display: block;
+          font-weight: 400;
+          width: 100%;
         }
 
         .oneyPayment-mobile & {
-          padding: 16px;
+          padding: 8px 0;
         }
       }
-    }
-
-    &_logo {
-      display: block;
-      width: 135px;
-      height: 35px;
-      max-width: 100%;
-
-      .oneyPayment-mobile & {
-        width: 100px;
-        height: 30px;
-      }
-
-      .oneyPayment-invalidCarrier &.oneyLogo-x3 {
-        background-image: url(~"@{img_oney}3x-alt.svg");
-      }
-
-      .oneyPayment-invalidCarrier &.oneyLogo-x4 {
-        background-image: url(~"@{img_oney}4x-alt.svg");
-      }
-    }
-
-    &_title {
-      display: flex;
-      height: 90px;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 500;
-      color: #2f2930;
-      padding: 0 0 35px;
-
-      .oneyPayment-mobile & {
-        width: 50%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: transparent;
-        border: 1px solid #dce0e8;
-        border-left: none;
-        border-bottom: 5px solid transparent;
-        padding: 0;
-      }
-
-      .oneyPayment-mobile .oneyOption:nth-child(2) & {
-        left: 50%;
-        border-right: none;
-        border-left: none;
-      }
-
-      .oneyPayment-mobile .oneyOption-selected & {
-        border-bottom: 5px solid #colorMap[oney];
-      }
-    }
-
-    &_prices {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      flex-direction: column;
-      justify-content: space-between;
-
-      .oneyPayment-mobile & {
-        display: none;
-        height: auto;
-        padding: 30px 16px;
-        border-top: 1px solid #dce0e8;
-      }
-
-      .oneyPayment-mobile .oneyOption-selected & {
-        display: block;
-      }
-
-      // Oney Detail
-      ul {
-        display: flex;
-        flex-direction: column;
-        font-weight: 600;
-        font-size: 15px;
-        color: #2F2930;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-
-        li {
-          .border(#dce0e8, b);
-          display: flex;
-          justify-content: space-between;
-          line-height: 21px;
-          padding: 0 0 16px;
-          flex-wrap: wrap;
-
-          & + li {
-            padding: 16px 0;
-          }
-
-          &:last-child {
-            padding: 16px 0 0;
-            margin: auto 0 0;
-            border: none;
-          }
-
-          span {
-            display: flex;
-            font-weight: 600;
-
-            &:first-child {
-              font-weight: 500;
-            }
-          }
-
-          small {
-            display: block;
-            font-weight: 400;
-            width: 100%;
-          }
-
-          .oneyPayment-mobile & {
-            padding: 8px 0;
-          }
-        }
-      }
-    }
-
-    &_legend {
-      text-align: center;
-      font-weight: 400;
-      margin: auto 0 0;
-      color: #2f2930;
-    }
-
-    &_radio {
-      width: 0;
-      height: 0;
-      overflow: hidden;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .oneyPayment-mobile & {
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      position: static;
-      border: none;
-      background: none;
     }
   }
 
