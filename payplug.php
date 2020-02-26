@@ -1157,7 +1157,7 @@ class Payplug extends PaymentModule
             $os = $order_state->id;
             $log->info('ID: ' . $os);
         }
-        return $this->setConfiguration($key_config, $os);
+        return Configuration::updateValue($key_config, $os);
     }
 
     /**
@@ -2109,7 +2109,7 @@ class Payplug extends PaymentModule
     public function setConfiguration($key, $value)
     {
         $this->_conf[$key]['value'] = $value;
-        return Configuration::set($key, $value);
+        return Configuration::updateValue($key, $value);
     }
 
     /**
@@ -4335,11 +4335,11 @@ class Payplug extends PaymentModule
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $flag = true;
-        if (!$this->setConfiguration('PAYPLUG_ONEY', 0) ||
-            !$this->setConfiguration('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
-            !$this->setConfiguration('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-            !$this->setConfiguration('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
-            !$this->setConfiguration('PAYPLUG_ONEY_TOS', 0)
+        if (!Configuration::updateValue('PAYPLUG_ONEY', 0) ||
+            !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
+            !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
+            !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
+            !Configuration::updateValue('PAYPLUG_ONEY_TOS', 0)
         ) {
             $log->error('Installation failed: oney configurations failed.');
             $flag = false;
