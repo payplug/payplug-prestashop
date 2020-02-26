@@ -1107,7 +1107,7 @@ class Payplug extends PaymentModule
         $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
 
         $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
-        $os = $this->getConfiguration($key_config);
+        $os = Configuration::get($key_config);
 
         if (!$os) {
             if ($val = $this->findOrderState($state['name'], $sandbox)) {
@@ -1302,6 +1302,20 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO')
             && Configuration::deleteByName('PAYPLUG_DEFERRED_STATE')
         );
+    }
+
+    /**
+     * Delete basic configuration
+     *
+     * @return bool
+     */
+    private function deleteOneyConfig()
+    {
+        return (Configuration::deleteByName('PAYPLUG_ONEY')
+            && Configuration::deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
+            && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
+            && Configuration::deleteByName('PAYPLUG_ONEY_TOS'));
     }
 
     /**
@@ -2038,8 +2052,6 @@ class Payplug extends PaymentModule
         return $this->html;
     }
 
-
-
     /**
      * @return string
      */
@@ -2094,62 +2106,6 @@ class Payplug extends PaymentModule
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
-        );
-    }
-
-    public function getConfiguration($key)
-    {
-        if (isset($this->_conf[$key])) {
-            return $this->_conf[$key]['value'];
-        } else {
-            return Configuration::get($key);
-        }
-    }
-
-    public function setConfiguration($key, $value)
-    {
-        $this->_conf[$key]['value'] = $value;
-        return Configuration::updateValue($key, $value);
-    }
-
-    /**
-     * @param $cart_id
-     * @param bool $is_deferred
-     * @return array
-     */
-    private function getInstPaymentOptions($cart_id, $is_deferred = false)
-    {
-        $is_installment = (int)Tools::getValue('inst');
-        if ($is_installment == 1) {
-            $payment = $this->preparePayment((int)$cart_id, null, true, $is_deferred);
-        } else {
-            $payment = $this->preparePayment((int)$cart_id, null, false, $is_deferred);
-        }
-        $payment_url = false;
-        if (is_array($payment)) {
-            if (!$payment['result']) {
-                $this->setError($payment['response']);
-            } else {
-                $payment_url = $payment['payment_url'];
-            }
-        } else {
-            $payment_data = json_decode($payment);
-            if (is_object($payment_data)) {
-                $payment_url = $payment_data->payment_url;
-            } else {
-                $payment_url = $payment;
-            }
-        }
-
-
-        $payplug_errors = count($this->errors) ? implode('<br/>', $this->errors) : false;
-
-        return array(
-            'payplug_errors' => $payplug_errors,
-            'lightbox' => 1,
-            'is_installment' => $is_installment,
-            'payment_url' => $payment_url,
-            'api_url' => $this->api_url,
         );
     }
 
@@ -2237,23 +2193,23 @@ class Payplug extends PaymentModule
         $this->checkConfiguration();
 
         $configurations = array(
-            'show' => $this->getConfiguration('PAYPLUG_SHOW'),
-            'email' => $this->getConfiguration('PAYPLUG_EMAIL'),
-            'sandbox_mode' => $this->getConfiguration('PAYPLUG_SANDBOX_MODE'),
-            'embedded_mode' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
-            'one_click' => $this->getConfiguration('PAYPLUG_ONE_CLICK'),
-            'inst' => $this->getConfiguration('PAYPLUG_INST'),
-            'inst_mode' => $this->getConfiguration('PAYPLUG_INST_MODE'),
-            'inst_min_amount' => $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT'),
-            'test_api_key' => $this->getConfiguration('PAYPLUG_TEST_API_KEY'),
-            'live_api_key' => $this->getConfiguration('PAYPLUG_LIVE_API_KEY'),
-            'debug_mode' => $this->getConfiguration('PAYPLUG_DEBUG_MODE'),
-            'deferred' => $this->getConfiguration('PAYPLUG_DEFERRED'),
-            'deferred_auto' => $this->getConfiguration('PAYPLUG_DEFERRED_AUTO'),
-            'deferred_state' => $this->getConfiguration('PAYPLUG_DEFERRED_STATE'),
-            'oney' => $this->getConfiguration('PAYPLUG_ONEY'),
-            'oney_tos' => $this->getConfiguration('PAYPLUG_ONEY_TOS'),
-            'oney_optimized' => $this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED'),
+            'show' => Configuration::get('PAYPLUG_SHOW'),
+            'email' => Configuration::get('PAYPLUG_EMAIL'),
+            'sandbox_mode' => Configuration::get('PAYPLUG_SANDBOX_MODE'),
+            'embedded_mode' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
+            'one_click' => Configuration::get('PAYPLUG_ONE_CLICK'),
+            'inst' => Configuration::get('PAYPLUG_INST'),
+            'inst_mode' => Configuration::get('PAYPLUG_INST_MODE'),
+            'inst_min_amount' => Configuration::get('PAYPLUG_INST_MIN_AMOUNT'),
+            'test_api_key' => Configuration::get('PAYPLUG_TEST_API_KEY'),
+            'live_api_key' => Configuration::get('PAYPLUG_LIVE_API_KEY'),
+            'debug_mode' => Configuration::get('PAYPLUG_DEBUG_MODE'),
+            'deferred' => Configuration::get('PAYPLUG_DEFERRED'),
+            'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
+            'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
+            'oney' => Configuration::get('PAYPLUG_ONEY'),
+            'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
+            'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         );
 
         $connected = !empty($configurations['email'])
@@ -4569,7 +4525,6 @@ class Payplug extends PaymentModule
         return $flag;
     }
 
-
     /**
      * Check if Oney is allowed
      * @return bool
@@ -6136,6 +6091,8 @@ class Payplug extends PaymentModule
             $this->log_install->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $this->log_install->error('Uninstall failed: tab.');
+        }  elseif (!$this->uninstallOney()) {
+            $this->log_install->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;
@@ -6173,6 +6130,32 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Install Oney feature
+     */
+    public function uninstallOney()
+    {
+        return $this->deleteOneyConfig() && $this->uninstallOneySql();
+    }
+
+    /**
+     * Install Oney SQL
+     * @return bool
+     */
+    private function uninstallOneySql()
+    {
+        $flag = true;
+        $queries = [
+            'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_carrier`'
+        ];
+
+        foreach($queries as $query) {
+            $flag = $flag && Db::getInstance()->execute($query);
+        }
+
+        return $flag;
+    }
+
+    /**
      * @param $tabClass
      * @return bool
      * @throws PrestaShopDatabaseException
@@ -6201,54 +6184,26 @@ class Payplug extends PaymentModule
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Uninstallation SQL starting.');
-        $req_payplug_lock = '
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_lock`';
-        $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 
-        if (!$res_payplug_lock) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_LOCK.');
-            return false;
-        }
+        $flag = true;
+        $queries = [
+            'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_lock`'
+        ];
+
 
         if (!$keep_cards) {
-            $req_payplug_card = '
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_card`';
-            $res_payplug_card = DB::getInstance()->Execute($req_payplug_card);
-
-            if (!$res_payplug_card) {
-                $log->error('Uninstallation SQL failed: PAYPLUG_CARD.');
-                return false;
-            }
-        } else {
-            $log->info('Cards kept in database.');
+            $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_card`';
         }
 
-        $req_payplug_payment_cart = '
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_payment_cart`';
-        $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_payment_cart`';
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
 
-        if (!$res_payplug_payment_cart) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_PAYMENT_CART.');
-            return false;
+        foreach($queries as $query) {
+            $flag = $flag && Db::getInstance()->execute($query);
         }
 
-        $req_payplug_installment_cart = '
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
-        $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
-
-        if (!$res_payplug_installment_cart) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENT_CART.');
-            return false;
-        }
-
-        $req_payplug_installment = '
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
-        $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
-
-        if (!$res_payplug_installment) {
-            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENTS.');
-            return false;
-        }
+        return $flag;
 
         $log->info('Uninstallation SQL ended.');
         return true;
