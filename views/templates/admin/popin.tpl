@@ -64,6 +64,7 @@
             <li>{l s='Mode:' mod='payplug'} <span class="ppbold">{if $sandbox == 1}{l s='TEST' mod='payplug'}{else}{l s='LIVE' mod='payplug'}{/if}</span></li>
             <li>{l s='Payment page:' mod='payplug'} <span class="ppbold">{if $embedded == 1}{l s='EMBEDDED' mod='payplug'}{else}{l s='REDIRECTED' mod='payplug'}{/if}</span></li>
             <li>{l s='One-click payments:' mod='payplug'} <span class="ppbold">{if $one_click == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
+            <li>{l s='Payments 3x, 4x Oney:' mod='payplug'} <span class="ppbold">{if $oney == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
             <li>{l s='Installments :' mod='payplug'} <span class="ppbold">{if $installment == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
             <li>{l s='Deferred payments :' mod='payplug'} <span class="ppbold">{if $deferred == 1}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</span></li>
         </ul>

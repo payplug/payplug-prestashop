@@ -139,12 +139,14 @@ function admin_start()
             var one_click = $('#payplug_one_click_left').attr('checked');
             var installment = $('#payplug_inst_left').attr('checked');
             var deferred = $('#payplug_deferred_left').attr('checked');
+            var oney = $('#payplug_oney_left').attr('checked');
             var args = {
                 sandbox: (sandbox == 'checked' || sandbox == true) ? 1 : 0,
                 embedded: (embedded == 'checked' || embedded == true) ? 1 : 0,
                 one_click: (one_click == 'checked' || one_click == true) ? 1 : 0,
                 installment: (installment == 'checked' || installment == true) ? 1 : 0,
                 deferred: (deferred == 'checked' || deferred == true) ? 1 : 0,
+                oney: (oney == 'checked' || oney == true) ? 1 : 0,
                 activate: 1
             };
             callPopin('confirm', args);
@@ -243,12 +245,14 @@ function admin_start()
             var one_click = $('#payplug_one_click_left').attr('checked');
             var installment = $('#payplug_inst_left').attr('checked');
             var deferred = $('#payplug_deferred_left').attr('checked');
+            var oney = $('#payplug_oney_left').attr('checked');
             var args = {
                 sandbox: (sandbox == 'checked' || sandbox == true) ? 1 : 0,
                 embedded: (embedded == 'checked' || embedded == true) ? 1 : 0,
                 one_click: (one_click == 'checked' || one_click == true) ? 1 : 0,
                 installment: (installment == 'checked' || installment == true) ? 1 : 0,
                 deferred: (deferred == 'checked' || deferred == true) ? 1 : 0,
+                oney: (oney == 'checked' || oney == true) ? 1 : 0,
                 activate: 0
             };
             e.preventDefault();
@@ -493,7 +497,7 @@ function callPopin(type, args){
         var data = {_ajax: 1, popin: 1, type: type};
         if(type == 'confirm')
         {
-            data = {_ajax: 1, popin: 1, type: type, sandbox: args['sandbox'], embedded: args['embedded'], one_click: args['one_click'], installment: args['installment'], deferred: args['deferred'], activate: args['activate']};
+            data = {_ajax: 1, popin: 1, type: type, sandbox: args['sandbox'], embedded: args['embedded'], oney: args['oney'], one_click: args['one_click'], installment: args['installment'], deferred: args['deferred'], activate: args['activate']};
         }
         $.ajax({
             type: 'POST',

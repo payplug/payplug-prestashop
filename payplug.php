@@ -333,20 +333,19 @@ class Payplug extends PaymentModule
             if ((int)Tools::getValue('popin') == 1) {
                 $args = null;
                 if (Tools::getValue('type') == 'confirm') {
-                    $sandbox = (int)Tools::getValue('sandbox');
-                    $embedded = (int)Tools::getValue('embedded');
-                    $one_click = (int)Tools::getValue('one_click');
-                    $installment = (int)Tools::getValue('installment');
-                    $deferred = (int)Tools::getValue('deferred');
-                    $activate = (int)Tools::getValue('activate');
-                    $args = array(
-                        'sandbox' => $sandbox,
-                        'embedded' => $embedded,
-                        'one_click' => $one_click,
-                        'installment' => $installment,
-                        'deferred' => $deferred,
-                        'activate' => $activate,
-                    );
+                    $keys = [
+                        'sandbox',
+                        'embedded',
+                        'one_click',
+                        'oney',
+                        'installment',
+                        'activate',
+                        'deferred',
+                    ];
+                    $args = [];
+                    foreach ($keys as $key) {
+                        $args[$key] = Tools::getValue($key);
+                    }
                 }
                 $this->displayPopin(Tools::getValue('type'), $args);
             }
@@ -1527,6 +1526,7 @@ class Payplug extends PaymentModule
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
                 'one_click' => $args['one_click'],
+                'oney' => $args['oney'],
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
@@ -3413,6 +3413,27 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Automatically update PayPlugCarrier after someone update a Prestashop Carrier
+     *
+     * @param array $params List of parameters used when the hook was triggered
+     * @return void
+     */
+    public function hookActionCarrierUpdate($params)
+    {
+        $updated_carrier = $params['carrier'];
+        $payplug_carrier = PayPlugCarrier::getPayPlugCarrierByIdCarrier((int)$params['id_carrier']);
+
+        // if the payplug carrier don't exists, set default value
+        if (!Validate::isLoadedObject($payplug_carrier)) {
+            $payplug_carrier->delay = '1';
+            $payplug_carrier->delivery_type = 'carrier';
+        }
+
+        $payplug_carrier->id_carrier = (int)$updated_carrier->id;
+        $payplug_carrier->save();
+    }
+
+    /**
      * @param $customer
      * @return false|string
      */
@@ -3436,6 +3457,20 @@ class Payplug extends PaymentModule
         } else {
             return json_encode($cards);
         }
+    }
+
+    /**
+     * Automatically add and populate a PayPlugCarrier after someone add a Prestashop Carrier
+     *
+     * @param array $params List of parameters used when the hook was triggered
+     * @return void
+     */
+    public function hookActionObjectCarrierAddAfter($params)
+    {
+        $new_carrier = $params['object'];
+        $new_pp_carrier = new PayPlugCarrier();
+        $new_pp_carrier->populateFromCarrier($new_carrier);
+        $new_pp_carrier->save();
     }
 
     /**
@@ -4197,9 +4232,7 @@ class Payplug extends PaymentModule
             !$this->registerHook('header') ||
             !$this->registerHook('adminOrder') ||
             !$this->registerHook('actionOrderStatusUpdate') ||
-            !$this->registerHook('customerAccount') ||
-            !$this->registerHook('displayProductPriceBlock') ||
-            !$this->registerHook('displayExpressCheckout')
+            !$this->registerHook('customerAccount')
         ) {
             $this->log_install->error('Install failed: classics hooks.');
         } elseif (!$this->registerHook('paymentOptions')) {
@@ -6068,6 +6101,15 @@ class Payplug extends PaymentModule
             'can_create_deferred_payment' => $json_answer->permissions->can_create_deferred_payment,
             'can_use_oney' => $json_answer->permissions->can_use_oney,
         );
+
+        // If sandbox mode active, no allowed countries sent
+        // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
+        if (isset($json_answer->is_live) && !$json_answer->is_live) {
+            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
+        }
+
+        // todo: Remove this while API can manage overseas phone numbers
+        $configuration['oney_allowed_countries'] = 'FR';
 
         Configuration::updateValue('PAYPLUG_COMPANY_ID', $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
