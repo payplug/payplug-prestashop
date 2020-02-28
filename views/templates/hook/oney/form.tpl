@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {if isset($oney_required_fields) && $oney_required_fields}
-    <form class="oneyForm">
+    <form class="oneyForm"{if isset($oney_type) && $oney_type} data-oney_type="{$oney_type|escape:'htmlall':'UTF-8'}"{/if}>
         {if isset($is_popin_tpl) && $is_popin_tpl}
             <p class="oneyForm_title">{l s='Missing information(s)' mod='payplug'}</p>
         {/if}

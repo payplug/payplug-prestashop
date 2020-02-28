@@ -1487,10 +1487,13 @@ class Payplug extends PaymentModule
         $payment_messages = array();
         $with_msg_button = false;
         foreach ($errors as $error) {
-            if ($error == 'oney_required_field') {
+            if (strpos('oney_required_field', $error) >= 0) {
                 $this->smarty->assign(['is_popin_tpl' => true]);
                 $fields = $this->getOneyRequiredFields();
-                $this->smarty->assign(['oney_required_fields' => $fields]);
+                $this->smarty->assign([
+                    'oney_type' => str_replace('oney_required_field_', '', $error),
+                    'oney_required_fields' => $fields,
+                ]);
                 $payment_messages[] = [
                     'type' => 'template',
                     'value' => 'oney/form.tpl'
@@ -2264,9 +2267,14 @@ class Payplug extends PaymentModule
         }
 
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
+
+        Media::addJsDef([
+            'admin_ajax_url' => $admin_ajax_url
+        ]);
 
         $login_infos = array();
 
@@ -5446,12 +5454,12 @@ class Payplug extends PaymentModule
             if ($this->getOneyRequiredFields()) {
 
                 // check oney required fields
-                if ($payment_data = $this->getPaymentDataCookie()) {
-                    $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
-                } else {
-                    $this->setPaymentErrorsCookie(array('oney_required_field'));
+//                if ($payment_data = $this->getPaymentDataCookie()) {
+//                    $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
+//                } else {
+                    $this->setPaymentErrorsCookie(array('oney_required_field_' . $is_oney));
                     return ['result' => false, 'response' => false];
-                }
+//                }
             }
 
             unset($payment_tab['allow_save_card']);

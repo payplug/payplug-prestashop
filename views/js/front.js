@@ -60,6 +60,18 @@ var $document, $window, payplugModule = {
                 success: function (data) {
                     if (data.result) {
                         payplugModule.popup.set(data.template);
+
+                        // Select Oney Option
+                        var $form = $('.'+payplugModule.oney.form.props.identifier);
+                        if($form.length) {
+                            var oney_type = $form.data('oney_type'),
+                                paymentOption = $('input[value="'+oney_type+'"]')
+                                    .parent('form')
+                                    .find('button[type=submit]')
+                                    .attr('id')
+                                    .replace('pay-with-', '');
+                            $('#'+paymentOption).trigger('click');
+                        }
                     }
                 }
             });
