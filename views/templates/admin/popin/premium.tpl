@@ -19,13 +19,9 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel-row separate_margin_block">
-    {include file='./switch.tpl' switch=$switch_one_click}
-    <div class="panel-row">
-        <div class="block-right">
-            <p class="pptips">{l s='Allow customers to save their credit card information for later purchases' mod='payplug'}
-                <a href="http://support.payplug.com/customer/portal/articles/2563975" target="_blank">{l s='Learn more.' mod='payplug'}</a>
-            </p>
-        </div>
-    </div>
+
+<p class="ppoc">{l s='You cannot access this feature. For further information please contact our team : support@payplug.com' mod='payplug'}</p>
+<div class="block-button">
+    <input class="popin-button green-button center-button ppcancel" type="button"
+           name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Ok' mod='payplug'}">
 </div>

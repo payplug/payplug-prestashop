@@ -886,12 +886,8 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         display: flex;
         justify-content: space-between;
         line-height: 21px;
-        padding: 12px 0;
+        padding: 0;
         flex-wrap: wrap;
-
-        & + li {
-          .border(#dce0e8, t);
-        }
 
         span {
           display: flex;
@@ -900,6 +896,11 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
           &:first-child {
             font-weight: 500;
           }
+        }
+
+        &:first-child,
+        &:last-child{
+          padding: 12px 0;
         }
 
         small {

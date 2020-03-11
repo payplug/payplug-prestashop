@@ -868,11 +868,8 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   display: flex;
   justify-content: space-between;
   line-height: 21px;
-  padding: 12px 0;
+  padding: 0;
   flex-wrap: wrap;
-}
-.oneySchedule ul li + li {
-  border-top: 1px solid #dce0e8;
 }
 .oneySchedule ul li span {
   display: flex;
@@ -880,6 +877,10 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
 }
 .oneySchedule ul li span:first-child {
   font-weight: 500;
+}
+.oneySchedule ul li:first-child,
+.oneySchedule ul li:last-child {
+  padding: 12px 0;
 }
 .oneySchedule ul li small {
   display: block;

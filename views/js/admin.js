@@ -19,32 +19,652 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+var $document, payplug = {
+    init: function () {
+        for (const section in payplug) {
+            if (section != 'init') {
+                payplug[section]['init']();
+            }
+        }
+    },
+    form: {
+        props: {
+            identifier: 'payplug',
+            query: null,
+            data: {},
+        },
+        init: function () {
+            var {form} = payplug;
+            var {identifier} = form.props;
 
-$(document).ready(function() {
+            $document.on('click', 'form.' + identifier + ' button[type="submit"]', form.submit)
+                .on('click', 'button[name="confirm"]', form.save);
+        },
+        submit: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {form} = payplug;
+
+            form.hydrate();
+
+            var data = {
+                _ajax: 1,
+                popin: 1,
+                type: 'confirm',
+                sandbox: form.props.data['payplug_sandbox'],
+                embedded: form.props.data['payplug_embedded'],
+                oney: form.props.data['payplug_oney'],
+                one_click: form.props.data['payplug_one_click'],
+                installment: form.props.data['payplug_inst'],
+                deferred: form.props.data['payplug_deferred'],
+                activate: 0
+            };
+
+            if (form.props.query != null) {
+                form.props.query.abort();
+                form.props.query = null;
+            }
+
+            form.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    }
+                },
+                success: function (result) {
+                    if (typeof result.content != 'undefined') {
+                        var {popup} = payplug.tools;
+                        popup.set(result.content);
+                    }
+                }
+            });
+        },
+        hydrate: function () {
+            var {form} = payplug;
+            var {identifier} = form.props;
+            var data = {};
+            var $form = $('form.' + identifier);
+            var $input = $form.find('input');
+            var $select = $form.find('select');
+
+            $input.each(function () {
+                var $elem = $(this),
+                    name = $elem.attr('name'),
+                    type = $elem.attr('type'),
+                    value = $elem.val();
+
+                switch (type) {
+                    case 'radio' :
+                        if ($elem.prop('checked')) {
+                            data[name] = value;
+                        }
+                        break;
+                    case 'checkbox' :
+                        data[name] = $elem.prop('checked');
+                        break;
+                    default :
+                        data[name] = value;
+                        break;
+                }
+            });
+            $select.each(function () {
+                var $elem = $(this);
+                data[$elem.attr('name')] = $elem.val();
+            });
+
+            form.props.data = data;
+        },
+        save: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {form} = payplug;
+            var {data} = form.props;
+
+            data['_ajax'] = 1;
+            data['submitSettings'] = 1;
+
+            if (form.props.query != null) {
+                form.props.query.abort();
+                form.props.query = null;
+            }
+
+            form.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    }
+                },
+                success: function (result) {
+                    if (typeof result.content != 'undefined') {
+                        var {popup} = payplug.tools;
+                        popup.set(result.popin);
+                        $('form.payplug').replaceWith(result.content);
+                    }
+                }
+            });
+        },
+    },
+    config: {
+        props: {
+            identifier: 'payplugConfig',
+            query: null
+        },
+        init: function () {
+            var {config} = payplug,
+                {identifier} = config.props;
+            $document.on('click', '.' + identifier + '_check', config.check);
+        },
+        check: function (event) {
+            event.preventDefault();
+            var {config} = payplug;
+            config.refresh();
+        },
+        refresh: function () {
+            var {config} = payplug,
+                {identifier} = config.props;
+
+            if (config.props.query != null) {
+                config.props.query.abort();
+                config.props.query = null;
+            }
+
+            config.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: {
+                    _ajax: 1,
+                    check: 1,
+                },
+                beforeSend: function () {
+                    payplug.tools.loader.show($('.' + identifier));
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        payplug.tools.loader.hide($('.' + identifier));
+                    }
+                },
+                success: function (result) {
+                    $('.' + identifier).replaceWith(result.content);
+                    payplug.tools.loader.hide($('.' + identifier));
+                }
+            });
+        },
+    },
+    show: {
+        props: {
+            identifier: 'payplugShow',
+            query: null,
+        },
+        init: function () {
+            var {show} = payplug,
+                {identifier} = show.props;
+            $document.on('switchSelected','.'+identifier+ ' input',show.change);
+        },
+        change: function(event){
+            var {show} = payplug,
+                $input = $(this),
+                enable = parseInt($input.val());
+
+            if(enable) {
+                show.enable();
+            } else {
+                event.stopPropagation();
+                event.preventDefault();
+                show.disable();
+            }
+        },
+        enable: function(){
+            var {form} = payplug,
+                {identifier} = form.props,
+                $submit = $('form.' + identifier).find('button[type="submit"]');
+
+            $submit.trigger('click');
+        },
+        disable: function(){
+            var {show} = payplug,
+                data = {
+                    _ajax: 1,
+                    popin: 1,
+                    type: 'desactivate'
+                };
+
+            if (show.props.query != null) {
+                show.props.query.abort();
+                show.props.query = null;
+            }
+
+            show.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    }
+                },
+                success: function (result) {
+                    if (typeof result.content != 'undefined') {
+                        var {popup} = payplug.tools;
+                        popup.set(result.content);
+                    }
+                }
+            });
+        },
+    },
+    login: {
+        props: {
+            identifier: 'payplugLogin',
+            query: null
+        },
+        init: function () {
+            var {login} = payplug,
+                {identifier} = login.props;
+            $document.on('click', '.' + identifier + '_login', login.login)
+                .on('click', '.' + identifier + '_logout', login.logout);
+        },
+        login: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {login} = payplug,
+                {identifier} = login.props,
+                data = {
+                    _ajax: 1,
+                    log: 1,
+                    submitAccount: 1,
+                    PAYPLUG_EMAIL: $('input[name=PAYPLUG_EMAIL]').val(),
+                    PAYPLUG_PASSWORD: $('input[name=PAYPLUG_PASSWORD]').val(),
+                }
+
+            if (login.props.query != null) {
+                login.props.query.abort();
+                login.props.query = null;
+            }
+
+            login.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                beforeSend: function () {
+                    payplug.tools.loader.show($('.' + identifier));
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        payplug.tools.loader.hide($('.' + identifier));
+                    }
+                },
+                success: function (result) {
+                    $('form.payplug').replaceWith(result.content);
+                }
+            });
+        },
+        logout: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {login} = payplug,
+                {identifier} = login.props,
+                data = {
+                    _ajax: 1,
+                    submitDisconnect: 1,
+                }
+
+            if (login.props.query != null) {
+                login.props.query.abort();
+                login.props.query = null;
+            }
+
+            login.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                beforeSend: function () {
+                    payplug.tools.loader.show($('.' + identifier));
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        payplug.tools.loader.hide($('.' + identifier));
+                    }
+                },
+                success: function (result) {
+                    $('form.payplug').replaceWith(result.content);
+                }
+            });
+        },
+        loader: {
+            props: {
+                identifer: 'login_loader',
+            },
+            hide: function () {
+                var obj = this, $loader = $('.' + obj.props.identifer);
+                $loader.removeClass(obj.props.identifer + '-visible');
+                setTimeout(function () {
+                    $loader.removeClass(obj.props.identifer + '-on');
+                }, 100);
+            },
+            show: function () {
+                var obj = this, $loader = $('.' + obj.props.identifer);
+                $loader.addClass(obj.props.identifer + '-on');
+                setTimeout(function () {
+                    $loader.addClass(obj.props.identifer + '-visible');
+                }, 100);
+            }
+        }
+    },
+    settings: {
+        init: function(){
+            var {settings} = payplug;
+            $document.on('switchSelected','.payplugSettings_advanced input',settings.change);
+        },
+        change: function(){
+            var $input = $(this),
+                value = parseInt($input.val());
+
+            if(value) {
+                console.log($input.attr('name'));
+            }
+        }
+    },
+    installment: {
+        props: {
+            identifier: 'payplugInstallment',
+            query: null,
+            limits: {
+                min: 4,
+                max: 2000,
+            }
+        },
+        init: function () {
+            var {installment} = payplug;
+            $document.on('change', 'input[name=PAYPLUG_INST_MODE]', installment.select)
+                .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check);
+        },
+        select: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {installment} = payplug,
+                {identifier} = installment.props;
+
+            var inst = $('input[name=PAYPLUG_INST_MODE]:checked').val();
+
+            $('.' + identifier + '_schedule').removeClass(identifier + '_schedule-select');
+            $('.' + identifier + '_schedule-x' + inst).addClass(identifier + '_schedule-select');
+        },
+        check: function (event) {
+            var {installment} = payplug,
+                {identifier, limits} = installment.props,
+                amount = $(this).val();
+
+            if (limits.min > amount || amount > limits.max) {
+                $('.' + identifier + '_amount').find('span').show();
+            } else {
+                $('.' + identifier + '_amount').find('span').hide();
+            }
+        },
+    },
+    tools: {
+        init: function () {
+            this.switcher.init();
+            this.popup.init();
+        },
+        loader: {
+            props: {
+                identifer: 'payplug_loader',
+            },
+            hide: function (context) {
+                var obj = this,
+                    $loader = context.find('.' + obj.props.identifer);
+                $loader.removeClass(obj.props.identifer + '-visible');
+                setTimeout(function () {
+                    $loader.removeClass(obj.props.identifer + '-on');
+                }, 100);
+            },
+            show: function (context) {
+                var obj = this,
+                    $loader = context.find('.' + obj.props.identifer);
+                $loader.addClass(obj.props.identifer + '-on');
+                setTimeout(function () {
+                    $loader.addClass(obj.props.identifer + '-visible');
+                }, 100);
+            }
+        },
+        switcher: {
+            props: {
+                identifier: 'payplugSwitch'
+            },
+            init: function () {
+                var switcher = this,
+                    {identifier} = switcher.props;
+                $document.on('click', '.' + identifier, switcher.toggle)
+                    .on('click', '.' + identifier + '_label', switcher.select);
+            },
+            toggle: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props,
+                    $switch = $(this),
+                    is_right = $switch.is('.' + identifier + '-right');
+
+                if ($switch.is('.' + identifier + '-disabled')) {
+                    return;
+                }
+
+                if (is_right) {
+                    switcher.left($switch);
+                } else {
+                    switcher.right($switch);
+                }
+            },
+            select: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props,
+                    $label = $(this),
+                    id = $label.attr('for').replace('_left', '').replace('_right', ''),
+                    is_right = $label.is('.' + identifier + '_label-right'),
+                    $switch = $label.parents('.' + identifier),
+                    $tips = null;
+
+                if ($switch.is('.' + identifier + '-disabled')) {
+                    return;
+                }
+
+                if ($('.payplugTips-' + id).length) {
+                    $tips = $('.payplugTips-' + id);
+                    $tips.find('.payplugTips_item').hide();
+                }
+
+                if (is_right) {
+                    if (!$switch.is('.' + identifier + '-right')) {
+                        switcher.right($switch);
+                        if ($tips) {
+                            $tips.find('.payplugTips_item-right').show();
+                        }
+                    }
+                } else {
+                    if ($switch.is('.' + identifier + '-right')) {
+                        switcher.left($switch);
+                        if ($tips) {
+                            $tips.find('.payplugTips_item-left').show();
+                        }
+                    }
+                }
+            },
+            right: function (target) {
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props;
+                target.addClass(identifier + '-right');
+                target.find('input').removeAttr('checked').prop('checked',false);
+                target.find('input[value=0]').attr('checked', 'checked').trigger('switchSelected');
+            },
+            left: function (target) {
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props;
+                target.removeClass(identifier + '-right');
+                target.find('input').removeAttr('checked').prop('checked',false);
+                target.find('input[value=1]').attr('checked', 'checked').trigger('switchSelected');
+            },
+            able: function (target) {
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props;
+                target.removeClass(identifier + '-disabled');
+            },
+            disable: function (target) {
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props;
+                target.addClass(identifier + '-disabled');
+            },
+        },
+        popup: {
+            props: {
+                identifier: 'payplugPopup',
+            },
+            init: function () {
+                var {popup} = payplug.tools,
+                    {identifier} = popup.props;
+
+                $document.on('click', '.' + identifier + '_close', popup.close)
+                    .on('click', '.' + identifier + ' .payplugButton-close', popup.close)
+                    .on('click', function (event) {
+                        var $clicked = $(event.target);
+                        if ($clicked.is('.' + identifier) && $('.' + identifier).is('.' + identifier + '-open')) {
+                            popup.close();
+                        }
+                    });
+            },
+            set: function (content) {
+                var {popup} = payplug.tools,
+                    {identifier, loaded} = popup.props;
+
+                if (!$('.' + identifier).length) {
+                    popup.create();
+                }
+                popup.hydrate(content);
+                popup.open();
+            },
+            open: function () {
+                var {popup} = payplug.tools,
+                    {identifier} = popup.props,
+                    $popup = $('.' + identifier);
+
+                $popup.addClass(identifier + '-open');
+                window.setTimeout(function () {
+                    $popup.addClass(identifier + '-show');
+                }, 0);
+            },
+            close: function () {
+                var {popup} = payplug.tools,
+                    {identifier} = popup.props,
+                    $popup = $('.' + identifier);
+
+                $popup.removeClass(identifier + '-show');
+                window.setTimeout(function () {
+                    $popup.removeClass(identifier + '-open');
+                    popup.remove();
+                }, 500);
+            },
+            create: function () {
+                var {popup} = payplug.tools,
+                    {identifier} = popup.props,
+                    html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
+                $('body').append(html);
+            },
+            remove: function(){
+                var {popup} = payplug.tools,
+                    {identifier} = popup.props,
+                    $popup = $('.' + identifier);
+
+                $popup.remove();
+            },
+            hydrate: function (content) {
+                var {popup} = payplug.tools,
+                    {identifier} = popup.props;
+                $('.' + identifier + '_content').html(content);
+            }
+        }
+    },
+};
+
+$(document).ready(function () {
+    $document = $(document);
+    payplug.init();
     admin_start();
 });
 
-function disableInput(){
-    $('.ppdisabled').attr('disabled','disabled');
-    $('span.ppdisabled').css('display','none');
-    $('.ppdisabled').bind('click', function(e) {
+function disableInput() {
+    $('.ppdisabled').attr('disabled', 'disabled');
+    $('span.ppdisabled').css('display', 'none');
+    $('.ppdisabled').bind('click', function (e) {
         e.preventDefault();
     });
 }
 
-function validate_isEmail(s)
-{
+function validate_isEmail(s) {
     var reg = /^[a-z\p{L}0-9!#$%&'*+\/=?^`{}|~_-]+[.a-z\p{L}0-9!#$%&'*+\/=?^`{}|~_-]*@[a-z\p{L}0-9]+[._a-z\p{L}0-9-]*\.[a-z\p{L}0-9]+$/i;
     return reg.test(s);
 }
 
-function validate_isPasswd(s)
-{
+function validate_isPasswd(s) {
     return (s.length >= 8 && s.length < 255);
 }
 
-function validate_field()
-{
+function validate_field() {
     $('.error-email-input').addClass('hide');
     $('.error-password-input').addClass('hide');
     var result = false;
@@ -74,46 +694,45 @@ function validate_field()
         $('input[name=submitAccount]').removeAttr('disabled');
         $('input[name=submitAccount]').removeClass('ppdisabled');
     } else {
-        $('input[name=submitAccount]').attr('disabled','disabled');
+        $('input[name=submitAccount]').attr('disabled', 'disabled');
         $('input[name=submitAccount]').addClass('ppdisabled');
     }
 }
 
-function admin_start()
-{
+function admin_start() {
     disableInput();
 
-    $('#payplug_deferred_auto').bind('change', function() {
+    $('#payplug_deferred_auto').bind('change', function () {
         if ($("#payplug_deferred_auto").is(':checked')) {
             $('#payplug_deferred_state').attr('disabled', false);
         } else {
             $('#payplug_deferred_state').attr('disabled', true);
-            if(!$('#deferred_config_error').hasClass('hide')) {
+            if (!$('#deferred_config_error').hasClass('hide')) {
                 $('#deferred_config_error').addClass('hide');
             }
         }
     });
 
-    $('#payplug_deferred_state').bind('change', function() {
+    $('#payplug_deferred_state').bind('change', function () {
         if (!validateDeferred()) {
             $('#payplug_admin_form form').bind('submit', disableForm());
         } else {
-            if(!$('#deferred_config_error').hasClass('hide')) {
+            if (!$('#deferred_config_error').hasClass('hide')) {
                 $('#deferred_config_error').addClass('hide');
             }
         }
     });
 
-    $('input.switch-input').bind('change', function() {
+    $('input.switch-input').bind('change', function () {
         var firstValue = $(this).parent().find('.switch-input:first').val();
-        if($(this).val() == firstValue) {
+        if ($(this).val() == firstValue) {
             $(this).siblings('.slide-button').css('left', '0%');
         } else {
             $(this).siblings('.slide-button').css('left', '50%');
         }
     });
 
-    $('#payplug_sandbox_right').bind('click', function(e) {
+    $('#payplug_sandbox_right').bind('click', function (e) {
         if (($(this).attr('checked') == 'checked' || $(this).attr('checked') == true)) {
             can_be_live();
             e.preventDefault();
@@ -122,16 +741,16 @@ function admin_start()
         }
     });
 
-    $('#payplug_sandbox_left').bind('click', function(e) {
+    $('#payplug_sandbox_left').bind('click', function (e) {
         $(this).siblings('.slide-button').css('left', '50%');
     });
 
-    $('input.validate').bind('keyup', function() {
+    $('input.validate').bind('keyup', function () {
         validate_field();
     });
 
-    $('#payplug_show_on').bind('change', function(){
-        if($(this).attr('checked') == true || $(this).attr('checked') == 'checked'){
+    $('#payplug_show_on').bind('change', function () {
+        if ($(this).attr('checked') == true || $(this).attr('checked') == 'checked') {
             $(this).siblings('.switch-selection').css('left', '2px');
             $(this).attr('checked', false);
             var sandbox = $('#payplug_sandbox_left').attr('checked');
@@ -153,8 +772,8 @@ function admin_start()
         }
     });
 
-    $('#payplug_show_off').bind('change', function(){
-        if($(this).attr('checked') == true || $(this).attr('checked') == 'checked'){
+    $('#payplug_show_off').bind('change', function () {
+        if ($(this).attr('checked') == true || $(this).attr('checked') == 'checked') {
             $(this).parent().removeClass('ppon');
             $(this).siblings('.switch-selection').css('left', '31px');
             $('.switch-show').css('background-color', '#00ab7a');
@@ -163,54 +782,54 @@ function admin_start()
         }
     });
 
-    $('#payplug_debug_mode_left').bind('change', function(){
-        if($(this).attr('checked') == true || $(this).attr('checked') == 'checked'){
+    $('#payplug_debug_mode_left').bind('change', function () {
+        if ($(this).attr('checked') == true || $(this).attr('checked') == 'checked') {
             var status = $('input[name=payplug_debug_mode]:checked').val();
             debug(status);
         }
     });
 
-    $('#payplug_debug_mode_right').bind('change', function(){
-        if($(this).attr('checked') == true || $(this).attr('checked') == 'checked'){
+    $('#payplug_debug_mode_right').bind('change', function () {
+        if ($(this).attr('checked') == true || $(this).attr('checked') == 'checked') {
             var status = $('input[name=payplug_debug_mode]:checked').val();
             debug(status);
         }
     });
 
-    $('#payplug_one_click_left').bind('click', function(e) {
+    $('#payplug_one_click_left').bind('click', function (e) {
         if (
             ($('#payplug_sandbox_right').attr('checked') == 'checked' || $('#payplug_sandbox_right').attr('checked') == true)
             && !$(this).hasClass('premium')
-        ){
+        ) {
             e.preventDefault();
             checkPremium(false, 'oneclick');
         }
     });
 
-    $('#payplug_inst_left').bind('click', function(e) {
+    $('#payplug_inst_left').bind('click', function (e) {
         if (
             ($('#payplug_sandbox_right').attr('checked') == 'checked' || $('#payplug_sandbox_right').attr('checked') == true)
             && !$(this).hasClass('premium')
-        ){
+        ) {
             e.preventDefault();
             checkPremium(false, 'installment');
 
         }
     });
 
-    $('#payplug_deferred_left').bind('click', function(e) {
+    $('#payplug_deferred_left').bind('click', function (e) {
         if (
             ($('#payplug_sandbox_right').attr('checked') == 'checked' || $('#payplug_sandbox_right').attr('checked') == true)
             && !$(this).hasClass('premium')
-        ){
+        ) {
             e.preventDefault();
             checkPremium(false, 'deferred');
         }
     });
 
-    $('input[name=payplug_sandbox]').bind('change', function(e){
+    $('input[name=payplug_sandbox]').bind('change', function (e) {
         // Change tips value of live / sandbox mode selected
-        if($(this).val() == 0) { // Live
+        if ($(this).val() == 0) { // Live
             $('#mode_live_tips').show();
             $('#mode_sandbox_tips').hide();
             $('#mode_live_tips').removeClass('hide');
@@ -221,9 +840,9 @@ function admin_start()
         }
     });
 
-    $('input[name=payplug_embedded]').bind('change', function(e){
+    $('input[name=payplug_embedded]').bind('change', function (e) {
         // Change tips value of redirect / embedded mode selected
-        if($(this).val() == 1) { // Redirect
+        if ($(this).val() == 1) { // Redirect
             $('#payment_page_embedded_tips').show();
             $('#payment_page_redirect_tips').hide();
             $('#payment_page_embedded_tips').removeClass('hide');
@@ -234,9 +853,8 @@ function admin_start()
         }
     });
 
-    $('#submitSettings').bind('click', function(e) {
-        if (!validate_before_submit())
-        {
+    $('#submitSettings').bind('click', function (e) {
+        if (!validate_before_submit()) {
             return false;
         }
         if ($(this).hasClass('is_active') && $('#installment_config_error').hasClass('hide')) {
@@ -263,12 +881,12 @@ function admin_start()
         }
     });
 
-    $('input[name=submitCheckConfiguration]').bind('click', function(e){
+    $('input[name=submitCheckConfiguration]').bind('click', function (e) {
         e.preventDefault();
         callFieldset();
     });
 
-    $('input[name=submitAccount]').bind('click', function(e){
+    $('input[name=submitAccount]').bind('click', function (e) {
         e.preventDefault();
         login();
     });
@@ -276,8 +894,8 @@ function admin_start()
     if ($('input[name=payplug_inst]:checked').val() == 0) {
         $('.ppinstallmentchecked').hide();
     }
-    $('input[name=payplug_inst]').bind('change', function(e){
-        if($(this).val() == 1) {
+    $('input[name=payplug_inst]').bind('change', function (e) {
+        if ($(this).val() == 1) {
             $('.ppinstallmentchecked').show();
         } else {
             $('.ppinstallmentchecked').hide();
@@ -287,8 +905,8 @@ function admin_start()
     if ($('input[name=payplug_deferred]:checked').val() == 0) {
         $('.ppdeferredchecked').hide();
     }
-    $('input[name=payplug_deferred]').bind('change', function(e){
-        if($(this).val() == 1) {
+    $('input[name=payplug_deferred]').bind('change', function (e) {
+        if ($(this).val() == 1) {
             $('.ppdeferredchecked').show();
         } else {
             $('.ppdeferredchecked').hide();
@@ -296,29 +914,29 @@ function admin_start()
     });
 
     showInstallments($('input[name=PAYPLUG_INST_MODE]:checked').val());
-    $('input[name=PAYPLUG_INST_MODE]').bind('change', function(e){
+    $('input[name=PAYPLUG_INST_MODE]').bind('change', function (e) {
         showInstallments(this.value);
     });
 
-    $('#payplug_installment_min_amount').bind('keyup', function() {
+    $('#payplug_installment_min_amount').bind('keyup', function () {
         var amount = $(this).val();
         var matches = amount.match(/^[0-9]+([,|\.]?[0-9]+)?$/);
         var formatedAmount = amount.replace(',', '.');
         if (matches == null || parseFloat(formatedAmount) < 4 || parseFloat(formatedAmount) > 20000) {
-            if($('#installment_config_error').hasClass('hide')) {
+            if ($('#installment_config_error').hasClass('hide')) {
                 $('#installment_config_error').removeClass('hide');
             }
             $('#payplug_admin_form form').bind('submit', disableForm());
         } else {
-            if(!$('#installment_config_error').hasClass('hide')) {
+            if (!$('#installment_config_error').hasClass('hide')) {
                 $('#installment_config_error').addClass('hide');
             }
             $('#payplug_admin_form form').unbind('submit', disableForm());
         }
     });
 
-    $(document).on('keyup keypress', '#payplug_admin_form form', function(e) {
-        if(e.which == 13) {
+    $(document).on('keyup keypress', '#payplug_admin_form form', function (e) {
+        if (e.which == 13) {
             e.preventDefault();
             return false;
         }
@@ -329,8 +947,7 @@ function disableForm() {
     return false;
 }
 
-function login()
-{
+function login() {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     var email = $('input[name=PAYPLUG_EMAIL]').val();
     var pwd = $('input[name=PAYPLUG_PASSWORD]').val();
@@ -339,19 +956,19 @@ function login()
         url: url,
         dataType: 'json',
         data: {
-            _ajax : 1,
-            log : 1,
-            submitAccount : 1,
-            PAYPLUG_EMAIL : email,
-            PAYPLUG_PASSWORD : pwd,
+            _ajax: 1,
+            log: 1,
+            submitAccount: 1,
+            PAYPLUG_EMAIL: email,
+            PAYPLUG_PASSWORD: pwd,
         },
-        beforeSend: function() {
+        beforeSend: function () {
             $('.panel-login .loader').show();
         },
-        complete: function(){
+        complete: function () {
             $('.panel-login .loader').hide();
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to login. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -360,18 +977,16 @@ function login()
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
+        success: function (result) {
             $('div.panel-remove').remove();
             $('p.interpanel').after(result.content);
             admin_start();
-			callFieldset();
+            callFieldset();
         }
     });
 }
 
-function activate(enable)
-{
+function activate(enable) {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     var data = {_ajax: 1, en: enable};
 
@@ -380,12 +995,11 @@ function activate(enable)
         url: url,
         dataType: 'json',
         data: {
-            _ajax : 1,
-            en : enable,
+            _ajax: 1,
+            en: enable,
         },
-        success: function()
-        {
-            if(enable == 1)
+        success: function () {
+            if (enable == 1)
                 $('#submitSettings').addClass('is_active');
             else
                 $('#submitSettings').removeClass('is_active');
@@ -393,8 +1007,7 @@ function activate(enable)
     });
 }
 
-function debug(status)
-{
+function debug(status) {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     data = {_ajax: 1, db: status};
     $.ajax({
@@ -402,10 +1015,10 @@ function debug(status)
         url: url,
         dataType: 'json',
         data: {
-            _ajax : 1,
-            db : status,
+            _ajax: 1,
+            db: status,
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to switch debug mode. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -414,17 +1027,16 @@ function debug(status)
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
-            $('div.module_confirmation').each(function(){
+        success: function (result) {
+            $('div.module_confirmation').each(function () {
                 if (!$(this).hasClass('pphide')) {
-                    if($(this).parent().hasClass('bootstrap')) {
+                    if ($(this).parent().hasClass('bootstrap')) {
                         $(this).parent().hide(500).remove();
                     } else {
                         $(this).hide(500).remove();
                     }
                 } else {
-                    if($(this).parent().hasClass('bootstrap')) {
+                    if ($(this).parent().hasClass('bootstrap')) {
                         $(this).parent().show(500);
                     }
                     $(this).show(500);
@@ -435,9 +1047,8 @@ function debug(status)
     });
 }
 
-function callPopin(type, args){
-    if(type == 'live_ok' || type == 'live_ok_not_premium' || type == 'live_ok_no_inst' || type == 'live_ok_no_oneclick' )
-    {
+function callPopin(type, args) {
+    if (type == 'live_ok' || type == 'live_ok_not_premium' || type == 'live_ok_no_inst' || type == 'live_ok_no_oneclick') {
         //essentiel
         $('#payplug_sandbox_right').siblings('.slide-button').css('left', '50%');
 
@@ -445,30 +1056,24 @@ function callPopin(type, args){
         $('.ppwarning.not_verified').remove();
         $('#payplug_sandbox_left').removeAttr('checked');
         $('#payplug_popin').remove();
-        if(type == 'live_ok_not_premium' || type == 'live_ok_no_oneclick')
-        {
+        if (type == 'live_ok_not_premium' || type == 'live_ok_no_oneclick') {
             $('#payplug_one_click_left').attr('checked', '');
             $('#payplug_one_click_no').attr('checked', 'checked');
         }
-        if(type == 'live_ok_not_premium' || type == 'live_ok_no_inst')
-        {
+        if (type == 'live_ok_not_premium' || type == 'live_ok_no_inst') {
             $('#payplug_inst_left').attr('checked', '');
             $('#payplug_installment_no').attr('checked', 'checked');
         }
 
         $('#payplug_popin').remove();
         $('.ppoverlay').remove();
-    }
-    else if(type == 'confirm_ok')
-    {
+    } else if (type == 'confirm_ok') {
         $('#submitSettings').unbind('click');
         $('#submitSettings').click();
 
         $('#payplug_popin').remove();
         $('.ppoverlay').remove();
-    }
-    else if(type == 'confirm_ok_activate')
-    {
+    } else if (type == 'confirm_ok_activate') {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '31px');
         $('.switch-show').css('background-color', '#00ab7a');
         $('#payplug_show_on').attr('checked', true);
@@ -479,32 +1084,38 @@ function callPopin(type, args){
 
         $('#payplug_popin').remove();
         $('.ppoverlay').remove();
-    }
-    else if(type == 'confirm_ok_desactivate')
-    {
+    } else if (type == 'confirm_ok_desactivate') {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '2px');
         $('.switch-show').css('background-color', '#dd2525');
         $('#payplug_show_on').attr('checked', false);
         activate(0);
         $('#payplug_popin').remove();
         $('.ppoverlay').remove();
-    }
-    else
-    {
+    } else {
         $('.ppoverlay').remove();
         $('#payplug_popin').remove();
         var url = $('input:hidden[name=admin_ajax_url]').val();
         var data = {_ajax: 1, popin: 1, type: type};
-        if(type == 'confirm')
-        {
-            data = {_ajax: 1, popin: 1, type: type, sandbox: args['sandbox'], embedded: args['embedded'], oney: args['oney'], one_click: args['one_click'], installment: args['installment'], deferred: args['deferred'], activate: args['activate']};
+        if (type == 'confirm') {
+            data = {
+                _ajax: 1,
+                popin: 1,
+                type: type,
+                sandbox: args['sandbox'],
+                embedded: args['embedded'],
+                oney: args['oney'],
+                one_click: args['one_click'],
+                installment: args['installment'],
+                deferred: args['deferred'],
+                activate: args['activate']
+            };
         }
         $.ajax({
             type: 'POST',
             url: url,
             dataType: 'json',
             data: data,
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown) {
                 alert('An error occurred while trying to open the popin. ' +
                     'Maybe you clicked too fast before scripts are fully loaded ' +
                     'or maybe you have a different back-office url than expected.' +
@@ -513,20 +1124,19 @@ function callPopin(type, args){
                 console.log(textStatus);
                 console.log(errorThrown);
             },
-            success: function(result)
-            {
+            success: function (result) {
                 $('body').append(result.content);
-                if(type == 'pwd') {
+                if (type == 'pwd') {
                     $('#payplug_popin input[type=password]').focus();
                 }
-                $('span.ppclose, .ppcancel').bind('click', function() {
+                $('span.ppclose, .ppcancel').bind('click', function () {
                     $('#payplug_popin').remove();
                     $('.ppoverlay').remove();
-                    if(type == 'wrong_pwd' || type == 'activate') {
+                    if (type == 'wrong_pwd' || type == 'activate') {
                         $('#payplug_sandbox_left').siblings('.slide-button').css('left', '0%');
                     }
                 });
-                $('#payplug_popin input[type=submit]').bind('click', function(e){
+                $('#payplug_popin input[type=submit]').bind('click', function (e) {
                     e.preventDefault();
                     submitPopin(this);
                 });
@@ -535,13 +1145,13 @@ function callPopin(type, args){
     }
 }
 
-function submitPopin(input){
+function submitPopin(input) {
     $('#payplug_popin p.pperror').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();
     var submit = input.name;
     var data = {_ajax: 1, submit: submit};
     var pwd = $('#payplug_popin input[name=pwd]').val();
-    if(pwd != undefined)
+    if (pwd != undefined)
         data = {_ajax: 1, submit: submit, pwd: pwd};
 
     $.ajax({
@@ -549,7 +1159,7 @@ function submitPopin(input){
         url: url,
         dataType: 'json',
         data: data,
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to submit your settings. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -558,9 +1168,8 @@ function submitPopin(input){
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(response)
-        {
-            if(response.content == 'wrong_pwd') {
+        success: function (response) {
+            if (response.content == 'wrong_pwd') {
                 $('#payplug_popin p.pperror').show();
             } else {
                 callPopin(response.content);
@@ -569,24 +1178,23 @@ function submitPopin(input){
     });
 }
 
-function callFieldset()
-{
+function callFieldset() {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     $.ajax({
         type: 'POST',
         url: url,
         dataType: 'json',
         data: {
-            _ajax : 1,
-            check : 1,
+            _ajax: 1,
+            check: 1,
         },
-        beforeSend: function() {
+        beforeSend: function () {
             $('.checkFieldset .loader').show();
         },
-        complete: function(){
+        complete: function () {
             $('.checkFieldset .loader').hide();
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to refresh indicators. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -595,10 +1203,9 @@ function callFieldset()
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
+        success: function (result) {
             $('.checkFieldset').html(result.content);
-            $('input[name=submitCheckConfiguration]').bind('click', function(e){
+            $('input[name=submitCheckConfiguration]').bind('click', function (e) {
                 e.preventDefault();
                 callFieldset();
             });
@@ -606,8 +1213,7 @@ function callFieldset()
     });
 }
 
-function checkPremium(go_live, type)
-{
+function checkPremium(go_live, type) {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     var data = {_ajax: 1, checkPremium: 1};
     $.ajax({
@@ -615,7 +1221,7 @@ function checkPremium(go_live, type)
         url: url,
         dataType: 'json',
         data: data,
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to checking your premium status. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -624,8 +1230,7 @@ function checkPremium(go_live, type)
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
+        success: function (result) {
             if (go_live == false) {
                 if (result['can_save_cards'] == true && type == 'oneclick') {
                     $('input[name=payplug_one_click]').addClass('premium');
@@ -665,19 +1270,18 @@ function checkPremium(go_live, type)
     });
 }
 
-function showInstallments(installment_value)
-{
+function showInstallments(installment_value) {
     $('.ppinstallments').hide();
-    $('.pp'+installment_value+'installments').show();
+    $('.pp' + installment_value + 'installments').show();
 }
-function validateDeferred()
-{
+
+function validateDeferred() {
     var is_auto = $("#payplug_deferred_auto").is(':checked');
-    var has_state = parseInt($('#payplug_deferred_state').val()) > 0 ;
+    var has_state = parseInt($('#payplug_deferred_state').val()) > 0;
 
     if (is_auto) {
         if (!has_state) {
-            if($('#deferred_config_error').hasClass('hide')) {
+            if ($('#deferred_config_error').hasClass('hide')) {
                 $('#deferred_config_error').removeClass('hide');
             }
             return false;
@@ -686,8 +1290,7 @@ function validateDeferred()
     return true;
 }
 
-function validate_before_submit()
-{
+function validate_before_submit() {
     var flag = true;
     if (!validateDeferred()) {
         flag = false;
@@ -698,8 +1301,7 @@ function validate_before_submit()
     return flag;
 }
 
-function can_be_live()
-{
+function can_be_live() {
     var url = $('input:hidden[name=admin_ajax_url]').val();
     var data = {_ajax: 1, has_live_key: 1};
     $.ajax({
@@ -707,7 +1309,7 @@ function can_be_live()
         url: url,
         dataType: 'json',
         data: data,
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to checking your verified status. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -716,8 +1318,7 @@ function can_be_live()
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(response)
-        {
+        success: function (response) {
             if (response.result) {
                 switch_to_live();
             } else {
@@ -727,8 +1328,7 @@ function can_be_live()
     });
 }
 
-function switch_to_live()
-{
+function switch_to_live() {
     $('#payplug_sandbox_right').attr('checked', 'checked');
     $('#payplug_sandbox_right').siblings('.slide-button').css('left', '50%');
 }
