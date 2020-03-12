@@ -5428,12 +5428,12 @@ class Payplug extends PaymentModule
             if ($this->getOneyRequiredFields()) {
 
                 // check oney required fields
-//                if ($payment_data = $this->getPaymentDataCookie()) {
-//                    $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
-//                } else {
-                $this->setPaymentErrorsCookie(array('oney_required_field_' . $is_oney));
-                return ['result' => false, 'response' => false];
-//                }
+                if ($payment_data = $this->getPaymentDataCookie()) {
+                    $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
+                } else {
+                    $this->setPaymentErrorsCookie(array('oney_required_field_' . $is_oney));
+                    return ['result' => false, 'response' => false];
+                }
             }
 
             unset($payment_tab['allow_save_card']);
