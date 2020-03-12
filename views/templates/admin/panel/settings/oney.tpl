@@ -32,58 +32,62 @@
             </p>
             <div class="payplugTips payplugTips-{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active}style="display: none;"{/if}>
-                    <div class="payplugPanel_section">
-                        {include file='./switch.tpl' switch=$payplug_switch.oney_cgv}
-                        <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}</p>
-                    </div>
-                    {if isset($carriers) && !empty($carriers)}
+
+                    <div class="payplugOney">
                         <div class="payplugPanel_section">
-                            <p>
-                                {l s='To qualify the payment and avoid fraud, Oney must know your carriers and the average delivery time.' mod='payplug'}<br>
-                                {l s='Warning: The Store Pick-up and Network Pick-up shipping are conflicting with the Oney payment method. To use Oney, your customers will need to choose one of the other shipping method.' mod='payplug'}
-                            </p>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th><span class="title_box">{l s='Carrier' mod='payplug'}</span>
-                                    </td>
-                                    <th><span class="title_box">{l s='Delivery type' mod='payplug'}</span></th>
-                                    <th><span class="title_box">{l s='Expected delivery time' mod='payplug'}</span></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {foreach from=$carriers item=carrier}
-                                    <tr>
-                                        <td>{$carrier->name|escape:'htmlall':'UTF-8'}</td>
-                                        <td>
-                                            <select name="payplug_carrier_{$carrier->id|escape:'htmlall':'UTF-8'}_delivery_type">
-                                                <option value="">{l s='Select a delivery type' mod='payplug'}</option>
-                                                <option value="storepickup"{if $carrier->delivery_type == 'storepickup'} selected{/if}>{l s='Store Pick-up' mod='payplug'}</option>
-                                                <option value="networkpickup"{if $carrier->delivery_type == 'networkpickup'} selected{/if}>{l s='Network Pick-up' mod='payplug'}</option>
-                                                <option value="carrier"{if $carrier->delivery_type == 'carrier'} selected{/if}>{l s='Carrier' mod='payplug'}</option>
-                                                <option value="edelivery"{if $carrier->delivery_type == 'edelivery'} selected{/if}>{l s='eDelivery' mod='payplug'}</option>
-                                            </select>
-                                        </td>
-                                        <td class="payplug_carrier_delay">
-                                            <input type="number" min="0" step="1" pattern="\d+"
-                                                   name="payplug_carrier_{$carrier->id|escape:'htmlall':'UTF-8'}_delay"
-                                                   value="{$carrier->delay|escape:'htmlall':'UTF-8'}"/>
-                                            {l s='days' mod='payplug'}
-                                        </td>
-                                    </tr>
-                                {/foreach}
-                                </tbody>
-                            </table>
+                            {include file='./switch.tpl' switch=$payplug_switch.oney_cgv}
+                            <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}</p>
                         </div>
-                    {/if}
-                    <div class="payplugPanel_section payplugPanel_section-nowrap">
-                        {include file='./switch.tpl' switch=$payplug_switch.oney_optimized}
-                        <p>
-                            <strong>{l s='Go further' mod='payplug'}</strong>
-                            {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration. Please follow our' mod='payplug'}
-                            <a class="payplugLink" href="{$faq_links['guide']|escape:'htmlall':'UTF-8'}" target="_blank"> {l s='personalisation guide' mod='payplug'} </a>
-                            {l s='if you are using other plug-ins or themes. ' mod='payplug'}
-                        </p>
+                        {if isset($carriers) && !empty($carriers)}
+                            <div class="payplugPanel_section">
+                                <p>
+                                    {l s='To qualify the payment and avoid fraud, Oney must know your carriers and the average delivery time.' mod='payplug'}<br>
+                                    {l s='Warning: The Store Pick-up and Network Pick-up shipping are conflicting with the Oney payment method. To use Oney, your customers will need to choose one of the other shipping method.' mod='payplug'}
+                                </p>
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th><span class="title_box">{l s='Carrier' mod='payplug'}</span>
+                                        </td>
+                                        <th><span class="title_box">{l s='Delivery type' mod='payplug'}</span></th>
+                                        <th><span class="title_box">{l s='Expected delivery time' mod='payplug'}</span></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {foreach from=$carriers item=carrier}
+                                        <tr>
+                                            <td>{$carrier->name|escape:'htmlall':'UTF-8'}</td>
+                                            <td>
+                                                <select name="payplug_carrier_{$carrier->id|escape:'htmlall':'UTF-8'}_delivery_type">
+                                                    <option value="">{l s='Select a delivery type' mod='payplug'}</option>
+                                                    <option value="storepickup"{if $carrier->delivery_type == 'storepickup'} selected{/if}>{l s='Store Pick-up' mod='payplug'}</option>
+                                                    <option value="networkpickup"{if $carrier->delivery_type == 'networkpickup'} selected{/if}>{l s='Network Pick-up' mod='payplug'}</option>
+                                                    <option value="carrier"{if $carrier->delivery_type == 'carrier'} selected{/if}>{l s='Carrier' mod='payplug'}</option>
+                                                    <option value="edelivery"{if $carrier->delivery_type == 'edelivery'} selected{/if}>{l s='eDelivery' mod='payplug'}</option>
+                                                </select>
+                                            </td>
+                                            <td class="payplug_carrier_delay">
+                                                <input type="number" min="0" step="1" pattern="\d+"
+                                                       name="payplug_carrier_{$carrier->id|escape:'htmlall':'UTF-8'}_delay"
+                                                       value="{$carrier->delay|escape:'htmlall':'UTF-8'}"/>
+                                                {l s='days' mod='payplug'}
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                    </tbody>
+                                </table>
+                                <div class="payplugOney_error">{l s='You must enter a number of day in integer.' mod='payplug'}</div>
+                            </div>
+                        {/if}
+                        <div class="payplugPanel_section payplugPanel_section-nowrap">
+                            {include file='./switch.tpl' switch=$payplug_switch.oney_optimized}
+                            <p>
+                                <strong>{l s='Go further' mod='payplug'}</strong>
+                                {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration. Please follow our' mod='payplug'}
+                                <a class="payplugLink" href="{$faq_links['guide']|escape:'htmlall':'UTF-8'}" target="_blank"> {l s='personalisation guide' mod='payplug'} </a>
+                                {l s='if you are using other plug-ins or themes. ' mod='payplug'}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

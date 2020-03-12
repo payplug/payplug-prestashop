@@ -361,6 +361,7 @@
     &_item {
       display: flex;
       justify-content: start;
+      align-items: center;
       margin: 0 !important;
 
       &:before {
@@ -393,6 +394,10 @@
         &:before {
           background-image: url(~"@{img_admin}icon-warn.png")
         }
+      }
+
+      &-oney {
+        display: none;
       }
     }
   }
@@ -436,6 +441,13 @@
       margin: 0;
       padding: 15px 0 20px 0;
       line-height: 2.2em;
+    }
+  }
+
+  &Oney {
+    &_error {
+      display: none;
+      color: #colorMap[error];
     }
   }
 

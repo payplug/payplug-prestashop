@@ -412,7 +412,10 @@ class Payplug extends PaymentModule
             $password = Tools::getValue('PAYPLUG_PASSWORD');
             $email = Tools::getValue('PAYPLUG_EMAIL');
             if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
-                die(json_encode(['content' => null, 'error' => $this->l('The email and/or password was not correct.')]));
+                die(json_encode([
+                    'content' => null,
+                    'error' => $this->l('The email and/or password was not correct.')
+                ]));
             }
 
             if ($this->login($email, $password)) {
@@ -424,13 +427,16 @@ class Payplug extends PaymentModule
 
                 die(json_encode(array('content' => $content)));
             } else {
-                die(json_encode(['content' => null, 'error' => $this->l('The email and/or password was not correct.')]));
+                die(json_encode([
+                    'content' => null,
+                    'error' => $this->l('The email and/or password was not correct.')
+                ]));
             }
         }
 
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
-            if(!$password || !Validate::isPlaintextPassword($password)) {
+            if (!$password || !Validate::isPlaintextPassword($password)) {
                 die(json_encode(['content' => null, 'error' => $this->l('The password you entered is invalid')]));
             }
 
@@ -453,9 +459,11 @@ class Payplug extends PaymentModule
                     die(json_encode(['popin' => $popin]));
                 }
             } else {
-                die(json_encode(['content' => null, 'error' => $this->l('The email and/or password was not correct.')]));
+                die(json_encode([
+                    'content' => null,
+                    'error' => $this->l('The email and/or password was not correct.')
+                ]));
             }
-
 
 
             $this->submitPopinPwd($password);
@@ -647,7 +655,8 @@ class Payplug extends PaymentModule
         return $payment_details;
     }
 
-    public function capturePayment() {
+    public function capturePayment()
+    {
         $pay_id = Tools::getValue('pay_id');
         $id_order = Tools::getValue('id_order');
         $payment = new PPPayment($pay_id);
@@ -685,6 +694,7 @@ class Payplug extends PaymentModule
             )));
         }
     }
+
     /**
      * Return exeption error form API
      * @param $str
@@ -5693,7 +5703,8 @@ class Payplug extends PaymentModule
         return $payment;
     }
 
-    public function saveConfiguration(){
+    public function saveConfiguration()
+    {
         Configuration::updateValue('PAYPLUG_DEFERRED', Tools::getValue('payplug_deferred'));
         Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', Tools::getValue('PAYPLUG_DEFERRED_AUTO'));
         Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));

@@ -38,6 +38,11 @@
                 <p class="payplugConfig_item payplugConfig_item-error"><span>{$error|escape:'htmlall':'UTF-8'}</span></p>
             {/foreach}
         {/if}
+
+        <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-error"><span>{l s='At least one of your shipping method isn’t configured for Oney.' mod='payplug'}</span></p>
+        <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-warning"><span>{l s='Your shipping methods configuration doesn’t allow to provide Oney' mod='payplug'}</span></p>
+        <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-success"><span>{l s='Your shipping methods are configured for Oney.' mod='payplug'}</span></p>
+
         <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>
     <div class="panel-footer">

@@ -365,6 +365,7 @@ button.payplugLink:hover {
 .payplugConfig_item {
   display: flex;
   justify-content: start;
+  align-items: center;
   margin: 0 !important;
 }
 .payplugConfig_item:before {
@@ -391,6 +392,9 @@ button.payplugLink:hover {
 }
 .payplugConfig_item-warning:before {
   background-image: url(../img/admin/icon-warn.png);
+}
+.payplugConfig_item-oney {
+  display: none;
 }
 .payplugLogin_email {
   color: #00ab7a;
@@ -431,6 +435,10 @@ button.payplugLink:hover {
   margin: 0;
   padding: 15px 0 20px 0;
   line-height: 2.2em;
+}
+.payplugOney_error {
+  display: none;
+  color: #e56876;
 }
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
