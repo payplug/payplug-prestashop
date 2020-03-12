@@ -438,12 +438,12 @@ var $document, $window, payplug = {
                     console.log(errorThrown);
                 },
                 success: function (result) {
-                    if(typeof result.error != 'undefined' && result.error) {
+                    if (typeof result.error != 'undefined' && result.error) {
                         $('.payplugPopup_error').html(result.error);
-                    } else if(typeof result.popin != 'undefined' && result.popin) {
+                    } else if (typeof result.popin != 'undefined' && result.popin) {
                         var {popup} = payplug.tools;
                         popup.set(result.popin);
-                    } else if(typeof result.content != 'undefined' && result.content) {
+                    } else if (typeof result.content != 'undefined' && result.content) {
                         var {popup} = payplug.tools;
                         popup.close();
                     }
@@ -623,8 +623,8 @@ var $document, $window, payplug = {
                     if (response.result) {
                         settings.reset();
                         var {switcher} = payplug.tools,
-                            $switcher = $('input[name=payplug_sandbox]').parents('.'+switcher.props.identifier);
-                        switcher.right($switcher,true);
+                            $switcher = $('input[name=payplug_sandbox]').parents('.' + switcher.props.identifier);
+                        switcher.right($switcher, true);
                     } else {
                         var {login} = payplug;
                         login.reload();
@@ -710,6 +710,37 @@ var $document, $window, payplug = {
             }
         },
     },
+    deferred: {
+        props: {
+            identifier: 'payplugDeferred'
+        },
+        init: function () {
+            var {deferred} = payplug,
+                {identifier} = deferred.props;
+            $document.on('change', '.' + identifier + ' input[type=checkbox]', deferred.change);
+            $('.' + identifier + ' input[type=checkbox]').trigger('change');
+        },
+        change: function(event) {
+            var {deferred} = payplug,
+                $checkbox = $(this),
+                checked = $checkbox.prop('checked');
+            if(checked) {
+                deferred.active();
+            } else {
+                deferred.deactive();
+            }
+        },
+        active: function(){
+            var {deferred} = payplug,
+                {identifier} = deferred.props;
+            $('.' + identifier).find('select').attr('disabled', false);
+        },
+        deactive: function(){
+            var {deferred} = payplug,
+                {identifier} = deferred.props;
+            $('.' + identifier).find('select').attr('disabled', true);
+        },
+    },
     tools: {
         init: function () {
             this.switcher.init();
@@ -793,7 +824,7 @@ var $document, $window, payplug = {
                     }
                 }
             },
-            right: function (target,withoutEvent) {
+            right: function (target, withoutEvent) {
                 var {switcher} = payplug.tools,
                     {identifier} = switcher.props;
                 target.addClass(identifier + '-right');
@@ -807,7 +838,7 @@ var $document, $window, payplug = {
 
                 var $selected = target.find('input[value=0]');
                 $selected.attr('checked', 'checked')
-                if(typeof withoutEvent == 'undefined' || !withoutEvent){
+                if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');
                 }
             },
@@ -826,7 +857,7 @@ var $document, $window, payplug = {
 
                 var $selected = target.find('input[value=1]');
                 $selected.attr('checked', 'checked')
-                if(typeof withoutEvent == 'undefined' || !withoutEvent){
+                if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');
                 }
             },
