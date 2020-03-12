@@ -367,7 +367,6 @@ class Payplug extends PaymentModule
             return;
         }
 
-        //
         if (Tools::getValue('popin')) {
             $args = null;
             if (Tools::getValue('type') == 'confirm') {
@@ -409,8 +408,57 @@ class Payplug extends PaymentModule
             }
         }
 
-        if (Tools::getValue('submit') == 'submitPopin_pwd') {
-            $this->submitPopinPwd($_POST['pwd']);
+        if (Tools::isSubmit('submitAccount')) {
+            $password = Tools::getValue('PAYPLUG_PASSWORD');
+            $email = Tools::getValue('PAYPLUG_EMAIL');
+            if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
+                die(json_encode(['content' => null, 'error' => $this->l('The email and/or password was not correct.')]));
+            }
+
+            if ($this->login($email, $password)) {
+                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
+                Configuration::updateValue('PAYPLUG_SHOW', 1);
+
+                $this->assignContentVar();
+                $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+
+                die(json_encode(array('content' => $content)));
+            } else {
+                die(json_encode(['content' => null, 'error' => $this->l('The email and/or password was not correct.')]));
+            }
+        }
+
+        if (Tools::getValue('submitPwd')) {
+            $password = Tools::getValue('password');
+            if(!$password || !Validate::isPlaintextPassword($password)) {
+                die(json_encode(['content' => null, 'error' => $this->l('The password you entered is invalid')]));
+            }
+
+            $email = Configuration::get('PAYPLUG_EMAIL');
+
+            if ($this->login($email, $password)) {
+                $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+                if ((bool)$api_key) {
+                    Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 0);
+                    $this->assignContentVar();
+                    $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+                    die(json_encode(array('content' => $content)));
+                } else {
+
+                    $this->context->smarty->assign(array(
+                        'title' => '',
+                        'type' => 'activate',
+                    ));
+                    $popin = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
+                    die(json_encode(['popin' => $popin]));
+                }
+            } else {
+                die(json_encode(['content' => null, 'error' => $this->l('The email and/or password was not correct.')]));
+            }
+
+
+
+            $this->submitPopinPwd($password);
         }
 
         if (Tools::getValue('submit') == 'submitPopin_abort') {
@@ -426,7 +474,15 @@ class Payplug extends PaymentModule
         }
         if ((int)Tools::getValue('checkPremium') == 1) {
             $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-            die(json_encode($this->getAccountPermissions($api_key)));
+            $permissions = $this->getAccountPermissions($api_key);
+            $return = [
+                'payplug_sandbox' => $permissions['use_live_mode'],
+                'payplug_one_click' => $permissions['can_save_cards'],
+                'payplug_oney' => $permissions['can_use_oney'],
+                'payplug_inst' => $permissions['can_create_installment_plan'],
+                'payplug_deferred' => $permissions['can_create_deferred_payment'],
+            ];
+            die(json_encode($return));
         }
         if (Tools::getValue('has_live_key')) {
             die(json_encode(['result' => $this->has_live_key()]));
@@ -5075,13 +5131,11 @@ class Payplug extends PaymentModule
         $openssl_exists = extension_loaded('openssl');
         if (Tools::isSubmit('submitAccount')) {
             $password = isset($_POST['PAYPLUG_PASSWORD']) && $_POST['PAYPLUG_PASSWORD'] ? $_POST['PAYPLUG_PASSWORD'] : false;
-            if (
-                (!Validate::isEmail(Tools::getValue('PAYPLUG_EMAIL')) || !Validate::isPlaintextPassword($password))
-                && (Tools::getValue('PAYPLUG_EMAIL') != false)
-            ) {
+            $email = Tools::getValue('PAYPLUG_EMAIL');
+            if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
             } elseif ($curl_exists && $openssl_exists) {
-                if ($this->login(Tools::getValue('PAYPLUG_EMAIL'), $password)) {
+                if ($this->login($email, $password)) {
                     Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
                     Configuration::updateValue('PAYPLUG_SHOW', 1);
 
@@ -5090,8 +5144,7 @@ class Payplug extends PaymentModule
 
                     die(json_encode(array('content' => $content)));
                 } else {
-                    $this->validationErrors['username_password']
-                        = $this->l('The email and/or password was not correct.');
+                    $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
                 }
             }
         }

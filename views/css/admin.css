@@ -75,6 +75,13 @@
   background: #009268;
   color: #fff;
 }
+.payplugButton-disabled,
+.payplugButton-disabled:hover {
+  border-color: #b2b2b2;
+  background: #b2b2b2;
+  color: #fff;
+  cursor: default;
+}
 .panel-footer .payplugButton {
   margin: 10px 0 0;
 }
@@ -589,6 +596,32 @@ button.payplugLink:hover {
   margin: 0;
   text-align: left;
   list-style: none;
+}
+.payplugPopup_row input[type=email],
+.payplugPopup_row input[type=password],
+.payplugPopup_row input[type=search],
+.payplugPopup_row input[type=tel],
+.payplugPopup_row input[type=text] {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  max-width: 100%;
+  background: transparent;
+  margin: 0;
+  display: inline-block;
+  height: 22px;
+}
+.payplugPopup_row input[type=email]:focus,
+.payplugPopup_row input[type=password]:focus,
+.payplugPopup_row input[type=search]:focus,
+.payplugPopup_row input[type=tel]:focus,
+.payplugPopup_row input[type=text]:focus {
+  background: transparent;
+}
+.payplugPopup_error {
+  margin: 0 0 8px;
+  color: #e56876;
 }
 .payplugPopup_footer {
   border-top: 1px solid #e6e6e6;

@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugSwitch{if !$switch.checked} payplugSwitch-right{/if}{if isset($switch.small) && $switch.small} payplugSwitch-small{/if}{if !$switch.active} payplugSwitch-disabled{/if}">
+<div class="payplugSwitch{if !$switch.checked || !$switch.active} payplugSwitch-right{/if}{if isset($switch.small) && $switch.small} payplugSwitch-small{/if}{if !$switch.active} payplugSwitch-disabled{/if}">
     <input type="radio" name="{$switch.name|escape:'htmlall':'UTF-8'}" value="1" id="{$switch.name|escape:'htmlall':'UTF-8'}_left" {if $switch.checked}checked="checked"{/if}>
     <input type="radio" name="{$switch.name|escape:'htmlall':'UTF-8'}" value="0" id="{$switch.name|escape:'htmlall':'UTF-8'}_right" {if !$switch.checked}checked="checked"{/if}>
 

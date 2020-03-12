@@ -59,6 +59,16 @@
       }
     }
 
+    &-disabled {
+      &,
+      &:hover {
+        border-color: #colorMap[grey];
+        background: #colorMap[grey];
+        color: #fff;
+        cursor: default;
+      }
+    }
+
     .panel-footer & {
       margin: 10px 0 0;
     }
@@ -601,6 +611,30 @@
         text-align: left;
         list-style: none;
       }
+
+      input {
+        &[type=email],
+        &[type=password],
+        &[type=search],
+        &[type=tel],
+        &[type=text] {
+          .borderRadius(3px);
+          .border(#colorMap[stroke]);
+          max-width: 100%;
+          background: transparent;
+          margin: 0;
+          display: inline-block;
+          height: 22px;
+
+          &:focus {
+            background: transparent;
+          }
+        }
+      }
+    }
+    &_error {
+      margin: 0 0 8px;
+      color: #colorMap[error];
     }
 
     &_footer {
@@ -609,7 +643,7 @@
       display: flex;
       justify-content: space-between;
 
-      &-center{
+      &-center {
         justify-content: center;
       }
     }

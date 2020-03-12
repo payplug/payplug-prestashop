@@ -21,10 +21,9 @@
 *}
 
 <p>{l s='Please enter your Payplug account password' mod='payplug'}</p>
-<p class="pperror hide">{l s='The password you entered is invalid' mod='payplug'}</p>
-<input type="password" name="pwd"/>
-<div class="block-button">
-    <input type="button" class="popin-button ppcancel white-button" value="{l s='Cancel' mod='payplug'}">
-    <input class="popin-button green-button" type="submit"
-           name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Ok' mod='payplug'}">
+<input type="password" name="reload_password"/>
+<p class="payplugPopup_error"></p>
+<div class="payplugPopup_footer">
+    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton payplugButton-green" name="password">{l s='Ok' mod='payplug'}</button>
 </div>

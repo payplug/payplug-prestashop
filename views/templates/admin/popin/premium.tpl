@@ -20,8 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<p class="ppoc">{l s='You cannot access this feature. For further information please contact our team : support@payplug.com' mod='payplug'}</p>
-<div class="block-button">
-    <input class="popin-button green-button center-button ppcancel" type="button"
-           name="submitPopin_{$type|escape:'htmlall':'UTF-8'}" value="{l s='Ok' mod='payplug'}">
+<p>{l s='You cannot access this feature. For further information please contact our team : support@payplug.com' mod='payplug'}</p>
+<div class="payplugPopup_footer payplugPopup_footer-center">
+    <button type="button" class="payplugButton payplugButton-green payplugButton-close">{l s='Ok' mod='payplug'}</button>
 </div>

@@ -19,9 +19,8 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
-<p class="ppoc">{l s='You need to activate your account before performing LIVE transactions.' mod='payplug'}</p>
-<div class="block-button">
-    <input type="button" class="popin-button ppcancel white-button" value="{l s='Cancel' mod='payplug'}">
-    <a class="green-button popin-button" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' mod='payplug'}</a>
+<p>{l s='You need to activate your account before performing LIVE transactions.' mod='payplug'}</p>
+<div class="payplugPopup_footer">
+    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
+    <a class="payplugButton payplugButton-green" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' mod='payplug'}</a>
 </div>
