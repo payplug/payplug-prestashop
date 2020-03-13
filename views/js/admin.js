@@ -820,7 +820,6 @@ var $document, $window, payplug = {
                 }, 100);
             },
             show: function (context) {
-                console.log(context);
                 var obj = this,
                     $loader = context.find('.' + obj.props.identifer);
                 $loader.addClass(obj.props.identifer + '-on');

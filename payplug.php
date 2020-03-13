@@ -577,6 +577,40 @@ class Payplug extends PaymentModule
                 $status_class = 'pp_neutral';
                 break;
         }
+
+        switch ($pay_status) {
+            case 1:
+                $status_code = 'not_paid';
+                break;
+            case 2:
+                $status_code = 'paid';
+                break;
+            case 3:
+                $status_code = 'failed';
+                break;
+            case 4:
+                $status_code = 'partially_refunded';
+                break;
+            case 5:
+                $status_code = 'refunded';
+                break;
+            case 6:
+                $status_code = 'on_going';
+                break;
+            case 7:
+                $status_code = 'cancelled';
+                break;
+            case 8:
+                $status_code = 'authorized';
+                break;
+            case 9:
+                $status_code = 'authorization_expired';
+                break;
+            default: // none
+                $status_code = 'none';
+                break;
+        }
+
         $pay_status = $this->payment_status[(int)$pay_status];
 
         $pay_brand = $this->getCardBrandByPayment($payment);
@@ -587,6 +621,7 @@ class Payplug extends PaymentModule
         $payment_details = array(
             'id' => $payment->id,
             'status' => $pay_status,
+            'status_code' => $status_code,
             'status_class' => $status_class,
             'amount' => (int)$payment->amount / 100,
             'card_brand' => $pay_brand,
@@ -2329,7 +2364,7 @@ class Payplug extends PaymentModule
         $switch['show'] = [
             'name' => 'PAYPLUG_SHOW',
             'label' => $this->l('Show Payplug to my customers'),
-            'active' => true,
+            'active' => $connected,
             'small' => true,
             'checked' => $configurations['show'],
         ];
