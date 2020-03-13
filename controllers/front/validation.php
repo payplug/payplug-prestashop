@@ -132,8 +132,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                     $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
                     $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'], $oney_payment_methods);
-
-                    $is_authorized = isset($payment->authorization) && $payment->authorization && count($payment->authorization) > 0;
+                    $is_authorized = isset($payment->authorization) && isset($payment->authorization->authorized_at);
 
                     $amount = (int)$payment->amount;
                 } catch (Exception $e) {
