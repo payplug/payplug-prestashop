@@ -19,17 +19,162 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+var $document, $window, payplug = {
+    init: function () {
+        $document = $(document);
+        $window = $(window);
 
+        for (const section in payplug) {
+            if (section != 'init') {
+                payplug[section]['init']();
+            }
+        }
+    },
+    abort: {
+        init: function(){
+            var {abort} = payplug;
+            $document.on('click','input[name=submitPPAbort]', abort.call)
+                .on('click','button[name=confirmPayplugAbort]', abort.confirm);
+        },
+        call: function(event) {
+            event.preventDefault();
+            var {abort} = payplug;
+            var {popup} = payplug;
+            var url = $('input:hidden[name=admin_ajax_url]').val();
+            var inst_id = $('input:hidden[name=inst_id]').val();
+            var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('An error occurred while trying to open the popin. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (result) {
+                    popup.set(result.content);
+                }
+            });
+        },
+        confirm: function(event){
+            event.preventDefault();
+            var {abort} = payplug;
+            var {popup} = payplug;
+            var url = $('input:hidden[name=admin_ajax_url]').val();
+            var inst_id = $('input:hidden[name=inst_id]').val();
+            var id_order = $('input:hidden[name=id_order]').val();
+            var submit = 'submitPopin_abort';
+            var data = {_ajax: 1, submit: submit, inst_id: inst_id, id_order: id_order};
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('An error occurred while trying to abort the installment plan. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (response) {
+                    if (response.reload) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    },
+    popup: {
+        props: {
+            identifier: 'payplugPopup',
+        },
+        init: function () {
+            var {popup} = payplug,
+                {identifier} = popup.props;
+
+            $document.on('click', '.' + identifier + '_close', popup.close)
+                .on('click', '.' + identifier + ' .payplugButton-close', popup.close)
+                .on('click', function (event) {
+                    var $clicked = $(event.target);
+                    if ($clicked.is('.' + identifier) && $('.' + identifier).is('.' + identifier + '-open')) {
+                        popup.close();
+                    }
+                });
+        },
+        set: function (content) {
+            console.log('popup set');
+            var {popup} = payplug,
+                {identifier} = popup.props;
+
+            if (!$('.' + identifier).length) {
+                popup.create();
+            }
+            popup.hydrate(content);
+            popup.open();
+        },
+        open: function () {
+            console.log('popup open');
+            var {popup} = payplug,
+                {identifier} = popup.props,
+                $popup = $('.' + identifier);
+
+            $popup.addClass(identifier + '-open');
+            window.setTimeout(function () {
+                $popup.addClass(identifier + '-show');
+            }, 0);
+        },
+        close: function () {
+            console.log('popup close');
+            var {popup} = payplug,
+                {identifier} = popup.props,
+                $popup = $('.' + identifier);
+
+            $popup.removeClass(identifier + '-show');
+            window.setTimeout(function () {
+                $popup.removeClass(identifier + '-open');
+                popup.remove();
+            }, 500);
+        },
+        create: function () {
+            console.log('popup create');
+            var {popup} = payplug,
+                {identifier} = popup.props,
+                html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
+            $('body').append(html);
+        },
+        remove: function () {
+            console.log('popup remove');
+            var {popup} = payplug,
+                {identifier} = popup.props,
+                $popup = $('.' + identifier);
+
+            $popup.remove();
+        },
+        hydrate: function (content) {
+            console.log('popup hydrate');
+            var {popup} = payplug,
+                {identifier} = popup.props;
+            $('.' + identifier + '_content').html(content);
+        }
+    }
+};
 $(document).ready(function() {
     $('input[name=submitPPRefund]').bind('click', function(e) {
         e.preventDefault();
         callRefund();
     });
 
-    $('input[name=submitPPAbort]').bind('click', function(e) {
-        e.preventDefault();
-        callAbort();
-    });
 
     $('input[name=submitPPUpdate]').bind('click', function(e) {
         e.preventDefault();
@@ -40,6 +185,8 @@ $(document).ready(function() {
         e.preventDefault();
         callCapture();
     });
+
+    payplug.init();
 });
 
 function callRefund() {
