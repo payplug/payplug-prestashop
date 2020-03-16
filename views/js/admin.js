@@ -953,9 +953,10 @@ var $document, $window, payplug = {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props;
 
-                if (!$('.' + identifier).length) {
-                    popup.create(id);
+                if ($('.' + identifier).length) {
+                    popup.remove();
                 }
+                popup.create(id);
                 popup.hydrate(content);
                 popup.open();
             },
