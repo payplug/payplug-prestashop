@@ -93,7 +93,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
                         var {popup} = payplug.tools;
-                        popup.set(result.content);
+                        popup.set(result.content,'submit');
                     }
                 }
             });
@@ -167,7 +167,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
                         var {popup} = payplug.tools;
-                        popup.set(result.popin);
+                        popup.set(result.popin,'confirm');
                         $('form.payplug').replaceWith(result.content);
                         $window.trigger('load');
                     }
@@ -291,7 +291,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
                         var {popup} = payplug.tools;
-                        popup.set(result.content);
+                        popup.set(result.content,'deactivate');
                     }
                 }
             });
@@ -359,7 +359,7 @@ var $document, $window, payplug = {
                             '<button type="button" class="payplugButton payplugButton-green payplugButton-close">Ok</button>' +
                             '</div>' +
                             '</div>';
-                        payplug.tools.popup.set($error);
+                        payplug.tools.popup.set($error,'error');
                     }
                 }
             });
@@ -442,7 +442,7 @@ var $document, $window, payplug = {
                         $('.payplugPopup_error').html(result.error);
                     } else if (typeof result.popin != 'undefined' && result.popin) {
                         var {popup} = payplug.tools;
-                        popup.set(result.popin);
+                        popup.set(result.popin,'activate');
                     } else if (typeof result.content != 'undefined' && result.content) {
                         var {popup} = payplug.tools;
                         popup.close();
@@ -481,7 +481,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
                         var {popup} = payplug.tools;
-                        popup.set(result.content);
+                        popup.set(result.content,'password');
                     }
                 }
             });
@@ -666,7 +666,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
                         var {popup} = payplug.tools;
-                        popup.set(result.content);
+                        popup.set(result.content,'disable');
                     }
                 }
             });
@@ -949,12 +949,12 @@ var $document, $window, payplug = {
                         }
                     });
             },
-            set: function (content) {
+            set: function (content, id) {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props;
 
                 if (!$('.' + identifier).length) {
-                    popup.create();
+                    popup.create(id);
                 }
                 popup.hydrate(content);
                 popup.open();
@@ -980,10 +980,10 @@ var $document, $window, payplug = {
                     popup.remove();
                 }, 500);
             },
-            create: function () {
+            create: function (id) {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props,
-                    html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
+                    html = '<div class="' + identifier + '"'+(id? ' data-e2e-popin="'+id+'"' : '')+'><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
                 $('body').append(html);
             },
             remove: function () {
