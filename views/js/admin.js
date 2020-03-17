@@ -726,7 +726,7 @@ var $document, $window, payplug = {
                 $number = $(this),
                 num = parseInt($number.val());
 
-            if(isNaN(num)) {
+            if(isNaN(num) || num < 0) {
                 $('.' +identifier +'_error').show();
             } else {
                 $('.' +identifier +'_error').hide();
