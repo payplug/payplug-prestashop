@@ -68,7 +68,7 @@
                         <div class="payplugPanel_content">
                             <div class="payplugInstallment_amount">
                                 <input type="text" name="PAYPLUG_INST_MIN_AMOUNT" value="{$PAYPLUG_INST_MIN_AMOUNT|escape:'htmlall':'UTF-8'}"> €
-                                <span style="display: none;">{l s='Amount must be greater than 4€ and lower than 20000€.' mod='payplug'}</span>
+                                <span style="display: none;" data-e2e-error="installment_amount">{l s='Amount must be greater than 4€ and lower than 20000€.' mod='payplug'}</span>
                             </div>
                         </div>
                     </div>

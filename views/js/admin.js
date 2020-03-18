@@ -724,9 +724,10 @@ var $document, $window, payplug = {
             var {oney} = payplug,
                 {identifier} = oney.props,
                 $number = $(this),
-                num = parseInt($number.val());
+                delay = $number.val(),
+                matches = delay.match(/^[0-9]+$/);
 
-            if(isNaN(num) || num < 0) {
+            if (matches == null) {
                 $('.' +identifier +'_error').show();
             } else {
                 $('.' +identifier +'_error').hide();

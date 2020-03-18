@@ -76,7 +76,7 @@
                                     {/foreach}
                                     </tbody>
                                 </table>
-                                <div class="payplugOney_error">{l s='You must enter a number of day in integer.' mod='payplug'}</div>
+                                <div class="payplugOney_error" data-e2e-error="oney_delay">{l s='You must enter a number of day in integer.' mod='payplug'}</div>
                             </div>
                         {/if}
                         <div class="payplugPanel_section payplugPanel_section-nowrap">

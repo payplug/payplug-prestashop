@@ -43,7 +43,7 @@
                                 <option value="{$order_state.id_order_state}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name}</option>
                             {/foreach}
                         </select>
-                        <span style="display: none;">{l s='You have to choose an order state.' mod='payplug'}</span>
+                        <span style="display: none;" data-e2e-error="deferred_state">{l s='You have to choose an order state.' mod='payplug'}</span>
                     </div>
                 </div>
             </div>
