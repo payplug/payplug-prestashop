@@ -33,11 +33,11 @@
             <div class="payplugTips payplugTips-{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.deferred.checked}style="display: none;"{/if}>
                     <div class="payplugDeferred">
-                        <label for="payplug_deferred_auto">
-                            <input type="checkbox" name="PAYPLUG_DEFERRED_AUTO" value="1" id="payplug_deferred_auto" {if $PAYPLUG_DEFERRED_AUTO == 1}checked="checked"{/if}>
+                        <label for="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}">
+                            <input type="checkbox" name="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" value="1" id="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" {if $payplug_switch.deferred_auto.checked}checked="checked"{/if}>
                             {l s='During the 7 days of the authorization, capture payments whose state is :' mod='payplug'}
                         </label>
-                        <select name="PAYPLUG_DEFERRED_STATE" id="payplug_deferred_state"{if $PAYPLUG_DEFERRED_AUTO == 0} disabled="disabled"{/if}>
+                        <select name="PAYPLUG_DEFERRED_STATE" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
                             <option value="0">{l s='-- Choose an order state --' mod='payplug'}</option>
                             {foreach from=$order_states item=order_state}
                                 <option value="{$order_state.id_order_state}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name}</option>

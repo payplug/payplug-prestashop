@@ -2431,6 +2431,14 @@ class Payplug extends PaymentModule
             'label_right' => $this->l('no'),
         ];
 
+        $switch['deferred_auto'] = [
+            'name' => 'payplug_deferred_auto',
+            'active' => $connected,
+            'checked' => $configurations['deferred_auto'],
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        ];
+
         $this->context->smarty->assign(array(
             'payplug_switch' => $switch
         ));
@@ -5741,7 +5749,7 @@ class Payplug extends PaymentModule
     public function saveConfiguration()
     {
         Configuration::updateValue('PAYPLUG_DEFERRED', Tools::getValue('payplug_deferred'));
-        Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', Tools::getValue('PAYPLUG_DEFERRED_AUTO'));
+        Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', Tools::getValue('payplug_deferred_auto'));
         Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));
         if (Tools::getValue('PAYPLUG_DEFERRED_AUTO')) {
             Configuration::updateValue('PAYPLUG_DEFERRED_STATE', Tools::getValue('PAYPLUG_DEFERRED_STATE'));
