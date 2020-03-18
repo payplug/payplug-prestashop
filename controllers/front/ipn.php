@@ -576,6 +576,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     } else {
                         $this->addLog('CREATE MODE');
 
+                        if (isset($this->resource->failure) && $this->resource->failure !== null) {
+                            echo $this->addLog('The payment has failed.');
+                            header($_SERVER['SERVER_PROTOCOL'] . ' 200 No treatment because payment has failed.', true, 200);
+                            die;
+                        }
+
                         $amount = 0;
 
                         if ($this->resource->installment_plan_id != null) {
