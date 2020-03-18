@@ -147,7 +147,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
                 if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->addLog('Payment is not stored or is already consumed.', 'error');
-                    $id_order = Order::getOrderByCartId($cart->id);
+                    $id_order = Order::getIdByCartId($cart->id);
                     $customer = new Customer((int)$cart->id_customer);
                     $link_redirect = __PS_BASE_URI__ . $this->url['valid'] . 'id_cart=' . $cart->id
                         . '&id_module=' . $this->payplug->id . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
@@ -157,19 +157,22 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $pay_id = false;
                     $this->type = 'installment';
                     try {
+                        $this->addLog('Retrieving installment...', 'info');
                         $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                        $this->addLog('Current amount: ' . $amount, 'info');
+                        $pay_id = false;
                         if (isset($installment->schedule)) {
-                            foreach ($installment->schedule as $schedule) {
-                                if (!empty($schedule->payment_ids)) {
-                                    $amount += (int)$schedule->amount;
-                                    if ($pay_id) {
-                                        continue;
-                                    }
-                                    $pay_id = $schedule->payment_ids[0];
+                            foreach ($installment->schedule as $k=>$schedule) {
+                                $schedule_amount = (int)$schedule->amount;
+                                $this->addLog('Schedule n.'.$k.': ' . $schedule_amount, 'info');
+                                $amount += $schedule_amount;
+                                $this->addLog('Current amount: ' . $amount, 'info');
+                                if ($pay_id) {
+                                    continue;
                                 }
+                                $pay_id = $schedule->payment_ids[0];
                             }
                         }
-                        $this->addLog('Retrieving installment...', 'info');
                         if ($installment->failure) {
                             $this->addLog('Installment failure : ' . $installment->failure->message,
                                 'error');
