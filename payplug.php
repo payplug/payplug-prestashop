@@ -2297,7 +2297,10 @@ class Payplug extends PaymentModule
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
         Media::addJsDef([
-            'admin_ajax_url' => $admin_ajax_url
+            'admin_ajax_url' => $admin_ajax_url,
+            'error_installment' => $this->l('Installment: '),
+            'error_deferred' => $this->l('Deferred: '),
+            'error_oney' => $this->l('Oney: '),
         ]);
 
         $login_infos = [];
