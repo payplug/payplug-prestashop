@@ -124,7 +124,7 @@ var $document, $window, payplug = {
                         }
                         break;
                     case 'checkbox' :
-                        data[name] = $elem.prop('checked');
+                        data[name] = $elem.prop('checked') ? 1 : 0;
                         break;
                     default :
                         data[name] = value;
@@ -702,7 +702,7 @@ var $document, $window, payplug = {
 
             $document.on('switchSelected', 'input[name=' + switcher + ']', oney.carrier)
                 .on('change', '.' + identifier + ' select', oney.carrier)
-                .on('keyup', '.' + identifier + ' input[type="number"]', oney.number);
+                .on('keyup', '.' + identifier + ' input[type="number"]', oney.check);
 
             $('input[name=' + switcher + ']').trigger('switchSelected');
         },
@@ -739,7 +739,7 @@ var $document, $window, payplug = {
                 $('.' + payplug.config.props.identifier + '_item-oney').hide();
             }
         },
-        number: function () {
+        check: function () {
             var {oney} = payplug,
                 {identifier} = oney.props,
                 $number = $(this),
@@ -747,13 +747,13 @@ var $document, $window, payplug = {
                 matches = delay.match(/^[0-9]+$/);
 
             var $error = $('.' + identifier + '_error');
+            oney.props.error = null;
 
             if (matches == null) {
                 $error.show();
                 oney.props.error = $error.text();
             } else {
                 $error.hide();
-                oney.props.error = null;
             }
         }
     },
@@ -791,24 +791,26 @@ var $document, $window, payplug = {
                 matches = amount.match(/^[0-9]+$/);
 
             var $error = $('.' + identifier + '_amount').find('span');
+            installment.props.error = null;
 
             if (limits.min > amount || amount > limits.max || matches == null) {
                 $error.show();
                 installment.props.error = $error.text();
             } else {
                 $error.hide();
-                installment.props.error = null;
             }
         },
     },
     deferred: {
         props: {
-            identifier: 'payplugDeferred'
+            identifier: 'payplugDeferred',
+            switcher: 'payplug_deferred',
         },
         init: function () {
             var {deferred} = payplug,
-                {identifier} = deferred.props;
+                {identifier,switcher} = deferred.props;
             $document.on('change', '.' + identifier + ' input[type=checkbox]', deferred.change)
+                .on('switchSelected', 'input[name=' + switcher + ']', deferred.select)
                 .on('change', '.' + identifier + ' select', deferred.select);
             $('.' + identifier + ' input[type=checkbox]').trigger('change');
         },
@@ -835,19 +837,20 @@ var $document, $window, payplug = {
         },
         select: function () {
             var {deferred} = payplug,
-                {identifier} = deferred.props,
+                {identifier,switcher} = deferred.props,
                 $checkbox = $('.' + identifier).find('input[type=checkbox]'),
                 $select = $('.' + identifier).find('select'),
-                checked = $checkbox.prop('checked');
+                checked = $checkbox.prop('checked'),
+                active = parseInt($('input[name='+switcher+']:checked').val());
 
             var $error = $('.' + identifier).find('span');
+            deferred.props.error = null;
 
-            if(checked && !parseInt($select.val())) {
+            if(checked && !parseInt($select.val()) && active) {
                 $error.show();
                 deferred.props.error = $error.text();
             } else {
                 $error.hide();
-                deferred.props.error = null;
             }
         }
     },

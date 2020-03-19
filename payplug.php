@@ -5752,11 +5752,9 @@ class Payplug extends PaymentModule
     public function saveConfiguration()
     {
         Configuration::updateValue('PAYPLUG_DEFERRED', Tools::getValue('payplug_deferred'));
-        Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', Tools::getValue('payplug_deferred_auto'));
+        Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', (int)Tools::getValue('payplug_deferred_auto'));
+        Configuration::updateValue('PAYPLUG_DEFERRED_STATE', (int)Tools::getValue('payplug_deferred_state'));
         Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));
-        if (Tools::getValue('PAYPLUG_DEFERRED_AUTO')) {
-            Configuration::updateValue('PAYPLUG_DEFERRED_STATE', Tools::getValue('PAYPLUG_DEFERRED_STATE'));
-        }
         Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', Tools::getValue('payplug_embedded'));
         Configuration::updateValue('PAYPLUG_INST', Tools::getValue('payplug_inst'));
         Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', Tools::getValue('PAYPLUG_INST_MIN_AMOUNT'));

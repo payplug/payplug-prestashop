@@ -37,7 +37,7 @@
                             <input type="checkbox" name="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" value="1" id="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" {if $payplug_switch.deferred_auto.checked}checked="checked"{/if}>
                             {l s='During the 7 days of the authorization, capture payments whose state is :' mod='payplug'}
                         </label>
-                        <select name="PAYPLUG_DEFERRED_STATE" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
+                        <select name="payplug_deferred_state" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
                             <option value="0">{l s='-- Choose an order state --' mod='payplug'}</option>
                             {foreach from=$order_states item=order_state}
                                 <option value="{$order_state.id_order_state}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name}</option>
