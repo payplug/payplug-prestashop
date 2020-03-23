@@ -678,7 +678,8 @@ class Payplug extends PaymentModule
         }
 
         if (isset($payment->failure) && isset($payment->failure->message) && !$is_expired) {
-            $payment_details['error'] = $this->l('(' . $payment->failure->message . ')');
+            $error = '(' . $payment->failure->message . ')';
+            $payment_details['error'] = $this->l($error);
         }
 
         if (isset($payment_details['type']) && in_array($payment_details['type'], array('Oney 3x', 'Oney 4x'))) {
@@ -1551,7 +1552,7 @@ class Payplug extends PaymentModule
                 $title = $this->l('Save settings');
                 break;
             case 'desactivate' :
-                $title = $this->l('Desactivate');
+                $title = $this->l('Deactivate');
                 break;
             case 'refund' :
                 $title = $this->l('Refund');
