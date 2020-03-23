@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,22 +15,21 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel-row separate_margin_block">
-    {include file='./switch.tpl' switch=$switch_sandbox}
-    <div class="panel-row">
-        <div class="block-right">
-            <p class="pptips">
-                        <span{if !$PAYPLUG_SANDBOX_MODE} class="hide"{/if} id="mode_live_tips">
-{l s='In TEST mode all payments will be simulations and will not generate real transactions.' mod='payplug'}<a href="http://support.payplug.com/customer/portal/articles/1701656" target="_blank">
-{l s='Learn more.' mod='payplug'}</a>
-                        </span>
-                <span{if $PAYPLUG_SANDBOX_MODE} class="hide"{/if} id="mode_sandbox_tips">{l s='In LIVE mode the payments will generate real transactions.' mod='payplug'}</span>
+    <div class="payplugPanel">
+        <div class="payplugPanel_label">{l s='Enable one-click payments' mod='payplug'}</div>
+        <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
+    </div>
+    <div class="payplugPanel">
+        <div class="payplugPanel_content">
+            <p>
+                {l s='Allow customers to save their credit card information for later purchases' mod='payplug'}
+                <a class="payplugLink" href="http://support.payplug.com/customer/portal/articles/2563975" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
-
         </div>
     </div>
 </div>

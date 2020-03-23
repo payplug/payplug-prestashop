@@ -29,7 +29,7 @@
             </li>
             <li>
                 <span>{l s='Contribution: ' mod='payplug'}</span>
-                <span><b>{$oney_payment_option.down_payment_amount.value}</b></span>
+                <span>{$oney_payment_option.down_payment_amount.value}</span>
                 <small>
                     ({l s='Financing cost:' mod='payplug'} <b>{$oney_payment_option.total_cost.value}</b>
                     {l s='TAEG:' mod='payplug'} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
@@ -39,7 +39,7 @@
                 {assign var="inst_number" value=$oney_inst_number+1}
                 <li>
                     <span>{l s='Installment no%d:' mod='payplug' sprintf=[$inst_number]}</span>
-                    <span><b>{$oney_installment.value}</b></span>
+                    <span>{$oney_installment.value}</span>
                 </li>
             {/foreach}
             <li>

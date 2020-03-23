@@ -101,8 +101,8 @@
   .mixin(@b);
 }
 
-.boxShadow(@inset: 0, @hoff:0, @voff:0, @blur:0, @color:#000){
-  -webkit-box-shadow: @inset @hoff @voff @blur @color;
-  -moz-box-shadow: @inset @hoff @voff @blur @color;
-  box-shadow: @inset @hoff @voff @blur @color;
+.boxShadow(@bs: none){
+  -webkit-box-shadow: @bs;
+  -moz-box-shadow: @bs;
+  box-shadow: @bs;
 }
