@@ -26,7 +26,6 @@ var allow_debug = true, debug = function (str) {
 };
 var $document, $window, payplugModule = {
     init: function () {
-        debug('payplug init');
         this.card.init();
         this.order.init();
         this.oney.init();
@@ -128,7 +127,6 @@ var $document, $window, payplugModule = {
             payplugModule.oney.props.queries = [];
         },
         init: function () {
-            debug('oney init');
             if (typeof payplug_oney == 'undefined' || !payplug_oney) {
                 return;
             }
@@ -211,7 +209,6 @@ var $document, $window, payplugModule = {
             },
             init: function () {
                 var cta = this;
-                debug('oney cta init');
                 cta.props.loaded = true;
                 $document.on('click', '.' + cta.props.identifier + '_button', cta.popin.toggle);
                 cta.popin.init();
