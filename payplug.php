@@ -4031,6 +4031,12 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayExpressCheckout($param)
     {
+        if (!$this->active) {
+            return;
+        }
+        if (Configuration::get('PAYPLUG_SHOW') == 0) {
+            return;
+        }
         if (!Configuration::get('PAYPLUG_ONEY')) {
             return;
         }
@@ -4044,6 +4050,12 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($param)
     {
+        if (!$this->active) {
+            return;
+        }
+        if (Configuration::get('PAYPLUG_SHOW') == 0) {
+            return;
+        }
         if (!Configuration::get('PAYPLUG_ONEY')) {
             return;
         }
