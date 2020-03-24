@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,13 +15,11 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel">
-    <div class="panel-heading">{l s='Debug mode' mod='payplug'}</div>
-    <div class="panel-row">
-        {include file='./switch.tpl' switch=$switch_debug_mode}
-    </div>
+<p>{l s='Your configuration have been saved' mod='payplug'}</p>
+<div class="payplugPopup_footer payplugPopup_footer-center">
+    <button type="button" class="payplugButton payplugButton-close payplugButton-green">{l s='Ok' mod='payplug'}</button>
 </div>

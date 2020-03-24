@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,17 +15,15 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel-row separate_margin_block">
-    {include file='./switch.tpl' switch=$switch_one_click}
-    <div class="panel-row">
-        <div class="block-right">
-            <p class="pptips">{l s='Allow customers to save their credit card information for later purchases' mod='payplug'}
-                <a href="http://support.payplug.com/customer/portal/articles/2563975" target="_blank">{l s='Learn more.' mod='payplug'}</a>
-            </p>
-        </div>
-    </div>
+
+<p>{l s='Please enter your Payplug account password' mod='payplug'}</p>
+<input type="password" name="reload_password"/>
+<p class="payplugPopup_error"></p>
+<div class="payplugPopup_footer">
+    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton payplugButton-green" name="password">{l s='Ok' mod='payplug'}</button>
 </div>
