@@ -1418,8 +1418,7 @@ class Payplug extends PaymentModule
     {
         $this->smarty->assign(array(
             'payplug_module_dir' => _PS_MODULE_DIR_,
-            'payplug_oney_loading_msg' => $this->l('Loading'),
-            'oney_required_fields' => $this->displayOneyRequiredFields()
+            'payplug_oney_loading_msg' => $this->l('Loading')
         ));
 
         return $this->display(__FILE__, 'oney/payment.tpl');
@@ -1448,26 +1447,6 @@ class Payplug extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'oney/popin.tpl');
-    }
-
-    /**
-     * Display Oney required fields template
-     *
-     * @return mixed
-     */
-    public function displayOneyRequiredFields()
-    {
-        $fields = $this->getOneyRequiredFields();
-
-        if (empty($fields)) {
-            return false;
-        }
-
-        $this->smarty->assign(array(
-            'oney_required_fields' => $fields
-        ));
-
-        return $this->display(__FILE__, 'oney/form.tpl');
     }
 
     /**
@@ -2592,7 +2571,6 @@ class Payplug extends PaymentModule
         );
 
         $this->smarty->assign(array(
-            'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => Tools::displayPrice($amount),
@@ -2682,7 +2660,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * todo: to clean or update
+     * Get the Oney required fields from Context
      * @return array
      */
     public function getOneyRequiredFields()
@@ -2854,6 +2832,56 @@ class Payplug extends PaymentModule
         }
 
         return $fields;
+    }
+
+    /**
+     * Get the Oney required fields from Context
+     * @return array
+     */
+    public function hasOneyRequiredFields($payment_data = array())
+    {
+        if (!$payment_data) {
+            return false;
+        }
+
+        // Check the shipping fields
+        $shipping = $payment_data['shipping'];
+
+        // Validate email format
+        if (strlen($shipping['email']) > 100 && strpos($shipping['email'], '+') !== false) {
+            return true;
+        } elseif (strlen($shipping['email']) > 100) {
+            return true;
+        } elseif (strpos($shipping['email'], '+') !== false) {
+            return true;
+        }
+
+        // Validate phone number
+        $valid_shipping_mobile = $this->isValidMobilePhoneNumber($shipping['mobile_phone_number'], $shipping['country']);
+        if (!$valid_shipping_mobile) {
+            return true;
+        }
+
+        // Validate address
+        if (strlen($shipping['city']) > 32) {
+            return true;
+        }
+
+        // Check the billing fields
+        $billing = $payment_data['billing'];
+
+        // Validate phone number
+        $valid_billing_mobile = $this->isValidMobilePhoneNumber($billing['mobile_phone_number'], $billing['country']);
+        if (!$valid_billing_mobile) {
+            return true;
+        }
+
+        // Validate address
+        if (strlen($billing['city']) > 32) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -5395,7 +5423,7 @@ class Payplug extends PaymentModule
             'title' => null,
             'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
             'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
-            'company_name' => !empty($shipping_address->company) ? $shipping_address->company : null,
+            'company_name' => !empty($shipping_address->company) ? $shipping_address->company : $shipping_address->firstname . ' ' . $shipping_address->lastname,
             'email' => $customer->email,
             'landline_phone_number' => $this->formatPhoneNumber($shipping_address->phone,
                 $shipping_address->id_country),
@@ -5471,6 +5499,8 @@ class Payplug extends PaymentModule
 
         // check payment tab from current payment method
         if ($is_oney) {
+            // check mobile phone number
+
             // check if oney was elligible then return if not
             $is_elligible = $this->isOneyElligible($this->context->cart);
             if (!$is_elligible['result']) {
@@ -5484,8 +5514,25 @@ class Payplug extends PaymentModule
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
 
-            if ($this->getOneyRequiredFields()) {
+            // check billing phonenumber
+            if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
+                $payment_tab['billing']['country'])) {
+                if ($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'],
+                    $payment_tab['billing']['country'])) {
+                    $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
+                }
+            }
 
+            // check shipping phonenumber
+            if (!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'],
+                $payment_tab['shipping']['country'])) {
+                if ($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'],
+                    $payment_tab['shipping']['country'])) {
+                    $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
+                }
+            }
+
+            if ($this->hasOneyRequiredFields()) {
                 // check oney required fields
                 if ($payment_data = $this->getPaymentDataCookie()) {
                     $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
@@ -5496,23 +5543,6 @@ class Payplug extends PaymentModule
             }
 
             unset($payment_tab['allow_save_card']);
-
-            // check billing phonenumber
-            if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
-                $payment_tab['billing']['country'])) {
-                if ($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'],
-                    $payment_tab['billing']['country'])) {
-                    $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
-                }
-            }
-            // check shipping phonenumber
-            if (!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'],
-                $payment_tab['shipping']['country'])) {
-                if ($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'],
-                    $payment_tab['shipping']['country'])) {
-                    $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
-                }
-            }
 
             $payment_tab['force_3ds'] = false;
             $payment_tab['auto_capture'] = true;
