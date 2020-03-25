@@ -4053,6 +4053,21 @@ class Payplug extends PaymentModule
             return;
         }
         $this->smarty->assign(['env' => 'checkout']);
+
+        $action = Tools::getValue('action');
+        if($action == 'refresh') {
+            $use_taxes = (bool)Configuration::get('PS_TAX');
+
+            $context = Context::getContext();
+            $amount = $context->cart->getOrderTotal($use_taxes);
+            $delivery_address = new Address($context->cart->id_address_delivery);
+            $delivery_country = new Country($delivery_address->id_country);
+            $iso_code = $delivery_country->iso_code;
+            $cart = $context->cart;
+
+            $payment_options = $this->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+            $this->smarty->assign(['popin' => true]);
+        }
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
