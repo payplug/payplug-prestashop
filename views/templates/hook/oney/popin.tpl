@@ -29,13 +29,13 @@
         </span>
 
         <ul class="oneyPopin_navigation">
-            {foreach $oney_payment_options as $key => $oney_payment_option}
-                <li{if !$key} class="selected"{/if}><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
+            {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
+                <li{if $oney_payment_method == 'x3_with_fees'} class="selected"{/if}><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
             {/foreach}
         </ul>
 
-        {foreach $oney_payment_options as $key => $oney_payment_option}
-            <span class="oneyPopin_option{if !$key} oneyPopin_option-show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
+        {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
+            <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} oneyPopin_option-show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
 			    {include file="./payment_detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
         {/foreach}
