@@ -21,10 +21,13 @@
 *}
 <div class="oneyCta_wrapper">
     <div class="oneyCta{if isset($env) && $env} oneyCta-{$env}{/if}">
-        <button type="button" class="oneyCta_button">
+        <button type="button" class="oneyCta_button{if isset($payplug_oney_error) && $payplug_oney_error} oneyCta_button-disabled{/if}">
             <span>{l s='Or pay in' mod='payplug'}</span>
             <span class="oneyCta_logo oneyLogo oneyLogo-x3x4"></span>
             <span class="oneyCta_tooltip oneyLogo oneyLogo-tooltip"></span>
         </button>
+        {if isset($popin) && $popin}
+            {include file="./popin.tpl"}
+        {/if}
     </div>
 </div>

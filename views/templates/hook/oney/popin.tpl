@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<span class="oneyPopin">
+<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} oneyPopin-error{/if}">
     {if isset($payplug_oney_error) && $payplug_oney_error}
         <p class="oneyPopin_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</p>
     {elseif isset($oney_payment_options) && $oney_payment_options}
@@ -29,13 +29,13 @@
         </span>
 
         <ul class="oneyPopin_navigation">
-            {foreach $oney_payment_options as $oney_payment_option}
-                <li><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
+            {foreach $oney_payment_options as $key => $oney_payment_option}
+                <li{if !$key} class="selected"{/if}><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
             {/foreach}
         </ul>
 
-        {foreach $oney_payment_options as $oney_payment_option}
-            <span class="oneyPopin_option" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
+        {foreach $oney_payment_options as $key => $oney_payment_option}
+            <span class="oneyPopin_option{if !$key} oneyPopin_option-show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
 			    {include file="./payment_detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
         {/foreach}

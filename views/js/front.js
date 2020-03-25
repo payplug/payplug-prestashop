@@ -136,7 +136,13 @@ var $document, $window, payplugModule = {
             this.form.init();
 
             $window.on('load', oney.load);
-            prestashop.on('updatedProduct', oney.load);
+            prestashop.on('updatedProduct', function(){
+                var {popin} = payplugModule.oney.cta,
+                    {open} = popin.props;
+                if(open) {
+                    popin.open();
+                }
+            });
         },
         load: function () {
             var oney = payplugModule.oney,
@@ -298,10 +304,6 @@ var $document, $window, payplugModule = {
                     var popin = payplugModule.oney.cta.popin,
                         identifier = popin.props.identifier;
 
-                    if (!$('.' + identifier).length) {
-                        popin.reset();
-                        payplugModule.oney.load();
-                    }
                     var is_open = $('.' + identifier + '-open').length > 0;
                     if (is_open) {
                         popin.close();
