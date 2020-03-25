@@ -2593,8 +2593,6 @@ class Payplug extends PaymentModule
             }
         }
 
-        sort($payment_list);
-
         return $payment_list;
     }
 
@@ -3297,11 +3295,11 @@ class Payplug extends PaymentModule
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
-
                 if ($optimized) {
                     $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption->setAdditionalInformation($schedules);
                 }
+
 
                 $payment_list[] = $paymentOption;
             }
