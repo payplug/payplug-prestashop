@@ -308,7 +308,6 @@ var $document, $window, payplugModule = {
                     }
                 },
                 check: function () {
-                    console.log('check');
                     var {popin} = payplugModule.oney.cta,
                         {open} = popin.props;
                     if (open) {
