@@ -2321,6 +2321,76 @@ class Payplug extends PaymentModule
         return $this->html;
     }
 
+    /**
+     * Display Oney payment options
+     *
+     * @param $cart Cart
+     * @param float $order_total
+     * @param string $country
+     * @return array
+     */
+    public function assignOneyPriceAndPaymentOptions($cart, $amount, $country = false)
+    {
+        if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+            $is_elligible = $this->isOneyElligible($cart, $amount, $country);
+        } else {
+            $id_currency = $this->context->currency->id;
+            $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+        }
+
+        $error = false;
+        if ($is_elligible['result']) {
+            $oney_payment_options = $this->getOneyPaymentOptionsList($amount, $country);
+        } else {
+            $oney_payment_options = false;
+            $error = $is_elligible['error'] ? $is_elligible['error'] : $this->l('Oney is momentarily unavailable.');
+        }
+
+        $error = $is_elligible['error'] ? $is_elligible['error'] : (
+        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+        );
+
+        $this->smarty->assign(array(
+            'payplug_oney_amount' => [
+                'amount' => $amount,
+                'value' => Tools::displayPrice($amount),
+            ],
+            'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
+            'payplug_oney_error' => $error
+        ));
+
+        if ($oney_payment_options) {
+            $this->smarty->assign(array(
+                'oney_payment_options' => $oney_payment_options,
+            ));
+        }
+
+        // if no errors check carrier for payment template
+        if ($oney_payment_options && Validate::isLoadedObject($cart) && $cart->id_carrier) {
+            $is_valid_carrier = $this->isValidOneyCarrier($cart);
+            $this->smarty->assign(array(
+                'payplug_oney_allowed' => $is_valid_carrier['result'],
+                'payplug_oney_error' => $is_valid_carrier['error']
+            ));
+        }
+
+
+        $limits = $this->getOneyPriceLimit();
+        $min_amount = $this->convertAmount($limits['min'], true);
+        $max_amount = $this->convertAmount($limits['max'], true);
+
+        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. ';
+        $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
+        $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
+        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
+        $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
+
+        $this->smarty->assign(array(
+            'legal_notice' => sprintf($this->l($legal_text), Tools::displayPrice($min_amount),
+                Tools::displayPrice($max_amount))
+        ));
+    }
+
     private function assignSwitchConfiguration($configurations)
     {
         $switch = [];
@@ -4065,7 +4135,7 @@ class Payplug extends PaymentModule
             $iso_code = $delivery_country->iso_code;
             $cart = $context->cart;
 
-            $payment_options = $this->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+            $this->assignOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
             $this->smarty->assign(['popin' => true]);
         }
         return $this->display(__FILE__, 'oney/cta.tpl');
@@ -4104,7 +4174,7 @@ class Payplug extends PaymentModule
             $iso_code = false;
             $cart = false;
 
-            $payment_options = $this->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+            $this->assignOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
             $this->smarty->assign(['popin' => true]);
         }
         $this->smarty->assign(['env' => 'product']);

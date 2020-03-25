@@ -61,15 +61,15 @@ var $document, $window, payplugModule = {
                         payplugModule.popup.set(data.template);
 
                         // Select Oney Option
-                        var $form = $('.'+payplugModule.oney.form.props.identifier);
-                        if($form.length) {
+                        var $form = $('.' + payplugModule.oney.form.props.identifier);
+                        if ($form.length) {
                             var oney_type = $form.data('oney_type'),
-                                paymentOption = $('input[value="'+oney_type+'"]')
+                                paymentOption = $('input[value="' + oney_type + '"]')
                                     .parent('form')
                                     .find('button[type=submit]')
                                     .attr('id')
                                     .replace('pay-with-', '');
-                            $('#'+paymentOption).trigger('click');
+                            $('#' + paymentOption).trigger('click');
                         }
                     }
                 }
@@ -130,19 +130,15 @@ var $document, $window, payplugModule = {
             if (typeof payplug_oney == 'undefined' || !payplug_oney) {
                 return;
             }
-            var oney = payplugModule.oney;
+            var {oney} = payplugModule;
 
             this.cta.init();
             this.form.init();
 
             $window.on('load', oney.load);
-            prestashop.on('updatedProduct', function(){
-                var {popin} = payplugModule.oney.cta,
-                    {open} = popin.props;
-                if(open) {
-                    popin.open();
-                }
-            });
+
+            var {popin} = oney.cta;
+            prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
         },
         load: function () {
             var oney = payplugModule.oney,
@@ -308,6 +304,14 @@ var $document, $window, payplugModule = {
                     if (is_open) {
                         popin.close();
                     } else {
+                        popin.open();
+                    }
+                },
+                check: function () {
+                    console.log('check');
+                    var {popin} = payplugModule.oney.cta,
+                        {open} = popin.props;
+                    if (open) {
                         popin.open();
                     }
                 },
