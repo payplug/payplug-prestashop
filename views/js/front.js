@@ -136,7 +136,13 @@ var $document, $window, payplugModule = {
             this.form.init();
 
             $window.on('load', oney.load);
-            prestashop.on('updatedProduct', oney.load);
+            prestashop.on('updatedProduct', function(){
+                var {popin} = payplugModule.oney.cta,
+                    {open} = popin.props;
+                if(open) {
+                    popin.open();
+                }
+            });
         },
         load: function () {
             var oney = payplugModule.oney,
@@ -228,18 +234,21 @@ var $document, $window, payplugModule = {
             popin: {
                 props: {
                     identifier: 'oneyPopin',
+                    open: false,
                 },
                 init: function () {
-                    var popin = payplugModule.oney.cta.popin.props.identifier,
-                        cta = payplugModule.oney.cta.popin.props.identifier;
-                    $document.on('click', '.' + popin + '_close', payplugModule.oney.cta.popin.hide)
-                        .on('click', '.' + popin + '_navigation button', payplugModule.oney.cta.popin.select)
+                    var {cta} = payplugModule.oney,
+                        {popin} = cta;
+
+                    $document.on('click', '.' + popin.props.identifier + '_close', popin.hide)
+                        .on('click', '.' + popin.props.identifier + '_navigation button', popin.select)
                         .on('click', function (event) {
                             var $clicked = $(event.target);
-                            if ((!$clicked.is('.' + popin) && !$clicked.parents('.' + popin).length) && $('.' + cta).is('.' + cta + '-open')) {
-                                payplugModule.oney.cta.popin.close();
+                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('.' + cta.props.identifier + '-open')) {
+                                popin.close();
                             }
                         });
+                    popin.reset();
                 },
                 reset: function () {
                     var oney = payplugModule.oney,
@@ -255,15 +264,16 @@ var $document, $window, payplugModule = {
                     if (typeof content == 'undefined' || !content) {
                         return false;
                     }
-                    var identifier = payplugModule.oney.cta.popin.props.identifier,
-                        is_open = $('.' + identifier + '-open').length > 0;
+                    var {popin} = payplugModule.oney.cta,
+                        {identifier, open} = popin.props;
+
                     $('.' + identifier).replaceWith(content).removeClass(identifier + '-loading');
 
-                    var $button = $('.' + payplugModule.oney.cta.popin.props.identifier + '_navigation button').eq(0);
-                    payplugModule.oney.cta.popin.choose($button.data('type'));
+                    var $button = $('.' + identifier + '_navigation button').eq(0);
+                    popin.choose($button.data('type'));
 
-                    if (is_open) {
-                        setTimeout(payplugModule.oney.cta.popin.open, 0);
+                    if (open) {
+                        setTimeout(popin.open, 0);
                     }
                 },
                 select: function (event) {
@@ -294,10 +304,6 @@ var $document, $window, payplugModule = {
                     var popin = payplugModule.oney.cta.popin,
                         identifier = popin.props.identifier;
 
-                    if (!$('.' + identifier).length) {
-                        popin.reset();
-                        payplugModule.oney.load();
-                    }
                     var is_open = $('.' + identifier + '-open').length > 0;
                     if (is_open) {
                         popin.close();
@@ -306,22 +312,30 @@ var $document, $window, payplugModule = {
                     }
                 },
                 open: function () {
-                    var cta = payplugModule.oney.cta.props.identifier,
-                        popin = payplugModule.oney.cta.popin.props.identifier;
-                    $('.' + cta).addClass(cta + '-open');
-                    $('.' + popin).addClass(popin + '-open');
+                    var {oney} = payplugModule,
+                        {cta} = oney,
+                        {popin} = cta;
+
+                    $('.' + cta.props.identifier).addClass(cta.props.identifier + '-open');
+                    $('.' + popin.props.identifier).addClass(popin.props.identifier + '-open');
+
                     setTimeout(function () {
-                        $('.' + popin).addClass(popin + '-show');
+                        $('.' + popin.props.identifier).addClass(popin.props.identifier + '-show');
+                        popin.props.open = true;
                     }, 0);
                 },
                 close: function () {
-                    var cta = payplugModule.oney.cta.props.identifier,
-                        popin = payplugModule.oney.cta.popin.props.identifier;
-                    $('.' + popin).addClass(popin + '-show');
-                    $('.' + popin).removeClass(popin + '-open');
+                    var {oney} = payplugModule,
+                        {cta} = oney,
+                        {popin} = cta;
+
+                    $('.' + popin.props.identifier).removeClass(popin.props.identifier + '-show');
+                    $('.' + popin.props.identifier).removeClass(popin.props.identifier + '-open');
+
                     setTimeout(function () {
-                        $('.' + cta).removeClass(cta + '-open');
-                    }, 400);
+                        $('.' + cta.props.identifier).removeClass(cta.props.identifier + '-open');
+                        popin.props.open = false;
+                    }, 0);
                 },
                 show: function (event) {
                     event.preventDefault();
