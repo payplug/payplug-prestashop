@@ -260,7 +260,7 @@ var $document, $window, payplugModule = {
                     }
                     var {popin} = payplugModule.oney.cta,
                         {identifier, open} = popin.props;
-                    console.log(open?'ok':'nok');
+
                     $('.' + identifier).replaceWith(content).removeClass(identifier + '-loading');
 
                     var $button = $('.' + identifier + '_navigation button').eq(0);
