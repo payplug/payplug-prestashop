@@ -601,6 +601,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   .oneyPopin-open {
     border: 1px solid #7ebd00;
     max-height: 500px;
+    background: #fff;
   }
 }
 .oneyPopin-show {
