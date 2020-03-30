@@ -5617,10 +5617,17 @@ class Payplug extends PaymentModule
                 }
             }
 
-            if ($this->hasOneyRequiredFields()) {
+            if ($this->hasOneyRequiredFields($payment_tab)) {
                 // check oney required fields
                 if ($payment_data = $this->getPaymentDataCookie()) {
+                    // hydrate with payment data
                     $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
+
+                    // then recheck
+                    if ($this->hasOneyRequiredFields($payment_tab)) {
+                        $this->setPaymentErrorsCookie(array('oney_required_field_' . $is_oney));
+                        return ['result' => false, 'response' => false];
+                    }
                 } else {
                     $this->setPaymentErrorsCookie(array('oney_required_field_' . $is_oney));
                     return ['result' => false, 'response' => false];

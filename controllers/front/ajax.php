@@ -96,19 +96,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if (empty($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => $payplug->l('Empty payment data')
+                        'message' => [$payplug->l('Empty payment data')]
                     ]));
                 } elseif ($payplug->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => $payplug->l('At least one of the fields is not correctly completed.')
+                        'message' => [$payplug->l('At least one of the fields is not correctly completed.')]
                     ]));
                 }
 
                 $result = $payplug->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
-                    'message' => $result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')
+                    'message' => [$result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')]
                 ]));
             }
         }
