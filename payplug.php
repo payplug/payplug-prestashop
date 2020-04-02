@@ -1449,7 +1449,7 @@ class Payplug extends PaymentModule
         $payment_messages = array();
         $with_msg_button = false;
         foreach ($errors as $error) {
-            if (strpos('oney_required_field', $error) >= 0) {
+            if (strpos($error, 'oney_required_field') !== false) {
                 $this->smarty->assign(['is_popin_tpl' => true]);
                 $fields = $this->getOneyRequiredFields();
                 $this->smarty->assign([
@@ -2338,12 +2338,10 @@ class Payplug extends PaymentModule
             $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
         }
 
-        $error = false;
         if ($is_elligible['result']) {
             $oney_payment_options = $this->getOneyPaymentOptionsList($amount, $country);
         } else {
             $oney_payment_options = false;
-            $error = $is_elligible['error'] ? $is_elligible['error'] : $this->l('Oney is momentarily unavailable.');
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
@@ -2909,7 +2907,8 @@ class Payplug extends PaymentModule
         }
 
         // Validate phone number
-        $valid_shipping_mobile = $this->isValidMobilePhoneNumber($shipping['mobile_phone_number'], $shipping['country']);
+        $valid_shipping_mobile = $this->isValidMobilePhoneNumber($shipping['mobile_phone_number'],
+            $shipping['country']);
         if (!$valid_shipping_mobile) {
             return true;
         }
@@ -2988,7 +2987,6 @@ class Payplug extends PaymentModule
                 'simulations' => $simulations
             );
         } catch (Exception $exception) {
-            die(var_dump($exception->__toString()));
             return array(
                 'result' => false,
                 'error' => $exception->__toString()
@@ -3218,15 +3216,18 @@ class Payplug extends PaymentModule
 
         if ($options['oney'] && isset($this->available_oney_payments) && $this->available_oney_payments) {
 
-            $is_elligible = $this->isOneyElligible($this->context->cart);
+            $use_taxes = (bool)Configuration::get('PS_TAX');
+            $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
+
+            $is_elligible = $this->isOneyElligible($this->context->cart, $cart_amount, true);
             $is_valid_carrier = $this->isValidOneyCarrier($this->context->cart);
 
             $error = $is_elligible['result'] ? ($is_valid_carrier['result'] ? false : $is_valid_carrier['error_type']) : $is_elligible['error_type'];
             $payment_schedule = false;
+
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && !$error;
-            if ($optimized) {
-                $use_taxes = (bool)Configuration::get('PS_TAX');
-                $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
+
+            if ($optimized && !$error) {
                 $delivery_address = new Address($this->context->cart->id_address_delivery);
                 $delivery_country = new Country($delivery_address->id_country);
                 $iso_code = $delivery_country->iso_code;
@@ -3265,7 +3266,7 @@ class Payplug extends PaymentModule
 
 
                 if ($error) {
-                    switch ($is_elligible['error_type']) {
+                    switch ($error) {
                         case 'invalid_addresses':
                             $err_label = $this->l('Available for France only');
                             break;
@@ -4123,17 +4124,12 @@ class Payplug extends PaymentModule
         $this->smarty->assign(['env' => 'checkout']);
 
         $action = Tools::getValue('action');
-        if($action == 'refresh') {
+        if ($action == 'refresh') {
             $use_taxes = (bool)Configuration::get('PS_TAX');
 
             $context = Context::getContext();
             $amount = $context->cart->getOrderTotal($use_taxes);
-            $delivery_address = new Address($context->cart->id_address_delivery);
-            $delivery_country = new Country($delivery_address->id_country);
-            $iso_code = $delivery_country->iso_code;
-            $cart = $context->cart;
-
-            $this->assignOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+            $this->assignOneyPriceAndPaymentOptions($context->cart, $amount);
             $this->smarty->assign(['popin' => true]);
         }
         return $this->display(__FILE__, 'oney/cta.tpl');
@@ -4159,7 +4155,7 @@ class Payplug extends PaymentModule
         }
 
         $action = Tools::getValue('action');
-        if($action == 'refresh') {
+        if ($action == 'refresh') {
             $use_taxes = (bool)Configuration::get('PS_TAX');
 
             $id_product = (int)Tools::getValue('id_product');
@@ -4167,12 +4163,10 @@ class Payplug extends PaymentModule
             $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
             $quantity = (int)Tools::getValue('qty', 1);
 
-            $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
+            $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null,
+                false, true, $quantity);
             $amount = $product_price * $quantity;
-            $iso_code = false;
-            $cart = false;
-
-            $this->assignOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+            $this->assignOneyPriceAndPaymentOptions(false, $amount);
             $this->smarty->assign(['popin' => true]);
         }
         $this->smarty->assign(['env' => 'product']);
@@ -4783,7 +4777,7 @@ class Payplug extends PaymentModule
      * @param int $amount
      * @return array
      */
-    public function isOneyElligible($cart, $amount = false)
+    public function isOneyElligible($cart, $amount = false, $country = false)
     {
         // check if cart is valid
         $is_valid_cart = $this->isValidOneyCart($cart);
@@ -4796,13 +4790,15 @@ class Payplug extends PaymentModule
         }
 
         // check if cart address is valid
-        $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
-        if (!$is_valid_addresses['result']) {
-            return array(
-                'result' => false,
-                'error_type' => 'invalid_addresses',
-                'error' => $is_valid_addresses['error']
-            );
+        if ($country) {
+            $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
+            if (!$is_valid_addresses['result']) {
+                return array(
+                    'result' => false,
+                    'error_type' => 'invalid_addresses',
+                    'error' => $is_valid_addresses['error']
+                );
+            }
         }
 
         // check if current amount is between min and max values
@@ -5010,8 +5006,6 @@ class Payplug extends PaymentModule
             );
         }
 
-        /*
-        // todo: check if valid carrier
         $invalid_carrier_type = array('storepickup', 'networkpickup');
 
         // check if current carrier is available
@@ -5020,7 +5014,7 @@ class Payplug extends PaymentModule
 
         if (!$payplug_carrier->delivery_type) {
             $carrier = new Carrier($cart->id_carrier);
-            $error = $this->l('The carrier') . ' ' . $carrier->name . ' ' . $this->l('shipping is conflicting with this payment method ');
+            $error = $this->l('The carrier') . ' ' . $carrier->name . ' ' . $this->l('shipping is conflicting with this payment method. ');
             $error .= $this->l('Please change the shipping method chosen at the last step.');
             return array(
                 'result' => false,
@@ -5037,15 +5031,17 @@ class Payplug extends PaymentModule
                     $delivery_type = $this->l('Store Pickup');
                     break;
             }
-            $error = $this->l('The') . ' ' . $delivery_type . ' ' . $this->l('shipping is conflicting with this payment method. ');
+
+
+            $error = $this->l('The ') . $delivery_type . $this->l(' shipping is conflicting with this payment method. ');
             $error .= $this->l('Please change the shipping method chosen at the last step.');
+
             return array(
                 'result' => false,
-                'error' => sprintf($error),
+                'error' => $error,
                 'error_type' => 'invalid_carrier',
             );
         }
-        //*/
 
         return array('result' => true, 'error' => false);
     }
@@ -5367,7 +5363,7 @@ class Payplug extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => __LINE__ . $this->l('The transaction was not completed and your card was not charged.')
+                'response' => $this->l('The transaction was not completed and your card was not charged.')
             ];
         }
 
@@ -5390,7 +5386,7 @@ class Payplug extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => __LINE__ . $this->l('The transaction was not completed and your card was not charged.')
+                'response' => $this->l('The transaction was not completed and your card was not charged.')
             ];
         }
 
@@ -5420,7 +5416,7 @@ class Payplug extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => __LINE__ . $this->l('The transaction was not completed and your card was not charged.')
+                'response' => $this->l('The transaction was not completed and your card was not charged.')
             ];
         }
 
@@ -5587,7 +5583,8 @@ class Payplug extends PaymentModule
             // check mobile phone number
 
             // check if oney was elligible then return if not
-            $is_elligible = $this->isOneyElligible($this->context->cart);
+            $is_elligible = $this->isOneyElligible($this->context->cart, false, true);
+
             if (!$is_elligible['result']) {
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
@@ -5654,7 +5651,7 @@ class Payplug extends PaymentModule
                 if ($payment->failure != null && !empty($payment->failure['message'])) {
                     return [
                         'result' => false,
-                        'response' => __LINE__ . $payment->failure['message'],
+                        'response' => $payment->failure['message'],
                     ];
                 }
                 $this->storeInstallment($payment->id, (int)$cart->id);
@@ -5663,7 +5660,7 @@ class Payplug extends PaymentModule
                 if ($payment->failure == true && !empty($payment->failure['message'])) {
                     return [
                         'result' => false,
-                        'response' => __LINE__ . $payment->failure['message'],
+                        'response' => $payment->failure['message'],
                     ];
                 }
                 $this->storePayment($payment->id, (int)$cart->id);

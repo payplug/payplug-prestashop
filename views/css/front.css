@@ -1155,6 +1155,21 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   content: "";
   margin: 0 0 15px;
 }
+.oneyForm_validation button {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  background: #00ab7a;
+  width: auto;
+  height: 32px;
+  padding: 0 16px;
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  outline: none;
+  margin: 5px 0 0;
+  cursor: pointer;
+}
 .oneyForm_validation-show {
   display: flex;
 }
