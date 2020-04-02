@@ -68,18 +68,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,
                         null, false, true, $quantity);
                     $amount = $product_price * $quantity;
-                    $iso_code = false;
                     $cart = false;
                 } else {
                     $context = Context::getContext();
                     $amount = $context->cart->getOrderTotal($use_taxes);
-                    $delivery_address = new Address($context->cart->id_address_delivery);
-                    $delivery_country = new Country($delivery_address->id_country);
-                    $iso_code = $delivery_country->iso_code;
                     $cart = $context->cart;
                 }
 
-                $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+                $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount);
                 die(json_encode($payment_options));
             } elseif (Tools::getIsset('getPaymentErrors')) {
                 // check if errors
@@ -96,19 +92,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if (empty($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => $payplug->l('Empty payment data')
+                        'message' => [$payplug->l('Empty payment data')]
                     ]));
                 } elseif ($payplug->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => $payplug->l('At least one of the fields is not correctly completed.')
+                        'message' => [$payplug->l('At least one of the fields is not correctly completed.')]
                     ]));
                 }
 
                 $result = $payplug->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
-                    'message' => $result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')
+                    'message' => [$result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')]
                 ]));
             }
         }

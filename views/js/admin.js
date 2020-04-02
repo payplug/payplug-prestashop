@@ -174,6 +174,8 @@ var $document, $window, payplug = {
                         var {popup} = payplug.tools;
                         popup.set(result.popin, 'confirm');
                         $('form.payplug').replaceWith(result.content);
+                        var {oney} = payplug;
+                        oney.carrier();
                         $window.trigger('load');
                     }
                 }
