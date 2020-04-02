@@ -559,13 +559,11 @@ class Payplug extends PaymentModule
         $status_class = null;
         switch ($pay_status) {
             case 1: // not paid
-            case 4: // partially refunded
             case 5: // refunded
             case 8: // authorized
                 $status_class = 'pp_warning';
                 break;
             case 2: // paid
-            case 6: // on going
                 $status_class = 'pp_success';
                 break;
             case 3: // failed
@@ -573,8 +571,12 @@ class Payplug extends PaymentModule
             case 9: // authorization expired
                 $status_class = 'pp_error';
                 break;
-            default:
+            case 4: // partially refunded
+            case 6: // on going
                 $status_class = 'pp_neutral';
+                break;
+            default:
+                $status_class = 'pp_other';
                 break;
         }
 
@@ -606,12 +608,15 @@ class Payplug extends PaymentModule
             case 9:
                 $status_code = 'authorization_expired';
                 break;
+            case 10:
+                $status_code = 'oney_pending';
+                break;
             default: // none
                 $status_code = 'none';
                 break;
         }
 
-        $pay_status = $this->payment_status[(int)$pay_status];
+        $pay_status = $this->payment_status[$pay_status];
 
         $pay_brand = $this->getCardBrandByPayment($payment);
         if ($payment->card->country != '') {
@@ -628,6 +633,7 @@ class Payplug extends PaymentModule
             'card_mask' => $this->getCardMaskByPayment($payment),
             'card_date' => $this->getCardExpiryDateByPayment($payment),
             'mode' => $payment->is_live ? $this->l('LIVE') : $this->l('TEST'),
+            'paid' => (bool)$payment->is_paid,
         );
 
         //Deferred payment does'nt display 3DS option before capture so we have to consider it null
@@ -635,7 +641,7 @@ class Payplug extends PaymentModule
             $payment_details['tds'] = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
         }
 
-        if (isset($payment->payment_method['type'])) {
+        if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                     $payment_details['type'] = 'Oney 3x';
@@ -647,39 +653,54 @@ class Payplug extends PaymentModule
                     $payment_details['type'] = $payment->payment_method['type'];
             }
         }
-
-        $is_expired = false;
         if ($payment->authorization !== null) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
-                $payment_details['date'] = date('d/m/Y', (int)$payment->paid_at);
+                $payment_details['date'] = date('d/m/Y', $payment->paid_at);
+                $payment_details['can_be_cancelled'] = false;
                 $payment_details['can_be_captured'] = false;
                 if (!isset($payment_details['type'])) {
                     $payment_details['status_message'] = $this->l('(deferred)');
                 }
             } else {
-                $expiration = date('d/m/Y', (int)$payment->authorization->expires_at);
-                if ($payment->authorization->expires_at - time() > 0) {
-                    $payment_details['can_be_captured'] = true;
-                    $payment_details['status_message'] = sprintf($this->l('(capture authorized before %s)'),
-                        $expiration);
-                    $payment_details['date'] = date('d/m/Y', (int)$payment->authorization->authorized_at);
-                    $payment_details['date_expiration'] = $expiration;
-                } else {
-                    $is_expired = true;
+                $expiration = date('d/m/Y', $payment->authorization->expires_at);
+                if (isset($payment->authorization->expires_at) && $payment->authorization->expires_at - time() > 0) {
+                    if (isset($payment->failure) && count($payment->failure) > 0) {
+                        $payment_details['can_be_cancelled'] = false;
+                        $payment_details['can_be_captured'] = false;
+                    } else {
+                        $payment_details['can_be_captured'] = true;
+                        $payment_details['can_be_cancelled'] = true;
+                        $payment_details['status_message'] = sprintf($this->l('(capture authorized before %s)'),
+                            $expiration);
+                    }
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
+                    $payment_details['date_expiration'] = $expiration;
+                    $payment_details['expiration_display'] = sprintf(
+                        $this->l('Capture of this payment is authorized before %s. After this date, you will not be able to get paid.'),
+                        $expiration
+                    );
+                } elseif (
+                    isset($payment->authorization->authorized_at)
+                    && $payment->authorization->authorized_at != null
+                ) {
+                    $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
+                    $payment_details['can_be_cancelled'] = false;
+                    $payment_details['can_be_captured'] = false;
+                } else {
+                    $payment_details['can_be_cancelled'] = false;
                     $payment_details['can_be_captured'] = false;
                 }
             }
         } else {
             $payment_details['authorization'] = false;
-            $payment_details['date'] = date('d/m/Y', (int)$payment->created_at);
+            $payment_details['date'] = date('d/m/Y', $payment->created_at);
+            $payment_details['can_be_cancelled'] = false;
             $payment_details['can_be_captured'] = false;
         }
 
-        if (isset($payment->failure) && isset($payment->failure->message) && !$is_expired) {
-            $error = '(' . $payment->failure->message . ')';
-            $payment_details['error'] = $this->l($error);
+        if (isset($payment->failure) && isset($payment->failure->message)) {
+            $payment_details['error'] = '(' . $payment->failure->message . ')';
         }
 
         if (isset($payment_details['type']) && in_array($payment_details['type'], array('Oney 3x', 'Oney 4x'))) {
@@ -3340,6 +3361,7 @@ class Payplug extends PaymentModule
             7 => 'cancelled',
             8 => 'authorized',
             9 => 'authorization expired',
+            10 => 'oney pending',
         */
         if (!is_object($payment)) {
             $payment = \Payplug\Payment::retrieve($payment);
@@ -3354,17 +3376,24 @@ class Payplug extends PaymentModule
         $pay_status = 1; //not paid
         if ((int)$payment->is_paid == 1) {
             $pay_status = 2; //paid
+        } elseif (
+            isset($payment->payment_method)
+            && isset($payment->payment_method['is_pending'])
+            && (int)$payment->payment_method['is_pending'] == 1
+        ) {
+            $pay_status = 10; //oney pending
+        } elseif (count($payment->failure) > 0 && $pay_status != 9) {
+            if ($payment->failure->code == 'aborted') {
+                $pay_status = 7; //cancelled
+            } else {
+                $pay_status = 3; //failed
+            }
         } elseif ($payment->authorization !== null && ($payment->authorization->expires_at - time()) > 0) {
             $pay_status = 8; //authorized
         } elseif ($payment->authorization !== null && ($payment->authorization->expires_at - time()) <= 0) {
             $pay_status = 9; //authorization expired
         } elseif ($payment->installment_plan_id !== null && (int)$installment->is_active == 1) {
             $pay_status = 6; //ongoing
-        } else {
-            $pay_status = 7; //cancelled
-        }
-        if (is_array($payment->failure) && count($payment->failure) > 0) {
-            $pay_status = 3; //failed
         }
         if ((int)$payment->is_refunded == 1) {
             $pay_status = 5; //refunded
@@ -6058,6 +6087,7 @@ class Payplug extends PaymentModule
             7 => $this->l('cancelled'),
             8 => $this->l('authorized'),
             9 => $this->l('authorization expired'),
+            10 => $this->l('oney pending'),
         );
     }
 
