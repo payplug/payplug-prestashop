@@ -1155,7 +1155,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   content: "";
   margin: 0 0 15px;
 }
-.oneyForm_validation button {
+.oneyForm_validation button.oneyForm_close {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -1167,7 +1167,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   border: none;
   font-size: 15px;
   outline: none;
-  margin: 5px 0 0;
+  margin: 15px 0 0;
   cursor: pointer;
 }
 .oneyForm_validation-show {

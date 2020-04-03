@@ -27,7 +27,7 @@
             <p class="payplugAlert payplugAlert-warning">
                 <span>
                     {l s='You are able to perform only TEST transactions.' mod='payplug'} {l s='Please activate your account to perform LIVE transactions.' mod='payplug'}
-                    <a href="http://support.payplug.com/customer/portal/articles/1438899" target="_blank">{l s='More information' mod='payplug'}</a>
+                    <a href="{$faq_links.activation|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod='payplug'}</a>
                 </span>
             </p>
         </div>

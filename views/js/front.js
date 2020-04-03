@@ -418,7 +418,7 @@ var $document, $window, payplugModule = {
             close: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                payplugModule.form.reset();
+                payplugModule.oney.form.reset();
                 payplugModule.popup.close();
             },
             reset: function () {

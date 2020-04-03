@@ -28,7 +28,7 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Allow customers to spread out payments over 3 or 4 installments from %d € to %d €.' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}
-                <a class="payplugLink" href="{$faq_links['oney']|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
             <div class="payplugTips payplugTips-{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active}style="display: none;"{/if}>
@@ -83,9 +83,7 @@
                             {include file='./switch.tpl' switch=$payplug_switch.oney_optimized}
                             <p>
                                 <strong>{l s='Go further' mod='payplug'}</strong>
-                                {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration. Please follow our' mod='payplug'}
-                                <a class="payplugLink" href="{$faq_links['guide']|escape:'htmlall':'UTF-8'}" target="_blank"> {l s='personalisation guide' mod='payplug'} </a>
-                                {l s='if you are using other plug-ins or themes. ' mod='payplug'}
+                                {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration.' mod='payplug'}
                             </p>
                         </div>
                     </div>

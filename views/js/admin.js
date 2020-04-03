@@ -382,6 +382,7 @@ var $document, $window, payplug = {
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
                         payplug.tools.popup.error(result.error);
+                        payplug.tools.loader.hide($('.' + identifier));
                     }
                 }
             });

@@ -28,7 +28,7 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
-                <a class="payplugLink" href="http://support.payplug.com/customer/{$iso|escape:'htmlall':'UTF-8'}/portal/articles/2966107" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
 
             <div class="payplugTips payplugTips-{$payplug_switch.installment.name|escape:'htmlall':'UTF-8'}">
@@ -42,7 +42,7 @@
                     </p>
                     <p>
                         {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
-                        <a class="payplugLink" href="http://support.payplug.com/customer/{$iso|escape:'htmlall':'UTF-8'}/portal/articles/2966107" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                        <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                     </p>
 
                     <div class="payplugInstallment_fieldset payplugPanel">

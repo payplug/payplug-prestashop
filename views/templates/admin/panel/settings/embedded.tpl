@@ -31,11 +31,11 @@
             <div class="payplugTips payplugTips-{$payplug_switch.embedded.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.embedded.checked}style="display: none;"{/if}>
                     {l s='Payments are performed in an embeddable payment form.' mod='payplug'}<br>{l s='The customers will pay without being redirected.' mod='payplug'}
-                    <a class="payplugLink" href="http://support.payplug.com/customer/portal/articles/2563974" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                    <a class="payplugLink" href="{$faq_links.payment_page|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                 </div>
                 <div class="payplugTips_item payplugTips_item-right"{if $payplug_switch.embedded.checked}style="display: none;"{/if}>
                     {l s='The customers will be redirected to a PayPlug payment page to finalize the transaction.' mod='payplug'}
-                    <a class="payplugLink" href="http://support.payplug.com/customer/portal/articles/2018493" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                    <a class="payplugLink" href="{$faq_links.payment_page|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                 </div>
             </div>
         </div>
