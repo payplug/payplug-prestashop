@@ -21,9 +21,8 @@
 *}
 
 <p>{l s='You can refund your customer on his card from the Refund with Payplug section located on this page.' mod='payplug'}
-    <a href="http://support.payplug.com/customer/portal/articles/2563976"
-       target="_blank">{l s='More information' mod='payplug'}</a></p>
+    <a href="{$faq_links.refund|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod='payplug'}</a>
+</p>
 <div class="block-button">
-    <input type="button" class="popin-button center-button ppclose green-button"
-           value="{l s='Ok' mod='payplug'}">
+    <input type="button" class="popin-button center-button ppclose green-button" value="{l s='Ok' mod='payplug'}">
 </div>
