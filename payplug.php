@@ -3674,7 +3674,7 @@ class Payplug extends PaymentModule
      * @see Module::hookAdminOrder()
      *
      */
-    public function hookAdminOrder($params)
+    function hookAdminOrder($params)
     {
         if (!$this->active) {
             return;
@@ -3699,9 +3699,6 @@ class Payplug extends PaymentModule
         $pay_error = '';
         $amount_refunded_payplug = 0;
         $amount_available = 0;
-        $id_new_order_state = 0;
-        $id_pending_order_state = 0;
-        $pay_mode = '';
 
         $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
         $amount_refunded_presta = $this->getTotalRefunded($order->id);
@@ -3797,11 +3794,8 @@ class Payplug extends PaymentModule
             ));
 
             $sandbox = ((int)$installment->is_live == 1 ? false : true);
-            if ($sandbox) {
-                $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-            } else {
-                $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-            }
+            $state_addons = ($sandbox ? '' : '_TEST');
+            $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
             $this->updatePayplugInstallment($installment);
         } else {
@@ -3814,14 +3808,16 @@ class Payplug extends PaymentModule
                 }
             }
 
+            $sandbox = (bool)Configuration::get('PAYPLUG_SANDBOX_MODE');
+
             if (!$pay_id || empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
+                if ($sandbox) {
                     $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
                         $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
-                } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
+                } else {
                     $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
                         $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
@@ -3830,20 +3826,19 @@ class Payplug extends PaymentModule
                 }
             }
 
+            $this->updateOrderState($payment);
+
             $single_payment = $this->buildPaymentDetails($payment);
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
             $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
             $sandbox = ((int)$payment->is_live == 1 ? false : true);
+            $state_addons = ($sandbox ? '' : '_TEST');
 
-            if ($sandbox) {
-                $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST');
-            } else {
-                $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING');
-            }
+            $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
+            $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
+
             $current_state = (int)$order->getCurrentState();
 
             if ((int)$payment->is_paid == 0) {
@@ -3856,12 +3851,15 @@ class Payplug extends PaymentModule
                 if ($current_state != 0 && $current_state == $id_pending_order_state) {
                     $show_menu_update = true;
                 }
-            } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
+            }
+            elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
                 $display_refund = true;
-            } elseif ((int)$payment->is_refunded == 1) {
+            }
+            elseif ((int)$payment->is_refunded == 1) {
                 $show_menu_refunded = true;
                 $display_refund = false;
-            } else {
+            }
+            else {
                 $display_refund = true;
             }
 
@@ -3872,14 +3870,15 @@ class Payplug extends PaymentModule
                 $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
 
                 $this->html .= '
-                    <a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>
-                ';
+<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>
+';
             }
 
             $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
             if ((int)$payment->is_refunded == 1) {
                 $pay_status = $this->l('REFUNDED');
-            } elseif ((int)$payment->amount_refunded > 0) {
+            }
+            elseif ((int)$payment->amount_refunded > 0) {
                 $pay_status = $this->l('PARTIALLY REFUNDED');
             }
             $pay_amount = (int)$payment->amount / 100;
@@ -3897,130 +3896,8 @@ class Payplug extends PaymentModule
             } else {
                 $pay_card_mask = $this->l('Unavailable in test mode');
             }
-            {
-                if (!$pay_id = $this->isTransactionPending((int)$order->id_cart)) {
-                    $payments = $order->getOrderPaymentCollection();
-                    if (count($payments) > 1 || !isset($payments[0])) {
-                        return false;
-                    } else {
-                        $pay_id = $payments[0]->transaction_id;
-                    }
-                }
 
-                if (!$pay_id || empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                    if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                        if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                            return false;
-                        }
-                    } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
-                        \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                        if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
-                            \Payplug\Payplug::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                            return false;
-                        }
-                    }
-                }
-
-                $single_payment = $this->buildPaymentDetails($payment);
-                $amount_refunded_payplug = ($payment->amount_refunded) / 100;
-                $amount_available_payment = ($payment->amount - $payment->amount_refunded);
-                $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
-                $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
-                $sandbox = ((int)$payment->is_live == 1 ? false : true);
-
-                if ($sandbox) {
-                    $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                    $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST');
-                } else {
-                    $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                    $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING');
-                }
-                $current_state = (int)$order->getCurrentState();
-
-                if ((int)$payment->is_paid == 0) {
-                    if (isset($payment->failure) && isset($payment->failure->message)) {
-                        $pay_error = '(' . $payment->failure->message . ')';
-                    } else {
-                        $pay_error = '';
-                    }
-                    $display_refund = false;
-                    if ($current_state != 0 && $current_state == $id_pending_order_state) {
-                        $show_menu_update = true;
-                    }
-                } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
-                    $display_refund = true;
-                } elseif ((int)$payment->is_refunded == 1) {
-                    $show_menu_refunded = true;
-                    $display_refund = false;
-                } else {
-                    $display_refund = true;
-                }
-
-                $conf = (int)Tools::getValue('conf');
-                if (($conf == 30 || $conf == 31) && version_compare(_PS_VERSION_, '1.5', '>=')) {
-                    $show_popin = true;
-
-                    $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
-
-                    $this->html .= '
-                    <a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>
-                ';
-                }
-
-                $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
-                if ((int)$payment->is_refunded == 1) {
-                    $pay_status = $this->l('REFUNDED');
-                } elseif ((int)$payment->amount_refunded > 0) {
-                    $pay_status = $this->l('PARTIALLY REFUNDED');
-                }
-                $pay_amount = (int)$payment->amount / 100;
-                $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
-                if ($payment->card->brand != '') {
-                    $pay_brand = $payment->card->brand;
-                } else {
-                    $pay_brand = $this->l('Unavailable in test mode');
-                }
-                if ($payment->card->country != '') {
-                    $pay_brand .= ' ' . $this->l('Card') . ' (' . $payment->card->country . ')';
-                }
-                if ($payment->card->last4 != '') {
-                    $pay_card_mask = '**** **** **** ' . $payment->card->last4;
-                } else {
-                    $pay_card_mask = $this->l('Unavailable in test mode');
-                }
-
-                //Deferred payment does'nt display 3DS option before capture so we have to consider it null
-                if ($payment->is_3ds !== null) {
-                    $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
-                    $this->context->smarty->assign(array('pay_tds' => $pay_tds));
-                }
-
-                $pay_mode = $payment->is_live ? $this->l('LIVE') : $this->l('TEST');
-
-                if ($payment->card->exp_month === null) {
-                    $pay_card_date = $this->l('Unavailable in test mode');
-                } else {
-                    $pay_card_date = date('m/y',
-                        strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
-                }
-
-                $show_menu_payment = true;
-
-                $this->context->smarty->assign(array(
-                    'pay_id' => $pay_id,
-                    'pay_status' => $pay_status,
-                    'pay_amount' => $pay_amount,
-                    'pay_date' => $pay_date,
-                    'pay_brand' => $pay_brand,
-                    'pay_card_mask' => $pay_card_mask,
-                    'pay_card_date' => $pay_card_date,
-                    'pay_error' => $pay_error,
-                ));
-            }
-
-            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            // Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
                 $this->context->smarty->assign(array('pay_tds' => $pay_tds));
@@ -4030,7 +3907,8 @@ class Payplug extends PaymentModule
 
             if ($payment->card->exp_month === null) {
                 $pay_card_date = $this->l('Unavailable in test mode');
-            } else {
+            }
+            else {
                 $pay_card_date = date('m/y',
                     strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
             }
@@ -4047,6 +3925,12 @@ class Payplug extends PaymentModule
                 'pay_card_date' => $pay_card_date,
                 'pay_error' => $pay_error,
             ));
+
+//Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            if ($payment->is_3ds !== null) {
+                $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
+                $this->context->smarty->assign(array('pay_tds' => $pay_tds));
+            }
         }
 
         $currency = new Currency($id_currency);
@@ -4070,12 +3954,14 @@ class Payplug extends PaymentModule
                 'amount_suggested' => $amount_suggested,
                 'id_new_order_state' => $id_new_order_state,
             ));
-        } elseif ($show_menu_refunded) {
+        }
+        elseif ($show_menu_refunded) {
             $this->context->smarty->assign(array(
                 'amount_refunded_payplug' => $amount_refunded_payplug,
                 'currency' => $currency,
             ));
-        } elseif ($show_menu_update) {
+        }
+        elseif ($show_menu_update) {
             $this->context->smarty->assign(array(
                 'admin_ajax_url' => $admin_ajax_url,
                 'order' => $order,
@@ -4105,6 +3991,8 @@ class Payplug extends PaymentModule
         if ($show_popin && $display_refund) {
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
+
+
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
 
@@ -6617,6 +6505,48 @@ class Payplug extends PaymentModule
     public function uninstallTab()
     {
         return ($this->uninstallModuleTab('AdminPayPlug') && $this->uninstallModuleTab('AdminPayPlugInstallment'));
+    }
+
+    public function updateOrderState($payment)
+    {
+
+        if (!Validate::isLoadedObject($payment)) {
+            return false;
+        }
+
+        $id_cart = $payment->metadata['ID Cart'];
+        $order = Order::getByCartId($id_cart);
+
+        $state_addons = ($payment->is_live ? '' : '_TEST');
+        $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+        $oney_state = Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+        $cancelled_state = Configuration::get('PS_OS_CANCELED');
+
+        $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+        $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+                $oney_payment_methods);
+
+        if ($is_oney) {
+            if ($order->getCurrentState() == $oney_state && $payment->is_paid) {
+                $new_order_state = $paid_state;
+                $order_history = new OrderHistory();
+                $order_history->id_order = $order->id;
+                $order_history->changeIdOrderState($new_order_state, $order->id, true);
+                return $order_history->save();
+            } elseif (
+                $order->getCurrentState() == $oney_state
+                && isset($payment->failure)
+                && $payment->failure !== null
+            ) {
+                $new_order_state = $cancelled_state;
+                $order_history = new OrderHistory();
+                $order_history->id_order = $order->id;
+                $order_history->changeIdOrderState($new_order_state, $order->id, true);
+                return $order_history->save();
+            }
+        }
+
+        return true;
     }
 
     /**
