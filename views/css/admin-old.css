@@ -1,0 +1,980 @@
+/**
+ * 2013 - 2020 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2020 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+/* BEGIN Override bootstrap for old versions */
+
+#main {
+	background-color: #EFF1F2;
+}
+
+.separate_pipe {
+	color: #00ab7a;
+	margin: 0 0.5em;
+}
+
+.separate_margin_block {
+	margin-bottom: 20px;
+}
+
+#payplug_admin_form .switch {
+	display: block;
+	height: 2.2em;
+	position: relative;
+}
+
+#payplug_admin_form .fixed-width-lg {
+	width: 13.4em !important;
+}
+
+#payplug_admin_form .switch input {
+	position: absolute;
+	opacity: 0;
+}
+
+#payplug_admin_form .prestashop-switch input:checked+label {
+	color: #fff;
+}
+
+#payplug_admin_form .prestashop-switch label {
+	text-transform: uppercase;
+	color: #bbb;
+	font-weight: 400;
+	cursor: pointer;
+	-webkit-transition: color 0.2s ease-out;
+	-o-transition: color 0.2s ease-out;
+	transition: color 0.2s ease-out;
+}
+
+#payplug_admin_form .switch label {
+	position: relative;
+	z-index: 2;
+	width: 50%;
+	height: 100%;
+	margin: 0;
+	text-align: center;
+	float: left;
+}
+
+#payplug_admin_form .switch label, #payplug_admin_form .switch>span {
+	line-height: 2.2em;
+	vertical-align: middle;
+}
+
+#payplug_admin_form .prestashop-switch * {
+	outline: 0 !important;
+}
+
+#payplug_admin_form label {
+	display: inline-block;
+	max-width: 100%;
+	text-shadow: initial;
+}
+
+#payplug_admin_form .btn {
+	display: inline-block;
+	margin-bottom: 0;
+	font-weight: normal;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	white-space: nowrap;
+	padding: 6px 8px;
+	font-size: 12px;
+	line-height: 1.42857;
+	border-radius: 3px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#payplug_admin_form .switch a {
+	position: absolute;
+	top: 0;
+	padding: 0;
+	z-index: 1;
+	width: 50%;
+	height: 100%;
+	border: solid 1px #279CBB;
+	-webkit-box-shadow: "#1B7088" 0 -1px 0 inset;
+	box-shadow: "#1B7088" 0 -1px 0 inset;
+	display: block;
+	-webkit-transition: all 0.3s ease-out;
+	-o-transition: all 0.3s ease-out;
+	transition: all 0.3s ease-out;
+	background-color: #00ab7a;
+	border-color: #00ab7a;
+}
+
+#payplug_admin_form .prestashop-switch {
+	margin-top: 3px;
+	background-color: #eee;
+	border-radius: 3px;
+	color: #333;
+	text-align: center;
+	-webkit-box-shadow: rgba(0,0,0,0.15) 0 1px 4px 1px inset;
+	box-shadow: rgba(0,0,0,0.15) 0 1px 4px 1px inset;
+}
+
+#payplug_admin_form .prestashop-switch > span {
+	color: #666;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+/* END Override bootstrap for old versions */
+
+body {
+/*	background-color: #eff1f2;*/
+	font: 400 12px/1.42857 "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+label.switch-label {
+	padding: 0;
+}
+
+#content {
+	background-color: #eff1f2;
+}
+
+#payplug_admin_form *{
+	box-sizing: border-box;
+	font-size: 1em;
+	font-weight: normal;
+}
+
+#payplug_admin_form a{
+	color: #00ab7a;
+}
+
+#payplug_admin_form .hide {
+	display: none;
+}
+
+#payplug_admin_form .panel-row {
+	overflow: hidden;
+	height: auto;
+}
+
+#payplug_admin_form .panel-row > img{
+    /*margin: -0.2em 0 0 -0.4em;*/
+}
+
+#payplug_admin_form .panel-row > label{
+	text-align: right;
+	width: 25%;
+	font-weight: bold;
+	vertical-align: text-bottom;
+	float: left;
+	/*padding-top: 7px;*/
+}
+
+#payplug_admin_form label.left-block {
+	padding: 7px 0.5em 0 0;
+	color: #555555;
+}
+
+#payplug_admin_form .panel-row ul{
+	margin-bottom: 0;
+}
+
+#payplug_admin_form .panel-login .block-right {
+	width: 200px;
+}
+
+#payplug_admin_form .panel-login label {
+	vertical-align: middle;
+	margin: 0;
+}
+
+#payplug_admin_form .panel-login input {
+	width: 100%;
+	height: 31px;
+}
+
+#payplug_admin_form .block-right {
+	display: inline-block;
+	padding-left: 10px;
+	margin-bottom: 13px;
+}
+
+#payplug_admin_form .panel-login .center-block {
+	width: 200px;
+}
+#payplug_admin_form .center-block {
+	display: inline-block;
+	padding-left: 10px;
+	float: left;
+}
+
+#payplug_popin .panel-heading {
+	font-weight: bold;
+}
+
+#content.bootstrap #payplug_admin_form .panel-heading,
+#payplug_admin_form .panel-heading {
+	border: none;
+	font-size: 1.2em;
+	line-height: 2.2em;
+	height: 2.2em;
+	text-transform: uppercase;
+	border-bottom: solid 1px #eee;
+	margin: -1em 0em 19px -1em;
+	font-family: "Ubuntu Condensed",Helvetica,Arial,sans-serif;
+	font-weight: 400;
+}
+#payplug_admin_form .block-head {
+	color: #555555;
+}
+#payplug_admin_form .block-head,
+#payplug_admin_form .block-button,
+#payplug_popin .block-button {
+	border: none;
+	font-weight: bold;
+	line-height: 2.2em;
+	border-top: solid 1px #eee;
+	margin: 0;
+	padding: 15px 0 20px 0;
+}
+
+#payplug_admin_form .block-button,
+#payplug_popin .block-button {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+}
+
+#payplug_admin_form #submitSettings {
+	margin: 20px 0 0 0;
+}
+
+#payplug_admin_form .block-title {
+	font-size: 1.5em;
+}
+#payplug_admin_form .panel {
+	margin: 10px auto;
+	max-width: 1010px;
+}
+#payplug_admin_form .panel {
+	position: relative;
+	padding: 20px;
+	margin-bottom: 20px;
+	border: solid 1px #d3d8db;
+	background-color: #fff;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	float: none;
+}
+
+#payplug_admin_form fieldset {
+	background-color: #ffffff;
+	border: 0.1em solid #cccccc;
+	color: #585a69;
+	margin: 1em 0 0 0;
+	padding: 1em;
+}
+
+#payplug_admin_form legend {
+	color: #00ab7a;
+	background: none;
+	border: none;
+	font-weight: 700;
+	padding: 0;
+	margin: 0;
+	width: auto;
+	font-size: 1.3em;
+}
+
+#payplug_admin_form .ppwarning,
+#payplug_admin_form .pperror,
+#payplug_admin_form .ppsuccess{
+	width: auto;
+	margin: 0;
+}
+
+#payplug_admin_form .ppwarning{
+	background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
+	border-left: solid 3px #f7a000;
+	margin: 0 0 1em 0;
+	color: #d2a63c;
+	padding: 0.7em 3em;
+}
+
+#payplug_admin_form .interpanel {
+	max-width: 1010px;
+	margin: 10px auto 20px auto;
+	background: #ddfce8;
+	border-left: 3px solid #00ab7a;
+	color: #000000;
+	padding: 10px 0 10px 20px;
+}
+
+#payplug_admin_form .interpanel a{
+	color: #00ab7a;
+	text-decoration: underline;
+}
+
+#payplug_admin_form .interpanel a:hover,
+#payplug_admin_form .interpanel a:active,
+#payplug_admin_form .interpanel a:visited,
+#payplug_admin_form .interpanel a:focus{
+	color: #00ab7a;
+	text-decoration: none;
+}
+#content .module_confirmation {
+	max-width: 960px;
+	margin: 0 auto;
+}
+#content .bootstrap .module_confirmation {
+	max-width: 1010px;
+}
+#payplug_admin_form .ppwarn,
+#payplug_admin_form .pperror,
+#payplug_admin_form .ppsuccess{
+	border: none;
+	/*margin-left: 1.5em;*/
+	padding: 0 0 0 1.8em;
+	line-height: 1.6em;
+}
+
+#payplug_admin_form .pperror{
+	color: #dd2525;
+	background: url("../img/admin/icon-error.png") no-repeat center left;
+}
+
+#payplug_admin_form .ppsuccess{
+	color: #00ab7a;
+	background: url("../img/admin/icon-success.png") no-repeat center left;
+}
+#payplug_admin_form .ppwarn {
+	color: #d2a63c;
+	background: url("../img/admin/icon-warn.png") no-repeat center left;
+}
+#payplug_popin p.pperror {
+	color: #dd2525;
+	padding: 15px 0 0 0;
+}
+
+#payplug_admin_form input{
+	width: auto;
+	border-radius: 3px;
+	background: #f5f8f9;
+	border: 0.1em solid #cccccc;
+	margin: 0 auto;
+	display: block;
+}
+
+#payplug_admin_form input[type="submit"],
+#payplug_admin_form input.submit-btn {
+	background: #ffffff none repeat scroll 0 0;
+	border: 0.1em solid #cccccc;
+	border-radius: 0.25em;
+	color: #9c9c9c;
+	cursor: pointer;
+	display: block;
+	line-height: normal;
+	margin: 20px 0 0 0;
+	padding: 0.4em 0.5em;
+	text-transform: uppercase;
+	font-size: 12px;
+}
+
+#payplug_admin_form #disconnect-button {
+	background: #ffffff none repeat scroll 0 0;
+	border: none;
+	color: #00ab7a;
+	text-transform: initial;
+	width: initial;
+	margin: 0;
+	padding: 0;
+	display: inline;
+}
+
+#payplug_admin_form #disconnect-button:hover {
+	text-decoration: underline;
+}
+
+#payplug_admin_form input[type="checkbox"] {
+	margin: 1em 0 0 1.5em;
+	display: inline;
+	width: auto;
+}
+
+label.cb_label {
+	color: #9c9c9c;
+	font-weight: normal;
+}
+
+label.cb_label b{
+	font-weight: 700;
+}
+
+#payplug_admin_form input[type="submit"].green-button{
+	background: #00ab7a;
+	color: #ffffff;
+	border: none;
+	margin: 15px 0 20px 0;
+}
+
+#payplug_admin_form input[type="submit"].green-button:hover{
+	background: #49a482;
+}
+
+#payplug_admin_form input[type="submit"].ppdisabled,
+#payplug_admin_form input[type="submit"].ppdisabled:hover {
+	background: #cdcdcd;
+	border: 1px solid #b3b3b3;
+	color: #ffffff;
+}
+.ppsettings {
+	color: #777777;
+}
+a.forgot_pwd{
+	color: #aaaaaa;
+	display: block;
+	text-align: right;
+	margin-top: 5px;
+}
+
+p.pptips, table.pptips {
+	color: #777777;
+	display: block;
+	margin: 0 auto;
+	padding: 2px 0 0 243px;
+}
+p.pptips.desc,
+table.pptips.desc {
+	color: #555555;
+}
+#payplug_admin_form .pperror.pptips {
+	margin: 2px 0 0 243px;
+}
+
+p.pptips.login {
+	padding: 2px 0 0 0;
+}
+
+p.ppmode {
+	padding: 1em 1em 3em 1em;
+}
+
+p.pptips a {
+	color: #000000;
+}
+
+#payplug_admin_form .form-error input{
+	border-color: #dd2525;
+}
+
+#payplug_admin_form .form-ok input{
+	border-color: #00ab7a;
+}
+
+#payplug_admin_form .input-error {
+	color: #dd2525;
+	display: block;
+	margin-left: 0.5em;
+	position: absolute;
+	top: 0.5em;
+	width: 250px;
+	left: 100%;
+}
+/*
+#payplug_admin_form .panel-login .block-right .input-error {
+	width: 205px;
+}
+*/
+#payplug_admin_form .ppemail,
+#payplug_admin_form .pppassword{
+	margin: 0 auto 15px;
+	position: relative;
+}
+
+#payplug_admin_form .hide,
+#payplug_popin .hide{
+	display:none;
+}
+
+#payplug_admin_form .ppmailnotvalid {
+	color: #dd2525;
+	margin: 0 auto 1em auto;
+	text-align: center;
+	width: 14em;
+}
+
+#payplug_admin_form .ppconnected{
+	color: #000000;
+	display: block;
+	text-align: center;
+	width: 14em;
+	font-weight: 700;
+	margin-bottom: 0.3em;
+}
+
+#payplug_admin_form .ppmail{
+	color: #00ab7a;
+	display: block;
+	width: 14em;
+	font-weight: 700;
+	margin: 0 0 5px 0;
+}
+
+#payplug_admin_form div.ppconnectedbuttons {
+	display: table;
+	width: 200px;
+}
+
+#payplug_admin_form a.green-button{
+	background: #00ab7a;
+	color: #ffffff;
+	border: none;
+	padding: 0.4em 0.5em;
+	border-radius: 0.25em;
+	text-transform: uppercase;
+	float: left;
+	text-align: center;
+	width: 100%;
+	font-size: 12px;
+}
+
+a.green-button:hover,
+a.green-button:active,
+a.green-button:visited,
+a.green-button:focus{
+	text-decoration: none;
+}
+
+#payplug_admin_form  a.green-button:hover{
+	background: #49a482;
+}
+
+#payplug_admin_form .panel-login input[type="submit"].white-button{
+	float: left;
+}
+
+#payplug_admin_form .white-button:hover{
+	background: #ccc;
+	color: #ffffff;
+}
+span.ppclose {
+	position: absolute;
+	right: 11px;
+	top: 10px;
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+	opacity: 0.4;
+	filter: alpha(opacity=50);
+	text-transform: initial;
+	font-size: 14px;
+	line-height: 17px;
+}
+#payplug_popin {
+	background: #fff;
+	border: 1px solid rgba(0,0,0,0.2);
+	border-radius: 3px;
+	left: 50%;
+	margin-left: -163px;
+	position: fixed;
+	top: 50%;
+	width: 326px;
+	z-index: 3;
+	font-size: 12px;
+}
+
+/*
+#payplug_popin.confirm {
+	width: 420px;
+	margin-left: -210px;
+}
+*/
+
+#payplug_popin .status_bar {
+	border-bottom: 1px solid #e5e5e5;
+	border: none;
+	font-size: 12px;
+	border-bottom: solid 1px #eee;
+	padding: 10px 0 10px 20px;
+}
+
+#payplug_popin form {
+	padding: 20px 20px 15px 20px;
+	text-align: center;
+	overflow: hidden;
+}
+
+#payplug_popin p {
+	color: #000000;
+	padding: 0;
+	margin: 0;
+}
+#payplug_popin confirm .popin-button {
+	width: 120px;
+}
+#payplug_popin .popin-button {
+	min-width: 6.5em;
+	height: 2.5em;
+	border-radius: 0.25em;
+	border: 0.1em solid #bbbbbb;
+	display: inline-block;
+	cursor: pointer;
+	margin: 15px 0 0 0;
+	text-transform: uppercase;
+}
+#payplug_popin .white-button {
+	float: left;
+	background-color: #fff;
+	font-weight: normal;
+}
+#payplug_popin .green-button {
+	float: right;
+	color: #ffffff;
+	background: #00ab7a none repeat scroll 0 0;
+	font-weight: 700;
+}
+#payplug_popin .red-button {
+	float: right;
+	color: #ffffff;
+	background: #ff2400 none repeat scroll 0 0;
+	font-weight: 700;
+}
+#payplug_popin a.green-button {
+	height: auto;
+	text-decoration: none;
+	width: 145px;
+}
+#payplug_popin .center-button {
+	float: initial;
+}
+#payplug_popin input {
+	border: 0.1em solid #bbbbbb;
+	border-radius: 0;
+	display: block;
+	height: 2em;
+	margin: 0 auto;
+}
+
+#payplug_popin input[name=pwd] {
+	margin: 15px auto 20px;
+}
+
+#payplug_popin input.green-button:hover{
+	background: #49a482;
+}
+#payplug_popin input.red-button:hover {
+	background: #ff695e;
+}
+#payplug_popin input.white-button:hover{
+	background: #ccc;
+	color: #ffffff;
+}
+
+#payplug_popin a.green-button:hover,
+#payplug_popin a.green-button:active,
+#payplug_popin a.green-button:visited,
+#payplug_popin a.green-button:focus{
+	text-decoration: none;
+}
+
+.checkFieldset{
+	position: relative;
+}
+
+.checkFieldset .loader{
+	display: none;
+	left: 50%;
+	margin: -30px;
+	position: absolute;
+	top: 50%;
+	width: 30px;
+	height: 30px;
+	border-radius: 11px;
+	opacity: 1;
+	z-index: 9999;
+	background: none;
+}
+
+.panel-login .loader{
+	display: none;
+	width: 30px;
+	height: 30px;
+	border-radius: 11px;
+	opacity: 1;
+	z-index: 9999;
+	background: none;
+	margin: 16px 0px 0 10px;
+}
+
+/**** Switch ****/
+
+#payplug_admin_form .panel-show .switch,
+#payplug_admin_form .panel-oney .switch {
+	position: relative;
+	height: 1.7em;
+}
+#payplug_admin_form .panel-oney .switch {
+	margin-top: 6px;
+	margin-right: 6px;
+}
+#payplug_admin_form .panel-show .switch-show {
+	border-radius: 1em;
+	background: #dd2525;
+	width: 4em;
+}
+#payplug_admin_form .panel-oney .switch-oney-tos,
+#payplug_admin_form .panel-oney .switch-oney-optimized {
+	border-radius: 1em;
+	background: #bbbbbb;
+	width: 4em;
+}
+#payplug_admin_form .panel-show .switch-show ~ .switch-input:checked,
+#payplug_admin_form .panel-oney .switch-oney-tos ~ .switch-input:checked,
+#payplug_admin_form .panel-oney .switch-oney-optimized ~ .switch-input:checked {
+	background: #00ab7a;
+}
+
+#payplug_admin_form .panel-show .switch-label,
+#payplug_admin_form .panel-oney .switch-label {
+	position: relative;
+	z-index: 2;
+	float: left;
+	width: 50%;
+	height: 100%;
+	line-height: 1.6em;
+	color: #ffffff;
+	text-align: center;
+	cursor: pointer;
+	text-transform: uppercase;
+	padding: 0 0 0 0;
+}
+
+#payplug_admin_form .panel-show .switch-label:active,
+#payplug_admin_form .panel-oney .switch-label:active {
+	font-weight: bold;
+}
+
+#payplug_admin_form .panel-show .switch-label-off,
+#payplug_admin_form .panel-oney .switch-label-off {
+	padding-left: 0.5em;
+}
+
+#payplug_admin_form .panel-show .switch-label-on,
+#payplug_admin_form .panel-oney .switch-label-on {
+	padding-right: 0.5em;
+}
+
+#payplug_admin_form .panel-show input.switch-input,
+#payplug_admin_form .panel-oney input.switch-input {
+	display: none;
+}
+
+#payplug_admin_form .panel-show .switch-input:checked + .switch-label,
+#payplug_admin_form .panel-oney .switch-input:checked + .switch-label {
+	font-weight: bold;
+	color: #ffffff;
+	-webkit-transition: 0.15s ease-out;
+	-moz-transition: 0.15s ease-out;
+	-o-transition: 0.15s ease-out;
+	transition: 0.15s ease-out;
+}
+
+#payplug_admin_form .panel-show .switch-show .switch-input:checked + .switch-label-on ~ .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-tos .switch-input:checked + .switch-label-on ~ .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-optimized .switch-input:checked + .switch-label-on ~ .switch-selection {
+	left: 31px;
+}
+
+#payplug_admin_form .panel-show .switch-selection,
+#payplug_admin_form .panel-oney .switch-selection {
+	display: block;
+	position: absolute;
+	z-index: 1;
+	top: 0.2em;
+	left: 0.1em;
+	-webkit-transition: left 0.15s ease-out;
+	-moz-transition: left 0.15s ease-out;
+	-o-transition: left 0.15s ease-out;
+	transition: left 0.15s ease-out;
+}
+#payplug_admin_form .panel-show .switch-show .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-tos .switch-selection,
+#payplug_admin_form .panel-oney .switch-oney-optimized .switch-selection {
+	border-radius: 1em;
+	background: #ffffff;
+	height: 1.3em;
+	width: 1.3em;
+}
+
+#payplug_admin_form .switch input:disabled ~ a {
+	background-color: #cdcdcd;
+	border: 1px solid #b3b3b3;
+	box-shadow: 0 -1px 0 #b3b3b3 inset;
+}
+
+#payplug_admin_form .panela-show .switch-show.ppdisabled,
+#payplug_admin_form .panel-show .switch-show.ppdisabled.ppon,
+#payplug_admin_form .panela-oney .switch-oney-tos.ppdisabled,
+#payplug_admin_form .panel-oney .switch-oney-tos.ppdisabled.ppon,
+#payplug_admin_form .panela-oney .switch-oney-optimized.ppdisabled,
+#payplug_admin_form .panel-oney .switch-oney-optimized.ppdisabled.ppon {
+	background: #ffaaaa;
+}
+
+#payplug_admin_form .panel-show .switch-show.ppon,
+#payplug_admin_form .panel-oney .switch-oney-tos.ppon,
+#payplug_admin_form .panel-oney .switch-oney-optimized.ppon {
+	background: #00ab7a;
+}
+#payplug_admin_form .switch.switch-oney-tos,
+#payplug_admin_form .switch.switch-oney-optimized {
+	display: inline-block;
+}
+#payplug_admin_form .switch.switch-oney-optimized {
+	margin: 0 0 0 242px;
+}
+#payplug_admin_form span.oney-optimized {
+	max-width: calc(95% - 48px);
+	display: inline-block;
+}
+#payplug_admin_form span.oney-optimized strong {
+	font-weight: bold;
+}
+.ppoverlay {
+	background: #000000 none repeat scroll 0 0;
+	height: 100%;
+	left: 0;
+	opacity: 0.5;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 2;
+}
+
+#payplug_popin p.ppoc {
+	padding: 0 0 20px 0;
+}
+
+#payplug_popin ul {
+	padding: 20px 0 20px 0;
+	margin: 0;
+	text-align: left;
+	list-style: none;
+}
+
+.ppbold {
+	font-weight: bold;
+}
+.pphide {
+	display: none;
+}
+#payplug_admin_form .ppinline {
+	display: block;
+}
+
+#payplug_admin_form span.ppinline {
+	margin: 0 0 12px 0;
+}
+
+#payplug_admin_form .ppinline input {
+	display: inline;
+}
+
+#payplug_admin_form input.ppminamount {
+	width: 50px;
+}
+
+#payplug_admin_form  .ppinstallmentchecked input[type="radio"] {
+	margin: 0 0 0 40px;
+	vertical-align: text-bottom;
+}
+
+#payplug_admin_form #payplug_installment_min_amount {
+	width: 75px;
+}
+
+#installment_config_error,
+#oney_config_error,
+#deferred_config_error {
+	color: #dd2525;
+	padding: 0 0 0 10px;
+}
+
+#installment_config_warning {
+	color: #f7a000;
+	padding: 2px 0 0 243px;
+}
+#payplug_deferred_state {
+	width: 300px;
+	display: inline;
+}
+#payplug_admin_form #payplug_deferred_auto,
+#payplug_admin_form #payplug_oney_tos {
+	margin: 0;
+}
+label.vertical-top {
+	vertical-align: top;
+}
+.italic {
+	font-style: italic;
+}
+#payplug_admin_form .payplug_carrier_delay {
+	text-align: center;
+}
+#payplug_admin_form .payplug_carrier_delay input {
+	width: 50px;
+	display: inline-block;
+}
+#payplug_admin_form .oney_carrier {
+	display: none;
+}
+#payplug_admin_form .panel-row .pponeychecked {
+	margin: 0 0 16px;
+}
+#payplug_admin_form .panel-row .panel-oney {
+	display: flex;
+	align-items: start;
+	padding-bottom: 13px;
+	margin: 0;
+}
+#payplug_admin_form .panel-row .panel-oney .left-block {
+	padding: 0 6px 0 0;
+	line-height: 20px;
+	margin: 0;
+	font-weight: normal;
+	color: #777777;
+}
+#payplug_admin_form .panel-row .panel-oney .block-right {
+	width: 75%;
+	display: flex;
+	align-items: start;
+	padding: 0;
+	margin: 0;
+	line-height: 20px;
+}
+#payplug_admin_form .panel-row .panel-oney .block-right .switch {
+	width: 48px;
+	margin: 0 10px;
+}
+#payplug_admin_form .panel-row .panel-oney:nth-child(2) {
+	padding-top: 8px;
+}

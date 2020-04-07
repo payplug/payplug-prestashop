@@ -26,8 +26,14 @@
             <span class="pp_col2">{$payment.id|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
-    {if isset($payment.status)}
+    {if isset($payment.type)}
         <li>
+            <span class="pp_col1">{l s='Type' mod='payplug'} :</span>
+            <span class="pp_col2">{$payment.type|escape:'htmlall':'UTF-8'}</span>
+        </li>
+    {/if}
+    {if isset($payment.status)}
+        <li data-e2e-state_code="{$payment.status_code}">
             <span class="pp_col1">{l s='Status' mod='payplug'} :</span>
             <span class="pp_col2">
                 <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">{$payment.status|escape:'htmlall':'UTF-8'}</span>
