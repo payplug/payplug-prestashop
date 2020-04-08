@@ -86,7 +86,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     {
         $this->payplug = new Payplug();
         $this->notification->info('set configuration', '--', __LINE__);
-        $this->debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->debug = true; //(int)Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->getResource();
         $this->setLogger();
 

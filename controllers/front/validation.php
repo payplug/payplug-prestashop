@@ -110,7 +110,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         if ($this->debug) {
             require_once(dirname(__FILE__) . '/../../classes/MyLogPHP.class.php');
             $this->log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/validation-' . date("Y-m-d") . '.csv');
-            $this->log->info('---------------- NEW IPN RECEIVED ----------------');
+            $this->log->info('---------------- NEW VALIDATION RECEIVED ----------------');
         }
     }
 
@@ -162,9 +162,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $this->addLog('Current amount: ' . $amount, 'info');
                         $pay_id = false;
                         if (isset($installment->schedule)) {
-                            foreach ($installment->schedule as $k=>$schedule) {
+                            foreach ($installment->schedule as $k => $schedule) {
                                 $schedule_amount = (int)$schedule->amount;
-                                $this->addLog('Schedule n.'.$k.': ' . $schedule_amount, 'info');
+                                $this->addLog('Schedule n.' . $k . ': ' . $schedule_amount, 'info');
                                 $amount += $schedule_amount;
                                 $this->addLog('Current amount: ' . $amount, 'info');
                                 if ($pay_id) {
@@ -282,7 +282,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     } else {
                         $order_state = $inst_state;
                     }
-                } elseif ($is_paid) {
+                } elseif ($is_paid && true == false) {
                     $order_state = $paid_state;
                 } elseif ($is_oney) {
                     $order_state = $oney_state;
@@ -300,15 +300,16 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
                 $this->addLog('Order state will be :' . $order_state, 'info');
 
+                $transaction_id = null;
                 if ($this->type == 'payment') {
-                    $extra_vars = array(
-                        'transaction_id' => $payment->id
-                    );
+                    $transaction_id = $payment->id;
                 } elseif ($this->type == 'installment') {
-                    $extra_vars = array(
-                        'transaction_id' => $inst_id
-                    );
+                    $transaction_id = $inst_id;
                 }
+                $extra_vars = array(
+                    'transaction_id' => $transaction_id
+                );
+
                 /*
                  * For some reasons, secure key form cart can differ from secure key from customer
                  * Maybe due to migration or Prestashop's Update
@@ -411,6 +412,19 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $this->payplug->patchPayment($api_key, $payment->id, $data);
                     } elseif ($this->type == 'installment') {
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
+                    }
+
+                    //
+                    $order_payments = OrderPayment::getByOrderReference($order->reference);
+                    if ($order_payments) {
+                        foreach ($order_payments as $order_payment) {
+                            if (!$order_payment->transaction_id) {
+                                $order_payment->transaction_id = $transaction_id;
+                                $order_payment->update();
+                            }
+                        }
+                    } else {
+                        $order->addOrderPayment($order->total_paid, null, $transaction_id);
                     }
                 }
 
