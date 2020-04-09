@@ -282,7 +282,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     } else {
                         $order_state = $inst_state;
                     }
-                } elseif ($is_paid && true == false) {
+                } elseif ($is_paid) {
                     $order_state = $paid_state;
                 } elseif ($is_oney) {
                     $order_state = $oney_state;
@@ -415,16 +415,17 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
 
                     //
-                    $order_payments = OrderPayment::getByOrderReference($order->reference);
-                    if ($order_payments) {
-                        foreach ($order_payments as $order_payment) {
+                    if ($order_state == $oney_state) {
+                        $order_payments = OrderPayment::getByOrderReference($order->reference);
+                        if ($order_payments) {
+                            $order_payment = end($order_payments);
                             if (!$order_payment->transaction_id) {
                                 $order_payment->transaction_id = $transaction_id;
                                 $order_payment->update();
                             }
+                        } else {
+                            $order->addOrderPayment($order->total_paid, null, $transaction_id);
                         }
-                    } else {
-                        $order->addOrderPayment($order->total_paid, null, $transaction_id);
                     }
                 }
 
