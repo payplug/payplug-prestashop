@@ -4556,7 +4556,8 @@ class Payplug extends PaymentModule
             `id_cart` INT(11) UNSIGNED NOT NULL,
             `id_order` VARCHAR(100),
             `date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
-            `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'
+            `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
+            CONSTRAINT lock_cart_unique UNIQUE (id_cart)
             ) ENGINE=' . _MYSQL_ENGINE_;
         $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 

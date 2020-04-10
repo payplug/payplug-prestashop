@@ -41,5 +41,23 @@ function upgrade_module_2_27_0($object)
         $flag = false;
     }
 
+    // Update payplug lock table
+    $sql_requests = array(
+        'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
+    );
+
+    try {
+        foreach ($sql_requests as $sql_request) {
+            $request = Db::getInstance()->execute($sql_request);
+            if (!$request) {
+                $log->error('Fail to execute request: ' . $request);
+                $flag = false;
+            }
+        }
+    } catch (PrestaShopDatabaseException $e) {
+        $log->error('Fail to execute requests');
+        $flag = false;
+    }
+
     return $flag;
 }
