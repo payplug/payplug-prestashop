@@ -2119,7 +2119,7 @@ class Payplug extends PaymentModule
             'install' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021389891',
             'installments' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022447972',
             'one_click' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022213892',
-            'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360009549540',
+            'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360013071080',
             'payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142312',
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',

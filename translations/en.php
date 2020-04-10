@@ -148,5 +148,5 @@ $_MODULE['<{payplug}prestashop>confirmation_8ea82c5f8b4825d683f2fc0202ccdb14'] =
 $_MODULE['<{payplug}prestashop>confirmation_eae9c553a9ba6b913ec08183247bd58a'] = 'Reference : ';
 $_MODULE['<{payplug}prestashop>confirmation_b632d5925615d201370e7bbffa2ed5d7'] = 'Total amount : ';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Saved cards';
-$_MODULE['<{payplug}prestashop>schedule_42e70b576ae1a435fdfaf7ac632c4236'] = 'Installment n%d:';
-$_MODULE['<{payplug}prestashop>payment_detail_42e70b576ae1a435fdfaf7ac632c4236'] = 'Installment n%d:';
+$_MODULE['<{payplug}prestashop>schedule_42e70b576ae1a435fdfaf7ac632c4236'] = 'Installment n %d:';
+$_MODULE['<{payplug}prestashop>payment_detail_42e70b576ae1a435fdfaf7ac632c4236'] = 'Installment n %d:';
