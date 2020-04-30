@@ -295,6 +295,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
                     $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
                     $error_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons);
+                    $cancelled_state = (int)Configuration::get('PS_OS_CANCELED');
                     /*
                     * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
                     * We keep this $inst_state to give more readability.
@@ -347,6 +348,73 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     $exception->getCode()
                                 );
                                 die(json_encode($response));
+                            }
+
+                            $is_oney = false;
+                            if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
+                                switch ($payment->payment_method['type']) {
+                                    case 'oney_x3_with_fees':
+                                    case 'oney_x4_with_fees':
+                                        $is_oney = true;
+                                        break;
+                                    default:
+                                        $is_oney = false;
+                                }
+                            }
+                            // if it's a refused oney payment, we switch to payment_error status
+                            if ($is_oney && isset($payment->failure) && $payment->failure !== null && $current_state != $cancelled_state) {
+                                $this->addLog('The payment is refused by Oney.');
+                                $new_order_state = $error_state;
+
+                                $order_history = new OrderHistory();
+                                $order_history->id_order = (int)$order_id;
+                                try {
+                                    $order_history->changeIdOrderState((int)$new_order_state, $order_id);
+                                    $order_history->save();
+                                } catch (Exception $exception) {
+                                    $this->notification->error($exception->getMessage(), '--', __LINE__);
+                                    $this->addLog(
+                                        'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                                    $this->addLog(
+                                        'Please check if order state ' . (int)$new_order_state . ' exists.',
+                                        'error');
+                                    $response = array(
+                                        'exception' => $exception->getMessage(),
+                                    );
+                                    header(
+                                        $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                                        true,
+                                        $exception->getCode()
+                                    );
+                                    die(json_encode($response));
+                                }
+
+                                $order->current_state = $order_history->id_order_state;
+                                try {
+                                    $order->update();
+                                } catch (Exception $exception) {
+                                    $this->notification->error($exception->getMessage(), '--', __LINE__);
+                                    $this->addLog(
+                                        'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                                    $response = array(
+                                        'exception' => $exception->getMessage(),
+                                    );
+                                    header(
+                                        $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                                        true,
+                                        $exception->getCode()
+                                    );
+                                    die(json_encode($response));
+                                }
+                                echo $this->addLog('Order updated.');
+                                $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                                if (!$cart_unlock) {
+                                    $this->addLog('Lock cannot be deleted.', 'error');
+                                } else {
+                                    $this->addLog('Lock deleted.', 'debug');
+                                }
+                                header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
+                                die;
                             }
 
                             // if payment is deferred and expired
