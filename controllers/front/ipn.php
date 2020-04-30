@@ -230,6 +230,18 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $this->addLog('Is Live: ' . (int)$payment->is_live, 'debug');
             $this->addLog('Amount: ' . (int)$payment->amount, 'debug');
 
+            $is_oney = false;
+            if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
+                switch ($payment->payment_method['type']) {
+                    case 'oney_x3_with_fees':
+                    case 'oney_x4_with_fees':
+                        $is_oney = true;
+                        break;
+                    default:
+                        $is_oney = false;
+                }
+            }
+
             //Payment treatment
             try {
                 $cart = new Cart((int)$meta['ID Cart']);
@@ -350,17 +362,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 die(json_encode($response));
                             }
 
-                            $is_oney = false;
-                            if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
-                                switch ($payment->payment_method['type']) {
-                                    case 'oney_x3_with_fees':
-                                    case 'oney_x4_with_fees':
-                                        $is_oney = true;
-                                        break;
-                                    default:
-                                        $is_oney = false;
-                                }
-                            }
                             // if it's a refused oney payment, we switch to payment_error status
                             if ($is_oney && isset($payment->failure) && $payment->failure !== null && $current_state != $cancelled_state) {
                                 $this->addLog('The payment is refused by Oney.');
@@ -655,17 +656,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         }
 
                         $amount = 0;
-                        $is_oney = false;
-                        if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
-                            switch ($payment->payment_method['type']) {
-                                case 'oney_x3_with_fees':
-                                case 'oney_x4_with_fees':
-                                    $is_oney = true;
-                                    break;
-                                default:
-                                    $is_oney = false;
-                            }
-                        }
 
                         if ($payment->installment_plan_id != null) {
                             $installment = new PPPaymentInstallment($this->resource->installment_plan_id);
