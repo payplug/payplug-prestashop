@@ -363,7 +363,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                             // if it's a refused oney payment, we switch to payment_error status
-                            if ($is_oney && isset($payment->failure) && $payment->failure !== null && $current_state != $cancelled_state) {
+                            if ($is_oney
+                                && isset($payment->failure)
+                                && $payment->failure !== null
+                                && !in_array($current_state, array($cancelled_state, $paid_state))
+                            ) {
                                 $this->addLog('The payment is refused by Oney.');
                                 $new_order_state = $error_state;
 
