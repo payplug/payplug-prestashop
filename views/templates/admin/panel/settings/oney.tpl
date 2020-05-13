@@ -36,7 +36,10 @@
                     <div class="payplugOney">
                         <div class="payplugPanel_section">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_cgv}
-                            <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}</p>
+                            <p>
+                                {l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}
+                                <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_f9ffbbdb-e5f2-487f-a709-854eb852e480" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                            </p>
                         </div>
                         {if isset($carriers) && !empty($carriers)}
                             <div class="payplugPanel_section">
@@ -84,6 +87,7 @@
                             <p>
                                 <strong>{l s='Go further' mod='payplug'}</strong>
                                 {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration.' mod='payplug'}
+                                <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                             </p>
                         </div>
                     </div>
