@@ -72,18 +72,6 @@ class PayplugLock extends ObjectModel
     );
 
     /**
-     * @see ObjectModel::__construct()
-     *
-     * @param int $id
-     * @param int $id_lang
-     * @return PayplugLock
-     */
-    public function __construct($id = null, $id_lang = null)
-    {
-        parent::__construct($id, $id_lang);
-    }
-
-    /**
      * get fields
      *
      * @return array
@@ -220,13 +208,19 @@ class PayplugLock extends ObjectModel
     //TODO: check multishop si cart_id identiques ou uniques
     public static function createLockG2($id_cart, $process_print = 'none')
     {
-        $req_lock = '
-            INSERT INTO '._DB_PREFIX_.'payplug_lock (              
-                id_cart,
-                id_order,
-                date_add,
-                date_upd
-            )
+        // check if has lock
+        $lock_exists = self::existsLockG2($id_cart);
+        if ($lock_exists) {
+            $lifetime = new DateInterval('PT2M');
+            $date_limit = new DateTime('now');
+            $date_limit->sub($lifetime);
+            $date_add = new DateTime($lock_exists['date_add']);
+            if ($date_limit > $date_add) {
+                self::deleteLockG2($id_cart);
+            }
+        }
+
+        $req_lock = 'INSERT INTO '._DB_PREFIX_.'payplug_lock (id_cart,id_order,date_add,date_upd)
             VALUE (
                 '.(int)$id_cart.',
                 IFNULL(
