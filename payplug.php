@@ -3794,7 +3794,7 @@ class Payplug extends PaymentModule
             ));
 
             $sandbox = ((int)$installment->is_live == 1 ? false : true);
-            $state_addons = ($sandbox ? '' : '_TEST');
+            $state_addons = ($sandbox ? '_TEST' : '');
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
             $this->updatePayplugInstallment($installment);
@@ -3834,7 +3834,7 @@ class Payplug extends PaymentModule
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
             $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
             $sandbox = ((int)$payment->is_live == 1 ? false : true);
-            $state_addons = ($sandbox ? '' : '_TEST');
+            $state_addons = ($sandbox ? '_TEST' : '');
 
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
             $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
@@ -4556,7 +4556,8 @@ class Payplug extends PaymentModule
             `id_cart` INT(11) UNSIGNED NOT NULL,
             `id_order` VARCHAR(100),
             `date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
-            `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'
+            `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
+            CONSTRAINT lock_cart_unique UNIQUE (id_cart)
             ) ENGINE=' . _MYSQL_ENGINE_;
         $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 
@@ -5681,12 +5682,8 @@ class Payplug extends PaymentModule
                 $amount_refunded_payplug = (float)($amount_refunded_payplug / 100);
                 if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
                     $new_state = (int)Tools::getValue('id_state');
-                    if ($new_state == 0) {
-                        if ($installment->is_live == 1) {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                        } else {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                        }
+                    if (!$new_state) {
+                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . ($installment->is_live ? '' : '_TEST'));
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
@@ -5702,14 +5699,9 @@ class Payplug extends PaymentModule
                 }
             } else {
                 $payment = $this->retrievePayment($refund->payment_id);
-                if ((int)Tools::getValue('id_state') != 0) {
-                    $new_state = (int)Tools::getValue('id_state');
-                } elseif ($payment->is_refunded == 1) {
-                    if ($payment->is_live == 1) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                    } else {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                    }
+                $new_state = (int)Tools::getValue('id_state');
+                if (!$new_state && $payment->is_refunded) {
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . ($payment->is_live ? '' : '_TEST'));
                 }
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
