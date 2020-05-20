@@ -3851,15 +3851,12 @@ class Payplug extends PaymentModule
                 if ($current_state != 0 && $current_state == $id_pending_order_state) {
                     $show_menu_update = true;
                 }
-            }
-            elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
+            } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
                 $display_refund = true;
-            }
-            elseif ((int)$payment->is_refunded == 1) {
+            } elseif ((int)$payment->is_refunded == 1) {
                 $show_menu_refunded = true;
                 $display_refund = false;
-            }
-            else {
+            } else {
                 $display_refund = true;
             }
 
@@ -3877,8 +3874,7 @@ class Payplug extends PaymentModule
             $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
             if ((int)$payment->is_refunded == 1) {
                 $pay_status = $this->l('REFUNDED');
-            }
-            elseif ((int)$payment->amount_refunded > 0) {
+            } elseif ((int)$payment->amount_refunded > 0) {
                 $pay_status = $this->l('PARTIALLY REFUNDED');
             }
             $pay_amount = (int)$payment->amount / 100;
@@ -3907,8 +3903,7 @@ class Payplug extends PaymentModule
 
             if ($payment->card->exp_month === null) {
                 $pay_card_date = $this->l('Unavailable in test mode');
-            }
-            else {
+            } else {
                 $pay_card_date = date('m/y',
                     strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
             }
@@ -3954,14 +3949,12 @@ class Payplug extends PaymentModule
                 'amount_suggested' => $amount_suggested,
                 'id_new_order_state' => $id_new_order_state,
             ));
-        }
-        elseif ($show_menu_refunded) {
+        } elseif ($show_menu_refunded) {
             $this->context->smarty->assign(array(
                 'amount_refunded_payplug' => $amount_refunded_payplug,
                 'currency' => $currency,
             ));
-        }
-        elseif ($show_menu_update) {
+        } elseif ($show_menu_update) {
             $this->context->smarty->assign(array(
                 'admin_ajax_url' => $admin_ajax_url,
                 'order' => $order,
@@ -4938,8 +4931,10 @@ class Payplug extends PaymentModule
             return array(
                 'result' => false,
                 'error' => $this->l('The cart is unvalid'),
-                'error_type' => 'invalid_carrier',
+                'error_type' => 'invalid_cart',
             );
+        } elseif ($cart->isVirtualCart()) {
+            return array('result' => true, 'error' => false);
         }
 
         $invalid_carrier_type = array('storepickup', 'networkpickup');
