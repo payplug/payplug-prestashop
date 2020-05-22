@@ -3692,6 +3692,7 @@ class Payplug extends PaymentModule
 
         $show_popin = false;
         $display_refund = false;
+        $refund_delay_oney = false;
         $show_menu_refunded = false;
         $show_menu_update = false;
         $show_menu_installment = false;
@@ -3827,6 +3828,25 @@ class Payplug extends PaymentModule
             }
 
             $this->updateOrderState($payment);
+
+
+            $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+            $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+                    $oney_payment_methods);
+
+            if ($is_oney) {
+                $refund_delay_oney = true;
+                $refund_list = \Payplug\Refund::listRefunds($payment);
+                $lastest_operation = 0;
+                if (!empty($refund_list)) {
+                    $lastest_operation = end($refund_list)->created_at;
+                } elseif ($payment->is_paid) {
+                    $lastest_operation = $payment->paid_at;
+                }
+                if (time() > ($lastest_operation + 172800)) {
+                    $refund_delay_oney = false;
+                }
+            }
 
             $single_payment = $this->buildPaymentDetails($payment);
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
@@ -3967,6 +3987,7 @@ class Payplug extends PaymentModule
             'admin_ajax_url' => $admin_ajax_url,
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
+            'refund_delay_oney' => $refund_delay_oney,
             'show_menu_payment' => $show_menu_payment,
             'show_menu_refunded' => $show_menu_refunded,
             'show_menu_update' => $show_menu_update,
