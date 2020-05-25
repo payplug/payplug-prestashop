@@ -40,5 +40,12 @@
         <label for="change_order_state">{l s='Change Prestashop order state to "Refunded"' mod='payplug'}</label>
         <input class="control-label" type="checkbox" value="{$id_new_order_state|escape:'htmlall':'UTF-8'}" name="change_order_state" >
     </div>
-    {include file='./button_with_loader.tpl' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
+    <div class="form-group">
+        {if $refund_delay_oney}
+            <input class="btn green-button button" type="submit" name="submitPPRefund" value="{l s='Refund' mod='payplug'}" disabled />
+            <p class="oney_delay">{l s='The refund will be possible 48h after the last payment or refund transaction.' mod='payplug'}</p>
+        {else}
+            {include file='./button_with_loader.tpl' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
+        {/if}
+    </div>
 </form>

@@ -20,636 +20,665 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-#pppanel .pp_list{
-	padding: 0 0 10px 0;
+#pppanel .pp_list {
+    padding: 0 0 10px 0;
 }
 
-#pppanel label{
-	float: none;
+#pppanel label {
+    float: none;
 }
 
-#pppanel .btn{
-	margin: 0 0 0 100px;
-	display: block;
-	float: left;
+#pppanel .btn {
+    margin: 0 0 0 100px;
+    display: block;
+    float: left;
 }
 
-#pppanel .btn.open_installment_information{
-	margin: 0;
+#pppanel .btn.open_installment_information {
+    margin: 0;
 }
 
-#pppanel input[type="submit"].green-button.button{
-	margin-top: 20px;
+#pppanel input[type="submit"].green-button.button {
+    margin-top: 20px;
 }
 
-#pppanel input[type="submit"].green-button.abort-button{
-	margin-top: 0;
+#pppanel input[type="submit"].green-button.abort-button {
+    margin-top: 0;
 }
 
-#pppanel input[type="submit"].green-button{
-	background: #00ab7a;
-	color: #ffffff;
-	border: none;
-	/*margin: 15px 0 20px 0;*/
-	text-transform: uppercase;
-	font-weight: bold;
-	margin: 0 0 0 60px;
-	width: 150px;
-	height: 27px;
+#pppanel input[type="submit"].green-button {
+    background: #00ab7a;
+    color: #ffffff;
+    border: none;
+    /*margin: 15px 0 20px 0;*/
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0 0 0 60px;
+    width: 150px;
+    height: 27px;
 }
 
-#pppanel input[type="submit"].green-button.abort-button.btn[disabled]{
-	cursor: not-allowed;
-	pointer-events: none;
-	opacity: 0.65;
-	filter: alpha(opacity=65);
-	-webkit-box-shadow: none;
-	box-shadow: none;
+#pppanel input[type="submit"].green-button.abort-button.btn[disabled] {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
-#pppanel input[type="submit"].green-button:hover{
-	background: #49a482;
+#pppanel input[type="submit"].green-button:hover {
+    background: #49a482;
 }
 
-#pppanel form{
-	position: relative;
-	overflow: hidden;
-	min-height: 62px;
+#pppanel form {
+    position: relative;
+    overflow: hidden;
+    min-height: 62px;
 }
 
 #pppanel img.loader {
-	display: none;
-	width: 30px;
-	height: 30px;
-	border-radius: 11px;
-	opacity: 1;
-	z-index: 9999;
-	left: 50%;
-	margin: -30px;
-	position: absolute;
-	top: 50%;
-	background: none;
+    display: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 11px;
+    opacity: 1;
+    z-index: 9999;
+    left: 50%;
+    margin: -30px;
+    position: absolute;
+    top: 50%;
+    background: none;
 }
 
 #pppanel .table-responsive.half-width {
-	max-width: 50%;
+    max-width: 50%;
 }
 
 #pppanel .table-responsive td.actions {
-	width: 100px;
+    width: 100px;
 }
 
 #pppanel .table-responsive .open_payment_information {
-	margin: 0;
+    margin: 0;
 }
 
 #pppanel table {
-	margin: 0 0 15px 0;
+    margin: 0 0 15px 0;
 }
 
-.pp_admin_ajax_url{
-	display: none;
+.pp_admin_ajax_url {
+    display: none;
 }
 
 #payplug_popin {
-	background: #fff;
-	border: 1px solid rgba(0,0,0,0.2);
-	border-radius: 3px;
-	left: 50%;
-	margin-left: -10em;
-	position: fixed;
-	top: 50%;
-	width: 326px;
-	z-index: 101;
-	font-size: 12px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    left: 50%;
+    margin-left: -10em;
+    position: fixed;
+    top: 50%;
+    width: 326px;
+    z-index: 101;
+    font-size: 12px;
 }
 
 #payplug_popin .status_bar {
-	border-bottom: 1px solid #e5e5e5;
-	border: none;
-	font-size: 12px;
-	border-bottom: solid 1px #eee;
-	padding: 10px 0 10px 20px;
+    border-bottom: 1px solid #e5e5e5;
+    border: none;
+    font-size: 12px;
+    border-bottom: solid 1px #eee;
+    padding: 10px 0 10px 20px;
 }
 
 span.ppclose {
-	position: absolute;
-	right: 11px;
-	top: 10px;
-	color: #000;
-	text-decoration: none;
-	cursor: pointer;
-	opacity: 0.4;
-	filter: alpha(opacity=50);
-	text-transform: initial;
-	font-size: 14px;
+    position: absolute;
+    right: 11px;
+    top: 10px;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: 0.4;
+    filter: alpha(opacity=50);
+    text-transform: initial;
+    font-size: 14px;
 }
 
 #payplug_popin form {
-	padding: 20px 20px 15px 20px;
-	text-align: center;
-	overflow: hidden;
+    padding: 20px 20px 15px 20px;
+    text-align: center;
+    overflow: hidden;
 }
 
 #payplug_popin p {
-	color: #000000;
-	padding: 0 0 20px 0;
-	margin: 0;
+    color: #000000;
+    padding: 0 0 20px 0;
+    margin: 0;
 }
 
 #payplug_popin input {
-	border: 0.1em solid #bbbbbb;
-	border-radius: 0;
-	display: block;
-	height: 2em;
-	margin: 0 auto;
+    border: 0.1em solid #bbbbbb;
+    border-radius: 0;
+    display: block;
+    height: 2em;
+    margin: 0 auto;
 }
 
 #payplug_popin input[name=pwd] {
-	margin: 15px auto 20px;
+    margin: 15px auto 20px;
 }
 
 #payplug_popin .popin-button {
-	width: 6.5em;
-	height: 2.5em;
-	border-radius: 0.25em;
-	border: 0.1em solid #bbbbbb;
-	display: inline-block;
-	cursor: pointer;
-	margin: 15px 0 0 0;
-	text-transform: uppercase;
+    width: 6.5em;
+    height: 2.5em;
+    border-radius: 0.25em;
+    border: 0.1em solid #bbbbbb;
+    display: inline-block;
+    cursor: pointer;
+    margin: 15px 0 0 0;
+    text-transform: uppercase;
 }
 
 #payplug_popin .popin-button.no-width {
-	width: auto;
+    width: auto;
 }
 
 #payplug_popin .white-button {
-	float: left;
-	background-color: #fff;
-	font-weight: normal;
+    float: left;
+    background-color: #fff;
+    font-weight: normal;
 }
 
 #payplug_popin .green-button {
-	float: right;
-	color: #ffffff;
-	background: #00ab7a none repeat scroll 0 0;
-	font-weight: 700;
+    float: right;
+    color: #ffffff;
+    background: #00ab7a none repeat scroll 0 0;
+    font-weight: 700;
 }
 
-#payplug_popin input.green-button:hover{
-	background: #49a482;
+#payplug_popin input.green-button:hover {
+    background: #49a482;
 }
-#payplug_popin input.white-button:hover{
-	background: #ccc;
-	color: #ffffff;
+
+#payplug_popin input.white-button:hover {
+    background: #ccc;
+    color: #ffffff;
 }
 
 
 #payplug_popin a.green-button {
-	display: block;
-	height: auto;
-	margin: 0 auto;
-	padding: 1em 1em 1em 1em;
-	text-align: center;
-	text-decoration: none;
-	text-transform: uppercase;
-	width: 11em;
+    display: block;
+    height: auto;
+    margin: 0 auto;
+    padding: 1em 1em 1em 1em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 11em;
 }
 
 #payplug_popin .center-button {
-	float: initial;
+    float: initial;
 }
 
 #payplug_popin a.green-button:hover,
 #payplug_popin a.green-button:active,
 #payplug_popin a.green-button:visited,
-#payplug_popin a.green-button:focus{
-	text-decoration: none;
+#payplug_popin a.green-button:focus {
+    text-decoration: none;
 }
 
 #payplug_popin .block-button {
-	border: none;
-	font-weight: bold;
-	line-height: 2.2em;
-	border-top: solid 1px #eee;
-	margin: 0;
-	padding: 15px 0 20px 0;
+    border: none;
+    font-weight: bold;
+    line-height: 2.2em;
+    border-top: solid 1px #eee;
+    margin: 0;
+    padding: 15px 0 20px 0;
 }
 
 #payplug_popin .block-button {
-	padding: 0 0 0 0;
-	margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
 }
 
 .ppoverlay {
-	background: #000000 none repeat scroll 0 0;
-	height: 100%;
-	left: 0;
-	opacity: 0.5;
-	position: fixed;
-	top: 0;
-	width: 100%;
-	z-index: 100;
+    background: #000000 none repeat scroll 0 0;
+    height: 100%;
+    left: 0;
+    opacity: 0.5;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
 }
 
 #payplug_popin p.ppoc {
-	padding: 0 0 20px 0;
+    padding: 0 0 20px 0;
 }
 
 #payplug_popin p {
-	text-align: left;
+    text-align: left;
 }
 
 #payplug_popin a {
-	color: #00ab7a;
+    color: #00ab7a;
 }
 
 #payplug_popin ul {
-	padding: 20px 0 20px 0;
-	margin: 0;
-	text-align: left;
-	list-style: none;
+    padding: 20px 0 20px 0;
+    margin: 0;
+    text-align: left;
+    list-style: none;
 }
 
 .ppbold {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 #payplug_popin .panel-heading {
-	font-weight: bold;
-	text-align: left;
+    font-weight: bold;
+    text-align: left;
 }
 
 #pppanel img.logo {
-	width: 79px;
-	height: 28px;
-	margin: 0 0 15px 0;
+    width: 79px;
+    height: 28px;
+    margin: 0 0 15px 0;
 }
 
 #pppanel .form-group {
-	overflow: hidden;
+    overflow: hidden;
 }
 
 #pppanel.panel-1-6 .form-group input,
 #pppanel.panel-1-6 .form-group label {
-	float: left;
-	/*padding: 0;*/
-	margin: 0;
+    float: left;
+    /*padding: 0;*/
+    margin: 0;
 }
 
 #pppanel.panel-1-6 input[name=pp_amount2refund] {
-	width: 100px;
+    width: 100px;
 }
 
 #pppanel.panel-1-6 label[for=pp_amount2refund] {
-	padding: 5px 10px 0 0;
+    padding: 5px 10px 0 0;
 }
 
 #pppanel label[for=change_order_state] {
-	clear: both;
-	font-weight: normal;
+    clear: both;
+    font-weight: normal;
 }
 
 #pppanel.panel-1-6 label[for=change_order_state] {
-	clear: both;
-	padding: 12px 0 0 0;
+    clear: both;
+    padding: 12px 0 0 0;
 }
 
 #pppanel.panel-1-6 input[name=change_order_state] {
-	margin: 12px 0 0 10px;
-	/*margin: 12px 0 0 63px;*/
+    margin: 12px 0 0 10px;
+    /*margin: 12px 0 0 63px;*/
 }
 
 #pppanel .pperror {
-	color: #dd2525;
-	padding: 26px 0 0 10px;
-	float: left;
-	margin: 0;
+    color: #dd2525;
+    padding: 26px 0 0 10px;
+    float: left;
+    margin: 0;
 }
 
 #pppanel.panel-1-6 .pperror {
-	padding: 5px 0 0 10px;
+    padding: 5px 0 0 10px;
 }
 
 #pppanel .ppsuccess {
-	color: #00ab7a;
-	padding: 26px 0 0 10px;
-	float: left;
-	margin: 0;
+    color: #00ab7a;
+    padding: 26px 0 0 10px;
+    float: left;
+    margin: 0;
 }
 
 #pppanel.panel-1-6 .ppsuccess {
-	padding: 5px 0 0 10px;
+    padding: 5px 0 0 10px;
 }
 
 #pppanel p.refunded_amount {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 #formAddPayment table td:nth-child(3) {
-	overflow: hidden;
-	max-width: 10px;
+    overflow: hidden;
+    max-width: 10px;
 }
 
 #pppanel ul li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 #pppanel .ppred {
-	color: #dd2525;
+    color: #dd2525;
 }
 
 #pppanel hr {
-	-moz-border-bottom-colors: none;
-	-moz-border-left-colors: none;
-	-moz-border-right-colors: none;
-	-moz-border-top-colors: none;
-	border-color: #ddd -moz-use-text-color -moz-use-text-color;
-	border-image: none;
-	border-style: solid none none;
-	border-width: 1px 0 0;
-	margin-bottom: 17px;
-	margin-top: 17px;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: #ddd -moz-use-text-color -moz-use-text-color;
+    border-image: none;
+    border-style: solid none none;
+    border-width: 1px 0 0;
+    margin-bottom: 17px;
+    margin-top: 17px;
 }
 
 #pppanel .pp_fixed_height {
-	height: 38px;
+    height: 38px;
 }
 
 #pppanel td.pp_success {
-	color: #00ab7a;
-	font-weight: bold;
+    color: #00ab7a;
+    font-weight: bold;
 }
 
 #pppanel td.pp_error {
-	color: #dd2525;
-	font-weight: bold;
+    color: #dd2525;
+    font-weight: bold;
 }
 
 .pp_inst_status {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 #pppanel .ppwarning {
-	width: auto;
-	margin: 0;
+    width: auto;
+    margin: 0;
 }
 
 #pppanel .ppwarning {
-	background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
-	border-left: solid 3px #f7a000;
-	margin: 0 0 1em 0;
-	color: #d2a63c;
-	padding: 0.7em 3em;
+    background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
+    border-left: solid 3px #f7a000;
+    margin: 0 0 1em 0;
+    color: #d2a63c;
+    padding: 0.7em 3em;
 }
 
 /*
 * Payment Details
 */
 .pp_payment_details {
-	padding: 0;
-	display: flex;
-	flex-direction: column;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
+
 .pp_payment_details li {
-	display: flex;
-	flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
 
 .pp_payment_details .pp_col1,
 .pp_payment_detail .pp_col2 {
-	display: flex;
+    display: flex;
 }
 
 .pp_payment_details .pp_col1 {
-	color: #000000;
-	font-weight: bold;
-	width: 215px;
-	justify-content: flex-end;
+    color: #000000;
+    font-weight: bold;
+    width: 215px;
+    justify-content: flex-end;
 }
 
 .pp_payment_details .pp_col2 {
-	flex-direction: column;
-	width: calc(100% - 215px);
-	padding: 0 0 0 10px;
+    flex-direction: column;
+    width: calc(100% - 215px);
+    padding: 0 0 0 10px;
 }
-.pp_payment_details .pp_col2 span{
-	display: block;
+
+.pp_payment_details .pp_col2 span {
+    display: block;
 }
 
 #pppanel .pp_success {
-	color: #00ab7a;
-	font-weight: bold;
+    color: #00ab7a;
+    font-weight: bold;
 }
 
 #pppanel .pp_warning {
-	color: #ff8d34;
-	font-weight: bold;
+    color: #ff8d34;
+    font-weight: bold;
 }
 
 #pppanel .pp_error {
-	color: #dd2525;
-	font-weight: bold;
+    color: #dd2525;
+    font-weight: bold;
 }
 
 #pppanel.panel-1-6 .ppaction.pperror, #pppanel.panel-1-6 .ppaction.ppsuccess {
-	padding: 25px 0 0 10px;
+    padding: 25px 0 0 10px;
 }
 
-
+#pppanel .oney_delay {
+    clear: both;
+    padding: 8px 0 0;
+}
 
 
 .payplugPopup {
-	-webkit-transform: translate(-50%, -50%);
-	-moz-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	-o-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	-webkit-transition: opacity 0.4s;
-	-moz-transition: opacity 0.4s;
-	-ms-transition: opacity 0.4s;
-	-o-transition: opacity 0.4s;
-	transition: opacity 0.4s;
-	opacity: 0;
-	position: fixed;
-	display: none;
-	top: 50%;
-	left: 50%;
-	max-width: 80vw;
-	z-index: 5004;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    -webkit-transition: opacity 0.4s;
+    -moz-transition: opacity 0.4s;
+    -ms-transition: opacity 0.4s;
+    -o-transition: opacity 0.4s;
+    transition: opacity 0.4s;
+    opacity: 0;
+    position: fixed;
+    display: none;
+    top: 50%;
+    left: 50%;
+    max-width: 80vw;
+    z-index: 5004;
 }
+
 .payplugPopup:before {
-	-webkit-transform: translate(-50%, -50%);
-	-moz-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	-o-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	content: "";
-	background: rgba(0, 0, 0, 0.2);
-	width: 100vw;
-	height: 100vh;
-	z-index: -1;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: "";
+    background: rgba(0, 0, 0, 0.2);
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
 }
+
 .payplugPopup_content {
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-	z-index: 1;
-	background: #fff;
-	max-height: 80vh;
-	overflow-y: auto;
-	padding: 0;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    z-index: 1;
+    background: #fff;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 0;
 }
+
 .payplugPopup_close {
-	z-index: 1;
-	display: block;
-	position: absolute;
-	top: 3px;
-	right: 3px;
-	width: 30px;
-	height: 30px;
-	line-height: 24px;
-	text-indent: 24px;
-	background: none;
-	border: none;
-	overflow: hidden;
-	padding: 0;
-	cursor: pointer;
+    z-index: 1;
+    display: block;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 30px;
+    height: 30px;
+    line-height: 24px;
+    text-indent: 24px;
+    background: none;
+    border: none;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
 }
+
 .payplugPopup_close:focus {
-	outline: 0;
+    outline: 0;
 }
+
 .payplugPopup_close:before,
 .payplugPopup_close:after {
-	display: block;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 50%;
-	height: 2px;
-	content: "";
-	background: #303030;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 2px;
+    content: "";
+    background: #303030;
 }
+
 .payplugPopup_close:before {
-	-webkit-transform: translate(-50%, -50%) rotate(45deg);
-	-moz-transform: translate(-50%, -50%) rotate(45deg);
-	-ms-transform: translate(-50%, -50%) rotate(45deg);
-	-o-transform: translate(-50%, -50%) rotate(45deg);
-	transform: translate(-50%, -50%) rotate(45deg);
+    -webkit-transform: translate(-50%, -50%) rotate(45deg);
+    -moz-transform: translate(-50%, -50%) rotate(45deg);
+    -ms-transform: translate(-50%, -50%) rotate(45deg);
+    -o-transform: translate(-50%, -50%) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg);
 }
+
 .payplugPopup_close:after {
-	-webkit-transform: translate(-50%, -50%) rotate(-45deg);
-	-moz-transform: translate(-50%, -50%) rotate(-45deg);
-	-ms-transform: translate(-50%, -50%) rotate(-45deg);
-	-o-transform: translate(-50%, -50%) rotate(-45deg);
-	transform: translate(-50%, -50%) rotate(-45deg);
+    -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+    -moz-transform: translate(-50%, -50%) rotate(-45deg);
+    -ms-transform: translate(-50%, -50%) rotate(-45deg);
+    -o-transform: translate(-50%, -50%) rotate(-45deg);
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
+
 .payplugPopup-open {
-	display: block;
+    display: block;
 }
+
 .payplugPopup-show {
-	opacity: 1;
+    opacity: 1;
 }
+
 .payplugPopup_heading {
-	border-bottom: 1px solid #e6e6e6;
-	padding: 10px 20px;
-	font-weight: 700;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px 20px;
+    font-weight: 700;
 }
+
 .payplugPopup_row {
-	text-align: center;
-	padding: 20px 20px 15px;
+    text-align: center;
+    padding: 20px 20px 15px;
 }
+
 .payplugPopup_row ul {
-	padding: 20px 0;
-	margin: 0;
-	text-align: left;
-	list-style: none;
+    padding: 20px 0;
+    margin: 0;
+    text-align: left;
+    list-style: none;
 }
+
 .payplugPopup_row input[type=email],
 .payplugPopup_row input[type=password],
 .payplugPopup_row input[type=search],
 .payplugPopup_row input[type=tel],
 .payplugPopup_row input[type=text] {
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-	border: 1px solid #ccc;
-	max-width: 100%;
-	background: transparent;
-	margin: 0;
-	display: inline-block;
-	height: 22px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    max-width: 100%;
+    background: transparent;
+    margin: 0;
+    display: inline-block;
+    height: 22px;
 }
+
 .payplugPopup_row input[type=email]:focus,
 .payplugPopup_row input[type=password]:focus,
 .payplugPopup_row input[type=search]:focus,
 .payplugPopup_row input[type=tel]:focus,
 .payplugPopup_row input[type=text]:focus {
-	background: transparent;
+    background: transparent;
 }
+
 .payplugPopup_error {
-	margin: 0 0 8px;
-	color: #e56876;
+    margin: 0 0 8px;
+    color: #e56876;
 }
+
 .payplugPopup_footer {
-	border-top: 1px solid #e6e6e6;
-	padding: 15px 0 0;
-	display: flex;
-	justify-content: space-between;
+    border-top: 1px solid #e6e6e6;
+    padding: 15px 0 0;
+    display: flex;
+    justify-content: space-between;
 }
+
 .payplugPopup_footer-center {
-	justify-content: center;
+    justify-content: center;
 }
+
 @media (max-width: 767px) {
-	.payplugPopup {
-		max-width: 98vw;
-	}
-	.payplugPopup_content {
-		max-height: 98vh;
-	}
+    .payplugPopup {
+        max-width: 98vw;
+    }
+
+    .payplugPopup_content {
+        max-height: 98vh;
+    }
 }
 
 .payplugButton {
-	border: 1px solid #cccccc;
-	-webkit-border-radius: 0.25em;
-	-moz-border-radius: 0.25em;
-	border-radius: 0.25em;
-	-webkit-transition: all 0.4s;
-	-moz-transition: all 0.4s;
-	-ms-transition: all 0.4s;
-	-o-transition: all 0.4s;
-	transition: all 0.4s;
-	background: transparent;
-	cursor: pointer;
-	margin: 0;
-	text-align: center;
-	padding: 0.4em 0.5em;
-	text-transform: uppercase;
-	font-size: 12px;
-	outline: none;
-	min-width: 6.5em;
+    border: 1px solid #cccccc;
+    -webkit-border-radius: 0.25em;
+    -moz-border-radius: 0.25em;
+    border-radius: 0.25em;
+    -webkit-transition: all 0.4s;
+    -moz-transition: all 0.4s;
+    -ms-transition: all 0.4s;
+    -o-transition: all 0.4s;
+    transition: all 0.4s;
+    background: transparent;
+    cursor: pointer;
+    margin: 0;
+    text-align: center;
+    padding: 0.4em 0.5em;
+    text-transform: uppercase;
+    font-size: 12px;
+    outline: none;
+    min-width: 6.5em;
 }
+
 .payplugButton-green {
-	border-color: #00ab7a;
-	background: #00ab7a;
-	color: #fff;
+    border-color: #00ab7a;
+    background: #00ab7a;
+    color: #fff;
 }
+
 .payplugButton-green:hover {
-	border-color: #009268;
-	background: #009268;
-	color: #fff;
+    border-color: #009268;
+    background: #009268;
+    color: #fff;
 }
+
 .payplugButton-disabled,
 .payplugButton-disabled:hover {
-	border-color: #b2b2b2;
-	background: #b2b2b2;
-	color: #fff;
-	cursor: default;
+    border-color: #b2b2b2;
+    background: #b2b2b2;
+    color: #fff;
+    cursor: default;
 }
+
 .panel-footer .payplugButton {
-	margin: 10px 0 0;
+    margin: 10px 0 0;
 }

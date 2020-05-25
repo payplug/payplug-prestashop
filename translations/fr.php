@@ -89,7 +89,7 @@ $_MODULE['<{payplug}prestashop>payplug_16bfbf9c462762cf1cba4134ec53c504'] = 'Cha
 $_MODULE['<{payplug}prestashop>payplug_22d545ded224c1e3f0f821e99f01ed09'] = 'Le montant total de votre commande doit être compris entre %s et %s pour payer avec Oney.';
 $_MODULE['<{payplug}prestashop>payplug_0f3e17b27426f0c030c3a3a7f461cf7b'] = 'Le panier n\'est pas valide';
 $_MODULE['<{payplug}prestashop>payplug_e181052b07a91a4cacd05dd1a2db223f'] = 'Le transporteur';
-$_MODULE['<{payplug}prestashop>payplug_14cc547f9ee50676a9c87658e812bab9'] = 'n\'est pas compatible avec cette méthode de paiement.';
+$_MODULE['<{payplug}prestashop>payplug_14cc547f9ee50676a9c87658e812bab9'] = 'n\'est pas compatible avec cette méthode de paiement. ';
 $_MODULE['<{payplug}prestashop>payplug_4055a85829a5c48b45b8ed088d8deefa'] = 'Merci de changer de méthode de livraison.';
 $_MODULE['<{payplug}prestashop>payplug_36d6d089e7939f0e387e7ad3c914bd1c'] = 'Retrait en Point Relais';
 $_MODULE['<{payplug}prestashop>payplug_147720874246c41f77c71059a9e5cc80'] = 'Retrait en magasin';
@@ -151,6 +151,7 @@ $_MODULE['<{payplug}prestashop>admin_order_refund_4bf290898e0226ffb1041cd114347e
 $_MODULE['<{payplug}prestashop>admin_order_refund_554cd9e547629109b77e4c60ddd44da3'] = 'Montant à rembourser';
 $_MODULE['<{payplug}prestashop>admin_order_refund_de0585357d47ceb0dbbe92118bcf2a64'] = 'Changer le statut de commande de Prestashop à \"Remboursé\"';
 $_MODULE['<{payplug}prestashop>admin_order_refund_76f0ed934de85cc7131910b32ede7714'] = 'Rembourser';
+$_MODULE['<{payplug}prestashop>admin_order_refund_3e220cc8128d7b270226d79b84ebce33'] = 'Le remboursement sera possible 48h après la dernière opération de paiement ou de remboursement.';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Montant déjà remboursé avec Payplug :';
 $_MODULE['<{payplug}prestashop>admin_order_refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Montant disponible pour effectuer un remboursement avec Payplug :';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_96f4b8e98e77cb6409c71ef3b166da19'] = 'Désinstaller  la configuration';
