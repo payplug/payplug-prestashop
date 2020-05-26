@@ -1392,6 +1392,11 @@ class Payplug extends PaymentModule
         }
 
         try {
+            //load libphonenumber
+            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
+                include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
+            }
+
             $iso_code = $this->getIsoCodeByCountryId($country->id);
             $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
