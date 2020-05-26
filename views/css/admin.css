@@ -320,6 +320,9 @@ button.payplugLink:hover {
   font-weight: 700;
   text-align: right;
 }
+.payplugInstallment_fieldset .payplugPanel_label {
+  width: 185px;
+}
 .payplugPanel_content {
   display: flex;
   flex-wrap: wrap;

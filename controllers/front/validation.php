@@ -89,7 +89,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
     private function setConfig()
     {
         $this->payplug = new Payplug();
-        $this->debug = true; // (int)Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->type = 'payment';
         $this->setLogger();
 
