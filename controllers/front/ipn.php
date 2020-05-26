@@ -253,6 +253,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 header($_SERVER['SERVER_PROTOCOL'] . ' 500 The cart cannot be loaded.', true, 500);
                 die;
             } else {
+                $this->setContextFromCartID($cart->id);
+
                 try {
                     $address = new Address((int)$cart->id_address_invoice);
                 } catch (Exception $exception) {
@@ -920,5 +922,20 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         $this->addLog('Active : ' . (int)$this->resource->is_active);
         header($_SERVER['SERVER_PROTOCOL'] . ' 200 installment resource receive.', true, 200);
         die();
+    }
+
+    /**
+     * @param $id_cart
+     */
+    protected function setContextFromCartID($id_cart) {
+        Context::getContext()->cart = new Cart((int) $id_cart);
+        $address = new Address((int) Context::getContext()->cart->id_address_invoice);
+        Context::getContext()->country = new Country((int) $address->id_country);
+        Context::getContext()->customer = new Customer((int) Context::getContext()->cart->id_customer);
+        Context::getContext()->language = new Language((int) Context::getContext()->cart->id_lang);
+        Context::getContext()->currency = new Currency((int) Context::getContext()->cart->id_currency);
+        if (isset(Context::getContext()->cart->id_shop)) {
+            Context::getContext()->shop = new Shop(Context::getContext()->cart->id_shop);
+        }
     }
 }
