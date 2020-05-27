@@ -65,9 +65,12 @@ function callRefund() {
         data: data,
         beforeSend: function() {
             $('#pppanel .loader').show();
+            $('input[name=submitPPRefund]').prop("disabled", true);
         },
         complete: function(){
             $('#pppanel .loader').hide();
+            $('input[name=submitPPRefund]').prop("disabled", false);
+
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to refund. ' +
@@ -77,6 +80,7 @@ function callRefund() {
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
+            $('input[name=submitPPRefund]').prop("disabled", false);
         },
         success: function(result)
         {
@@ -94,6 +98,7 @@ function callRefund() {
                 if (result.reload) {
                     location.reload();
                 }
+                $('input[name=pp_amount2refund]').val('');
             }
         }
     });
