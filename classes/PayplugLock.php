@@ -234,7 +234,13 @@ class PayplugLock extends ObjectModel
                 \''.date('Y-m-d H:i:s').'\',
                 \''.date('Y-m-d H:i:s').'\'
             )';
-        $res_lock = Db::getInstance()->execute($req_lock);
+
+        // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
+        try {
+            $res_lock = Db::getInstance()->execute($req_lock);
+        } catch (Exception $e) {
+            $res_lock = false;
+        }
         if (!$res_lock) {
             return false;
         } else {
