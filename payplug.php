@@ -4075,6 +4075,11 @@ class Payplug extends PaymentModule
         if (!$this->active) {
             return;
         }
+        $action = Tools::getValue('action');
+        if ($action == 'quickview'){
+            return false;
+        }
+
         if (Configuration::get('PAYPLUG_SHOW') == 0) {
             return;
         }
