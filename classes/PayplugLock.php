@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2019 PayPlug SAS
+ * 2013 - 2020 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2019 PayPlug SAS
+ *  @copyright 2013 - 2020 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -234,7 +234,13 @@ class PayplugLock extends ObjectModel
                 \''.date('Y-m-d H:i:s').'\',
                 \''.date('Y-m-d H:i:s').'\'
             )';
-        $res_lock = Db::getInstance()->execute($req_lock);
+
+        // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
+        try {
+            $res_lock = Db::getInstance()->execute($req_lock);
+        } catch (Exception $e) {
+            $res_lock = false;
+        }
         if (!$res_lock) {
             return false;
         } else {
