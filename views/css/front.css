@@ -957,6 +957,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   text-align: center;
   color: #7ebd00;
   margin: 0 0 15px;
+  cursor: pointer;
 }
 .oneyForm_close:focus {
   outline: 0;
