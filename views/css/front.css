@@ -1096,6 +1096,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   font-size: 15px;
   margin: 16px 0 8px;
   outline: none;
+  cursor: pointer;
 }
 .oneyForm_message {
   text-align: center;
