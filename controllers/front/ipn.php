@@ -180,8 +180,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         $this->addLog('Payment ID: ' . $this->resource->id);
         $this->addLog('Paid (Resource): ' . (int)$this->resource->is_paid);
 
-
-
         try {
             $payment = $this->payplug->retrievePayment($this->resource->id);
         } catch (ConfigurationNotSetException $exception) {
@@ -221,8 +219,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             }
             $this->addLog('Payment details:');
 
-            if ($this->resource->installment_plan_id != null) {
-                $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
+            if ($payment->installment_plan_id != null) {
+                $installment = $this->payplug->retrieveInstallment($payment->installment_plan_id);
                 $meta = $installment->metadata;
             } else {
                 $meta = $payment->metadata;
@@ -299,6 +297,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
                     $paid_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
                     $error_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons);
+                    $cancelled_state = (int)Configuration::get('PS_OS_CANCELED');
                     /*
                     * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
                     * We keep this $inst_state to give more readability.
@@ -408,7 +407,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                                 die;
-                            } elseif ($current_state == $pending_state || $current_state == $auth_state) {
+                            }
+                            elseif (in_array($current_state, array($pending_state, $auth_state))) {
                                 $this->addLog('Order is currently pending.');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
                                 $is_amount_correct = false;
@@ -517,7 +517,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                                 die;
-                            } elseif ($current_state == $paid_state) {
+                            }
+                            elseif ($current_state == $paid_state) {
                                 echo $this->addLog('Order is already paid.');
                                 $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                                 if (!$cart_unlock) {
@@ -527,7 +528,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order is already paid.', true, 200);
                                 die;
-                            } elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
+                            }
+                            elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
                                 $this->addLog('Order is currently pending for installment.',
                                     'info');
                                 $this->addLog('Payment amount: ' . $payment->amount, 'debug');
@@ -541,7 +543,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     die;
                                 }
                                 $this->payplug->updatePayplugInstallment($installment);
-                            } elseif ($current_state == $refund_state) {
+                            }
+                            elseif ($current_state == $refund_state) {
                                 echo $this->addLog('Order has been refunded.');
                                 $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                                 if (!$cart_unlock) {
@@ -551,7 +554,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order has been refunded.', true, 200);
                                 die;
-                            } else {
+                            }
+                            else {
                                 echo $this->addLog(
                                     'Current state: ' . (int)$current_state,
                                     'debug'
@@ -578,7 +582,13 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     } else {
                         $this->addLog('CREATE MODE');
 
-                        if ($this->resource->installment_plan_id != null) {
+                        if (isset($payment->failure) && $payment->failure !== null) {
+                            echo $this->addLog('The payment has failed.');
+                            header($_SERVER['SERVER_PROTOCOL'] . ' 200 No treatment because payment has failed.', true, 200);
+                            die;
+                        }
+
+                        if ($payment->installment_plan_id != null) {
                             $installment = new PPPaymentInstallment($this->resource->installment_plan_id);
                             $first_payment = $installment->getFirstPayment();
                             if ($first_payment->isDeferred()) {
@@ -590,7 +600,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 'transaction_id' => $this->resource->installment_plan_id
                             );
                         } else {
-                            if ($deferred) {
+                            //We can't treat Oney pending IPN anymore because it's sent with no reason
+                            if ($deferred && !$payment->is_paid) {
                                 $order_state = $auth_state;
                             } else {
                                 $order_state = $paid_state;
