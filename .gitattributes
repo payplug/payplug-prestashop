@@ -3,3 +3,6 @@
 .gitignore export-ignore
 .gitlab-ci.yml export-ignore
 README.rst export-ignore
+views/css/less export-ignore
+views/css/*.less export-ignore
+views/css/*.map export-ignore
