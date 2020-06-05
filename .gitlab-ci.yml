@@ -1,0 +1,14 @@
+stages:
+  - build
+
+build zip release:
+  image: ubuntu:16.04
+  stage: build
+  before_script:
+    - apt-get -y -qq update
+    - apt-get -y -qq install git zip
+  script:
+    - git archive --format=zip --output=payplug_$CI_COMMIT_REF_NAME.zip --prefix=payplug/ HEAD
+  artifacts:
+    paths:
+      - payplug_$CI_COMMIT_REF_NAME.zip
