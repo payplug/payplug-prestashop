@@ -219,16 +219,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             }
             $this->addLog('Payment details:');
 
-            if ($payment->installment_plan_id != null) {
-                $installment = $this->payplug->retrieveInstallment($payment->installment_plan_id);
-                $meta = $installment->metadata;
-            } else {
-                $meta = $payment->metadata;
-            }
-
-            $this->addLog('Cart ID: ' . (int)$meta['ID Cart'], 'debug');
-            $this->addLog('Is Live: ' . (int)$payment->is_live, 'debug');
-            $this->addLog('Amount: ' . (int)$payment->amount, 'debug');
 
             $is_oney = false;
             if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
@@ -241,6 +231,44 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         $is_oney = false;
                 }
             }
+
+            if ($payment->installment_plan_id != null) {
+                $installment = $this->payplug->retrieveInstallment($payment->installment_plan_id);
+                $meta = $installment->metadata;
+
+                $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
+                $id_cart = Db::getInstance()->getValue($sql);
+
+                if (!$id_cart) {
+                    $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->installment_plan_id;
+                    $this->logger->addLog($error_msg,'error');
+                    header($_SERVER['SERVER_PROTOCOL'] . ' ' . $error_msg,
+                        true,
+                        ($is_oney ? 242 : 500)
+                    );
+                    die($error_msg);
+                }
+            } else {
+                $meta = $payment->metadata;
+
+                $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` WHERE `id_payment` = "' . $this->resource->id . '"';
+                $id_cart = Db::getInstance()->getValue($sql);
+
+                if (!$id_cart) {
+                    $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
+                    $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
+                    $this->logger->addLog($error_msg,'error');
+                    header($_SERVER['SERVER_PROTOCOL'] . ' ' . $error_msg,
+                        true,
+                        ($is_oney ? 242 : 500)
+                    );
+                    die($error_msg);
+                }
+            }
+
+            $this->addLog('Cart ID: ' . (int)$meta['ID Cart'], 'debug');
+            $this->addLog('Is Live: ' . (int)$payment->is_live, 'debug');
+            $this->addLog('Amount: ' . (int)$payment->amount, 'debug');
 
             //Payment treatment
             try {
