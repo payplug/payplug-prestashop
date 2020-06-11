@@ -232,25 +232,23 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 }
             }
 
-            if ($payment->installment_plan_id != null) {
-                $installment = $this->payplug->retrieveInstallment($payment->installment_plan_id);
+            if ($this->resource->installment_plan_id != null) {
+                $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
                 $meta = $installment->metadata;
-
                 $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
                 $id_cart = Db::getInstance()->getValue($sql);
 
                 if (!$id_cart) {
                     $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->installment_plan_id;
                     $this->logger->addLog($error_msg,'error');
-                    header($_SERVER['SERVER_PROTOCOL'] . ' ' . $error_msg,
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 500 ' . $error_msg,
                         true,
-                        ($is_oney ? 242 : 500)
+                        500
                     );
                     die($error_msg);
                 }
             } else {
                 $meta = $payment->metadata;
-
                 $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` WHERE `id_payment` = "' . $this->resource->id . '"';
                 $id_cart = Db::getInstance()->getValue($sql);
 
@@ -258,10 +256,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
                     $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
                     $this->logger->addLog($error_msg,'error');
-                    header($_SERVER['SERVER_PROTOCOL'] . ' ' . $error_msg,
-                        true,
-                        ($is_oney ? 242 : 500)
-                    );
+                    //HOTFIX: MR331 We use custom http code to precisely log this case of desync between real payment notification and wrong ones.
+                    $response_code = ($is_oney ? 242 : 500);
+                    header($_SERVER['SERVER_PROTOCOL'] . ' ' . $response_code . ' '. $error_msg, true, $response_code);
                     die($error_msg);
                 }
             }
