@@ -731,7 +731,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             true, 200);
                                         die;
                                     } else {
-                                        $order_payment = end($order->getOrderPayments());
+                                        $orderPayments = $order->getOrderPayments();
+                                        $orderPayments = $orderPayments ? $orderPayments : [];
+                                        $order_payment = end($orderPayments);
                                         $order_payment->transaction_id = $extra_vars['transaction_id'];
                                         try {
                                             $order_payment->update();
