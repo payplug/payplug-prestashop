@@ -240,7 +240,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                 if (!$id_cart) {
                     $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->installment_plan_id;
-                    $this->logger->addLog($error_msg,'error');
+                    $this->addLog($error_msg,'error');
                     header($_SERVER['SERVER_PROTOCOL'] . ' 500 ' . $error_msg,
                         true,
                         500
@@ -254,8 +254,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                 if (!$id_cart) {
                     $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-                    $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
-                    $this->logger->addLog($error_msg,'error');
+                    $this->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
+                    $this->addLog($error_msg,'error');
                     //HOTFIX: MR331 We use custom http code to precisely log this case of desync between real payment notification and wrong ones.
                     $response_code = ($is_oney ? 242 : 500);
                     header($_SERVER['SERVER_PROTOCOL'] . ' ' . $response_code . ' '. $error_msg, true, $response_code);
