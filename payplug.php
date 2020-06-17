@@ -3350,23 +3350,19 @@ class Payplug extends PaymentModule
      */
     public function install()
     {
-        $this->logger->addLog('Starting to install');
         $this->log_install->info('Starting to install.');
         $report = $this->checkRequirements();
         if (!$report['php']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
             $this->log_install->error('Install failed: PHP Requirement.');
-            $this->logger->addLog('Install failed: PHP Requirement.', 'error');
         }
         if (!$report['curl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
             $this->log_install->error('Install failed: cURL Requirement.');
-            $this->logger->addLog('Install failed: cURL Requirement.', 'error');
         }
         if (!$report['openssl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
             $this->log_install->error('Install failed: OpenSSL Requirement.');
-            $this->logger->addLog('Install failed: OpenSSL Requirement.', 'error');
         }
 
         if (Shop::isFeatureActive()) {
@@ -3382,31 +3378,23 @@ class Payplug extends PaymentModule
             !$this->registerHook('customerAccount')
         ) {
             $this->log_install->error('Install failed: classics hooks.');
-            $this->logger->addLog('Install failed: classics hooks.', 'error');
         } elseif (!$this->registerHook('paymentOptions')) {
             $this->log_install->error('Install failed: hook paymentOptions.');
-            $this->logger->addLog('Install failed: hook paymentOptions.', 'error');
         } elseif (!$this->registerHook('registerGDPRConsent') ||
             !$this->registerHook('actionDeleteGDPRCustomer') ||
             !$this->registerHook('actionExportGDPRData')
         ) {
             $this->log_install->error('Install failed: hooks GDPR.');
-            $this->logger->addLog('Install failed: hooks GDPR.', 'error');
         } elseif (!$this->createConfig()) {
             $this->log_install->error('Install failed: configuration.');
-            $this->logger->addLog('Install failed: configuration.', 'error');
         } elseif (!$this->createOrderStates()) {
             $this->log_install->error('Install failed: order states.');
-            $this->logger->addLog('Install failed: order states.', 'error');
         } elseif (!$this->installSQL()) {
             $this->log_install->error('Install failed: sql.');
-            $this->logger->addLog('Install failed: sql.', 'error');
         } elseif (!$this->installTab()) {
             $this->log_install->error('Install failed: tab.');
-            $this->logger->addLog('Install failed: tab.', 'error');
         } else {
             $this->log_install->info('Install succeeded.');
-            $this->logger->addLog('Install succeeded.');
             return true;
         }
         return false;
