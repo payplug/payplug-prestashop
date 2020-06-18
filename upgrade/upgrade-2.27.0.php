@@ -21,12 +21,27 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-header("Location: ../../../");
-exit;
+function upgrade_module_2_27_0()
+{
+    $flag = true;
+
+    // install table `payplug_logger`
+    $sql = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
+            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `process` VARCHAR(255) NOT NULL,
+            `content` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+    $flag = $flag && Db::getInstance()->execute($sql);
+
+    return $flag;
+}
