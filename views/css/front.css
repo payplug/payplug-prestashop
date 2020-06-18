@@ -693,6 +693,8 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   flex-direction: column;
   width: 100%;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .oneyPopin_navigation li {
   border: 1px solid #e5e5e5;
@@ -753,6 +755,9 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
 .oneyPopin_option ul,
 .oneyPopin_option p {
   margin: 0;
+}
+.oneyPopin_option ul {
+  padding: 0;
 }
 .oneyPopin_option p {
   padding: 4px 0;
@@ -864,6 +869,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   width: 100%;
   height: 100%;
   margin: 0;
+  padding: 0;
 }
 .oneySchedule ul li {
   display: flex;

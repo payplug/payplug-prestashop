@@ -643,4 +643,10 @@ button.payplugLink:hover {
 .payplugPopup_footer-center {
   justify-content: center;
 }
+.payplugOrder {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: column;
+}
 /*# sourceMappingURL=admin.css.map */
