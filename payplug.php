@@ -3012,7 +3012,7 @@ class Payplug extends PaymentModule
                     if (!$this->payplug_cache->setCache($cache_id, $to_cache)) {
                         $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                         $error_level = 'error';
-                        $this->logger->addLog($error_message, $error_level);
+//                        $this->logger->addLog($error_message, $error_level);
                     }
 
                 }
