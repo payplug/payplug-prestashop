@@ -106,6 +106,7 @@ class PayPlugCarrier extends ObjectModel
             SELECT pc.`id_payplug_carrier`, c.`name`
             FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
             LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
+            WHERE c.`active` = 1
             ORDER BY pc.`id_payplug_carrier` ASC';
         $res_payplug_carriers = Db::getInstance()->executeS($req_payplug_carriers);
         if ($res_payplug_carriers) {

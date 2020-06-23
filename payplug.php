@@ -4963,8 +4963,6 @@ class Payplug extends PaymentModule
             return array('result' => true, 'error' => false);
         }
 
-        $invalid_carrier_type = array('storepickup', 'networkpickup');
-
         // check if current carrier is available
         $payplug_carrier = new PayPlugCarrier();
         $payplug_carrier = $payplug_carrier->getByIdCarrier($cart->id_carrier);
@@ -4976,26 +4974,6 @@ class Payplug extends PaymentModule
             return array(
                 'result' => false,
                 'error' => sprintf($error),
-                'error_type' => 'invalid_carrier',
-            );
-        } elseif ((bool)in_array($payplug_carrier->delivery_type, $invalid_carrier_type)) {
-            switch ($payplug_carrier->delivery_type) {
-                case 'networkpickup':
-                    $delivery_type = $this->l('Network Pickup');
-                    break;
-                case 'storepickup':
-                default:
-                    $delivery_type = $this->l('Store Pickup');
-                    break;
-            }
-
-
-            $error = $this->l('The ') . $delivery_type . $this->l(' shipping is conflicting with this payment method. ');
-            $error .= $this->l('Please change the shipping method chosen at the last step.');
-
-            return array(
-                'result' => false,
-                'error' => $error,
                 'error_type' => 'invalid_carrier',
             );
         }
