@@ -43,8 +43,8 @@ class PayPlugCache extends ObjectModel
     /** @var datetime */
     public $date_upd;
 
-//    /** @var PayPlugLogger  */
-//    public $logger;
+    /** @var PayPlugLogger  */
+    public $logger;
 
     /** @var array */
     public static $definition = array(
@@ -69,7 +69,7 @@ class PayPlugCache extends ObjectModel
     {
         parent::__construct($id, $id_lang);
 
-//        $this->logger = new PayPlugLogger('cache');
+        $this->logger = new PayPlugLogger('cache');
     }
 
     /**
@@ -128,7 +128,7 @@ class PayPlugCache extends ObjectModel
         if (!$res_cache) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
             $error_level = 'error';
-//            $this->logger->addLog($error_message,$error_level);
+            $this->logger->addLog($error_message,$error_level);
             return false;
         } else {
             return true;
