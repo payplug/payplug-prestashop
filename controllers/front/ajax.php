@@ -31,12 +31,13 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
         if (Tools::getValue('_ajax') == 1) {
             $payplug = new Payplug();
+            $context = Context::getContext();
+
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
                     $payment = $payplug->preparePayment(['id_card' => Tools::getValue('pc')]);
                     die($payment);
                 } elseif ((int)Tools::getValue('delete') == 1) {
-                    $context = Context::getContext();
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;
                     if ((int)$id_customer == 0) {
@@ -56,21 +57,38 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => true,
                     'tpl' => $payplug->getOneyCTA(),
                 )));
+            } elseif (Tools::getIsset('isOneyElligible')) {
+                $use_taxes = (bool)Configuration::get('PS_TAX');
+
+                if ($id_product = (int)Tools::getValue('id_product')) {
+                    $group = Tools::getValue('group');
+                    $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+                    $quantity = (int)Tools::getValue('qty', 1);
+                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
+                    $amount = $product_price * $quantity;
+                    $id_currency = $context->currency->id;
+                    $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency);
+                } else {
+                    $amount = $context->cart->getOrderTotal($use_taxes);
+                    $delivery_address = new Address($context->cart->id_address_delivery);
+                    $delivery_country = new Country($delivery_address->id_country);
+                    $iso_code = $delivery_country->iso_code;
+                    $cart = $context->cart;
+                    $is_elligible = $payplug->isOneyElligible($cart, $amount, $iso_code);
+                }
+
+                die(json_encode($is_elligible));
             } elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)Configuration::get('PS_TAX');
 
                 if ($id_product = (int)Tools::getValue('id_product')) {
                     $group = Tools::getValue('group');
-                    $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes(
-                        $id_product, $group) : 0;
+                    $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
                     $quantity = (int)Tools::getValue('qty', 1);
-
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,
-                        null, false, true, $quantity);
+                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $cart = false;
                 } else {
-                    $context = Context::getContext();
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $cart = $context->cart;
                 }
