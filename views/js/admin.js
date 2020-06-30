@@ -699,15 +699,16 @@ var $document, $window, payplug = {
         props: {
             identifier: 'payplugOney',
             switcher: 'payplug_oney',
+            inputElement: 'tos_url',
             error: null,
         },
         init: function () {
             var {oney} = payplug,
-                {identifier, switcher} = oney.props;
-
+                {identifier, switcher, inputElement} = oney.props;
             $document.on('switchSelected', 'input[name=' + switcher + ']', oney.carrier)
                 .on('change', '.' + identifier + ' select', oney.carrier)
-                .on('keyup', '.' + identifier + ' input[type="number"]', oney.check);
+                .on('keyup', '.' + identifier + ' input[type="number"]', oney.check)
+                .on('keyup', 'input[name=payplug_oney_tos_url]', oney.urlcheck);
 
             $('input[name=' + switcher + ']').trigger('switchSelected');
         },
@@ -760,7 +761,32 @@ var $document, $window, payplug = {
             } else {
                 $error.hide();
             }
-        }
+        },
+        urlcheck: function () {
+            const url = ($(this).val());
+            const pattern = new RegExp('^(https?:\\/\\/)?' +
+                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+                '((\\d{1,3}\\.){3}\\d{1,3}))' +
+                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+                '(\\?[;&a-z\\d%_.~+=-]*)?' +
+                '(\\#[-a-z\\d_]*)?$', 'i');
+            const matches = url.match(pattern);
+            if (matches == null) {
+                if ($('#error_invalid_url').hasClass('hide')) {
+                    $('#error_invalid_url').removeClass('hide');
+                }
+                $("button[name=submitSettings]").prop("disabled", true);
+                $("button[name=submitSettings]").addClass('payplugButton-disabled');
+            }
+            if ((matches !== null) || (url.length == 0)) {
+                if (!$('#error_invalid_url').hasClass('hide')) {
+                    $('#error_invalid_url').addClass('hide');
+                }
+                $("button[name=submitSettings]").prop("disabled", false);
+                $("button[name=submitSettings]").removeClass('payplugButton-disabled');
+
+            }
+        },
     },
     installment: {
         props: {

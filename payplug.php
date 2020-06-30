@@ -1317,6 +1317,7 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
             && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
             && Configuration::deleteByName('PAYPLUG_ONEY_TOS')
+            && Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')
             && Configuration::deleteByName('PAYPLUG_SANDBOX_MODE')
             && Configuration::deleteByName('PAYPLUG_SHOW')
             && Configuration::deleteByName('PAYPLUG_TEST_API_KEY')
@@ -1337,7 +1338,8 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
             && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_ONEY_TOS'));
+            && Configuration::deleteByName('PAYPLUG_ONEY_TOS')
+            && Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL'));
     }
 
     /**
@@ -1441,6 +1443,11 @@ class Payplug extends PaymentModule
      */
     public function displayOneyPopin()
     {
+        $this->smarty->assign(array(
+            'tos_active' => Configuration::get('PAYPLUG_ONEY_TOS'),
+            'tos_url' => Configuration::get('PAYPLUG_ONEY_TOS_URL')
+        ));
+
         $limits = $this->getOneyPriceLimit();
         $min_amount = $this->convertAmount($limits['min'], true);
         $max_amount = $this->convertAmount($limits['max'], true);
@@ -2231,6 +2238,7 @@ class Payplug extends PaymentModule
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
             'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
+            'oney_tos_url' => Configuration::get('PAYPLUG_ONEY_TOS_URL'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         );
 
@@ -2333,6 +2341,7 @@ class Payplug extends PaymentModule
             'PAYPLUG_DEFERRED_AUTO' => $configurations['deferred_auto'],
             'PAYPLUG_DEFERRED_STATE' => $configurations['deferred_state'],
             'PAYPLUG_ONEY' => $configurations['oney'],
+            'PAYPLUG_ONEY_TOS_URL' => $configurations['oney_tos_url'],
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->getOrderStates(),
@@ -2397,7 +2406,7 @@ class Payplug extends PaymentModule
             ));
         }
 
-
+        // Legal Notice (Mentions légales)
         $limits = $this->getOneyPriceLimit();
         $min_amount = $this->convertAmount($limits['min'], true);
         $max_amount = $this->convertAmount($limits['max'], true);
@@ -2462,7 +2471,7 @@ class Payplug extends PaymentModule
             'label_right' => $this->l('no'),
         ];
 
-        $switch['oney_cgv'] = [
+        $switch['oney_tos'] = [
             'name' => 'payplug_oney_tos',
             'active' => true,
             'small' => true,
@@ -2670,7 +2679,7 @@ class Payplug extends PaymentModule
             $is_valid_carrier = $this->isValidOneyCarrier($cart);
             $this->smarty->assign(array(
                 'payplug_oney_allowed' => $is_valid_carrier['result'],
-                'payplug_oney_error' => $is_valid_carrier['error']
+                'payplug_oney_error' => $is_valid_carrier['error'],
             ));
         }
 
@@ -4461,7 +4470,8 @@ class Payplug extends PaymentModule
             !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
             !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
             !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
-            !Configuration::updateValue('PAYPLUG_ONEY_TOS', 0)
+            !Configuration::updateValue('PAYPLUG_ONEY_TOS', 0) ||
+            !Configuration::updateValue('PAYPLUG_ONEY_TOS_URL', '')
         ) {
             $log->error('Installation failed: oney configurations failed.');
             $flag = false;
@@ -5877,6 +5887,7 @@ class Payplug extends PaymentModule
         }
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
         Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
+        Configuration::updateValue('PAYPLUG_ONEY_TOS_URL', Tools::getValue('payplug_oney_tos_url'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         if (Tools::getValue('PAYPLUG_SHOW')) {
             $this->enable();
