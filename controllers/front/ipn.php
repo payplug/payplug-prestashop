@@ -72,16 +72,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     {
         $this->payplug = new Payplug();
         $this->setLogger();
-
-        $this->logger->addLog('set configuration');
-        $this->debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->getResource();
-
-        //Notification identification
-        $this->logger->addLog('Notification treatment and authenticity verification:');
-
-        $this->notification = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/notification-' . date('Y-m-d') . '.csv');
-
+        $this->logger->addLog('set configuration');
     }
 
     /**
