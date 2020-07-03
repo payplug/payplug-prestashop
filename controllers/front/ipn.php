@@ -238,11 +238,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     header($_SERVER['SERVER_PROTOCOL'] . ' 500 The address cannot be loaded.', true, 500);
                     die;
                 } else {
-                    $this->logger->addLog('Lock checking start.', 'debug');
-                    PayplugLock::check($cart->id);
-                    $this->logger->addLog('Lock checking end.', 'debug');
-
-
                     $cart_lock = false;
                     do {
                         $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');

@@ -140,11 +140,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
             $this->logger->addLog('Total : ' . $total);
 
-            $this->logger->addLog('Lock checking start.', 'debug');
-            PayplugLock::check($cart->id);
-            $this->logger->addLog('Lock checking end.', 'debug');
-
-
             $cart_lock = false;
             do {
                 $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
