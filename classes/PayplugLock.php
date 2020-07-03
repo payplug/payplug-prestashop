@@ -220,27 +220,44 @@ class PayplugLock extends ObjectModel
     //TODO: check multishop si cart_id identiques ou uniques
     public static function createLockG2($id_cart, $process_print = 'none')
     {
+        // check if has lock
+        $lock_exists = self::existsLockG2($id_cart);
+        if ($lock_exists) {
+            $lifetime = new DateInterval('PT2M');
+            $date_limit = new DateTime('now');
+            $date_limit->sub($lifetime);
+            $date_add = new DateTime($lock_exists['date_add']);
+            if ($date_limit > $date_add) {
+                self::deleteLockG2($id_cart);
+            }
+        }
+
         $req_lock = '
-            INSERT INTO '._DB_PREFIX_.'payplug_lock (              
+            INSERT INTO ' . _DB_PREFIX_ . 'payplug_lock (              
                 id_cart,
                 id_order,
                 date_add,
                 date_upd
             )
             VALUE (
-                '.(int)$id_cart.',
+                ' . (int)$id_cart . ',
                 IFNULL(
                     (
                         SELECT o.id_order 
-                        FROM '._DB_PREFIX_.'orders o 
-                        WHERE o.id_cart = '.(int)$id_cart.' 
+                        FROM ' . _DB_PREFIX_ . 'orders o 
+                        WHERE o.id_cart = ' . (int)$id_cart . ' 
                     ), 
-                    \''.pSQL($process_print).'\'
+                    \'' . pSQL($process_print) . '\'
                 ),
-                \''.date('Y-m-d H:i:s').'\',
-                \''.date('Y-m-d H:i:s').'\'
+                \'' . date('Y-m-d H:i:s') . '\',
+                \'' . date('Y-m-d H:i:s') . '\'
             )';
-        $res_lock = Db::getInstance()->execute($req_lock);
+        try {
+            $res_lock = Db::getInstance()->execute($req_lock);
+        } catch (Exception $e) {
+            return false;
+        }
+
         if (!$res_lock) {
             return false;
         } else {
