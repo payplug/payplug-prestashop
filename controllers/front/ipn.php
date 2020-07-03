@@ -83,8 +83,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     {
         $body = Tools::file_get_contents('php://input');
 
-        $this->logger->addLog('get resource: ' . $body, '--');
-
         try {
             $resource = json_decode($body);
             $api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
@@ -240,24 +238,17 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     header($_SERVER['SERVER_PROTOCOL'] . ' 500 The address cannot be loaded.', true, 500);
                     die;
                 } else {
-                    $this->logger->addLog('Lock checking start.', 'debug');
-                    PayplugLock::check($cart->id);
-                    $this->logger->addLog('Lock checking end.', 'debug');
-
-                    $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
-                    if (!$cart_lock) {
-                        $this->logger->addLog('Lock cannot be created.', 'error');
-                    } else {
-                        $this->logger->addLog('Lock created.', 'debug');
-                        switch ($cart_lock) {
-                            case 'ipn':
-                            case 'validation':
-                                $order_id = false;
-                                break;
-                            default:
-                                $order_id = (int)$cart_lock;
+                    $cart_lock = false;
+                    do {
+                        $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
+                        if (!$cart_lock) {
+                            PayplugLock::check($cart->id);
+                        } else {
+                            $this->logger->addLog('Lock created');
                         }
-                    }
+                    } while (!$cart_lock);
+
+                    $id_order = Order::getOrderByCartId($cart->id);
 
                     $state_addons = ($payment->is_live ? '' : '_TEST');
                     $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
@@ -273,10 +264,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     $exp_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons);
                     $refund_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
-                    if ($order_id) {
+                    if ($id_order) {
                         $this->logger->addLog('UPDATE MODE');
                         try {
-                            $order = new Order((int)$order_id);
+                            $order = new Order((int)$id_order);
                         } catch (Exception $exception) {
                             $this->logger->addLog(
                                 'The order cannot be loaded: ' . $exception->getMessage(), 'error');
@@ -323,9 +314,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $new_order_state = $exp_state;
 
                                 $order_history = new OrderHistory();
-                                $order_history->id_order = (int)$order_id;
+                                $order_history->id_order = (int)$id_order;
                                 try {
-                                    $order_history->changeIdOrderState((int)$new_order_state, $order_id);
+                                    $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                     $order_history->save();
                                 } catch (Exception $exception) {
                                     $this->logger->addLog(
@@ -428,9 +419,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
 
                                 $order_history = new OrderHistory();
-                                $order_history->id_order = (int)$order_id;
+                                $order_history->id_order = (int)$id_order;
                                 try {
-                                    $order_history->changeIdOrderState((int)$new_order_state, $order_id);
+                                    $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                     $order_history->save();
                                 } catch (Exception $exception) {
                                     $this->logger->addLog(
@@ -653,8 +644,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                                 die;
                             } else {
-                                $order_id = Order::getOrderByCartId($cart->id);
-                                $order = new Order($order_id);
+                                $id_order = Order::getOrderByCartId($cart->id);
+                                $order = new Order($id_order);
                                 $this->logger->addLog('Order validated: ' . $order->id);
 
                                 if ($this->resource->installment_plan_id != null) {
@@ -664,7 +655,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $api_key = Payplug::setAPIKey();
                                 $data = array();
                                 $data['metadata'] = $meta;
-                                $data['metadata']['Order'] = $order_id;
+                                $data['metadata']['Order'] = $id_order;
                                 try {
                                     $this->payplug->patchPayment($api_key, $payment->id, $data);
                                 } catch (Exception $exception) {
@@ -828,9 +819,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $this->logger->addLog('TOTAL REFUND MODE');
 
             $cart_id = (int)$meta['ID Cart'];
-            $order_id = (int)Order::getOrderByCartId($cart_id);
-            $order = new Order($order_id);
-            $this->logger->addLog('Order ID : ' . $order_id);
+            $id_order = (int)Order::getOrderByCartId($cart_id);
+            $order = new Order($id_order);
+            $this->logger->addLog('Order ID : ' . $id_order);
             if (!Validate::isLoadedObject($order)) {
                 $this->logger->addLog('Order cannot be loaded.', 'error');
                 header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be loaded.', true, 500);
@@ -843,9 +834,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 if ($current_state != $new_order_state) {
                     $this->logger->addLog('Changing status to \'refunded\'');
                     $order_history = new OrderHistory();
-                    $order_history->id_order = $order_id;
+                    $order_history->id_order = $id_order;
                     try {
-                        $order_history->changeIdOrderState((int)$new_order_state, $order_id);
+                        $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                         $order_history->save();
                         header($_SERVER['SERVER_PROTOCOL'] . ' 200 Changing status to \'refunded\'', true, 200);
                         die();
