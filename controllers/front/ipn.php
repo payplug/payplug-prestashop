@@ -83,8 +83,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     {
         $body = Tools::file_get_contents('php://input');
 
-        $this->logger->addLog('get resource: ' . $body, '--');
-
         try {
             $resource = json_decode($body);
             $api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
