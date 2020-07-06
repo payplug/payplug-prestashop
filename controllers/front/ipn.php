@@ -35,9 +35,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     public $debug;
     /**
-     * @var object $log
+     * @var object $logger
      */
-    public $log;
+    public $logger;
+
     /**
      * @var object $resource
      */
@@ -63,8 +64,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
     public $api_key;
 
-    public $logger;
-
     /**
      * Set Config to process the notification
      * @throws Exception
@@ -72,16 +71,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private function setConfig()
     {
         $this->payplug = new Payplug();
-        $this->notification->info('set configuration', '--', __LINE__);
-        $this->debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
-        $this->getResource();
         $this->setLogger();
-
-        //Notification identification
-        $this->logger->addLog('Notification treatment and authenticity verification:');
-
-        $this->notification = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/notification-' . date('Y-m-d') . '.csv');
-
+        $this->getResource();
+        $this->logger->addLog('set configuration');
     }
 
     /**
@@ -90,8 +82,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private function getResource()
     {
         $body = Tools::file_get_contents('php://input');
-
-        $this->notification->info('get resource: ' . $body, '--', __LINE__);
 
         try {
             $resource = json_decode($body);
@@ -126,8 +116,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
-        $this->notification = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/notification-' . date('Y-m-d') . '.csv');
-        $this->notification->info('Start new notification', '--', __LINE__);
         //Settings
         $this->setConfig();
 
@@ -149,7 +137,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     private function processPayment()
     {
-        $this->notification->info('process payment', '--', __LINE__);
+        $this->logger->addLog('process payment');
 
         if ($this->resource->installment_plan_id != null) {
             $this->logger->addLog('Installment ID: ' . $this->resource->installment_plan_id);
@@ -162,7 +150,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         try {
             $payment = $this->payplug->retrievePayment($this->resource->id);
         } catch (ConfigurationNotSetException $exception) {
-            $this->notification->error($exception->getMessage(), '--', __LINE__);
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
             $response = array(
                 'exception' => $exception->getMessage(),
@@ -250,7 +237,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             try {
                 $cart = new Cart((int)$meta['ID Cart']);
             } catch (Exception $exception) {
-                $this->notification->error($exception->getMessage(), '--', __LINE__);
                 $this->logger->addLog('The cart cannot be loaded: ' . $exception->getMessage(), 'error');
                 $response = array(
                     'exception' => $exception->getMessage(),
@@ -269,24 +255,17 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             } else {
                 $this->setContextFromCartID($cart->id);
 
-                $this->logger->addLog('Lock checking start.', 'debug');
-                PayplugLock::check($cart->id);
-                $this->logger->addLog('Lock checking end.', 'debug');
-
-                $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
-                if (!$cart_lock) {
-                    $this->logger->addLog('Lock cannot be created.', 'error');
-                } else {
-                    $this->logger->addLog('Lock created.', 'debug');
-                    switch ($cart_lock) {
-                        case 'ipn':
-                        case 'validation':
-                            $order_id = false;
-                            break;
-                        default:
-                            $order_id = (int)$cart_lock;
+                $cart_lock = false;
+                do {
+                    $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
+                    if (!$cart_lock) {
+                        PayplugLock::check($cart->id);
+                    } else {
+                        $this->logger->addLog('Lock created');
                     }
-                }
+                } while (!$cart_lock);
+
+                $id_order = Order::getOrderByCartId($cart->id);
 
                 $state_addons = ($payment->is_live ? '' : '_TEST');
                 $pending_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
@@ -303,7 +282,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $refund_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
                 $oney_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
 
-                if ($order_id) {
+                if ($id_order) {
                     $this->logger->addLog('UPDATE MODE');
                     try {
                         $order = new Order((int)$order_id);
@@ -1004,11 +983,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $this->logger->addLog('TOTAL REFUND MODE');
 
             $cart_id = (int)$meta['ID Cart'];
-            $order_id = (int)Order::getOrderByCartId($cart_id);
-            $order = new Order($order_id);
-            $this->logger->addLog('Order ID : ' . $order_id);
+            $id_order = (int)Order::getOrderByCartId($cart_id);
+            $order = new Order($id_order);
+            $this->logger->addLog('Order ID : ' . $id_order);
             if (!Validate::isLoadedObject($order)) {
-                echo $this->logger->addLog('Order cannot be loaded.', 'error');
+                $this->logger->addLog('Order cannot be loaded.', 'error');
                 header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be loaded.', true, 500);
                 die;
             } else {
@@ -1019,14 +998,13 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 if ($current_state != $new_order_state) {
                     $this->logger->addLog('Changing status to \'refunded\'');
                     $order_history = new OrderHistory();
-                    $order_history->id_order = $order_id;
+                    $order_history->id_order = $id_order;
                     try {
-                        $order_history->changeIdOrderState((int)$new_order_state, $order_id);
+                        $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                         $order_history->save();
                         header($_SERVER['SERVER_PROTOCOL'] . ' 200 Changing status to \'refunded\'', true, 200);
                         die();
                     } catch (Exception $exception) {
-                        $this->notification->error($exception->getMessage(), '--', __LINE__);
                         $this->logger->addLog(
                             'Order history cannot be saved: ' . $exception->getMessage(), 'error');
                         $this->logger->addLog(
@@ -1059,7 +1037,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     private function processInstallment()
     {
-        $this->notification->info('process installment', '--', __LINE__);
+        $this->logger->addLog('process installment');
         $this->logger->addLog('INSTALLMENT MODE');
         $this->logger->addLog('Installment ID: ' . $this->resource->id);
         $this->logger->addLog('Active : ' . (int)$this->resource->is_active);
