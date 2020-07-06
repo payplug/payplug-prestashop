@@ -4290,13 +4290,11 @@ class Payplug extends PaymentModule
     {
     }
 
-    public function hookActionAdminPerformanceControllerSaveAfter($params)
+    /**
+     * Flush PayPlugCache, when PrestaShop cache cleared
+    */
+    public function hookActionClearCompileCache($params)
     {
-        if (!Tools::getValue('empty_smarty_cache')) {
-            return false;
-        }
-
-        // Purge PayPlug cache
         if (!$this->payplug_cache->flushCache()) {
             $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
             $error_level = 'error';
@@ -4509,6 +4507,7 @@ class Payplug extends PaymentModule
             'actionCarrierUpdate',
             'displayProductPriceBlock',
             'displayExpressCheckout',
+            'actionClearCompileCache',
         );
 
         $flag = true;
@@ -6178,7 +6177,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.27.2';
+        $this->version = '2.29.0';
         $this->api_version = '2019-08-06';
     }
 
