@@ -513,6 +513,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   }
 }
 .oneyPopin {
+  color: #777;
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
   font-weight: 400;

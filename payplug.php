@@ -38,6 +38,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugLogger.php');
 
 class Payplug extends PaymentModule
 {
@@ -218,6 +219,9 @@ class Payplug extends PaymentModule
             ),
         ),
     );
+
+    /** @var object */
+    public $logger;
 
     /**
      * Constructor
@@ -3941,7 +3945,7 @@ class Payplug extends PaymentModule
                 'pay_error' => $pay_error,
             ));
 
-//Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
                 $this->context->smarty->assign(array('pay_tds' => $pay_tds));
@@ -4076,7 +4080,7 @@ class Payplug extends PaymentModule
             return;
         }
         $action = Tools::getValue('action');
-        if ($action == 'quickview'){
+        if ($action == 'quickview') {
             return false;
         }
 
@@ -4184,7 +4188,7 @@ class Payplug extends PaymentModule
      *
      * @return bool
      */
-    function isMobiledevice()
+    public function isMobiledevice()
     {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
@@ -4652,6 +4656,23 @@ class Payplug extends PaymentModule
 
         if (!$res_payplug_installment) {
             $log->error('Installation SQL failed: PAYPLUG_INSTALLMENTS.');
+            return false;
+        }
+
+        // install table `payplug_logger`
+        $req_payplug_logger = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
+            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `process` VARCHAR(255) NOT NULL,
+            `content` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+        $res_payplug_logger = Db::getInstance()->execute($req_payplug_logger);
+
+        if (!$res_payplug_logger) {
+            $log->error('Installation SQL failed: PAYPLUG_LOGGERS.');
             return false;
         }
 
@@ -6055,6 +6076,8 @@ class Payplug extends PaymentModule
     {
         $this->log_general = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $this->logger = new PayPlugLogger('payplug');
+        $this->logger->flush();
     }
 
     /**
@@ -6517,7 +6540,32 @@ class Payplug extends PaymentModule
             $flag = $flag && Db::getInstance()->execute($query);
         }
 
-        return $flag;
+        $req_payplug_installment_cart = '
+            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
+        $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
+
+        if (!$res_payplug_installment_cart) {
+            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENT_CART.');
+            return false;
+        }
+
+        $req_payplug_installment = '
+            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
+        $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
+
+        if (!$res_payplug_installment) {
+            $log->error('Uninstallation SQL failed: PAYPLUG_INSTALLMENTS.');
+            return false;
+        }
+
+        $req_payplug_logger = '
+            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_logger`';
+        $res_payplug_logger = DB::getInstance()->Execute($req_payplug_logger);
+
+        if (!$res_payplug_logger) {
+            $log->error('Uninstallation SQL failed: PAYPLUG_LOGGER.');
+            return false;
+        }
 
         $log->info('Uninstallation SQL ended.');
         return true;
