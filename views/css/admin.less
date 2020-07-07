@@ -251,7 +251,7 @@
         border: none;
         position: absolute;
         top: 50%;
-        left: 2px;
+        left: calc(100% - 18px);
         content: "";
         background: #fff;
         display: block;
@@ -260,10 +260,10 @@
       }
 
       &.payplugSwitch-right {
-        background: #colorMap[error];
+        background: darken(#colorMap[grey],10);
 
         &:before {
-          left: calc(100% - 18px);
+          left: 2px;
         }
       }
 
