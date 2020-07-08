@@ -699,16 +699,15 @@ var $document, $window, payplug = {
         props: {
             identifier: 'payplugOney',
             switcher: 'payplug_oney',
-            inputElement: 'tos_url',
             error: null,
         },
         init: function () {
             var {oney} = payplug,
-                {identifier, switcher, inputElement} = oney.props;
+                {identifier, switcher} = oney.props;
             $document.on('switchSelected', 'input[name=' + switcher + ']', oney.carrier)
                 .on('change', '.' + identifier + ' select', oney.carrier)
                 .on('keyup', '.' + identifier + ' input[type="number"]', oney.check)
-                .on('keyup', 'input[name=payplug_oney_tos_url]', oney.urlcheck);
+                .on('keyup', 'input[name=payplug_oney_tos_url]', oney.urlCheck);
 
             $('input[name=' + switcher + ']').trigger('switchSelected');
         },
@@ -762,7 +761,7 @@ var $document, $window, payplug = {
                 $error.hide();
             }
         },
-        urlcheck: function () {
+        urlCheck: function () {
             const url = ($(this).val());
             const pattern = new RegExp('^(https?:\\/\\/)?' +
                 '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
