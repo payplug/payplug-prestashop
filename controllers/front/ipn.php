@@ -930,7 +930,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private function processRefund()
     {
         $this->logger->addLog('process refund');
-        $this->logger->addLog('REFUND MODE');
         $this->logger->addLog('Refund ID : ' . $this->resource->id);
         $refund = $this->resource;
 
@@ -1017,7 +1016,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private function processInstallment()
     {
         $this->logger->addLog('process installment');
-        $this->logger->addLog('INSTALLMENT MODE');
         $this->logger->addLog('Installment ID: ' . $this->resource->id);
         $this->logger->addLog('Active : ' . (int)$this->resource->is_active);
         header($_SERVER['SERVER_PROTOCOL'] . ' 200 installment resource receive.', true, 200);
