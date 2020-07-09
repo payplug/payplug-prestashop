@@ -60,8 +60,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     public $payplug = null;
 
-    public $notification;
-
     public $api_key;
 
     /**
@@ -87,12 +85,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $resource = json_decode($body);
             $api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
             $authentication = $this->payplug->setSecretKey($api_key);
-            $this->notification->info('set api key: ' . $api_key, '--', __LINE__);
+            $this->logger->addLog('set api key: ' . $api_key);
             $this->resource = \Payplug\Notification::treat($body, $authentication);
-            $this->notification->info('resource id: ' . $this->resource->id, '--', __LINE__);
+            $this->logger->addLog('resource id: ' . $this->resource->id);
         } catch (Exception $exception) {
-            $this->notification->error('An error occured while getting resource: ' . $exception->getMessage(), '--',
-                __LINE__);
+            $this->logger->addLog('An error occured while getting resource: ' . $exception->getMessage(), 'error');
             header(
                 $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
                 true,
@@ -288,7 +285,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     try {
                         $order = new Order((int)$id_order);
                     } catch (Exception $exception) {
-                        $this->notification->error($exception->getMessage(), '--', __LINE__);
                         $this->logger->addLog(
                             'The order cannot be loaded: ' . $exception->getMessage(), 'error');
                         $response = array(
@@ -313,7 +309,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $current_state = (int)$order->getCurrentState();
                             $this->logger->addLog('Get the current state: ' . $current_state, 'info');
                         } catch (Exception $exception) {
-                            $this->notification->error($exception->getMessage(), '--', __LINE__);
                             $this->logger->addLog(
                                 'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
                             $response = array(
@@ -342,7 +337,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                 $order_history->save();
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Order history cannot be saved: ' . $exception->getMessage(), 'error');
                                 $this->logger->addLog(
@@ -363,7 +357,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             try {
                                 $order->update();
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Order cannot be updated: ' . $exception->getMessage(), 'error');
                                 $response = array(
@@ -400,7 +393,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                 $order_history->save();
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Order history cannot be saved: ' . $exception->getMessage(), 'error');
                                 $this->logger->addLog(
@@ -421,7 +413,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             try {
                                 $order->update();
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Order cannot be updated: ' . $exception->getMessage(), 'error');
                                 $response = array(
@@ -469,7 +460,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 try {
                                     $message->save();
                                 } catch (Exception $exception) {
-                                    $this->notification->error($exception->getMessage(), '--', __LINE__);
                                     $this->logger->addLog(
                                         'The message cannot be saved: ' . $exception->getMessage(),
                                         'error');
@@ -507,7 +497,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                 $order_history->save();
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Order history cannot be saved: ' . $exception->getMessage(), 'error');
                                 $this->logger->addLog(
@@ -530,7 +519,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             try {
                                 $order->update();
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Order cannot be updated: ' . $exception->getMessage(), 'error');
                                 $response = array(
@@ -668,7 +656,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     try {
                         $customer = new Customer((int)$cart->id_customer);
                     } catch (Exception $exception) {
-                        $this->notification->error($exception->getMessage(), '--', __LINE__);
                         $this->logger->addLog(
                             'Customer cannot be loaded: ' . $exception->getMessage(), 'error');
                         $response = array(
@@ -779,7 +766,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                         } catch (Exception $exception) {
-                            $this->notification->error($exception->getMessage(), '--', __LINE__);
                             $this->logger->addLog(
                                 'Order cannot be validated: ' . $exception->getMessage(), 'error');
                             $response = array(
@@ -819,7 +805,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             try {
                                 $this->payplug->patchPayment($api_key, $payment->id, $data);
                             } catch (Exception $exception) {
-                                $this->notification->error($exception->getMessage(), '--', __LINE__);
                                 $this->logger->addLog(
                                     'Payment cannot be patched: ' . $exception->getMessage(), 'error');
                                 $response = array(
@@ -857,7 +842,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     try {
                                         $order_payment->update();
                                     } catch (Exception $exception) {
-                                        $this->notification->error($exception->getMessage(), '--', __LINE__);
                                         $this->logger->addLog(
                                             'Payment cannot be updated: ' . $exception->getMessage(),
                                             'error');
@@ -945,7 +929,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     private function processRefund()
     {
-        $this->notification->info('process refund', '--', __LINE__);
+        $this->logger->addLog('process refund');
         $this->logger->addLog('REFUND MODE');
         $this->logger->addLog('Refund ID : ' . $this->resource->id);
         $refund = $this->resource;
@@ -954,7 +938,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         try {
             $payment = $this->payplug->retrievePayment($refund->payment_id);
         } catch (ConfigurationNotSetException $exception) {
-            $this->notification->error($exception->getMessage(), '--', __LINE__);
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
             $response = array(
                 'exception' => $exception->getMessage(),
