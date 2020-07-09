@@ -218,7 +218,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                 if (!$id_cart) {
                     $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-                    $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
                     $this->logger->addLog($error_msg, 'error');
                     //HOTFIX: MR331 We use custom http code to precisely log this case of desync between real payment notification and wrong ones.
                     $response_code = ($is_oney ? 242 : 500);
