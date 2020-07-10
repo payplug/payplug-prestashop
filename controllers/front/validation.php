@@ -206,24 +206,15 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
             $this->logger->addLog('Total : ' . $amount, 'info');
 
-            $this->logger->addLog('Lock checking start.', 'debug');
-            PayplugLock::check($cart->id);
-            $this->logger->addLog('Lock checking end.', 'debug');
-
-            $cart_lock = PayplugLock::createLockG2($cart->id, 'validation');
-            if (!$cart_lock) {
-                $this->logger->addLog('Lock cannot be created.', 'error');
-            } else {
-                $this->logger->addLog('Lock created.', 'debug');
-                switch ($cart_lock) {
-                    case 'ipn':
-                    case 'validation':
-                        $id_order = false;
-                        break;
-                    default:
-                        $id_order = (int)$cart_lock;
+            $cart_lock = false;
+            do {
+                $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
+                if (!$cart_lock) {
+                    PayplugLock::check($cart->id);
+                } else {
+                    $this->logger->addLog('Lock created');
                 }
-            }
+            } while (!$cart_lock);
 
             $id_order = Order::getOrderByCartId($cart->id);
 

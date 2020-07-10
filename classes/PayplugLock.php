@@ -95,17 +95,20 @@ class PayplugLock extends ObjectModel
      * @param  int $loop_time
      * @return void
      */
-    public static function check($id_cart, $loop_time = 1)
+    public static function check($id_cart, $loop_time = 1, $process = 'none')
     {
-        //definir le delai
+        // Set delay
         $delay = new DateInterval('PT10S');
+        $lifetime = new DateInterval('PT20S');
 
-        //test s'il y a un lock
+        // Check if lock exists
         $lock_exists = self::existsLockG2($id_cart);
         if ($lock_exists) {
-            //definir la date de fin du lock
+            // Then define the expiration
             $last_update = new DateTime($lock_exists['date_upd']);
             $last_check = $last_update->add($delay);
+            $creation_date = new DateTime($lock_exists['date_add']);
+            $end_of_life = $creation_date->add($lifetime);
             $time = new DateTime('now');
 
             while ((self::existsLockG2($id_cart) !== false) && ($time < $last_check)) {
@@ -113,6 +116,16 @@ class PayplugLock extends ObjectModel
                     usleep($loop_time * 1000000);
                 } else {
                     self::usleep($loop_time * 1000);
+                }
+
+
+                // If lock take too much time, end the process
+                if ($time > $end_of_life) {
+                    if ($process == 'validation') {
+                        self::deleteLockG2($id_cart);
+                    } else {
+                        return 'stop ipn';
+                    }
                 }
 
                 $time = new DateTime('now');
@@ -222,17 +235,17 @@ class PayplugLock extends ObjectModel
 
         $req_lock = 'INSERT INTO '._DB_PREFIX_.'payplug_lock (id_cart,id_order,date_add,date_upd)
             VALUE (
-                '.(int)$id_cart.',
+                ' . (int)$id_cart . ',
                 IFNULL(
                     (
                         SELECT o.id_order 
-                        FROM '._DB_PREFIX_.'orders o 
-                        WHERE o.id_cart = '.(int)$id_cart.' 
+                        FROM ' . _DB_PREFIX_ . 'orders o 
+                        WHERE o.id_cart = ' . (int)$id_cart . ' 
                     ), 
-                    \''.pSQL($process_print).'\'
+                    \'' . pSQL($process_print) . '\'
                 ),
-                \''.date('Y-m-d H:i:s').'\',
-                \''.date('Y-m-d H:i:s').'\'
+                \'' . date('Y-m-d H:i:s') . '\',
+                \'' . date('Y-m-d H:i:s') . '\'
             )';
 
         // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock

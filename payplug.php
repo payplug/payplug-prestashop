@@ -1848,6 +1848,10 @@ class Payplug extends PaymentModule
      */
     public function getAvailableOptions($cart)
     {
+        if (!$this->isAllowed()) {
+            return false;
+        }
+
         $permissions = $this->getAccountPermissions();
         $inst_min_amount = (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'));
 
@@ -1861,9 +1865,7 @@ class Payplug extends PaymentModule
             'oney' => (int)Configuration::get('PAYPLUG_ONEY') === 1 ? true : false,
         );
 
-        if (!$this->active
-            || Configuration::get('PAYPLUG_EMAIL') === null
-            || (int)Configuration::get('PAYPLUG_SHOW') === 0
+        if (Configuration::get('PAYPLUG_EMAIL') === null
             || !$this->checkCurrency($cart)
             || !$this->checkAmount($cart)
         ) {
@@ -4039,11 +4041,8 @@ class Payplug extends PaymentModule
      */
     public function hookCustomerAccount($params)
     {
-        if (!$this->active) {
-            return;
-        }
-        if (Configuration::get('PAYPLUG_SHOW') == 0) {
-            return;
+        if (!$this->isAllowed()) {
+            return false;
         }
 
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
@@ -4062,14 +4061,8 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayExpressCheckout($param)
     {
-        if (!$this->active) {
-            return;
-        }
-        if (Configuration::get('PAYPLUG_SHOW') == 0) {
-            return;
-        }
-        if (!Configuration::get('PAYPLUG_ONEY')) {
-            return;
+        if (!$this->isOneyAllowed()) {
+            return false;
         }
         $this->smarty->assign(['env' => 'checkout']);
 
@@ -4091,19 +4084,12 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($param)
     {
-        if (!$this->active) {
-            return;
+        if (!$this->isOneyAllowed()) {
+            return false;
         }
         $action = Tools::getValue('action');
         if ($action == 'quickview') {
             return false;
-        }
-
-        if (Configuration::get('PAYPLUG_SHOW') == 0) {
-            return;
-        }
-        if (!Configuration::get('PAYPLUG_ONEY')) {
-            return;
         }
         if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
             return;
@@ -4136,11 +4122,8 @@ class Payplug extends PaymentModule
      */
     public function hookHeader($params)
     {
-        if (!$this->active) {
-            return;
-        }
-        if (Configuration::get('PAYPLUG_SHOW') == 0) {
-            return;
+        if (!$this->isAllowed()) {
+            return false;
         }
 
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
@@ -4225,6 +4208,10 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
+        if(!$this->isAllowed()) {
+            return false;
+        }
+
         $cart = $params['cart'];
         if (!Validate::isLoadedObject($cart)) {
             return false;
@@ -4247,11 +4234,8 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentReturn($params)
     {
-        if (!$this->active) {
-            return null;
-        }
-        if (Configuration::get('PAYPLUG_SHOW') == 0) {
-            return null;
+        if (!$this->isAllowed()) {
+            return false;
         }
         $order_id = Tools::getValue('id_order');
         $order = new Order($order_id);
@@ -4752,13 +4736,26 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Check if Payplug is allowed
+     * @return bool
+     */
+    public function isAllowed()
+    {
+        if (!$this->active || !Configuration::get('PAYPLUG_SHOW')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Check if Oney is allowed
      * @return bool
      */
     public function isOneyAllowed()
     {
         $context = Context::getContext();
-        return Configuration::get('PAYPLUG_SHOW')
+        return $this->isAllowed()
             && Configuration::get('PAYPLUG_ONEY')
             && $this->isOneyAllowedCurrency($context->currency);
     }
