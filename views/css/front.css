@@ -521,6 +521,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   -ms-transition: opacity 0.4s;
   -o-transition: opacity 0.4s;
   transition: opacity 0.4s;
+  color: #777;
   display: none;
   position: absolute;
   right: 35px;
@@ -530,7 +531,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   width: 350px;
   padding: 15px;
   opacity: 0;
-  opacity: 1;
   text-align: left;
   -webkit-transform: translateY(-15%);
   -moz-transform: translateY(-15%);
