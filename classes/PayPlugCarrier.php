@@ -76,19 +76,24 @@ class PayPlugCarrier extends ObjectModel
      */
     public static function getActiveCarriers($id_lang)
     {
-        $req_all_carriers = '
-            SELECT *
-            FROM '._DB_PREFIX_.'carrier
-            WHERE deleted = 0
-        ';
-        $carriers = Db::getInstance()->executeS($req_all_carriers);
+        $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`
+                FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
+                LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
+                WHERE c.`deleted` = 0
+                AND c.`active` = 1';
+        $carriers = Db::getInstance()->executeS($sql);
+
         //$carriers = Carrier::getCarriers($id_lang, true);
         $active_carriers = array();
         if (!empty($carriers)) {
             foreach ($carriers as $carrier) {
-                $c = new PayPlugCarrier();
-                $c->populateFromCarrier($carrier['id_carrier']);
-                $active_carriers[$carrier['id_carrier']] = $c;
+                $c = new PayPlugCarrier($carrier['id_payplug_carrier']);
+                if ($carrier['name'] !== '0') {
+                    $c->name = $carrier['name'];
+                } else {
+                    $c->name = Carrier::getCarrierNameFromShopName();
+                }
+                $active_carriers[$c->id_carrier] = $c;
             }
         }
         return $active_carriers;
@@ -103,10 +108,9 @@ class PayPlugCarrier extends ObjectModel
     {
         $carriers = array();
         $req_payplug_carriers = '
-            SELECT pc.`id_payplug_carrier`, c.`name`
+            SELECT pc.`id_payplug_carrier`, c.`name` 
             FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
             LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
-            WHERE c.`active` = 1
             ORDER BY pc.`id_payplug_carrier` ASC';
         $res_payplug_carriers = Db::getInstance()->executeS($req_payplug_carriers);
         if ($res_payplug_carriers) {

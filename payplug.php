@@ -2302,7 +2302,7 @@ class Payplug extends PaymentModule
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
 
-        $carriers = PayPlugCarrier::getAll();
+        $carriers = PayPlugCarrier::getActiveCarriers($this->context->language->id);
 
         $this->assignSwitchConfiguration($configurations);
 
@@ -5820,7 +5820,7 @@ class Payplug extends PaymentModule
         Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
         if ((int)Tools::getValue('payplug_oney') == 1) {
-            $carriers = PayPlugCarrier::getAll();
+            $carriers = PayPlugCarrier::getActiveCarriers($this->context->language->id);
             foreach ($carriers as $carrier) {
                 if ((int)(Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay')) < 0) {
                     $this->displayError($this->l('Settings not updated'));
