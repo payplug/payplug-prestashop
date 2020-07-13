@@ -27,37 +27,21 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_0($object)
+function upgrade_module_2_27_0()
 {
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
-    // run the method who install Oney feature
-    $flag = $object->installOney();
+    // install table `payplug_logger`
+    $sql = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
+            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `process` VARCHAR(255) NOT NULL,
+            `content` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
 
-    //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $log->error('Fail to add new configuration');
-        $flag = false;
-    }
-
-    // Update payplug lock table
-    $sql_requests = array(
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
-    );
-
-    try {
-        foreach ($sql_requests as $sql_request) {
-            $request = Db::getInstance()->execute($sql_request);
-            if (!$request) {
-                $log->error('Fail to execute request: ' . $request);
-                $flag = false;
-            }
-        }
-    } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to execute requests');
-        $flag = false;
-    }
+    $flag = $flag && Db::getInstance()->execute($sql);
 
     return $flag;
 }
