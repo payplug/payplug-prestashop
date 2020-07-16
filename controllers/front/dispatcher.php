@@ -21,6 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+/**
+ * @description Dispatch payment method
+ */
 class PayplugDispatcherModuleFrontController extends ModuleFrontController
 {
 
