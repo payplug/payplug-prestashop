@@ -74,11 +74,12 @@ class PayPlugCache extends ObjectModel
 
     /**
      *
-     * Create the cache
+     * @description Set the cache in the DB
+     * Every Oney Simulation is stored
      *
      * @param string $cache_key
      * @param string $cache_value
-     * @return bool
+     * @return boolean
      */
     public function setCache($cache_key, $cache_value)
     {
@@ -93,8 +94,7 @@ class PayPlugCache extends ObjectModel
     }
 
     /**
-     *
-     * Retrieve id_payplug_cache
+     * @description Get the Oney simulation (identified by id_payplug_cache in parameter), if it exists in the database.
      *
      * @param string $cache_key
      * @return object
@@ -107,8 +107,10 @@ class PayPlugCache extends ObjectModel
     }
 
     /**
+     * @description Remove ONE specific Oney simulation (identified by id_payplug_cache in parameter).
+     *
      * @param $cache_key
-     * @return bool
+     * @return boolean
      */
     public function deleteCacheByKey($cache_key)
     {
@@ -119,6 +121,12 @@ class PayPlugCache extends ObjectModel
         return $cache->delete();
     }
 
+    /**
+     * @description Flush all the cache.
+     * Remove all Oney Simulation.
+     *
+     * @return boolean
+     */
     public function flushCache()
     {
         $req_cache = '

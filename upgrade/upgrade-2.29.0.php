@@ -27,6 +27,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @description Install PayPlug Cache DB in case of an upgrade of the module.
+ *
+ * @return boolean
+ */
 function upgrade_module_2_29_0()
 {
     $flag = true;
