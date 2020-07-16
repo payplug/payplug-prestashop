@@ -135,7 +135,7 @@ var $document, $window, payplugModule = {
             this.cta.init();
             this.form.init();
 
-            $window.on('load', function(){
+            $window.on('load', function () {
                 oney.load();
             });
 
@@ -148,7 +148,7 @@ var $document, $window, payplugModule = {
                     _ajax: 1,
                 };
 
-            if(full) {
+            if (full) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
             } else {
                 data['isOneyElligible'] = 1;
@@ -334,7 +334,7 @@ var $document, $window, payplugModule = {
                         {cta} = oney,
                         {popin} = cta;
 
-                    if(!oney.props.loaded) {
+                    if (!oney.props.loaded) {
                         oney.load(true);
                     }
 

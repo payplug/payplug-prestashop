@@ -21,8 +21,18 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+/**
+ * @description
+ * Treat ajax call
+ */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
+    /**
+     * @description
+     * Method that is executed after init() and checkAccess().
+     * Used to process user input.
+     *
+     */
     public function postProcess()
     {
         require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
