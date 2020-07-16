@@ -23,10 +23,14 @@
 
 class PayplugDispatcherModuleFrontController extends ModuleFrontController
 {
+
     /**
-     * @return string
-     * @see FrontController::postProcess()
+     * @description
+     * Method that is executed after init() and checkAccess().
+     * Used to process user input.
      *
+     * @return bool|void
+     * @throws Exception
      */
     public function postProcess()
     {
@@ -39,7 +43,6 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $is_installment = (bool)($method === 'installment');
             $oney_type = Tools::getValue('oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
-
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
