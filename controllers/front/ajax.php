@@ -32,6 +32,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
      * Method that is executed after init() and checkAccess().
      * Used to process user input.
      *
+     * return void
      */
     public function postProcess()
     {

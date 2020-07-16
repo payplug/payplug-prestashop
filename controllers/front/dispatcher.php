@@ -23,10 +23,13 @@
 
 class PayplugDispatcherModuleFrontController extends ModuleFrontController
 {
+
     /**
-     * @return string
-     * @see FrontController::postProcess()
+     * @description
+     * Method that is executed after init() and checkAccess().
+     * Used to process user input.
      *
+     * return void
      */
     public function postProcess()
     {
