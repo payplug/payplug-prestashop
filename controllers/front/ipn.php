@@ -28,6 +28,10 @@ require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 
+/**
+ * @description
+ * Treat notification received
+ */
 class PayplugIPNModuleFrontController extends ModuleFrontController
 {
     /**
@@ -63,6 +67,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     public $api_key;
 
     /**
+     * @description
      * Set Config to process the notification
      * @throws Exception
      */
@@ -75,6 +80,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Set the resource from the notification body
      */
     private function getResource()
@@ -100,6 +106,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Set the log method
      */
     private function setLogger()
@@ -109,6 +116,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification
      * @throws Exception
      */
@@ -129,6 +137,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification as a payment
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -968,6 +977,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification as a refund
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -1056,6 +1066,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification as an installment plan
      */
     private function processInstallment()
@@ -1068,6 +1079,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * @param $id_cart
      */
     protected function setContextFromCartID($id_cart)
