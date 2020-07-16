@@ -4094,7 +4094,7 @@ class Payplug extends PaymentModule
             $amount = $product_price * $quantity;
             $is_elligible = $this->isValidOneyAmount($amount, $this->context->currency->id);
 
-            if($is_elligible['error']) {
+            if ($is_elligible['error']) {
                 $this->smarty->assign(array(
                     'payplug_oney_error' => $is_elligible['error'],
                 ));
@@ -4199,7 +4199,7 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        if(!$this->isAllowed()) {
+        if (!$this->isAllowed()) {
             return false;
         }
 
