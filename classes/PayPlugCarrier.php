@@ -22,6 +22,7 @@
  */
 
 /**
+ * @description
  * PayPlugCarrier : This class associate delivery type and delivery time to existing Carrier
  * It's necessary for Oney
  */
@@ -69,22 +70,23 @@ class PayPlugCarrier extends ObjectModel
     );
 
     /**
+     * @description
      * Get Carriers from Prestashop who are not "deleted" for a given language
      *
      * @param int $id_lang ID of a language
+     * @param boolean $is_active
      * @return array of PayPlugCarrier
      */
-    public static function getActiveCarriers($id_lang)
+    public static function getCarriers($id_lang, $is_active = true)
     {
         $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`
                 FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
                 LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
-                WHERE c.`deleted` = 0
-                AND c.`active` = 1';
+                WHERE c.`deleted` = 0'
+                . ($is_active ? 'AND c.`active` = 1' : '');
         $carriers = Db::getInstance()->executeS($sql);
 
-        //$carriers = Carrier::getCarriers($id_lang, true);
-        $active_carriers = array();
+        $active_carriers = [];
         if (!empty($carriers)) {
             foreach ($carriers as $carrier) {
                 $c = new PayPlugCarrier($carrier['id_payplug_carrier']);
@@ -100,6 +102,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get all PayPlugCarrier registered in database
      *
      * @return array of PayPlugCarrier
@@ -128,6 +131,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get PayPlugCarrier for given id_carrier
      *
      * @param int $id_carrier ID of a Prestashop Carrier
@@ -147,6 +151,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get name from the corresponding Prestashop Carrier
      *
      * @return string Carrier name
@@ -158,6 +163,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get PayPlugCarrier for given id_carrier : static version
      *
      * @param int $id_carrier ID of a Prestashop Carrier
@@ -173,6 +179,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Automatically populate a PayPlugCarrier with basic data from a given Carrier
      *
      * @param Carrier $carrier Object Carrier
