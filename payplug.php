@@ -6217,7 +6217,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Initialize the cache (For the API Marketing)
+     * @description Initialize the cache (For the API Marketing)
      */
     private function initializeCache()
     {
