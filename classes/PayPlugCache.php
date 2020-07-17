@@ -25,6 +25,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @description The PayPlug Cache class is used to store and retrieve every Oney Simulation
+ */
 class PayPlugCache extends ObjectModel
 {
 
@@ -59,11 +62,12 @@ class PayPlugCache extends ObjectModel
     );
 
     /**
+     * @description Constructor of tf the class
+     *
      * @param int $id
      * @param int $id_lang
      * @return PayplugCache
      * @see ObjectModel::__construct()
-     *
      */
     public function __construct($id = null, $id_lang = null)
     {

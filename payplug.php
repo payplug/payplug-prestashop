@@ -4275,7 +4275,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Flush PayPlugCache, when PrestaShop cache cleared
+     * @description Flush PayPlugCache, when PrestaShop cache cleared
     */
     public function hookActionClearCompileCache($params)
     {
