@@ -80,8 +80,8 @@ class PayPlugCarrier extends ObjectModel
     public static function getCarriers($id_lang, $is_active = true)
     {
         $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`
-                FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
-                LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
+                FROM `'._DB_PREFIX_.'carrier` c
+                LEFT JOIN `'._DB_PREFIX_.self::$definition['table'] . '` pc ON (pc.id_carrier = c.id_carrier)
                 WHERE c.`deleted` = 0'
                 . ($is_active ? 'AND c.`active` = 1' : '');
         $carriers = Db::getInstance()->executeS($sql);
