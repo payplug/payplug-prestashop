@@ -29,9 +29,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_27_20($object)
 {
-    $flag = true;
-
     Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
-
-    return $flag;
+    return true;
 }
