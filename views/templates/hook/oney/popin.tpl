@@ -39,7 +39,6 @@
 			    {include file="./payment_detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
         {/foreach}
-
         <span class="oneyPopin_legal">{$legal_notice|escape:'htmlall':'UTF-8'}</span>
     {else}
         <p class="oneyPopin_error">{l s='Oney is momentarily unavailable.' mod='payplug'}</p>
