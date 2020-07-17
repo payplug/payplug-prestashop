@@ -4092,8 +4092,14 @@ class Payplug extends PaymentModule
             $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null,
                 false, true, $quantity);
             $amount = $product_price * $quantity;
-            $this->assignOneyPriceAndPaymentOptions(false, $amount);
-            $this->smarty->assign(['popin' => true]);
+            $is_elligible = $this->isValidOneyAmount($amount, $this->context->currency->id);
+
+            if ($is_elligible['error']) {
+                $this->smarty->assign(array(
+                    'payplug_oney_error' => $is_elligible['error'],
+                ));
+                $this->smarty->assign(['popin' => true]);
+            }
         }
         $this->smarty->assign(['env' => 'product']);
         return $this->display(__FILE__, 'oney/cta.tpl');
@@ -4193,7 +4199,7 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        if(!$this->isAllowed()) {
+        if (!$this->isAllowed()) {
             return false;
         }
 
