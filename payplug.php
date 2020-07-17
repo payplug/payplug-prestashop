@@ -4094,7 +4094,6 @@ class Payplug extends PaymentModule
             return;
         }
 
-        $action = Tools::getValue('action');
         if ($action == 'refresh') {
             $use_taxes = (bool)Configuration::get('PS_TAX');
 
