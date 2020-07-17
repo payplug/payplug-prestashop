@@ -30,10 +30,10 @@
 class PayPlugCarrier extends ObjectModel
 {
     /** @const int Default delivery delay value in days for new carrier */
-    const CARRIER_DEFAULT_DELAY = 3;
+    const CARRIER_DEFAULT_DELAY = 0;
 
     /** @const string Default delivery type value for new carrier */
-    const CARRIER_DEFAULT_DELIVERY_TYPE = '';
+    const CARRIER_DEFAULT_DELIVERY_TYPE = 'storepickup';
 
     /** @var int Carrier id */
     public $id_carrier;
@@ -82,8 +82,7 @@ class PayPlugCarrier extends ObjectModel
         $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`
                 FROM `'._DB_PREFIX_.'carrier` c
                 LEFT JOIN `'._DB_PREFIX_.self::$definition['table'] . '` pc ON (pc.id_carrier = c.id_carrier)
-                WHERE c.`deleted` = 0'
-                . ($is_active ? 'AND c.`active` = 1' : '');
+                WHERE c.`deleted` = 0' . ($is_active ? ' AND c.`active` = 1' : '');
         $carriers = Db::getInstance()->executeS($sql);
 
         $active_carriers = [];

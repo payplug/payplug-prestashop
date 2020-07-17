@@ -2308,8 +2308,6 @@ class Payplug extends PaymentModule
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
 
-        $carriers = PayPlugCarrier::getCarriers($this->context->language->id);
-
         $this->assignSwitchConfiguration($configurations);
 
         $this->context->smarty->assign(array(
@@ -2569,7 +2567,7 @@ class Payplug extends PaymentModule
         return [
             'delivery_label' => $carrier->name,
             'expected_delivery_date' => date('Y-m-d'),
-            'delivery_type' => 'carrier'
+            'delivery_type' => 'storepickup'
         ];
 
         return $delivery_data;
@@ -5524,12 +5522,6 @@ class Payplug extends PaymentModule
             // check if oney was elligible then return if not
             $is_elligible = $this->isOneyElligible($this->context->cart, false, true);
 
-            if (!$is_elligible['result']) {
-                $this->setPaymentErrorsCookie([$is_elligible['error']]);
-                return ['result' => false, 'response' => $is_elligible['error']];
-            }
-
-            $is_elligible = $this->isValidOneyCarrier($this->context->cart);
             if (!$is_elligible['result']) {
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
