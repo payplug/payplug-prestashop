@@ -2308,8 +2308,6 @@ class Payplug extends PaymentModule
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
 
-        $carriers = PayPlugCarrier::getCarriers($this->context->language->id);
-
         $this->assignSwitchConfiguration($configurations);
 
         $this->context->smarty->assign(array(
@@ -2338,7 +2336,6 @@ class Payplug extends PaymentModule
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->getOrderStates(),
-            'carriers' => $carriers,
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
             'faq_links' => $faq_links,
@@ -2387,15 +2384,6 @@ class Payplug extends PaymentModule
         if ($oney_payment_options) {
             $this->smarty->assign(array(
                 'oney_payment_options' => $oney_payment_options,
-            ));
-        }
-
-        // if no errors check carrier for payment template
-        if ($oney_payment_options && Validate::isLoadedObject($cart) && $cart->id_carrier) {
-            $is_valid_carrier = $this->isValidOneyCarrier($cart);
-            $this->smarty->assign(array(
-                'payplug_oney_allowed' => $is_valid_carrier['result'],
-                'payplug_oney_error' => $is_valid_carrier['error']
             ));
         }
 
@@ -2579,7 +2567,7 @@ class Payplug extends PaymentModule
         return [
             'delivery_label' => $carrier->name,
             'expected_delivery_date' => date('Y-m-d'),
-            'delivery_type' => 'carrier'
+            'delivery_type' => 'storepickup'
         ];
 
         return $delivery_data;
@@ -2666,15 +2654,6 @@ class Payplug extends PaymentModule
         }
 
         $popin_tpl = $this->displayOneyPopin();
-
-        // if no errors check carrier for payment template
-        if ($oney_payment_options && Validate::isLoadedObject($cart) && $cart->id_carrier) {
-            $is_valid_carrier = $this->isValidOneyCarrier($cart);
-            $this->smarty->assign(array(
-                'payplug_oney_allowed' => $is_valid_carrier['result'],
-                'payplug_oney_error' => $is_valid_carrier['error']
-            ));
-        }
 
         return [
             'options' => $oney_payment_options,
@@ -3247,9 +3226,8 @@ class Payplug extends PaymentModule
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
 
             $is_elligible = $this->isOneyElligible($this->context->cart, $cart_amount, true);
-            $is_valid_carrier = $this->isValidOneyCarrier($this->context->cart);
 
-            $error = $is_elligible['result'] ? ($is_valid_carrier['result'] ? false : $is_valid_carrier['error_type']) : $is_elligible['error_type'];
+            $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
             $payment_schedule = false;
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && !$error;
@@ -5544,12 +5522,6 @@ class Payplug extends PaymentModule
             // check if oney was elligible then return if not
             $is_elligible = $this->isOneyElligible($this->context->cart, false, true);
 
-            if (!$is_elligible['result']) {
-                $this->setPaymentErrorsCookie([$is_elligible['error']]);
-                return ['result' => false, 'response' => $is_elligible['error']];
-            }
-
-            $is_elligible = $this->isValidOneyCarrier($this->context->cart);
             if (!$is_elligible['result']) {
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];

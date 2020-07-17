@@ -30,10 +30,10 @@
 class PayPlugCarrier extends ObjectModel
 {
     /** @const int Default delivery delay value in days for new carrier */
-    const CARRIER_DEFAULT_DELAY = 3;
+    const CARRIER_DEFAULT_DELAY = 0;
 
     /** @const string Default delivery type value for new carrier */
-    const CARRIER_DEFAULT_DELIVERY_TYPE = '';
+    const CARRIER_DEFAULT_DELIVERY_TYPE = 'storepickup';
 
     /** @var int Carrier id */
     public $id_carrier;
@@ -79,17 +79,23 @@ class PayPlugCarrier extends ObjectModel
      */
     public static function getCarriers($id_lang, $is_active = true)
     {
-        $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`
-                FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
-                LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
-                WHERE c.`deleted` = 0'
-                . ($is_active ? 'AND c.`active` = 1' : '');
+        $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`, c.`id_carrier`
+                FROM `'._DB_PREFIX_.'carrier` c
+                LEFT JOIN `'._DB_PREFIX_.self::$definition['table'] . '` pc ON (pc.id_carrier = c.id_carrier)
+                WHERE c.`deleted` = 0' . ($is_active ? ' AND c.`active` = 1' : '');
         $carriers = Db::getInstance()->executeS($sql);
 
         $active_carriers = [];
         if (!empty($carriers)) {
             foreach ($carriers as $carrier) {
                 $c = new PayPlugCarrier($carrier['id_payplug_carrier']);
+
+                if (!Validate::isLoadedObject($c)) {
+                    $c->id_carrier = $carrier['id_carrier'];
+                    $c->delay = PayPlugCarrier::CARRIER_DEFAULT_DELAY;
+                    $c->delivery_type = PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE;
+                }
+
                 if ($carrier['name'] !== '0') {
                     $c->name = $carrier['name'];
                 } else {
