@@ -73,7 +73,6 @@ class PayPlugCache extends ObjectModel
     }
 
     /**
-     *
      * @description Set the cache in the DB
      * Every Oney Simulation is stored
      *
