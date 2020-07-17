@@ -28,6 +28,10 @@ require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 
+/**
+ * @description
+ * Treat notification received
+ */
 class PayplugIPNModuleFrontController extends ModuleFrontController
 {
     /**
@@ -63,6 +67,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     public $api_key;
 
     /**
+     * @description
      * Set Config to process the notification
      * @throws Exception
      */
@@ -75,6 +80,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Set the resource from the notification body
      */
     private function getResource()
@@ -100,6 +106,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Set the log method
      */
     private function setLogger()
@@ -109,6 +116,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification
      * @throws Exception
      */
@@ -129,6 +137,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification as a payment
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -252,8 +261,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             } else {
                 $this->setContextFromCartID($cart->id);
 
+                $lock_counter = 0;
                 $cart_lock = false;
                 do {
+                    $lock_counter++;
                     $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
                     if (!$cart_lock) {
                         PayplugLock::check($cart->id);
@@ -261,6 +272,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         $this->logger->addLog('Lock created');
                     }
                 } while (!$cart_lock);
+                $this->logger->addLog('Lock_count: ' . (int)$lock_counter, 'debug');
 
                 $id_order = Order::getOrderByCartId($cart->id);
 
@@ -295,8 +307,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     }
                     if (!Validate::isLoadedObject($order)) {
                         $this->logger->addLog('Order cannot be loaded.', 'error');
-                        $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                        if (!$cart_unlock) {
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'debug');
@@ -369,8 +380,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 die(json_encode($response));
                             }
                             $this->logger->addLog('Order updated.');
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -425,8 +435,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 die(json_encode($response));
                             }
                             $this->logger->addLog('Order updated.');
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -476,8 +485,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                             if (!$payment->is_paid) {
                                 $this->logger->addLog('The payment is not paid yet.');
-                                $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                                if (!$cart_unlock) {
+                                if (!PayplugLock::deleteLockG2($cart->id)) {
                                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
@@ -531,8 +539,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 die(json_encode($response));
                             }
                             $this->logger->addLog('Order updated.');
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -541,8 +548,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             die;
                         } elseif ($current_state == $paid_state) {
                             $this->logger->addLog('Order is already paid.');
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -565,8 +571,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $this->payplug->updatePayplugInstallment($installment);
                         } elseif ($current_state == $refund_state) {
                             $this->logger->addLog('Order has been refunded.');
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -586,8 +591,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 'Paid state: ' . (int)$paid_state, 'debug'
                             );
                             $this->logger->addLog('Current order state is in conflict with IPN.', 'error');
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -629,6 +633,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         //We can't treat Oney pending IPN anymore because it's sent with no reason
                         if ($is_oney && !$payment->is_paid) {
                             $this->logger->addLog('This is a pending IPN, no order will be created.', 'info');
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
+                                $this->logger->addLog('Lock cannot be deleted.', 'error');
+                            } else {
+                                $this->logger->addLog('Lock deleted.', 'debug');
+                            }
                             header(
                                 $_SERVER['SERVER_PROTOCOL']
                                 . ' 200 This is a pending IPN, no order will be created.',
@@ -657,6 +666,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     } catch (Exception $exception) {
                         $this->logger->addLog(
                             'Customer cannot be loaded: ' . $exception->getMessage(), 'error');
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'debug');
+                        }
                         $response = array(
                             'exception' => $exception->getMessage(),
                         );
@@ -669,13 +683,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     }
                     if (!Validate::isLoadedObject($customer)) {
                         $this->logger->addLog('Customer cannot be loaded.', 'error');
-                        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Customer cannot be loaded.', true, 500);
-                        $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                        if (!$cart_unlock) {
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'debug');
                         }
+                        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Customer cannot be loaded.', true, 500);
                         die;
                     } else {
                         /*
@@ -767,6 +780,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         } catch (Exception $exception) {
                             $this->logger->addLog(
                                 'Order cannot be validated: ' . $exception->getMessage(), 'error');
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
+                                $this->logger->addLog('Lock cannot be deleted.', 'error');
+                            } else {
+                                $this->logger->addLog('Lock deleted.', 'debug');
+                            }
                             $response = array(
                                 'exception' => $exception->getMessage(),
                             );
@@ -779,14 +797,13 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         }
                         if (!$is_order_validated) {
                             $this->logger->addLog('Order cannot be validated.', 'error');
-                            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be validated.', true,
-                                500);
-                            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                            if (!$cart_unlock) {
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
                             }
+                            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be validated.', true,
+                                500);
                             die;
                         } else {
                             $id_order = Order::getOrderByCartId($cart->id);
@@ -806,6 +823,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
                                     'Payment cannot be patched: ' . $exception->getMessage(), 'error');
+                                if (!PayplugLock::deleteLockG2($cart->id)) {
+                                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                                } else {
+                                    $this->logger->addLog('Lock deleted.', 'debug');
+                                }
                                 $response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -819,19 +841,23 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $this->logger->addLog('Payment patched');
                             if (!Validate::isLoadedObject($order)) {
                                 $this->logger->addLog('Order cannot be loaded.', 'error');
-                                header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be loaded.', true,
-                                    500);
-                                $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                                if (!$cart_unlock) {
+                                if (!PayplugLock::deleteLockG2($cart->id)) {
                                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
                                 }
+                                header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be loaded.', true,
+                                    500);
                                 die;
                             } else {
                                 if ($this->resource->installment_plan_id != null) {
                                     $this->logger->addLog('Installment correctly registered.',
                                         'info');
+                                    if (!PayplugLock::deleteLockG2($cart->id)) {
+                                        $this->logger->addLog('Lock cannot be deleted.', 'error');
+                                    } else {
+                                        $this->logger->addLog('Lock deleted.', 'debug');
+                                    }
                                     header($_SERVER['SERVER_PROTOCOL'] . ' 200 Installment correctly registered.',
                                         true, 200);
                                     die;
@@ -844,6 +870,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $this->logger->addLog(
                                             'Payment cannot be updated: ' . $exception->getMessage(),
                                             'error');
+                                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                                        } else {
+                                            $this->logger->addLog('Lock deleted.', 'debug');
+                                        }
                                         $response = array(
                                             'exception' => $exception->getMessage(),
                                         );
@@ -860,8 +891,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         }
                     }
 
-                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                    if (!$cart_unlock) {
+                    if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
@@ -877,6 +907,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     if (!$res_nb_orders) {
                         $this->logger->addLog('No order can be found using id_cart ' . (int)$cart->id,
                             'error');
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'debug');
+                        }
                         header($_SERVER['SERVER_PROTOCOL'] . ' 500 No order can be found using id_cart ' . (int)$cart->id,
                             true, 500);
                         die;
@@ -885,6 +920,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             'There is more than one order using id_cart ' . (int)$cart->id, 'error');
                         foreach ($res_nb_orders as $o) {
                             $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
+                        }
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'debug');
                         }
                         header($_SERVER['SERVER_PROTOCOL'] . ' 500 There is more than one order using id_cart ' . (int)$cart->id,
                             true, 500);
@@ -900,12 +940,22 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     if (!$payments) {
                         $this->logger->addLog(
                             'No transaction can be found using id_order ' . (int)$id_order, 'error');
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'debug');
+                        }
                         header($_SERVER['SERVER_PROTOCOL'] . ' 500 No transaction can be found using id_order ' . (int)$id_order,
                             true, 500);
                         die;
                     } elseif (count($payments) > 1) {
                         $this->logger->addLog(
                             'There is more than one transaction using id_order ' . (int)$id_order, 'error');
+                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'debug');
+                        }
                         header($_SERVER['SERVER_PROTOCOL'] . ' 500 There is more than one transaction using id_order ' . (int)$id_order,
                             true, 500);
                         die;
@@ -914,6 +964,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     }
 
                     $this->logger->addLog('Order created.');
+                    if (!PayplugLock::deleteLockG2($cart->id)) {
+                        $this->logger->addLog('Lock cannot be deleted.', 'error');
+                    } else {
+                        $this->logger->addLog('Lock deleted.', 'debug');
+                    }
                     header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order created.', true, 200);
                     die;
                 }
@@ -922,6 +977,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification as a refund
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -1010,6 +1066,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * Process the notification as an installment plan
      */
     private function processInstallment()
@@ -1022,6 +1079,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * @description
      * @param $id_cart
      */
     protected function setContextFromCartID($id_cart)
