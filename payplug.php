@@ -1092,6 +1092,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Create basic configuration
      *
      * @return bool
@@ -1100,6 +1101,7 @@ class Payplug extends PaymentModule
     {
         return (Configuration::updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
             && Configuration::updateValue('PAYPLUG_COMPANY_ID', null)
+            && Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', null)
             && Configuration::updateValue('PAYPLUG_COMPANY_STATUS', '')
             && Configuration::updateValue('PAYPLUG_CURRENCIES', 'EUR')
             && Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0)
@@ -1203,6 +1205,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Delete card
      *
      * @param int $id_customer
@@ -1212,7 +1215,8 @@ class Payplug extends PaymentModule
      */
     public function deleteCard($id_customer, $id_payplug_card, $api_key)
     {
-        $id_company = (int)Configuration::get('PAYPLUG_COMPANY_ID');
+        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $id_company = (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
         $url = $this->api_url . '/v1/cards/' . $id_card;
         $curl_version = curl_version();
@@ -1283,6 +1287,7 @@ class Payplug extends PaymentModule
     {
         return (Configuration::deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
             && Configuration::deleteByName('PAYPLUG_COMPANY_ID')
+            && Configuration::deleteByName('PAYPLUG_COMPANY_ID_TEST')
             && Configuration::deleteByName('PAYPLUG_COMPANY_STATUS')
             && Configuration::deleteByName('PAYPLUG_CONFIGURATION_OK')
             && Configuration::deleteByName('PAYPLUG_CURRENCIES')
@@ -1740,12 +1745,14 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Get account permission from Payplug API
      *
      * @param string $api_key
+     * @param boolean $sandbox
      * @return array OR bool
      */
-    public function getAccount($api_key)
+    public function getAccount($api_key, $sandbox = true)
     {
         $url = $this->api_url . $this->routes['account'];
         $curl_version = curl_version();
@@ -1769,7 +1776,7 @@ class Payplug extends PaymentModule
         if ($error_curl == 0) {
             $json_answer = json_decode($answer);
 
-            if ($permissions = $this->treatAccountResponse($json_answer)) {
+            if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
                 return $permissions;
             } else {
                 return false;
@@ -1780,6 +1787,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Check if account is premium
      *
      * @param string $api_key
@@ -1790,7 +1798,7 @@ class Payplug extends PaymentModule
         if ($api_key == null) {
             $api_key = self::setAPIKey();
         }
-        $permissions = $this->getAccount($api_key);
+        $permissions = $this->getAccount($api_key, false);
         return $permissions;
     }
 
@@ -1990,6 +1998,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Get collection of cards
      *
      * @param int $id_customer
@@ -2005,7 +2014,7 @@ class Payplug extends PaymentModule
               pc. exp_month, pc.exp_year, pc.brand, pc.country, pc.metadata');
         $req_payplug_card->from('payplug_card', 'pc');
         $req_payplug_card->where('pc.id_customer = ' . (int)$id_customer);
-        $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get('PAYPLUG_COMPANY_ID'));
+        $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')));
         $req_payplug_card->where('pc.is_sandbox = ' . (int)$is_sandbox);
         $res_payplug_card = Db::getInstance()->executeS($req_payplug_card);
 
@@ -5328,6 +5337,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * prepare payment
      *
      * @param object $cart
@@ -5367,11 +5377,13 @@ class Payplug extends PaymentModule
             ];
         }
 
+        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+
         // get the config
         $config = [
             'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK'),
             'installment' => (int)Configuration::get('PAYPLUG_INST'),
-            'company' => (int)Configuration::get('PAYPLUG_COMPANY_ID'),
+            'company' => (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')),
             'inst_mode' => (int)Configuration::get('PAYPLUG_INST_MODE'),
             'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED'),
             'oney' => (int)Configuration::get('PAYPLUG_ONEY')
@@ -5883,6 +5895,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Determine witch environnement is used
      *
      * @param PayplugPayment $payment
@@ -5896,7 +5909,8 @@ class Payplug extends PaymentModule
         }
 
         $customer_id = (int)$payment->metadata['ID Client'];
-        $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
+        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
         // if card exists then return false
@@ -6300,12 +6314,14 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description
      * Read API response and return permissions
      *
      * @param string $json_answer
+     * @param boolean $is_sandbox
      * @return array OR bool
      */
-    private function treatAccountResponse($json_answer)
+    private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
         if ((isset($json_answer->object) && $json_answer->object == 'error')
             || empty($json_answer)
@@ -6387,7 +6403,7 @@ class Payplug extends PaymentModule
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
-        Configuration::updateValue('PAYPLUG_COMPANY_ID', $id);
+        Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
         Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', $configuration['max_amounts']);
