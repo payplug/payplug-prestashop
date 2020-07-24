@@ -25,7 +25,13 @@
  * Core file of PayPlug module
  */
 
+require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
+
+use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
+use PayPlug\classes\MyLogPHP;
+use PayPlug\entities\PayPlugTestEntity;
+use PayPlug\entities\PayPlugConfigurationEntity as PayPlugConfiguration;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -33,7 +39,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
@@ -96,6 +101,10 @@ class Payplug extends PaymentModule
 
     /** @var string */
     public $site_url;
+
+
+    /** @var PayPlugConfiguration */
+    public $configuration;
 
     /** @var bool */
     private $ssl_enable;
@@ -227,6 +236,11 @@ class Payplug extends PaymentModule
      */
     public function __construct()
     {
+        $this->configuration = new PayplugConfiguration();
+        $config = $this->configuration->get('sandbox_mode');
+        //$config = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        die($config);
+
         $this->setPrimaryModuleProperties();
         $this->setLoggers();
         parent::__construct();

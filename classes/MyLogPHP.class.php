@@ -14,6 +14,8 @@
  * @link       http://github.com/llagerlof/MyLogPHP
  */
 
+namespace PayPlug\classes;
+
 class MyLogPHP
 {
     /**

@@ -1,0 +1,11 @@
+{
+    "name": "cyril/payplug",
+    "require": {
+        "giggsey/libphonenumber-for-php": "^8.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "PayPlug\\": "./"
+        }
+    }
+}
