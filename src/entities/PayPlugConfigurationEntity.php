@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PayPlug\entities;
+namespace PayPlug\src\entities;
 
 
 

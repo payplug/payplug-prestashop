@@ -30,8 +30,10 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
 use PayPlug\classes\MyLogPHP;
-use PayPlug\entities\PayPlugTestEntity;
-use PayPlug\entities\PayPlugConfigurationEntity as PayPlugConfiguration;
+use PayPlug\src\entities\PayPlugTestEntity;
+use PayPlug\src\entities\PayPlugConfigurationEntity as PayPlugConfiguration;
+use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\repositories\PluginRepository;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -50,6 +52,9 @@ class Payplug extends PaymentModule
     const PAYPLUG_PROD_SITE_URL = 'https://www.payplug.com';
     const INST_MIN_AMOUNT = 4;
 
+    /** @var PluginEntity */
+    private $plugin;
+
     /** @var string */
     private $api_live;
 
@@ -58,9 +63,6 @@ class Payplug extends PaymentModule
 
     /** @var string */
     private $api_url;
-
-    /** @var string */
-    public $api_version;
 
     /** @var array */
     public $check_configuration = array();
@@ -236,18 +238,38 @@ class Payplug extends PaymentModule
      */
     public function __construct()
     {
-        $this->configuration = new PayplugConfiguration();
-        $config = $this->configuration->get('sandbox_mode');
-        //$config = Configuration::get('PAYPLUG_SANDBOX_MODE');
-        die($config);
+        $this->name = 'payplug';
+        $this->author = 'PayPlug';
+        $this->bootstrap = true;
+        $this->currencies = true;
+        $this->currencies_mode = 'checkbox';
+        $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
+        $this->displayName = 'PayPlug';
+        $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
+        $this->need_instance = true;
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
+        $this->tab = 'payments_gateways';
+        $this->version = '2.27.0';
 
-        $this->setPrimaryModuleProperties();
+        $this->plugin = (new PluginRepository())->getEntity();
+
         $this->setLoggers();
         parent::__construct();
         $this->setEnvironment();
         $this->setConfigurationProperties();
         $this->setSecretKey();
         $this->setUserAgent();
+    }
+
+    public function getPlugin()
+    {
+        return $this->plugin;
+    }
+
+    public function setPlugin($plugin)
+    {
+        $this->api_version = $plugin;
+        return $this;
     }
 
     public function abortPayment()
@@ -6099,21 +6121,7 @@ class Payplug extends PaymentModule
      */
     private function setPrimaryModuleProperties()
     {
-        // Must be set before translations
-        $this->name = 'payplug';
 
-        $this->author = 'PayPlug';
-        $this->bootstrap = true;
-        $this->currencies = true;
-        $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
-        $this->displayName = 'PayPlug';
-        $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
-        $this->need_instance = true;
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
-        $this->tab = 'payments_gateways';
-        $this->version = '2.27.0';
-        $this->api_version = '2019-08-06';
     }
 
     /**
@@ -6134,7 +6142,7 @@ class Payplug extends PaymentModule
 
         return \Payplug\Payplug::init([
             'secretKey' => $token,
-            'apiVersion' => $this->api_version
+            'apiVersion' => $this->plugin->getApiVersion()
         ]);
     }
 

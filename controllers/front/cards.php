@@ -52,7 +52,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $payplug = Module::getInstanceByName('payplug');
         \Payplug\Payplug::init([
             'secretKey' => $payplug->current_api_key,
-            'apiVersion' => $payplug->api_version
+            'apiVersion' => $payplug->getPlugin()->getApiVersion()
         ]);
 
         $context = Context::getContext();
