@@ -12,4 +12,10 @@ class Repository
     {
         return $this->entity;
     }
-}
+
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        return $this;
+    }
+}   

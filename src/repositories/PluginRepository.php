@@ -1,21 +1,41 @@
 <?php
+/**
+ * 2013 - 2020 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
 
 
 namespace PayPlug\src\repositories;
 
 
-use PayPlug\classes\MyLogPHP;
+use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\entities\PluginEntity;
 
 class PluginRepository extends Repository
 {
     public function __construct()
     {
-        //$logger = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
-
-        $this->entity = new PluginEntity();
+        $logger = new LoggerEntity();
+        $this->setEntity(new PluginEntity());
         $this->entity
-            ->setApiVersion('2019-08-06');
-            //->setLogger($logger);
+            ->setApiVersion('2019-08-06')
+            ->setLogger($logger);
     }
 }

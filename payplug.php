@@ -30,8 +30,8 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
 use PayPlug\classes\MyLogPHP;
-use PayPlug\src\entities\PayPlugTestEntity;
-use PayPlug\src\entities\PayPlugConfigurationEntity as PayPlugConfiguration;
+use PayPlug\repositories\LoggerRepository;
+use PayPlug\src\entities\ConfigurationEntity as PayPlugConfiguration;
 use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\repositories\PluginRepository;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
@@ -253,7 +253,8 @@ class Payplug extends PaymentModule
 
         $this->plugin = (new PluginRepository())->getEntity();
 
-        $this->setLoggers();
+        $this->plugin->getLogger()->info('Test.');
+
         parent::__construct();
         $this->setEnvironment();
         $this->setConfigurationProperties();
