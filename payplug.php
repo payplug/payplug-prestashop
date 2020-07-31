@@ -1530,7 +1530,10 @@ class Payplug extends PaymentModule
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
-        $inst_id = $args['inst_id'];
+        $inst_id = null;
+        if (isset($args['inst_id'])) {
+            $inst_id = $args['inst_id'];
+        }
 
         switch ($type) {
             case 'pwd' :
