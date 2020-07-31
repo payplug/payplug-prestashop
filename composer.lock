@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "61a034aa7f16e20f34fc78409b808454",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
-            "version": "8.12.7",
+            "version": "8.12.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "3ca7b9a09fc2b00a508875ac2c52ef5c19ef2c4c"
+                "reference": "fda8a51ad0769d82ce7023255e52e9c45efc1e75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/3ca7b9a09fc2b00a508875ac2c52ef5c19ef2c4c",
-                "reference": "3ca7b9a09fc2b00a508875ac2c52ef5c19ef2c4c",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/fda8a51ad0769d82ce7023255e52e9c45efc1e75",
+                "reference": "fda8a51ad0769d82ce7023255e52e9c45efc1e75",
                 "shasum": ""
             },
             "require": {
@@ -72,7 +72,7 @@
                 "phonenumber",
                 "validation"
             ],
-            "time": "2020-07-02T12:08:36+00:00"
+            "time": "2020-07-25T15:34:01+00:00"
         },
         {
             "name": "giggsey/locale",
@@ -194,5 +194,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

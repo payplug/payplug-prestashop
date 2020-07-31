@@ -24,18 +24,25 @@
 
 namespace PayPlug\src\repositories;
 
-
-use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\entities\PluginEntity;
 
-class PluginRepository extends Repository
+class PluginRepository
 {
+    private $plugin;
+
     public function __construct()
     {
-        $logger = new LoggerEntity();
-        $this->setEntity(new PluginEntity());
-        $this->entity
+        $this->plugin = new PluginEntity();
+        $this->plugin
             ->setApiVersion('2019-08-06')
-            ->setLogger($logger);
+            /*->setLogger($this->loggerEntity)*/;
+        return $this;
     }
+
+    public function logger()
+    {
+        return new \PayPlug\src\repositories\LoggerRepository();
+    }
+
+
 }
