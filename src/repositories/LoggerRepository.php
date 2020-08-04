@@ -37,9 +37,9 @@ class LoggerRepository
         $this->LoggerEntity = new LoggerEntity();
     }
 
-    public function addLog()
+    public function addLog($niveau, $message)
     {
-        die('Je add dans le log');
+        die($niveau.', '.$message);
     }
 
     /*
