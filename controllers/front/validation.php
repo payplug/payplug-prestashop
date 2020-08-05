@@ -21,6 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+
+
+use PayPlug\classes\MyLogPHP;
+
 //Inclusions
 require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');

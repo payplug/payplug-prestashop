@@ -253,15 +253,7 @@ class Payplug extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '2.27.0';
 
-        $this->plugin = new PluginRepository();
-        var_dump($this->plugin->getEntity()->getApiVersion()); exit;
-        var_dump($this->plugin->getEntity()->getLogger()->addlog('warning','fuck')); exit;
-
-
-        $this->logger = $this->plugin->logger();
-
-//        $this->plugin->getLogger();
-//        $this->logger->addLog('notice','message du log');
+        $this->plugin = (new PluginRepository())->getEntity();
 
         parent::__construct();
         $this->setEnvironment();
