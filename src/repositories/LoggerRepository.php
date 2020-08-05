@@ -21,20 +21,27 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlug\entities\PayPlugLoggerEntity;
+use PayPlug\src\entities\LoggerEntity;
 
 class LoggerRepository
 {
     /**
      * @var object $PayPlugLoggerEntity
      */
-    private $PayPlugLoggerEntity;
+    private $LoggerEntity;
 
-    public function info() {
-        die('logger repo info');
+    public function __construct()
+    {
+        $this->LoggerEntity = new LoggerEntity();
     }
+
+    public function addLog($niveau, $message)
+    {
+        die($niveau.', '.$message);
+    }
+
     /*
 
     public function __construct($process = '', $id = null, $id_lang = null, $type = 'notification')

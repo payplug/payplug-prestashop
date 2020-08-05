@@ -40,6 +40,8 @@ include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
 
 $payplug = new Payplug();
 
+$logger = $payplug->getPlugin()->logger();
+
 if (Tools::getValue('_ajax') == 1) {
     if ((int)Tools::getValue('en') == 1 && (int)Configuration::get('PAYPLUG_SHOW') == 0) {
         Configuration::updateValue('PAYPLUG_SHOW', 1);
@@ -62,6 +64,7 @@ if (Tools::getValue('_ajax') == 1) {
         die(true);
     }
     if ((int)Tools::getValue('popin') == 1) {
+        $logger->addLog('notice','Popin OK');
         $args = null;
         if (Tools::getValue('type') == 'confirm') {
             $sandbox = (int)Tools::getValue('sandbox');

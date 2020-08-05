@@ -8,7 +8,7 @@ namespace PayPlug\src\entities;
 use PayPlug\src\specific\SpecificConfiguration;
 
 
-class PayPlugConfigurationEntity
+class ConfigurationEntity
 {
     private $specific_class;
 

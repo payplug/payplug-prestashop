@@ -6,16 +6,15 @@ namespace PayPlug\src\repositories;
 
 class Repository
 {
-    public $entity;
-
-    public function getEntity()
-    {
-        return $this->entity;
-    }
+    private $entity;
 
     public function setEntity($entity)
     {
         $this->entity = $entity;
-        return $this;
+        return  $this;
     }
-}   
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+}

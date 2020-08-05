@@ -21,21 +21,22 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 namespace PayPlug\src\repositories;
 
-
-use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\entities\PluginEntity;
 
 class PluginRepository extends Repository
 {
+    private $plugin;
+    private $logger;
+
     public function __construct()
     {
-        $logger = new LoggerEntity();
-        $this->setEntity(new PluginEntity());
-        $this->entity
+        $this->plugin = new PluginEntity();
+        $this->logger = new LoggerRepository();
+        $this->plugin
             ->setApiVersion('2019-08-06')
-            ->setLogger($logger);
+            ->setLogger($this->logger);
+        $this->setEntity($this->plugin);
     }
 }
