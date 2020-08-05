@@ -253,16 +253,10 @@ class Payplug extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '2.27.0';
 
-        $this->plugin = new PluginRepository();
-        var_dump($this->plugin->getEntity()->getApiVersion()); exit;
-        var_dump($this->plugin->getEntity()->getLogger()->addlog('warning','fuck')); exit;
+        $this->plugin = (new PluginRepository())->getEntity();
 
-
-        $this->logger = $this->plugin->logger();
-
-//        $this->plugin->getLogger();
-//        $this->logger->addLog('notice','message du log');
-
+        $this->setLoggers();
+        
         parent::__construct();
         $this->setEnvironment();
         $this->setConfigurationProperties();
@@ -4355,19 +4349,21 @@ class Payplug extends PaymentModule
      */
     public function install()
     {
-        $this->log_install->info('Starting to install.');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+
+        $log->info('Starting to install.');
         $report = $this->checkRequirements();
         if (!$report['php']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
-            $this->log_install->error('Install failed: PHP Requirement.');
+            $log->error('Install failed: PHP Requirement.');
         }
         if (!$report['curl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
-            $this->log_install->error('Install failed: cURL Requirement.');
+            $log->error('Install failed: cURL Requirement.');
         }
         if (!$report['openssl']['up2date']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
-            $this->log_install->error('Install failed: OpenSSL Requirement.');
+            $log->error('Install failed: OpenSSL Requirement.');
         }
 
         if (Shop::isFeatureActive()) {
@@ -4375,33 +4371,33 @@ class Payplug extends PaymentModule
         }
 
         if (!parent::install()) {
-            $this->log_install->error('Install failed: parent.');
+            $log->error('Install failed: parent.');
         } elseif (!$this->registerHook('paymentReturn') ||
             !$this->registerHook('header') ||
             !$this->registerHook('adminOrder') ||
             !$this->registerHook('actionOrderStatusUpdate') ||
             !$this->registerHook('customerAccount')
         ) {
-            $this->log_install->error('Install failed: classics hooks.');
+            $log->error('Install failed: classics hooks.');
         } elseif (!$this->registerHook('paymentOptions')) {
-            $this->log_install->error('Install failed: hook paymentOptions.');
+            $log->error('Install failed: hook paymentOptions.');
         } elseif (!$this->registerHook('registerGDPRConsent') ||
             !$this->registerHook('actionDeleteGDPRCustomer') ||
             !$this->registerHook('actionExportGDPRData')
         ) {
-            $this->log_install->error('Install failed: hooks GDPR.');
+            $log->error('Install failed: hooks GDPR.');
         } elseif (!$this->createConfig()) {
-            $this->log_install->error('Install failed: configuration.');
+            $log->error('Install failed: configuration.');
         } elseif (!$this->createOrderStates()) {
-            $this->log_install->error('Install failed: order states.');
+            $log->error('Install failed: order states.');
         } elseif (!$this->installSQL()) {
-            $this->log_install->error('Install failed: sql.');
+            $log->error('Install failed: sql.');
         } elseif (!$this->installTab()) {
-            $this->log_install->error('Install failed: tab.');
+            $log->error('Install failed: tab.');
         } elseif (!$this->installOney()) {
-            $this->log_install->error('Install failed: Oney.');
+            $log->error('Install failed: Oney.');
         } else {
-            $this->log_install->info('Install succeeded.');
+            $log->info('Install succeeded.');
             return true;
         }
         return false;
@@ -6406,30 +6402,30 @@ class Payplug extends PaymentModule
     public function uninstall()
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $this->log_install->info('Starting to uninstall.');
+        $log->info('Starting to uninstall.');
 
         $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
         if (!$keep_cards) {
-            $this->log_install->info('Saved cards will be deleted.');
+            $log->info('Saved cards will be deleted.');
             if (!$this->uninstallCards()) {
-                $this->log_install->error('Unable to delete saved cards.');
+                $log->error('Unable to delete saved cards.');
             } else {
-                $this->log_install->error('Saved cards successfully deleted.');
+                $log->error('Saved cards successfully deleted.');
             }
         } else {
-            $this->log_install->info('Cards will be kept.');
+            $log->info('Cards will be kept.');
         }
 
         if (!parent::uninstall()) {
-            $this->log_install->error('Uninstall failed: parent.');
+            $log->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
-            $this->log_install->error('Uninstall failed: configuration.');
+            $log->error('Uninstall failed: configuration.');
         } elseif (!$this->uninstallSQL($keep_cards)) {
-            $this->log_install->error('Uninstall failed: sql.');
+            $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
-            $this->log_install->error('Uninstall failed: tab.');
+            $log->error('Uninstall failed: tab.');
         } elseif (!$this->uninstallOney()) {
-            $this->log_install->error('Uninstall failed: Oney.');
+            $log->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;
