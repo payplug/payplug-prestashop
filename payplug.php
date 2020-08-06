@@ -480,7 +480,7 @@ class Payplug extends PaymentModule
 
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
-            if (!$password || !Validate::isPlaintextPassword($password)) {
+            if (!$password || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode(['content' => null, 'error' => $this->l('The password you entered is invalid')]));
             }
 
@@ -5292,7 +5292,7 @@ class Payplug extends PaymentModule
         if (Tools::isSubmit('submitAccount')) {
             $password = isset($_POST['PAYPLUG_PASSWORD']) && $_POST['PAYPLUG_PASSWORD'] ? $_POST['PAYPLUG_PASSWORD'] : false;
             $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
+            if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
             } elseif ($curl_exists && $openssl_exists) {
                 if ($this->login($email, $password)) {
