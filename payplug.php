@@ -34,7 +34,6 @@ switch (_PS_VERSION_) {
         require_once(_PS_MODULE_DIR_ . 'payplug/use_payment_option.php');
         break;
     default :
-        throw new UnexpectedValueException(_PS_VERSION_);
 }
 /*
 use libphonenumber\NumberParseException;
