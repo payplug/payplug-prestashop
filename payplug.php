@@ -37,8 +37,9 @@ use PayPlug\classes\MyLogPHP;
 use PayPlug\repositories\LoggerRepository;
 use PayPlug\src\entities\ConfigurationEntity as PayPlugConfiguration;
 use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\repositories\PluginRepository;
+use PayPlug\src\repositories\PluginRepository;*/
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+/*
 use Symfony\Component\VarDumper\VarDumper;
 */
 
