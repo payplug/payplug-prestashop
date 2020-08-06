@@ -24,12 +24,18 @@
 /**
  * Core file of PayPlug module
  */
-
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 
+switch (_PS_VERSION_) {
+    case (substr(_PS_VERSION_,0,3) == '1.7') :
+        require_once(_PS_MODULE_DIR_ . 'payplug/use_payment_option.php');
+        break;
+    default :
+        throw new UnexpectedValueException(_PS_VERSION_);
+}
 /*
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
@@ -37,9 +43,8 @@ use PayPlug\classes\MyLogPHP;
 use PayPlug\repositories\LoggerRepository;
 use PayPlug\src\entities\ConfigurationEntity as PayPlugConfiguration;
 use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\repositories\PluginRepository;*/
+use PayPlug\src\repositories\PluginRepository;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-/*
 use Symfony\Component\VarDumper\VarDumper;
 */
 
@@ -3209,7 +3214,7 @@ class Payplug extends PaymentModule
         }
 
         // Standart Payment or new card from one-click
-        $paymentOption = new PaymentOption();
+        $paymentOption = $paymentOptionByCedric;
         $input_options = array(
             'pc' => array(
                 'name' => 'pc',
