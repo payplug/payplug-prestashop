@@ -67,7 +67,7 @@ class LoggerEntity
     /**
      * @return string
      */
-    public function getProcess(): string
+    public function getProcess()
     {
         return $this->process;
     }
@@ -76,7 +76,7 @@ class LoggerEntity
      * @param string $process
      * @return PayPlugLoggerEntity
      */
-    public function setProcess(string $process): PayPlugLoggerEntity
+    public function setProcess(string $process)
     {
         $this->process = $process;
         return $this;
@@ -85,7 +85,7 @@ class LoggerEntity
     /**
      * @return text
      */
-    public function getContent(): text
+    public function getContent()
     {
         return $this->content;
     }
@@ -94,7 +94,7 @@ class LoggerEntity
      * @param text $content
      * @return PayPlugLoggerEntity
      */
-    public function setContent(text $content): PayPlugLoggerEntity
+    public function setContent(text $content)
     {
         $this->content = $content;
         return $this;
@@ -103,7 +103,7 @@ class LoggerEntity
     /**
      * @return datetime
      */
-    public function getDateAdd(): datetime
+    public function getDateAdd()
     {
         return $this->date_add;
     }
@@ -112,7 +112,7 @@ class LoggerEntity
      * @param datetime $date_add
      * @return PayPlugLoggerEntity
      */
-    public function setDateAdd(datetime $date_add): PayPlugLoggerEntity
+    public function setDateAdd(datetime $date_add)
     {
         $this->date_add = $date_add;
         return $this;
@@ -121,7 +121,7 @@ class LoggerEntity
     /**
      * @return datetime
      */
-    public function getDateUpd(): datetime
+    public function getDateUpd()
     {
         return $this->date_upd;
     }
@@ -130,7 +130,7 @@ class LoggerEntity
      * @param datetime $date_upd
      * @return PayPlugLoggerEntity
      */
-    public function setDateUpd(datetime $date_upd): PayPlugLoggerEntity
+    public function setDateUpd(datetime $date_upd)
     {
         $this->date_upd = $date_upd;
         return $this;
@@ -139,7 +139,7 @@ class LoggerEntity
     /**
      * @return array
      */
-    public static function getDefinition(): array
+    public static function getDefinition()
     {
         return self::$definition;
     }
@@ -147,7 +147,7 @@ class LoggerEntity
     /**
      * @param array $definition
      */
-    public static function setDefinition(array $definition): void
+    public static function setDefinition(array $definition)
     {
         self::$definition = $definition;
     }
@@ -155,7 +155,7 @@ class LoggerEntity
     /**
      * @return int
      */
-    public function getLimitNumber(): int
+    public function getLimitNumber()
     {
         return $this->limit_number;
     }
@@ -164,7 +164,7 @@ class LoggerEntity
      * @param int $limit_number
      * @return PayPlugLoggerEntity
      */
-    public function setLimitNumber(int $limit_number): PayPlugLoggerEntity
+    public function setLimitNumber(int $limit_number)
     {
         $this->limit_number = $limit_number;
         return $this;
@@ -173,7 +173,7 @@ class LoggerEntity
     /**
      * @return string
      */
-    public function getLimitDate(): string
+    public function getLimitDate()
     {
         return $this->limitDate;
     }
@@ -182,7 +182,7 @@ class LoggerEntity
      * @param string $limitDate
      * @return PayPlugLoggerEntity
      */
-    public function setLimitDate(string $limitDate): PayPlugLoggerEntity
+    public function setLimitDate(string $limitDate)
     {
         $this->limitDate = $limitDate;
         return $this;

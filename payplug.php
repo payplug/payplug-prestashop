@@ -26,7 +26,11 @@
  */
 
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 
+/*
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
 use PayPlug\classes\MyLogPHP;
@@ -36,6 +40,7 @@ use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\repositories\PluginRepository;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\VarDumper\VarDumper;
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -249,11 +254,11 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.8');
         $this->tab = 'payments_gateways';
         $this->version = '2.27.0';
 
-        $this->plugin = (new PluginRepository())->getEntity();
+        $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
 
         $this->setLoggers();
         
@@ -450,7 +455,7 @@ class Payplug extends PaymentModule
         if (Tools::isSubmit('submitAccount')) {
             $password = Tools::getValue('PAYPLUG_PASSWORD');
             $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
+            if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
                     'content' => null,
                     'error' => $this->l('The email and/or password was not correct.')
@@ -475,7 +480,7 @@ class Payplug extends PaymentModule
 
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
-            if (!$password || !Validate::isPlaintextPassword($password)) {
+            if (!$password || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode(['content' => null, 'error' => $this->l('The password you entered is invalid')]));
             }
 
@@ -1160,7 +1165,7 @@ class Payplug extends PaymentModule
 
     public function createOrderState($name, $state, $sandbox = true)
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
 
         $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
@@ -1225,7 +1230,7 @@ class Payplug extends PaymentModule
      */
     public function createOrderStates()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $this->log_install->info('Order state creation starting.');
 
         foreach ($this->order_states as $key => $state) {
@@ -4349,7 +4354,7 @@ class Payplug extends PaymentModule
      */
     public function install()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
 
         $log->info('Starting to install.');
         $report = $this->checkRequirements();
@@ -4444,7 +4449,7 @@ class Payplug extends PaymentModule
      */
     public function installOney()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
         $log->info('Install Oney feature');
         return $this->installOneyHook()
             && $this->installOneyConfig()
@@ -4473,7 +4478,7 @@ class Payplug extends PaymentModule
      */
     private function installOneyConfig()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $flag = true;
         if (!Configuration::updateValue('PAYPLUG_ONEY', 0) ||
             !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
@@ -4552,7 +4557,7 @@ class Payplug extends PaymentModule
      */
     private function installOneySql()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
 
         // install payplug carrier db
         $requests = array(
@@ -4584,7 +4589,7 @@ class Payplug extends PaymentModule
      */
     private function installSQL()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Installation SQL Starting.');
 
         if (!defined('_MYSQL_ENGINE_')) {
@@ -5287,7 +5292,7 @@ class Payplug extends PaymentModule
         if (Tools::isSubmit('submitAccount')) {
             $password = isset($_POST['PAYPLUG_PASSWORD']) && $_POST['PAYPLUG_PASSWORD'] ? $_POST['PAYPLUG_PASSWORD'] : false;
             $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
+            if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
             } elseif ($curl_exists && $openssl_exists) {
                 if ($this->login($email, $password)) {
@@ -6083,8 +6088,8 @@ class Payplug extends PaymentModule
      */
     private function setLoggers()
     {
-        $this->log_general = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
-        $this->log_install = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
+        $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
     }
 
     /**
@@ -6401,7 +6406,7 @@ class Payplug extends PaymentModule
      */
     public function uninstall()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to uninstall.');
 
         $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
@@ -6515,7 +6520,7 @@ class Payplug extends PaymentModule
      */
     private function uninstallSQL($keep_cards = false)
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Uninstallation SQL starting.');
 
         $flag = true;
