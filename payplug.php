@@ -30,7 +30,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
-require_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
+@include_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
 
 /*
 use libphonenumber\NumberParseException;
@@ -263,8 +263,6 @@ class Payplug extends PaymentModule
         $this->version = '2.27.0';
 
         $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
-
-        $this->paymentOption = (new PrestaShop\PrestaShop\Core\Payment\PaymentOption());
         
         $this->setLoggers();
 
@@ -274,6 +272,12 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
     }
+    
+    public function setPaymentOption()
+    {
+        return new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+    }
+    
 
     public function getPlugin()
     {
@@ -3178,7 +3182,7 @@ class Payplug extends PaymentModule
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
             foreach ($payplug_cards as $card) {
-                $paymentOption = $this->paymentOption;
+                $paymentOption = $this->setPaymentOption();
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                 $input_options = array(
                     'pc' => array(
@@ -3214,7 +3218,7 @@ class Payplug extends PaymentModule
         }
 
         // Standart Payment or new card from one-click
-        $paymentOption = $this->paymentOption;
+        $paymentOption = $this->setPaymentOption();
         $input_options = array(
             'pc' => array(
                 'name' => 'pc',
@@ -3251,7 +3255,7 @@ class Payplug extends PaymentModule
 
         // Installment Payment
         if ($options['installment']) {
-            $paymentOption = $this->paymentOption;
+            $paymentOption = $this->setPaymentOption();
             $input_options = array(
                 'pc' => array(
                     'name' => 'pc',
@@ -3306,7 +3310,7 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-                $paymentOption = $this->paymentOption;
+                $paymentOption = $this->setPaymentOption();
                 $input_options = array(
                     'pc' => array(
                         'name' => 'pc',
