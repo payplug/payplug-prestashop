@@ -1,3 +1,9 @@
 <?php
 
-die('presta 1.7');
+namespace PrestaShop;
+
+require_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
+
+//use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+//
+//return new PaymentOption();
