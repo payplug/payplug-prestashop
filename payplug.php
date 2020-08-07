@@ -28,14 +28,8 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
 
-$prestaVersion = str_replace('.','',substr(_PS_VERSION_,0,3));
-$specificPresta = _PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopSpecific'.$prestaVersion.'.php';
-
-if (is_file($specificPresta))
-{
-    require_once($specificPresta);
-}
 /*
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;

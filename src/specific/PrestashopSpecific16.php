@@ -1,3 +1,3 @@
 <?php
 
-die('presta 1.6');
+die('On charge config presta 1.6');
