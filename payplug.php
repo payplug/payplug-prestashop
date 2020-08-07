@@ -24,6 +24,7 @@
 /**
  * Core file of PayPlug module
  */
+
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
@@ -33,8 +34,8 @@ require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.ph
 /*
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
-use PayPlug\classes\MyLogPHP;
-use PayPlug\repositories\LoggerRepository;
+use PayPlug\classes\MyLogPHP;*/
+use PayPlug\repositories\LoggerRepository;/*
 use PayPlug\src\entities\ConfigurationEntity as PayPlugConfiguration;
 use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\repositories\PluginRepository;*/
@@ -261,7 +262,7 @@ class Payplug extends PaymentModule
         $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
 
         $this->setLoggers();
-        
+
         parent::__construct();
         $this->setEnvironment();
         $this->setConfigurationProperties();
@@ -3172,7 +3173,7 @@ class Payplug extends PaymentModule
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
             foreach ($payplug_cards as $card) {
-                $paymentOption = new PaymentOption();
+                $paymentOption = $monMotherFuckingObject;
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                 $input_options = array(
                     'pc' => array(
@@ -3208,7 +3209,7 @@ class Payplug extends PaymentModule
         }
 
         // Standart Payment or new card from one-click
-        $paymentOption = new PaymentOption();
+        $paymentOption = $monMotherFuckingObject;
         $input_options = array(
             'pc' => array(
                 'name' => 'pc',
@@ -3245,7 +3246,7 @@ class Payplug extends PaymentModule
 
         // Installment Payment
         if ($options['installment']) {
-            $paymentOption = new PaymentOption();
+            $paymentOption = $monMotherFuckingObject;
             $input_options = array(
                 'pc' => array(
                     'name' => 'pc',
@@ -3300,7 +3301,7 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-                $paymentOption = new PaymentOption();
+                $paymentOption = $monMotherFuckingObject;
                 $input_options = array(
                     'pc' => array(
                         'name' => 'pc',
