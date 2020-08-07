@@ -4,7 +4,7 @@
 namespace PayPlug\src\interfaces;
 
 
-interface PayPlugConfigurationInterface
+interface ConfigurationInterface
 {
     function get($configuration_name);
 }

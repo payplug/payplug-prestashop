@@ -5,7 +5,7 @@ namespace PayPlug\src\entities;
 
 
 
-use PayPlug\src\specific\SpecificConfiguration;
+use PayPlug\src\specific\ConfigurationSpecific;
 
 
 class ConfigurationEntity
@@ -14,7 +14,7 @@ class ConfigurationEntity
 
     public function __construct()
     {
-        $this->specific_class = new SpecificConfiguration();
+        $this->specific_class = new ConfigurationSpecific();
     }
 
     public function get($configuration_name)
