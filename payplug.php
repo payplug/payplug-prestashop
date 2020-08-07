@@ -28,6 +28,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
 
 /*
 use libphonenumber\NumberParseException;
@@ -37,7 +38,7 @@ use PayPlug\repositories\LoggerRepository;
 use PayPlug\src\entities\ConfigurationEntity as PayPlugConfiguration;
 use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\repositories\PluginRepository;*/
-use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+//use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 /*use Symfony\Component\VarDumper\VarDumper;
 */
 
