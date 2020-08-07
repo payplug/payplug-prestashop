@@ -21,34 +21,46 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
-require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
-require_once(_PS_MODULE_DIR_ . '/payplug/lib/init.php');
+class PayplugPaymentModuleFrontController extends ModuleFrontController
+{
+    public function postProcess()
+    {
+        require_once(dirname(__FILE__) . './../../../../config/config.inc.php');
 
-$payplug = Module::getInstanceByName('payplug');
-\Payplug\Payplug::init([
-    'secretKey' => $payplug->current_api_key,
-    'apiVersion' => $payplug->getPlugin()->getApiVersion()
-]);
+        /** Call init.php to initialize context */
+        require_once(_PS_MODULE_DIR_ . '../init.php');
 
-\Payplug\Core\HttpClient::addDefaultUserAgentProduct(
-    'PayPlug-Prestashop',
-    $payplug->version,
-    'Prestashop/' . _PS_VERSION_
-);
+        /** Call to payplug-php API */
+        require_once(_PS_MODULE_DIR_ . '/payplug/classes/PayplugBackward.php');
+        require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
+        require_once(_PS_MODULE_DIR_ . '/payplug/lib/init.php');
 
-$context = Context::getContext();
-$cookie = $context->cookie;
+        $payplug = Module::getInstanceByName('payplug');
+        $payplug->initializeApi();
 
-$result_currency = array();
-$cart = $context->cart;
-$is_deferred = (int)Tools::getValue('def');
+        $context = Context::getContext();
+        $cart = $context->cart;
 
-$payment_url = $payplug->preparePayment($cart->id, 'new_card', false, $is_deferred);
+        $id_payplug_card = Tools::getValue('pc', null);
 
-if (!is_array($payment_url)) {
-    Tools::redirect($payment_url);
-} else {
-    Tools::redirect('index.php?controller=order&step=3&error=1');
+
+        $payment_data = $payplug->preparePayment($id_payplug_card);
+        //$payment_data = Tools::jsonDecode($payment, true);
+
+        $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
+        $error_url = $context->link->getPageLink($page, true, $context->language->id, array('error' => 1, 'step' => 3));
+
+
+        // Invalid payment then return error
+        if ($payment_data['result'] && isset($payment_data['return_url']) && $payment_data['return_url']) {
+            Payplug::redirectForVersion($payment_data['return_url']);
+        } elseif(!$payment_data['result']) {
+            if(isset($payment_data['response']) && $payment_data['response']) {
+                $payplug->setPaymentErrorsCookie(array($payment_data['response']));
+            }
+            Payplug::redirectForVersion($error_url);
+        }
+
+        die($payment_data['response']);
+    }
 }

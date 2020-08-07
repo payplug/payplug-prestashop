@@ -289,7 +289,7 @@ class Payplug extends PaymentModule
 
     public function setPlugin($plugin)
     {
-        $this->api_version = $plugin;
+        $this->plugin = $plugin;
         return $this;
     }
 
@@ -7039,5 +7039,38 @@ class Payplug extends PaymentModule
         }
 
         return true;
+    }
+
+    public function initializeApi($sandbox = null)
+    {
+        if ($sandbox === null) {
+            $payplug_key = $this->current_api_key;
+        } else {
+            $payplug_key = $this->getConfiguration('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
+        }
+
+        try {
+            \Payplug\Payplug::init(array('secretKey' => $payplug_key, 'apiVersion' => $this->plugin->getApiVersion()));
+
+            return $payplug_key;
+        } catch (Exception $e) {
+            // todo: return error log
+            return false;
+        }
+    }
+
+    /**
+     * Redirection
+     *
+     * @param string $link
+     * @return void
+     */
+    public static function redirectForVersion($link)
+    {
+        if (version_compare(_PS_VERSION_, '1.5', '<')) {
+            Tools::redirectLink($link);
+        } else {
+            Tools::redirect($link);
+        }
     }
 }
