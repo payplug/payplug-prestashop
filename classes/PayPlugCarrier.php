@@ -22,6 +22,7 @@
  */
 
 /**
+ * @description
  * PayPlugCarrier : This class associate delivery type and delivery time to existing Carrier
  * It's necessary for Oney
  */
@@ -29,10 +30,10 @@
 class PayPlugCarrier extends ObjectModel
 {
     /** @const int Default delivery delay value in days for new carrier */
-    const CARRIER_DEFAULT_DELAY = 3;
+    const CARRIER_DEFAULT_DELAY = 0;
 
     /** @const string Default delivery type value for new carrier */
-    const CARRIER_DEFAULT_DELIVERY_TYPE = '';
+    const CARRIER_DEFAULT_DELIVERY_TYPE = 'storepickup';
 
     /** @var int Carrier id */
     public $id_carrier;
@@ -69,32 +70,45 @@ class PayPlugCarrier extends ObjectModel
     );
 
     /**
+     * @description
      * Get Carriers from Prestashop who are not "deleted" for a given language
      *
      * @param int $id_lang ID of a language
+     * @param boolean $is_active
      * @return array of PayPlugCarrier
      */
-    public static function getActiveCarriers($id_lang)
+    public static function getCarriers($id_lang, $is_active = true)
     {
-        $req_all_carriers = '
-            SELECT *
-            FROM '._DB_PREFIX_.'carrier
-            WHERE deleted = 0
-        ';
-        $carriers = Db::getInstance()->executeS($req_all_carriers);
-        //$carriers = Carrier::getCarriers($id_lang, true);
-        $active_carriers = array();
+        $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`, c.`id_carrier`
+                FROM `'._DB_PREFIX_.'carrier` c
+                LEFT JOIN `'._DB_PREFIX_.self::$definition['table'] . '` pc ON (pc.id_carrier = c.id_carrier)
+                WHERE c.`deleted` = 0' . ($is_active ? ' AND c.`active` = 1' : '');
+        $carriers = Db::getInstance()->executeS($sql);
+
+        $active_carriers = [];
         if (!empty($carriers)) {
             foreach ($carriers as $carrier) {
-                $c = new PayPlugCarrier();
-                $c->populateFromCarrier($carrier['id_carrier']);
-                $active_carriers[$carrier['id_carrier']] = $c;
+                $c = new PayPlugCarrier($carrier['id_payplug_carrier']);
+
+                if (!Validate::isLoadedObject($c)) {
+                    $c->id_carrier = $carrier['id_carrier'];
+                    $c->delay = PayPlugCarrier::CARRIER_DEFAULT_DELAY;
+                    $c->delivery_type = PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE;
+                }
+
+                if ($carrier['name'] !== '0') {
+                    $c->name = $carrier['name'];
+                } else {
+                    $c->name = Carrier::getCarrierNameFromShopName();
+                }
+                $active_carriers[$c->id_carrier] = $c;
             }
         }
         return $active_carriers;
     }
 
     /**
+     * @description
      * Get all PayPlugCarrier registered in database
      *
      * @return array of PayPlugCarrier
@@ -103,7 +117,7 @@ class PayPlugCarrier extends ObjectModel
     {
         $carriers = array();
         $req_payplug_carriers = '
-            SELECT pc.`id_payplug_carrier`, c.`name`
+            SELECT pc.`id_payplug_carrier`, c.`name` 
             FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
             LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
             ORDER BY pc.`id_payplug_carrier` ASC';
@@ -123,6 +137,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get PayPlugCarrier for given id_carrier
      *
      * @param int $id_carrier ID of a Prestashop Carrier
@@ -142,6 +157,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get name from the corresponding Prestashop Carrier
      *
      * @return string Carrier name
@@ -153,6 +169,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Get PayPlugCarrier for given id_carrier : static version
      *
      * @param int $id_carrier ID of a Prestashop Carrier
@@ -168,6 +185,7 @@ class PayPlugCarrier extends ObjectModel
     }
 
     /**
+     * @description
      * Automatically populate a PayPlugCarrier with basic data from a given Carrier
      *
      * @param Carrier $carrier Object Carrier

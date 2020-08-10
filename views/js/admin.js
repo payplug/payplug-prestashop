@@ -720,15 +720,13 @@ var $document, $window, payplug = {
                 $('.' + payplug.config.props.identifier + '_item-oney').hide();
                 var $carriers = $('.' + identifier).find('select'),
                     configured = true,
-                    valid = false,
-                    disable_types = ['storepickup', 'networkpickup'];
+                    valid = true,
+                    disable_types = [];
 
                 $carriers.each(function () {
                     var value = $(this).val();
                     configured = configured && value;
-                    if (!valid) {
-                        valid = !disable_types.includes(value);
-                    }
+                    valid = valid && !disable_types.includes(value);
                 });
 
                 if (configured) {

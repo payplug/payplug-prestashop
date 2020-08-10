@@ -40,7 +40,7 @@
             </span>
         {/foreach}
 
-        {*  Phrase 'Accept CGV'    *}
+        {*  Phrase 'Accept CGV' *}
         {if $tos_active && $tos_url}
                 <span class="oneyPopin_legal">
                     {l s='By placing an order, you accept our ' mod='payplug'}
