@@ -3317,7 +3317,7 @@ class Payplug extends PaymentModule
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png'))
+                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.svg'))
                     ->setCallToActionText($label)
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
