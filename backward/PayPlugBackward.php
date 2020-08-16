@@ -31,4 +31,39 @@ class PayPlugBackward
             return Validate::isPlaintextPassword($plaintextPasswd);
         }
     }
+
+
+
+    /**
+     * Get an order object by its cart id.
+     *
+     * @param int $id_cart Cart id
+     *
+     * @return OrderCore
+     */
+    public static function getOrderByCartId($id_cart)
+    {
+        $id_order = (int) self::getIdByCartId((int) $id_cart);
+
+        return ($id_order > 0) ? new self($id_order) : null;
+    }
+
+    /**
+     * Get the order id by its cart id.
+     *
+     * @param int $id_cart Cart id
+     *
+     * @return int $id_order
+     */
+    public static function getIdByCartId($id_cart)
+    {
+        $sql = 'SELECT `id_order` 
+            FROM `' . _DB_PREFIX_ . 'orders`
+            WHERE `id_cart` = ' . (int) $id_cart .
+            Shop::addSqlRestriction();
+
+        $result = Db::getInstance()->getValue($sql);
+
+        return !empty($result) ? (int) $result : false;
+    }
 }
