@@ -269,7 +269,7 @@ label.payplugSwitch_label {
   border: none;
   position: absolute;
   top: 50%;
-  left: 2px;
+  left: calc(100% - 18px);
   content: "";
   background: #fff;
   display: block;
@@ -277,10 +277,10 @@ label.payplugSwitch_label {
   height: 16px;
 }
 .payplugSwitch-small.payplugSwitch-right {
-  background: #e56876;
+  background: #b2b2b2;
 }
 .payplugSwitch-small.payplugSwitch-right:before {
-  left: calc(100% - 18px);
+  left: 2px;
 }
 .payplugSwitch-small.payplugSwitch-disabled {
   cursor: default;
@@ -354,6 +354,22 @@ button.payplugLink:hover {
 .payplugPanel_content input[type=text]:focus {
   background: transparent;
 }
+
+.payplug_oney_tos_url_desc {
+  display: inline-block;
+}
+
+#tos_url {
+  margin: initial;
+  display: inline-block;
+  width: 250px;
+}
+
+#error_invalid_url {
+  color: #dd2525;
+  padding: 0 0 0 10px;
+}
+
 .payplugPanel_section {
   display: flex;
   flex-wrap: wrap;

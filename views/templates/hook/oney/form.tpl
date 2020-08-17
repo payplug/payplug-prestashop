@@ -27,13 +27,15 @@
         <div class="oneyForm_content">
             {foreach $oney_required_fields as $fieldset_type => $fieldset}
                 <div class="oneyForm_fieldset oneyForm_fieldset-{$fieldset_type|escape:'htmlall':'UTF-8'}">
-                    <p class="oneyForm_sectionName">
-                        {if $fieldset_type == 'billing'}
-                            {l s='Your billing address:' mod='payplug'}
-                        {else}
-                            {l s='Your shipping address:' mod='payplug'}
-                        {/if}
-                    </p>
+                    {if $oney_required_fields|count > 1}
+                        <p class="oneyForm_sectionName">
+                            {if $fieldset_type == 'billing'}
+                                {l s='Your billing address:' mod='payplug'}
+                            {else}
+                                {l s='Your shipping address:' mod='payplug'}
+                            {/if}
+                        </p>
+                    {/if}
                     {foreach $fieldset as $name => $field}
                         <div class="oneyForm_group oneyForm_group-{$name|escape:'htmlall':'UTF-8'}">
                             <p>{$field.text|escape:'htmlall':'UTF-8'}</p>

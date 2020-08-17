@@ -43,6 +43,13 @@
         <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-warning"><span>{l s='Your shipping methods configuration doesn’t allow to provide Oney' mod='payplug'}</span></p>
         <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-success"><span>{l s='Your shipping methods are configured for Oney.' mod='payplug'}</span></p>
 
+        {if $PAYPLUG_ONEY}
+            {if $payplug_switch.oney_tos.checked && empty($PAYPLUG_ONEY_TOS_URL)}
+                <p class="payplugAlert payplugAlert-warning">{l s='Please manage the “General terms and conditions” part for Oney' mod='payplug'}</p>
+            {/if}
+        {/if}
+
+
         <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>
     <div class="panel-footer">

@@ -397,13 +397,13 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   background-size: 100%;
 }
 .oneyLogo-x3 {
-  background-image: url(../img/oney/3x.svg);
+  background-image: url(../img/oney/x3_with_fees.svg);
 }
 .oneyLogo-x3x4 {
   background-image: url(../img/oney/3x4x.svg);
 }
 .oneyLogo-x4 {
-  background-image: url(../img/oney/4x.svg);
+  background-image: url(../img/oney/x4_with_fees.svg);
 }
 .oneyLogo-tooltip {
   background-image: url(../img/oney/tooltip.svg);

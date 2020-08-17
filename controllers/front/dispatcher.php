@@ -32,8 +32,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      * Method that is executed after init() and checkAccess().
      * Used to process user input.
      *
-     * @return bool|void
-     * @throws Exception
+     * return void
      */
     public function postProcess()
     {
