@@ -4399,7 +4399,10 @@ class Payplug extends PaymentModule
             $log->error('Install failed: classics hooks.');
         } elseif (!$this->registerHook('paymentOptions')) {
             $log->error('Install failed: hook paymentOptions.');
-        } elseif (!$this->registerHook('registerGDPRConsent') ||
+        } elseif (!$this->registerHook('Payment')) {
+            $log->error('Install failed: hook Payment.');
+        }
+        elseif (!$this->registerHook('registerGDPRConsent') ||
             !$this->registerHook('actionDeleteGDPRCustomer') ||
             !$this->registerHook('actionExportGDPRData')
         ) {
