@@ -24,7 +24,7 @@
     <div class="panel-row">
         {if isset($check_configuration.warning) && !empty($check_configuration.warning) && sizeof($check_configuration.warning)}
             {foreach from = $check_configuration.warning item = warning}
-                <p class="payplugAlert payplugAlert-warning"><span>{$warning|escape:'quotes':'UTF-8'}</span></p>
+                <p class="payplugAlert payplugAlert-warning"><span>{$warning|escape:'htmlall':'UTF-8'}</span></p>
             {/foreach}
         {/if}
         <p>{l s='Version of PayPlug module:' mod='payplug'} {$pp_version|escape:'htmlall':'UTF-8'}</p>
