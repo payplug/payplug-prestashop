@@ -449,6 +449,34 @@
       display: none;
       color: #colorMap[error];
     }
+
+    &TOS {
+      display: flex;
+      width: 100%;
+      flex-wrap: wrap;
+
+      &_text {
+        p&{
+          margin: 0 8px 0 0;
+          line-height: 31px;
+        }
+      }
+      &_input {
+        margin: initial;
+        display: inline-block;
+        width: 250px;
+      }
+      &_error {
+        width: 100%;
+        display: none;
+        color: #dd2525;
+        padding: 0 0 0 10px;
+
+        &-show{
+          display: block;
+        }
+      }
+    }
   }
 
   &Installment {
