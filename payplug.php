@@ -1463,9 +1463,14 @@ class Payplug extends PaymentModule
         $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
+        $tos_url = Configuration::get('PAYPLUG_ONEY_TOS_URL');
+        if (strpos($tos_url, 'http://') === false && strpos($tos_url, 'https://') === false && $tos_url) {
+            $tos_url = Tools::getShopProtocol() . $tos_url;
+        }
+
         $this->smarty->assign(array(
             'tos_active' => Configuration::get('PAYPLUG_ONEY_TOS'),
-            'tos_url' => Configuration::get('PAYPLUG_ONEY_TOS_URL'),
+            'tos_url' => $tos_url,
             'legal_notice' => sprintf($this->l($legal_text), Tools::displayPrice($min_amount),
                 Tools::displayPrice($max_amount))
         ));
