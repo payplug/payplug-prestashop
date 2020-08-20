@@ -912,11 +912,17 @@ class Payplug extends PaymentModule
 
         $check_warning = $this->l('Unfortunately at least one issue is preventing you from using Payplug.') . ' '
             . $this->l('Refresh the page or click "Check" once they are fixed');
-        if ($is_payplug_configured) {
-        } else {
+        if (!$is_payplug_configured) {
             Configuration::get('PAYPLUG_SHOW', 0);
             $this->check_configuration['warning'][] .= $check_warning;
         }
+
+        // check if oney tos is complete
+        $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
+        if(Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
+            $this->check_configuration['warning'][] = $check_oney_tos;
+        }
+
 
         return true;
     }

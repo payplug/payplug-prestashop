@@ -354,22 +354,6 @@ button.payplugLink:hover {
 .payplugPanel_content input[type=text]:focus {
   background: transparent;
 }
-
-.payplug_oney_tos_url_desc {
-  display: inline-block;
-}
-
-#tos_url {
-  margin: initial;
-  display: inline-block;
-  width: 250px;
-}
-
-#error_invalid_url {
-  color: #dd2525;
-  padding: 0 0 0 10px;
-}
-
 .payplugPanel_section {
   display: flex;
   flex-wrap: wrap;
@@ -411,9 +395,6 @@ button.payplugLink:hover {
 }
 .payplugConfig_item-warning:before {
   background-image: url(../img/admin/icon-warn.png);
-}
-.payplugConfig_item-oney {
-  display: none;
 }
 .payplugLogin_email {
   color: #00ab7a;
