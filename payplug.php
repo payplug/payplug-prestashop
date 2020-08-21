@@ -4721,12 +4721,16 @@ class Payplug extends PaymentModule
     {
         $translationsAdminPayPlug = array(
             'en' => 'PayPlug',
+            'gb' => 'PayPlug',
+            'it' => 'PayPlug',
             'fr' => 'PayPlug'
         );
         $flag = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
 
         $translationsAdminPayPlugInstallment = array(
             'en' => 'Installment Plans',
+            'gb' => 'Installment Plans',
+            'it' => 'Pagamenti frazionati',
             'fr' => 'Paiements en plusieurs fois'
         );
 
