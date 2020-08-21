@@ -4058,16 +4058,6 @@ class Payplug extends PaymentModule
             return false;
         }
         $this->smarty->assign(['env' => 'checkout']);
-
-        $action = Tools::getValue('action');
-        if ($action == 'refresh') {
-            $use_taxes = (bool)Configuration::get('PS_TAX');
-
-            $context = Context::getContext();
-            $amount = $context->cart->getOrderTotal($use_taxes);
-            $this->assignOneyPriceAndPaymentOptions($context->cart, $amount);
-            $this->smarty->assign(['popin' => true]);
-        }
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
