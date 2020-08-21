@@ -25,6 +25,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
+
 class PPPaymentInstallment extends PPPayment
 {
     public function __construct($id = null)
