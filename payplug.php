@@ -4093,11 +4093,26 @@ class Payplug extends PaymentModule
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
             true);
 
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $payplug_icon_url = PayplugBackward::getHttpHost(true) . __PS_BASE_URI__
+                . 'modules/' . $this->name . '/views/img/logo26.png';
+            $version = 1.6;
+
+            $this->smarty->assign(array(
+                'payplug_icon_url' => $payplug_icon_url,
+                'version' => $version
+            ));
+        }
+
         $this->smarty->assign(array(
             'payplug_cards_url' => $payplug_cards_url
         ));
 
-        return $this->display(__FILE__, 'my_account.tpl');
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            return $this->display(__FILE__, 'my_account_1_6.tpl');
+        } else {
+            return $this->display(__FILE__, 'my_account.tpl');
+        }
     }
 
     /**
