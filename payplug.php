@@ -3882,7 +3882,6 @@ class Payplug extends PaymentModule
                     }
                 }
             }
-
             $this->updateOrderState($payment);
 
             $single_payment = $this->buildPaymentDetails($payment);
@@ -6577,13 +6576,13 @@ class Payplug extends PaymentModule
 
     public function updateOrderState($payment)
     {
-
+        /*
         if (!Validate::isLoadedObject($payment)) {
             return false;
         }
 
         $id_cart = $payment->metadata['ID Cart'];
-        $order = Order::getByCartId($id_cart);
+        $order = \PayPlug\backward\PayPlugBackward::getByCartId($id_cart);
 
         $state_addons = ($payment->is_live ? '' : '_TEST');
         $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
@@ -6613,7 +6612,7 @@ class Payplug extends PaymentModule
                 return $order_history->save();
             }
         }
-
+*/
         return true;
     }
 

@@ -6,6 +6,9 @@ namespace PayPlug\backward;
 
 use Tools;
 use ValidateCore as Validate;
+use ShopCore as Shop;
+use DbCore as Db;
+use OrderCore as Order;
 
 class PayPlugBackward
 {
@@ -41,29 +44,19 @@ class PayPlugBackward
      *
      * @return OrderCore
      */
-    public static function getOrderByCartId($id_cart)
+    public static function getByCartId($id_cart)
     {
-        $id_order = (int) self::getIdByCartId((int) $id_cart);
-
-        return ($id_order > 0) ? new self($id_order) : null;
-    }
-
-    /**
-     * Get the order id by its cart id.
-     *
-     * @param int $id_cart Cart id
-     *
-     * @return int $id_order
-     */
-    public static function getIdByCartId($id_cart)
-    {
-        $sql = 'SELECT `id_order` 
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $sql = 'SELECT `id_order` 
             FROM `' . _DB_PREFIX_ . 'orders`
             WHERE `id_cart` = ' . (int) $id_cart .
-            Shop::addSqlRestriction();
+                Shop::addSqlRestriction();
 
-        $result = Db::getInstance()->getValue($sql);
+            $result = Db::getInstance()->getValue($sql);
 
-        return !empty($result) ? (int) $result : false;
+            return !empty($result) ? (int) $result : false;
+        } else {
+            return Order::getByCartId($id_cart);
+        }
     }
 }
