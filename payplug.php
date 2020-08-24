@@ -2702,7 +2702,17 @@ class Payplug extends PaymentModule
         $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
-        $this->smarty->assign(array(
+//        $this->smarty->assign(array(
+//            'payplug_oney_amount' => [
+//                'amount' => $amount,
+//                'value' => Tools::displayPrice($amount),
+//            ],
+//            'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
+//            'payplug_oney_error' => $error
+//        ));
+
+            $this->smarty->assign(array(
+            'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => Tools::displayPrice($amount),
@@ -2728,12 +2738,21 @@ class Payplug extends PaymentModule
             ));
         }
 
-        return [
-            'options' => $oney_payment_options,
+//        return [
+//            'options' => $oney_payment_options,
+//            'result' => $is_elligible['result'] && $oney_payment_options,
+//            'error' => $error,
+//            'popin' => $popin_tpl,
+//        ];
+
+        $payment_tpl = $this->displayOneyPaymentOptions();
+
+        return array(
             'result' => $is_elligible['result'] && $oney_payment_options,
             'error' => $error,
             'popin' => $popin_tpl,
-        ];
+            'payment' => $payment_tpl,
+        );
     }
 
     /**
@@ -4163,12 +4182,24 @@ class Payplug extends PaymentModule
             return;
         }
 
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+
 
         if (Tools::getValue('error')) {
             Media::addJsDef(['payment_errors' => true]);
         }
+        if (version_compare(_PS_VERSION_, '1.6', '>=')) {
+            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
+            Media::addJsDef(array(
+                'payplug_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
+            ));
+            $this->assignOneyJSVar();
+        }
+        else {
+            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+        }
+
 
         if ((int)Tools::getValue('lightbox') == 1) {
             $cart = $params['cart'];
@@ -4660,7 +4691,8 @@ class Payplug extends PaymentModule
             `id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_payment` VARCHAR(255) NOT NULL,
             `id_cart` INT(11) UNSIGNED NOT NULL,
-            `is_pending` TINYINT(1) NOT NULL DEFAULT 0
+            `is_pending` TINYINT(1) NOT NULL DEFAULT 0, 
+            `date_upd` DATETIME NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
 
@@ -5360,6 +5392,9 @@ class Payplug extends PaymentModule
      * @param string $id_card
      * @return mixed
      */
+    // PS 1.6 : preparePayment($id_card = null)
+    // PS 1.7 : preparePayment($options)
+    // Réunif : preparePayment($options, $id_card = null) --> Pour les functions PS 1.6, mettre null en 1er paramètre, par ex. : $payment = $payplug->preparePayment(null,Tools::getValue('pc'));
     public function preparePayment($options, $id_card = null)
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
@@ -5459,9 +5494,9 @@ class Payplug extends PaymentModule
                 }
             } catch (Exception $e) {
                 $messages = $this->catchErrorsFromApi($e->__toString());
-                $this->log_payment->info(
-                    'Payment abort: ' . count($messages) > 1 ? json_encode($messages) : reset($messages)
-                );
+//                $this->log_payment->info(
+//                    'Payment abort: ' . count($messages) > 1 ? json_encode($messages) : reset($messages)
+//                );
                 $data = array(
                     'result' => false,
                     'response' => count($messages) > 1 ? $messages : reset($messages),
@@ -5506,7 +5541,6 @@ class Payplug extends PaymentModule
             }
 
             // $this->log_payment->info('Payment valided');
-
             return Tools::jsonEncode($data);
         }
 
@@ -7403,5 +7437,55 @@ class Payplug extends PaymentModule
         } else {
             Tools::redirect($link);
         }
+    }
+
+    // Let's go 4 Oney in 1.6 :-)
+
+    /**
+     * Display Oney required fields template
+     *
+     * @return mixed
+     */
+    public function displayOneyRequiredFields()
+    {
+        $fields = $this->getOneyRequiredFields();
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $this->smarty->assign(array(
+            'oney_required_fields' => $fields
+        ));
+
+        return $this->display(__FILE__, 'oney_form.tpl');
+    }
+
+    /**
+     * Assign Oney javascript variable
+     */
+    private function assignOneyJSVar()
+    {
+        $js_var = array(
+            'loading_msg' => $this->l('Loading'),
+            'can_use_oney' => $this->getConfiguration('PAYPLUG_ONEY'),
+        );
+        return Media::addJsDef($js_var);
+    }
+
+    /**
+     * Display Oney popin payment option
+     *
+     * @return mixed
+     */
+    public function displayOneyPaymentOptions()
+    {
+        $this->smarty->assign(array(
+            'payplug_module_dir' => _PS_MODULE_DIR_,
+            'payplug_oney_loading_msg' => $this->l('Loading'),
+            'oney_required_fields' => $this->displayOneyRequiredFields()
+        ));
+
+        return $this->display(__FILE__, 'oney_payment.tpl');
     }
 }

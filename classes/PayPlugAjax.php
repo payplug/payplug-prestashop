@@ -39,8 +39,15 @@ class PayPlugAjax
             $context = Context::getContext();
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
-                    $payment = $payplug->preparePayment(Tools::getValue('pc'));
-                    die($payment);
+                    $payment = $payplug->preparePayment(null,Tools::getValue('pc'));
+                    if(is_array($payment))
+                    {
+                        die(implode($payment));
+                    }
+                    else
+                    {
+                        die($payment);
+                    }
                 } else {
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;
