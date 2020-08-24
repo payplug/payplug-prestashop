@@ -4679,8 +4679,8 @@ class Payplug extends PaymentModule
 
         $req_payplug_card = '
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_card` (
+            `id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_customer` int(11) UNSIGNED NOT NULL,
-            `id_payplug_card` int(11) UNSIGNED NOT NULL,
             `id_company` int(11) UNSIGNED NOT NULL,
             `is_sandbox` int(1) UNSIGNED NOT NULL,
             `id_card` varchar(255) NOT NULL,
@@ -4689,8 +4689,7 @@ class Payplug extends PaymentModule
             `exp_year` varchar(4) NOT NULL,
             `brand` varchar(255) DEFAULT NULL,
             `country` varchar(3) NOT NULL,
-            `metadata` varchar(255) DEFAULT NULL,
-            PRIMARY KEY (`id_customer`,`id_payplug_card`, `id_company`, `is_sandbox`)
+            `metadata` varchar(255) DEFAULT NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
         $res_payplug_card = DB::getInstance()->Execute($req_payplug_card);
 
