@@ -262,7 +262,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.27.0';
+        $this->version = '3.0.0';
 
         $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
 
