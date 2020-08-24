@@ -769,15 +769,15 @@ var $document, $window, payplug = {
                 '(\\#[-a-z\\d_]*)?$', 'i');
             const matches = url.match(pattern);
             if (matches == null) {
-                if ($('#error_invalid_url').hasClass('hide')) {
-                    $('#error_invalid_url').removeClass('hide');
+                if (!$('.payplugOneyTOS_error').hasClass('payplugOneyTOS_error-show')) {
+                    $('.payplugOneyTOS_error').addClass('payplugOneyTOS_error-show');
                 }
                 $("button[name=submitSettings]").prop("disabled", true);
                 $("button[name=submitSettings]").addClass('payplugButton-disabled');
             }
             if ((matches !== null) || (url.length == 0)) {
-                if (!$('#error_invalid_url').hasClass('hide')) {
-                    $('#error_invalid_url').addClass('hide');
+                if ($('.payplugOneyTOS_error').hasClass('payplugOneyTOS_error-show')) {
+                    $('.payplugOneyTOS_error').removeClass('payplugOneyTOS_error-show');
                 }
                 $("button[name=submitSettings]").prop("disabled", false);
                 $("button[name=submitSettings]").removeClass('payplugButton-disabled');

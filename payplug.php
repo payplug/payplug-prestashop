@@ -919,8 +919,11 @@ class Payplug extends PaymentModule
 
         // check if oney tos is complete
         $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
-        if(Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
-            $this->check_configuration['warning'][] = $check_oney_tos;
+        if($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
+            $this->check_configuration['other'][] = [
+                'text' => $check_oney_tos,
+                'type' => 'warning'
+            ];
         }
 
 
