@@ -57,8 +57,13 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
         $context = Context::getContext();
 
-        $customer = $context->customer;
-        $payplug_cards = $payplug->getCardsByCustomer($customer->id);
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $payplug_card = new PayPlugCard();
+            $payplug_cards = $payplug_card->getByCustomer($context->customer);
+        } else {
+            $customer = $context->customer;
+            $payplug_cards = $payplug->getCardsByCustomer($customer->id);
+        }
 
         $payplug_delete_card_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
         $this->context->smarty->assign(array(
