@@ -3859,7 +3859,7 @@ class Payplug extends PaymentModule
 
 
             $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-            $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+            $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
                     $oney_payment_methods);
 
             if ($is_oney) {
@@ -6643,7 +6643,7 @@ class Payplug extends PaymentModule
         $cancelled_state = Configuration::get('PS_OS_CANCELED');
 
         $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-        $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+        $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
                 $oney_payment_methods);
 
         if ($is_oney) {
