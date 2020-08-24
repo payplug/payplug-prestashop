@@ -262,7 +262,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.27.0';
+        $this->version = '3.0.0';
 
         $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
 
@@ -4093,11 +4093,26 @@ class Payplug extends PaymentModule
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
             true);
 
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $payplug_icon_url = PayplugBackward::getHttpHost(true) . __PS_BASE_URI__
+                . 'modules/' . $this->name . '/views/img/logo26.png';
+            $version = 1.6;
+
+            $this->smarty->assign(array(
+                'payplug_icon_url' => $payplug_icon_url,
+                'version' => $version
+            ));
+        }
+
         $this->smarty->assign(array(
             'payplug_cards_url' => $payplug_cards_url
         ));
 
-        return $this->display(__FILE__, 'my_account.tpl');
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            return $this->display(__FILE__, 'my_account_1_6.tpl');
+        } else {
+            return $this->display(__FILE__, 'my_account.tpl');
+        }
     }
 
     /**
@@ -4147,7 +4162,6 @@ class Payplug extends PaymentModule
         if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
             return;
         }
-
         $action = Tools::getValue('action');
         if ($action == 'refresh') {
             $use_taxes = (bool)Configuration::get('PS_TAX');
@@ -4187,7 +4201,7 @@ class Payplug extends PaymentModule
         if (Tools::getValue('error')) {
             Media::addJsDef(['payment_errors' => true]);
         }
-        if (version_compare(_PS_VERSION_, '1.6', '>=')) {
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
             Media::addJsDef(array(
