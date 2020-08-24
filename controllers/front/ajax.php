@@ -25,6 +25,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
+        if ((version_compare(_PS_VERSION_, '1.6', '>=')) && (version_compare(_PS_VERSION_, '1.7', '<'))) {
+            $ajax = new PayPlugAjax();
+            $ajax->run();
+            exit;
+        }
+
         require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
         require_once(_PS_MODULE_DIR_ . '../init.php');
         include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
@@ -33,8 +39,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $payplug = new Payplug();
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
-                    $payment = $payplug->preparePayment(['id_card' => Tools::getValue('pc')]);
-                    die($payment);
+                    $payment = $payplug->preparePayment(null, ['id_card' => Tools::getValue('pc')]);
                 } elseif ((int)Tools::getValue('delete') == 1) {
                     $context = Context::getContext();
                     $cookie = $context->cookie;

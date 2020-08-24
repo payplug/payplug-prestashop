@@ -23,13 +23,17 @@
     <ul>
         <li>
             <span><b>{l s='Amount:' mod='payplug'}</b></span>
-            <span><b>{displayPrice price=$payplug_oney_amount}</b></span>
+            <span><b>{displayPrice price=$payplug_oney_amount.amount}</b></span>
+        </li>
+        <li>
+            <span><b>{l s='Total cost:' mod='payplug'}</b></span>
+            <span><b>{displayPrice price=$oney_payment_option.total_cost.amount}</b></span>
         </li>
         <li>
             <span>{l s='Contribution: ' mod='payplug'}</span>
-            <span><b>{displayPrice price=$oney_payment_option.down_payment_amount}</b></span>
+            <span><b>{displayPrice price=$oney_payment_option.down_payment_amount.value}</b></span>
             <small>
-                ({l s='Financing cost:' mod='payplug'} <b>{displayPrice price=$oney_payment_option.total_cost}</b>
+                ({l s='Financing cost:' mod='payplug'} <b>{displayPrice price=$oney_payment_option.total_cost.amount}</b>
                 {l s='TAEG:' mod='payplug'} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
             </small>
         </li>
@@ -40,7 +44,7 @@
                 <span><b>{displayPrice price=$oney_installment.amount}</b></span>
             </li>
         {/foreach}
-        {assign var="payplug_oney_total_amount" value=$payplug_oney_amount+$oney_payment_option.total_cost}
+        {assign var="payplug_oney_total_amount" value=$payplug_oney_amount.amount+$oney_payment_option.total_cost.amount}
         <li>
             <span><b>{l s='Total:' mod='payplug'}</b></span>
             <span><b>{displayPrice price=$payplug_oney_total_amount}</b></span>

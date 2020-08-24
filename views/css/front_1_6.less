@@ -22,19 +22,57 @@
 
 @import "less/include";
 
-p.payment_module a.payplug
-{
+p.payment_module a.payplug {
   background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
   padding-left: 240px;
+  cursor: pointer;
 }
 
-p.payment_module a.payplug:hover
-{
+p.payment_module a.payplug.it {
+  background-image: url('../img/logos_schemes_it.png');
+}
+
+p.payment_module a.payplug.installment_2 {
+  background: url('../img/logos_schemes_installment_2_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_2.it {
+  background-image: url('../img/logos_schemes_installment_2_it.png');
+}
+
+p.payment_module a.payplug.installment_2.en {
+  background-image: url('../img/logos_schemes_installment_2_en.png');
+}
+
+p.payment_module a.payplug.installment_3 {
+  background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_3.it {
+  background-image: url('../img/logos_schemes_installment_3_it.png');
+}
+
+p.payment_module a.payplug.installment_3.en {
+  background-image: url('../img/logos_schemes_installment_3_en.png');
+}
+
+p.payment_module a.payplug.installment_4 {
+  background: url('../img/logos_schemes_installment_4_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_4.it {
+  background-image: url('../img/logos_schemes_installment_4_it.png');
+}
+
+p.payment_module a.payplug.installment_4.en {
+  background-image: url('../img/logos_schemes_installment_4_en.png');
+}
+
+p.payment_module a.payplug:hover {
   background-color: #F6F6F6;
 }
 
-p.payment_module a.payplug:after
-{
+p.payment_module a.payplug:after {
   display: block;
   content: "\f054";
   position: absolute;
@@ -48,83 +86,87 @@ p.payment_module a.payplug:after
   color: #777;
 }
 
-div.payplug-wrapper{
+div.payplug-wrapper {
+  .borderRadius(4px);
   border: 1px solid #d6d4d4;
-  border-radius: 4px;
   background: #fbfbfb;
   color: #333;
   display: block;
   font-size: 17px;
   font-weight: bold;
-  /*letter-spacing: -1px;*/
   line-height: 23px;
-  /*padding: 0;
-  margin: 0;*/
   position: relative;
+  margin: 0 0 10px;
 }
 
 div.payplug-wrapper .payment_module {
   letter-spacing: -1px;
 }
 
-div.payplug-wrapper .payment_module span{
+div.payplug-wrapper .payment_module span {
   background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
   /*padding-left: 197px;*/
-  padding: 33px 40px 34px 197px;
+  padding: 33px 40px 34px 240px;
   display: block;
 }
 
-div.payplug-wrapper form{
+div.payplug-wrapper .payment_module span.it {
+  background-image: url('../img/logos_schemes_it.png');
+}
+
+div.payplug-wrapper form {
   padding: 0 0 10px 16px;
   position: relative;
 }
 
-form div.card-wrapper {
+div.payplug-wrapper form div.card-wrapper {
   overflow: hidden;
   line-height: normal;
   padding: 0 0 10px 0;
 }
 
-form div.card-wrapper input {
+div.payplug-wrapper div:first-child {
   float: left;
+  padding: 10px 15px 0 0;
 }
 
 div.info-wrapper div:first-child {
   padding: 0;
 }
 
-form input[name=payplug_card] {
-  /*float: left;*/
-  margin: 10px 10px 0 0;
-}
-
-form div label {
+div.payplug-wrapper form input[name=payplug_card] {
   float: left;
+  margin: 10px 10px 0 0;
+  cursor: pointer;
 }
 
-form div label img {
+div.payplug-wrapper form div label {
+  float: left;
+  cursor: pointer;
+}
+
+div.payplug-wrapper form div label img {
   float: left;
   padding: 0 8px 0 0;
-  width: 60px;
 }
 
-form div label div.info-wrapper {
+div.payplug-wrapper form div label div.info-wrapper {
   float: left;
 }
 
-label[for=payplug_card_new] {
+div.payplug-wrapper label[for=payplug_card_new] {
   /*padding: 10px 0 0 0;*/
 }
 
-.payplug_expiry_date{
+.payplug_expiry_date {
   display: block;
-  font-size: 13px;
+  font-size: 0.8em;
   font-weight: normal;
-  padding: 0 0 0 19px;
-  text-align: center;
+  /*padding: 0 0 0 19px;*/
+  padding: 0 0 0 0;
 }
 
-.ppdelete{
+.ppdelete {
   display: block;
   padding: 0 0 0 19px;
   text-decoration: underline;
@@ -136,16 +178,16 @@ label[for=payplug_card_new] {
 .ppdelete:hover,
 .ppdelete:active,
 .ppdelete:visited,
-.ppdelete:focus{
+.ppdelete:focus {
   text-decoration: underline;
 }
 
-.ppsubmit{
+.ppsubmit {
+  .borderRadius(0.25em);
   position: absolute;
   bottom: 0;
   right: 0;
-  background: #00ab7a none repeat scroll 0 0;
-  border-radius: 0.25em;
+  background: #colorMap[payplug];
   color: #ffffff;
   font-weight: 700;
   height: 3em;
@@ -154,31 +196,33 @@ label[for=payplug_card_new] {
   text-transform: uppercase;
   min-width: 11em;
   border: none;
+
+  &:hover {
+    background: darken(#colorMap[payplug],5);
+  }
+  &.disable {
+    background: #dddddd none repeat scroll 0 0;
+  }
 }
-.ppsubmit:hover {
-  background: #49a482 none repeat scroll 0 0;
-}
-.ppsubmit.disable{
-  background: #dddddd none repeat scroll 0 0;
-}
-.ppOneClickStatus{
+
+.ppOneClickStatus {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
   font-size: 14px;
-  clear:both;
-}
-.ppfail{
-  margin-bottom: 9px;
-  font-weight: bold;
-  font-size: 15px;
 }
 
-.ppOneClickStatus p{
-  text-align: left;
-  font-weight: bold;
+.ppOneClickStatus p {
+  bottom: 3em;
+  font-weight: normal;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  width: 325px;
+  display: none;
+  text-align: right;
 }
 
-.ppfail .material-icons{
-  margin: 0 19px 0 -4px;
-}
 
 @media (max-width: 700px) {
   .ppOneClickStatus p {
@@ -191,15 +235,18 @@ label[for=payplug_card_new] {
   .info-wrapper {
     font-size: 14px;
   }
+
   .ppsubmit {
     position: relative;
     display: block;
   }
+
   .ppOneClickStatus {
     position: relative;
     bottom: 0;
     right: 0;
   }
+
   .ppOneClickStatus p {
     bottom: 0;
     position: relative;
@@ -208,7 +255,7 @@ label[for=payplug_card_new] {
   }
 }
 
-.loader{
+.loader {
   left: 50%;
   margin-right: -30px;
   position: absolute;
@@ -216,7 +263,7 @@ label[for=payplug_card_new] {
   width: 50px;
   height: 50px;
   padding: 10px;
-  border-radius: 11px;
+  .borderRadius(11px);
   z-index: 9999;
   background: #000000;
 }
@@ -232,18 +279,18 @@ label[for=payplug_card_new] {
   margin: 0;
 }
 
-.ppsuccess{
-  color: #00ab7a;
+.ppsuccess {
+  color: #colorMap[payplug];
 }
 
-p.ppwait{
-  display: none;
-  bottom: 6em;
-  right: 12em;
-}
-
-.ppfail{
+.ppfail {
   color: #dd2525;
+}
+
+.ppfail-default,
+.ppfail-installment {
+  font-size: 13px;
+  font-weight: 400;
 }
 
 div.ppoverlay {
@@ -261,29 +308,22 @@ div.ppoverlay {
   /*opacity: 0.5;*/
 }
 
-
 .ppbold {
   font-weight: bold;
 }
 
-#module-payplug-cards div.message{
+a.ppdeletecard {
+  text-decoration: underline;
+}
+
+#module-payplug-cards p.message {
   display: none;
 }
 
-.payplug-payment-option{
-
+a.payplug.call.pphide {
+  display: none;
 }
 
-body#checkout section.checkout-step .payment-options .payplug-payment-option label{
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  justify-content: flex-end;
-  margin: 0;
-}
-body#checkout section.checkout-step .payment-options .payplug-payment-option img{
-  margin: 0 12px 0 0;
-}
 
 .payplug {
   &Popin {
@@ -339,7 +379,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       border: none;
       overflow: hidden;
       padding: 0;
-      cursor: pointer;
 
       &:focus {
         outline: 0;
@@ -363,6 +402,10 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
 
       &:after {
         .transform(translate(-50%, -50%) rotate(-45deg));
+      }
+
+      @media (@mobile) {
+        display: none;
       }
     }
 
@@ -404,7 +447,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       font-size: 15px;
       outline: none;
       margin: 5px 0 0;
-      cursor: pointer;
     }
   }
 }
@@ -440,10 +482,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     z-index: 3;
     display: inline-block;
 
-    &-checkout{
-      margin: 16px 0 0;
-    }
-
     @media (@mobile) {
       &,
       #order-detail-content #cart_summary & {
@@ -472,7 +510,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       align-items: center;
       text-transform: uppercase;
       color: #2F2930;
-      cursor: pointer;
 
       &:hover {
         color: #colorMap[oney];
@@ -493,6 +530,21 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         &:hover {
           color: #colorMap[grey];
         }
+      }
+
+      &-product {
+        max-width: 100%;
+        font-size: 10px;
+
+        @media (@mobile) {
+          position: relative;
+          height: 32px;
+          font-size: 13px;
+        }
+      }
+
+      &-checkout {
+        display: none;
       }
 
       span {
@@ -531,14 +583,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       .table tfoot tr& {
         background: none;
       }
-
-      td {
-        &:first-child {
-          border-left: 1px solid #fff;
-          border-bottom: 1px solid #fff;
-          background: none;
-        }
-      }
     }
 
     &_field {
@@ -552,12 +596,22 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         background: transparent;
       }
     }
+
+    &_wrapper {
+      display: flex !important;
+      justify-content: flex-end;
+
+      .oneyCta_button-checkout {
+        display: flex;
+      }
+    }
   }
 
   // Oney popin
   &Popin {
     .Poppins;
     .transition(~"opacity @{dur}");
+    color: #777;
     display: none;
     position: absolute;
     right: 35px;
@@ -583,7 +637,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       content: "";
       top: 17.5%;
       right: -2px;
-      z-index: -1;
 
       .oneyPopin-error& {
         border-color: #colorMap[grey];
@@ -623,7 +676,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       @media (@mobile) {
         .border(#colorMap[oney]);
         max-height: 500px;
-        background: #fff;
       }
     }
 
@@ -701,51 +753,58 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     }
 
     &_navigation {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      margin: 0;
+      ul& {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: 0;
 
-      li {
-        .border(lighten(#colorMap[grey], 20%));
-        .transition;
+        li {
+          .border(lighten(#colorMap[grey], 20%));
+          .transition;
+          padding: 0;
 
-        &:first-child {
-          .borderRadius(2px 2px 0 0);
-        }
+          &:first-child {
+            .borderRadius(2px 2px 0 0);
+          }
 
-        &:last-child {
-          .borderRadius(0 0 2px 2px);
-        }
+          &:last-child {
+            .borderRadius(0 0 2px 2px);
+          }
 
-        & + li {
-          margin: -1px 0 0;
-        }
+          &:before {
+            display: none;
+          }
 
-        button {
-          background: transparent;
-          border: none;
-          width: 100%;
-          height: 32px;
-          text-align: left;
-          padding: 0 16px;
-          outline: 0;
-          color: #colorMap[grey];
-          cursor: pointer;
-        }
-
-        &:hover,
-        &.selected {
-          .border(#colorMap[oney]);
-          z-index: 2;
+          & + li {
+            margin: -1px 0 0;
+          }
 
           button {
-            color: #777;
+            background: transparent !important;
+            border: none;
+            width: 100%;
+            height: 32px;
+            text-align: left;
+            padding: 0 16px;
+            outline: 0;
+            color: #colorMap[grey] !important;
+            text-transform: none;
           }
-        }
 
-        &.selected {
-          background: fade(#colorMap[oney], 15);
+          &:hover,
+          &.selected {
+            .border(#colorMap[oney]);
+            z-index: 2;
+
+            button {
+              color: #colorMap[grey] !important;
+            }
+          }
+
+          &.selected {
+            background: fade(#colorMap[oney], 15);
+          }
         }
       }
     }
@@ -765,28 +824,36 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
 
       ul, p {
         margin: 0;
+
+        p,
+        li {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+          flex-wrap: wrap;
+          line-height: 17px;
+          padding: 0;
+
+          &:first-child,
+          &:last-child {
+            padding: 4px 0;
+          }
+          &:before {
+            display: none;
+          }
+
+          span {
+            display: flex;
+            padding: 0;
+            font: inherit;
+            color: inherit;
+            width: auto;
+          }
+        }
       }
 
       p {
         padding: 4px 0;
-      }
-
-      p,
-      li {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        flex-wrap: wrap;
-        line-height: 17px;
-
-        &:first-child,
-        &:last-child {
-          padding: 4px 0;
-        }
-        small {
-          display: block;
-          width: 100%;
-        }
       }
 
       &[data-type="3x"] {
@@ -806,6 +873,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       line-height: 1.2em;
       color: #8a8a8a;
       margin: 8px 0 0;
+      white-space: normal;
 
       @media (@mobile) {
         padding: 0 0 15px;
@@ -825,7 +893,10 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       border: none;
       overflow: hidden;
       padding: 0;
-      cursor: pointer;
+
+      &:hover{
+        background: none;
+      }
 
       &:focus {
         outline: 0;
@@ -864,56 +935,382 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     }
   }
 
-  &Schedule {
-    .border(#colorMap[oney], tb);
-    position: relative;
-    font-size: 12px;
-    line-height: 17px;
-    width: 100%;
-    margin: -10px 0 20px -8px;
+  // Oney payment
+  &Payment {
+    .borderRadius(4px);
+    .Poppins();
+    .transition(~"max-height @{dur}");
+    border: 1px solid #d6d4d4;
+    background: #fbfbfb;
+    max-height: 90px;
+    overflow: hidden;
 
-    // Oney Detail
-    ul {
+    &-disabled {
+      max-height: none;
+    }
+
+    &-open {
+      max-height: 10000vh;
+    }
+
+    &_trigger {
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: 88px;
+      align-items: center;
+      border: none;
+      background: none;
+      text-align: left;
+      color: #333;
+      font-size: 17px;
+      font-weight: bold;
+      padding: 0 15px;
+      letter-spacing: -1px;
+
+      .oneyPayment-disabled & {
+        color: #colorMap[grey];
+        cursor: default;
+
+        &:hover {
+          background: #fbfbfb;
+        }
+
+        .oneyPayment-mobile& {
+          padding: 8px 15px;
+          height: auto;
+        }
+      }
+
+      &:hover {
+        background: #f6f6f6;
+
+        .oneyPayment-open & {
+          background: #fbfbfb;
+        }
+      }
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:after {
+        .transition(~"transform @{dur}");
+        .transform(translateY(-50%));
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        content: "\f054";
+        position: absolute;
+        right: 7px;
+        top: 50%;
+        font-family: "FontAwesome";
+        font-size: 25px;
+        height: 30px;
+        width: 30px;
+        color: #777;
+
+        .oneyPayment-open & {
+          .transform(translateY(-50%) rotate(90deg));
+        }
+
+        .oneyPayment-disabled & {
+          display: none;
+        }
+      }
+
+      .oneyPayment-mobile & {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+      }
+    }
+
+    &_label {
       display: flex;
       flex-direction: column;
-      font-weight: 600;
-      font-size: 13px;
-      color: #2F2930;
+      line-height: 1.3em;
+    }
+
+    &_error {
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 400;
+
+      &-invalidCarrier {
+        padding: 0 15px;
+        color: #colorMap[error];
+        font-size: 13px;
+        font-style: normal;
+        margin: 0 0 16px;
+      }
+    }
+
+    &_logo {
+      display: block;
+      width: 165px;
+      height: 45px;
+      background-size: 110%;
+      max-width: 100%;
+      margin: 0 15px 0 0;
+
+      .oneyPayment-disabled & {
+        background-image: url(~"@{img_oney}3x4x-alt.svg");
+      }
+    }
+
+    &_cta {
+      display: flex;
+      justify-content: center;
       width: 100%;
-      height: 100%;
-      margin: 0;
+      margin: 0 0 30px;
+    }
 
-      li {
-        display: flex;
-        justify-content: space-between;
-        line-height: 21px;
-        padding: 0;
-        flex-wrap: wrap;
+    &_button {
+      background: #colorMap[oney];
+      width: 254px;
+      height: 50px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      .borderRadius(2px);
 
-        span {
-          display: flex;
-          font-weight: 600;
+      &-disabled,
+      .oneyPayment-invalidCarrier & {
+        background: #colorMap[grey];
+        cursor: default;
+        outline: none;
+      }
+    }
+  }
 
-          &:first-child {
-            font-weight: 500;
-          }
-        }
+  // Oney payment option
+  &Option {
+    .transition();
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: calc(50% - 16px);
+    border: 1px solid #dce0e8;
+    padding: 30px;
+    cursor: pointer;
+    margin: 0 8px 50px;
+    position: relative;
 
-        &:first-child,
-        &:last-child{
-          padding: 12px 0;
-        }
+    &:after {
+      .transition(~"opacity @{dur}");
+      content: "";
+      position: absolute;
+      display: block;
+      bottom: -14px;
+      right: 0;
+      left: 0;
+      height: 13px;
+      background: #colorMap[oney];
+      opacity: 0;
+      -webkit-box-shadow: 0px -5px 10px 5px #fff inset;
+      -moz-box-shadow: 0px -5px 10px 5px #fff inset;
+      box-shadow: 0px -5px 10px 5px #fff inset;
 
-        small {
-          display: block;
-          font-weight: 400;
-          width: 100%;
+      .oneyPayment-mobile & {
+        display: none;
+      }
+    }
+
+    &:hover {
+      border-color: #colorMap[oney];
+
+      &:after {
+        opacity: 1;
+      }
+    }
+
+    &-selected {
+      border-color: #colorMap[oney];
+      background: fade(#colorMap[oney], 15);
+
+      &:after {
+        opacity: 1;
+      }
+
+      .oneyPayment-mobile & {
+        border: none;
+        background: none;
+      }
+    }
+
+    &_wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 0 8px;
+      flex-wrap: wrap;
+      position: relative;
+
+      .oneyPayment-mobile & {
+        padding: 89px 0 0;
+        position: relative;
+      }
+
+      &-loading {
+        justify-content: center;
+        padding: 16px;
+
+        & + .oneyPayment_cta {
+          display: none;
         }
 
         .oneyPayment-mobile & {
-          padding: 8px 0;
+          padding: 16px;
         }
       }
+    }
+
+    &_logo {
+      display: block;
+      width: 135px;
+      height: 35px;
+      max-width: 100%;
+
+      .oneyPayment-mobile & {
+        width: 100px;
+        height: 30px;
+      }
+
+      .oneyPayment-invalidCarrier &.oneyLogo-x3 {
+        background-image: url(~"@{img_oney}3x-alt.svg");
+      }
+
+      .oneyPayment-invalidCarrier &.oneyLogo-x4 {
+        background-image: url(~"@{img_oney}4x-alt.svg");
+      }
+    }
+
+    &_title {
+      display: flex;
+      height: 90px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: #2f2930;
+      padding: 0 0 35px;
+
+      .oneyPayment-mobile & {
+        width: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: transparent;
+        border: 1px solid #dce0e8;
+        border-left: none;
+        border-bottom: 5px solid transparent;
+        padding: 0;
+      }
+
+      .oneyPayment-mobile .oneyOption:nth-child(2) & {
+        left: 50%;
+        border-right: none;
+        border-left: none;
+      }
+
+      .oneyPayment-mobile .oneyOption-selected & {
+        border-bottom: 5px solid #colorMap[oney];
+      }
+    }
+
+    &_prices {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .oneyPayment-mobile & {
+        display: none;
+        height: auto;
+        padding: 30px 16px;
+        border-top: 1px solid #dce0e8;
+      }
+
+      .oneyPayment-mobile .oneyOption-selected & {
+        display: block;
+      }
+
+      // Oney Detail
+      ul {
+        display: flex;
+        flex-direction: column;
+        font-weight: 600;
+        font-size: 15px;
+        color: #2F2930;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+
+        li {
+          .border(#dce0e8, b);
+          display: flex;
+          justify-content: space-between;
+          line-height: 21px;
+          padding: 0 0 16px;
+          flex-wrap: wrap;
+
+          & + li {
+            padding: 16px 0;
+          }
+
+          &:last-child {
+            padding: 16px 0 0;
+            margin: auto 0 0;
+            border: none;
+          }
+
+          span {
+            display: flex;
+            font-weight: 600;
+
+            &:first-child {
+              font-weight: 500;
+            }
+          }
+
+          small {
+            display: block;
+            font-weight: 400;
+            width: 100%;
+          }
+
+          .oneyPayment-mobile & {
+            padding: 8px 0;
+          }
+        }
+      }
+    }
+
+    &_legend {
+      text-align: center;
+      font-weight: 400;
+      margin: auto 0 0;
+      color: #2f2930;
+    }
+
+    &_radio {
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .oneyPayment-mobile & {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      position: static;
+      border: none;
+      background: none;
     }
   }
 
@@ -1198,22 +1595,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
             content: "";
             margin: 0 0 15px;
           }
-        }
-      }
-
-      button {
-        &.oneyForm_close {
-          .borderRadius(2px);
-          background: #colorMap[payplug];
-          width: auto;
-          height: 32px;
-          padding: 0 16px;
-          color: #fff;
-          border: none;
-          font-size: 15px;
-          outline: none;
-          margin: 15px 0 0;
-          cursor: pointer;
         }
       }
 
