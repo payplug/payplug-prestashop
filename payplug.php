@@ -4196,11 +4196,10 @@ class Payplug extends PaymentModule
             return;
         }
 
-
-
         if (Tools::getValue('error')) {
             Media::addJsDef(['payment_errors' => true]);
         }
+
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
@@ -5480,7 +5479,6 @@ class Payplug extends PaymentModule
                     }
                 }
             }
-
             $payplug_method_name = $this->getCurrentPaymentMethod($id_card);
             $payplug_payment = new $payplug_method_name($id_card, $options);
 
@@ -5922,7 +5920,6 @@ class Payplug extends PaymentModule
         } else {
             $payment_method = 'PayPlugPaymentStandard';
         }
-
         return $payment_method;
     }
 
@@ -7000,8 +6997,8 @@ class Payplug extends PaymentModule
         $path_ssl = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/';
 
         $payplug_card = new PayPlugCard();
-        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
 
+        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
         $use_taxes = $this->getConfiguration('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
         $base_total_tax_exc = $cart->getOrderTotal(false);

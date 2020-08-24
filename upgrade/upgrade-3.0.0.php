@@ -38,5 +38,10 @@ function upgrade_module_3_0_0($object)
         return true;
     }
 
+    /*
+     * Voir PayPlugCard : Auto Increment sur id_payplug_card (différent 1.6 1.7)
+     * Voir pour migrations cartes existantes
+     */
+
     return $res_payplug_payment_cart;
 }
