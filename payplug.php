@@ -4161,7 +4161,12 @@ class Payplug extends PaymentModule
             return;
         }
 
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
+        if (version_compare(_PS_VERSION_, '1.6', '>=')) {
+            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/16views/css/front_1_6.css');
+        } else {
+            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
+        }
+
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
 
         if (Tools::getValue('error')) {
