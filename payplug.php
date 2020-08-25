@@ -919,8 +919,11 @@ class Payplug extends PaymentModule
 
         // check if oney tos is complete
         $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
-        if(Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
-            $this->check_configuration['warning'][] = $check_oney_tos;
+        if($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
+            $this->check_configuration['other'][] = [
+                'text' => $check_oney_tos,
+                'type' => 'warning'
+            ];
         }
 
 
@@ -1469,9 +1472,14 @@ class Payplug extends PaymentModule
         $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
+        $tos_url = Configuration::get('PAYPLUG_ONEY_TOS_URL');
+        if (strpos($tos_url, 'http://') === false && strpos($tos_url, 'https://') === false && $tos_url) {
+            $tos_url = Tools::getShopProtocol() . $tos_url;
+        }
+
         $this->smarty->assign(array(
             'tos_active' => Configuration::get('PAYPLUG_ONEY_TOS'),
-            'tos_url' => Configuration::get('PAYPLUG_ONEY_TOS_URL'),
+            'tos_url' => $tos_url,
             'legal_notice' => sprintf($this->l($legal_text), Tools::displayPrice($min_amount),
                 Tools::displayPrice($max_amount))
         ));
@@ -2800,7 +2808,7 @@ class Payplug extends PaymentModule
             $shipping_country->iso_code);
         if (!$is_valid_mobile_phone_number) {
             $shipping_fields['mobile_phone_number'] = array(
-                'text' => $this->l('Please enter your mobile phone number'),
+                'text' => $this->l('Please enter your mobile phone number.'),
                 'input' => array(
                     array(
                         'name' => 'mobile_phone_number',
@@ -2862,7 +2870,7 @@ class Payplug extends PaymentModule
                 $billing_country->iso_code);
             if (!$is_valid_mobile_phone_number) {
                 $billing_fields['mobile_phone_number'] = array(
-                    'text' => $this->l('Please enter your mobile phone number'),
+                    'text' => $this->l('Please enter your mobile phone number.'),
                     'input' => array(
                         array(
                             'name' => 'mobile_phone_number',
@@ -3851,7 +3859,7 @@ class Payplug extends PaymentModule
 
 
             $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-            $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+            $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
                     $oney_payment_methods);
 
             if ($is_oney) {
@@ -4064,16 +4072,6 @@ class Payplug extends PaymentModule
             return false;
         }
         $this->smarty->assign(['env' => 'checkout']);
-
-        $action = Tools::getValue('action');
-        if ($action == 'refresh') {
-            $use_taxes = (bool)Configuration::get('PS_TAX');
-
-            $context = Context::getContext();
-            $amount = $context->cart->getOrderTotal($use_taxes);
-            $this->assignOneyPriceAndPaymentOptions($context->cart, $amount);
-            $this->smarty->assign(['popin' => true]);
-        }
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
@@ -4731,12 +4729,16 @@ class Payplug extends PaymentModule
     {
         $translationsAdminPayPlug = array(
             'en' => 'PayPlug',
+            'gb' => 'PayPlug',
+            'it' => 'PayPlug',
             'fr' => 'PayPlug'
         );
         $flag = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
 
         $translationsAdminPayPlugInstallment = array(
             'en' => 'Installment Plans',
+            'gb' => 'Installment Plans',
+            'it' => 'Pagamenti frazionati',
             'fr' => 'Paiements en plusieurs fois'
         );
 
@@ -5339,6 +5341,9 @@ class Payplug extends PaymentModule
         if (Tools::isSubmit('submitDisconnect')) {
             $this->createConfig();
             Configuration::updateValue('PAYPLUG_SHOW', 0);
+
+            // force reload configuration to be sure all config are reset
+            Configuration::loadConfiguration();
 
             $this->assignContentVar();
             $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
@@ -6641,7 +6646,7 @@ class Payplug extends PaymentModule
         $cancelled_state = Configuration::get('PS_OS_CANCELED');
 
         $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-        $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+        $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
                 $oney_payment_methods);
 
         if ($is_oney) {

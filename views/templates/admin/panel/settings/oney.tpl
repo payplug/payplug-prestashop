@@ -33,25 +33,25 @@
             <div class="payplugTips payplugTips-{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active}style="display: none;"{/if}>
                     <div class="payplugOney">
-                        <div class="payplugPanel_section">
+                        <div class="payplugPanel_section payplugOneyTOS">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_tos}
-                            <p class="payplug_oney_tos_url_desc">{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}
+                            <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}
                                 <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_f9ffbbdb-e5f2-487f-a709-854eb852e480" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                             </p>
                             <div class="payplugTips payplugTips-{$payplug_switch.oney_tos.name|escape:'htmlall':'UTF-8'}">
                                 <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.oney_tos.checked || !$payplug_switch.oney_tos.active}style="display: none;"{/if}>
-                                    <div id="tos_group" >{l s='Please enter your General terms and conditions URL here: ' mod='payplug'}
-                                        <input  id="tos_url"
-                                                type="text"
-                                                class="payplug_oney_tos_url"
+                                    <div class="payplugOneyTOS" >
+                                        <p class="payplugOneyTOS_text">{l s='Please enter your General terms and conditions URL here: ' mod='payplug'}</p>
+                                        <input  type="text"
+                                                class="payplugOneyTOS_input"
                                                 name="payplug_oney_tos_url"
                                                 placeholder="ex : http://monsite.fr/mes-cgv"
                                                 {if $PAYPLUG_ONEY_TOS_URL}
                                                     value="{$PAYPLUG_ONEY_TOS_URL}"
                                                 {/if}
                                         >
+                                        <div class="payplugOneyTOS_error">{l s='Error : Please enter a valid URL.' mod='payplug'}</div>
                                     </div>
-                                    <div id="error_invalid_url" class="hide">{l s='Error : Please enter a valid URL.' mod='payplug'}</div>
                                 </div>
                             </div>
                         </div>
