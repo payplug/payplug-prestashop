@@ -6151,7 +6151,7 @@ class Payplug extends PaymentModule
      */
     public function saveCard($payment)
     {
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        if ($payment->metadata['Client']) {
             $payplug_card = new PayPlugCard();
 
             $id_customer = $payment->metadata['Client'];
