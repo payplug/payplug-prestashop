@@ -6151,36 +6151,12 @@ class Payplug extends PaymentModule
      */
     public function saveCard($payment)
     {
-        if ($payment->metadata['Client']) {
-            $payplug_card = new PayPlugCard();
-
-            $id_customer = $payment->metadata['Client'];
-
-            $payplug_card->brand = $payment->card->brand;
-            $payplug_card->country = $payment->card->country ? $payment->card->country : '';
-            $payplug_card->exp_month = $payment->card->exp_month;
-            $payplug_card->exp_year = $payment->card->exp_year;
-            $payplug_card->id_card = $payment->card->id;
-            $payplug_card->id_customer = $id_customer;
-            $payplug_card->last4 = $payment->card->last4;
-
-            $payplug_card->metadata = $payment->card->metadata ? serialize($payment->card->metadata) : '';
-
-            $_errors = $payplug_card->validateController();
-
-            if ($_errors) {
-                // @todo: log error while card creation
-                return false;
-            }
-
-            return $payplug_card->save();
-        } else {
             $brand = $payment->card->brand;
             if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
                 $brand = 'none';
             }
 
-            $customer_id = (int)$payment->metadata['ID Client'];
+            $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
             $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
             $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
@@ -6224,7 +6200,6 @@ class Payplug extends PaymentModule
             $return = Db::getInstance()->insert('payplug_card', $card);
 
             return (bool)$return;
-        }
     }
 
     /**
