@@ -68,6 +68,10 @@ class Payplug extends PaymentModule
 
     private $logger;
 
+    private $PrestashopSpecificClass;
+
+    private $PrestashopSpecificObject;
+
     /** @var string */
     private $api_live;
 
@@ -275,7 +279,17 @@ class Payplug extends PaymentModule
         $this->setConfigurationProperties();
         $this->setSecretKey();
         $this->setUserAgent();
+        $this->loadSpecificPrestaClasses();
     }
+
+    public function loadSpecificPrestaClasses()
+    {
+        $this->PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific'._PS_VERSION_[0]._PS_VERSION_[2];
+        if (class_exists($this->PrestashopSpecificClass)) {
+            $this->PrestashopSpecificObject = new $this->PrestashopSpecificClass();
+        }
+    }
+
 
     public function setPaymentOption()
     {
@@ -4091,14 +4105,9 @@ class Payplug extends PaymentModule
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
             true);
 
-        if (class_exists('PrestashopSpecific'._PS_VERSION_[0]._PS_VERSION_[2])) {
-            return hookCustomerAccount();
-            $payplug_icon_url = PayplugBackward::getHttpHost(true) . __PS_BASE_URI__
-                . 'modules/' . $this->name . '/views/img/logo26.png';
-
-            $this->smarty->assign(array(
-                'payplug_icon_url' => $payplug_icon_url
-            ));
+        d('hoho();');
+        if (class_exists($this->PrestashopSpecificClass)) {
+            ($this->PrestashopSpecificObject)->hookCustomerAccount();
         }
 
         $this->smarty->assign(array(
