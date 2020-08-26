@@ -3941,14 +3941,12 @@ class Payplug extends PaymentModule
             }
 
             $conf = (int)Tools::getValue('conf');
-            if (($conf == 30 || $conf == 31) && version_compare(_PS_VERSION_, '1.5', '>=')) {
+            if ($conf == 30 || $conf == 31) {
                 $show_popin = true;
 
                 $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
 
-                $this->html .= '
-<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>
-';
+                $this->html .= '<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>';
             }
 
             $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
@@ -4003,7 +4001,7 @@ class Payplug extends PaymentModule
                 'pay_error' => $pay_error,
             ));
 
-//Deferred payment does'nt display 3DS option before capture so we have to consider it null
+        //Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
                 $this->context->smarty->assign(array('pay_tds' => $pay_tds));
@@ -4096,23 +4094,18 @@ class Payplug extends PaymentModule
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $payplug_icon_url = PayplugBackward::getHttpHost(true) . __PS_BASE_URI__
                 . 'modules/' . $this->name . '/views/img/logo26.png';
-            $version = 1.6;
 
             $this->smarty->assign(array(
-                'payplug_icon_url' => $payplug_icon_url,
-                'version' => $version
+                'payplug_icon_url' => $payplug_icon_url
             ));
         }
 
         $this->smarty->assign(array(
+            'version' => _PS_VERSION_[0].'.'._PS_VERSION_[2],
             'payplug_cards_url' => $payplug_cards_url
         ));
 
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            return $this->display(__FILE__, 'my_account_1_6.tpl');
-        } else {
-            return $this->display(__FILE__, 'my_account.tpl');
-        }
+        return $this->display(__FILE__, 'my_account.tpl');
     }
 
     /**
@@ -6155,36 +6148,12 @@ class Payplug extends PaymentModule
      */
     public function saveCard($payment)
     {
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_card = new PayPlugCard();
-
-            $id_customer = $payment->metadata['Client'];
-
-            $payplug_card->brand = $payment->card->brand;
-            $payplug_card->country = $payment->card->country ? $payment->card->country : '';
-            $payplug_card->exp_month = $payment->card->exp_month;
-            $payplug_card->exp_year = $payment->card->exp_year;
-            $payplug_card->id_card = $payment->card->id;
-            $payplug_card->id_customer = $id_customer;
-            $payplug_card->last4 = $payment->card->last4;
-
-            $payplug_card->metadata = $payment->card->metadata ? serialize($payment->card->metadata) : '';
-
-            $_errors = $payplug_card->validateController();
-
-            if ($_errors) {
-                // @todo: log error while card creation
-                return false;
-            }
-
-            return $payplug_card->save();
-        } else {
             $brand = $payment->card->brand;
             if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
                 $brand = 'none';
             }
 
-            $customer_id = (int)$payment->metadata['ID Client'];
+            $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
             $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
             $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
@@ -6228,7 +6197,6 @@ class Payplug extends PaymentModule
             $return = Db::getInstance()->insert('payplug_card', $card);
 
             return (bool)$return;
-        }
     }
 
     /**
