@@ -1,3 +1,11 @@
 <?php
 
-// echo ('On charge config presta 1.6');
+namespace PayPlug\src\specific;
+
+class PrestashopSpecific16
+{
+    public function hookCustomerAccount()
+    {
+        die('ok on est là');
+    }
+}

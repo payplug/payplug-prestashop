@@ -4091,7 +4091,8 @@ class Payplug extends PaymentModule
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
             true);
 
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        if (class_exists('PrestashopSpecific'._PS_VERSION_[0]._PS_VERSION_[2])) {
+            return hookCustomerAccount();
             $payplug_icon_url = PayplugBackward::getHttpHost(true) . __PS_BASE_URI__
                 . 'modules/' . $this->name . '/views/img/logo26.png';
 
@@ -6924,26 +6925,15 @@ class Payplug extends PaymentModule
                 'price2display' => $price2display,
                 'this_path' => $this->_path,
             ));
-            return $this->display(__FILE__, 'hook_16/payment_options_display.tpl');
+            return $this->display(__FILE__, 'payment_options_display.tpl');
         }
         $this->assignPaymentOptions($params['cart']);
 
-        // Different tpl depending version
-        if (version_compare(_PS_VERSION_, '1.6', '<')) {
-            $this->smarty->assign(array(
-                'version' => _PS_VERSION_,
-            ));
-            if (version_compare(_PS_VERSION_, '1.5', '<')) {
-                return $this->display(__FILE__, './views/templates/hook/payment_1_5.tpl');
-            } else {
-                return $this->display(__FILE__, 'payment_1_5.tpl');
-            }
-        } else {
             if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
                 $this->assignOneyPaymentOptions($params['cart']);
             }
-            return $this->display(__FILE__, 'hook_16/payment_1_6.tpl');
-        }
+
+            return $this->display(__FILE__, 'payment.tpl');
     }
 
     /**
