@@ -4570,6 +4570,10 @@ class Payplug extends PaymentModule
             'displayExpressCheckout',
         );
 
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $hooks[] = 'displayBeforeShoppingCartBlock';
+        }
+
         $flag = true;
         foreach ($hooks as $hook) {
             $flag = $this->registerHook($hook) && $flag;
@@ -7522,5 +7526,29 @@ class Payplug extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'oney_payment.tpl');
+    }
+
+    /**
+     * Display Oney CTA on Shopping cart page
+     *
+     * @param array $params
+     * @return bool|mixedf
+     */
+    public function hookDisplayBeforeShoppingCartBlock($params)
+    {
+        if (!$this->isOneyAllowed()) {
+            return false;
+        }
+
+        $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
+        $is_valid_amount = $this->isValidOneyAmount($amount, $params['cart']->id_currency);
+
+        $this->smarty->assign(array(
+            'payplug_oney_amount' => $amount,
+            'payplug_oney_allowed' => $is_valid_amount['result'],
+            'payplug_oney_error' => $is_valid_amount['error'],
+        ));
+
+        return $this->getOneyCTA('checkout');
     }
 }
