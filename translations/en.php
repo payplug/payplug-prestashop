@@ -155,3 +155,5 @@ $_MODULE['<{payplug}prestashop>schedule_42e70b576ae1a435fdfaf7ac632c4236'] = 'In
 $_MODULE['<{payplug}prestashop>payment_detail_42e70b576ae1a435fdfaf7ac632c4236'] = 'Installment n %d:';
 $_MODULE['<{payplug}prestashop>popin_22ca5113a70aaf3d8c87b384cf295405'] = 'By placing an order, you accept our ';
 $_MODULE['<{payplug}prestashop>popin_62f48e578155501b5f19f06641a698b0'] = 'TOS';
+$_MODULE['<{payplug}prestashop>confirm_ea4788705e6873b424c65e91c2846b19'] = 'Cancel';
+$_MODULE['<{payplug}prestashop>confirm_03667315cfda61b24a2ae02c6668e10e'] = 'SAVE SETTINGS';
