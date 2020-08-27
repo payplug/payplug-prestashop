@@ -4105,7 +4105,6 @@ class Payplug extends PaymentModule
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
             true);
 
-        d('hoho();');
         if (class_exists($this->PrestashopSpecificClass)) {
             ($this->PrestashopSpecificObject)->hookCustomerAccount();
         }
@@ -4206,6 +4205,10 @@ class Payplug extends PaymentModule
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
+
+//            if (class_exists($this->PrestashopSpecificClass)) {
+//                ($this->PrestashopSpecificObject)->hookHeader();
+//            }
             Media::addJsDef(array(
                 'payplug_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
             ));
@@ -7000,11 +7003,7 @@ class Payplug extends PaymentModule
             ));
         }
 
-        if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            $payment_url = 'order.php?step=3';
-        } else {
-            $payment_url = 'index.php?controller=order&step=3';
-        }
+        $payment_url = 'index.php?controller=order&step=3';
 
         $payment_controller_url = PayplugBackward::getModuleLink($this->name, 'payment', array(), true);
         $installment_controller_url = PayplugBackward::getModuleLink($this->name, 'payment', array('i' => 1), true);
@@ -7434,11 +7433,7 @@ class Payplug extends PaymentModule
      */
     public static function redirectForVersion($link)
     {
-        if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            Tools::redirectLink($link);
-        } else {
-            Tools::redirect($link);
-        }
+        Tools::redirect($link);
     }
 
     // Let's go 4 Oney in 1.6 :-)
