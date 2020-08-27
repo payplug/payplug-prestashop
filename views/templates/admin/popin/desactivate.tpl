@@ -21,6 +21,7 @@
 *}
 
 <p>{l s='Payplug will no longer be displayed as a payment option to your customers.' mod='payplug'}</p>
-<div class="payplugPopup_footer payplugPopup_footer-center">
-    <button type="button" class="payplugButton payplugButton-green payplugButton-close">{l s='Ok' mod='payplug'}</button>
+<div class="payplugPopup_footer">
+    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton payplugButton-green" name="confirm_desactivate">{l s='SAVE SETTINGS' mod='payplug'}</button>
 </div>
