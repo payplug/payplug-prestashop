@@ -4105,14 +4105,21 @@ class Payplug extends PaymentModule
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'),
             true);
 
-        if (class_exists($this->PrestashopSpecificClass)) {
-            ($this->PrestashopSpecificObject)->hookCustomerAccount();
-        }
+//        if (class_exists($this->PrestashopSpecificClass)) {
+//            ($this->PrestashopSpecificObject)->hookCustomerAccount();
+//        }
 
-        $this->smarty->assign(array(
-            'version' => _PS_VERSION_[0].'.'._PS_VERSION_[2],
-            'payplug_cards_url' => $payplug_cards_url
-        ));
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
+            $this->smarty->assign(array(
+                'payplug_icon_url' => $payplug_icon_url
+            ));
+
+            $this->smarty->assign(array(
+                'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
+                'payplug_cards_url' => $payplug_cards_url
+            ));
+        }
 
         return $this->display(__FILE__, 'my_account.tpl');
     }
