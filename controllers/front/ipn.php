@@ -862,30 +862,35 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         true, 200);
                                     die;
                                 } else {
-                                    $order_payment = end($order->getOrderPayments());
-                                    $order_payment->transaction_id = $extra_vars['transaction_id'];
-                                    try {
-                                        $order_payment->update();
-                                    } catch (Exception $exception) {
-                                        $this->logger->addLog(
-                                            'Payment cannot be updated: ' . $exception->getMessage(),
-                                            'error');
-                                        if (!PayplugLock::deleteLockG2($cart->id)) {
-                                            $this->logger->addLog('Lock cannot be deleted.', 'error');
-                                        } else {
-                                            $this->logger->addLog('Lock deleted.', 'debug');
+                                    $order_payments = $order->getOrderPayments();
+                                    if (is_array($order_payments) && !empty($order_payments)) {
+                                        $order_payment = end($order_payments);
+                                        $order_payment->transaction_id = $extra_vars['transaction_id'];
+                                        try {
+                                            $order_payment->update();
+                                        } catch (Exception $exception) {
+                                            $this->logger->addLog(
+                                                'Payment cannot be updated: ' . $exception->getMessage(),
+                                                'error');
+                                            if (!PayplugLock::deleteLockG2($cart->id)) {
+                                                $this->logger->addLog('Lock cannot be deleted.', 'error');
+                                            } else {
+                                                $this->logger->addLog('Lock deleted.', 'debug');
+                                            }
+                                            $response = array(
+                                                'exception' => $exception->getMessage(),
+                                            );
+                                            header(
+                                                $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                                                true,
+                                                $exception->getCode()
+                                            );
+                                            die(json_encode($response));
                                         }
-                                        $response = array(
-                                            'exception' => $exception->getMessage(),
-                                        );
-                                        header(
-                                            $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                                            true,
-                                            $exception->getCode()
-                                        );
-                                        die(json_encode($response));
+                                        $this->logger->addLog('Transaction ID added.');
+                                    } else {
+                                        $this->logger->addLog('Can\'t find any order payment to update with transaction id: ' . $extra_vars['transaction_id']);
                                     }
-                                    $this->logger->addLog('Transaction ID added.');
                                 }
                             }
                         }
