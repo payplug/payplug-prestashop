@@ -56,46 +56,48 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
 
+        parent::__construct();
+
         $this->fields_list = array(
             'id_payplug_installment' => array(
-                'title' => Context::getContext()->getTranslator()->trans('ID'),
+                'title' => $this->l('ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs',
             ),
             'id_installment' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Installment ID'),
+                'title' => $this->l('Installment ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
             ),
             'id_payment' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Payment ID'),
+                'title' => $this->l('Payment ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
             ),
             'reference' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Order reference'),
+                'title' => $this->l('Order reference'),
             ),
             'customer' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Customer'),
+                'title' => $this->l('Customer'),
                 'havingFilter' => true,
             ),
             'order_total' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Order total'),
+                'title' => $this->l('Order total'),
                 'type' => 'price',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
             ),
             'step' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Installment payment #'),
+                'title' => $this->l('Installment payment #'),
             ),
             'amount' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Installment amount'),
+                'title' => $this->l('Installment amount'),
                 'type' => 'price',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
             ),
             'status' => array(
-                'title' => Context::getContext()->getTranslator()->trans('PayPlug payment status'),
+                'title' => $this->l('PayPlug payment status'),
                 'callback' => 'getPaymentStatusById',
                 'type' => 'select',
                 'list' => $this->payplug->payment_status,
@@ -103,12 +105,10 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 'filter_type' => 'int',
             ),
             'scheduled_date' => array(
-                'title' => Context::getContext()->getTranslator()->trans('Date'),
+                'title' => $this->l('Date'),
                 'type' => 'datetime',
             ),
         );
-
-        parent::__construct();
     }
 
     public function getPaymentStatusById($id_status)

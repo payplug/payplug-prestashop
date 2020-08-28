@@ -2824,7 +2824,7 @@ class Payplug extends PaymentModule
             $shipping_country->iso_code);
         if (!$is_valid_mobile_phone_number) {
             $shipping_fields['mobile_phone_number'] = array(
-                'text' => $this->l('Please enter your mobile phone number'),
+                'text' => $this->l('Please enter your mobile phone number.'),
                 'input' => array(
                     array(
                         'name' => 'mobile_phone_number',
@@ -2886,7 +2886,7 @@ class Payplug extends PaymentModule
                 $billing_country->iso_code);
             if (!$is_valid_mobile_phone_number) {
                 $billing_fields['mobile_phone_number'] = array(
-                    'text' => $this->l('Please enter your mobile phone number'),
+                    'text' => $this->l('Please enter your mobile phone number.'),
                     'input' => array(
                         array(
                             'name' => 'mobile_phone_number',
@@ -3875,7 +3875,7 @@ class Payplug extends PaymentModule
 
 
             $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-            $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+            $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
                     $oney_payment_methods);
 
             if ($is_oney) {
@@ -5358,6 +5358,9 @@ class Payplug extends PaymentModule
             $this->createConfig();
             Configuration::updateValue('PAYPLUG_SHOW', 0);
 
+            // force reload configuration to be sure all config are reset
+            Configuration::loadConfiguration();
+
             $this->assignContentVar();
             $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
 
@@ -6659,7 +6662,7 @@ class Payplug extends PaymentModule
         $cancelled_state = Configuration::get('PS_OS_CANCELED');
 
         $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-        $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+        $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
                 $oney_payment_methods);
 
         if ($is_oney) {
