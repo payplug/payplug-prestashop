@@ -417,6 +417,22 @@ class Payplug extends PaymentModule
             }
         }
 
+        if (Tools::getValue('submitDisable')) {
+
+            Configuration::updateValue('PAYPLUG_SHOW', false);
+
+            $this->assignContentVar();
+            $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+
+            $this->context->smarty->assign(array(
+                'title' => '',
+                'type' => 'save',
+            ));
+            $popin = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
+
+            die(json_encode(array('popin' => $popin, 'content' => $content)));
+        }
+
         if (Tools::isSubmit('submitAccount')) {
             $password = Tools::getValue('PAYPLUG_PASSWORD');
             $email = Tools::getValue('PAYPLUG_EMAIL');
