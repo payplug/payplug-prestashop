@@ -4114,12 +4114,12 @@ class Payplug extends PaymentModule
             $this->smarty->assign(array(
                 'payplug_icon_url' => $payplug_icon_url
             ));
+        }
 
             $this->smarty->assign(array(
                 'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
                 'payplug_cards_url' => $payplug_cards_url
             ));
-        }
 
         return $this->display(__FILE__, 'my_account.tpl');
     }
