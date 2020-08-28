@@ -45,7 +45,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $error_url = 'index.php?controller=order&step=3&error=1';
 
-            if($options['oney'] && $method = 'oney' && $oney_type = Tools::getValue('oney_type')) {
+            if($options['oney'] && $method == 'oney' && $oney_type = Tools::getValue('oney_type')) {
                 $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
                 if(!$payment['result']) {
                     Tools::redirect($error_url);
@@ -74,6 +74,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     . ($method == 'installment' ? '&inst=1' : '')
                     . ($method == 'one_click' ? '&pc=' . $id_card : '')
                     . '&def='.(int)Tools::getValue('def');
+
                 Tools::redirect($return_url);
             }
         }
