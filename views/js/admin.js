@@ -1020,9 +1020,10 @@ var $document, $window, payplug = {
                 target.find('input').removeAttr('checked').prop('checked', false);
                 var name = target.find('input').eq(0).attr('name'),
                     $tips = $('.payplugTips-' + name);
+
                 if ($tips.length) {
-                    $tips.find('.payplugTips_item').hide();
-                    $tips.find('.payplugTips_item-right').show();
+                    $('.payplugTips-' + name + ' > .payplugTips_item').hide();
+                    $('.payplugTips-' + name + ' > .payplugTips_item-right').show();
                 }
 
                 var $selected = target.find('input[value=0]');
@@ -1039,9 +1040,10 @@ var $document, $window, payplug = {
 
                 var name = target.find('input').eq(0).attr('name'),
                     $tips = $('.payplugTips-' + name);
+
                 if ($tips.length) {
-                    $tips.find('.payplugTips_item').hide();
-                    $tips.find('.payplugTips_item-left').show();
+                    $('.payplugTips-' + name + ' > .payplugTips_item').hide();
+                    $('.payplugTips-' + name + ' > .payplugTips_item-left').show();
                 }
 
                 var $selected = target.find('input[value=1]');
