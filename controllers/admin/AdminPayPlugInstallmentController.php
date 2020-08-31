@@ -56,6 +56,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
 
+        parent::__construct();
+
         $this->fields_list = array(
             'id_payplug_installment' => array(
                 'title' => $this->l('ID'),
@@ -107,8 +109,6 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 'type' => 'datetime',
             ),
         );
-
-        parent::__construct();
     }
 
     public function getPaymentStatusById($id_status)
