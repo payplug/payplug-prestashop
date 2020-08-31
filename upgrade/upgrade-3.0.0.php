@@ -46,6 +46,8 @@ function upgrade_module_3_0_0($object)
     /*
      * Ajouter la greffe vers le hook displayBeforeShoppingCartBlock pour les 1.6
      * et verifier qu'il n'y ait pas de conflit avec 1.7
+     *
+     * installOneyHook : rajouter displayBeforeShoppingCartBlock
      */
 
     return $res_payplug_payment_cart;
