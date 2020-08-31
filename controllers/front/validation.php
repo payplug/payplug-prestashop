@@ -332,19 +332,22 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
-                switch (Tools::getValue('isoney')) {
-                    case 'x3_with_fees' :
-                    case 'x3_without_fees' :
-                        $module_name = $this->payplug->l('Oney 3x');
-                        break;
-                    case 'x4_with_fees' :
-                    case 'x4_without_fees' :
-                        $module_name = $this->payplug->l('Oney 4x');
-                        break;
-                    default:
-                        $module_name = $this->payplug->displayName;
-                        break;
+                $module_name = $this->payplug->displayName;
+                if ($is_oney) {
+                    switch ($payment->payment_method['type']) {
+                        case 'oney_x3_with_fees' :
+                        case 'oney_x3_without_fees' :
+                            $module_name = $this->payplug->l('Oney 3x');
+                            break;
+                        case 'oney_x4_with_fees' :
+                        case 'oney_x4_without_fees' :
+                            $module_name = $this->payplug->l('Oney 4x');
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
 
                 if ($amount != $total) {
                     $this->addLog('Cart amount is different and may occured an error', 'info');
