@@ -282,7 +282,7 @@ var $document,
             },
             init: function () {
                 var oney = this;
-                if ($('.oneyCta_button-checkout').length) {
+                if ($('.oneyCta_wrapper').length) {
                     oney.setCheckout();
                 }
 
@@ -845,6 +845,7 @@ var $document,
                     '</tr>';
 
                 var $cart_voucher = $table.find('#cart_voucher');
+
                 if ($cart_voucher.length) {
                     var rs = parseInt($cart_voucher.attr('rowspan'));
                     $cart_voucher.attr('rowspan', rs + 1);
