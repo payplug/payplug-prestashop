@@ -1,0 +1,108 @@
+.borderRadius(@radius: 100%){
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.transition(@t: ~"all @{dur}"){
+  -webkit-transition: @t;
+  -moz-transition: @t;
+  -ms-transition: @t;
+  -o-transition: @t;
+  transition: @t;
+}
+
+.transform(@transform: none){
+  -webkit-transform: @transform;
+  -moz-transform: @transform;
+  -ms-transform: @transform;
+  -o-transform: @transform;
+  transform: @transform;
+}
+
+.rotate(@rotate : 0deg) {
+  -webkit-transform: ~"rotate(@{rotate})";
+  -moz-transform: ~"rotate(@{rotate})";
+  -ms-transform: ~"rotate(@{rotate})";
+  -o-transform: ~"rotate(@{rotate})";
+  transform: ~"rotate(@{rotate})";
+}
+
+.border(@c:#000,@b:all,@w:1px,@s:solid){
+  // 4 cotes
+  .mixin(@border) when(@border = all){
+    border: @w @s @c;
+  }
+
+  // 3 cotes
+  .mixin(@border) when(@border = rbl){
+    border: @w @s @c;
+    border-top: none;
+  }
+  .mixin(@border) when(@border = tbl){
+    border: @w @s @c;
+    border-right: none;
+  }
+  .mixin(@border) when(@border = trl){
+    border: @w @s @c;
+    border-bottom: none;
+  }
+  .mixin(@border) when(@border = trb){
+    border: @w @s @c;
+    border-left: none;
+  }
+
+  // 2 cotes
+  .mixin(@border) when(@border = bl){
+    border: @w @s @c;
+    border-top: none;
+    border-right: none;
+  }
+  .mixin(@border) when(@border = rl){
+    border: @w @s @c;
+    border-top: none;
+    border-bottom: none;
+  }
+  .mixin(@border) when(@border = rb){
+    border: @w @s @c;
+    border-top: none;
+    border-left: none;
+  }
+  .mixin(@border) when(@border = tl){
+    border: @w @s @c;
+    border-right: none;
+    border-bottom: none;
+  }
+  .mixin(@border) when(@border = tb){
+    border: @w @s @c;
+    border-right: none;
+    border-left: none;
+  }
+  .mixin(@border) when(@border = tr){
+    border: @w @s @c;
+    border-bottom: none;
+    border-left: none;
+  }
+
+  // 1 cote
+  .mixin(@border) when(@border = t){
+    border-top: @w @s @c;
+  }
+  .mixin(@border) when(@border = r){
+    border-right: @w @s @c;
+  }
+  .mixin(@border) when(@border = b){
+    border-bottom: @w @s @c;
+  }
+  .mixin(@border) when(@border = l){
+    border-left: @w @s @c;
+  }
+
+  .mixin(@b);
+}
+
+.boxShadow(@bs: none){
+  -webkit-box-shadow: @bs;
+  -moz-box-shadow: @bs;
+  box-shadow: @bs;
+}

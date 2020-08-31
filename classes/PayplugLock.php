@@ -72,18 +72,6 @@ class PayplugLock extends ObjectModel
     );
 
     /**
-     * @see ObjectModel::__construct()
-     *
-     * @param int $id
-     * @param int $id_lang
-     * @return PayplugLock
-     */
-    public function __construct($id = null, $id_lang = null)
-    {
-        parent::__construct($id, $id_lang);
-    }
-
-    /**
      * get fields
      *
      * @return array
@@ -245,13 +233,7 @@ class PayplugLock extends ObjectModel
             }
         }
 
-        $req_lock = '
-            INSERT INTO ' . _DB_PREFIX_ . 'payplug_lock (              
-                id_cart,
-                id_order,
-                date_add,
-                date_upd
-            )
+        $req_lock = 'INSERT INTO '._DB_PREFIX_.'payplug_lock (id_cart,id_order,date_add,date_upd)
             VALUE (
                 ' . (int)$id_cart . ',
                 IFNULL(
@@ -265,12 +247,13 @@ class PayplugLock extends ObjectModel
                 \'' . date('Y-m-d H:i:s') . '\',
                 \'' . date('Y-m-d H:i:s') . '\'
             )';
+
+        // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
         try {
             $res_lock = Db::getInstance()->execute($req_lock);
         } catch (Exception $e) {
-            return false;
+            $res_lock = false;
         }
-
         if (!$res_lock) {
             return false;
         } else {

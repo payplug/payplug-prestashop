@@ -45,6 +45,7 @@ $payplug_lib_files = array(
     '/Payplug/Payment.php',
     '/Payplug/Payplug.php',
     '/Payplug/Refund.php',
+    '/Payplug/OneySimulation.php',
     '/Payplug/Core/APIRoutes.php',
     '/Payplug/Exception/PayplugException.php',
     '/Payplug/Exception/DependencyException.php',
@@ -84,31 +85,9 @@ $payplug_lib_files = array(
     '/Payplug/Resource/PaymentAuthorization.php',
     '/Payplug/Resource/PaymentBilling.php',
     '/Payplug/Resource/PaymentShipping.php',
+    '/Payplug/Resource/OneySimulationResource.php',
 );
 $files = array_merge($files, $payplug_lib_files);
-
-// get PHP Phone Number Libs
-$phonenumber_files = array(
-    '/libphonenumber/CountryCodeSource.php',
-    '/libphonenumber/CountryCodeToRegionCodeMap.php',
-    '/libphonenumber/MetadataLoaderInterface.php',
-    '/libphonenumber/DefaultMetadataLoader.php',
-    '/libphonenumber/Matcher.php',
-    '/libphonenumber/MatcherAPIInterface.php',
-    '/libphonenumber/MetadataSourceInterface.php',
-    '/libphonenumber/MultiFileMetadataSourceImpl.php',
-    '/libphonenumber/NumberFormat.php',
-    '/libphonenumber/NumberParseException.php',
-    '/libphonenumber/PhoneMetadata.php',
-    '/libphonenumber/PhoneNumber.php',
-    '/libphonenumber/PhoneNumberDesc.php',
-    '/libphonenumber/PhoneNumberFormat.php',
-    '/libphonenumber/PhoneNumberType.php',
-    '/libphonenumber/PhoneNumberUtil.php',
-    '/libphonenumber/RegexBasedMatcher.php',
-    '/libphonenumber/ValidationResult.php',
-);
-$files = array_merge($files, $phonenumber_files);
 
 if (!function_exists('curl_init')) {
     throw new Exception('PHP cURL extension must be enabled on your server.');

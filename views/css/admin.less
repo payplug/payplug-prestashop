@@ -1,0 +1,691 @@
+/**
+ * 2013 - 2020 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2020 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+@import "less/include";
+
+.payplug {
+  //display: none;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .panel {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 0 20px;
+  }
+
+  &Button {
+    .border(#cccccc);
+    .borderRadius(.25em);
+    .transition;
+    background: transparent;
+    cursor: pointer;
+    margin: 0;
+    text-align: center;
+    padding: .4em .5em;
+    text-transform: uppercase;
+    font-size: 12px;
+    outline: none;
+    min-width: 6.5em;
+
+    &-green {
+      border-color: #colorMap[payplug];
+      background: #colorMap[payplug];
+      color: #fff;
+
+      &:hover {
+        border-color: darken(#colorMap[payplug], 5%);
+        background: darken(#colorMap[payplug], 5%);
+        color: #fff;
+      }
+    }
+
+    &-disabled {
+      &,
+      &:hover {
+        border-color: #colorMap[grey];
+        background: #colorMap[grey];
+        color: #fff;
+        cursor: default;
+      }
+    }
+
+    .panel-footer & {
+      margin: 10px 0 0;
+    }
+  }
+
+  &Interpanel {
+    width: 100%;
+    max-width: 1000px;
+
+    &,
+    p& {
+      margin: 0 auto 20px;
+    }
+  }
+
+  &Alert {
+    .border(transparent, l, 3px);
+    display: flex;
+    background: #fff;
+    color: #000000;
+    padding: 10px 20px;
+    position: relative;
+
+    &-success {
+      background: fade(#colorMap[payplug], 15%);
+      border-color: #colorMap[payplug];
+
+      a {
+        &,
+        &:hover,
+        &:active,
+        &:visited,
+        &:focus {
+          color: #colorMap[payplug];
+        }
+      }
+    }
+
+    &-warning {
+      background: fade(#colorMap[warning], 15%);
+      border-color: #colorMap[warning];
+      color: fade(darken(#colorMap[warning], 10%), 80%);
+
+      &:before {
+        content: "";
+        display: block;
+        background: 50% url(~"@{img_admin}icon-lock.png") no-repeat;
+        background-size: contain;
+        width: 11px;
+        height: 15px;
+        margin: 0 8px 0 -8px;
+      }
+
+      a {
+        &,
+        &:hover,
+        &:active,
+        &:visited,
+        &:focus {
+          color: #colorMap[warning];
+        }
+      }
+    }
+  }
+
+  &Loader {
+    .transform(translate(-50%, -50%));
+    .transition(opacity @dur);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    z-index: -1;
+    opacity: 0;
+
+    &-on {
+      z-index: 1;
+    }
+
+    &-visible {
+      opacity: 1;
+    }
+  }
+
+  &Switch {
+    .borderRadius(.25em);
+    .boxShadow(rgba(0, 0, 0, .15) 0 1px 4px 1px inset);
+    background: rgba(0, 0, 0, .1);
+    display: flex;
+    position: relative;
+    width: 160px;
+    height: 26px;
+    flex: 0 0 160px;
+
+    &_label {
+      label& {
+        .transition(color @dur);
+        position: relative;
+        display: flex;
+        width: 50%;
+        height: 100%;
+        z-index: 1;
+        font-weight: 400;
+        text-transform: uppercase;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      &-left {
+        color: #fff;
+      }
+    }
+
+    &:before {
+      .borderRadius(.25em);
+      .transition(left @dur);
+      //.boxShadow(rgba(0,0,0,.15) 0 1px 4px 1px inset);
+      .border(darken(#colorMap[payplug], 5%));
+      border-bottom-width: 2px;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: "";
+      background: #colorMap[payplug];
+      width: 50%;
+      height: 100%;
+    }
+
+    &-right {
+      .payplugSwitch_label {
+        &-left {
+          color: inherit;
+        }
+
+        &-right {
+          color: #fff;
+        }
+      }
+
+      &:before {
+        left: 50%;
+      }
+    }
+
+    &-disabled {
+      &:before {
+        border-color: darken(#colorMap[stroke], 5%);
+        background: #colorMap[stroke];
+      }
+    }
+
+    &-small {
+      .borderRadius(10px);
+      .transition(background @dur/1.5);
+      .boxShadow();
+      display: inline-block;
+      background: transparent;
+      width: 45px;
+      flex: 0 0 45px;
+      height: 20px;
+      margin: 0 8px 0 0;
+      cursor: pointer;
+      background: #colorMap[payplug];
+
+      label {
+        display: none;
+      }
+
+      & + label {
+        margin: 0;
+      }
+
+      &:before {
+        .borderRadius();
+        .transform(translateY(-50%));
+        .transition(left @dur);
+        border: none;
+        position: absolute;
+        top: 50%;
+        left: calc(100% - 18px);
+        content: "";
+        background: #fff;
+        display: block;
+        width: 16px;
+        height: 16px;
+      }
+
+      &.payplugSwitch-right {
+        background: #colorMap[grey];
+
+        &:before {
+          left: 2px;
+        }
+      }
+
+      &.payplugSwitch-disabled {
+        cursor: default;
+        background: fade(#colorMap[grey], 50%);
+      }
+    }
+
+    input {
+      display: none;
+    }
+  }
+
+  &Link {
+    a&,
+    button& {
+      border: none;
+      background: none;
+      padding: 0;
+      color: #colorMap[payplug];
+      text-decoration: none;
+      outline: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: #colorMap[payplug];
+      }
+    }
+  }
+
+  &Pipe {
+    color: #colorMap[payplug];
+    margin: 0 .5em;
+  }
+
+  &Panel {
+    display: flex;
+    padding: 0 0 15px;
+
+    &_label {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 25%;
+      padding: 0 8px 0 0;
+      font-weight: 700;
+      text-align: right;
+
+      .payplugInstallment_fieldset &{
+        width: 185px;
+      }
+    }
+
+    &_content {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-self: flex-end;
+      margin: 0 0 0 auto;
+      width: 75%;
+      padding: 0 0 0 8px;
+
+      input {
+        &[type=email],
+        &[type=password],
+        &[type=search],
+        &[type=tel],
+        &[type=text] {
+          .borderRadius(3px);
+          .border(#colorMap[stroke]);
+          width: 200px;
+          max-width: 100%;
+          background: transparent;
+          margin: 0;
+          display: block;
+
+          &:focus {
+            background: transparent;
+          }
+        }
+      }
+    }
+
+    &_section {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 20px 0 0;
+
+      &-nowrap {
+        flex-wrap: nowrap;
+      }
+    }
+  }
+
+  &Config {
+    position: relative;
+
+    &_item {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      margin: 0 !important;
+
+      &:before {
+        content: "";
+        height: 20px;
+        width: 20px;
+        margin: 0 4px 0 0;
+        background: transparent 50% no-repeat;
+      }
+
+      &-error {
+        color: #colorMap[error];
+
+        &:before {
+          background-image: url(~"@{img_admin}icon-error.png")
+        }
+      }
+
+      &-success {
+        color: #colorMap[payplug];
+
+        &:before {
+          background-image: url(~"@{img_admin}icon-success.png")
+        }
+      }
+
+      &-warning {
+        color: #colorMap[warning];
+
+        &:before {
+          background-image: url(~"@{img_admin}icon-warn.png")
+        }
+      }
+    }
+  }
+
+  &Login {
+    &_email {
+      color: #colorMap[payplug];
+      font-weight: 700;
+    }
+
+    &_login {
+      width: 200px;
+      max-width: 100%;
+    }
+
+    .loader {
+      .transform(translate(-50%, -50%));
+      .transition(opacity @dur);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      z-index: -1;
+      opacity: 0;
+
+      &-on {
+        z-index: 1;
+      }
+
+      &-visible {
+        opacity: 1;
+      }
+    }
+  }
+
+  &Settings {
+    &_separator {
+      .border(lighten(#colorMap[stroke], 10%), t);
+      font-weight: 700;
+      margin: 0;
+      padding: 15px 0 20px 0;
+      line-height: 2.2em;
+    }
+  }
+
+  &Oney {
+    &_error {
+      display: none;
+      color: #colorMap[error];
+    }
+
+    &TOS {
+      display: flex;
+      width: 100%;
+      flex-wrap: wrap;
+
+      &_text {
+        p&{
+          margin: 0 8px 0 0;
+          line-height: 31px;
+        }
+      }
+      &_input {
+        margin: initial;
+        display: inline-block;
+        width: 250px;
+      }
+      &_error {
+        width: 100%;
+        display: none;
+        color: #dd2525;
+        padding: 0 0 0 10px;
+
+        &-show{
+          display: block;
+        }
+      }
+    }
+  }
+
+  &Installment {
+    &_fieldset {
+      .payplugPanel {
+        &_label {
+          align-items: flex-start;
+          font-weight: 400;
+        }
+
+        &_content {
+          padding: 0;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: flex-start;
+        }
+      }
+
+      label {
+        display: flex;
+        font-weight: 400;
+        cursor: pointer;
+        align-items: center;
+      }
+
+      input {
+        &[type=radio] {
+          margin: 0 5px 0 0;
+        }
+
+        &[type=text] {
+          width: 50px;
+          height: 28px;
+          margin: 0 5px 0 0;
+        }
+      }
+    }
+
+    &_amount {
+      display: flex;
+      align-items: center;
+      margin: -6px 0 0;
+
+      span {
+        color: #colorMap[error];
+        display: none;
+        margin: 0 0 0 8px;
+
+        &.show {
+          display: inline;
+        }
+      }
+    }
+
+    &_schedule {
+      display: none;
+
+      &-select {
+        display: block;
+      }
+    }
+  }
+
+  &Deferred {
+    label {
+      font-weight: 400;
+    }
+  }
+
+  &Popup {
+    .transform(translate(-50%, -50%));
+    .transition(opacity @dur);
+    opacity: 0;
+    position: fixed;
+    display: none;
+    top: 50%;
+    left: 50%;
+    max-width: 80vw;
+    z-index: 5004;
+
+    @media (@mobile) {
+      max-width: 98vw;
+    }
+
+    &:before {
+      .transform(translate(-50%, -50%));
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      content: "";
+      background: rgba(0, 0, 0, .2);
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+    }
+
+    &_content {
+      .borderRadius(3px);
+      z-index: 1;
+      background: #fff;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 0;
+
+      @media (@mobile) {
+        max-height: 98vh;
+      }
+    }
+
+    &_close {
+      z-index: 1;
+      display: block;
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 30px;
+      height: 30px;
+      line-height: 24px;
+      text-indent: 24px;
+      background: none;
+      border: none;
+      overflow: hidden;
+      padding: 0;
+      cursor: pointer;
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:before,
+      &:after {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 2px;
+        content: "";
+        background: #colorMap[dark];
+      }
+
+      &:before {
+        .transform(translate(-50%, -50%) rotate(45deg));
+      }
+
+      &:after {
+        .transform(translate(-50%, -50%) rotate(-45deg));
+      }
+    }
+
+    &-open {
+      display: block;
+    }
+
+    &-show {
+      opacity: 1;
+    }
+
+    &_heading {
+      .border(lighten(#colorMap[stroke], 10%), b);
+      padding: 10px 20px;
+      font-weight: 700;
+    }
+
+    &_row {
+      text-align: center;
+      padding: 20px 20px 15px;
+
+      ul {
+        padding: 20px 0;
+        margin: 0;
+        text-align: left;
+        list-style: none;
+      }
+
+      input {
+        &[type=email],
+        &[type=password],
+        &[type=search],
+        &[type=tel],
+        &[type=text] {
+          .borderRadius(3px);
+          .border(#colorMap[stroke]);
+          max-width: 100%;
+          background: transparent;
+          margin: 0;
+          display: inline-block;
+          height: 22px;
+
+          &:focus {
+            background: transparent;
+          }
+        }
+      }
+    }
+    &_error {
+      margin: 0 0 8px;
+      color: #colorMap[error];
+    }
+
+    &_footer {
+      .border(lighten(#colorMap[stroke], 10%), t);
+      padding: 15px 0 0;
+      display: flex;
+      justify-content: space-between;
+
+      &-center {
+        justify-content: center;
+      }
+    }
+  }
+}
