@@ -7485,13 +7485,15 @@ class Payplug extends PaymentModule
      */
     public function displayOneyPaymentOptions()
     {
-        $this->smarty->assign(array(
-            'payplug_module_dir' => _PS_MODULE_DIR_,
-            'payplug_oney_loading_msg' => $this->l('Loading'),
-            'oney_required_fields' => $this->displayOneyRequiredFields()
-        ));
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $this->smarty->assign(array(
+                'payplug_module_dir' => _PS_MODULE_DIR_,
+                'payplug_oney_loading_msg' => $this->l('Loading'),
+                'oney_required_fields' => $this->displayOneyRequiredFields()
+            ));
 
-        return $this->display(__FILE__, 'oney_payment.tpl');
+            return $this->display(__FILE__, 'oney_payment.tpl');
+        }
     }
 
     /**
