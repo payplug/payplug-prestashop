@@ -37,6 +37,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
         if (Tools::getValue('_ajax') == 1) {
             $payplug = new Payplug();
+
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
                     $payment = $payplug->preparePayment(null, ['id_card' => Tools::getValue('pc')]);
