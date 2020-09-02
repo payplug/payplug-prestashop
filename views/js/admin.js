@@ -954,7 +954,7 @@ var $document, $window, payplug = {
                 }
 
                 var $selected = target.find('input[value=0]');
-                $selected.attr('checked', 'checked')
+                $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');
                 }
@@ -973,10 +973,11 @@ var $document, $window, payplug = {
                 }
 
                 var $selected = target.find('input[value=1]');
-                $selected.attr('checked', 'checked')
+                $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
-                    $selected.trigger('switchSelected');
+                 $selected.trigger('switchSelected');
                 }
+
             },
             able: function (target) {
                 var {switcher} = payplug.tools,
