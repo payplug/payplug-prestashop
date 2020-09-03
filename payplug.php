@@ -2725,7 +2725,7 @@ class Payplug extends PaymentModule
 //            'payplug_oney_error' => $error
 //        ));
 
-            $this->smarty->assign(array(
+        $this->smarty->assign(array(
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_amount' => [
                 'amount' => $amount,
@@ -4015,7 +4015,7 @@ class Payplug extends PaymentModule
                 'pay_error' => $pay_error,
             ));
 
-        //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
                 $this->context->smarty->assign(array('pay_tds' => $pay_tds));
@@ -4115,10 +4115,10 @@ class Payplug extends PaymentModule
             ));
         }
 
-            $this->smarty->assign(array(
-                'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
-                'payplug_cards_url' => $payplug_cards_url
-            ));
+        $this->smarty->assign(array(
+            'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
+            'payplug_cards_url' => $payplug_cards_url
+        ));
 
         return $this->display(__FILE__, 'my_account.tpl');
     }
@@ -6047,55 +6047,55 @@ class Payplug extends PaymentModule
      */
     public function saveCard($payment)
     {
-            $brand = $payment->card->brand;
-            if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
-                $brand = 'none';
-            }
+        $brand = $payment->card->brand;
+        if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
+            $brand = 'none';
+        }
 
-            $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
-            $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
-            $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
+        $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
+        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
-            // if card exists then return false
-            $db = new DbQuery();
-            $db->select('id_card');
-            $db->from('payplug_card');
-            $db->where('id_card = "' . $payment->card->id . '"');
-            $db->where('id_company = ' . (int)$company_id);
-            $db->where('is_sandbox = ' . (int)$is_sandbox);
-            if (Db::getInstance()->getValue($db)) {
-                return false;
-            }
+        // if card exists then return false
+        $db = new DbQuery();
+        $db->select('id_card');
+        $db->from('payplug_card');
+        $db->where('id_card = "' . $payment->card->id . '"');
+        $db->where('id_company = ' . (int)$company_id);
+        $db->where('is_sandbox = ' . (int)$is_sandbox);
+        if (Db::getInstance()->getValue($db)) {
+            return false;
+        }
 
-            // else get next card position
-            $db = new DbQuery();
-            $db->select('COUNT(pc.id_payplug_card)');
-            $db->from('payplug_card', 'pc');
-            $db->where('pc.id_customer = ' . (int)$customer_id);
-            $db->where('pc.id_company = ' . (int)$company_id);
-            $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
-            $card_index = Db::getInstance()->getValue($db);
+        // else get next card position
+        $db = new DbQuery();
+        $db->select('COUNT(pc.id_payplug_card)');
+        $db->from('payplug_card', 'pc');
+        $db->where('pc.id_customer = ' . (int)$customer_id);
+        $db->where('pc.id_company = ' . (int)$company_id);
+        $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
+        $card_index = Db::getInstance()->getValue($db);
 
-            $card_index = (int)$card_index + 1;
+        $card_index = (int)$card_index + 1;
 
-            // insert the new card in database
-            $card = [
-                'id_customer' => (int)$customer_id,
-                'id_payplug_card' => (int)$card_index + 1,
-                'id_company' => (int)$company_id,
-                'is_sandbox' => (int)$is_sandbox,
-                'id_card' => pSQL($payment->card->id),
-                'last4' => pSQL($payment->card->last4),
-                'exp_month' => pSQL($payment->card->exp_month),
-                'exp_year' => pSQL($payment->card->exp_year),
-                'brand' => pSQL($brand),
-                'country' => pSQL($payment->card->country),
-                'metadata' => serialize($payment->card->metadata),
-            ];
+        // insert the new card in database
+        $card = [
+            'id_customer' => (int)$customer_id,
+            'id_payplug_card' => (int)$card_index + 1,
+            'id_company' => (int)$company_id,
+            'is_sandbox' => (int)$is_sandbox,
+            'id_card' => pSQL($payment->card->id),
+            'last4' => pSQL($payment->card->last4),
+            'exp_month' => pSQL($payment->card->exp_month),
+            'exp_year' => pSQL($payment->card->exp_year),
+            'brand' => pSQL($brand),
+            'country' => pSQL($payment->card->country),
+            'metadata' => serialize($payment->card->metadata),
+        ];
 
-            $return = Db::getInstance()->insert('payplug_card', $card);
+        $return = Db::getInstance()->insert('payplug_card', $card);
 
-            return (bool)$return;
+        return (bool)$return;
     }
 
     /**
@@ -6829,11 +6829,11 @@ class Payplug extends PaymentModule
         }
         $this->assignPaymentOptions($params['cart']);
 
-            if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-                $this->assignOneyPaymentOptions($params['cart']);
-            }
+        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+            $this->assignOneyPaymentOptions($params['cart']);
+        }
 
-            return $this->display(__FILE__, 'payment.tpl');
+        return $this->display(__FILE__, 'payment.tpl');
     }
 
     /**
@@ -6916,11 +6916,11 @@ class Payplug extends PaymentModule
     }
 
     /**
-    * Assign Oney var
-    *
-    * @param $cart Cart
-    * @return bool
-    */
+     * Assign Oney var
+     *
+     * @param $cart Cart
+     * @return bool
+     */
     private function assignOneyPaymentOptions($cart)
     {
         if (!$this->getConfiguration('PAYPLUG_ONEY')) {
