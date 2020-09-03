@@ -116,7 +116,7 @@ class PayPlugLogger extends ObjectModel
 
     public function flush($all = false){
         try {
-            Db::getInstance()->getValue('SELECT 1 FROM `'._DB_PREFIX_.self::$definition['table'].'` LIMIT 1');
+            $exists = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.self::$definition['table'].'`');
         } catch (Exception $exception) {
             return false;
         }
