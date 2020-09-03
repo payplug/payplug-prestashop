@@ -5763,7 +5763,7 @@ class Payplug extends PaymentModule
             'return_url' => $payment->hosted_payment->payment_url
         ];
 
-        $return = ($result == 'new_card') ? Tools::jsonEncode($data) : $data;
+        $return = ($result !== 'new_card') ? $data : Tools::jsonEncode($data);
 
         return $return;
     }
