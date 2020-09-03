@@ -2725,7 +2725,7 @@ class Payplug extends PaymentModule
 //            'payplug_oney_error' => $error
 //        ));
 
-            $this->smarty->assign(array(
+        $this->smarty->assign(array(
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_amount' => [
                 'amount' => $amount,
@@ -4015,7 +4015,7 @@ class Payplug extends PaymentModule
                 'pay_error' => $pay_error,
             ));
 
-        //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
                 $this->context->smarty->assign(array('pay_tds' => $pay_tds));
@@ -4115,10 +4115,10 @@ class Payplug extends PaymentModule
             ));
         }
 
-            $this->smarty->assign(array(
-                'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
-                'payplug_cards_url' => $payplug_cards_url
-            ));
+        $this->smarty->assign(array(
+            'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
+            'payplug_cards_url' => $payplug_cards_url
+        ));
 
         return $this->display(__FILE__, 'my_account.tpl');
     }
@@ -5442,135 +5442,6 @@ class Payplug extends PaymentModule
             'is_oney' => false
         ];
 
-        // Si $options est vide, c'est qu'on est sur 1.6
-        if (!$options)
-        {
-            if ($this->isPaymentPending($this->context->cart->id)) {
-                $this->log_payment->info('Payment abort: is pending');
-                $data = array(
-                    'result' => false,
-                    'response' => $this->l('payment is pending'),
-                );
-                return Tools::jsonEncode($data);
-            }
-
-            $deferred = $this->getConfiguration('PAYPLUG_DEFERRED');
-            $options = array();
-
-            if ($deferred) {
-                $options['deferred'] = true;
-            }
-            if ($oney_type = Tools::getValue('io')) {
-                // todo: set var in method PayPlugPaymentOney
-                $options['oney_type'] = $oney_type;
-                $options['oney_form'] = Tools::getValue('form');
-
-                if (!$this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-                    // check if oney was elligible then return if not
-                    $is_elligible = $this->isOneyElligible($this->context->cart);
-                    if (!$is_elligible['result']) {
-                        $data = array('result' => false, 'response' => $is_elligible['error']);
-                        return Tools::jsonEncode($data);
-                    }
-
-                    $is_elligible = $this->isValidOneyCarrier($this->context->cart);
-                    if (!$is_elligible['result']) {
-                        $data = array('result' => false, 'response' => $is_elligible['error']);
-                        return Tools::jsonEncode($data);
-                    }
-
-                    // else check the cookie
-                    $payment_tab = $this->getPaymentDataCookie();
-
-                    if (!empty($payment_tab)) {
-                        $options['oney_form'] = $payment_tab['oney_form'];
-                    } else {
-                        $has_required_fields = $this->getOneyRequiredFields();
-                        if (!empty($has_required_fields)) {
-                            $this->setPaymentErrorsCookie(array('oney_required_field'));
-                            $data = array('result' => false, 'response' => false);
-                            return Tools::jsonEncode($data);
-                        }
-                    }
-                }
-            }
-            $payplug_method_name = $this->getCurrentPaymentMethod($id_card);
-            $payplug_payment = new $payplug_method_name($id_card, $options);
-
-            try {
-                $result = $payplug_payment->create();
-                $payment = $result['resource'];
-
-                if (!$payment) {
-                    $messages = $this->catchErrorsFromApi($result['message']);
-                    $this->log_payment->info(
-                        'Payment abort: ' . count($messages) > 1 ? json_encode($messages) : reset($messages)
-                    );
-                    $data = array(
-                        'result' => false,
-                        'response' => count($messages) > 1 ? $messages : reset($messages),
-                    );
-                    return Tools::jsonEncode($data);
-                } elseif (!$payplug_payment->isValidPayment($payment)) {
-                    $this->log_payment->info('Payment abort: ' . $payment->failure->message);
-                    $data = array(
-                        'result' => false,
-                        'response' => $payment->failure->message,
-                    );
-                    return Tools::jsonEncode($data);
-                }
-            } catch (Exception $e) {
-                $messages = $this->catchErrorsFromApi($e->__toString());
-//                $this->log_payment->info(
-//                    'Payment abort: ' . count($messages) > 1 ? json_encode($messages) : reset($messages)
-//                );
-                $data = array(
-                    'result' => false,
-                    'response' => count($messages) > 1 ? $messages : reset($messages),
-                );
-                return Tools::jsonEncode($data);
-            }
-
-            $payplug_payment->register($payment->id);
-
-            switch ($payplug_payment->type) {
-                case 'oneclick' :
-                    $redirect = $payment->is_paid;
-                    if (!$redirect && $deferred) {
-                        $redirect = (bool)$payment->authorization->authorized_at;
-                    }
-                    $data = array(
-                        'result' => true,
-                        'embedded' => true,
-                        'redirect' => $redirect, // force `true` we are in 3DS 1
-                        'return_url' => $redirect ?
-                            $payplug_payment->payment_url['return'] : $payment->hosted_payment->payment_url,
-                    );
-                    break;
-                case 'oney' :
-                    $data = array(
-                        'result' => 'new_card',
-                        'embedded' => false,
-                        'redirect' => true,
-                        'return_url' => $payment->hosted_payment->payment_url,
-                    );
-                    break;
-                case 'standard' :
-                case 'installment' :
-                default:
-                    $data = array(
-                        'result' => 'new_card',
-                        'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
-                        'redirect' => false,
-                        'return_url' => $payment->hosted_payment->payment_url,
-                    );
-                    break;
-            }
-
-            // $this->log_payment->info('Payment valided');
-            return Tools::jsonEncode($data);
-        }
-
         $id_card = isset($options['id_card']) ? $options['id_card'] : $default_options['id_card'];
         $is_installment = isset($options['is_installment']) ? $options['is_installment'] : $default_options['is_installment'];
         $is_deferred = isset($options['is_deferred']) ? $options['is_deferred'] : $default_options['is_deferred'];
@@ -5881,11 +5752,20 @@ class Payplug extends PaymentModule
             ];
         }
 
-        return [
-            'result' => true,
+        $result = true;
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $result = 'new_card';
+        }
+
+        $data = [
+            'result' => $result,
             'redirect' => false,
             'return_url' => $payment->hosted_payment->payment_url
         ];
+
+        $return = ($result == 'new_card') ? Tools::jsonEncode($data) : $data;
+
+        return $return;
     }
 
     /**
@@ -6167,55 +6047,55 @@ class Payplug extends PaymentModule
      */
     public function saveCard($payment)
     {
-            $brand = $payment->card->brand;
-            if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
-                $brand = 'none';
-            }
+        $brand = $payment->card->brand;
+        if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
+            $brand = 'none';
+        }
 
-            $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
-            $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
-            $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
+        $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID');
+        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
 
-            // if card exists then return false
-            $db = new DbQuery();
-            $db->select('id_card');
-            $db->from('payplug_card');
-            $db->where('id_card = "' . $payment->card->id . '"');
-            $db->where('id_company = ' . (int)$company_id);
-            $db->where('is_sandbox = ' . (int)$is_sandbox);
-            if (Db::getInstance()->getValue($db)) {
-                return false;
-            }
+        // if card exists then return false
+        $db = new DbQuery();
+        $db->select('id_card');
+        $db->from('payplug_card');
+        $db->where('id_card = "' . $payment->card->id . '"');
+        $db->where('id_company = ' . (int)$company_id);
+        $db->where('is_sandbox = ' . (int)$is_sandbox);
+        if (Db::getInstance()->getValue($db)) {
+            return false;
+        }
 
-            // else get next card position
-            $db = new DbQuery();
-            $db->select('COUNT(pc.id_payplug_card)');
-            $db->from('payplug_card', 'pc');
-            $db->where('pc.id_customer = ' . (int)$customer_id);
-            $db->where('pc.id_company = ' . (int)$company_id);
-            $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
-            $card_index = Db::getInstance()->getValue($db);
+        // else get next card position
+        $db = new DbQuery();
+        $db->select('COUNT(pc.id_payplug_card)');
+        $db->from('payplug_card', 'pc');
+        $db->where('pc.id_customer = ' . (int)$customer_id);
+        $db->where('pc.id_company = ' . (int)$company_id);
+        $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
+        $card_index = Db::getInstance()->getValue($db);
 
-            $card_index = (int)$card_index + 1;
+        $card_index = (int)$card_index + 1;
 
-            // insert the new card in database
-            $card = [
-                'id_customer' => (int)$customer_id,
-                'id_payplug_card' => (int)$card_index + 1,
-                'id_company' => (int)$company_id,
-                'is_sandbox' => (int)$is_sandbox,
-                'id_card' => pSQL($payment->card->id),
-                'last4' => pSQL($payment->card->last4),
-                'exp_month' => pSQL($payment->card->exp_month),
-                'exp_year' => pSQL($payment->card->exp_year),
-                'brand' => pSQL($brand),
-                'country' => pSQL($payment->card->country),
-                'metadata' => serialize($payment->card->metadata),
-            ];
+        // insert the new card in database
+        $card = [
+            'id_customer' => (int)$customer_id,
+            'id_payplug_card' => (int)$card_index + 1,
+            'id_company' => (int)$company_id,
+            'is_sandbox' => (int)$is_sandbox,
+            'id_card' => pSQL($payment->card->id),
+            'last4' => pSQL($payment->card->last4),
+            'exp_month' => pSQL($payment->card->exp_month),
+            'exp_year' => pSQL($payment->card->exp_year),
+            'brand' => pSQL($brand),
+            'country' => pSQL($payment->card->country),
+            'metadata' => serialize($payment->card->metadata),
+        ];
 
-            $return = Db::getInstance()->insert('payplug_card', $card);
+        $return = Db::getInstance()->insert('payplug_card', $card);
 
-            return (bool)$return;
+        return (bool)$return;
     }
 
     /**
@@ -6949,11 +6829,11 @@ class Payplug extends PaymentModule
         }
         $this->assignPaymentOptions($params['cart']);
 
-            if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-                $this->assignOneyPaymentOptions($params['cart']);
-            }
+        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+            $this->assignOneyPaymentOptions($params['cart']);
+        }
 
-            return $this->display(__FILE__, 'payment.tpl');
+        return $this->display(__FILE__, 'payment.tpl');
     }
 
     /**
@@ -7036,11 +6916,11 @@ class Payplug extends PaymentModule
     }
 
     /**
-    * Assign Oney var
-    *
-    * @param $cart Cart
-    * @return bool
-    */
+     * Assign Oney var
+     *
+     * @param $cart Cart
+     * @return bool
+     */
     private function assignOneyPaymentOptions($cart)
     {
         if (!$this->getConfiguration('PAYPLUG_ONEY')) {
