@@ -135,7 +135,7 @@ var $document, $window, payplugModule = {
             this.cta.init();
             this.form.init();
 
-            $window.on('load', oney.load);
+            $window.on('load', oney.load());
 
             var {popin} = oney.cta;
             prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
