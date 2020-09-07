@@ -177,7 +177,7 @@ class Payplug extends PaymentModule
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#8f0621',
             'name' => array(
                 'en' => 'Payment failed',
@@ -189,13 +189,13 @@ class Payplug extends PaymentModule
         'auth' => array(
             'cfg' => null,
             'template' => null,
-            'logable' => true,
+            'logable' => false,
             'send_email' => false,
             'paid' => true,
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#04b404',
             'name' => array(
                 'en' => 'Payment authorised',
@@ -207,13 +207,13 @@ class Payplug extends PaymentModule
         'exp' => array(
             'cfg' => null,
             'template' => null,
-            'logable' => true,
+            'logable' => false,
             'send_email' => false,
             'paid' => false,
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#8f0621',
             'name' => array(
                 'en' => 'Authorization expired',
@@ -4592,13 +4592,13 @@ class Payplug extends PaymentModule
                 'template' => null,
 
                 // OS have to be "logable" to register transaction_id
-                'logable' => true,
+                'logable' => false,
                 'send_email' => false,
                 'paid' => false,
                 'module_name' => 'payplug',
                 'hidden' => false,
                 'delivery' => false,
-                'invoice' => true,
+                'invoice' => false,
                 'color' => '#a1f8a1',
                 'name' => array(
                     'en' => 'Oney - Pending',
