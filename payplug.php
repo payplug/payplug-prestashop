@@ -950,7 +950,7 @@ class Payplug extends PaymentModule
 
         // check if oney tos is complete
         $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
-        if($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
+        if ($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
             $this->check_configuration['other'][] = [
                 'text' => $check_oney_tos,
                 'type' => 'warning'
@@ -3890,12 +3890,17 @@ class Payplug extends PaymentModule
 
             $this->updatePayplugInstallment($installment);
         } else {
-            if (!$pay_id = $this->isTransactionPending((int)$order->id_cart)) {
-                $payments = $order->getOrderPaymentCollection();
-                if (count($payments) > 1 || !isset($payments[0])) {
-                    return false;
-                } else {
-                    $pay_id = $payments[0]->transaction_id;
+            if (!$pay_id = $this->isTransactionPending($order->id_cart)) {
+                $pay_id = $this->getPayplugOrderPayment($order->id);
+
+                // if order created before upgrade 2.28.0
+                if (!$pay_id) {
+                    $payments = $order->getOrderPaymentCollection();
+                    if (count($payments->getResults()) > 1 || !$payments->getFirst()) {
+                        return false;
+                    } else {
+                        $pay_id = $payments->getFirst()->transaction_id;
+                    }
                 }
             }
 
@@ -4159,11 +4164,13 @@ class Payplug extends PaymentModule
 
             $id_product = (int)Tools::getValue('id_product');
             $group = Tools::getValue('group');
-             // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
+            // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
             if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
-                $id_product_attribute = $group ? (int)Product::getIdProductAttributesByIdAttributes($id_product, $group) : 0;
+                $id_product_attribute = $group ? (int)Product::getIdProductAttributesByIdAttributes($id_product,
+                    $group) : 0;
             } else {
-                $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+                $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product,
+                    $group) : 0;
             }
             $quantity = (int)Tools::getValue('qty', 1);
 
@@ -4344,10 +4351,10 @@ class Payplug extends PaymentModule
     }
 
     /**
-    * @description Flush PayPlugCache, when PrestaShop cache cleared
-    *
-    * @param array $params
-    */
+     * @description Flush PayPlugCache, when PrestaShop cache cleared
+     *
+     * @param array $params
+     */
     public function hookActionClearCompileCache($params)
     {
         if (!$this->payplug_cache->flushCache()) {
