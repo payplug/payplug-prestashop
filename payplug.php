@@ -4212,9 +4212,9 @@ class Payplug extends PaymentModule
             $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
 
-//            if (class_exists($this->PrestashopSpecificClass)) {
-//                ($this->PrestashopSpecificObject)->hookHeader();
-//            }
+            if (class_exists($this->PrestashopSpecificClass)) {
+                ($this->PrestashopSpecificObject)->hookHeader();
+            }
             Media::addJsDef(array(
                 'payplug_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
             ));
