@@ -9,7 +9,6 @@ class PrestashopSpecific16
 {
     public function hookHeader()
     {
-        die('Je suis dans le hookHeader de la classe PrestashopSpecific16');
 //        Media::addJsDef(array(
 //            'payplug_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
 //        ));

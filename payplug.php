@@ -4208,10 +4208,6 @@ class Payplug extends PaymentModule
             Media::addJsDef(['payment_errors' => true]);
         }
 
-        if (class_exists($this->PrestashopSpecificClass)) {
-            ($this->PrestashopSpecificObject)->hookHeader();
-        }
-
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
