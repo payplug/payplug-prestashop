@@ -366,6 +366,21 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Add Order Payment
+     *
+     * @param int $id_order
+     * @param string $id_payment
+     * @return bool
+     */
+    public function addPayplugOrderPayment($id_order, $id_payment)
+    {
+        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_order_payment (id_order, id_payment) 
+                VALUE (' . (int)$id_order . ',\'' . pSQL($id_payment) . '\')';
+
+        return Db::getInstance()->execute($sql);
+    }
+
+    /**
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws \Payplug\Exception\ConfigurationNotSetException
@@ -2252,6 +2267,37 @@ class Payplug extends PaymentModule
 
         return $this->html;
     }
+
+    /**
+     * get order payment
+     *
+     * @param int $id_order
+     * @return integer
+     */
+    public function getPayplugOrderPayment($id_order)
+    {
+        $sql = 'SELECT id_payment 
+                FROM ' . _DB_PREFIX_ . 'payplug_order_payment   
+                WHERE id_order = ' . (int)$id_order;
+
+        return Db::getInstance()->getValue($sql);
+    }
+
+    /**
+     * get all order payment for given id order
+     *
+     * @param int $id_order
+     * @return array
+     */
+    public function getPayplugOrderPayments($id_order)
+    {
+        $sql = 'SELECT * 
+                FROM ' . _DB_PREFIX_ . 'payplug_order_payment 
+                WHERE id_order = ' . (int)$id_order;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
 
     /**
      * @return string
@@ -4732,6 +4778,21 @@ class Payplug extends PaymentModule
             return false;
         }
 
+        $req_payplug_order_payment = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
+            `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_order` INT(11) UNSIGNED NOT NULL,
+            `id_payment` VARCHAR(255) NOT NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+        $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
+
+        if (!$res_payplug_order_payment) {
+            $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
+            return false;
+        }
+
+
         $log->info('Installation SQL ended.');
         return true;
     }
@@ -6630,6 +6691,16 @@ class Payplug extends PaymentModule
             $log->error('Uninstallation SQL failed: PAYPLUG_LOGGER.');
             return false;
         }
+
+        $req_payplug_order_payment = '
+            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment`';
+        $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
+
+        if (!$res_payplug_order_payment) {
+            $log->error('Uninstallation SQL failed: PAYPLUG_ORDER_PAYMENT.');
+            return false;
+        }
+
 
         $log->info('Uninstallation SQL ended.');
         return true;
