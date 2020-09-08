@@ -82,33 +82,47 @@ function upgrade_module_2_31_0($object)
     }
 
     try {
-
-        $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
-        $res_truncate = Db::getInstance()->execute($req_truncate);
-        if (!$res_truncate) {
-            $flag = false;
-            $log->error('Can\'t truncate payplug_lock');
-        }
-        if ($flag) {
-            $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
-            $res_alter = Db::getInstance()->execute($req_alter);
-            if (!$res_alter) {
-                $flag = false;
-                $log->error('Can\'t alter table payplug_lock');
+        // check if lock exists on id_cart
+        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+        $res_describe = Db::getInstance()->executeS($req_describe);
+        $lock_exists = false;
+        if ($res_describe) {
+            foreach ($res_describe as $field) {
+                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                    $lock_exists = true;
+                }
             }
         }
-        if ($flag) {
-            $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
-            $res_describe = Db::getInstance()->executeS($req_describe);
-            if ($res_describe) {
-                foreach ($res_describe as $field) {
-                    if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
-                        $flag = $flag && true;
-                    }
-                }
-            } else {
+
+        // check doesn't exist then add it
+        if(!$lock_exists) {
+            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
+            $res_truncate = Db::getInstance()->execute($req_truncate);
+            if (!$res_truncate) {
                 $flag = false;
-                $log->error('Wrong table describe payplug_lock');
+                $log->error('Can\'t truncate payplug_lock');
+            }
+            if ($flag) {
+                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
+                $res_alter = Db::getInstance()->execute($req_alter);
+                if (!$res_alter) {
+                    $flag = false;
+                    $log->error('Can\'t alter table payplug_lock');
+                }
+            }
+            if ($flag) {
+                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+                $res_describe = Db::getInstance()->executeS($req_describe);
+                if ($res_describe) {
+                    foreach ($res_describe as $field) {
+                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                            $flag = $flag && true;
+                        }
+                    }
+                } else {
+                    $flag = false;
+                    $log->error('Wrong table describe payplug_lock');
+                }
             }
         }
     } catch (Exception $e) {
