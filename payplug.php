@@ -3215,6 +3215,7 @@ class Payplug extends PaymentModule
         $options = $this->getAvailableOptions($cart);
 
         $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
+
         $payment_list = [];
 
         // OneClick Payment
@@ -3417,6 +3418,16 @@ class Payplug extends PaymentModule
 
                 $payment_list[] = $paymentOption;
             }
+        }
+
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $this->assignPaymentOptions($cart);
+
+            if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+                $this->assignOneyPaymentOptions($cart);
+            }
+
+            return $this->display(__FILE__, 'payment.tpl');
         }
 
         return $payment_list;
