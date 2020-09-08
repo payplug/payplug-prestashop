@@ -3218,8 +3218,9 @@ class Payplug extends PaymentModule
     {
         $options = $this->getAvailableOptions($cart);
 
-//        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
-        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart['cart']->id_customer, true) : [];
+        $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
+
+        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$id_customer, true) : [];
 
         $payment_list = [];
 
