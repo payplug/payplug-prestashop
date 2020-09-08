@@ -25,7 +25,6 @@
  * Core file of PayPlug module
  */
 
-
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
@@ -3221,9 +3220,8 @@ class Payplug extends PaymentModule
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
             foreach ($payplug_cards as $card) {
-                $paymentOption = $this->setPaymentOption();
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                $input_options = array(
+                $paymentOption['one_click']['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
                         'type' => 'hidden',
@@ -3245,20 +3243,17 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
-                $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png'))
-                    ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
-                        array('def' => (int)$options['deferred']), true))
-                    ->setModuleName('payplug')
-                    ->setInputs($input_options);
+                $paymentOption['one_click']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
+                $paymentOption['one_click']['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'];
+                $paymentOption['one_click']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
+                $paymentOption['one_click']['moduleName'] = 'payplug';
+
                 $payment_list[] = $paymentOption;
             }
         }
 
         // Standart Payment or new card from one-click
-        $paymentOption = $this->setPaymentOption();
-        $input_options = array(
+        $paymentOption['standard']['inputs'] = array(
             'pc' => array(
                 'name' => 'pc',
                 'type' => 'hidden',
@@ -3280,22 +3275,16 @@ class Payplug extends PaymentModule
                 'value' => 'standard',
             ),
         );
-        $paymentOption
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/'
-                . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang)
-                . '.png'))
-            ->setCallToActionText(count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
-                array('def' => (int)$options['deferred']), true))
-            ->setModuleName('payplug')
-            ->setInputs($input_options);
+        $paymentOption['standard']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang) . '.png');
+        $paymentOption['standard']['callToActionText'] = count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card');
+        $paymentOption['standard']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
+        $paymentOption['standard']['moduleName'] = 'payplug';
 
         $payment_list[] = $paymentOption;
 
         // Installment Payment
         if ($options['installment']) {
-            $paymentOption = $this->setPaymentOption();
-            $input_options = array(
+            $paymentOption['installment']['inputs'] = array(
                 'pc' => array(
                     'name' => 'pc',
                     'type' => 'hidden',
@@ -3317,13 +3306,10 @@ class Payplug extends PaymentModule
                     'value' => 'installment',
                 ),
             );
-            $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
-                ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
-                    array('def' => (int)$options['deferred']), true))
-                ->setModuleName('payplug')
-                ->setInputs($input_options);
+            $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
+            $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
+            $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
+            $paymentOption['installment']['moduleName'] = 'payplug';
 
             $payment_list[] = $paymentOption;
         }
@@ -3349,8 +3335,7 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-                $paymentOption = $this->setPaymentOption();
-                $input_options = array(
+                $paymentOption['oney']['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
                         'type' => 'hidden',
@@ -3404,33 +3389,21 @@ class Payplug extends PaymentModule
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
-                $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png'))
-                    ->setCallToActionText($label)
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
-                    ->setModuleName('payplug')
-                    ->setInputs($input_options);
+                $paymentOption['oney']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
+                $paymentOption['oney']['callToActionText'] = $label;
+                $paymentOption['oney']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
+                $paymentOption['oney']['moduleName'] = 'payplug';
                 if ($optimized) {
                     $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption->setAdditionalInformation($schedules);
                 }
 
-
                 $payment_list[] = $paymentOption;
             }
         }
+            var_dump($payment_list); exit;
 
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->assignPaymentOptions($cart);
-
-            if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-                $this->assignOneyPaymentOptions($cart);
-            }
-
-            return $this->display(__FILE__, 'payment.tpl');
-        }
-
-        return $payment_list;
+//        return $payment_list;
     }
 
     /**
@@ -6812,40 +6785,41 @@ class Payplug extends PaymentModule
      */
     public function hookPayment($params)
     {
-        if (!$this->isAllowed()) {
-            return false;
-        }
-
-        $use_taxes = $this->getConfiguration('PS_TAX');
-        $base_total_tax_inc = $params['cart']->getOrderTotal(true);
-        $base_total_tax_exc = $params['cart']->getOrderTotal(false);
-
-        if ($use_taxes) {
-            $price2display = $base_total_tax_inc;
-        } else {
-            $price2display = $base_total_tax_exc;
-        }
-
-        if (!$this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-            $paymentOptions = $this->buildPaymentOptions($params['cart']);
-            $this->smarty->assign(array(
-                'payplug_payment_options' => $paymentOptions,
-                'spinner_url' => PayplugBackward::getHttpHost(true)
-                    . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
-                'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
-                'api_url' => $this->api_url,
-                'price2display' => $price2display,
-                'this_path' => $this->_path,
-            ));
-            return $this->display(__FILE__, 'payment_options_display.tpl');
-        }
-        $this->assignPaymentOptions($params['cart']);
-
-        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-            $this->assignOneyPaymentOptions($params['cart']);
-        }
-
-        return $this->display(__FILE__, 'payment.tpl');
+//        if (!$this->isAllowed()) {
+//            return false;
+//        }
+//
+//        $use_taxes = $this->getConfiguration('PS_TAX');
+//        $base_total_tax_inc = $params['cart']->getOrderTotal(true);
+//        $base_total_tax_exc = $params['cart']->getOrderTotal(false);
+//
+//        if ($use_taxes) {
+//            $price2display = $base_total_tax_inc;
+//        } else {
+//            $price2display = $base_total_tax_exc;
+//        }
+//
+//        if (!$this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+//            $paymentOptions = $this->buildPaymentOptions($params['cart']);
+//            $this->smarty->assign(array(
+//                'payplug_payment_options' => $paymentOptions,
+//                'spinner_url' => PayplugBackward::getHttpHost(true)
+//                    . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
+//                'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
+//                'api_url' => $this->api_url,
+//                'price2display' => $price2display,
+//                'this_path' => $this->_path,
+//            ));
+//            return $this->display(__FILE__, 'payment_options_display.tpl');
+//        }
+//        $this->assignPaymentOptions($params['cart']);
+//
+//        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+//            $this->assignOneyPaymentOptions($params['cart']);
+//        }
+//
+//        return $this->display(__FILE__, 'payment.tpl');
+        return $this->getPaymentOptions($params);
     }
 
     /**
