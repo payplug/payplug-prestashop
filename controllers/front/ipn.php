@@ -254,6 +254,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 );
                 die(json_encode($response));
             }
+
             if (!Validate::isLoadedObject($cart)) {
                 $this->logger->addLog('The cart cannot be loaded.', 'error');
                 header($_SERVER['SERVER_PROTOCOL'] . ' 500 The cart cannot be loaded.', true, 500);
@@ -630,21 +631,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $amount += (int)$schedule->amount;
                         }
                     } else {
-                        //We can't treat Oney pending IPN anymore because it's sent with no reason
                         if ($is_oney && !$payment->is_paid) {
-                            $this->logger->addLog('This is a pending IPN, no order will be created.', 'info');
-                            if (!PayplugLock::deleteLockG2($cart->id)) {
-                                $this->logger->addLog('Lock cannot be deleted.', 'error');
-                            } else {
-                                $this->logger->addLog('Lock deleted.', 'debug');
-                            }
-                            header(
-                                $_SERVER['SERVER_PROTOCOL']
-                                . ' 200 This is a pending IPN, no order will be created.',
-                                true,
-                                200
-                            );
-                            die;
+                            $order_state = $oney_state;
                         } elseif ($deferred && !$payment->is_paid) {
                             $order_state = $auth_state;
                         } else {
@@ -681,6 +669,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         );
                         die(json_encode($response));
                     }
+
                     if (!Validate::isLoadedObject($customer)) {
                         $this->logger->addLog('Customer cannot be loaded.', 'error');
                         if (!PayplugLock::deleteLockG2($cart->id)) {
