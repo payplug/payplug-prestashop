@@ -59,7 +59,7 @@ function upgrade_module_2_31_0($object)
             if (Validate::isLoadedObject($s)) {
                 $s->logable = false;
                 $s->invoice = false;
-                if(!$s->update()) {
+                if (!$s->update()) {
                     $flag = false;
                 }
             }
@@ -81,38 +81,39 @@ function upgrade_module_2_31_0($object)
         $flag = false;
     }
 
-    $is_applied_constraint = false;
     try {
-        $req_truncate = 'TRUNCATE `'._DB_PREFIX_.'payplug_lock`;';
-        $res_truncate = Db::getInstance()->Execute($req_truncate);
-        if ($res_truncate) {
-            $req_alter = 'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
-            $res_alter = Db::getInstance()->Execute($req_alter);
-            if ($req_alter) {
-                $req_describe = 'DESCRIBE '._DB_PREFIX_.'payplug_lock;';
-                $res_describe = Db::getInstance()->ExecuteS($req_describe);
-                if ($res_describe) {
-                    foreach ($res_describe as $field) {
-                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
-                            $is_applied_constraint = true;
-                        }
+
+        $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
+        $res_truncate = Db::getInstance()->execute($req_truncate);
+        if (!$res_truncate) {
+            $flag = false;
+            $log->error('Can\'t truncate payplug_lock');
+        }
+        if ($flag) {
+            $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
+            $res_alter = Db::getInstance()->execute($req_alter);
+            if (!$res_alter) {
+                $flag = false;
+                $log->error('Can\'t alter table payplug_lock');
+            }
+        }
+        if ($flag) {
+            $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+            $res_describe = Db::getInstance()->executeS($req_describe);
+            if ($res_describe) {
+                foreach ($res_describe as $field) {
+                    if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                        $flag = $flag && true;
                     }
-                } else {
-                    return false;
                 }
             } else {
-                return false;
+                $flag = false;
+                $log->error('Wrong table describe payplug_lock');
             }
-        } else {
-            return false;
         }
     } catch (Exception $e) {
-        return false;
-    }
-    if ($is_applied_constraint) {
-        return $flag;
-    } else {
-        return false;
+        $log->error('Exception: ' . $e->getMessage());
+        $flag = false;
     }
 
     return $flag;
