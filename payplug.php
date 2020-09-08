@@ -52,7 +52,6 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class Payplug extends PaymentModule
@@ -873,6 +872,9 @@ class Payplug extends PaymentModule
      */
     private function checkAmount($cart)
     {
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            return true;
+        }
         $currency = new Currency($cart->id_currency);
         $amounts_by_currency = $this->getAmountsByCurrency($currency->iso_code);
         $amount = $cart->getOrderTotal(true, Cart::BOTH) * 100;
@@ -992,6 +994,9 @@ class Payplug extends PaymentModule
      */
     private function checkCurrency($cart)
     {
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            return true;
+        }
         $currency_order = new Currency((int)($cart->id_currency));
         $currencies_module = $this->getCurrency((int)$cart->id_currency);
         if (is_array($currencies_module)) {
@@ -1947,7 +1952,7 @@ class Payplug extends PaymentModule
                 $available_options['one_click'] = false;
             }
             if (!$permissions['can_create_installment_plan']
-                || $cart->getOrderTotal(true, Cart::BOTH) < $inst_min_amount
+//                || $cart->getOrderTotal(true, Cart::BOTH) < $inst_min_amount
             ) {
                 $available_options['installment'] = false;
             }
@@ -3213,7 +3218,8 @@ class Payplug extends PaymentModule
     {
         $options = $this->getAvailableOptions($cart);
 
-        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
+//        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
+        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart['cart']->id_customer, true) : [];
 
         $payment_list = [];
 
