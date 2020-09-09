@@ -3222,12 +3222,15 @@ class Payplug extends PaymentModule
 
         $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$id_customer, true) : [];
 
-        $payment_list = [];
-
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
+
+            $paymentOption['payplug_cards']['name'] = 'payplug_cards';
+            $paymentOption['payplug_cards']['data'] = $payplug_cards;
             foreach ($payplug_cards as $card) {
+
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                $paymentOption['one_click']['name'] = 'one_click';
                 $paymentOption['one_click']['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
@@ -3254,12 +3257,11 @@ class Payplug extends PaymentModule
                 $paymentOption['one_click']['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'];
                 $paymentOption['one_click']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
                 $paymentOption['one_click']['moduleName'] = 'payplug';
-
-                $payment_list[] = $paymentOption;
             }
         }
 
         // Standart Payment or new card from one-click
+        $paymentOption['standard']['name'] = 'standard';
         $paymentOption['standard']['inputs'] = array(
             'pc' => array(
                 'name' => 'pc',
@@ -3287,10 +3289,9 @@ class Payplug extends PaymentModule
         $paymentOption['standard']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
         $paymentOption['standard']['moduleName'] = 'payplug';
 
-        $payment_list[] = $paymentOption;
-
         // Installment Payment
         if ($options['installment']) {
+            $paymentOption['installment']['name'] = 'installment';
             $paymentOption['installment']['inputs'] = array(
                 'pc' => array(
                     'name' => 'pc',
@@ -3317,8 +3318,6 @@ class Payplug extends PaymentModule
             $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
             $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
             $paymentOption['installment']['moduleName'] = 'payplug';
-
-            $payment_list[] = $paymentOption;
         }
 
         if ($options['oney'] && isset($this->available_oney_payments) && $this->available_oney_payments) {
@@ -3342,6 +3341,7 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
+                $paymentOption['oney']['name'] = 'oney';
                 $paymentOption['oney']['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
@@ -3400,17 +3400,14 @@ class Payplug extends PaymentModule
                 $paymentOption['oney']['callToActionText'] = $label;
                 $paymentOption['oney']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
                 $paymentOption['oney']['moduleName'] = 'payplug';
-                if ($optimized) {
-                    $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
-                    $paymentOption->setAdditionalInformation($schedules);
-                }
-
-                $payment_list[] = $paymentOption;
+//                if ($optimized) {
+//                    $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
+//                    $paymentOption->setAdditionalInformation($schedules);
+//                }
             }
         }
-            var_dump($payment_list); exit;
 
-//        return $payment_list;
+        return $paymentOption;
     }
 
     /**
@@ -4303,8 +4300,9 @@ class Payplug extends PaymentModule
         ));
 
         $payment_options = $this->getPaymentOptions($cart);
+var_dump($this->PrestashopSpecificObject->displayPaymentOption($payment_options)); exit;
 
-        return $payment_options;
+        return $this->PrestashopSpecificObject->displayPaymentOption($payment_options);
     }
 
     /**
