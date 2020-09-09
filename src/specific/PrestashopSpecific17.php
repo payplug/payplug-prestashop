@@ -33,6 +33,11 @@ class PrestashopSpecific17
                 ->setModuleName($payment_option['moduleName'])
                 ->setInputs($payment_option['inputs']);
 
+            if (isset($payment_option['additionalInformation']))
+            {
+                $paymentOption->setAdditionalInformation($payment_option['additionalInformation']); // Échéanciers Oney
+            }
+
             $paymentOptions[] = $paymentOption;
         }
 

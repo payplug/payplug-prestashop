@@ -3401,10 +3401,11 @@ class Payplug extends PaymentModule
                 $paymentOption['oney_'.$oney_payment]['callToActionText'] = $label;
                 $paymentOption['oney_'.$oney_payment]['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
                 $paymentOption['oney_'.$oney_payment]['moduleName'] = 'payplug';
-//                if ($optimized) {
-//                    $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
-//                    $paymentOption->setAdditionalInformation($schedules);
-//                }
+                if ($optimized) {
+                    $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
+                    $paymentOption['oney_'.$oney_payment]['additionalInformation'] = $schedules;
+
+                }
             }
         }
 
