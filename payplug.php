@@ -3341,8 +3341,9 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-                $paymentOption['oney']['name'] = 'oney';
-                $paymentOption['oney']['inputs'] = array(
+
+                $paymentOption['oney_'.$oney_payment]['name'] = 'oney';
+                $paymentOption['oney_'.$oney_payment]['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
                         'type' => 'hidden',
@@ -3396,10 +3397,10 @@ class Payplug extends PaymentModule
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
-                $paymentOption['oney']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
-                $paymentOption['oney']['callToActionText'] = $label;
-                $paymentOption['oney']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
-                $paymentOption['oney']['moduleName'] = 'payplug';
+                $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
+                $paymentOption['oney_'.$oney_payment]['callToActionText'] = $label;
+                $paymentOption['oney_'.$oney_payment]['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
+                $paymentOption['oney_'.$oney_payment]['moduleName'] = 'payplug';
 //                if ($optimized) {
 //                    $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
 //                    $paymentOption->setAdditionalInformation($schedules);
@@ -4299,10 +4300,9 @@ class Payplug extends PaymentModule
             'api_url' => $this->api_url,
         ));
 
-        $payment_options = $this->getPaymentOptions($cart);
-var_dump($this->PrestashopSpecificObject->displayPaymentOption($payment_options)); exit;
+        $payment_options = $this->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
 
-        return $this->PrestashopSpecificObject->displayPaymentOption($payment_options);
+        return $this->PrestashopSpecificObject->displayPaymentOption($payment_options); // Transforme tableau en object
     }
 
     /**
