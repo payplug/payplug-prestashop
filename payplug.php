@@ -601,6 +601,7 @@ class Payplug extends PaymentModule
             case 1: // not paid
             case 5: // refunded
             case 8: // authorized
+            case 11: // abandoned
                 $status_class = 'pp_warning';
                 break;
             case 2: // paid
@@ -650,6 +651,9 @@ class Payplug extends PaymentModule
                 break;
             case 10:
                 $status_code = 'oney_pending';
+                break;
+            case 11:
+                $status_code = 'abandoned';
                 break;
             default: // none
                 $status_code = 'none';
@@ -3452,6 +3456,7 @@ class Payplug extends PaymentModule
             8 => 'authorized',
             9 => 'authorization expired',
             10 => 'oney pending',
+            11 => 'abandoned',
         */
         if (!is_object($payment)) {
             $payment = \Payplug\Payment::retrieve($payment);
@@ -3475,6 +3480,8 @@ class Payplug extends PaymentModule
         } elseif (count($payment->failure) > 0 && $pay_status != 9) {
             if ($payment->failure->code == 'aborted') {
                 $pay_status = 7; //cancelled
+            } elseif ($payment->failure->code == 'timeout') {
+                $pay_status = 11; //abandoned
             } else {
                 $pay_status = 3; //failed
             }
@@ -6148,6 +6155,7 @@ class Payplug extends PaymentModule
             8 => $this->l('authorized'),
             9 => $this->l('authorization expired'),
             10 => $this->l('oney pending'),
+            11 => $this->l('abandoned'),
         );
     }
 
