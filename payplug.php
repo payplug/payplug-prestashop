@@ -3347,6 +3347,9 @@ class Payplug extends PaymentModule
                 $delivery_country = new Country($delivery_address->id_country);
                 $iso_code = $delivery_country->iso_code;
                 $payment_schedule = $this->getOneyPaymentOptionsList($cart_amount, $iso_code);
+                if (empty($payment_schedule)) {
+                    $optimized = false;
+                }
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
