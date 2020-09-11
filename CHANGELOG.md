@@ -6,3 +6,4 @@
 
 **PATCH:**
 - truncate payplug_lock in order to add constraint
+- show oney schedule only if marketing API is available
