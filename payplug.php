@@ -3227,6 +3227,8 @@ class Payplug extends PaymentModule
 
             $paymentOption['payplug_cards']['name'] = 'payplug_cards';
             $paymentOption['payplug_cards']['data'] = $payplug_cards;
+            $paymentOption['payplug_cards']['extra_classes'] = strtolower($paymentOption['payplug_cards']['data'][0]['brand']);
+
             foreach ($payplug_cards as $card) {
 
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
@@ -3253,6 +3255,8 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
+                $paymentOption['one_click']['tpl'] = 'unified_payment.tpl';
+                $paymentOption['one_click']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array(), true);
                 $paymentOption['one_click']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
                 $paymentOption['one_click']['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'];
                 $paymentOption['one_click']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
@@ -3284,6 +3288,8 @@ class Payplug extends PaymentModule
                 'value' => 'standard',
             ),
         );
+        $paymentOption['standard']['tpl'] = 'standard_payment.tpl';
+        $paymentOption['standard']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array('type' => 'standard'));
         $paymentOption['standard']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang) . '.png');
         $paymentOption['standard']['callToActionText'] = count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card');
         $paymentOption['standard']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
@@ -3314,6 +3320,8 @@ class Payplug extends PaymentModule
                     'value' => 'installment',
                 ),
             );
+            $paymentOption['installment']['tpl'] = 'unified_payment.tpl';
+            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
             $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
             $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
             $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
@@ -3394,13 +3402,18 @@ class Payplug extends PaymentModule
                 }
 
                 $type = explode('_', $oney_payment);
+
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
+                $paymentOption['oney_'.$oney_payment]['tpl'] = 'oney_payment.tpl';
+                $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('-oney%sx', $split);
+                $paymentOption['oney_'.$oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
                 $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
                 $paymentOption['oney_'.$oney_payment]['callToActionText'] = $label;
                 $paymentOption['oney_'.$oney_payment]['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
                 $paymentOption['oney_'.$oney_payment]['moduleName'] = 'payplug';
+                $paymentOption['oney_'.$oney_payment]['err_label'] = $err_label;
                 if ($optimized) {
                     $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption['oney_'.$oney_payment]['additionalInformation'] = $schedules;

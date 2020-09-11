@@ -42,12 +42,12 @@ class PrestashopSpecific16
 
     public function displayPaymentOption($payment_options, $cart)
     {
-
         $paymentAllowedOptions = $this->payplug->getAllowedPaymentOptions($cart);
         $paymentOptions = array();
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
         $unified_mode = (bool)!$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
+
         $error = false;
         $is_oney_available = true;
 
@@ -118,120 +118,25 @@ class PrestashopSpecific16
             ));
         }
 
-        $installment_mode = $this->payplug->getConfiguration('PAYPLUG_INST_MODE');
-        $this->context->smarty->assign(array(
-            'installment_mode' => $installment_mode,
-        ));
+        foreach($payment_options as $payment_option) {
+            if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
+                $payplug_card = new PayPlugCard();
+                $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
 
-        // One-click Payment
-
-        if ($this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')) {
-            $payplug_card = new PayPlugCard();
-            $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
-
-            if ($unified_mode && false) {
-                $paymentOptions[] = array(
-                    'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $img_lang,
-                    'label' => $this->payplug->l('Credit card payment'),
-                    'logo_url' => $this->payplug->_path . 'views/img/logos_schemes_' . $img_lang . '.png',
-                    'payment_url' => PayplugBackward::getModuleLink($this->payplug->name, 'payment',
-                        array('type' => 'oneclick', 'pc' => null), true),
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/unified_payment.tpl',
-                );
-                if (is_array($payplug_cards) && count($payplug_cards) > 0) {
-                    foreach ($payplug_cards as $card) {
-                        $paymentOptions[] = array(
-                            'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . strtolower($card['brand']),
-                            'label' => '**** **** **** ' . $card['last4'] . ' ' . $card['brand'] . ' ' . $this->payplug->l('Expiry date: ') . $card['expiry_date'],
-                            'logo_url' => $this->payplug->_path . 'views/img/' . strtolower($card['brand']) . '.png',
-                            'payment_url' => PayplugBackward::getModuleLink($this->payplug->name, 'payment',
-                                array('type' => 'oneclick', 'pc' => (int)$card['id_payplug_card']), true),
-                            'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/unified_payment.tpl',
-                        );
-                    }
+                $extraClass = $img_lang;
+                if (isset($payment_option['extra_classes'])) {
+                    $extraClass = $payment_option['extra_classes'];
                 }
-            } else {
                 $paymentOptions[] = array(
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/one_click_payment.tpl',
+                    'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
+                    'label' => $payment_option['callToActionText'],
+                    'logo_url' => $payment_option['logo'],
+                    'payment_url' => $payment_option['action'],
+                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
                 );
                 $this->context->smarty->assign(array(
-                    'payplug_cards' => $payplug_cards,
-                    'payment_controller_url' => PayplugBackward::getModuleLink($this->payplug->name, 'payment', array(), true),
+                    'payment_controller_url' => $payment_option['payment_controller_url'],
                 ));
-            }
-        } else {
-            // Standard Payment
-            $paymentOptions[] = array(
-                'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $img_lang,
-                'label' => $this->payplug->l('Pay with credit card'),
-                'logo_url' => $this->payplug->_path . 'views/img/logos_schemes_' . $img_lang . '.png',
-                'payment_url' => PayplugBackward::getModuleLink($this->payplug->name, 'payment', array('type' => 'standard'),
-                    true),
-                //'tpl' => _PS_MODULE_DIR_.'payplug/views/templates/hook/' . ($unified_mode ? 'unified_payment' : 'standard_payment') . '.tpl',
-                'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/standard_payment.tpl',
-            );
-        }
-
-        // Oney
-        if ($this->payplug->getConfiguration('PAYPLUG_ONEY') && $is_oney_available) {
-            if ($unified_mode) {
-                if ($error) {
-                    switch ($is_elligible['error_type']) {
-                        case 'invalid_addresses':
-                            $err_label = $this->payplug->l('Available for France only');
-                            break;
-                        case 'invalid_amount_bottom':
-                        case 'invalid_amount_top':
-                            $err_label = $this->payplug->l('Between 100€ and 3000€ only');
-                            break;
-                        case 'invalid_carrier' :
-                            $err_label = $this->payplug->l('Unavailable for this shipping method');
-                            break;
-                        default:
-                        case 'invalid_cart' :
-                            $err_label = $this->payplug->l('Your cart is unavailable');
-                            break;
-                    }
-                }
-
-                $paymentOptions[] = array(
-                    'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-oney3x' . ($error ? '-alt' : ''),
-                    'label' => $error ? $err_label : $this->payplug->l('Pay by card in 3x with Oney'),
-                    'logo_url' => PayplugBackward::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/oney/3x' . ($error ? '-alt' : '') . '.svg',
-                    'payment_url' => PayplugBackward::getModuleLink('payplug', 'payment', array('type' => 'oney', 'io' => 3), true),
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/unified_payment.tpl',
-                );
-                $paymentOptions[] = array(
-                    'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-oney4x' . ($error ? '-alt' : ''),
-                    'label' => $error ? $err_label : $this->payplug->l('Pay by card in 4x with Oney'),
-                    'logo_url' => PayplugBackward::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/oney/4x' . ($error ? '-alt' : '') . '.svg',
-                    'payment_url' => PayplugBackward::getModuleLink('payplug', 'payment', array('type' => 'oney', 'io' => 4), true),
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/unified_payment.tpl',
-                );
-            } else {
-                $paymentOptions[] = array(
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/oney_payment.tpl',
-                );
-            }
-        }
-
-        // Installments
-        if ($paymentAllowedOptions['installment']) {
-            if ($unified_mode && false) {
-                $paymentOptions[] = array(
-                    'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $img_lang . '-x' . (int)$installment_mode,
-                    'label' => $this->payplug->l('Pay by card in') . (int)$installment_mode . $this->payplug->l('installments'),
-                    'logo_url' => PayplugBackward::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/logos_schemes_installment_' . (int)$installment_mode . '_' . $img_lang . '.png',
-                    'payment_url' => PayplugBackward::getModuleLink('payplug', 'payment', array('type' => 'installment', 'i' => (int)$installment_mode), true),
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/unified_payment.tpl',
-                );
-            } else {
-                $this->context->smarty->assign(array(
-                    'installment_controller_url' => PayplugBackward::getModuleLink('payplug', 'payment', array('i' => 1), true),
-                ));
-                $paymentOptions[] = array(
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/installment_payment.tpl',
-                );
             }
         }
 
