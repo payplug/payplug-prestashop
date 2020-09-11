@@ -18,6 +18,7 @@ return array(
     'PayPlug\\src\\repositories\\Repository' => $baseDir . '/src/repositories/Repository.php',
     'PayPlug\\src\\specific\\ConfigurationSpecific' => $baseDir . '/src/specific/ConfigurationSpecific.php',
     'PayPlug\\src\\specific\\PrestashopSpecific16' => $baseDir . '/src/specific/PrestashopSpecific16.php',
+    'PayPlug\\src\\specific\\PrestashopSpecific17' => $baseDir . '/src/specific/PrestashopSpecific17.php',
     'Symfony\\Polyfill\\Mbstring\\Mbstring' => $vendorDir . '/symfony/polyfill-mbstring/Mbstring.php',
     'libphonenumber\\AlternateFormatsCountryCodeSet' => $vendorDir . '/giggsey/libphonenumber-for-php/src/AlternateFormatsCountryCodeSet.php',
     'libphonenumber\\AsYouTypeFormatter' => $vendorDir . '/giggsey/libphonenumber-for-php/src/AsYouTypeFormatter.php',

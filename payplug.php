@@ -285,7 +285,7 @@ class Payplug extends PaymentModule
     {
         $this->PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific'._PS_VERSION_[0]._PS_VERSION_[2];
         if (class_exists($this->PrestashopSpecificClass)) {
-            $this->PrestashopSpecificObject = new $this->PrestashopSpecificClass();
+            $this->PrestashopSpecificObject = new $this->PrestashopSpecificClass($this);
         }
     }
 
@@ -6851,37 +6851,7 @@ class Payplug extends PaymentModule
         $payment_options = $this->getPaymentOptions($params); // Données sous forme de tableau (pour 1.6 et 1.7)
         $cart = $params['cart'];
 
-        // Paramètres temporaires
-        $paramPaymentOption = [];
-        $paramPaymentOption['getAllowedPaymentOptions'] = $this->getAllowedPaymentOptions($cart);
-        $paramPaymentOption['unified_mode'] = (bool)!$this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
-        $paramPaymentOption['current_lang'] = explode('-', $this->context->language->language_code);
-        $paramPaymentOption['getConfigPayplugOney'] = $this->getConfiguration('PAYPLUG_ONEY');
-        $paramPaymentOption['getPackageList'] = $cart->getPackageList();
-        $paramPaymentOption['isLoadedObject'] = Validate::isLoadedObject($cart);
-        $paramPaymentOption['id_address_invoice'] = $cart->id_address_invoice;
-        $paramPaymentOption['id_address_delivery'] = $cart->id_address_delivery;
-        $paramPaymentOption['isOneyElligible'] = $this->isOneyElligible($cart);
-        $paramPaymentOption['isValidOneyAmount'] = $this->isValidOneyAmount($cart->getOrderTotal(true, Cart::BOTH), $this->context->currency->id);
-        $paramPaymentOption['isValidOneyCarrier'] = $this->isValidOneyCarrier($cart);
-        $paramPaymentOption['displayOneyRequiredFields'] = $this->displayOneyRequiredFields();
-        $paramPaymentOption['tradLoading'] = $this->l('Loading');
-        $paramPaymentOption['installment_mode'] = $this->getConfiguration('PAYPLUG_INST_MODE');
-        $paramPaymentOption['oneclick_mode'] = $this->getConfiguration('PAYPLUG_ONE_CLICK');
-        $paramPaymentOption['id_customer'] = $cart->id_customer;
-        $paramPaymentOption['tradCCpayment'] = $this->l('Credit card payment');
-        $paramPaymentOption['thisPath'] = $this->_path;
-        $paramPaymentOption['thisName'] = $this->name;
-        $paramPaymentOption['oney_mode'] = $this->getConfiguration('PAYPLUG_ONEY');
-        $paramPaymentOption['tradAFFonly'] = $this->l('Available for France only');
-        $paramPaymentOption['tradB1A3only'] = $this->l('Between 100€ and 3000€ only');
-        $paramPaymentOption['tradUFTSmethod'] = $this->l('Unavailable for this shipping method');
-        $paramPaymentOption['tradYCIunav'] = $this->l('Your cart is unavailable');
-        $paramPaymentOption['tradPBCI3Woney'] = $this->l('Pay by card in 3x with Oney');
-        $paramPaymentOption['tradPBCI4Woney'] = $this->l('Pay by card in 4x with Oney');
-        $paramPaymentOption['tradPBCin'] = $this->l('Pay by card in');
-
-        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $paramPaymentOption); // Transforme tableau en object
+        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $cart); // Transforme tableau en object
 
         $this->smarty->assign(array(
             'payplug_payment_options' => $paymentOptions,

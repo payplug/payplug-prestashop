@@ -61,6 +61,7 @@ class ComposerStaticInit41d1eee5399c0a3712f65a673ae5e665
         'PayPlug\\src\\repositories\\Repository' => __DIR__ . '/../..' . '/src/repositories/Repository.php',
         'PayPlug\\src\\specific\\ConfigurationSpecific' => __DIR__ . '/../..' . '/src/specific/ConfigurationSpecific.php',
         'PayPlug\\src\\specific\\PrestashopSpecific16' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific16.php',
+        'PayPlug\\src\\specific\\PrestashopSpecific17' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific17.php',
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'libphonenumber\\AlternateFormatsCountryCodeSet' => __DIR__ . '/..' . '/giggsey/libphonenumber-for-php/src/AlternateFormatsCountryCodeSet.php',
         'libphonenumber\\AsYouTypeFormatter' => __DIR__ . '/..' . '/giggsey/libphonenumber-for-php/src/AsYouTypeFormatter.php',
