@@ -42,14 +42,12 @@ class PrestashopSpecific16
 
     public function displayPaymentOption($payment_options, $cart)
     {
-        $paymentAllowedOptions = $this->payplug->getAllowedPaymentOptions($cart);
         $paymentOptions = array();
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $unified_mode = (bool)!$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
+        $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
 
         $error = false;
-        $is_oney_available = true;
 
         $current_lang = explode('-', $this->context->language->language_code);
         $current_lang = $current_lang[0];
@@ -137,7 +135,7 @@ class PrestashopSpecific16
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_option['logo'],
-                        'payment_url' => $payment_option['action'],
+                        'payment_url' => $payment_option['payment_controller_url'],
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
                     );
                 }
@@ -148,9 +146,13 @@ class PrestashopSpecific16
                         ));
 
                 }
+                    // Oney optimized : 1 payment option => 2 échéanciers, on sort de la boucle
+                    // Oney non optimized : 2 payment options => 3x puis 4x
+                    if ($oneyOptimized && ($payment_option['name'] == 'oney')) {
+                        break;
+                    }
             }
         }
-
         return $paymentOptions;
     }
 }
