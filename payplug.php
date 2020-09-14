@@ -3255,7 +3255,8 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
-                $paymentOption['one_click']['tpl'] = 'unified_payment.tpl';
+                $paymentOption['one_click']['tpl'] = 'one_click_payment.tpl';
+//                $paymentOption['one_click']['tpl'] = 'unified_payment.tpl';
                 $paymentOption['one_click']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array(), true);
                 $paymentOption['one_click']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
                 $paymentOption['one_click']['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'];
@@ -3407,6 +3408,7 @@ class Payplug extends PaymentModule
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 $paymentOption['oney_'.$oney_payment]['tpl'] = 'oney_payment.tpl';
+//                $paymentOption['oney_'.$oney_payment]['tpl'] = 'unified_payment.tpl';
                 $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('-oney%sx', $split);
                 $paymentOption['oney_'.$oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
                 $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');

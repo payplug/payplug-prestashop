@@ -122,21 +122,32 @@ class PrestashopSpecific16
             if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
                 $payplug_card = new PayPlugCard();
                 $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+                $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
                 $extraClass = $img_lang;
                 if (isset($payment_option['extra_classes'])) {
                     $extraClass = $payment_option['extra_classes'];
                 }
-                $paymentOptions[] = array(
-                    'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
-                    'label' => $payment_option['callToActionText'],
-                    'logo_url' => $payment_option['logo'],
-                    'payment_url' => $payment_option['action'],
-                    'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
-                );
-                $this->context->smarty->assign(array(
-                    'payment_controller_url' => $payment_option['payment_controller_url'],
-                ));
+
+                if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK') && ($payment_option['name'] == 'standard')) {
+                    continue;
+                }
+                else {
+                    $paymentOptions[] = array(
+                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
+                        'label' => $payment_option['callToActionText'],
+                        'logo_url' => $payment_option['logo'],
+                        'payment_url' => $payment_option['action'],
+                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
+                    );
+                }
+                    if (isset($payment_option['payment_controller_url'])) {
+                        $this->context->smarty->assign(array(
+                            'payplug_cards' => $payplug_cards,
+                            'payment_controller_url' => $payment_option['payment_controller_url'],
+                        ));
+
+                }
             }
         }
 

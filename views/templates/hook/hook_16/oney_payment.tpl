@@ -23,7 +23,8 @@
     <button href="javascript:void(0);" class="oneyPayment_trigger">
         <span class="oneyPayment_logo oneyLogo oneyLogo-x3x4"></span>
         <span class="oneyPayment_label">
-                    {l s='Pay by card in 3 or 4' mod='payplug'}
+{*                    {l s='Pay by card in 3 or 4' mod='payplug'}*}
+            {$payplug_payment_option.label|escape:'html'}
             {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
                 </span>
     </button>
