@@ -3322,11 +3322,16 @@ class Payplug extends PaymentModule
                 ),
             );
             $paymentOption['installment']['tpl'] = 'unified_payment.tpl';
-            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
+//            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
+            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array('type' => 'installment', 'i' => 1), true);
             $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
             $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
             $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
             $paymentOption['installment']['moduleName'] = 'payplug';
+
+            $this->smarty->assign(array(
+                'installment_controller_url' => PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true),
+            ));
         }
 
         if ($options['oney'] && isset($this->available_oney_payments) && $this->available_oney_payments) {
@@ -3414,7 +3419,7 @@ class Payplug extends PaymentModule
                 }
                 $paymentOption['oney_'.$oney_payment]['tpl'] = $tpl;
 
-                $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('-oney%sx', $split);
+                $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('oney%sx', $split);
                 $paymentOption['oney_'.$oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
                 $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
                 $paymentOption['oney_'.$oney_payment]['callToActionText'] = $label;
@@ -6823,59 +6828,20 @@ class Payplug extends PaymentModule
         } else {
             $price2display = $base_total_tax_exc;
         }
-//
-//        if (!$this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-//            $paymentOptions = $this->buildPaymentOptions($params['cart']);
-//            $this->smarty->assign(array(
-//                'payplug_payment_options' => $paymentOptions,
-//                'spinner_url' => PayplugBackward::getHttpHost(true)
-//                    . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
-//                'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
-//                'api_url' => $this->api_url,
-//                'price2display' => $price2display,
-//                'this_path' => $this->_path,
-//            ));
-//            return $this->display(__FILE__, 'payment_options_display.tpl');
-//        }
-//        $this->assignPaymentOptions($params['cart']);
-//
-        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-            $this->assignOneyPaymentOptions($params['cart']);
-        }
-//
-//        return $this->display(__FILE__, 'payment.tpl');
 
-/*
- * $this->buildPaymentOptions($params['cart'])
- *
- * array (size=3)
-  0 =>
-    array (size=1)
-      'tpl' => string '/Applications/MAMP/htdocs/presta16.local/modules/payplug/views/templates/hook/one_click_payment.tpl' (length=99)
-  1 =>
-    array (size=5)
-      'extra_classes' => string 'payplug paymentLogo paymentLogo-oney3x-alt' (length=42)
-      'label' => string 'Uniquement entre 100€ et 3000€ d’achat' (length=44)
-      'logo_url' => string '/modules/payplug/views/img/oney/3x-alt.svg' (length=42)
-      'payment_url' => string 'http://presta16.local/fr/module/payplug/payment?type=oney&io=3' (length=62)
-      'tpl' => string '/Applications/MAMP/htdocs/presta16.local/modules/payplug/views/templates/hook/unified_payment.tpl' (length=97)
-  2 =>
-    array (size=5)
-      'extra_classes' => string 'payplug paymentLogo paymentLogo-oney4x-alt' (length=42)
-      'label' => string 'Uniquement entre 100€ et 3000€ d’achat' (length=44)
-      'logo_url' => string '/modules/payplug/views/img/oney/4x-alt.svg' (length=42)
-      'payment_url' => string 'http://presta16.local/fr/module/payplug/payment?type=oney&io=4' (length=62)
-      'tpl' => string '/Applications/MAMP/htdocs/presta16.local/modules/payplug/views/templates/hook/unified_payment.tpl' (length=97)
- */
-        $payment_options = $this->getPaymentOptions($params); // Données sous forme de tableau (pour 1.6 et 1.7)
         $cart = $params['cart'];
 
-        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $cart); // Transforme tableau en object
+        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+            $this->assignOneyPaymentOptions($cart);
+        }
+
+        $payment_options = $this->getPaymentOptions($params); // Données sous forme de tableau (pour 1.6 et 1.7)
+
+        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $cart); // Transforme tableau en TPL
 
         $this->smarty->assign(array(
             'payplug_payment_options' => $paymentOptions,
-            'spinner_url' => PayplugBackward::getHttpHost(true)
-                . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
+            'spinner_url' => PayplugBackward::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
             'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
             'api_url' => $this->api_url,
             'price2display' => $price2display,

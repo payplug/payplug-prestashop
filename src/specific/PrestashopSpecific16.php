@@ -84,11 +84,6 @@ class PrestashopSpecific16
                         $has_valid_carrier = true;
                     }
                 }
-
-                // if no carrier available for Oney, return false
-                if (!$has_valid_carrier) {
-                    $is_oney_available = false;
-                }
             }
 
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
@@ -115,7 +110,6 @@ class PrestashopSpecific16
                 'payplug_oney_loading_msg' => $this->payplug->l('Loading')
             ));
         }
-
         foreach($payment_options as $payment_option) {
             if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
                 $payplug_card = new PayPlugCard();
@@ -127,8 +121,12 @@ class PrestashopSpecific16
                     $extraClass = $payment_option['extra_classes'];
                 }
 
-                if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK') && ($payment_option['name'] == 'standard')) {
-                    continue;
+                // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
+                // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
+                if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
+                    && (!empty($payplug_cards))
+                    && ($payment_option['name'] == 'standard')) {
+                        continue;
                 }
                 else {
                     $paymentOptions[] = array(
@@ -153,6 +151,7 @@ class PrestashopSpecific16
                     }
             }
         }
+
         return $paymentOptions;
     }
 }
