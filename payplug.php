@@ -3407,8 +3407,13 @@ class Payplug extends PaymentModule
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
-                $paymentOption['oney_'.$oney_payment]['tpl'] = 'oney_payment.tpl';
-//                $paymentOption['oney_'.$oney_payment]['tpl'] = 'unified_payment.tpl';
+                $tpl = 'oney_payment.tpl';
+                if (!$optimized)
+                {
+                    $tpl = 'unified_payment.tpl';
+                }
+                $paymentOption['oney_'.$oney_payment]['tpl'] = $tpl;
+
                 $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('-oney%sx', $split);
                 $paymentOption['oney_'.$oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
                 $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
@@ -3423,7 +3428,6 @@ class Payplug extends PaymentModule
                 }
             }
         }
-
         return $paymentOption;
     }
 
