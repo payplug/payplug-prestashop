@@ -2,8 +2,7 @@
 
 namespace PayPlug\src\specific;
 
-//use Media;
-//use PayPlug\classes\PayPlugBackward;
+use Media;
 
 use Context;
 use PayplugBackward;
@@ -25,19 +24,22 @@ class PrestashopSpecific16
 
     public function hookHeader()
     {
-//        Media::addJsDef(array(
-//            'payplug_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
-//        ));
-//        $this->assignOneyJSVar();
+        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
+
+        Media::addJsDef(array(
+            'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', array(), true),
+        ));
+        $this->payplug->assignOneyJSVar();
     }
 
     public function hookCustomerAccount()
     {
-//        $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
-//
-//        $this->smarty->assign(array(
-//            'payplug_icon_url' => $payplug_icon_url
-//        ));
+        $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
+
+        $this->smarty->assign(array(
+            'payplug_icon_url' => $payplug_icon_url
+        ));
     }
 
     public function displayPaymentOption($payment_options, $cart)
@@ -110,16 +112,14 @@ class PrestashopSpecific16
                 'payplug_oney_loading_msg' => $this->payplug->l('Loading')
             ));
         }
+
         foreach($payment_options as $payment_option) {
             if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
                 $payplug_card = new PayPlugCard();
                 $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
                 $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
-                $extraClass = $img_lang;
-                if (isset($payment_option['extra_classes'])) {
-                    $extraClass = $payment_option['extra_classes'];
-                }
+                $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
 
                 // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
                 // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
@@ -127,8 +127,7 @@ class PrestashopSpecific16
                     && (!empty($payplug_cards))
                     && ($payment_option['name'] == 'standard')) {
                         continue;
-                }
-                else {
+                } else {
                     $paymentOptions[] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
@@ -137,18 +136,19 @@ class PrestashopSpecific16
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
                     );
                 }
-                    if (isset($payment_option['payment_controller_url'])) {
-                        $this->context->smarty->assign(array(
-                            'payplug_cards' => $payplug_cards,
-                            'payment_controller_url' => $payment_option['payment_controller_url'],
-                        ));
 
+                if (isset($payment_option['payment_controller_url'])) {
+                    $this->context->smarty->assign(array(
+                        'payplug_cards' => $payplug_cards,
+                        'payment_controller_url' => $payment_option['payment_controller_url'],
+                    ));
                 }
-                    // Oney optimized : 1 payment option => 2 échéanciers, on sort de la boucle
-                    // Oney non optimized : 2 payment options => 3x puis 4x
-                    if ($oneyOptimized && ($payment_option['name'] == 'oney')) {
-                        break;
-                    }
+
+                // Oney optimized : 1 payment option => 2 échéanciers, on sort de la boucle
+                // Oney non optimized : 2 payment options => 3x puis 4x
+                if ($oneyOptimized && ($payment_option['name'] == 'oney')) {
+                    break;
+                }
             }
         }
 

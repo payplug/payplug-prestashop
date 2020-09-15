@@ -4119,15 +4119,8 @@ class Payplug extends PaymentModule
 
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'), true);
 
-//        if (class_exists($this->PrestashopSpecificClass)) {
-//            ($this->PrestashopSpecificObject)->hookCustomerAccount();
-//        }
-
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
-            $this->smarty->assign(array(
-                'payplug_icon_url' => $payplug_icon_url
-            ));
+        if (class_exists($this->PrestashopSpecificClass)) {
+            $this->PrestashopSpecificObject->hookCustomerAccount();
         }
 
         $this->smarty->assign(array(
@@ -4223,23 +4216,9 @@ class Payplug extends PaymentModule
             Media::addJsDef(['payment_errors' => true]);
         }
 
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
-
-//            if (class_exists($this->PrestashopSpecificClass)) {
-//                ($this->PrestashopSpecificObject)->hookHeader();
-//            }
-            Media::addJsDef(array(
-                'payplug_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
-            ));
-            $this->assignOneyJSVar();
+        if (class_exists($this->PrestashopSpecificClass)) {
+            $this->PrestashopSpecificObject->hookHeader();
         }
-        else {
-            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
-        }
-
 
         if ((int)Tools::getValue('lightbox') == 1) {
             $cart = $params['cart'];
@@ -7174,7 +7153,7 @@ class Payplug extends PaymentModule
     /**
      * Assign Oney javascript variable
      */
-    private function assignOneyJSVar()
+    public function assignOneyJSVar()
     {
         $js_var = array(
             'loading_msg' => $this->l('Loading'),
@@ -7190,6 +7169,7 @@ class Payplug extends PaymentModule
      */
     public function displayOneyPaymentOptions()
     {
+
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->smarty->assign(array(
                 'payplug_module_dir' => _PS_MODULE_DIR_,
