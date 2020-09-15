@@ -4176,7 +4176,7 @@ class Payplug extends PaymentModule
                 $redirect = $payment['redirect'];
 
                 // If payment is paid then redirect
-                if ($redirect || $this->isMobiledevice()) {
+                if ($redirect) {
                     Tools::redirect($payment['return_url']);
                 } // else show the popin
                 else {
@@ -5734,7 +5734,7 @@ class Payplug extends PaymentModule
             default:
                 $payment_return = array(
                     'result' => 'new_card',
-                    'redirect' => false,
+                    'redirect' => $this->isMobiledevice(),
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
                 break;
