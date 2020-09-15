@@ -3298,6 +3298,7 @@ class Payplug extends PaymentModule
 
         // Installment Payment
         if ($options['installment']) {
+            $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
             $paymentOption['installment']['name'] = 'installment';
             $paymentOption['installment']['inputs'] = array(
                 'pc' => array(
@@ -3321,7 +3322,7 @@ class Payplug extends PaymentModule
                     'value' => 'installment',
                 ),
             );
-            $paymentOption['installment']['tpl'] = 'unified_payment.tpl';
+            $paymentOption['installment']['tpl'] = 'installment_payment.tpl';
 //            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
             $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array('type' => 'installment', 'i' => 1), true);
             $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
@@ -3331,6 +3332,7 @@ class Payplug extends PaymentModule
 
             $this->smarty->assign(array(
                 'installment_controller_url' => PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true),
+                'installment_mode' => $installment_mode,
             ));
         }
 

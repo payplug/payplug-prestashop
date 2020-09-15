@@ -144,8 +144,7 @@ class PrestashopSpecific16
                     ));
                 }
 
-                // Oney optimized : 1 payment option => 2 échéanciers, on sort de la boucle
-                // Oney non optimized : 2 payment options => 3x puis 4x
+                // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
                 if ($oneyOptimized && ($payment_option['name'] == 'oney')) {
                     break;
                 }
