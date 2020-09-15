@@ -1,7 +1,8 @@
 {
     "name": "cyril/payplug",
     "require": {
-        "giggsey/libphonenumber-for-php": "^8.12"
+        "giggsey/libphonenumber-for-php": "^8.12",
+        "phpunit/phpunit": "^9"
     },
     "autoload": {
         "psr-4": {
