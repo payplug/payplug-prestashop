@@ -39,7 +39,8 @@ class PayPlugAjax
             $context = Context::getContext();
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
-                    $payment = $payplug->preparePayment(null,Tools::getValue('pc'));
+                    $payment = $payplug->preparePayment16(Tools::getValue('pc'));
+//                    $payment = $payplug->preparePayment(null,Tools::getValue('pc'));
                     if(is_array($payment))
                     {
                         die(implode($payment));
