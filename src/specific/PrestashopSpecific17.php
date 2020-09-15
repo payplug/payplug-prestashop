@@ -6,10 +6,17 @@ use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class PrestashopSpecific17
 {
+    public $payplug;
+
+    public function __construct($payplug)
+    {
+        $this->payplug = $payplug;
+    }
+
     public function hookHeader()
     {
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
     }
 
     public function displayPaymentOption($payment_options)
