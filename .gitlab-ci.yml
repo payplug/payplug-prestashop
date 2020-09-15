@@ -1,0 +1,9 @@
+stages:
+  - tests
+
+unit tests:
+  image: composer:1.9
+  stage: tests
+  script:
+    - composer install
+    - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
