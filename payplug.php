@@ -4173,8 +4173,10 @@ class Payplug extends PaymentModule
             $payment = $this->preparePayment($payment_options);
 
             if ($payment['result']) {
+                $redirect = $payment['redirect'];
+
                 // If payment is paid then redirect
-                if ($payment['redirect'] || $this->isMobiledevice()) {
+                if ($redirect || $this->isMobiledevice()) {
                     Tools::redirect($payment['return_url']);
                 } // else show the popin
                 else {
@@ -5436,6 +5438,12 @@ class Payplug extends PaymentModule
         $is_one_click = $id_card != 'new_card' && $config['one_click'];
         $is_installment = $is_installment && $config['installment'];
 
+        // defined which is current payment method
+        $payment_method = $is_one_click ? 'oneclick' :
+            ($is_oney ? 'oney' :
+                ($is_installment ? 'installment' : 'standard')
+            );
+
         // Build payment Tab
 
         // Currency
@@ -5701,23 +5709,38 @@ class Payplug extends PaymentModule
             ];
         }
 
-        if ($is_one_click) {
-            $is_paid = $payment->is_paid;
-            if (!$is_paid && $is_deferred) {
-                $is_paid = $payment->authorization->authorized_at;
-            }
-            return [
-                'result' => true,
-                'redirect' => $is_paid,
-                'return_url' => $is_paid ? $payment_tab['hosted_payment']['return_url'] : $payment->hosted_payment->payment_url
-            ];
+        switch ($payment_method) {
+            case 'oneclick' :
+                $redirect = $payment->is_paid;
+                if (!$redirect && $is_deferred) {
+                    $redirect = (bool)$payment->authorization->authorized_at;
+                }
+                $payment_return = array(
+                    'result' => true,
+                    'redirect' => $redirect, // force `true` we are in 3DS 1
+                    'return_url' => $redirect ?
+                        $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
+                );
+                break;
+            case 'oney' :
+                $payment_return = array(
+                    'result' => 'new_card',
+                    'redirect' => true,
+                    'return_url' => $payment->hosted_payment->payment_url,
+                );
+                break;
+            case 'standard' :
+            case 'installment' :
+            default:
+                $payment_return = array(
+                    'result' => 'new_card',
+                    'redirect' => false,
+                    'return_url' => $payment->hosted_payment->payment_url,
+                );
+                break;
         }
 
-        return [
-            'result' => true,
-            'redirect' => false,
-            'return_url' => $payment->hosted_payment->payment_url
-        ];
+        return $payment_return;
     }
 
     public function refundPayment()
