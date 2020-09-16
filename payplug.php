@@ -5668,7 +5668,7 @@ class Payplug extends PaymentModule
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
-            //____-----> 1.6 <-----_____
+            //____-----> ..:::> ONEY 1.6 <:::.. <-----_____
             if (version_compare(_PS_VERSION_, '1.7', '<')) {
 
                 $payment_tab = $this->getPaymentDataCookie();
@@ -5709,7 +5709,7 @@ class Payplug extends PaymentModule
                 );
                 return Tools::jsonEncode($oneyData);
             }
-            //end 1.6
+            //end ONEY 1.6
 
             // check billing phonenumber
             if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
@@ -5816,145 +5816,6 @@ class Payplug extends PaymentModule
 
         return $return;
     }
-//    public function preparePayment16($id_card = null)
-//    {
-////        $this->log_payment->info('Starting payment.');
-//        if (!Validate::isLoadedObject($this->context->cart)) {
-//            $this->log_payment->info('Payment abort: missing cart');
-//            $data = array(
-//                'result' => false,
-//                'response' => $this->l('The cart is missing'),
-//            );
-//            return Tools::jsonEncode($data);
-//        }
-//
-//        if ($this->isPaymentPending($this->context->cart->id)) {
-//            $this->log_payment->info('Payment abort: is pending');
-//            $data = array(
-//                'result' => false,
-//                'response' => $this->l('payment is pending'),
-//            );
-//            return Tools::jsonEncode($data);
-//        }
-//
-//        $deferred = $this->getConfiguration('PAYPLUG_DEFERRED');
-//        $options = array();
-//
-//        if ($deferred) {
-//            $options['deferred'] = true;
-//        }
-//        if ($oney_type = Tools::getValue('io')) {
-//            // todo: set var in method PayPlugPaymentOney
-//            $options['oney_type'] = $oney_type;
-//            $options['oney_form'] = Tools::getValue('form');
-//
-//            if (!$this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-//                // check if oney was elligible then return if not
-//                $is_elligible = $this->isOneyElligible($this->context->cart);
-//                if (!$is_elligible['result']) {
-//                    $data = array('result' => false, 'response' => $is_elligible['error']);
-//                    return Tools::jsonEncode($data);
-//                }
-//
-//                $is_elligible = $this->isValidOneyCarrier($this->context->cart);
-//                if (!$is_elligible['result']) {
-//                    $data = array('result' => false, 'response' => $is_elligible['error']);
-//                    return Tools::jsonEncode($data);
-//                }
-//
-//                // else check the cookie
-//                $payment_tab = $this->getPaymentDataCookie();
-//
-//                if (!empty($payment_tab)) {
-//                    $options['oney_form'] = $payment_tab['oney_form'];
-//                } else {
-//                    $has_required_fields = $this->getOneyRequiredFields();
-//                    if (!empty($has_required_fields)) {
-//                        $this->setPaymentErrorsCookie(array('oney_required_field'));
-//                        $data = array('result' => false, 'response' => false);
-//                        return Tools::jsonEncode($data);
-//                    }
-//                }
-//            }
-//        }
-//
-//        $payplug_method_name = $this->getCurrentPaymentMethod($id_card);
-//        $payplug_payment = new $payplug_method_name($id_card, $options);
-//
-//        try {
-//            $result = $payplug_payment->create();
-//            $payment = $result['resource'];
-//
-//            if (!$payment) {
-//                $messages = $this->catchErrorsFromApi($result['message']);
-//                $this->log_payment->info(
-//                    'Payment abort: ' . count($messages) > 1 ? json_encode($messages) : reset($messages)
-//                );
-//                $data = array(
-//                    'result' => false,
-//                    'response' => count($messages) > 1 ? $messages : reset($messages),
-//                );
-//                return Tools::jsonEncode($data);
-//            } elseif (!$payplug_payment->isValidPayment($payment)) {
-//                $this->log_payment->info('Payment abort: ' . $payment->failure->message);
-//                $data = array(
-//                    'result' => false,
-//                    'response' => $payment->failure->message,
-//                );
-//                return Tools::jsonEncode($data);
-//            }
-//        } catch (Exception $e) {
-//            $messages = $this->catchErrorsFromApi($e->__toString());
-//            $this->log_payment->info(
-//                'Payment abort: ' . count($messages) > 1 ? json_encode($messages) : reset($messages)
-//            );
-//            $data = array(
-//                'result' => false,
-//                'response' => count($messages) > 1 ? $messages : reset($messages),
-//            );
-//            return Tools::jsonEncode($data);
-//        }
-//
-//        $payplug_payment->register($payment->id);
-//
-//        switch ($payplug_payment->type) {
-//            case 'oneclick' :
-//                $redirect = $payment->is_paid;
-//                if (!$redirect && $deferred) {
-//                    $redirect = (bool)$payment->authorization->authorized_at;
-//                }
-//                $data = array(
-//                    'result' => true,
-//                    'embedded' => true,
-//                    'redirect' => $redirect, // force `true` we are in 3DS 1
-//                    'return_url' => $redirect ?
-//                        $payplug_payment->payment_url['return'] : $payment->hosted_payment->payment_url,
-//                );
-//                break;
-//            case 'oney' :
-//                $data = array(
-//                    'result' => 'new_card',
-//                    'embedded' => false,
-//                    'redirect' => true,
-//                    'return_url' => $payment->hosted_payment->payment_url,
-//                );
-//                break;
-//            case 'standard' :
-//            case 'installment' :
-//            default:
-//                $data = array(
-//                    'result' => 'new_card',
-//                    'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
-//                    'redirect' => false,
-//                    'return_url' => $payment->hosted_payment->payment_url,
-//                );
-//                break;
-//        }
-//
-////        $this->log_payment->info('Payment valided');
-//
-//        return Tools::jsonEncode($data);
-//    }
 
     /**
      * check if a payment for the same id cart is pending

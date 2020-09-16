@@ -55,7 +55,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             'is_oney' => $is_oney
         ];
         $payment_data = $payplug->preparePayment($options,$id_payplug_card);
-//        $payment_data = $payplug->preparePayment16($id_payplug_card);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';

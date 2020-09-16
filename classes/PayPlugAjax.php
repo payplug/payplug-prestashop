@@ -39,7 +39,6 @@ class PayPlugAjax
             $context = Context::getContext();
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
-                    // _ajax=1&pc=new_card&pay=1&cart=50&i=1
                     $is_installment = Tools::getValue('i');
                     $is_installment = (isset($is_installment)) && (Tools::getValue('i') == 1);
                     $is_deferred = $payplug->getConfiguration('PAYPLUG_DEFERRED') == 1;
@@ -48,7 +47,6 @@ class PayPlugAjax
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred
                     ];
-//                    $payment = $payplug->preparePayment16(Tools::getValue('pc'));
                     $payment = $payplug->preparePayment($options,Tools::getValue('pc'));
                     if(is_array($payment))
                     {
