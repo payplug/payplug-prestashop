@@ -5672,28 +5672,15 @@ class Payplug extends PaymentModule
 
             //____-----> ..:::> ONEY 1.6 <:::.. <-----_____
             if (version_compare(_PS_VERSION_, '1.7', '<')) {
+
                 if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+
                     if ($oney_type = Tools::getValue('io')) {
                         // todo: set var in method PayPlugPaymentOney
                         $oneyOptions['oney_type'] = $oney_type;
                         $oneyOptions['oney_form'] = Tools::getValue('form');
                     }
 
-                    $payplug_method_name = $this->getCurrentPaymentMethod($id_card); // PayPlugPaymentOney
-                    $payplug_payment = new $payplug_method_name($id_card, $oneyOptions);
-
-                    $result = $payplug_payment->create();
-                    $payment = $result['resource'];
-
-                    $payplug_payment->register($payment->id);
-
-                    $oneyData = array(
-                        'result' => 'new_card',
-                        'embedded' => false,
-                        'redirect' => true,
-                        'return_url' => $payment->hosted_payment->payment_url,
-                    );
-                    return Tools::jsonEncode($oneyData);
                 } else {
                     $payment_tab = $this->getPaymentDataCookie();
 
@@ -5716,10 +5703,10 @@ class Payplug extends PaymentModule
                             $oneyOptions['oney_type'] = 'x' . $io . '_with_fees';
                         }
                     }
+                }
 
-                    $payplug_method_name = $this->getCurrentPaymentMethod($id_card); // PayPlugPaymentOney
+                    $payplug_method_name = $this->getCurrentPaymentMethod($id_card);
                     $payplug_payment = new $payplug_method_name($id_card, $oneyOptions);
-
 
                     $result = $payplug_payment->create();
                     $payment = $result['resource'];
@@ -5732,7 +5719,6 @@ class Payplug extends PaymentModule
                         'return_url' => $payment->hosted_payment->payment_url,
                     );
                     return Tools::jsonEncode($oneyData);
-                }
             }
             //end ONEY 1.6
 
