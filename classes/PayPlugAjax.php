@@ -50,7 +50,6 @@ class PayPlugAjax
                         'is_deferred' => $is_deferred,
                         'is_oney' => $is_oney
                     ];
-//                    $payment = $payplug->preparePayment16(Tools::getValue('pc'));
                     $payment = $payplug->preparePayment($options,Tools::getValue('pc'));
                     if(is_array($payment))
                     {
