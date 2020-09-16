@@ -43,7 +43,19 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
         $id_payplug_card = Tools::getValue('pc', null);
 
-        $payment_data = $payplug->preparePayment16($id_payplug_card);
+        $type = Tools::getValue('type', null);
+        $io = Tools::getValue('io', null);
+        $is_oney = null;
+        if ((isset($type)) && ($type == 'oney')) {
+            if (isset($io)) {
+                $is_oney = 'x'.$io.'_with_fees';
+            }
+        }
+        $options = [
+            'is_oney' => $is_oney
+        ];
+        $payment_data = $payplug->preparePayment($options,$id_payplug_card);
+//        $payment_data = $payplug->preparePayment16($id_payplug_card);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
