@@ -42,11 +42,15 @@ class PayPlugAjax
                     $is_installment = Tools::getValue('i');
                     $is_installment = (isset($is_installment)) && (Tools::getValue('i') == 1);
                     $is_deferred = $payplug->getConfiguration('PAYPLUG_DEFERRED') == 1;
+                    $is_oney = Tools::getValue('io');
+                    $is_oney = isset($is_oney);
                     $options = [
                         'id_card' => Tools::getValue('pc'),
                         'is_installment' => $is_installment,
-                        'is_deferred' => $is_deferred
+                        'is_deferred' => $is_deferred,
+                        'is_oney' => $is_oney
                     ];
+//                    $payment = $payplug->preparePayment16(Tools::getValue('pc'));
                     $payment = $payplug->preparePayment($options,Tools::getValue('pc'));
                     if(is_array($payment))
                     {
