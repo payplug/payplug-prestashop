@@ -5458,12 +5458,6 @@ class Payplug extends PaymentModule
             ];
         }
 
-        $deferred = $this->getConfiguration('PAYPLUG_DEFERRED');
-        $options = array();
-
-        if ($deferred) {
-            $options['deferred'] = true;
-        }
 
         // get the config
         $config = [

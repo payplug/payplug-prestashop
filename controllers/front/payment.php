@@ -52,8 +52,10 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             }
         }
         $options = [
-            'is_oney' => $is_oney
+            'is_oney' => $is_oney,
+            '_ajax' => 1
         ];
+
         $payment_data = $payplug->preparePayment($options,$id_payplug_card);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
