@@ -13,13 +13,6 @@ class PrestashopSpecific17
         $this->payplug = $payplug;
     }
 
-    public function hookCustomerAccount()
-    {
-        // Don't remove this empty function
-        // because : $this->PrestashopSpecificObject->hookCustomerAccount();
-    }
-
-
     public function hookHeader()
     {
         $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');

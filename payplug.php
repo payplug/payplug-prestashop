@@ -4124,8 +4124,9 @@ class Payplug extends PaymentModule
 
         $payplug_cards_url = $this->context->link->getModuleLink($this->name, 'cards', array('process' => 'cardlist'), true);
 
-        if (class_exists($this->PrestashopSpecificClass)) {
-            $this->PrestashopSpecificObject->hookCustomerAccount();
+        if  ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'hookCustomerAccount()'))) {
+                $this->PrestashopSpecificObject->hookCustomerAccount();
         }
 
         $this->smarty->assign(array(
@@ -4222,7 +4223,8 @@ class Payplug extends PaymentModule
             Media::addJsDef(['payment_errors' => true]);
         }
 
-        if (class_exists($this->PrestashopSpecificClass)) {
+        if  ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'hookHeader()'))) {
             $this->PrestashopSpecificObject->hookHeader();
         }
 
