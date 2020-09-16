@@ -5671,8 +5671,6 @@ class Payplug extends PaymentModule
             }
 
             //____-----> ..:::> ONEY 1.6 <:::.. <-----_____
-            if (version_compare(_PS_VERSION_, '1.7', '<')) {
-
                 if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
 
                     if ($oney_type = Tools::getValue('io')) {
@@ -5681,30 +5679,30 @@ class Payplug extends PaymentModule
                         $oneyOptions['oney_form'] = Tools::getValue('form');
                     }
 
-                } else {
+                } elseif (isset($options['_ajax'])) {
                     $payment_tab = $this->getPaymentDataCookie();
-
-                    if (!empty($payment_tab)) {
-                        $oneyOptions['oney_form'] = $payment_tab['oney_form'];
-                    } else {
-                        $has_required_fields = $this->getOneyRequiredFields();
-                        if (!empty($has_required_fields)) {
-                            $this->setPaymentErrorsCookie(array('oney_required_field'));
-                            $data = array('result' => false, 'response' => false);
-                            return Tools::jsonEncode($data);
+                        if (!empty($payment_tab)) {
+                            $oneyOptions['oney_form'] = $payment_tab['oney_form'];
+                        } else {
+                            $has_required_fields = $this->getOneyRequiredFields();
+                            if (!empty($has_required_fields)) {
+                                $this->setPaymentErrorsCookie(array('oney_required_field'));
+                                $data = array('result' => false, 'response' => false);
+                                return Tools::jsonEncode($data);
+                            }
                         }
-                    }
 
-                    $type = Tools::getValue('type', null);
-                    $io = Tools::getValue('io', null);
-                    $oneyOptions['oney_type'] = null;
-                    if ((isset($type)) && ($type == 'oney')) {
-                        if (isset($io)) {
-                            $oneyOptions['oney_type'] = 'x' . $io . '_with_fees';
+                        $type = Tools::getValue('type', null);
+                        $io = Tools::getValue('io', null);
+                        $oneyOptions['oney_type'] = null;
+                        if ((isset($type)) && ($type == 'oney')) {
+                            if (isset($io)) {
+                                $oneyOptions['oney_type'] = 'x' . $io . '_with_fees';
+                            }
                         }
-                    }
                 }
 
+                if (isset($oneyOptions)) {
                     $payplug_method_name = $this->getCurrentPaymentMethod($id_card);
                     $payplug_payment = new $payplug_method_name($id_card, $oneyOptions);
 
@@ -5719,7 +5717,7 @@ class Payplug extends PaymentModule
                         'return_url' => $payment->hosted_payment->payment_url,
                     );
                     return Tools::jsonEncode($oneyData);
-            }
+                }
             //end ONEY 1.6
 
             // check billing phonenumber

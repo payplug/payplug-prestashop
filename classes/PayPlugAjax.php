@@ -48,7 +48,8 @@ class PayPlugAjax
                         'id_card' => Tools::getValue('pc'),
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
-                        'is_oney' => $is_oney
+                        'is_oney' => $is_oney,
+                        '_ajax' => 1
                     ];
                     $payment = $payplug->preparePayment($options,Tools::getValue('pc'));
                     if(is_array($payment))
