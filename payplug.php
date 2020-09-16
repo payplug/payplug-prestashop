@@ -5669,7 +5669,9 @@ class Payplug extends PaymentModule
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
             //____-----> 1.6 <-----_____
-            $payment_tab = $this->getPaymentDataCookie();
+            if (version_compare(_PS_VERSION_, '1.7', '<')) {
+
+                $payment_tab = $this->getPaymentDataCookie();
 
                 if (!empty($payment_tab)) {
                     $oneyOptions['oney_form'] = $payment_tab['oney_form'];
@@ -5682,31 +5684,31 @@ class Payplug extends PaymentModule
                     }
                 }
 
-            $type = Tools::getValue('type', null);
-            $io = Tools::getValue('io', null);
-            $oneyOptions['oney_type'] = null;
-            if ((isset($type)) && ($type == 'oney')) {
-                if (isset($io)) {
-                    $oneyOptions['oney_type'] = 'x'.$io.'_with_fees';
+                $type = Tools::getValue('type', null);
+                $io = Tools::getValue('io', null);
+                $oneyOptions['oney_type'] = null;
+                if ((isset($type)) && ($type == 'oney')) {
+                    if (isset($io)) {
+                        $oneyOptions['oney_type'] = 'x' . $io . '_with_fees';
+                    }
                 }
-            }
 
-            $payplug_method_name = $this->getCurrentPaymentMethod($id_card); // PayPlugPaymentOney
-            $payplug_payment = new $payplug_method_name($id_card, $oneyOptions);
+                $payplug_method_name = $this->getCurrentPaymentMethod($id_card); // PayPlugPaymentOney
+                $payplug_payment = new $payplug_method_name($id_card, $oneyOptions);
 
 
-            $result = $payplug_payment->create();
-            $payment = $result['resource'];
-            $payplug_payment->register($payment->id);
-var_dump($payplug_payment); exit;
+                $result = $payplug_payment->create();
+                $payment = $result['resource'];
+                $payplug_payment->register($payment->id);
 
-            $oneyData = array(
+                $oneyData = array(
                     'result' => 'new_card',
                     'embedded' => false,
                     'redirect' => true,
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
-//            return Tools::jsonEncode($oneyData);
+                return Tools::jsonEncode($oneyData);
+            }
             //end 1.6
 
             // check billing phonenumber
