@@ -3292,6 +3292,7 @@ class Payplug extends PaymentModule
             ),
         );
         $paymentOption['standard']['tpl'] = 'standard_payment.tpl';
+        $paymentOption['standard']['extra_classes'] = 'payplug default';
         $paymentOption['standard']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array('type' => 'standard'));
         $paymentOption['standard']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang) . '.png');
         $paymentOption['standard']['callToActionText'] = count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card');
@@ -4221,7 +4222,6 @@ class Payplug extends PaymentModule
         if (Tools::getValue('error')) {
             Media::addJsDef(['payment_errors' => true]);
         }
-
         if  ((class_exists($this->PrestashopSpecificClass))
             && (method_exists($this->PrestashopSpecificObject, 'hookHeader'))) {
             $this->PrestashopSpecificObject->hookHeader();
@@ -4241,7 +4241,7 @@ class Payplug extends PaymentModule
                 'is_deferred' => (bool)Tools::getValue('def'),
             ];
 
-            $payment = $this->preparePayment($payment_options);
+            $payment = $this->preparePayment($payment_options, 'new_card');
 
             if ($payment['result']) {
                 // If payment is paid then redirect
@@ -5664,6 +5664,7 @@ class Payplug extends PaymentModule
             }
 
             //____-----> ..:::> ONEY 1.6 <:::.. <-----_____
+
                 if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
 
                     if ($oney_type = Tools::getValue('io')) {
@@ -5810,6 +5811,7 @@ class Payplug extends PaymentModule
 
         $data = [
             'result' => $result,
+            'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
             'redirect' => false,
             'return_url' => $payment->hosted_payment->payment_url
         ];
