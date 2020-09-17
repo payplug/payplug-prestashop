@@ -4777,12 +4777,6 @@ class Payplug extends PaymentModule
      */
     public function installTab()
     {
-        $translationsAdminPayPlug = array(
-            'en' => 'PayPlug',
-            'fr' => 'PayPlug'
-        );
-        $flag = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
-
         $translationsAdminPayPlugInstallment = array(
             'en' => 'Installment Plans',
             'fr' => 'Paiements en plusieurs fois'
