@@ -37,7 +37,7 @@ class PrestashopSpecific16
     {
         $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
 
-        $this->smarty->assign(array(
+        $this->context->smarty->assign(array(
             'payplug_icon_url' => $payplug_icon_url
         ));
     }
