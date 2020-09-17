@@ -3417,16 +3417,19 @@ class Payplug extends PaymentModule
                 $split = (int)str_replace('x', '', $type[0]);
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
-                $tpl = 'oney_payment.tpl';
+                $oneyLogo = '3x4x.svg';
+                $oneyTpl = 'oney_payment.tpl';
                 if (!$optimized)
                 {
-                    $tpl = 'unified_payment.tpl';
+                    $oneyTpl = 'unified_payment.tpl';
+                    $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.png';
                 }
-                $paymentOption['oney_'.$oney_payment]['tpl'] = $tpl;
+
+                $paymentOption['oney_'.$oney_payment]['tpl'] = $oneyTpl;
 
                 $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('oney%sx', $split);
                 $paymentOption['oney_'.$oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
-                $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.png');
+                $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oneyLogo);
                 $paymentOption['oney_'.$oney_payment]['callToActionText'] = $label;
                 $paymentOption['oney_'.$oney_payment]['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array(), true);
                 $paymentOption['oney_'.$oney_payment]['moduleName'] = 'payplug';
@@ -4777,6 +4780,12 @@ class Payplug extends PaymentModule
      */
     public function installTab()
     {
+        $translationsAdminPayPlug = array(
+            'en' => 'PayPlug',
+            'fr' => 'PayPlug'
+        );
+        $flag = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
+
         $translationsAdminPayPlugInstallment = array(
             'en' => 'Installment Plans',
             'fr' => 'Paiements en plusieurs fois'

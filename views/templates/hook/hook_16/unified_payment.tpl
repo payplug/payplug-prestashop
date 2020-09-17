@@ -26,7 +26,7 @@
         <p class="payment_module">
             <a href="{$payplug_payment_option.payment_url|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">
                 <img class="payment_option_oney_3_4" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}"/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {$payplug_payment_option.label|escape:'html'}
             </a>
         </p>
