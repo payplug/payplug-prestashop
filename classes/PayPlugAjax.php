@@ -43,7 +43,6 @@ class PayPlugAjax
                     $is_installment = (isset($is_installment)) && (Tools::getValue('i') == 1);
                     $is_deferred = $payplug->getConfiguration('PAYPLUG_DEFERRED') == 1;
                     $is_oney = Tools::getValue('io');
-                    $is_oney = isset($is_oney);
                     $options = [
                         'id_card' => Tools::getValue('pc'),
                         'is_installment' => $is_installment,

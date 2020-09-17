@@ -129,7 +129,8 @@ class PrestashopSpecific16
                         continue;
                 } else {
                     /*var_dump($payment_option['tpl']); :
-                    standard_payment.tpl
+                    one_click_payment.tpl (oneClick activé)
+                    standard_payment.tpl (oneClick désactivé)
                     installment_payment.tpl
                     oney_payment.tpl (Oney optimisé)
                     unified_payment.tpl (Oney non optimisé)
