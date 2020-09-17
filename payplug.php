@@ -6122,11 +6122,14 @@ class Payplug extends PaymentModule
 
         // else get next card position
         $db = new DbQuery();
-        $db->select('COUNT(pc.id_payplug_card)');
+//        $db->select('COUNT(pc.id_payplug_card)');
+//        $db->from('payplug_card', 'pc');
+//        $db->where('pc.id_customer = ' . (int)$customer_id);
+//        $db->where('pc.id_company = ' . (int)$company_id);
+//        $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
+        $db->select('id_payplug_card');
         $db->from('payplug_card', 'pc');
         $db->where('pc.id_customer = ' . (int)$customer_id);
-        $db->where('pc.id_company = ' . (int)$company_id);
-        $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
         $card_index = Db::getInstance()->getValue($db);
 
         $card_index = (int)$card_index + 1;
