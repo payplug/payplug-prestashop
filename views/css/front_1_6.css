@@ -36,7 +36,7 @@
   }
 }
 p.payment_module a.payplug {
-  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
+  /*background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;*/
   padding-left: 240px;
   cursor: pointer;
 }
@@ -147,6 +147,12 @@ div.payplug-wrapper form div label div.info-wrapper {
 div.payplug-wrapper label[for=payplug_card_new] {
   /*padding: 10px 0 0 0;*/
 }
+
+.payment_option_standard_payment_logo {
+  position: absolute;
+  left: 12px;
+}
+
 .payplug_expiry_date {
   display: block;
   font-size: 0.8em;

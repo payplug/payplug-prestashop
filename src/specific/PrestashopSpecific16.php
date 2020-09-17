@@ -128,12 +128,18 @@ class PrestashopSpecific16
                     && ($payment_option['name'] == 'standard')) {
                         continue;
                 } else {
+                    /*var_dump($payment_option['tpl']); :
+                    standard_payment.tpl
+                    installment_payment.tpl
+                    oney_payment.tpl
+                    */
                     $paymentOptions[] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
+                        'mytest' => 'cool'
                     );
                 }
 
