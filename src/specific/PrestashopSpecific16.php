@@ -131,7 +131,8 @@ class PrestashopSpecific16
                     /*var_dump($payment_option['tpl']); :
                     standard_payment.tpl
                     installment_payment.tpl
-                    oney_payment.tpl
+                    oney_payment.tpl (Oney optimisé)
+                    unified_payment.tpl (Oney non optimisé)
                     */
                     $paymentOptions[] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
@@ -139,7 +140,6 @@ class PrestashopSpecific16
                         'logo_url' => $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
-                        'mytest' => 'cool'
                     );
                 }
 

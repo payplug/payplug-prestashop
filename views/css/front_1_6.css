@@ -53,7 +53,7 @@ p.payment_module a.payplug.installment_2.en {
   background-image: url('../img/logos_schemes_installment_2_en.png');
 }
 p.payment_module a.payplug.installment_3 {
-  background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
+  /*background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;*/
 }
 p.payment_module a.payplug.installment_3.it {
   background-image: url('../img/logos_schemes_installment_3_it.png');
@@ -148,9 +148,10 @@ div.payplug-wrapper label[for=payplug_card_new] {
   /*padding: 10px 0 0 0;*/
 }
 
-.payment_option_standard_payment_logo {
+.payment_option_standard_payment_logo, .payment_option_installment_3_logo, .payment_option_oney_3_4 {
   position: absolute;
-  left: 12px;
+  left: 15px;
+  /*min-width: 142px;*/
 }
 
 .payplug_expiry_date {
@@ -445,7 +446,7 @@ a.payplug.call.pphide {
   background-image: url(../img/oney/3x.svg);
 }
 .oneyLogo-x3x4 {
-  background-image: url(../img/oney/3x4x.svg);
+  /*background-image: url(../img/oney/3x4x.svg);*/
 }
 .oneyLogo-x4 {
   background-image: url(../img/oney/4x.svg);
@@ -1043,7 +1044,7 @@ ul.oneyPopin_navigation li.selected {
 .oneyPayment_logo {
   display: block;
   width: 165px;
-  height: 45px;
+  /*height: 45px;*/
   background-size: 110%;
   max-width: 100%;
   margin: 0 15px 0 0;

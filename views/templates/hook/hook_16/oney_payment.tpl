@@ -23,8 +23,9 @@
     <button href="javascript:void(0);" class="oneyPayment_trigger">
         <span class="oneyPayment_logo oneyLogo oneyLogo-x3x4"></span>
         <span class="oneyPayment_label">
-                    {l s='Pay by card in 3 or 4' mod='payplug'}
-{*            {$payplug_payment_option.label|escape:'html'}*}
+            <img class="payment_option_oney_3_4" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />
+{*            {l s='Pay by card in 3 or 4' mod='payplug'}*}
+            {$payplug_payment_option.label|escape:'html'}
             {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
                 </span>
     </button>
@@ -46,4 +47,14 @@
             </div>
         {/if}
     {/if}
+</div>
+{*<div class="row">*}
+{*    <div class="col-xs-12">*}
+{*        <p class="payment_module">*}
+{*            <a href="{$payplug_payment_option.payment_url|escape:'html'}" class="{$payplug_payment_option.extra_classes|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">*}
+{*                <img class="payment_option_oney_3_4" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />{$payplug_payment_option.label|escape:'html'}*}
+{*            </a>*}
+{*        </p>*}
+{*        <p class="ppfail ppfail-default"></p>*}
+{*    </div>*}
 </div>

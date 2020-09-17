@@ -45,7 +45,7 @@ p.payment_module a.payplug.installment_2.en {
 }
 
 p.payment_module a.payplug.installment_3 {
-  background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
+  //background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
 }
 
 p.payment_module a.payplug.installment_3.it {
@@ -158,9 +158,10 @@ div.payplug-wrapper label[for=payplug_card_new] {
   /*padding: 10px 0 0 0;*/
 }
 
-.payment_option_standard_payment_logo {
+.payment_option_standard_payment_logo, .payment_option_installment_3_logo, .payment_option_oney_3_4 {
   position: absolute;
-  left: 12px;
+  left: 15px;
+  //min-width: 142px;
 }
 
 .payplug_expiry_date {
@@ -468,7 +469,7 @@ a.payplug.call.pphide {
       background-image: url(~"@{img_oney}3x.svg");
 
       &x4 {
-        background-image: url(~"@{img_oney}3x4x.svg");
+        //background-image: url(~"@{img_oney}3x4x.svg");
       }
     }
 
