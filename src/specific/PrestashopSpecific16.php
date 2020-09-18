@@ -160,4 +160,13 @@ class PrestashopSpecific16
 
         return $paymentOptions;
     }
+
+    public function getPaymentOption()
+    {
+        return [
+            'oneyLogo' => '3x4x.svg',
+            'oneyCallToActionText' => 'Pay by card in 3 or 4'
+        ];
+    }
+
 }

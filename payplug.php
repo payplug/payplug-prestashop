@@ -71,6 +71,11 @@ class Payplug extends PaymentModule
 
     private $PrestashopSpecificObject;
 
+    /**
+     * @var To inject logo_url in oney_payment.tpl
+     */
+    private $oneyLogoUrl;
+
     /** @var string */
     private $api_live;
 
@@ -3416,18 +3421,23 @@ class Payplug extends PaymentModule
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
 
-                $oneyLogo = '3x4x.svg';
-                $oneyTpl = 'oney_payment.tpl';
-                $oneyCallToActionText = 'Pay by card in 3 or 4';
-                if (!$optimized)
+                $oneyTpl = 'unified_payment.tpl';
+                $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.png';
+                $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
+
+                if ($optimized)
                 {
-                    $oneyTpl = 'unified_payment.tpl';
-                    $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.png';
-                    $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
+                    $oneyTpl = 'oney_payment.tpl';
+
+                    if  ((class_exists($this->PrestashopSpecificClass))
+                        && (method_exists($this->PrestashopSpecificObject, 'getPaymentOption'))) {
+                            $oneyData = $this->PrestashopSpecificObject->getPaymentOption();
+                            $oneyLogo = $oneyData['oneyLogo'];
+                            $oneyCallToActionText = $oneyData['oneyCallToActionText'];
+                    }
                 }
 
                 $paymentOption['oney_'.$oney_payment]['tpl'] = $oneyTpl;
-
                 $paymentOption['oney_'.$oney_payment]['extra_classes'] = sprintf('oney%sx', $split);
                 $paymentOption['oney_'.$oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
                 $paymentOption['oney_'.$oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oneyLogo);
@@ -6884,6 +6894,14 @@ class Payplug extends PaymentModule
 
         $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $cart); // Transforme tableau en TPL
 
+            foreach ($paymentOptions as $paymentOption)
+            {
+                $find = 'oney';
+                if (strstr($paymentOption['tpl'],$find)) {
+                    $this->oneyLogoUrl = $paymentOption['logo_url'];
+                }
+            }
+
         $this->smarty->assign(array(
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => PayplugBackward::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
@@ -7033,7 +7051,7 @@ class Payplug extends PaymentModule
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_allowed' => $is_elligible['result'],
             'payplug_oney_error' => $is_elligible['error'],
-            'payplug_oney_loading_msg' => $this->l('Loading')
+            'payplug_oney_loading_msg' => $this->l('Loading'),
         ));
     }
 
@@ -7235,12 +7253,12 @@ class Payplug extends PaymentModule
      */
     public function displayOneyPaymentOptions()
     {
-
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->smarty->assign(array(
                 'payplug_module_dir' => _PS_MODULE_DIR_,
                 'payplug_oney_loading_msg' => $this->l('Loading'),
-                'oney_required_fields' => $this->displayOneyRequiredFields()
+                'oney_required_fields' => $this->displayOneyRequiredFields(),
+                'oneyLogo' => $this->oneyLogoUrl
             ));
 
             return $this->display(__FILE__, 'oney_payment.tpl');

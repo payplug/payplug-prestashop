@@ -50,13 +50,3 @@
         {/if}
     {/if}
 </div>
-{*<div class="row">*}
-{*    <div class="col-xs-12">*}
-{*        <p class="payment_module">*}
-{*            <a href="{$payplug_payment_option.payment_url|escape:'html'}" class="{$payplug_payment_option.extra_classes|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">*}
-{*                <img class="payment_option_oney_3_4" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />{$payplug_payment_option.label|escape:'html'}*}
-{*            </a>*}
-{*        </p>*}
-{*        <p class="ppfail ppfail-default"></p>*}
-{*    </div>*}
-</div>
