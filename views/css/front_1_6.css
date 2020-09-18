@@ -446,7 +446,7 @@ a.payplug.call.pphide {
   background-image: url(../img/oney/3x.svg);
 }
 .oneyLogo-x3x4 {
-  /*background-image: url(../img/oney/3x4x.svg);*/
+  background-image: url(../img/oney/3x4x.svg);
 }
 .oneyLogo-x4 {
   background-image: url(../img/oney/4x.svg);
@@ -954,7 +954,7 @@ ul.oneyPopin_navigation li.selected {
   position: relative;
   display: flex;
   width: 100%;
-  height: 73px;
+  height: 88px;
   align-items: center;
   border: none;
   background: none;
