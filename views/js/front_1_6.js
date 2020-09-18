@@ -66,6 +66,7 @@ var $document,
                     data.i = 1;
                 }
 
+
                 if (options['is_oney']) {
                     data.io = options['is_oney'];
                     if (options['oney_form']) {

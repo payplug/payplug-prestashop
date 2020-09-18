@@ -19,11 +19,14 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+{assign var=parse_3x_4x value="_"|explode:$payplug_payment_option.logo_url}
+{*{$parse_3x_4x[0]|substr:-1}*}
 <div class="row">
     <div class="col-xs-12">
         <p class="payment_module">
             <a href="{$payplug_payment_option.payment_url|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">
-                <img src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}"/>
+                <img class="payment_option_oney_3_4" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}"/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {$payplug_payment_option.label|escape:'html'}
             </a>
         </p>

@@ -36,7 +36,7 @@
   }
 }
 p.payment_module a.payplug {
-  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
+  /*background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;*/
   padding-left: 240px;
   cursor: pointer;
 }
@@ -53,7 +53,7 @@ p.payment_module a.payplug.installment_2.en {
   background-image: url('../img/logos_schemes_installment_2_en.png');
 }
 p.payment_module a.payplug.installment_3 {
-  background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
+  /*background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;*/
 }
 p.payment_module a.payplug.installment_3.it {
   background-image: url('../img/logos_schemes_installment_3_it.png');
@@ -147,6 +147,13 @@ div.payplug-wrapper form div label div.info-wrapper {
 div.payplug-wrapper label[for=payplug_card_new] {
   /*padding: 10px 0 0 0;*/
 }
+
+.payment_option_standard_payment_logo, .payment_option_installment_3_logo, .payment_option_oney_3_4 {
+  position: absolute;
+  left: 15px;
+  /*min-width: 142px;*/
+}
+
 .payplug_expiry_date {
   display: block;
   font-size: 0.8em;
@@ -955,7 +962,7 @@ ul.oneyPopin_navigation li.selected {
   color: #333;
   font-size: 17px;
   font-weight: bold;
-  padding: 0 15px;
+  padding: 0 95px;
   letter-spacing: -1px;
 }
 .oneyPayment-disabled .oneyPayment_trigger {
@@ -1013,9 +1020,9 @@ ul.oneyPopin_navigation li.selected {
   display: none;
 }
 .oneyPayment-mobile .oneyPayment_trigger {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  /*flex-direction: column;*/
+  /*align-items: flex-start;*/
+  justify-content: left;
 }
 .oneyPayment_label {
   display: flex;
@@ -1036,8 +1043,8 @@ ul.oneyPopin_navigation li.selected {
 }
 .oneyPayment_logo {
   display: block;
-  width: 165px;
-  height: 45px;
+  width: 100px;
+  /*height: 45px;*/
   background-size: 110%;
   max-width: 100%;
   margin: 0 15px 0 0;

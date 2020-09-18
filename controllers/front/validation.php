@@ -26,7 +26,8 @@
 use PayPlug\classes\MyLogPHP;
 
 //Inclusions
-require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
+require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
+//require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');

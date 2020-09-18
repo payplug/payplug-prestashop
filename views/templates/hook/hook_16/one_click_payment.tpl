@@ -27,6 +27,7 @@
                     <a href="{$payment_controller_url|escape:'htmlall':'UTF-8'}"
                        class="payplug{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}"
                        title="{l s='Credit card payment' mod='payplug'}">
+                        <img class="payment_option_standard_payment_logo" src="{$payplug_payment_option.logo_url|escape:'html'|replace:'none.png':'logos_schemes_default.png'}" alt="{$payplug_payment_option.label|escape:'html'}" />
                         {l s='Credit card checkout' mod='payplug'}
                     </a>
                 </p>
@@ -43,9 +44,11 @@
                                 <label for="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}">
                                     <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.png"/>
                                     <div class="info-wrapper">
-                                        <div>**** **** **** {$card.last4|escape:'htmlall':'UTF-8'}
-                                            ({if $card.brand == 'none'}{l s='Card' mod='payplug'}{else}{$card.brand|escape:'htmlall':'UTF-8'}{/if}
-                                            )
+                                        <div>
+{*                                            **** **** **** {$card.last4|escape:'htmlall':'UTF-8'}*}
+{*                                            ({if $card.brand == 'none'}{l s='Card' mod='payplug'}{else}{$card.brand|escape:'htmlall':'UTF-8'}{/if}*}
+{*                                            )*}
+                                            {$payplug_payment_option.label|escape:'html'}
                                         </div>
                                         <div class="payplug_expiry_date">{l s='Expiry date' mod='payplug'} {$card.expiry_date|escape:'htmlall':'UTF-8'}</div>
                                     </div>

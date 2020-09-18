@@ -25,7 +25,8 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        require_once(dirname(__FILE__) . './../../../../config/config.inc.php');
+        require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
+//        require_once(dirname(__FILE__) . './../../../../config/config.inc.php');
 
         /** Call init.php to initialize context */
         require_once(_PS_MODULE_DIR_ . '../init.php');
@@ -43,7 +44,20 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
         $id_payplug_card = Tools::getValue('pc', null);
 
-        $payment_data = $payplug->preparePayment($id_payplug_card);
+        $type = Tools::getValue('type', null);
+        $io = Tools::getValue('io', null);
+        $is_oney = null;
+        if ((isset($type)) && ($type == 'oney')) {
+            if (isset($io)) {
+                $is_oney = 'x'.$io.'_with_fees';
+            }
+        }
+        $options = [
+            'is_oney' => $is_oney,
+            '_ajax' => 1
+        ];
+
+        $payment_data = $payplug->preparePayment($options,$id_payplug_card);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
