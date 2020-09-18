@@ -4792,6 +4792,11 @@ class Payplug extends PaymentModule
      */
     public function installTab()
     {
+        if  ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'installTab'))) {
+                return $this->PrestashopSpecificObject->installTab();
+        }
+
         $translationsAdminPayPlug = array(
             'en' => 'PayPlug',
             'fr' => 'PayPlug'
@@ -6769,6 +6774,10 @@ class Payplug extends PaymentModule
      */
     public function uninstallTab()
     {
+        if  ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'uninstallTab'))) {
+            return $this->PrestashopSpecificObject->uninstallTab();
+        }
         return ($this->uninstallModuleTab('AdminPayPlug') && $this->uninstallModuleTab('AdminPayPlugInstallment'));
     }
 
