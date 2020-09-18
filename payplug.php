@@ -3960,7 +3960,7 @@ class Payplug extends PaymentModule
             $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
 //            $sandbox = ((int)$payment->is_live == 1 ? false : true);
 //            $state_addons = ($sandbox ? '' : '_TEST');
-            $state_addons = ((bool)Configuration::get('PAYPLUG_SANDBOX_MODE') ? '_TEST' : '');
+            $state_addons = (!$payment->is_live ? '_TEST' : '');
 
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
             $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
