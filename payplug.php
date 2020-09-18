@@ -5679,6 +5679,26 @@ class Payplug extends PaymentModule
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
+        // Before creating payment check is order already paid
+        if ($is_one_click) {
+            $pay_id = getPaymentByCart($id_card);
+
+            // if exists then check if payment is paid
+            if ($pay_id) {
+                $payment = $this->retrievePayment($pay_id);
+
+                // if payment already pay then return on validation url
+                if ($payment->is_paid) {
+                    return [
+                        'result' => true,
+                        'redirect' => true,
+                        'return_url' => $payment_tab['hosted_payment']['return_url']
+                    ];
+                }
+            }
+        }
+
+
         // Create payment
         try {
             if ($is_installment) {
