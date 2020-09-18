@@ -169,4 +169,21 @@ class PrestashopSpecific16
         ];
     }
 
+    public function installTab()
+    {
+        $translationsAdminPayPlugInstallment = array(
+            'en' => 'Installment Plans',
+            'fr' => 'Paiements en plusieurs fois'
+        );
+
+        $flag = $this->payplug->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, 0);
+
+        return $flag;
+    }
+
+    public function uninstallTab()
+    {
+        return ($this->payplug->uninstallModuleTab('AdminPayPlugInstallment'));
+    }
+
 }
