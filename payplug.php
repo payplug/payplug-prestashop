@@ -4173,10 +4173,8 @@ class Payplug extends PaymentModule
             $payment = $this->preparePayment($payment_options);
 
             if ($payment['result']) {
-                $redirect = $payment['redirect'];
-
                 // If payment is paid then redirect
-                if ($redirect) {
+                if ($payment['redirect']) {
                     Tools::redirect($payment['return_url']);
                 } // else show the popin
                 else {
@@ -5439,10 +5437,15 @@ class Payplug extends PaymentModule
         $is_installment = $is_installment && $config['installment'];
 
         // defined which is current payment method
-        $payment_method = $is_one_click ? 'oneclick' :
-            ($is_oney ? 'oney' :
-                ($is_installment ? 'installment' : 'standard')
-            );
+        if($is_one_click) {
+            $payment_method = 'oneclick';
+        } elseif($is_oney) {
+            $payment_method = 'oney';
+        } elseif($is_installment) {
+            $payment_method = 'installment';
+        } else {
+            $payment_method = 'standard';
+        }
 
         // Build payment Tab
 
