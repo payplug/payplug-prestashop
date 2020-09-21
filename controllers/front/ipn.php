@@ -89,9 +89,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         try {
             $resource = json_decode($body);
-            $api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
-            $authentication = $this->payplug->setSecretKey($api_key);
-            $this->logger->addLog('set api key: ' . $api_key);
+            $this->api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
+            $authentication = $this->payplug->setSecretKey($this->api_key);
+            $this->logger->addLog('set api key: ' . $this->api_key);
             $this->resource = \Payplug\Notification::treat($body, $authentication);
             $this->logger->addLog('resource id: ' . $this->resource->id);
         } catch (Exception $exception) {
@@ -805,11 +805,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                             try {
-                                $api_key = Payplug::setAPIKey();
                                 $data = array();
                                 $data['metadata'] = $meta;
                                 $data['metadata']['Order'] = $order->id;
-                                $this->payplug->patchPayment($api_key, $payment->id, $data);
+                                $this->payplug->patchPayment($this->api_key, $payment->id, $data);
                                 $this->logger->addLog('Payment patched');
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
