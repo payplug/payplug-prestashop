@@ -5713,8 +5713,7 @@ class Payplug extends PaymentModule
                     $has_required_fields = $this->getOneyRequiredFields();
                     if (!empty($has_required_fields)) {
                         $this->setPaymentErrorsCookie(array('oney_required_field'));
-                        $data = array('result' => false, 'response' => false);
-                        return Tools::jsonEncode($data);
+                        return ['result' => false, 'response' => false];
                     }
                 }
 
@@ -5742,7 +5741,8 @@ class Payplug extends PaymentModule
                     'redirect' => true,
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
-                return Tools::jsonEncode($oneyData);
+
+                return $oneyData;
             }
             //end ONEY 1.6
 
@@ -5824,11 +5824,6 @@ class Payplug extends PaymentModule
             ];
         }
 
-        $return_json = false;
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $return_json = true;
-        }
-
         switch ($payment_method) {
             case 'oneclick' :
                 $redirect = $payment->is_paid;
@@ -5860,7 +5855,7 @@ class Payplug extends PaymentModule
                 break;
         }
 
-        return $return_json ? Tools::jsonEncode($payment_return) : $payment_return;
+        return $payment_return;
     }
 
     /**
