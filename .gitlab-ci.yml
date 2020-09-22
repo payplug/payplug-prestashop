@@ -1,6 +1,6 @@
 stages:
   - tests
-    - build
+  - build
 
 unit tests:
   image: composer:1.9
