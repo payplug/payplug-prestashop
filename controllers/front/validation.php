@@ -334,7 +334,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
                 $module_name = $this->payplug->displayName;
-                if ($is_oney) {
+                if ((isset($is_oney)) && $is_oney) {
                     switch ($payment->payment_method['type']) {
                         case 'oney_x3_with_fees' :
                         case 'oney_x3_without_fees' :
