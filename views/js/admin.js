@@ -705,42 +705,9 @@ var $document, $window, payplug = {
             var {oney} = payplug,
                 {identifier, switcher} = oney.props;
 
-            $document.on('switchSelected', 'input[name=' + switcher + ']', oney.carrier)
-                .on('change', '.' + identifier + ' select', oney.carrier)
-                .on('keyup', '.' + identifier + ' input[type="number"]', oney.check);
+            $document.on('keyup', '.' + identifier + ' input[type="number"]', oney.check);
 
             $('input[name=' + switcher + ']').trigger('switchSelected');
-        },
-        carrier: function () {
-            var {oney} = payplug,
-                {identifier, switcher} = oney.props;
-            var active = parseInt($('input[name=' + switcher + ']:checked').val());
-
-            if (active) {
-                $('.' + payplug.config.props.identifier + '_item-oney').hide();
-                var $carriers = $('.' + identifier).find('select'),
-                    configured = true,
-                    valid = true,
-                    disable_types = [];
-
-                $carriers.each(function () {
-                    var value = $(this).val();
-                    configured = configured && value;
-                    valid = valid && !disable_types.includes(value);
-                });
-
-                if (configured) {
-                    if (valid) {
-                        $('.' + payplug.config.props.identifier + '_item-oney.' + payplug.config.props.identifier + '_item-success').css({'display': 'flex'});
-                    } else {
-                        $('.' + payplug.config.props.identifier + '_item-oney.' + payplug.config.props.identifier + '_item-warning').css({'display': 'flex'});
-                    }
-                } else {
-                    $('.' + payplug.config.props.identifier + '_item-oney.' + payplug.config.props.identifier + '_item-error').css({'display': 'flex'});
-                }
-            } else {
-                $('.' + payplug.config.props.identifier + '_item-oney').hide();
-            }
         },
         check: function () {
             var {oney} = payplug,
