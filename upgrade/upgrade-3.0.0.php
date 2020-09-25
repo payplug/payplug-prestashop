@@ -27,16 +27,26 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_0_0($object)
 {
-    //sql
-    $req_payplug_payment_cart = '
+    $flag = true;
+
+    // install payplug payment cart
+    $sql = '
         ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
         ADD COLUMN `date_upd` DATETIME NULL
         AFTER `is_pending`';
-    try {
-        $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
-    } catch (PrestaShopDatabaseException $e) {
-        return true;
-    }
+    $flag = $flag && Db::getInstance()->execute($sql);
+
+    // install table `payplug_logger`
+    $sql = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
+            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `process` VARCHAR(255) NOT NULL,
+            `content` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+    $flag = $flag && Db::getInstance()->execute($sql);
 
     /*
      * Voir PayPlugCard : Auto Increment sur id_payplug_card (différent 1.6 1.7)
@@ -50,5 +60,5 @@ function upgrade_module_3_0_0($object)
      * installOneyHook : rajouter displayBeforeShoppingCartBlock
      */
 
-    return $res_payplug_payment_cart;
+    return $flag;
 }

@@ -52,6 +52,7 @@ class ComposerStaticInit41d1eee5399c0a3712f65a673ae5e665
         'Giggsey\\Locale\\Locale' => __DIR__ . '/..' . '/giggsey/locale/src/Locale.php',
         'PayPlug\\backward\\PayPlugBackward' => __DIR__ . '/../..' . '/backward/PayPlugBackward.php',
         'PayPlug\\classes\\MyLogPHP' => __DIR__ . '/../..' . '/classes/MyLogPHP.class.php',
+        'PayPlug\\classes\\PayPlugLogger' => __DIR__ . '/../..' . '/classes/PayPlugLogger.php',
         'PayPlug\\src\\entities\\ConfigurationEntity' => __DIR__ . '/../..' . '/src/entities/ConfigurationEntity.php',
         'PayPlug\\src\\entities\\LoggerEntity' => __DIR__ . '/../..' . '/src/entities/LoggerEntity.php',
         'PayPlug\\src\\entities\\PluginEntity' => __DIR__ . '/../..' . '/src/entities/PluginEntity.php',
