@@ -3334,7 +3334,6 @@ class Payplug extends PaymentModule
 //            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
             $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment', array('type' => 'installment', 'i' => 1), true);
             $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
-            $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
             $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
             $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
             $paymentOption['installment']['moduleName'] = 'payplug';
@@ -5441,9 +5440,6 @@ class Payplug extends PaymentModule
      * @param string $id_card
      * @return mixed
      */
-    // PS 1.6 : preparePayment($id_card = null)
-    // PS 1.7 : preparePayment($options)
-    // Réunif : preparePayment($options, $id_card = null) --> Pour les functions PS 1.6, mettre null en 1er paramètre, par ex. : $payment = $payplug->preparePayment(null,Tools::getValue('pc'));
     public function preparePayment($options, $id_card = null)
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
