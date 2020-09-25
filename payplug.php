@@ -33,6 +33,8 @@ require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.ph
 @include_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCard.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugLogger.php');
+
 
 /*
 use libphonenumber\NumberParseException;
@@ -65,7 +67,7 @@ class Payplug extends PaymentModule
 
     private $paymentOption;
 
-    private $logger;
+//    private $logger;
 
     private $PrestashopSpecificClass;
 
@@ -251,6 +253,9 @@ class Payplug extends PaymentModule
         ),
     );
 
+    /** @var object */
+    public $logger;
+
     /**
      * Constructor
      *
@@ -276,7 +281,6 @@ class Payplug extends PaymentModule
 
         $this->setLoggers();
         $this->loadEntities();
-
 
         parent::__construct();
         $this->setEnvironment();
@@ -4779,6 +4783,22 @@ class Payplug extends PaymentModule
             return false;
         }
 
+        // install table `payplug_logger`
+        $req_payplug_logger = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
+            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `process` VARCHAR(255) NOT NULL,
+            `content` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+        $res_payplug_logger = Db::getInstance()->execute($req_payplug_logger);
+
+        if (!$res_payplug_logger) {
+            $log->error('Installation SQL failed: PAYPLUG_LOGGER.');
+            return false;
+        }
 
         $log->info('Installation SQL ended.');
         return true;
@@ -6307,6 +6327,11 @@ class Payplug extends PaymentModule
     {
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $this->logger = new Payplug\classes\PayPlugLogger('payplug');
+
+        if ($this->active) {
+            $this->logger->flush();
+        }
     }
 
     /**
@@ -6753,15 +6778,14 @@ class Payplug extends PaymentModule
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_payment_cart`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_logger`';
 
         foreach ($queries as $query) {
             $flag = $flag && Db::getInstance()->execute($query);
         }
 
-        return $flag;
-
         $log->info('Uninstallation SQL ended.');
-        return true;
+        return $flag;
     }
 
     /**
