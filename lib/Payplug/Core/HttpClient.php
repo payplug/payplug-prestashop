@@ -305,6 +305,7 @@ class HttpClient
      */
     private function throwRequestException($httpResponse, $httpStatus)
     {
+        var_dump($httpResponse, $httpStatus);
         $exception = null;
 
         // Error 5XX

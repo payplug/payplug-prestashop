@@ -22,6 +22,9 @@
  */
 
 //Inclusions
+use PayPlug\classes\PayPlugLogger;
+use Payplug\Notification;
+
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 //require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
@@ -86,15 +89,30 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     private function getResource()
     {
-        $body = Tools::file_get_contents('php://input');
+//        $body = Tools::file_get_contents('php://input');
+
+        // (from Kibana) : start processing notification.
+        $body = '{"key": "notifier.notification.start_processing", "body": {"id_request": 878522, "id_attempt": 823081, "id_user": 315198, "back_notification_url": "http://apipayment.svc.qa.infra.payplug.eu/notifier/ipn/878522", "asked_date": "2020-09-27T19:57:16.109171", "include_signature_header": false, "ipn_url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/ipn", "ipn_data": {"id": "pay_7cPQ5UghuSkRRiEkPkD67C", "object": "payment", "is_live": true, "amount": 3446, "amount_refunded": 0, "currency": "EUR", "created_at": 1601236631, "description": null, "is_paid": true, "paid_at": 1601236636, "is_refunded": false, "is_3ds": false, "save_card": false, "card": {"last4": "0001", "country": "FR", "exp_year": 2022, "exp_month": 9, "brand": "CB", "id": null, "metadata": null}, "hosted_payment": {"payment_url": "https://secure-qa.payplug.com/pay/7cPQ5UghuSkRRiEkPkD67C", "return_url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/validation?ps=1&cartid=457", "cancel_url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/validation?ps=2&cartid=457", "paid_at": 1601236636, "sent_by": null}, "notification": {"url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/ipn", "response_code": null}, "metadata": {"ID Client": 40, "ID Cart": 457, "Website": "http://votresiteecommerce.com"}, "failure": null, "installment_plan_id": null, "authorization": null, "refundable_after": 1601236636, "refundable_until": 1616788636, "billing": {"title": null, "first_name": "PayPlug", "last_name": "Development", "address1": "77 rue la Bo\u00e9tie", "address2": null, "company_name": "PayPlug Development", "postcode": "75008", "city": "Paris", "state": null, "country": "FR", "email": "ctouma@payplug.com", "mobile_phone_number": null, "landline_phone_number": "+33667899297", "language": "fr"}, "shipping": {"title": null, "first_name": "PayPlug", "last_name": "Development", "address1": "77 rue la Bo\u00e9tie", "address2": null, "company_name": "PayPlug Development", "postcode": "75008", "city": "Paris", "state": null, "country": "FR", "email": "ctouma@payplug.com", "mobile_phone_number": null, "landline_phone_number": "+33667899297", "language": "fr", "delivery_type": "BILLING"}}, "env": "live"}, "retry_count": 0, "event": "start processing notification.", "level": "info", "logger": "payplug.notifier.processor.notification", "timestamp": "2020-09-27T19:57:16.112735Z", "task_id": "89908f4e-2971-4ad2-ad88-1bc6be587bc7"}';
+
+
+        // (from Kibana) : Starting processing back notification :
+//        $body = '{"body": {"_version": 2, "success": true, "exception": null, "response_status": 200, "response_content": "", "response_reason": "OK", "sent_date": "2020-09-27T20:02:19.846255", "original_body": {"id_request": 878522, "id_attempt": 823081, "id_user": 315198, "back_notification_url": "http://apipayment.svc.qa.infra.payplug.eu/notifier/ipn/878522", "asked_date": "2020-09-27T19:57:16.109171", "include_signature_header": false, "ipn_url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/ipn", "ipn_data": {"id": "pay_7cPQ5UghuSkRRiEkPkD67C", "object": "payment", "is_live": true, "amount": 3446, "amount_refunded": 0, "currency": "EUR", "created_at": 1601236631, "description": null, "is_paid": true, "paid_at": 1601236636, "is_refunded": false, "is_3ds": false, "save_card": false, "card": {"last4": "0001", "country": "FR", "exp_year": 2022, "exp_month": 9, "brand": "CB", "id": null, "metadata": null}, "hosted_payment": {"payment_url": "https://secure-qa.payplug.com/pay/7cPQ5UghuSkRRiEkPkD67C", "return_url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/validation?ps=1&cartid=457", "cancel_url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/validation?ps=2&cartid=457", "paid_at": 1601236636, "sent_by": null}, "notification": {"url": "http://votresiteecommerce.com/demo/prestashop_1.7.4.0/fr/module/payplug/ipn", "response_code": null}, "metadata": {"ID Client": 40, "ID Cart": 457, "Website": "http://votresiteecommerce.com"}, "failure": null, "installment_plan_id": null, "authorization": null, "refundable_after": 1601236636, "refundable_until": 1616788636, "billing": {"title": null, "first_name": "PayPlug", "last_name": "Development", "address1": "77 rue la Bo\u00e9tie", "address2": null, "company_name": "PayPlug Development", "postcode": "75008", "city": "Paris", "state": null, "country": "FR", "email": "ctouma@payplug.com", "mobile_phone_number": null, "landline_phone_number": "+33667899297", "language": "fr"}, "shipping": {"title": null, "first_name": "PayPlug", "last_name": "Development", "address1": "77 rue la Bo\u00e9tie", "address2": null, "company_name": "PayPlug Development", "postcode": "75008", "city": "Paris", "state": null, "country": "FR", "email": "ctouma@payplug.com", "mobile_phone_number": null, "landline_phone_number": "+33667899297", "language": "fr", "delivery_type": "BILLING"}}, "env": "live"}}, "event": "Starting processing back notification.", "level": "info", "logger": "payplug.notifier.processor.back_notification", "timestamp": "2020-09-27T20:02:19.849386Z", "task_id": "fcf317fa-ade9-40b7-96a5-2dac3c199164"}';
+
 
         try {
             $resource = json_decode($body);
-            $this->api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
-            $authentication = $this->payplug->setSecretKey($this->api_key);
-            $this->logger->addLog('set api key: ' . $this->api_key);
-            $this->resource = \Payplug\Notification::treat($body, $authentication);
-            $this->logger->addLog('resource id: ' . $this->resource->id);
+            $resource = ($resource->body);
+
+            $this->api_key = (bool)$resource->ipn_data->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
+
+            //              (from Kibana) : Starting processing back notification :
+            //              $this->api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
+
+            $authentication = $this->payplug->setSecretKey($this->api_key); var_dump('1');
+            $this->logger->addLog('set api key: ' . $this->api_key); var_dump('2');
+            $this->resource = Notification::treat($body, $authentication); var_dump('3');
+//            $this->resource = \Payplug\Notification::treat($body, $authentication);
+            $this->logger->addLog('resource id: ' . $this->resource->id); var_dump('4');
         } catch (Exception $exception) {
             $this->logger->addLog('An error occured while getting resource: ' . $exception->getMessage(), 'error');
             header(

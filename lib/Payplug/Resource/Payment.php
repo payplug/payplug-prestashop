@@ -272,10 +272,12 @@ class Payment extends APIResource implements IVerifiableAPIResource
      */
     function getConsistentResource(Payplug\Payplug $payplug = null)
     {
-        if (!array_key_exists('id', $this->_attributes)) {
+        if (!array_key_exists('id', $this->_attributes['body']['ipn_data'])) {
+//        if (!array_key_exists('id', $this->_attributes)) {
             throw new Payplug\Exception\UndefinedAttributeException('The id of the payment is not set.');
         }
 
-        return Payment::retrieve($this->_attributes['id'], $payplug);
+        return Payment::retrieve($this->_attributes['body']['ipn_data']['id'], $payplug);
+//        return Payment::retrieve($this->_attributes['id'], $payplug);
     }
 }
