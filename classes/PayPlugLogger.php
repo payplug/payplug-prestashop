@@ -63,7 +63,7 @@ class PayPlugLogger extends \ObjectModel
     );
 
     /** @var int */
-    private $limit_number = 500;
+    private $limit_number = 4000;
 
     /** @var string */
     private $limit_date = 'P1M';
