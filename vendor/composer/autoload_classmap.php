@@ -9,6 +9,7 @@ return array(
     'Giggsey\\Locale\\Locale' => $vendorDir . '/giggsey/locale/src/Locale.php',
     'PayPlug\\backward\\PayPlugBackward' => $baseDir . '/backward/PayPlugBackward.php',
     'PayPlug\\classes\\MyLogPHP' => $baseDir . '/classes/MyLogPHP.class.php',
+    'PayPlug\\classes\\PayPlugLogger' => $baseDir . '/classes/PayPlugLogger.php',
     'PayPlug\\src\\entities\\ConfigurationEntity' => $baseDir . '/src/entities/ConfigurationEntity.php',
     'PayPlug\\src\\entities\\LoggerEntity' => $baseDir . '/src/entities/LoggerEntity.php',
     'PayPlug\\src\\entities\\PluginEntity' => $baseDir . '/src/entities/PluginEntity.php',
