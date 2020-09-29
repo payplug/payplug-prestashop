@@ -2644,8 +2644,8 @@ class Payplug extends PaymentModule
 
         return [
             'delivery_label' => $carrier->name,
-            'expected_delivery_date' => date('Y-m-d'),
-            'delivery_type' => 'storepickup'
+            'expected_delivery_date' => date('Y-m-d', strtotime('+' . PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')),
+            'delivery_type' => PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE
         ];
 
         return $delivery_data;
