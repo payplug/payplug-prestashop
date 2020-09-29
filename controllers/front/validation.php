@@ -418,31 +418,18 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $data['metadata'] = $payment->metadata;
                         $data['metadata']['Order'] = $id_order;
                         $this->payplug->patchPayment($api_key, $payment->id, $data);
+
+                        if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
+                            $this->logger->addLog('Unable to create order payment.', 'error');
+                        }
                     } elseif ($this->type == 'installment') {
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
-                    }
-
-                    //
-                    if ($order_state == $oney_state) {
-                        $order_payments = OrderPayment::getByOrderReference($order->reference);
-                        if ($order_payments) {
-                            $order_payment = end($order_payments);
-                            if (!$order_payment->transaction_id) {
-                                $order_payment->transaction_id = $transaction_id;
-                                $order_payment->update();
-                            }
-                        } else {
-                            $order->addOrderPayment($order->total_paid, null, $transaction_id);
-                        }
                     }
                 }
 
                 $this->addLog('Checking number of order passed with this id_cart...', 'info');
-                $req_nb_orders = '
-            SELECT o.* 
-            FROM ' . _DB_PREFIX_ . 'orders o 
-            WHERE o.id_cart = ' . $cart->id;
-                $res_nb_orders = Db::getInstance()->executeS($req_nb_orders);
+                $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'orders WHERE id_cart = ' . $cart->id;
+                $res_nb_orders = Db::getInstance()->executeS($sql);
                 if (!$res_nb_orders) {
                     $this->addLog('No order can be found using id_cart ' . (int)$cart->id, 'error');
                     $cart_unlock = PayplugLock::deleteLockG2($cart->id);
@@ -463,8 +450,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
 
                 $this->addLog('Checking number of transaction validated for this order...', 'info');
-                $order = new Order((int)$id_order);
-                $payments = $order->getOrderPaymentCollection();
+                $payments = $this->payplug->getPayplugOrderPayments($order->id);
 
                 if (!$payments) {
                     $this->addLog('No transaction can be found using id_order ' . (int)$id_order,
@@ -484,8 +470,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
             }
 
-            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-            if (!$cart_unlock) {
+            if (!PayplugLock::deleteLockG2($cart->id)) {
                 $this->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->addLog('Lock deleted.', 'debug');
