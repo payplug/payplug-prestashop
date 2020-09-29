@@ -24,7 +24,7 @@
     <div class="panel-row">
         {if isset($check_configuration.warning) && !empty($check_configuration.warning) && sizeof($check_configuration.warning)}
             {foreach from = $check_configuration.warning item = warning}
-                <p class="payplugAlert payplugAlert-warning"><span>{$warning|escape:'quotes':'UTF-8'}</span></p>
+                <p class="payplugAlert payplugAlert-warning"><span>{$warning|escape:'htmlall':'UTF-8'}</span></p>
             {/foreach}
         {/if}
         <p>{l s='Version of PayPlug module:' mod='payplug'} {$pp_version|escape:'htmlall':'UTF-8'}</p>
@@ -38,10 +38,12 @@
                 <p class="payplugConfig_item payplugConfig_item-error"><span>{$error|escape:'htmlall':'UTF-8'}</span></p>
             {/foreach}
         {/if}
+        {if isset($check_configuration.other) && !empty($check_configuration.other) && sizeof($check_configuration.other)}
+            {foreach from = $check_configuration.other item = other}
+                <p class="payplugConfig_item payplugConfig_item-{$other.type|escape:'quotes':'UTF-8'}"><span>{$other.text|escape:'quotes':'UTF-8'}</span></p>
+            {/foreach}
+        {/if}
 
-        <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-error"><span>{l s='At least one of your shipping method isn’t configured for Oney.' mod='payplug'}</span></p>
-        <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-warning"><span>{l s='Your shipping methods configuration doesn’t allow to provide Oney' mod='payplug'}</span></p>
-        <p class="payplugConfig_item payplugConfig_item-oney payplugConfig_item-success"><span>{l s='Your shipping methods are configured for Oney.' mod='payplug'}</span></p>
 
         <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>

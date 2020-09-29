@@ -251,7 +251,7 @@
         border: none;
         position: absolute;
         top: 50%;
-        left: 2px;
+        left: calc(100% - 18px);
         content: "";
         background: #fff;
         display: block;
@@ -260,10 +260,10 @@
       }
 
       &.payplugSwitch-right {
-        background: #colorMap[error];
+        background: #colorMap[grey];
 
         &:before {
-          left: calc(100% - 18px);
+          left: 2px;
         }
       }
 
@@ -312,6 +312,10 @@
       padding: 0 8px 0 0;
       font-weight: 700;
       text-align: right;
+
+      .payplugInstallment_fieldset &{
+        width: 185px;
+      }
     }
 
     &_content {
@@ -395,10 +399,6 @@
           background-image: url(~"@{img_admin}icon-warn.png")
         }
       }
-
-      &-oney {
-        display: none;
-      }
     }
   }
 
@@ -448,6 +448,34 @@
     &_error {
       display: none;
       color: #colorMap[error];
+    }
+
+    &TOS {
+      display: flex;
+      width: 100%;
+      flex-wrap: wrap;
+
+      &_text {
+        p&{
+          margin: 0 8px 0 0;
+          line-height: 31px;
+        }
+      }
+      &_input {
+        margin: initial;
+        display: inline-block;
+        width: 250px;
+      }
+      &_error {
+        width: 100%;
+        display: none;
+        color: #dd2525;
+        padding: 0 0 0 10px;
+
+        &-show{
+          display: block;
+        }
+      }
     }
   }
 
