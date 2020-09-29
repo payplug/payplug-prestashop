@@ -55,6 +55,7 @@ if (!defined('_PS_VERSION_')) {
 require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCache.php');
 
 class Payplug extends PaymentModule
 {
@@ -113,6 +114,9 @@ class Payplug extends PaymentModule
 
     /** @var MyLogPHP */
     private $log_install;
+
+    /** @var PayPlugCache */
+    private $payplug_cache;
 
     /** @var array */
     public $payment_status = array();
@@ -288,6 +292,7 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
+        $this->initializeCache();
     }
 
     public function loadSpecificPrestaClasses()
@@ -3070,7 +3075,7 @@ class Payplug extends PaymentModule
      * @param int $amount
      * @param string $country
      * @param array $operation contain x3|4_with_fees or x3|4_without_fees
-     * @return bool
+     * @return array
      */
     public function getOneySimulations($amount, $country, $operation)
     {
@@ -3080,8 +3085,12 @@ class Payplug extends PaymentModule
             (string)implode('_', $operation) . '_' .
             (Configuration::get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
 
-        if (Cache::isStored($cache_id)) {
-            return Cache::retrieve($cache_id);
+        $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
+
+        // Checks if the current simulation is already saved in the database
+        // If not, we do a simulation for Oney, and we will store it to the DB
+        if (Validate::isLoadedObject($cache_from_bdd)) {
+            return Tools::jsonDecode($cache_from_bdd->cache_value, true);
         }
 
         try {
@@ -3107,7 +3116,13 @@ class Payplug extends PaymentModule
                         'result' => true,
                         'simulations' => $simulations
                     );
-                    Cache::store($cache_id, $to_cache);
+
+                    if (!$this->payplug_cache->setCache($cache_id, $to_cache)) {
+                        $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
+                        $error_level = 'error';
+                        $this->logger->addLog($error_message, $error_level);
+                    }
+
                 }
             }
 
@@ -4386,6 +4401,20 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description Flush PayPlugCache, when PrestaShop cache cleared
+     *
+     * @param array $params
+     */
+    public function hookActionClearCompileCache($params)
+    {
+        if (!$this->payplug_cache->flushCache()) {
+            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
+            $error_level = 'error';
+            $this->payplug_cache->logger->addLog($error_message, $error_level);
+        }
+    }
+
+    /**
      * Hydrate Oney Payment Tab from Cookie Payment Data
      * @param array $payment_tab
      * @param array $payment_data
@@ -4599,6 +4628,7 @@ class Payplug extends PaymentModule
             'actionCarrierUpdate',
             'displayProductPriceBlock',
             'displayExpressCheckout',
+            'actionClearCompileCache',
         );
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
@@ -4796,7 +4826,24 @@ class Payplug extends PaymentModule
         $res_payplug_logger = Db::getInstance()->execute($req_payplug_logger);
 
         if (!$res_payplug_logger) {
-            $log->error('Installation SQL failed: PAYPLUG_LOGGER.');
+            $log->error('Installation SQL failed: PAYPLUG_LOGGERS.');
+            return false;
+        }
+
+        // install table `payplug_cache`
+        $req_payplug_cache = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_cache` (
+            `id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `cache_key` VARCHAR(255) NOT NULL,
+            `cache_value` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+        $res_payplug_cache = Db::getInstance()->execute($req_payplug_cache);
+
+        if (!$res_payplug_cache) {
+            $log->error('Installation SQL failed: PAYPLUG_CACHE.');
             return false;
         }
 
@@ -6415,6 +6462,14 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description Initialize the cache (For the API Marketing)
+     */
+    private function initializeCache()
+    {
+        $this->payplug_cache = new PayPlugCache();
+    }
+
+    /**
      * Register installment for later use
      *
      * @param string $installment_id
@@ -6779,6 +6834,7 @@ class Payplug extends PaymentModule
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_logger`';
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_cache`';
 
         foreach ($queries as $query) {
             $flag = $flag && Db::getInstance()->execute($query);
