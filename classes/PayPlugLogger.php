@@ -84,7 +84,6 @@ class PayPlugLogger extends \ObjectModel
 
     public function addLog($message, $level = 'info')
     {
-        return true;
         // get content
         $content = json_decode($this->content, true);
         if (!$content) {
