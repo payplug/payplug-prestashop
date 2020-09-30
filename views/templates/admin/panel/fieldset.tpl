@@ -44,7 +44,6 @@
             {/foreach}
         {/if}
 
-
         <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>
     <div class="panel-footer">
