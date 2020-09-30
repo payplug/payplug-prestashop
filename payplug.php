@@ -6307,6 +6307,11 @@ class Payplug extends PaymentModule
         );
     }
 
+    public function setNotification()
+    {
+        return new PayPlugNotifications();
+    }
+
     /**
      * Determine witch environment is used
      *
