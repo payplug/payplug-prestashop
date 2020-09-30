@@ -51,14 +51,7 @@ class PayPlugAjax
                         '_ajax' => 1
                     ];
                     $payment = $payplug->preparePayment($options,Tools::getValue('pc'));
-                    if(is_array($payment))
-                    {
-                        die(implode($payment));
-                    }
-                    else
-                    {
-                        die($payment);
-                    }
+                    die(Tools::jsonEncode($payment));
                 } else {
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;

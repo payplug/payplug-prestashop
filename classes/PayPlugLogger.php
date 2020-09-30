@@ -63,7 +63,7 @@ class PayPlugLogger extends \ObjectModel
     );
 
     /** @var int */
-    private $limit_number = 500;
+    private $limit_number = 4000;
 
     /** @var string */
     private $limit_date = 'P1M';
@@ -84,6 +84,7 @@ class PayPlugLogger extends \ObjectModel
 
     public function addLog($message, $level = 'info')
     {
+        return true;
         // get content
         $content = json_decode($this->content, true);
         if (!$content) {
