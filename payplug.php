@@ -4171,16 +4171,6 @@ class Payplug extends PaymentModule
             return;
         }
         $this->smarty->assign(['env' => 'checkout']);
-
-        $action = Tools::getValue('action');
-        if ($action == 'refresh') {
-            $use_taxes = (bool)Configuration::get('PS_TAX');
-
-            $context = Context::getContext();
-            $amount = $context->cart->getOrderTotal($use_taxes);
-            $this->assignOneyPriceAndPaymentOptions($context->cart, $amount);
-            $this->smarty->assign(['popin' => true]);
-        }
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
@@ -4199,23 +4189,40 @@ class Payplug extends PaymentModule
         if (!Configuration::get('PAYPLUG_ONEY')) {
             return;
         }
+        $action = Tools::getValue('action');
+        if ($action == 'quickview') {
+            return false;
+        }
         if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
             return;
         }
-        $action = Tools::getValue('action');
+
         if ($action == 'refresh') {
             $use_taxes = (bool)Configuration::get('PS_TAX');
 
             $id_product = (int)Tools::getValue('id_product');
             $group = Tools::getValue('group');
-            $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+            // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
+            if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
+                $id_product_attribute = $group ? (int)Product::getIdProductAttributesByIdAttributes($id_product,
+                    $group) : 0;
+            } else {
+                $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product,
+                    $group) : 0;
+            }
             $quantity = (int)Tools::getValue('qty', 1);
 
             $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null,
                 false, true, $quantity);
             $amount = $product_price * $quantity;
-            $this->assignOneyPriceAndPaymentOptions(false, $amount);
-            $this->smarty->assign(['popin' => true]);
+            $is_elligible = $this->isValidOneyAmount($amount, $this->context->currency->id);
+
+            if ($is_elligible['error']) {
+                $this->smarty->assign(array(
+                    'payplug_oney_error' => $is_elligible['error'],
+                ));
+                $this->smarty->assign(['popin' => true]);
+            }
         }
         $this->smarty->assign(['env' => 'product']);
         return $this->display(__FILE__, 'oney/cta.tpl');
