@@ -27,31 +27,7 @@ var $document, payplugModule = {
     oney: {
         init: function () {
             var oney = payplugModule.oney;
-            $document.on('change', 'input[name=payplug_oney], .pponeychecked select', oney.carrier);
             $document.on('click', '.panel-oney .switch', oney.switch);
-            oney.carrier();
-        },
-        carrier: function () {
-            var active = parseInt($('input[name=payplug_oney]:checked').val());
-
-            if (active) {
-                $('#payplug_admin_form .oney_carrier').hide();
-                var $carriers = $('.pponeychecked select'),
-                    configured = true;
-
-                $carriers.each(function () {
-                    var value = $(this).val();
-                    configured = configured && value;
-                });
-
-                if (configured) {
-                    $('#payplug_admin_form .oney_carrier.ppsuccess').show();
-                } else {
-                    $('#payplug_admin_form .oney_carrier.pperror').show();
-                }
-            } else {
-                $('#payplug_admin_form .oney_carrier').hide();
-            }
         },
         switch: function (event) {
             event.preventDefault();

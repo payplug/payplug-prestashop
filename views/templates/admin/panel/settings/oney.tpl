@@ -42,7 +42,6 @@
                             <div class="payplugPanel_section">
                                 <p>
                                     {l s='To qualify the payment and avoid fraud, Oney must know your carriers and the average delivery time.' mod='payplug'}<br>
-                                    {l s='Warning: The Store Pick-up and Network Pick-up shipping are conflicting with the Oney payment method. To use Oney, your customers will need to choose one of the other shipping method.' mod='payplug'}
                                 </p>
                                 <table class="table">
                                     <thead>
