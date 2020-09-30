@@ -53,81 +53,8 @@ class PayPlugNotifications
 
     private function getResource()
     {
-//        $body = Tools::file_get_contents('php://input');
-        $body = '{
-        "installment_plan_id": null,
-        "refundable_after": 1600675471,
-        "shipping": {
-          "address2": null,
-          "country": "FR",
-          "landline_phone_number": "+33120303937",
-          "delivery_type": "BILLING",
-          "email": "ctouma@payplug.com",
-          "title": null,
-          "company_name": "Cedric Payplug",
-          "first_name": "Cedric",
-          "postcode": "75000",
-          "last_name": "Payplug",
-          "mobile_phone_number": null,
-          "address1": "123 rue Bidon",
-          "language": "fr",
-          "state": null,
-          "city": "Paris"
-        },
-        "hosted_payment": {
-          "payment_url": "https://secure-qa.payplug.com/pay/18JQSJnjhUxGrPYyaOifzf",
-          "paid_at": 1600675471,
-          "return_url": "http://presta17.local/index.php?ps=1&cartid=57&fc=module&module=payplug&controller=validation&id_lang=1",
-          "cancel_url": "http://presta17.local/index.php?ps=2&cartid=57&fc=module&module=payplug&controller=validation&id_lang=1",
-          "sent_by": null
-        },
-        "failure": null,
-        "is_live": true,
-        "amount_refunded": 0,
-        "paid_at": 1600675471,
-        "description": null,
-        "created_at": 1600675446,
-        "billing": {
-          "address2": null,
-          "country": "FR",
-          "landline_phone_number": "+33120303937",
-          "email": "ctouma@payplug.com",
-          "title": null,
-          "company_name": "Cedric Payplug",
-          "first_name": "Cedric",
-          "postcode": "75000",
-          "last_name": "Payplug",
-          "mobile_phone_number": null,
-          "address1": "123 rue Bidon",
-          "language": "fr",
-          "state": null,
-          "city": "Paris"
-        },
-        "is_refunded": false,
-        "refundable_until": 1616227471,
-        "card": {
-          "id": "card_1V4xYzNdQpwSBDYmOzdby3",
-          "country": "FR",
-          "brand": "CB",
-          "last4": "0001",
-          "exp_month": 9,
-          "exp_year": 2022,
-          "metadata": null
-        },
-        "currency": "EUR",
-        "is_paid": true,
-        "amount": 4536,
-        "id": "pay_18JQSJnjhUxGrPYyaOifzf",
-        "is_3ds": true,
-        "authorization": null,
-        "object": "payment",
-        "notification": {
-          "url": "http://presta17.local/index.php?fc=module&module=payplug&controller=ipn&id_lang=1",
-          "response_code": null
-        },
-        "save_card": false,
-        "metadata": "{\"ID Cart\":57,\"ID Client\":3,\"Website\":\"http://presta17.local\"}"
-      }';
+        // $body = Tools::file_get_contents('php://input');
+        $body = Tools::file_get_contents(_PS_MODULE_DIR_ . 'payplug/test/tests/src/ipn.json');
 
         try {
             $this->resource = \Payplug\Notification::treat($body);
