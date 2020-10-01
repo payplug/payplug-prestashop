@@ -21,11 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugLogger;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+use PayPlug\classes\PayPlugLogger;
 
 /**
  * @description The PayPlug Cache class is used to store and retrieve every Oney Simulation
