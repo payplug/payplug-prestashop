@@ -5537,6 +5537,23 @@ class Payplug extends PaymentModule
     {
         $curl_exists = extension_loaded('curl');
         $openssl_exists = extension_loaded('openssl');
+
+        if (Tools::getValue('submitDisable')) {
+
+            Configuration::updateValue('PAYPLUG_SHOW', false);
+
+            $this->assignContentVar();
+            $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+
+            $this->context->smarty->assign(array(
+                'title' => '',
+                'type' => 'save',
+            ));
+            $popin = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
+
+            die(json_encode(array('popin' => $popin, 'content' => $content)));
+        }
+
         if (Tools::isSubmit('submitAccount')) {
             $password = isset($_POST['PAYPLUG_PASSWORD']) && $_POST['PAYPLUG_PASSWORD'] ? $_POST['PAYPLUG_PASSWORD'] : false;
             $email = Tools::getValue('PAYPLUG_EMAIL');
