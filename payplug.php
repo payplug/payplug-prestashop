@@ -2920,7 +2920,7 @@ class Payplug extends PaymentModule
             $shipping_country->iso_code);
         if (!$is_valid_mobile_phone_number) {
             $shipping_fields['mobile_phone_number'] = array(
-                'text' => $this->l('Please enter your mobile phone number'),
+                'text' => $this->l('Please enter your mobile phone number.'),
                 'input' => array(
                     array(
                         'name' => 'mobile_phone_number',
@@ -2982,7 +2982,7 @@ class Payplug extends PaymentModule
                 $billing_country->iso_code);
             if (!$is_valid_mobile_phone_number) {
                 $billing_fields['mobile_phone_number'] = array(
-                    'text' => $this->l('Please enter your mobile phone number'),
+                    'text' => $this->l('Please enter your mobile phone number.'),
                     'input' => array(
                         array(
                             'name' => 'mobile_phone_number',
