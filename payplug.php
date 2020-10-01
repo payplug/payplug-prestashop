@@ -5561,6 +5561,9 @@ class Payplug extends PaymentModule
             $this->createConfig();
             Configuration::updateValue('PAYPLUG_SHOW', 0);
 
+            // force reload configuration to be sure all config are reset
+            Configuration::loadConfiguration();
+
             $this->assignContentVar();
             $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
 
