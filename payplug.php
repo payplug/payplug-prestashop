@@ -4933,10 +4933,9 @@ class Payplug extends PaymentModule
      */
     public function isAllowed()
     {
-        if (!$this->active || !Configuration::get('PAYPLUG_SHOW')) {
+        if (!Module::isEnabled($this->name) || !$this->getConfiguration('PAYPLUG_SHOW')) {
             return false;
         }
-
         return true;
     }
 
@@ -7257,14 +7256,6 @@ class Payplug extends PaymentModule
         }
 
         return $flag;
-    }
-
-    public function isAllowed()
-    {
-        if (!Module::isEnabled($this->name) || !$this->getConfiguration('PAYPLUG_SHOW')) {
-            return false;
-        }
-        return true;
     }
 
     public function getConfiguration($key)
