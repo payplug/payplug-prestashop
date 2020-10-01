@@ -68,8 +68,6 @@ class Payplug extends PaymentModule
 
     private $paymentOption;
 
-//    private $logger;
-
     private $PrestashopSpecificClass;
 
     private $PrestashopSpecificObject;
@@ -210,7 +208,7 @@ class Payplug extends PaymentModule
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#8f0621',
             'name' => array(
                 'en' => 'Payment failed',
@@ -222,13 +220,13 @@ class Payplug extends PaymentModule
         'auth' => array(
             'cfg' => null,
             'template' => null,
-            'logable' => true,
+            'logable' => false,
             'send_email' => false,
             'paid' => true,
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#04b404',
             'name' => array(
                 'en' => 'Payment authorised',
@@ -240,13 +238,13 @@ class Payplug extends PaymentModule
         'exp' => array(
             'cfg' => null,
             'template' => null,
-            'logable' => true,
+            'logable' => false,
             'send_email' => false,
             'paid' => false,
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#8f0621',
             'name' => array(
                 'en' => 'Authorization expired',
@@ -440,6 +438,23 @@ class Payplug extends PaymentModule
             }
         }
     }
+
+    /**
+     * @description
+     * Add Order Payment
+     *
+     * @param int $id_order
+     * @param string $id_payment
+     * @return bool
+     */
+    public function addPayplugOrderPayment($id_order, $id_payment)
+    {
+        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_order_payment (id_order, id_payment) 
+                VALUE (' . (int)$id_order . ',\'' . pSQL($id_payment) . '\')';
+
+        return Db::getInstance()->execute($sql);
+    }
+
 
     /**
      * @throws PrestaShopDatabaseException
@@ -646,6 +661,7 @@ class Payplug extends PaymentModule
             case 1: // not paid
             case 5: // refunded
             case 8: // authorized
+            case 11: // abandoned
                 $status_class = 'pp_warning';
                 break;
             case 2: // paid
@@ -695,6 +711,9 @@ class Payplug extends PaymentModule
                 break;
             case 10:
                 $status_code = 'oney_pending';
+                break;
+            case 11:
+                $status_code = 'abandoned';
                 break;
             default: // none
                 $status_code = 'none';
@@ -3356,6 +3375,9 @@ class Payplug extends PaymentModule
                 $delivery_country = new Country($delivery_address->id_country);
                 $iso_code = $delivery_country->iso_code;
                 $payment_schedule = $this->getOneyPaymentOptionsList($cart_amount, $iso_code);
+                if (empty($payment_schedule)) {
+                    $optimized = false;
+                }
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
@@ -3481,6 +3503,7 @@ class Payplug extends PaymentModule
             8 => 'authorized',
             9 => 'authorization expired',
             10 => 'oney pending',
+            11 => 'abandoned',
         */
         if (!is_object($payment)) {
             $payment = \Payplug\Payment::retrieve($payment);
@@ -3504,6 +3527,8 @@ class Payplug extends PaymentModule
         } elseif (count($payment->failure) > 0 && $pay_status != 9) {
             if ($payment->failure->code == 'aborted') {
                 $pay_status = 7; //cancelled
+            } elseif ($payment->failure->code == 'timeout') {
+                $pay_status = 11; //abandoned
             } else {
                 $pay_status = 3; //failed
             }
@@ -3539,6 +3564,39 @@ class Payplug extends PaymentModule
 
         return $res_cart_installment;
     }
+
+    /**
+     * @description
+     * get order payment
+     *
+     * @param int $id_order
+     * @return integer
+     */
+    public function getPayplugOrderPayment($id_order)
+    {
+        $sql = 'SELECT id_payment 
+                FROM ' . _DB_PREFIX_ . 'payplug_order_payment   
+                WHERE id_order = ' . (int)$id_order;
+
+        return Db::getInstance()->getValue($sql);
+    }
+
+    /**
+     * @description
+     * get all order payment for given id order
+     *
+     * @param int $id_order
+     * @return array
+     */
+    public function getPayplugOrderPayments($id_order)
+    {
+        $sql = 'SELECT * 
+                FROM ' . _DB_PREFIX_ . 'payplug_order_payment 
+                WHERE id_order = ' . (int)$id_order;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
 
     /**
      * Generate refund form
@@ -3918,12 +3976,16 @@ class Payplug extends PaymentModule
 
             $this->updatePayplugInstallment($installment);
         } else {
-            if (!$pay_id = $this->isTransactionPending((int)$order->id_cart)) {
-                $payments = $order->getOrderPaymentCollection();
-                if (count($payments) > 1 || !isset($payments[0])) {
-                    return false;
-                } else {
-                    $pay_id = $payments[0]->transaction_id;
+            if (!$pay_id = $this->isTransactionPending($order->id_cart)) {
+                $pay_id = $this->getPayplugOrderPayment($order->id);
+
+                if (!$pay_id) {
+                    $payments = $order->getOrderPaymentCollection();
+                    if (count($payments->getResults()) > 1 || !$payments->getFirst()) {
+                        return false;
+                    } else {
+                        $pay_id = $payments->getFirst()->transaction_id;
+                    }
                 }
             }
 
@@ -4623,13 +4685,13 @@ class Payplug extends PaymentModule
                 'template' => null,
 
                 // OS have to be "logable" to register transaction_id
-                'logable' => true,
+                'logable' => false,
                 'send_email' => false,
                 'paid' => false,
                 'module_name' => 'payplug',
                 'hidden' => false,
                 'delivery' => false,
-                'invoice' => true,
+                'invoice' => false,
                 'color' => '#a1f8a1',
                 'name' => array(
                     'en' => 'Oney - Pending',
@@ -4813,6 +4875,20 @@ class Payplug extends PaymentModule
 
         if (!$res_payplug_cache) {
             $log->error('Installation SQL failed: PAYPLUG_CACHE.');
+            return false;
+        }
+
+        $req_payplug_order_payment = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
+            `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_order` INT(11) UNSIGNED NOT NULL,
+            `id_payment` VARCHAR(255) NOT NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+        $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
+
+        if (!$res_payplug_order_payment) {
+            $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
             return false;
         }
 
@@ -6304,6 +6380,7 @@ class Payplug extends PaymentModule
             8 => $this->l('authorized'),
             9 => $this->l('authorization expired'),
             10 => $this->l('oney pending'),
+            11 => $this->l('abandoned'),
         );
     }
 
@@ -6813,6 +6890,7 @@ class Payplug extends PaymentModule
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_logger`';
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_cache`';
 
         foreach ($queries as $query) {
