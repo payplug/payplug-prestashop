@@ -37,10 +37,6 @@
             <p class="pperror">{$error|escape:'htmlall':'UTF-8'}</p>
         {/foreach}
     {/if}
-    <p class="oney_carrier pperror">{l s='At least one of your shipping method isn’t configured for Oney.' mod='payplug'}</p>
-    <p class="oney_carrier ppwarn">{l s='Your shipping methods configuration doesn’t allow to provide Oney' mod='payplug'}</p>
-    <p class="oney_carrier ppsuccess">{l s='Your shipping methods are configured for Oney.' mod='payplug'}</p>
-
 </div>
 <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
 <div class="block-button">
