@@ -35,6 +35,11 @@ class PayPlugLogger extends \ObjectModel
 {
     private $idLogger;
 
+<<<<<<< HEAD
+=======
+    private $tempDBfields;
+
+>>>>>>> b1e8fe2a6286b0cea437c3b7758243909398cce4
     /** @var string */
     public $process;
 
