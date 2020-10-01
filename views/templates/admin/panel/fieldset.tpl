@@ -38,6 +38,11 @@
                 <p class="payplugConfig_item payplugConfig_item-error"><span>{$error|escape:'htmlall':'UTF-8'}</span></p>
             {/foreach}
         {/if}
+        {if isset($check_configuration.other) && !empty($check_configuration.other) && sizeof($check_configuration.other)}
+            {foreach from = $check_configuration.other item = other}
+                <p class="payplugConfig_item payplugConfig_item-{$other.type|escape:'quotes':'UTF-8'}"><span>{$other.text|escape:'quotes':'UTF-8'}</span></p>
+            {/foreach}
+        {/if}
 
         <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>
