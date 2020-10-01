@@ -33,6 +33,8 @@ use Db;
 
 class PayPlugLogger extends \ObjectModel
 {
+    private $idLogger;
+
     /** @var string */
     public $process;
 
@@ -96,17 +98,45 @@ class PayPlugLogger extends \ObjectModel
 
         $this->content = json_encode($content);
 
-        $req_save_log = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_logger (process, content, date_add, date_upd)
-                VALUES (\'' . pSQL($this->process) . '\', \'' . pSQL($this->content) . '\', \'' . pSQL($date) . '\', \'' . pSQL($date) . '\')';
-        $res_save_log = Db::getInstance()->execute($req_save_log);
-
-        if (!$res_save_log) {
-            return false;
-        }
+        $this->save($this->process, $this->content, $date);
 
         return $this;
     }
+
+    public function save($process = 'notification', $content = null, $date = null)
+    {
+        if ((int)$this->idLogger > 0) {
+            return $this->updateLog($this->idLogger, $this->process, $this->content, $date);
+        }
+
+        $req_add_log = '
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_logger (process, content, date_add, date_upd)
+                VALUES (\'' . pSQL($this->process) . '\', \'' . pSQL($this->content) . '\', \'' . pSQL($date) . '\', \'' . pSQL($date) . '\')';
+        $res_add_log = Db::getInstance()->execute($req_add_log);
+
+        $this->idLogger = Db::getInstance()->Insert_ID();
+
+        if (!$res_add_log) {
+            return false;
+        }
+    }
+
+
+    public function updateLog($idLogger, $process = 'notification', $content = null, $date = null)
+    {
+        $req_upd_log = '
+                UPDATE ' . _DB_PREFIX_ . 'payplug_logger log  
+                SET log.process = \'' . pSQL($process) . '\', log.content = \'' . pSQL($content) . '\', log.date_upd = \'' . pSQL($date) . '\'
+                WHERE log.id_payplug_logger = ' . (int)$idLogger;
+        $res_upd_log = Db::getInstance()->execute($req_upd_log);
+
+        if (!$res_upd_log) {
+            return false;
+        }
+
+        return $res_upd_log;
+    }
+
 
     public function udate($format = 'u', $utimestamp = null)
     {
