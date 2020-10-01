@@ -3463,7 +3463,7 @@ class Payplug extends PaymentModule
                 $split = (int)str_replace('x', '', $type[0]);
 
                 $oneyTpl = 'unified_payment.tpl';
-                $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.png';
+                $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.svg';
                 $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 if ($optimized) {
