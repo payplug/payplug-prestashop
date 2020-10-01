@@ -53,8 +53,7 @@ class PayPlugNotifications
 
     private function getResource()
     {
-        // $body = Tools::file_get_contents('php://input');
-        $body = Tools::file_get_contents(_PS_MODULE_DIR_ . 'payplug/test/tests/src/ipn.json');
+         $body = Tools::file_get_contents('php://input');
 
         try {
             $this->resource = \Payplug\Notification::treat($body);

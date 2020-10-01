@@ -95,7 +95,15 @@ class PayPlugLogger extends \ObjectModel
         array_push($content, $entry);
 
         $this->content = json_encode($content);
-        $this->save();
+
+        $req_save_log = '
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_logger (process, content, date_add, date_upd)
+                VALUES (\'' . pSQL($this->process) . '\', \'' . pSQL($this->content) . '\', \'' . pSQL($date) . '\', \'' . pSQL($date) . '\')';
+        $res_save_log = Db::getInstance()->execute($req_save_log);
+
+        if (!$res_save_log) {
+            return false;
+        }
 
         return $this;
     }
@@ -157,4 +165,3 @@ class PayPlugLogger extends \ObjectModel
         return $flag;
     }
 }
-

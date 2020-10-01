@@ -4538,6 +4538,8 @@ class Payplug extends PaymentModule
             $log->error('Install failed: hook paymentOptions.');
         } elseif (!$this->registerHook('Payment')) {
             $log->error('Install failed: hook Payment.');
+        } elseif (!$this->registerHook('moduleRoutes')) {
+            $log->error('Install failed: hook moduleRoutes.');
         } elseif (!$this->registerHook('registerGDPRConsent') ||
             !$this->registerHook('actionDeleteGDPRCustomer') ||
             !$this->registerHook('actionExportGDPRData')
@@ -7217,6 +7219,7 @@ class Payplug extends PaymentModule
             'header',
             'paymentReturn',
             'actionAdminPerformanceControllerAfter',
+            'moduleRoutes'
         );
 
         $flag = true;
