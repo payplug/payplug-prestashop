@@ -22,11 +22,10 @@
  */
 
 
-
 use PayPlug\classes\MyLogPHP;
 
 //Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
+require_once(_PS_ROOT_DIR_ . '/config/config.inc.php');
 //require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
@@ -230,24 +229,15 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
             $this->addLog('Total : ' . $amount, 'info');
 
-            $this->addLog('Lock checking start.', 'debug');
-            PayplugLock::check($cart->id);
-            $this->addLog('Lock checking end.', 'debug');
-
-            $cart_lock = PayplugLock::createLockG2($cart->id, 'validation');
-            if (!$cart_lock) {
-                $this->addLog('Lock cannot be created.', 'error');
-            } else {
-                $this->addLog('Lock created.', 'debug');
-                switch ($cart_lock) {
-                    case 'ipn':
-                    case 'validation':
-                        $id_order = false;
-                        break;
-                    default:
-                        $id_order = (int)$cart_lock;
+            $cart_lock = false;
+            do {
+                $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
+                if (!$cart_lock) {
+                    PayplugLock::check($cart->id);
+                } else {
+                    $this->logger->addLog('Lock created');
                 }
-            }
+            } while (!$cart_lock);
 
             $id_order = Order::getOrderByCartId($cart->id);
 
@@ -403,8 +393,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 if (!$validateOrder_result) {
                     $this->addLog('Order not validated', 'error');
-                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                    if (!$cart_unlock) {
+                    if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->addLog('Lock deleted.', 'debug');
@@ -432,8 +421,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $res_nb_orders = Db::getInstance()->executeS($sql);
                 if (!$res_nb_orders) {
                     $this->addLog('No order can be found using id_cart ' . (int)$cart->id, 'error');
-                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                    if (!$cart_unlock) {
+                    if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->addLog('Lock deleted.', 'debug');
@@ -455,8 +443,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if (!$payments) {
                     $this->addLog('No transaction can be found using id_order ' . (int)$id_order,
                         'error');
-                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                    if (!$cart_unlock) {
+                    if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->addLog('Lock deleted.', 'debug');
