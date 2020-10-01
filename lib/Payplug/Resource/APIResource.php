@@ -31,15 +31,11 @@ abstract class APIResource implements IAPIResourceFactory
      */
     public static function factory(array $attributes)
     {
-//        var_dump($attributes['body']['ipn_data']['object']); exit;
+        if (!array_key_exists('object', $attributes)) {
+            throw new Payplug\Exception\UnknownAPIResourceException('Missing "object" property.');
+        }
 
-//        if (!array_key_exists('object', $attributes['body'])) {
-////        if (!array_key_exists('object', $attributes)) {
-//            throw new Payplug\Exception\UnknownAPIResourceException('Missing "object" property.');
-//        }
-
-        switch ($attributes['body']['ipn_data']['object']) {
-//        switch ($attributes['object']) {
+        switch ($attributes['object']) {
             case 'payment':
                 return Payplug\Resource\Payment::fromAttributes($attributes);
             case 'refund':
