@@ -94,7 +94,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $this->logger->addLog('set api key: ' . $this->api_key);
             $this->resource = \Payplug\Notification::treat($body, $authentication);
             $this->logger->addLog('resource id: ' . $this->resource->id);
-        } catch (Exception $exception) {
             $this->logger->addLog('An error occured while getting resource: ' . $exception->getMessage(), 'error');
             header(
                 $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
@@ -735,12 +734,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     $secure_key
                                 );
 
-                                if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
-                                    $order = Order::getByCartId($cart->id);
-                                } else {
-                                    $id_order = Order::getOrderByCartId($cart->id);
+                                    $id_order = $this->payplug->currentOrder;
                                     $order = new Order($id_order);
-                                }
 
                                 $this->logger->addLog('Order payment patch with amount:' . $amount, 'info');
                                 $order->total_paid = $amount;
