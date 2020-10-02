@@ -269,7 +269,7 @@ label.payplugSwitch_label {
   border: none;
   position: absolute;
   top: 50%;
-  left: 2px;
+  left: calc(100% - 18px);
   content: "";
   background: #fff;
   display: block;
@@ -277,10 +277,10 @@ label.payplugSwitch_label {
   height: 16px;
 }
 .payplugSwitch-small.payplugSwitch-right {
-  background: #e56876;
+  background: #b2b2b2;
 }
 .payplugSwitch-small.payplugSwitch-right:before {
-  left: calc(100% - 18px);
+  left: 2px;
 }
 .payplugSwitch-small.payplugSwitch-disabled {
   cursor: default;
@@ -319,6 +319,9 @@ button.payplugLink:hover {
   padding: 0 8px 0 0;
   font-weight: 700;
   text-align: right;
+}
+.payplugInstallment_fieldset .payplugPanel_label {
+  width: 185px;
 }
 .payplugPanel_content {
   display: flex;
@@ -393,9 +396,6 @@ button.payplugLink:hover {
 .payplugConfig_item-warning:before {
   background-image: url(../img/admin/icon-warn.png);
 }
-.payplugConfig_item-oney {
-  display: none;
-}
 .payplugLogin_email {
   color: #00ab7a;
   font-weight: 700;
@@ -439,6 +439,29 @@ button.payplugLink:hover {
 .payplugOney_error {
   display: none;
   color: #e56876;
+}
+.payplugOneyTOS {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+p.payplugOneyTOS_text {
+  margin: 0 8px 0 0;
+  line-height: 31px;
+}
+.payplugOneyTOS_input {
+  margin: initial;
+  display: inline-block;
+  width: 250px;
+}
+.payplugOneyTOS_error {
+  width: 100%;
+  display: none;
+  color: #dd2525;
+  padding: 0 0 0 10px;
+}
+.payplugOneyTOS_error-show {
+  display: block;
 }
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
