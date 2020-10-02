@@ -1670,7 +1670,7 @@ class Payplug extends PaymentModule
             case 'confirm' :
                 $title = $this->l('Save settings');
                 break;
-            case 'desactivate' :
+            case 'deactivate' :
                 $title = $this->l('Deactivate');
                 break;
             case 'refund' :
