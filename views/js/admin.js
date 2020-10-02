@@ -266,7 +266,7 @@ var $document, $window, payplug = {
             var {show} = payplug,
                 {identifier} = show.props;
             $document.on('switchSelected', '.' + identifier + ' input', show.change)
-                .on('click', 'button[name="confirm_desactivate"]', show.desactivate);
+                .on('click', 'button[name="confirm_desactivate"]', show.deactivate);
         },
         change: function (event) {
             var {show} = payplug,
@@ -325,7 +325,7 @@ var $document, $window, payplug = {
                 }
             });
         },
-        desactivate: function (event) {
+        deactivate: function (event) {
             event.preventDefault();
             event.stopPropagation();
 
