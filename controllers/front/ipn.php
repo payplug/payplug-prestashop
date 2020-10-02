@@ -735,8 +735,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     $secure_key
                                 );
 
-                                    $id_order = $this->payplug->currentOrder;
-                                    $order = new Order($id_order);
+                                $id_order = $this->payplug->currentOrder;
+                                $order = new Order($id_order);
 
                                 $this->logger->addLog('Order payment patch with amount:' . $amount, 'info');
                                 $order->total_paid = $amount;
