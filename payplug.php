@@ -5876,7 +5876,7 @@ class Payplug extends PaymentModule
                 // check oney required fields
                 $payment_data = $this->getPaymentDataCookie();
                 if (!$payment_data) {
-                    $payment_data = Tools::getValue('form');
+                    $payment_data = Tools::getValue('oney_form');
                 }
 
                 //
