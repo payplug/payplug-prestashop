@@ -21,6 +21,8 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\classes\MyLogPHP;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }

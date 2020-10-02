@@ -104,6 +104,7 @@ class PayPlugLogger extends \ObjectModel
     public function save()
     {
         if ((int)$this->id > 0) {
+            $this->date_upd = $this->udate('Y-m-d H:i:s.u T');
             return $this->updateLog();
         }
 
@@ -130,7 +131,7 @@ class PayPlugLogger extends \ObjectModel
     {
         $req_upd_log = '
                 UPDATE ' . _DB_PREFIX_ . 'payplug_logger log  
-                SET log.process = \'' . pSQL($this->process) . '\', log.content = \'' . pSQL($this->content) . '\', log.date_upd = \'' . pSQL($this->date_add) . '\'
+                SET log.process = \'' . pSQL($this->process) . '\', log.content = \'' . pSQL($this->content) . '\', log.date_upd = \'' . pSQL($this->date_upd) . '\'
                 WHERE log.id_payplug_logger = ' . (int)$this->id;
         $res_upd_log = Db::getInstance()->execute($req_upd_log);
 
