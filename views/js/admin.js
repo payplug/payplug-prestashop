@@ -266,7 +266,7 @@ var $document, $window, payplug = {
             var {show} = payplug,
                 {identifier} = show.props;
             $document.on('switchSelected', '.' + identifier + ' input', show.change)
-                .on('click', 'button[name="confirm_desactivate"]', show.desactivate);
+                .on('click', 'button[name="confirm_deactivate"]', show.deactivate);
         },
         change: function (event) {
             var {show} = payplug,
@@ -293,7 +293,7 @@ var $document, $window, payplug = {
                 data = {
                     _ajax: 1,
                     popin: 1,
-                    type: 'desactivate'
+                    type: 'deactivate'
                 };
 
             if (show.props.query != null) {
@@ -321,6 +321,54 @@ var $document, $window, payplug = {
                     if (typeof result.content != 'undefined') {
                         var {popup} = payplug.tools;
                         popup.set(result.content, 'deactivate');
+                    }
+                }
+            });
+        },
+        deactivate: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {show} = payplug,
+                {identifier} = show.props,
+                data = {
+                    _ajax: 1,
+                    submitDisable: 1,
+                };
+
+            if (show.props.query != null) {
+                show.props.query.abort();
+                show.props.query = null;
+            }
+
+            show.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                beforeSend: function () {
+                    payplug.tools.loader.show($('.' + identifier));
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (textStatus != 'abort') {
+                        alert('An error occurred while trying to refresh indicators. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        payplug.tools.loader.hide($('.' + identifier));
+                    }
+                },
+                success: function (result) {
+                    if (typeof result.content != 'undefined') {
+                        var {popup} = payplug.tools;
+                        popup.set(result.popin, 'confirm');
+                        $('form.payplug').replaceWith(result.content);
+                        var {oney} = payplug;
+                        oney.carrier();
+                        $window.trigger('load');
                     }
                 }
             });

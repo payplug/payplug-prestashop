@@ -96,8 +96,8 @@ if (Tools::getValue('_ajax') == 1) {
     if (Tools::getValue('submit') == 'submitPopin_confirm_a') {
         die(json_encode(array('content' => 'confirm_ok_activate')));
     }
-    if (Tools::getValue('submit') == 'submitPopin_desactivate') {
-        die(json_encode(array('content' => 'confirm_ok_desactivate')));
+    if (Tools::getValue('submit') == 'submitPopin_deactivate') {
+        die(json_encode(array('content' => 'confirm_ok_deactivate')));
     }
     if (Tools::getValue('submit') == 'submitPopin_abort') {
         die(json_encode(array('content' => '')));

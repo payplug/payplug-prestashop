@@ -653,3 +653,10 @@ span.ppclose {
 .panel-footer .payplugButton {
 	margin: 10px 0 0;
 }
+
+.payplugOrder {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	flex-direction: column;
+}

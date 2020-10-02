@@ -19,22 +19,18 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 @import "less/include";
 
-p.payment_module a.payplug
-{
+p.payment_module a.payplug {
   background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
   padding-left: 240px;
 }
 
-p.payment_module a.payplug:hover
-{
+p.payment_module a.payplug:hover {
   background-color: #F6F6F6;
 }
 
-p.payment_module a.payplug:after
-{
+p.payment_module a.payplug:after {
   display: block;
   content: "\f054";
   position: absolute;
@@ -48,7 +44,7 @@ p.payment_module a.payplug:after
   color: #777;
 }
 
-div.payplug-wrapper{
+div.payplug-wrapper {
   border: 1px solid #d6d4d4;
   border-radius: 4px;
   background: #fbfbfb;
@@ -67,14 +63,14 @@ div.payplug-wrapper .payment_module {
   letter-spacing: -1px;
 }
 
-div.payplug-wrapper .payment_module span{
+div.payplug-wrapper .payment_module span {
   background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
   /*padding-left: 197px;*/
   padding: 33px 40px 34px 197px;
   display: block;
 }
 
-div.payplug-wrapper form{
+div.payplug-wrapper form {
   padding: 0 0 10px 16px;
   position: relative;
 }
@@ -116,7 +112,7 @@ label[for=payplug_card_new] {
   /*padding: 10px 0 0 0;*/
 }
 
-.payplug_expiry_date{
+.payplug_expiry_date {
   display: block;
   font-size: 13px;
   font-weight: normal;
@@ -124,7 +120,7 @@ label[for=payplug_card_new] {
   text-align: center;
 }
 
-.ppdelete{
+.ppdelete {
   display: block;
   padding: 0 0 0 19px;
   text-decoration: underline;
@@ -136,11 +132,11 @@ label[for=payplug_card_new] {
 .ppdelete:hover,
 .ppdelete:active,
 .ppdelete:visited,
-.ppdelete:focus{
+.ppdelete:focus {
   text-decoration: underline;
 }
 
-.ppsubmit{
+.ppsubmit {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -155,28 +151,32 @@ label[for=payplug_card_new] {
   min-width: 11em;
   border: none;
 }
+
 .ppsubmit:hover {
   background: #49a482 none repeat scroll 0 0;
 }
-.ppsubmit.disable{
+
+.ppsubmit.disable {
   background: #dddddd none repeat scroll 0 0;
 }
-.ppOneClickStatus{
+
+.ppOneClickStatus {
   font-size: 14px;
-  clear:both;
+  clear: both;
 }
-.ppfail{
+
+.ppfail {
   margin-bottom: 9px;
   font-weight: bold;
   font-size: 15px;
 }
 
-.ppOneClickStatus p{
+.ppOneClickStatus p {
   text-align: left;
   font-weight: bold;
 }
 
-.ppfail .material-icons{
+.ppfail .material-icons {
   margin: 0 19px 0 -4px;
 }
 
@@ -191,15 +191,18 @@ label[for=payplug_card_new] {
   .info-wrapper {
     font-size: 14px;
   }
+
   .ppsubmit {
     position: relative;
     display: block;
   }
+
   .ppOneClickStatus {
     position: relative;
     bottom: 0;
     right: 0;
   }
+
   .ppOneClickStatus p {
     bottom: 0;
     position: relative;
@@ -208,7 +211,7 @@ label[for=payplug_card_new] {
   }
 }
 
-.loader{
+.loader {
   left: 50%;
   margin-right: -30px;
   position: absolute;
@@ -232,17 +235,17 @@ label[for=payplug_card_new] {
   margin: 0;
 }
 
-.ppsuccess{
+.ppsuccess {
   color: #00ab7a;
 }
 
-p.ppwait{
+p.ppwait {
   display: none;
   bottom: 6em;
   right: 12em;
 }
 
-.ppfail{
+.ppfail {
   color: #dd2525;
 }
 
@@ -266,22 +269,23 @@ div.ppoverlay {
   font-weight: bold;
 }
 
-#module-payplug-cards div.message{
+#module-payplug-cards div.message {
   display: none;
 }
 
-.payplug-payment-option{
+.payplug-payment-option {
 
 }
 
-body#checkout section.checkout-step .payment-options .payplug-payment-option label{
+body#checkout section.checkout-step .payment-options .payplug-payment-option label {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
   justify-content: flex-end;
   margin: 0;
 }
-body#checkout section.checkout-step .payment-options .payplug-payment-option img{
+
+body#checkout section.checkout-step .payment-options .payplug-payment-option img {
   margin: 0 12px 0 0;
 }
 
@@ -369,6 +373,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     &-open {
       display: block;
     }
+
     &-show {
       opacity: 1;
     }
@@ -418,7 +423,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     background-size: 100%;
 
     &-x3 {
-      background-image: url(~"@{img_oney}3x.svg");
+      background-image: url(~"@{img_oney}x3_with_fees.svg");
 
       &x4 {
         background-image: url(~"@{img_oney}3x4x.svg");
@@ -426,7 +431,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     }
 
     &-x4 {
-      background-image: url(~"@{img_oney}4x.svg");
+      background-image: url(~"@{img_oney}x4_with_fees.svg");
     }
 
     &-tooltip {
@@ -440,7 +445,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     z-index: 3;
     display: inline-block;
 
-    &-checkout{
+    &-checkout {
       margin: 16px 0 0;
     }
 
@@ -568,7 +573,6 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     width: 350px;
     padding: 15px;
     opacity: 0;
-    opacity: 1;
     text-align: left;
     .transform(translateY(-15%));
 
@@ -706,6 +710,9 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       flex-direction: column;
       width: 100%;
       margin: 0;
+      padding: 0;
+      list-style: none;
+
 
       li {
         .border(lighten(#colorMap[grey], 20%));
@@ -768,6 +775,11 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         margin: 0;
       }
 
+      ul {
+        padding: 0;
+      }
+
+
       p {
         padding: 4px 0;
       }
@@ -784,6 +796,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         &:last-child {
           padding: 4px 0;
         }
+
         small {
           display: block;
           width: 100%;
@@ -883,6 +896,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
       width: 100%;
       height: 100%;
       margin: 0;
+      padding: 0;
 
       li {
         display: flex;
@@ -901,7 +915,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         }
 
         &:first-child,
-        &:last-child{
+        &:last-child {
           padding: 12px 0;
         }
 
@@ -1190,8 +1204,8 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
           font-size: 12px;
           margin: 0 0 15px;
 
-          &:before{
-            .border(#colorMap[payplug],bl,4px);
+          &:before {
+            .border(#colorMap[payplug], bl, 4px);
             .rotate(-45deg);
             display: block;
             width: 30px;
@@ -1218,10 +1232,11 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
         }
       }
 
-      &-show{
+      &-show {
         display: flex;
       }
-      &-appear{
+
+      &-appear {
         opacity: 1;
       }
     }
