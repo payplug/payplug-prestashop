@@ -107,6 +107,11 @@ class PayPlugLogger extends \ObjectModel
             return $this->updateLog();
         }
 
+        $this->addToDb();
+    }
+
+    public function addToDb()
+    {
         $req_add_log = '
                 INSERT INTO ' . _DB_PREFIX_ . 'payplug_logger (process, content, date_add, date_upd)
                 VALUES (\'' . pSQL($this->process) . '\', \'' . pSQL($this->content) . '\', \'' . pSQL($this->date_add) . '\', \'' . pSQL($this->date_add) . '\')';
@@ -118,6 +123,7 @@ class PayPlugLogger extends \ObjectModel
             return false;
         }
     }
+
 
 
     public function updateLog()
