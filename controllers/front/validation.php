@@ -373,7 +373,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 if (!$validateOrder_result) {
                     $this->logger->addLog('Order not validated', 'error');
-                    if (!PayplugLock::deleteLockG2($cart->id)) {
+                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                    if (!$cart_unlock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
@@ -424,7 +425,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if (!$payments) {
                     $this->logger->addLog('No transaction can be found using id_order ' . (int)$id_order,
                         'error');
-                    if (!PayplugLock::deleteLockG2($cart->id)) {
+                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
+                    if (!$cart_unlock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
