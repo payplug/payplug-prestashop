@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2019 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,15 +16,16 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2019 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
 use PayPlug\classes\PayPlugLogger;
 
-require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
+//Inclusions
+require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
+//require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
@@ -36,32 +37,26 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
      * @var bool $debug
      */
     public $debug;
-
     /**
      * @var object $log
      */
     public $log;
-
     /**
      * @var object $resource
      */
     public $resource = null;
-
     /**
      * @var bool $flag
      */
     public $flag = false;
-
     /**
      * @var object $except
      */
     public $except = null;
-
     /**
      * @var array $resp
      */
     public $resp = array();
-
     /**
      * @var $debug
      */
@@ -77,6 +72,12 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
     public $logger;
 
+    public function __construct()
+    {
+        $this->logger = new PayPlugLogger('validation');
+        $this->logger->addLog('New validation');
+    }
+
     /**
      * Set Config to process the notification
      * @throws Exception
@@ -84,23 +85,16 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
     private function setConfig()
     {
         $this->payplug = new Payplug();
-        $this->debug = (int)Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->debug = true; // (int)Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->type = 'payment';
-        $this->setLogger();
+
+        //Notification identification
+        $this->logger->addLog('Validation treatment and authenticity verification: ');
 
         $this->url = [
             'error' => 'index.php?controller=order&step=1',
             'valid' => 'index.php?controller=order-confirmation&',
         ];
-    }
-
-    /**
-     * Set the log method
-     */
-    private function setLogger()
-    {
-        $this->logger = new PayPlugLogger('validation');
-        $this->logger->addLog('New validation');
     }
 
     public function postProcess()
@@ -184,7 +178,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $is_paid = $payment->is_paid;
 
                     $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-                    $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
+                    $is_oney = (isset($payment->payment_method) && isset($payment->payment_method['type'])) && in_array($payment->payment_method['type'],
                             $oney_payment_methods);
                     $is_authorized = isset($payment->authorization) && isset($payment->authorization->authorized_at);
 
@@ -214,15 +208,24 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
             $this->logger->addLog('Total : ' . $amount, 'info');
 
-            $cart_lock = false;
-            do {
-                $cart_lock = PayplugLock::createLockG2($cart->id, 'ipn');
-                if (!$cart_lock) {
-                    PayplugLock::check($cart->id);
-                } else {
-                    $this->logger->addLog('Lock created');
+            $this->logger->addLog('Lock checking start.', 'debug');
+            PayplugLock::check($cart->id);
+            $this->logger->addLog('Lock checking end.', 'debug');
+
+            $cart_lock = PayplugLock::createLockG2($cart->id, 'validation');
+            if (!$cart_lock) {
+                $this->logger->addLog('Lock cannot be created.', 'error');
+            } else {
+                $this->logger->addLog('Lock created.', 'debug');
+                switch ($cart_lock) {
+                    case 'ipn':
+                    case 'validation':
+                        $id_order = false;
+                        break;
+                    default:
+                        $id_order = (int)$cart_lock;
                 }
-            } while (!$cart_lock);
+            }
 
             $id_order = Order::getOrderByCartId($cart->id);
 
@@ -308,19 +311,22 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
-                switch (Tools::getValue('isoney')) {
-                    case 'x3_with_fees' :
-                    case 'x3_without_fees' :
-                        $module_name = $this->payplug->l('Oney 3x');
-                        break;
-                    case 'x4_with_fees' :
-                    case 'x4_without_fees' :
-                        $module_name = $this->payplug->l('Oney 4x');
-                        break;
-                    default:
-                        $module_name = $this->payplug->displayName;
-                        break;
+                $module_name = $this->payplug->displayName;
+                if ((isset($is_oney)) && $is_oney) {
+                    switch ($payment->payment_method['type']) {
+                        case 'oney_x3_with_fees' :
+                        case 'oney_x3_without_fees' :
+                            $module_name = $this->payplug->l('Oney 3x');
+                            break;
+                        case 'oney_x4_with_fees' :
+                        case 'oney_x4_without_fees' :
+                            $module_name = $this->payplug->l('Oney 4x');
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
 
                 if ($amount != $total) {
                     $this->logger->addLog('Cart amount is different and may occured an error', 'info');
@@ -384,7 +390,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     Tools::redirect($this->url['error']);
                 } else {
                     $this->logger->addLog('Order validated', 'info');
-
                     if ($this->type == 'payment') {
                         $api_key = Payplug::setAPIKey();
                         $data = array();
@@ -424,6 +429,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
                 $this->logger->addLog('Checking number of transaction validated for this order...', 'info');
                 $payments = $this->payplug->getPayplugOrderPayments($order->id);
+
                 if (!$payments) {
                     $this->logger->addLog('No transaction can be found using id_order ' . (int)$id_order,
                         'error');
