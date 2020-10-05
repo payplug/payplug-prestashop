@@ -66,11 +66,10 @@ var $document,
                     data.i = 1;
                 }
 
-
                 if (options['is_oney']) {
                     data.io = options['is_oney'];
                     if (options['oney_form']) {
-                        data.form = options['oney_form'];
+                        data.oney_form = options['oney_form'];
                     }
                 }
 
@@ -821,7 +820,7 @@ var $document,
 
 
                         if ($('.oneyForm').parents('.payplugPopin').length) {
-                            return payplugModule.oney.payment.form.save(payment_data);
+                            return payplugModule.oney.payment.form.save(payment_data.oney_form);
                         }
 
                         payplugModule.payment.send(payment_data);
