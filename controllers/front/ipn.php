@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2019 PayPlug SAS
+ * 2013 - 2020 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2019 PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -27,6 +27,10 @@ require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 
+/**
+ * @description
+ * Treat notification received
+ */
 class PayplugIPNModuleFrontController extends ModuleFrontController
 {
     public function postProcess()

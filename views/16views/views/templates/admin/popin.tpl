@@ -72,8 +72,8 @@
             <input type="button" class="popin-button ppcancel white-button{if $activate == 1} activate{/if}" value="{l s='Cancel' mod='payplug'}">
             <input class="popin-button green-button" type="submit" name="submitPopin_{$type|escape:'htmlall':'UTF-8'}{if $activate == 1}_a{/if}" value="{l s='SAVE SETTINGS' mod='payplug'}">
         </div>
-{elseif $type == 'desactivate'}
-        <div class="panel-heading">{l s='Desactivate' mod='payplug'}</div>
+{elseif $type == 'deactivate'}
+        <div class="panel-heading">{l s='Deactivate' mod='payplug'}</div>
         <span class="ppclose">x</span>
     </div>
     <form action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" method="post">

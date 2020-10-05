@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="panel panel-1-6" id="pppanel">
+<div class="panel panel-1-6 payplugOrder" id="pppanel">
 
     <div class="panel-heading">
         <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}

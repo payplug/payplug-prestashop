@@ -197,7 +197,7 @@ function admin_start() {
             $(this).siblings('.switch-selection').css('left', '31px');
             $('.switch-show').css('background-color', '#00ab7a');
             $(this).attr('checked', false);
-            callPopin('desactivate');
+            callPopin('deactivate');
         }
     });
 
@@ -565,7 +565,7 @@ function callPopin(type, args) {
         $('#submitSettings').click();
 
         removePopin();
-    } else if (type == 'confirm_ok_desactivate') {
+    } else if (type == 'confirm_ok_deactivate') {
         $('#payplug_show_on').siblings('.switch-selection').css('left', '2px');
         $('.switch-show').css('background-color', '#dd2525');
         $('#payplug_show_on').attr('checked', false);

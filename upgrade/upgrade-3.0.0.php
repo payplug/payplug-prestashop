@@ -161,6 +161,7 @@ function upgrade_module_3_0_0($object)
         $flag = false;
     }
 
+    $flag = $flag && Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
 
 
     return $flag;
