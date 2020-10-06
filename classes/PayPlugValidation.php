@@ -89,12 +89,22 @@ class PayPlugValidation
 
             // create lock
             $cart_lock = false;
+            $datetime1 = date_create(date('Y-m-d H:i:s'));
             do {
-                $cart_lock = PayplugLock::createLockG2($cart->id, 'validation');
+                $this->logger->addLog('Check if lock exist', 'info');
+                $cart_lock = PayplugLock::check($cart->id);
                 if(!$cart_lock) {
-                    PayplugLock::check($cart->id);
-                } else {
-                    $this->logger->addLog('Lock created', 'info');
+                    $datetime2 = date_create(date('Y-m-d H:i:s'));
+                    $interval = date_diff($datetime1, $datetime2);
+                    $diff = explode('+',$interval->format('%R%s'));
+                    if ($diff[1] >= 10) {
+                        $this->logger->addLog('Try to create lock (PayplugLock::createLockG2) during '.$diff[1].' seconds, , but can\'t proceed', 'error');
+                        break;
+                    }
+                    if (PayplugLock::createLockG2($cart->id, 'validation')) {
+                        $this->logger->addLog('Lock created', 'info');
+                        break;
+                    }
                 }
             } while(!$cart_lock);
 
