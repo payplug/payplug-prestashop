@@ -6409,6 +6409,11 @@ class Payplug extends PaymentModule
         return new PayPlugNotifications();
     }
 
+    public function setValidation()
+    {
+        return new PayPlugValidation();
+    }
+
     /**
      * Determine witch environment is used
      *
