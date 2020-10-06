@@ -992,7 +992,6 @@ class PayPlugNotifications
                                     $this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $order);
                                 }
 
-                                $api_key = $this->payplug->getAPIKey();
                                 $data = array();
                                 $data['metadata'] = $meta;
                                 $data['metadata']['Order'] = $id_order;
