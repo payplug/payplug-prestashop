@@ -89,12 +89,21 @@ class PayPlugValidation
 
             // create lock
             $cart_lock = false;
+            $i = 0;
             do {
-                $cart_lock = PayplugLock::createLockG2($cart->id, 'validation');
+                $this->logger->addLog('Check if lock exist', 'info');
+                $cart_lock = PayplugLock::check($cart->id);
                 if(!$cart_lock) {
-                    PayplugLock::check($cart->id);
-                } else {
-                    $this->logger->addLog('Lock created', 'info');
+                    if ($i >= 20) {
+                        $this->logger->addLog('Try to create lock (PayplugLock::createLockG2) '.$i.' times, but can\'t proceed', 'error');
+                        break;
+                    }
+                    $i++;
+                    $this->logger->addLog('Attempt #'.$i.' on 20: Lock inexistent, proceed to create one', 'info');
+                    if (PayplugLock::createLockG2($cart->id, 'validation')) {
+                        $this->logger->addLog('Lock created', 'info');
+                        break;
+                    }
                 }
             } while(!$cart_lock);
 
