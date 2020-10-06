@@ -36,6 +36,7 @@ class PayPlugNotifications
     public $logger;
     public $sandbox;
     public $key;
+    public $api_key;
 
     public function __construct()
     {
@@ -47,8 +48,8 @@ class PayPlugNotifications
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
 
-        $this->getResource();
         $this->setLogger();
+        $this->getResource();
     }
 
     private function getResource()
@@ -56,6 +57,9 @@ class PayPlugNotifications
          $body = Tools::file_get_contents('php://input');
 
         try {
+            $resource = json_decode($body);
+            $this->api_key = (bool)$resource->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
+            $this->payplug->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
             $this->flag = true;
@@ -997,7 +1001,7 @@ class PayPlugNotifications
                                 $data['metadata']['Order'] = $id_order;
                                 try {
                                     $this->logger->addLog('Payment patched.', 'debug');
-                                    $this->payplug->patchPayment($payment->id, $data);
+                                    $this->payplug->patchPayment($this->api_key, $payment->id, $data);
                                 } catch (Exception $exception) {
                                     $this->logger->addLog(
                                         'Payment cannot be patched: ' . $exception->getMessage(), 'error');
