@@ -4257,7 +4257,7 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        if (Dispatcher::getInstance()->getController() == 'category') {
+        if (Dispatcher::getInstance()->getController() == 'category' || $param['type'] != 'price') {
             return false;
         }
 
@@ -5868,6 +5868,7 @@ class Payplug extends PaymentModule
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
+            
 
             // check billing phonenumber
             if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
