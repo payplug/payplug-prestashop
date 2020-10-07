@@ -3357,45 +3357,49 @@ class Payplug extends PaymentModule
 
         // Installment Payment
         if ($options['installment']) {
-            $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
-            $paymentOption['installment']['name'] = 'installment';
-            $paymentOption['installment']['inputs'] = array(
-                'pc' => array(
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ),
-                'pay' => array(
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ),
-                'id_cart' => array(
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ),
-                'method' => array(
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'installment',
-                ),
-            );
-            $paymentOption['installment']['tpl'] = 'installment_payment.tpl';
-//            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
-            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
-                'payment', array('type' => 'installment', 'i' => 1), true);
-            $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
-            $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
-            $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher',
-                array('def' => (int)$options['deferred']), true);
-            $paymentOption['installment']['moduleName'] = 'payplug';
+            $use_taxes = (bool)Configuration::get('PS_TAX');
+            $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
+            if ($cart_amount >= $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT')) {
+                $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
+                $paymentOption['installment']['name'] = 'installment';
+                $paymentOption['installment']['inputs'] = array(
+                    'pc' => array(
+                        'name' => 'pc',
+                        'type' => 'hidden',
+                        'value' => 'new_card',
+                    ),
+                    'pay' => array(
+                        'name' => 'pay',
+                        'type' => 'hidden',
+                        'value' => '1',
+                    ),
+                    'id_cart' => array(
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ),
+                    'method' => array(
+                        'name' => 'method',
+                        'type' => 'hidden',
+                        'value' => 'installment',
+                    ),
+                );
+                $paymentOption['installment']['tpl'] = 'installment_payment.tpl';
+                //            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
+                $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
+                    'payment', array('type' => 'installment', 'i' => 1), true);
+                $paymentOption['installment']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png');
+                $paymentOption['installment']['callToActionText'] = $this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments');
+                $paymentOption['installment']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher',
+                    array('def' => (int)$options['deferred']), true);
+                $paymentOption['installment']['moduleName'] = 'payplug';
 
-            $this->smarty->assign(array(
-                'installment_controller_url' => PayplugBackward::getModuleLink($this->name, 'payment', array('i' => 1),
-                    true),
-                'installment_mode' => $installment_mode,
-            ));
+                $this->smarty->assign(array(
+                    'installment_controller_url' => PayplugBackward::getModuleLink($this->name, 'payment', array('i' => 1),
+                        true),
+                    'installment_mode' => $installment_mode,
+                ));
+            }
         }
 
         if ($options['oney'] && isset($this->available_oney_payments) && $this->available_oney_payments) {
