@@ -4253,11 +4253,12 @@ class Payplug extends PaymentModule
 
     public function hookDisplayProductPriceBlock($param)
     {
-        if (!$this->isOneyAllowed()) {
-            return false;
-        }
-
-        if (Dispatcher::getInstance()->getController() == 'category' || $param['type'] != 'price') {
+        if (
+            (!$this->getConfiguration('PAYPLUG_ONEY'))
+            || (!$this->isOneyAllowed())
+            || (Dispatcher::getInstance()->getController() == 'category')
+            || (Dispatcher::getInstance()->getController() == 'index')
+        ) {
             return false;
         }
 
