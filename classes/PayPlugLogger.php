@@ -90,15 +90,58 @@ class PayPlugLogger extends \ObjectModel
             $content = [];
         }
 
-        $date = $this->udate('Y-m-d H:i:s.u T');
-        $entry = ['date' => $date, 'message' => $message, 'level' => $level];
+        $this->date_add = $this->udate('Y-m-d H:i:s.u T');
+        $entry = ['date' => $this->date_add, 'message' => $message, 'level' => $level];
         array_push($content, $entry);
 
         $this->content = json_encode($content);
+
         $this->save();
 
         return $this;
     }
+
+    public function save()
+    {
+        if ((int)$this->id > 0) {
+            $this->date_upd = $this->udate('Y-m-d H:i:s.u T');
+            return $this->updateLog();
+        }
+
+        $this->addToDb();
+    }
+
+    public function addToDb()
+    {
+        $req_add_log = '
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_logger (process, content, date_add, date_upd)
+                VALUES (\'' . pSQL($this->process) . '\', \'' . pSQL($this->content) . '\', \'' . pSQL($this->date_add) . '\', \'' . pSQL($this->date_add) . '\')';
+        $res_add_log = Db::getInstance()->execute($req_add_log);
+
+        $this->id = Db::getInstance()->Insert_ID();
+
+        if (!$res_add_log) {
+            return false;
+        }
+    }
+
+
+
+    public function updateLog()
+    {
+        $req_upd_log = '
+                UPDATE ' . _DB_PREFIX_ . 'payplug_logger log  
+                SET log.process = \'' . pSQL($this->process) . '\', log.content = \'' . pSQL($this->content) . '\', log.date_upd = \'' . pSQL($this->date_upd) . '\'
+                WHERE log.id_payplug_logger = ' . (int)$this->id;
+        $res_upd_log = Db::getInstance()->execute($req_upd_log);
+
+        if (!$res_upd_log) {
+            return false;
+        }
+
+        return $res_upd_log;
+    }
+
 
     public function udate($format = 'u', $utimestamp = null)
     {
@@ -157,4 +200,3 @@ class PayPlugLogger extends \ObjectModel
         return $flag;
     }
 }
-

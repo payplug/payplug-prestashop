@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2019 PayPlug SAS
+ * 2013 - 2020 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2019 PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -2634,11 +2634,20 @@ class Payplug extends PaymentModule
     /**
      *  Get Oney call to action
      *
+     * @param string $env
+     * @param bool $allowed
      * @return mixed
      */
-    public function getOneyCTA()
+    public function getOneyCTA($env = null)
     {
-        return $this->display(__FILE__, 'oney/cta.tpl');
+        $this->smarty->assign(array(
+            'this_path' => $this->_path,
+            'env' => $env,
+            'payplug_module_dir' => _MODULE_DIR_,
+            'payplug_oney_loading_msg' => $this->l('Loading')
+        ));
+
+        return $this->display(__FILE__, 'oney_cta.tpl');
     }
 
     /**
@@ -2675,7 +2684,7 @@ class Payplug extends PaymentModule
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
-                'brand' => isset($product['manufacturer_name']) && $product['manufacturer_name'] ?: Configuration::get('PS_SHOP_NAME')
+                'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ? $product['manufacturer_name']  : Configuration::get('PS_SHOP_NAME')
             );
 
             $cart_context[] = array_merge($item, $delivery_context);
@@ -4242,17 +4251,21 @@ class Payplug extends PaymentModule
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
-    /**
-     * @param $params
-     * @return string|void
-     */
     public function hookDisplayProductPriceBlock($param)
     {
-        $action = Tools::getValue('action');
-        if (!$this->isOneyAllowed() || $action == 'quickview') {
+        if (
+            (!$this->getConfiguration('PAYPLUG_ONEY'))
+            || (!$this->isOneyAllowed())
+            || (Dispatcher::getInstance()->getController() == 'category')
+            || (Dispatcher::getInstance()->getController() == 'index')
+        ) {
             return false;
         }
 
+        $action = Tools::getValue('action');
+        if ($action == 'quickview') {
+            return false;
+        }
         if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
             return;
         }
@@ -4287,6 +4300,7 @@ class Payplug extends PaymentModule
         $this->smarty->assign(['env' => 'product']);
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
+
 
     /**
      * @param array $params
@@ -4538,6 +4552,8 @@ class Payplug extends PaymentModule
             $log->error('Install failed: hook paymentOptions.');
         } elseif (!$this->registerHook('Payment')) {
             $log->error('Install failed: hook Payment.');
+        } elseif (!$this->registerHook('moduleRoutes')) {
+            $log->error('Install failed: hook moduleRoutes.');
         } elseif (!$this->registerHook('registerGDPRConsent') ||
             !$this->registerHook('actionDeleteGDPRCustomer') ||
             !$this->registerHook('actionExportGDPRData')
@@ -5853,6 +5869,7 @@ class Payplug extends PaymentModule
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
+            
 
             // check billing phonenumber
             if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
@@ -5871,9 +5888,10 @@ class Payplug extends PaymentModule
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
             }
-
+            
             if ($this->hasOneyRequiredFields($payment_tab)) {
                 // check oney required fields
+
                 $payment_data = $this->getPaymentDataCookie();
                 if (!$payment_data) {
                     $payment_data = Tools::getValue('oney_form');
@@ -6400,6 +6418,16 @@ class Payplug extends PaymentModule
         );
     }
 
+    public function setNotification()
+    {
+        return new PayPlugNotifications();
+    }
+
+    public function setValidation()
+    {
+        return new PayPlugValidation();
+    }
+
     /**
      * Determine witch environment is used
      *
@@ -6907,8 +6935,8 @@ class Payplug extends PaymentModule
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_logger`';
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment`';
         $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_cache`';
+        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment`';
 
         foreach ($queries as $query) {
             $flag = $flag && Db::getInstance()->execute($query);
@@ -7229,6 +7257,7 @@ class Payplug extends PaymentModule
             'header',
             'paymentReturn',
             'actionAdminPerformanceControllerAfter',
+            'moduleRoutes'
         );
 
         $flag = true;
