@@ -32,6 +32,7 @@ class PayPlugValidation
     public $payplug;
     public $debug;
     public $type;
+    public $api_key;
 
     public function __construct()
     {
@@ -129,6 +130,7 @@ class PayPlugValidation
                     $this->type = 'installment';
                     try {
                         $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                        $this->api_key = (bool)$installment->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
                         if (isset($installment->schedule)) {
                             foreach ($installment->schedule as $schedule) {
                                 $amount += (int)$schedule->amount;
@@ -160,6 +162,7 @@ class PayPlugValidation
                 $this->logger->addLog('Payment is not consumed yet.', 'info');
                 try {
                     $payment = \Payplug\Payment::retrieve($pay_id);
+                    $this->api_key = (bool)$payment->is_live ? Configuration::get('PAYPLUG_LIVE_API_KEY') : Configuration::get('PAYPLUG_TEST_API_KEY');
                     $this->logger->addLog('Retrieving payment...', 'info');
                     if (isset($payment->failure) && $payment->failure !== null) {
                         if (!PayplugLock::deleteLockG2($cart->id)) {
@@ -428,7 +431,7 @@ class PayPlugValidation
                         $data = array();
                         $data['metadata'] = $payment->metadata;
                         $data['metadata']['Order'] = $id_order;
-                        $this->payplug->patchPayment($payment->id, $data);
+                        $this->payplug->patchPayment($this->api_key, $payment->id, $data);
                     } elseif ($this->type == 'installment') {
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
                     }
