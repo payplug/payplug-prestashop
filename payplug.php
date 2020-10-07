@@ -2684,7 +2684,7 @@ class Payplug extends PaymentModule
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
-                'brand' => isset($product['manufacturer_name']) && $product['manufacturer_name'] ?: Configuration::get('PS_SHOP_NAME')
+                'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ? $product['manufacturer_name']  : Configuration::get('PS_SHOP_NAME')
             );
 
             $cart_context[] = array_merge($item, $delivery_context);
