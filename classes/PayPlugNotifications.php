@@ -982,8 +982,7 @@ class PayPlugNotifications
                                     die;
                                 } else {
                                     if ($deferred && count($order->getOrderPayments()) == 0) {
-                                        $this->logger->addLog('Add new orderPayment for deferred - ' . count($order->getOrderPayments()),
-                                            'debug');
+                                        $this->logger->addLog('Add new orderPayment for deferred - ' . count($order->getOrderPayments()), 'debug');
                                         $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                                     }
                                     $this->logger->addLog('Order loaded.', 'debug');

@@ -192,6 +192,12 @@ class PayPlugValidation
                         }
                     }
 
+                    if ($payment->authorization !== null && !$is_oney) {
+                        $deferred = true;
+                    } else {
+                        $deferred = false;
+                    }
+
                     $is_authorized = count($payment->authorization) > 0;
 
                     $amount = $payment->amount;
@@ -247,7 +253,7 @@ class PayPlugValidation
                     }
                 }
             } else {
-                $this->logger->addLog('Order does\'nt exists yet.', 'info');
+                $this->logger->addLog('Order doesn\'t exists yet.', 'info');
 
                 if ($this->type == 'payment') {
                     $state_addons = ($payment->is_live ? '' : '_TEST');
@@ -291,7 +297,7 @@ class PayPlugValidation
                         $this->logger->addLog('Stored payment successfully set up to pending.', 'info');
                     }
                 }
-                $this->logger->addLog('Order state will be :' . $order_state, 'info');
+                $this->logger->addLog('Order state will be : ' . $order_state, 'info');
 
                 $transaction_id = null;
                 if ($this->type == 'payment') {
@@ -418,6 +424,12 @@ class PayPlugValidation
                     if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
                         $this->logger->addLog('Unable to create order payment.', 'error');
                     }
+                }
+
+                // Add payment line
+                if ($deferred && count($order->getOrderPayments()) == 0) {
+                    $this->logger->addLog('Add new orderPayment for deferred - ' . count($order->getOrderPayments()), 'debug');
+                    $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                 }
 
                 if (!$validateOrder_result) {

@@ -838,6 +838,7 @@ class Payplug extends PaymentModule
 
             $order = new Order((int)$id_order);
             if (Validate::isLoadedObject($order)) {
+                $order->setInvoice(true);
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
                     $history = new OrderHistory();
