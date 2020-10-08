@@ -905,9 +905,6 @@ class Payplug extends PaymentModule
      */
     private function checkAmount($cart)
     {
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            return true;
-        }
         $currency = new Currency($cart->id_currency);
         $amounts_by_currency = $this->getAmountsByCurrency($currency->iso_code);
         $amount = $cart->getOrderTotal(true, Cart::BOTH) * 100;
@@ -1037,9 +1034,6 @@ class Payplug extends PaymentModule
      */
     private function checkCurrency($cart)
     {
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            return true;
-        }
         $currency_order = new Currency((int)($cart->id_currency));
         $currencies_module = $this->getCurrency((int)$cart->id_currency);
         if (is_array($currencies_module)) {
@@ -1052,7 +1046,6 @@ class Payplug extends PaymentModule
                 }
             }
         }
-
         return false;
     }
 
@@ -7085,7 +7078,7 @@ class Payplug extends PaymentModule
             $this->assignOneyPaymentOptions($cart);
         }
 
-        $payment_options = $this->getPaymentOptions($params); // Données sous forme de tableau (pour 1.6 et 1.7)
+        $payment_options = $this->getPaymentOptions($cart); // $payment_options = Données sous forme de tableau (pour 1.6 et 1.7)
 
         $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options,
             $cart); // Transforme tableau en TPL
