@@ -1233,6 +1233,7 @@ class Payplug extends PaymentModule
             && Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
             && Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
             && Configuration::updateValue('PAYPLUG_OFFER', '')
+            && Configuration::updateValue('PAYPLUG_ONEY', null)
             && Configuration::updateValue('PAYPLUG_ONE_CLICK', null)
             && Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 1)
             && Configuration::updateValue('PAYPLUG_SHOW', 0)
