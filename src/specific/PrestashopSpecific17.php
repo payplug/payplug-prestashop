@@ -39,6 +39,9 @@ class PrestashopSpecific17
             }
 
             $paymentOption = new PaymentOption();
+            if (isset($payment_option['expiry_date_card'])) {
+                $payment_option['callToActionText'] = $payment_option['callToActionText'] .' - '. $payment_option['expiry_date_card'];
+            }
             $paymentOption
                 ->setLogo($payment_option['logo'])
                 ->setCallToActionText($payment_option['callToActionText'])

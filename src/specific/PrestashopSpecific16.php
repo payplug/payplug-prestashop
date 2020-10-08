@@ -14,6 +14,7 @@ class PrestashopSpecific16
 {
     public $payplug;
     public $context;
+    private $one_click;
 
     public function __construct($payplug)
     {
@@ -135,6 +136,11 @@ class PrestashopSpecific16
                     oney_payment.tpl (Oney optimisé)
                     unified_payment.tpl (Oney non optimisé)
                     */
+                    if (empty($this->one_click)) {
+                        $this->one_click = $payment_option['name'];
+                        continue;
+                    }
+
                     $paymentOptions[] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
