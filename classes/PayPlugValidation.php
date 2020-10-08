@@ -205,7 +205,12 @@ class PayPlugValidation
                     $this->payplug->setPaymentErrorsCookie(array($this->payplug->l('The transaction was not completed and your card was not charged.')));
                     Payplug::redirectForVersion($redirect_url_error);
                 }
-                if ((int)$payment->save_card == 1 || ($payment->card->id != '' && $payment->hosted_payment != '')) {
+                if (
+                    ((isset($payment->save_card) && (int)$payment->save_card == 1))
+                    ||
+                    ((isset($payment->card->id) && $payment->card->id != '')
+                        && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
+                ) {
                     $this->logger->addLog('Saving card...', 'info');
                     $res_payplug_card = $this->payplug->saveCard($payment);
 
