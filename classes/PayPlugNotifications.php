@@ -133,6 +133,20 @@ class PayPlugNotifications
             }
         }
 
+        if (
+            ((isset($payment->save_card) && (int)$payment->save_card == 1))
+            ||
+                ((isset($payment->card->id) && $payment->card->id != '')
+                && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
+        ) {
+            $this->logger->addLog('Saving card...', 'info');
+            $res_payplug_card = $this->payplug->saveCard($payment);
+
+            if (!$res_payplug_card) {
+                $this->logger->addLog('Card cannot be saved.', 'error');
+            }
+        }
+
         $this->logger->addLog('Paid (Payment): ' . (int)$payment->is_paid);
 
         $is_oney = false;
@@ -755,6 +769,7 @@ class PayPlugNotifications
                             }
                         }
                     } else {
+
                         $this->logger->addLog('CREATE MODE');
 
                         if (isset($this->resource->failure) && $this->resource->failure !== null) {
