@@ -3275,9 +3275,9 @@ class Payplug extends PaymentModule
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
 
-            $paymentOption['payplug_cards']['name'] = 'payplug_cards';
-            $paymentOption['payplug_cards']['data'] = $payplug_cards;
-            $paymentOption['payplug_cards']['extra_classes'] = strtolower($paymentOption['payplug_cards']['data'][0]['brand']);
+//            $paymentOption['payplug_cards']['name'] = 'payplug_cards';
+//            $paymentOption['payplug_cards']['data'] = $payplug_cards;
+//            $paymentOption['payplug_cards']['extra_classes'] = strtolower($paymentOption['payplug_cards']['data'][0]['brand']);
 
             foreach ($payplug_cards as $card) {
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');

@@ -114,18 +114,28 @@ class PrestashopSpecific16
             ));
         }
 
+        $payplug_card = new PayPlugCard();
+        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
+        $i = 0;
         foreach($payment_options as $payment_option) {
-            if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
-                $payplug_card = new PayPlugCard();
-                $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
-                $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
+
+            if ((isset($payment_option['name']))) {
+                if (($payment_option['name'] == 'one_click') && $i <=1 ) {
+                    $i++;
+                    continue;
+                }
+
+                var_dump($payment_option['name'], $i);
+
+//            if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
 
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
 
                 // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
                 // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
-                    && (!empty($payplug_cards))
+//                    && (!empty($payplug_cards))
                     && ($payment_option['name'] == 'standard')) {
                         continue;
                 } else {
@@ -136,10 +146,10 @@ class PrestashopSpecific16
                     oney_payment.tpl (Oney optimisé)
                     unified_payment.tpl (Oney non optimisé)
                     */
-                    if (empty($this->one_click)) {
-                        $this->one_click = $payment_option['name'];
-                        continue;
-                    }
+//                    if (empty($this->one_click)) {
+//                        $this->one_click = $payment_option['name'];
+//                        continue;
+//                    }
 
                     $paymentOptions[] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
