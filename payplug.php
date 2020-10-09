@@ -5868,7 +5868,7 @@ class Payplug extends PaymentModule
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
                 return ['result' => false, 'response' => $is_elligible['error']];
             }
-            
+
 
             // check billing phonenumber
             if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
@@ -5887,7 +5887,7 @@ class Payplug extends PaymentModule
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
             }
-            
+
             if ($this->hasOneyRequiredFields($payment_tab)) {
                 // check oney required fields
 
@@ -5930,19 +5930,19 @@ class Payplug extends PaymentModule
         try {
             if ($is_installment) {
                 $payment = \Payplug\InstallmentPlan::create($payment_tab);
-                if ($payment->failure != null && !empty($payment->failure['message'])) {
+                if ($payment->failure != null && !empty($payment->failure->message)) {
                     return [
                         'result' => false,
-                        'response' => $payment->failure['message'],
+                        'response' => $payment->failure->message,
                     ];
                 }
                 $this->storeInstallment($payment->id, (int)$cart->id);
             } else {
                 $payment = \Payplug\Payment::create($payment_tab);
-                if ($payment->failure == true && !empty($payment->failure['message'])) {
+                if ($payment->failure == true && !empty($payment->failure->message)) {
                     return [
                         'result' => false,
-                        'response' => $payment->failure['message'],
+                        'response' => $payment->failure->message,
                     ];
                 }
                 $this->storePayment($payment->id, (int)$cart->id);
