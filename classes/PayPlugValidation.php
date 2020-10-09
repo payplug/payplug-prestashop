@@ -354,53 +354,23 @@ class PayPlugValidation
                 try {
                     if ($amount != $cart_amount) {
                         $this->logger->addLog('Cart amount is different and may occured an error', 'info');
-                        $this->logger->addLog('Order create with amount:' . $cart_amount, 'info');
-
-                        $validateOrder_result = $this->payplug->validateOrder(
-                            $cart->id,
-                            $order_state,
-                            $cart_amount,
-                            $module_name,
-                            false,
-                            $extra_vars,
-                            (int)$cart->id_currency,
-                            false,
-                            $secure_key
-                        );
-
-                        $id_order = $this->payplug->currentOrder;
-                        $order = new Order($id_order);
-
-                        $this->logger->addLog('Order payment patch with amount:' . $amount, 'info');
-                        $order->total_paid = $amount;
-                        $order->total_paid_real = $amount;
-                        $order->total_paid_tax_incl = $amount;
-                        $order->update();
-
-                        if ($this->payplug->checkVersion('1.5')) {
-                            $sql = 'UPDATE `' . _DB_PREFIX_ . 'order_payment` 
-                        SET `amount` = ' . (float)$amount . ' 
-                        WHERE  `transaction_id` = "' . pSQL($transaction_id) . '"';
-                            Db::getInstance()->execute($sql);
-                        }
-
-                        $this->logger->addLog('Order amount is patched' . $cart_amount, 'info');
-                    } else {
-                        $validateOrder_result = $this->payplug->validateOrder(
-                            $cart->id,
-                            $order_state,
-                            $amount,
-                            $module_name,
-                            false,
-                            $extra_vars,
-                            (int)$cart->id_currency,
-                            false,
-                            $secure_key
-                        );
-
-                        $id_order = $this->payplug->currentOrder;
-                        $order = new Order($id_order);
+                        $this->logger->addLog('Cart amount:' . $cart_amount, 'info');
                     }
+
+                    $validateOrder_result = $this->payplug->validateOrder(
+                        $cart->id,
+                        $order_state,
+                        $amount,
+                        $module_name,
+                        false,
+                        $extra_vars,
+                        (int)$cart->id_currency,
+                        false,
+                        $secure_key
+                    );
+
+                    $id_order = $this->payplug->currentOrder;
+                    $order = new Order($id_order);
                 } catch (Exception $exception) {
                     $this->logger->addLog('Order cannot be created: ' . $exception->getMessage(), 'error');
                     $this->response = array(
