@@ -722,50 +722,19 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             if ($amount != $cart_amount) {
                                 $this->logger->addLog('Cart amount is different and may occured an error', 'info');
                                 $this->logger->addLog('Order create with amount:' . $cart_amount, 'info');
-
-                                $is_order_validated = $this->payplug->validateOrder(
-                                    $cart->id,
-                                    $order_state,
-                                    $cart_amount,
-                                    $module_name,
-                                    null,
-                                    $extra_vars,
-                                    $currency,
-                                    false,
-                                    $secure_key
-                                );
-
-                                if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
-                                    $order = Order::getByCartId($cart->id);
-                                } else {
-                                    $id_order = Order::getOrderByCartId($cart->id);
-                                    $order = new Order($id_order);
-                                }
-
-                                $this->logger->addLog('Order payment patch with amount:' . $amount, 'info');
-                                $order->total_paid = $amount;
-                                $order->total_paid_real = $amount;
-                                $order->total_paid_tax_incl = $amount;
-                                $order->update();
-
-                                $sql = 'UPDATE `' . _DB_PREFIX_ . 'order_payment` SET `amount` = ' . (float)$amount . ' WHERE  `transaction_id` = "' . pSQL($this->resource->id) . '"';
-                                Db::getInstance()->execute($sql);
-
-                                $this->logger->addLog('Order amount is patched' . $cart_amount, 'info');
-                            } else {
-                                $is_order_validated = $this->payplug->validateOrder(
-                                    $cart->id,
-                                    $order_state,
-                                    $amount,
-                                    $module_name,
-                                    null,
-                                    $extra_vars,
-                                    $currency,
-                                    false,
-                                    $secure_key
-                                );
                             }
 
+                            $is_order_validated = $this->payplug->validateOrder(
+                                $cart->id,
+                                $order_state,
+                                $amount,
+                                $module_name,
+                                null,
+                                $extra_vars,
+                                $currency,
+                                false,
+                                $secure_key
+                            );
                         } catch (Exception $exception) {
                             $this->logger->addLog(
                                 'Order cannot be validated: ' . $exception->getMessage(), 'error');
