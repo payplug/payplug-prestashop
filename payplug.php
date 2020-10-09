@@ -5764,19 +5764,19 @@ class Payplug extends PaymentModule
         try {
             if ($is_installment) {
                 $payment = \Payplug\InstallmentPlan::create($payment_tab);
-                if ($payment->failure != null && !empty($payment->failure['message'])) {
+                if ($payment->failure != null && !empty($payment->failure->message)) {
                     return [
                         'result' => false,
-                        'response' => $payment->failure['message'],
+                        'response' => $payment->failure->message,
                     ];
                 }
                 $this->storeInstallment($payment->id, (int)$cart->id);
             } else {
                 $payment = \Payplug\Payment::create($payment_tab);
-                if ($payment->failure == true && !empty($payment->failure['message'])) {
+                if ($payment->failure == true && !empty($payment->failure->message)) {
                     return [
                         'result' => false,
-                        'response' => $payment->failure['message'],
+                        'response' => $payment->failure->message,
                     ];
                 }
                 $this->storePayment($payment->id, (int)$cart->id);
