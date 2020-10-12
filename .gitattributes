@@ -10,3 +10,5 @@ views/css/*.map export-ignore
 views/16views/viewscss/less export-ignore
 views/16views/viewscss/*.less export-ignore
 views/16views/viewscss/*.map export-ignore
+views/templates/front/tools export-ignore
+controllers/tools export-ignore
