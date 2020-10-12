@@ -25,17 +25,17 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_11_0()
+function upgrade_module_2_7_0()
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
-    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+    if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
-    
+
     //sql
     $req_payplug_payment_cart = '
         ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
-        ADD COLUMN `is_pending` TINYINT(1) NOT NULL DEFAULT 0
+        ADD COLUMN `date_upd` DATETIME NULL
         AFTER `id_cart`';
     try {
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);

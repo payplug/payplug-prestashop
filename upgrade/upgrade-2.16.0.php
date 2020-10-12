@@ -25,21 +25,20 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-
-function upgrade_module_2_17_0($object)
+function upgrade_module_2_16_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
-    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+    if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
+    require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
-    if (!Configuration::updateValue('PAYPLUG_INST', null)
-        || !Configuration::updateValue('PAYPLUG_INST_MODE', 3)
-        || !Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
+    if (!PayplugBackward::updateConfiguration('PAYPLUG_INST', 0)
+        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MODE', 3)
+        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MIN_AMOUNT', 150)
     ) {
         $log->error('Fail to add new configuration');
         $flag = false;
@@ -56,7 +55,7 @@ function upgrade_module_2_17_0($object)
             `id_payplug_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_installment` VARCHAR(255) NOT NULL,
             `id_cart` INT(11) UNSIGNED NOT NULL,
-            `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
+            `is_pending` TINYINT(1) NOT NULL DEFAULT 0, 
             `date_upd` DATETIME NULL
             ) ENGINE='._MYSQL_ENGINE_;
     try {

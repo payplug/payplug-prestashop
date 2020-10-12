@@ -29,6 +29,11 @@ require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
 
 function upgrade_module_2_23_0($object)
 {
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 

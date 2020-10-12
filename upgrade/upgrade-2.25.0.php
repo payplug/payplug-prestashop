@@ -29,6 +29,11 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_25_0()
 {
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     truncateCSV(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
     Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
     return true;

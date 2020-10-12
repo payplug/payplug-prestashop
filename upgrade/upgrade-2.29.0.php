@@ -21,27 +21,37 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_11_0()
+/**
+ * @description Install PayPlug Cache DB in case of an upgrade of the module.
+ *
+ * @return boolean
+ */
+function upgrade_module_2_29_0()
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
         return true;
     }
-    
-    //sql
-    $req_payplug_payment_cart = '
-        ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
-        ADD COLUMN `is_pending` TINYINT(1) NOT NULL DEFAULT 0
-        AFTER `id_cart`';
-    try {
-        $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
-    } catch (PrestaShopDatabaseException $e) {
-        return true;
-    }
 
-    return $res_payplug_payment_cart;
+    $flag = true;
+
+    // install table `payplug_cache`
+    $sql = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_cache` (
+            `id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `cache_key` VARCHAR(255) NOT NULL,
+            `cache_value` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+    $flag = $flag && Db::getInstance()->execute($sql);
+
+    return $flag;
 }
