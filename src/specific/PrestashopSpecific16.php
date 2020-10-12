@@ -113,18 +113,26 @@ class PrestashopSpecific16
             ));
         }
 
+        $payplug_card = new PayPlugCard();
+        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
+        $i = 0;
+
         foreach($payment_options as $payment_option) {
-            if ((isset($payment_option['name'])) && ($payment_option['name'] !== 'payplug_cards')) {
-                $payplug_card = new PayPlugCard();
-                $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
-                $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
+
+            // Pour n'affiche qu'un template OneClick
+            // Sinon, si x CB d'enregistrées : affiche x temmplates avec x CB dans chaque
+            if ((isset($payment_option['name']))) {
+                if (($payment_option['name'] == 'one_click') && $i <=1 ) {
+                    $i++;
+                    continue;
+                }
 
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
 
                 // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
                 // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
-                    && (!empty($payplug_cards))
                     && ($payment_option['name'] == 'standard')) {
                         continue;
                 } else {

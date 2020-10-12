@@ -3275,15 +3275,10 @@ class Payplug extends PaymentModule
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
 
-            $paymentOption['payplug_cards']['name'] = 'payplug_cards';
-            $paymentOption['payplug_cards']['data'] = $payplug_cards;
-            $paymentOption['payplug_cards']['extra_classes'] = strtolower($paymentOption['payplug_cards']['data'][0]['brand']);
-
             foreach ($payplug_cards as $card) {
-
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                $paymentOption['one_click']['name'] = 'one_click';
-                $paymentOption['one_click']['inputs'] = array(
+                $paymentOption['one_click_'.$card['id_payplug_card']]['name'] = 'one_click';
+                $paymentOption['one_click_'.$card['id_payplug_card']]['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
                         'type' => 'hidden',
@@ -3305,14 +3300,13 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
-                $paymentOption['one_click']['tpl'] = 'one_click_payment.tpl';
-                $paymentOption['one_click']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
-                    'payment', array(), true);
-                $paymentOption['one_click']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
-                $paymentOption['one_click']['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'];
-                $paymentOption['one_click']['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher',
-                    array('def' => (int)$options['deferred']), true);
-                $paymentOption['one_click']['moduleName'] = 'payplug';
+                $paymentOption['one_click_'.$card['id_payplug_card']]['tpl'] = 'one_click_payment.tpl';
+                $paymentOption['one_click_'.$card['id_payplug_card']]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,'payment', array(), true);
+                $paymentOption['one_click_'.$card['id_payplug_card']]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
+                $paymentOption['one_click_'.$card['id_payplug_card']]['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'];
+                $paymentOption['one_click_'.$card['id_payplug_card']]['expiry_date_card'] = $this->l('Expiry date') . ': ' . $card['expiry_date'];
+                $paymentOption['one_click_'.$card['id_payplug_card']]['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
+                $paymentOption['one_click_'.$card['id_payplug_card']]['moduleName'] = 'payplug';
             }
         }
 
@@ -7081,8 +7075,7 @@ class Payplug extends PaymentModule
 
         $payment_options = $this->getPaymentOptions($cart); // $payment_options = Données sous forme de tableau (pour 1.6 et 1.7)
 
-        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options,
-            $cart); // Transforme tableau en TPL
+        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $cart); // Transforme tableau en TPL
 
         foreach ($paymentOptions as $paymentOption) {
             $find = 'oney';
