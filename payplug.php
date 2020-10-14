@@ -5992,6 +5992,9 @@ class Payplug extends PaymentModule
      */
     protected function retrieveInstallment($inst_id)
     {
+        if(!$inst_id) {
+            return false;
+        }
         try {
             $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
         } catch (Exception $e) {
