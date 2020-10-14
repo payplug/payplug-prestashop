@@ -5920,6 +5920,11 @@ class Payplug extends PaymentModule
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
+        return [
+            'result' => false,
+            'response' => 'test error message',
+        ];
+
         // Create payment
         try {
             if ($is_installment) {

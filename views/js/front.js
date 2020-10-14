@@ -35,7 +35,7 @@ var $document, $window, payplugModule = {
         init: function () {
             // Styling
             var $options = $('input[data-module-name="payplug"]');
-            $options.parents('.payment-option').addClass('payplug-payment-option')
+            $options.parents('.payment-option').addClass('payplugPaymentOption')
 
             this.checkErrors();
 
@@ -77,15 +77,24 @@ var $document, $window, payplugModule = {
         },
     },
     card: {
+        props: {
+            identifier: 'payplugCard',
+            query: null,
+        },
         init: function () {
-            $document.on('click', 'a.ppdeletecard', payplugModule.card.delete);
+            var {card} = payplugModule,
+                {identifier} = card.props;
+            $document.on('click', '.'+identifier+'_delete', payplugModule.card.delete);
         },
         delete: function (event) {
             event.preventDefault();
+            event.stopPropagation();
 
             var $elem = $(this),
                 id_card = $elem.data('id_card'),
-                url = $(this).attr('href') + '&pc=' + id_card;
+                url = $(this).attr('href') + '&pc=' + id_card,
+                {card} = payplugModule,
+                {identifier} = card.props;
 
             $.ajax({
                 type: 'POST',
@@ -103,9 +112,9 @@ var $document, $window, payplugModule = {
                 },
                 success: function (result) {
                     if (result) {
-                        $('#id_payplug_card_' + id_card).remove();
-                        $('#module-payplug-cards div.message').show();
-                        $('#module-payplug-controllers-front-cards div.message').show();
+                        $('.'+identifier+'[data-id_card='+id_card+']').remove();
+                        $('#module-payplug-cards div.message').removeClass('hide');
+                        $('#module-payplug-controllers-front-cards div.message').removeClass('hide');
                     }
                 }
             });

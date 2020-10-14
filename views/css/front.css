@@ -35,229 +35,7 @@
     opacity: 1;
   }
 }
-p.payment_module a.payplug {
-  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
-  padding-left: 240px;
-}
-p.payment_module a.payplug:hover {
-  background-color: #F6F6F6;
-}
-p.payment_module a.payplug:after {
-  display: block;
-  content: "\f054";
-  position: absolute;
-  right: 15px;
-  margin-top: -11px;
-  top: 50%;
-  font-family: "FontAwesome";
-  font-size: 25px;
-  height: 22px;
-  width: 14px;
-  color: #777;
-}
-div.payplug-wrapper {
-  border: 1px solid #d6d4d4;
-  border-radius: 4px;
-  background: #fbfbfb;
-  color: #333;
-  display: block;
-  font-size: 17px;
-  font-weight: bold;
-  /*letter-spacing: -1px;*/
-  line-height: 23px;
-  /*padding: 0;
-  margin: 0;*/
-  position: relative;
-}
-div.payplug-wrapper .payment_module {
-  letter-spacing: -1px;
-}
-div.payplug-wrapper .payment_module span {
-  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
-  /*padding-left: 197px;*/
-  padding: 33px 40px 34px 197px;
-  display: block;
-}
-div.payplug-wrapper form {
-  padding: 0 0 10px 16px;
-  position: relative;
-}
-form div.card-wrapper {
-  overflow: hidden;
-  line-height: normal;
-  padding: 0 0 10px 0;
-}
-form div.card-wrapper input {
-  float: left;
-}
-div.info-wrapper div:first-child {
-  padding: 0;
-}
-form input[name=payplug_card] {
-  /*float: left;*/
-  margin: 10px 10px 0 0;
-}
-form div label {
-  float: left;
-}
-form div label img {
-  float: left;
-  padding: 0 8px 0 0;
-  width: 60px;
-}
-form div label div.info-wrapper {
-  float: left;
-}
-label[for=payplug_card_new] {
-  /*padding: 10px 0 0 0;*/
-}
-.payplug_expiry_date {
-  display: block;
-  font-size: 13px;
-  font-weight: normal;
-  padding: 0 0 0 19px;
-  text-align: center;
-}
-.ppdelete {
-  display: block;
-  padding: 0 0 0 19px;
-  text-decoration: underline;
-  font-weight: normal;
-  font-size: 0.8em;
-  width: 160px;
-}
-.ppdelete:hover,
-.ppdelete:active,
-.ppdelete:visited,
-.ppdelete:focus {
-  text-decoration: underline;
-}
-.ppsubmit {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #00ab7a none repeat scroll 0 0;
-  border-radius: 0.25em;
-  color: #ffffff;
-  font-weight: 700;
-  height: 3em;
-  margin: 1em auto 0 auto;
-  padding: 0;
-  text-transform: uppercase;
-  min-width: 11em;
-  border: none;
-}
-.ppsubmit:hover {
-  background: #49a482 none repeat scroll 0 0;
-}
-.ppsubmit.disable {
-  background: #dddddd none repeat scroll 0 0;
-}
-.ppOneClickStatus {
-  font-size: 14px;
-  clear: both;
-}
-.ppfail {
-  margin-bottom: 9px;
-  font-weight: bold;
-  font-size: 15px;
-}
-.ppOneClickStatus p {
-  text-align: left;
-  font-weight: bold;
-}
-.ppfail .material-icons {
-  margin: 0 19px 0 -4px;
-}
-@media (max-width: 700px) {
-  .ppOneClickStatus p {
-    width: 250px;
-  }
-}
-@media (max-width: 600px) {
-  .card-wrapper,
-  .info-wrapper {
-    font-size: 14px;
-  }
-  .ppsubmit {
-    position: relative;
-    display: block;
-  }
-  .ppOneClickStatus {
-    position: relative;
-    bottom: 0;
-    right: 0;
-  }
-  .ppOneClickStatus p {
-    bottom: 0;
-    position: relative;
-    text-align: center;
-    width: auto;
-  }
-}
-.loader {
-  left: 50%;
-  margin-right: -30px;
-  position: absolute;
-  top: 50%;
-  width: 50px;
-  height: 50px;
-  padding: 10px;
-  border-radius: 11px;
-  z-index: 9999;
-  background: #000000;
-}
-.ppOneClickStatus .loader {
-  width: 30px;
-  height: 30px;
-  background: none;
-  position: relative;
-  top: auto;
-  left: auto;
-  padding: 0;
-  margin: 0;
-}
-.ppsuccess {
-  color: #00ab7a;
-}
-p.ppwait {
-  display: none;
-  bottom: 6em;
-  right: 12em;
-}
-.ppfail {
-  color: #dd2525;
-}
-div.ppoverlay {
-  /*background: url('../img/admin/spinner.gif') no-repeat #000000 center;*/
-  background-color: transparent;
-  background-size: 30px 30px;
-  /*background: transparent none repeat scroll 0 0;*/
-  display: block;
-  height: 100%;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 9999999;
-  /*opacity: 0.5;*/
-}
-.ppbold {
-  font-weight: bold;
-}
-#module-payplug-cards div.message {
-  display: none;
-}
-body#checkout section.checkout-step .payment-options .payplug-payment-option label {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  justify-content: flex-end;
-  margin: 0;
-}
-body#checkout section.checkout-step .payment-options .payplug-payment-option img {
-  margin: 0 12px 0 0;
-}
+/* Payplug popin */
 .payplugPopin {
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
@@ -359,6 +137,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
 .payplugPopin-show {
   opacity: 1;
 }
+/* Payplug message */
 .payplugMsg_wrapper {
   display: flex;
   justify-content: center;
@@ -390,24 +169,18 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   margin: 5px 0 0;
   cursor: pointer;
 }
-/* Oney style */
-.oneyLogo {
-  background: 50% no-repeat;
-  -webkit-background-size: 100%;
-  background-size: 100%;
+/* Payplug payment option */
+.payplugPaymentOption label {
+  display: flex !important;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0;
 }
-.oneyLogo-x3 {
-  background-image: url(../img/oney/x3_with_fees.svg);
+.payplugPaymentOption img {
+  margin: 0 12px 0 0;
 }
-.oneyLogo-x3x4 {
-  background-image: url(../img/oney/3x4x.svg);
-}
-.oneyLogo-x4 {
-  background-image: url(../img/oney/x4_with_fees.svg);
-}
-.oneyLogo-tooltip {
-  background-image: url(../img/oney/tooltip.svg);
-}
+/* Oney cta */
 .oneyCta {
   position: relative;
   z-index: 3;
@@ -512,6 +285,101 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
     background: transparent;
   }
 }
+/* Oney Error */
+.oneyError {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  width: 100%;
+  color: #a91526;
+  clear: both;
+  padding: 0 15px;
+  margin: 0 0 16px;
+  display: none;
+}
+/* Oney Loader */
+.oneyLoader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.oneyLoader_spinner {
+  display: flex;
+  font-size: 30px;
+  width: 1em;
+  height: 1em;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+.oneyLoader_spinner span,
+.oneyLoader_spinner:before,
+.oneyLoader_spinner:after {
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border: 0.1em solid #7ebd00;
+  border-color: #7ebd00 transparent transparent transparent;
+  animation: pp-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+.oneyLoader_spinner:before,
+.oneyLoader_spinner:after {
+  content: "";
+}
+.oneyLoader_spinner:before {
+  animation-delay: -0.45s;
+}
+.oneyLoader_spinner span {
+  animation-delay: -0.3s;
+}
+.oneyLoader_spinner:after {
+  animation-delay: -0.15s;
+}
+.oneyLoader_message {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  padding: 8px 8px 0;
+  font-size: 16px;
+}
+.oneyLoader_message i {
+  animation: pp-opacity 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+}
+.oneyLoader_message i:nth-child(1) {
+  animation-delay: -0.6s;
+}
+.oneyLoader_message i:nth-child(2) {
+  animation-delay: -0.4s;
+}
+.oneyLoader_message i:nth-child(3) {
+  animation-delay: -0.2s;
+}
+/* Oney logo */
+.oneyLogo {
+  background: 50% no-repeat;
+  -webkit-background-size: 100%;
+  background-size: 100%;
+}
+.oneyLogo-x3 {
+  background-image: url(../img/oney/x3_with_fees.svg);
+}
+.oneyLogo-x3x4 {
+  background-image: url(../img/oney/3x4x.svg);
+}
+.oneyLogo-x4 {
+  background-image: url(../img/oney/x4_with_fees.svg);
+}
+.oneyLogo-tooltip {
+  background-image: url(../img/oney/tooltip.svg);
+}
+/* Oney popin */
 .oneyPopin {
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
@@ -850,53 +718,7 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
   font-style: italic;
   font-weight: 400;
 }
-.oneySchedule {
-  border: 1px solid #7ebd00;
-  border-right: none;
-  border-left: none;
-  position: relative;
-  font-size: 12px;
-  line-height: 17px;
-  width: 100%;
-  margin: -10px 0 20px -8px;
-}
-.oneySchedule ul {
-  display: flex;
-  flex-direction: column;
-  font-weight: 600;
-  font-size: 13px;
-  color: #2F2930;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-.oneySchedule ul li {
-  display: flex;
-  justify-content: space-between;
-  line-height: 21px;
-  padding: 0;
-  flex-wrap: wrap;
-}
-.oneySchedule ul li span {
-  display: flex;
-  font-weight: 600;
-}
-.oneySchedule ul li span:first-child {
-  font-weight: 500;
-}
-.oneySchedule ul li:first-child,
-.oneySchedule ul li:last-child {
-  padding: 12px 0;
-}
-.oneySchedule ul li small {
-  display: block;
-  font-weight: 400;
-  width: 100%;
-}
-.oneyPayment-mobile .oneySchedule ul li {
-  padding: 8px 0;
-}
+/* Oney Form */
 .oneyForm {
   display: flex;
   justify-content: space-between;
@@ -1182,78 +1004,52 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option img
 .oneyForm_validation-appear {
   opacity: 1;
 }
-.oneyError {
-  font-family: 'Poppins', sans-serif;
+/* Oney schedule */
+.oneySchedule {
+  border: 1px solid #7ebd00;
+  border-right: none;
+  border-left: none;
+  position: relative;
+  font-size: 12px;
+  line-height: 17px;
+  width: 100%;
+  margin: -10px 0 20px -8px;
+}
+.oneySchedule ul {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
   font-size: 13px;
+  color: #2F2930;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.oneySchedule ul li {
+  display: flex;
+  justify-content: space-between;
+  line-height: 21px;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.oneySchedule ul li span {
+  display: flex;
+  font-weight: 600;
+}
+.oneySchedule ul li span:first-child {
+  font-weight: 500;
+}
+.oneySchedule ul li:first-child,
+.oneySchedule ul li:last-child {
+  padding: 12px 0;
+}
+.oneySchedule ul li small {
+  display: block;
   font-weight: 400;
   width: 100%;
-  color: #a91526;
-  clear: both;
-  padding: 0 15px;
-  margin: 0 0 16px;
-  display: none;
 }
-.oneyLoader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-.oneyLoader_spinner {
-  display: flex;
-  font-size: 30px;
-  width: 1em;
-  height: 1em;
-  position: relative;
-  justify-content: center;
-  align-items: center;
-}
-.oneyLoader_spinner span,
-.oneyLoader_spinner:before,
-.oneyLoader_spinner:after {
-  -webkit-border-radius: 100%;
-  -moz-border-radius: 100%;
-  border-radius: 100%;
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: 90%;
-  height: 90%;
-  border: 0.1em solid #7ebd00;
-  border-color: #7ebd00 transparent transparent transparent;
-  animation: pp-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-}
-.oneyLoader_spinner:before,
-.oneyLoader_spinner:after {
-  content: "";
-}
-.oneyLoader_spinner:before {
-  animation-delay: -0.45s;
-}
-.oneyLoader_spinner span {
-  animation-delay: -0.3s;
-}
-.oneyLoader_spinner:after {
-  animation-delay: -0.15s;
-}
-.oneyLoader_message {
-  display: flex;
-  justify-content: center;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  padding: 8px 8px 0;
-  font-size: 16px;
-}
-.oneyLoader_message i {
-  animation: pp-opacity 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
-}
-.oneyLoader_message i:nth-child(1) {
-  animation-delay: -0.6s;
-}
-.oneyLoader_message i:nth-child(2) {
-  animation-delay: -0.4s;
-}
-.oneyLoader_message i:nth-child(3) {
-  animation-delay: -0.2s;
+.oneyPayment-mobile .oneySchedule ul li {
+  padding: 8px 0;
 }
 /*# sourceMappingURL=front.css.map */
