@@ -32,7 +32,6 @@ function upgrade_module_2_22_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
     //adding new configurations
@@ -43,26 +42,22 @@ function upgrade_module_2_22_0($object)
         || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)
         || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_EXP', 0)
         || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_EXP_TEST', 0)) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
     //hooking
     if (version_compare(_PS_VERSION_, '1.5', '>=')) {
         if (!$object->registerHook('actionOrderStatusUpdate')) {
-            $log->error('Fail to hook');
             $flag = false;
         }
     } else {
         if (!$object->registerHook('updateOrderStatus')) {
-            $log->error('Fail to hook');
             $flag = false;
         }
     }
 
     //add order-state for deferred payment
     if (!$object->createOrderStates()) {
-        $log->error('Fail to add order state');
         $flag = false;
     }
 
@@ -79,18 +74,15 @@ function upgrade_module_2_22_0($object)
         foreach ($sql_requests as $sql_request) {
             $request = Db::getInstance()->execute($sql_request);
             if (!$request) {
-                $log->error('Fail to execute request: ' . $request);
                 $flag = false;
             }
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to execute requests');
         $flag = false;
     }
 
     if (version_compare(_PS_VERSION_, '1.5', '<')) {
         if (!PayplugBackward::updateConfiguration('PAYPLUG_VERSION_1_4', '2.22.0')) {
-            $log->error('Fail to add new configuration');
             $flag = false;
         }
     }

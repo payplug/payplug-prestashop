@@ -36,7 +36,6 @@ function upgrade_module_2_28_0($object)
         define('_PS_OS_PENDING_', 0);
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     $states = array(
@@ -74,7 +73,6 @@ function upgrade_module_2_28_0($object)
     $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
 
     if (!$res_payplug_order_payment) {
-        $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
         return false;
     }
 
@@ -91,7 +89,6 @@ function upgrade_module_2_28_0($object)
     $res_payplug_cache = Db::getInstance()->execute($req_payplug_cache);
 
     if (!$res_payplug_cache) {
-        $log->error('Installation SQL failed: PAYPLUG_CACHE.');
         return false;
     }
 

@@ -25,8 +25,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-
 function upgrade_module_2_23_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
@@ -34,7 +32,6 @@ function upgrade_module_2_23_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
     //adding new configurations
@@ -45,19 +42,16 @@ function upgrade_module_2_23_0($object)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP', 0)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP_TEST', 0)) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
     //hooking
     if (!$object->registerHook('actionOrderStatusUpdate')) {
-        $log->error('Fail to hook');
         $flag = false;
     }
 
     //add order-state for deferred payment
     if (!$object->createOrderStates()) {
-        $log->error('Fail to add order state');
         $flag = false;
     }
 

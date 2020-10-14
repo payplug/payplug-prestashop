@@ -32,7 +32,6 @@ function upgrade_module_2_26_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     if (!$object->checkVersion()) {
@@ -44,14 +43,12 @@ function upgrade_module_2_26_0($object)
 
     if (version_compare(_PS_VERSION_, '1.5', '<')) {
         if (!PayplugBackward::updateConfiguration('PAYPLUG_VERSION_1_4', '2.26.0')) {
-            $log->error('Fail to add new configuration');
             $flag = false;
         }
     }
 
     //adding new configurations
     if (!PayplugBackward::updateConfiguration('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 

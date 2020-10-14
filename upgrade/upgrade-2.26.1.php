@@ -32,7 +32,6 @@ function upgrade_module_2_26_1($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     if (!$object->checkVersion()) {
@@ -51,7 +50,6 @@ function upgrade_module_2_26_1($object)
              * Exceptionally we don't want to block update after request execution
              * because the constraint may be duplicated for beta testers
             if (!$request) {
-                $log->error('Fail to execute request: ' . $request);
                 $flag = false;
             }
             */
@@ -60,8 +58,6 @@ function upgrade_module_2_26_1($object)
         /*
          * Exceptionally we don't want to block update after request execution
          * because the constraint may be duplicated for beta testers
-        $log->error('Fail to execute requests');
-        $log->error($e->getMessage());
         $flag = false;
         */
     }

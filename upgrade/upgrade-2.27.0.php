@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -34,7 +32,6 @@ function upgrade_module_2_27_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     // run the method who install Oney feature
@@ -42,7 +39,6 @@ function upgrade_module_2_27_0($object)
 
     //adding new configurations
     if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
@@ -55,12 +51,10 @@ function upgrade_module_2_27_0($object)
         foreach ($sql_requests as $sql_request) {
             $request = Db::getInstance()->execute($sql_request);
             if (!$request) {
-                $log->error('Fail to execute request: ' . $request);
                 $flag = false;
             }
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to execute requests');
         $flag = false;
     }
 

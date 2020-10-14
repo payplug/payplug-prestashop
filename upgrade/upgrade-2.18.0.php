@@ -32,12 +32,10 @@ function upgrade_module_2_18_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
     if (version_compare(_PS_VERSION_, '1.5', '<')) {
         if (!PayplugBackward::updateConfiguration('PAYPLUG_VERSION_1_4', '2.18.0')) {
-            $log->error('Fail to add new configuration');
             $flag = false;
         }
     }
@@ -60,21 +58,17 @@ function upgrade_module_2_18_0($object)
     try {
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
         if (!$res_payplug_installment) {
-            $log->error('Fail to add table installments');
             $flag = false;
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to add new table');
         $flag = false;
     }
 	
 	if (!$object->installTab()) {
-		$log->error('Fail to add installment tab.');
 		$flag = false;
 	}
 
 	if (!$object->registerHook('displayBackOfficeHeader')) {
-		$log->error('Fail to register hook.');
 		$flag = false;
 	}
 

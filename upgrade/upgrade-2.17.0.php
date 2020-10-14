@@ -34,19 +34,16 @@ function upgrade_module_2_17_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
     if (!Configuration::updateValue('PAYPLUG_INST', null)
         || !Configuration::updateValue('PAYPLUG_INST_MODE', 3)
         || !Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
     ) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
     if (!$object->createOrderStates()) {
-        $log->error('Fail to create new order states');
         $flag = false;
     }
 
@@ -62,11 +59,9 @@ function upgrade_module_2_17_0($object)
     try {
         $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
         if (!$res_payplug_installment_cart) {
-            $log->error('Fail to add table installment_cart');
             $flag = false;
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to add new table');
         $flag = false;
     }
 

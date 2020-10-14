@@ -25,8 +25,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-
 function upgrade_module_2_19_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
@@ -34,7 +32,6 @@ function upgrade_module_2_19_0($object)
         return true;
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     $flag = true;
 
     //Configurations may not exist if upgrade is from an old enough version
@@ -61,18 +58,15 @@ function upgrade_module_2_19_0($object)
     try {
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
         if (!$res_payplug_installment) {
-            $log->error('Fail to add table payplug_installment');
             $flag = false;
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to add new table');
         $flag = false;
     }
 
     $object->uninstallTab();
     $object->uninstallModuleTab('AdminPayplug');
     if (!$object->installTab()) {
-        $this->log_install->error('Fail to add installment tab.');
         $flag = false;
     }
 
