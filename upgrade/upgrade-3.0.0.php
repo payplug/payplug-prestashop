@@ -110,53 +110,8 @@ function upgrade_module_3_0_0($object)
         $flag = false;
     }
 
-    try {
-        // check if lock exists on id_cart
-        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
-        $res_describe = Db::getInstance()->executeS($req_describe);
-        $lock_exists = false;
-        if ($res_describe) {
-            foreach ($res_describe as $field) {
-                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
-                    $lock_exists = true;
-                }
-            }
-        }
-
-        // check doesn't exist then add it
-        if(!$lock_exists) {
-            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
-            $res_truncate = Db::getInstance()->execute($req_truncate);
-            if (!$res_truncate) {
-                $flag = false;
-            }
-            if ($flag) {
-                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
-                $res_alter = Db::getInstance()->execute($req_alter);
-                if (!$res_alter) {
-                    $flag = false;
-                }
-            }
-            if ($flag) {
-                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
-                $res_describe = Db::getInstance()->executeS($req_describe);
-                if ($res_describe) {
-                    foreach ($res_describe as $field) {
-                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
-                            $flag = $flag && true;
-                        }
-                    }
-                } else {
-                    $flag = false;
-                }
-            }
-        }
-    } catch (Exception $e) {
-        $flag = false;
-    }
-
     $flag = $flag && Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
 
 
-    return $flag;
+    return true;
 }
