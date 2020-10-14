@@ -21,8 +21,6 @@
  * International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -38,7 +36,6 @@ function upgrade_module_2_31_0($object)
         define('_PS_OS_PENDING_', 0);
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     $states = array(
@@ -82,7 +79,6 @@ function upgrade_module_2_31_0($object)
     $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
 
     if (!$res_payplug_order_payment) {
-        $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
         $flag = false;
     }
 
@@ -105,14 +101,12 @@ function upgrade_module_2_31_0($object)
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
-                $log->error('Can\'t truncate payplug_lock');
             }
             if ($flag) {
                 $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
                 $res_alter = Db::getInstance()->execute($req_alter);
                 if (!$res_alter) {
                     $flag = false;
-                    $log->error('Can\'t alter table payplug_lock');
                 }
             }
             if ($flag) {
@@ -126,12 +120,10 @@ function upgrade_module_2_31_0($object)
                     }
                 } else {
                     $flag = false;
-                    $log->error('Wrong table describe payplug_lock');
                 }
             }
         }
     } catch (Exception $e) {
-        $log->error('Exception: ' . $e->getMessage());
         $flag = false;
     }
 
