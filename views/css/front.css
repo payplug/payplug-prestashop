@@ -717,7 +717,7 @@
   width: 100%;
 }
 @media (max-width: 767px) {
-  .payplugPopin .oneyRequired {
+  .oneyRequired {
     width: calc(100vw - 30px);
     max-width: 100%;
   }
@@ -769,15 +769,12 @@
   background: none;
   border: none;
   text-align: center;
-  color: #7ebd00;
+  color: #00ab7a;
   margin: 0 0 15px;
   cursor: pointer;
 }
 .oneyRequired_close:focus {
   outline: 0;
-}
-.payplugPopin .oneyRequired_close {
-  color: #00ab7a;
 }
 .oneyRequired_close.-button {
   -webkit-border-radius: 2px;
@@ -831,11 +828,8 @@
 .oneyRequired_sectionName {
   margin: 0 0 4px;
   font-size: 15px;
-  color: #7ebd00;
-  text-align: center;
-}
-.payplugPopin .oneyRequired_sectionName {
   color: #00ab7a;
+  text-align: center;
 }
 .oneyRequired_group {
   display: flex;

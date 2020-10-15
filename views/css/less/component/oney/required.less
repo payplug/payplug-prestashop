@@ -10,13 +10,9 @@
     padding: 0;
     width: 100%;
 
-    // todo: rework this section
-    // we should apply a modifier
-    .payplugPopin & {
-      @media (@mobile) {
-        width: calc(100vw - 30px);
-        max-width: 100%;
-      }
+    @media (@mobile) {
+      width: calc(100vw - 30px);
+      max-width: 100%;
     }
 
     &:focus {
@@ -63,17 +59,12 @@
       background: none;
       border: none;
       text-align: center;
-      color: #colorMap[oney];
+      color: #colorMap[payplug];
       margin: 0 0 15px;
       cursor: pointer;
 
       &:focus {
         outline: 0;
-      }
-
-      // todo: better apply a modifier
-      .payplugPopin & {
-        color: #colorMap[payplug];
       }
 
       &.-button {
@@ -134,13 +125,8 @@
     &_sectionName {
       margin: 0 0 4px;
       font-size: 15px;
-      color: #colorMap[oney];
+      color: #colorMap[payplug];
       text-align: center;
-
-      // todo: better apply a modifier
-      .payplugPopin & {
-        color: #colorMap[payplug];
-      }
     }
 
     &_group {
