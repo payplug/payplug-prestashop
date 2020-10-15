@@ -4341,7 +4341,7 @@ class Payplug extends PaymentModule
                         'payment_url' => $payment['return_url'],
                         'api_url' => $this->api_url,
                     ));
-                    return $this->display(__FILE__, 'embedded.tpl');
+                    return $this->display(__FILE__, 'checkout/embedded.tpl');
                 }
             } else {
                 $this->setPaymentErrorsCookie([$this->l('The transaction was not completed and your card was not charged.')]);
