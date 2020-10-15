@@ -189,20 +189,6 @@
 .oneyCta.-checkout {
   margin: 16px 0 0;
 }
-@media (max-width: 767px) {
-  .oneyCta {
-    align-items: flex-start;
-  }
-  .oneyCta,
-  #order-detail-content #cart_summary .oneyCta {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  #order-detail-content #cart_summary .oneyCta {
-    align-items: flex-end;
-  }
-}
 .oneyCta_button {
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
