@@ -1531,7 +1531,7 @@ class Payplug extends PaymentModule
     public function displayGDPRConsent()
     {
         $this->context->smarty->assign(array('id_module' => $this->id));
-        return $this->display(__FILE__, 'gdpr_consent.tpl');
+        return $this->display(__FILE__, 'customer/gdpr_consent.tpl');
     }
 
     /**
