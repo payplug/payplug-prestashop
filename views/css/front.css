@@ -754,7 +754,7 @@
   padding: 0 16px;
   max-height: 0;
 }
-.oneyForm_overlay-show {
+.oneyForm_overlay.-show {
   max-height: 10000vh;
 }
 .oneyForm_wrapper {
@@ -829,7 +829,7 @@
   padding: 0 15px;
   margin: 0 0 15px;
 }
-.oneyForm_fieldset-same {
+.oneyForm_fieldset.-same {
   margin: auto;
 }
 .oneyForm_wrapper .oneyForm_fieldset {
@@ -874,10 +874,10 @@
 .oneyForm_field {
   width: 100%;
 }
-.oneyForm_field-firstname,
-.oneyForm_field-lastname,
-.oneyForm_field-postcode,
-.oneyForm_field-city {
+.oneyForm_field.-firstname,
+.oneyForm_field.-lastname,
+.oneyForm_field.-postcode,
+.oneyForm_field.-city {
   width: calc(50% - 2.5px);
 }
 .oneyForm_input {
@@ -891,7 +891,7 @@
   width: 100%;
   height: 36px;
 }
-.oneyForm_input-error {
+.oneyForm_input.-error {
   border: 1px solid #e56876;
 }
 .oneyForm_validate {
@@ -930,11 +930,11 @@
   margin: 10px 0 0;
   display: none;
 }
-.oneyForm_message-error {
+.oneyForm_message.-error {
   display: block;
   color: #e56876;
 }
-.oneyForm_message-success {
+.oneyForm_message.-success {
   display: block;
   color: #00ab7a;
 }
@@ -998,10 +998,10 @@
   margin: 15px 0 0;
   cursor: pointer;
 }
-.oneyForm_validation-show {
+.oneyForm_validation.-show {
   display: flex;
 }
-.oneyForm_validation-appear {
+.oneyForm_validation.-appear {
   opacity: 1;
 }
 /* Oney schedule */

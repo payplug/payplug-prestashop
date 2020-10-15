@@ -1608,7 +1608,7 @@ class Payplug extends PaymentModule
                 ]);
                 $payment_messages[] = [
                     'type' => 'template',
-                    'value' => 'oney/form.tpl'
+                    'value' => 'oney/required.tpl'
                 ];
             } else {
                 $with_msg_button = true;

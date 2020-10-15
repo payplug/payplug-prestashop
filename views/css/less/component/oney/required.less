@@ -10,6 +10,8 @@
     padding: 0;
     width: 100%;
 
+    // todo: rework this section
+    // we should apply a modifier
     .payplugPopin & {
       @media (@mobile) {
         width: calc(100vw - 30px);
@@ -32,7 +34,7 @@
       padding: 0 16px;
       max-height: 0;
 
-      &-show {
+      &.-show {
         max-height: 10000vh;
       }
     }
@@ -76,6 +78,7 @@
         .transform(translate(-50%, -50%) rotate(-45deg));
       }
 
+      // todo: better apply a modifier
       .payplugPopin & {
         color: #colorMap[payplug];
       }
@@ -106,7 +109,7 @@
       padding: 0 15px;
       margin: 0 0 15px;
 
-      &-same {
+      &.-same {
         margin: auto;
       }
 
@@ -114,10 +117,12 @@
         max-width: calc(~"50% - 50px");
       }
 
+      // todo: better apply a modifier
       .oneyPayment-mobile & {
         width: 100%;
       }
 
+      // todo: better apply a modifier
       .oneyPayment-mobile & {
         & + .oneyForm_fieldset {
           .border(fade(#colorMap[grey], 50), t);
@@ -139,6 +144,7 @@
       color: #colorMap[oney];
       text-align: center;
 
+      // todo: better apply a modifier
       .payplugPopin & {
         color: #colorMap[payplug];
       }
@@ -164,10 +170,10 @@
     &_field {
       width: 100%;
 
-      &-firstname,
-      &-lastname,
-      &-postcode,
-      &-city {
+      &.-firstname,
+      &.-lastname,
+      &.-postcode,
+      &.-city {
         width: calc(~"50% - 2.5px");
       }
     }
@@ -193,7 +199,7 @@
       &:-webkit-autofill:focus {
       }
 
-      &-error {
+      &.-error {
         .border(#colorMap[error]);
       }
     }
@@ -233,12 +239,12 @@
       margin: 10px 0 0;
       display: none;
 
-      &-error {
+      &.-error {
         display: block;
         color: #colorMap[error];
       }
 
-      &-success {
+      &.-success {
         display: block;
         color: #colorMap[payplug];
       }
@@ -298,11 +304,11 @@
         }
       }
 
-      &-show {
+      &.-show {
         display: flex;
       }
 
-      &-appear {
+      &.-appear {
         opacity: 1;
       }
     }

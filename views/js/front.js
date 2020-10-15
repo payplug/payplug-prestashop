@@ -84,7 +84,7 @@ var $document, $window, payplugModule = {
         init: function () {
             var {card} = payplugModule,
                 {identifier} = card.props;
-            $document.on('click', '.'+identifier+'_delete', payplugModule.card.delete);
+            $document.on('click', '.' + identifier + '_delete', payplugModule.card.delete);
         },
         delete: function (event) {
             event.preventDefault();
@@ -112,7 +112,7 @@ var $document, $window, payplugModule = {
                 },
                 success: function (result) {
                     if (result) {
-                        $('.'+identifier+'[data-id_card='+id_card+']').remove();
+                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
                         $('#module-payplug-cards div.message').removeClass('hide');
                         $('#module-payplug-controllers-front-cards div.message').removeClass('hide');
                     }
@@ -257,7 +257,7 @@ var $document, $window, payplugModule = {
                         .on('click', '.' + popin.props.identifier + '_navigation button', popin.select)
                         .on('click', function (event) {
                             var $clicked = $(event.target);
-                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('-open')) {
+                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('.-open')) {
                                 popin.close();
                             }
                         });
@@ -381,7 +381,7 @@ var $document, $window, payplugModule = {
         },
         form: {
             props: {
-                identifier: 'oneyForm'
+                identifier: 'oneyRequired'
             },
             init: function () {
                 var form = this,
@@ -392,8 +392,10 @@ var $document, $window, payplugModule = {
                     .on('keyup focusout', '.' + identifier + ' input', form.check);
             },
             check: function () {
-                var is_valid = true,
-                    $fields = $('.oneyForm_input');
+                var form = this,
+                    identifier = form.props.identifier,
+                    is_valid = true,
+                    $fields = $('.' + identifier + '_input');
 
                 $fields.each(function () {
                     var $input = $(this),
@@ -428,9 +430,9 @@ var $document, $window, payplugModule = {
                     }
 
                     if (valid_input) {
-                        $input.removeClass('oneyForm_input-error');
+                        $input.removeClass('-error');
                     } else {
-                        $input.addClass('oneyForm_input-error');
+                        $input.addClass('-error');
                     }
 
                     is_valid = is_valid && valid_input;
@@ -455,8 +457,8 @@ var $document, $window, payplugModule = {
                     var $field = $(this);
                     $field.val('');
 
-                    if ($field.is('.' + identifier + '_input-tocheck')) {
-                        $field.addClass(identifier + '_input-error');
+                    if ($field.is('.-tocheck')) {
+                        $field.addClass('-error');
                     }
                 });
             },
@@ -469,7 +471,7 @@ var $document, $window, payplugModule = {
                         payment_data: payment_data
                     };
 
-                $('.' + identifier + '_message').removeClass(identifier + '_message-success').removeClass(identifier + '_message-error');
+                $('.' + identifier + '_message').removeClass('-success').removeClass('-error');
 
                 $.ajax({
                     url: payplug_ajax_url + '?rand=' + new Date().getTime(),
@@ -481,9 +483,9 @@ var $document, $window, payplugModule = {
                     data: data,
                     success: function (data) {
                         if (data.result) {
-                            $('.' + identifier + '_validation').addClass(identifier + '_validation-show');
+                            $('.' + identifier + '_validation').addClass('-show');
                             window.setTimeout(function () {
-                                $('.' + identifier + '_validation').addClass(identifier + '_validation-appear');
+                                $('.' + identifier + '_validation').addClass('-appear');
                             });
                             window.setTimeout(function () {
                                 payplugModule.popup.close();
@@ -494,7 +496,7 @@ var $document, $window, payplugModule = {
                                 if (error !== 'indexOf')
                                     errors += $('<p />').html(data.message[error]).text() + "\n";
 
-                            $('.' + identifier + '_message').addClass(identifier + '_message-error').html(errors);
+                            $('.' + identifier + '_message').addClass('-error').html(errors);
                         }
                     }
                 });
@@ -536,7 +538,7 @@ var $document, $window, payplugModule = {
             $document.on('click', '.' + props.identifier + '_close', popup.close)
                 .on('click', function (event) {
                     var $clicked = $(event.target);
-                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('-open')) {
+                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('.-open')) {
                         popup.close();
                     }
                 });
