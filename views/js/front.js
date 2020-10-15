@@ -113,8 +113,7 @@ var $document, $window, payplugModule = {
                 success: function (result) {
                     if (result) {
                         $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
-                        $('#module-payplug-cards div.message').removeClass('hide');
-                        $('#module-payplug-controllers-front-cards div.message').removeClass('hide');
+                        payplugModule.popup.set(card_deleted_msg);
                     }
                 }
             });
