@@ -55,7 +55,7 @@
             <div class="oneyRequired_validation">
                 <span>{l s='Informations saved' mod='payplug'}</span>
                 <span>{l s='Click Oney again to continue' mod='payplug'}</span>
-                <button type="button" class="oneyRequired_close">{l s='Ok' mod='payplug'}</button>
+                <button type="button" class="oneyRequired_close -button">{l s='Ok' mod='payplug'}</button>
             </div>
         {/if}
         <button type="button" class="oneyRequired_close">{l s='Cancel' mod='payplug'}</button>

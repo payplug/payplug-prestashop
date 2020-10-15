@@ -61,9 +61,9 @@ var $document, $window, payplugModule = {
                         payplugModule.popup.set(data.template);
 
                         // Select Oney Option
-                        var $form = $('.' + payplugModule.oney.form.props.identifier);
-                        if ($form.length) {
-                            var oney_type = $form.data('oney_type'),
+                        var $required = $('.' + payplugModule.oney.required.props.identifier);
+                        if ($required.length) {
+                            var oney_type = $required.data('oney_type'),
                                 paymentOption = $('input[value="' + oney_type + '"]')
                                     .parent('form')
                                     .find('button[type=submit]')
@@ -142,7 +142,7 @@ var $document, $window, payplugModule = {
             var {oney} = payplugModule;
 
             this.cta.init();
-            this.form.init();
+            this.required.init();
 
             $window.on('load', function () {
                 oney.load();
@@ -379,21 +379,21 @@ var $document, $window, payplugModule = {
                 },
             }
         },
-        form: {
+        required: {
             props: {
                 identifier: 'oneyRequired'
             },
             init: function () {
-                var form = this,
-                    identifier = form.props.identifier;
+                var required = this,
+                    identifier = required.props.identifier;
                 $document
-                    .on('click', '.' + identifier + '_close', form.close)
-                    .on('submit', '.' + identifier, form.submit)
-                    .on('keyup focusout', '.' + identifier + ' input', form.check);
+                    .on('click', '.' + identifier + '_close', required.close)
+                    .on('submit', '.' + identifier, required.submit)
+                    .on('keyup focusout', '.' + identifier + ' input', required.check);
             },
             check: function () {
-                var form = this,
-                    identifier = form.props.identifier,
+                var required = this,
+                    identifier = required.props.identifier,
                     is_valid = true,
                     $fields = $('.' + identifier + '_input');
 
@@ -447,12 +447,12 @@ var $document, $window, payplugModule = {
             close: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                payplugModule.oney.form.reset();
+                payplugModule.oney.required.reset();
                 payplugModule.popup.close();
             },
             reset: function () {
-                var form = this,
-                    identifier = form.props.identifier;
+                var required = this,
+                    identifier = required.props.identifier;
                 $('.' + identifier).find('input').each(function () {
                     var $field = $(this);
                     $field.val('');
@@ -463,8 +463,8 @@ var $document, $window, payplugModule = {
                 });
             },
             save: function (payment_data) {
-                var form = this,
-                    identifier = form.props.identifier,
+                var required = this,
+                    identifier = required.props.identifier,
                     data = {
                         _ajax: 1,
                         savePaymentData: 1,
@@ -506,8 +506,8 @@ var $document, $window, payplugModule = {
                 event.stopPropagation();
 
                 var payment_data = {},
-                    $form = $('.oneyForm'),
-                    $fields = $form.find('input');
+                    $required = $('.oneyRequired'),
+                    $fields = $required.find('input');
 
                 $fields.each(function () {
                     var $el = $(this), name = $el.attr('name'), value = null;
@@ -523,7 +523,7 @@ var $document, $window, payplugModule = {
                     }
                 });
 
-                return payplugModule.oney.form.save(payment_data);
+                return payplugModule.oney.required.save(payment_data);
             },
         },
     },

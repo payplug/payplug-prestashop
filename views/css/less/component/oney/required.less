@@ -1,5 +1,5 @@
 /* Oney Form */
-.oneyForm {
+.oneyRequired {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -65,22 +65,29 @@
       text-align: center;
       color: #colorMap[oney];
       margin: 0 0 15px;
+      cursor: pointer;
 
       &:focus {
         outline: 0;
       }
 
-      &:before {
-        .transform(translate(-50%, -50%) rotate(45deg));
-      }
-
-      &:after {
-        .transform(translate(-50%, -50%) rotate(-45deg));
-      }
-
       // todo: better apply a modifier
       .payplugPopin & {
         color: #colorMap[payplug];
+      }
+
+      &.-button {
+        .borderRadius(2px);
+        background: #colorMap[payplug];
+        width: auto;
+        height: 32px;
+        padding: 0 16px;
+        color: #fff;
+        border: none;
+        font-size: 15px;
+        outline: none;
+        margin: 15px 0 0;
+        cursor: pointer;
       }
     }
 
@@ -113,7 +120,7 @@
         margin: auto;
       }
 
-      .oneyForm_wrapper & {
+      .oneyRequired_wrapper & {
         max-width: calc(~"50% - 50px");
       }
 
@@ -124,7 +131,7 @@
 
       // todo: better apply a modifier
       .oneyPayment-mobile & {
-        & + .oneyForm_fieldset {
+        & + .oneyRequired_fieldset {
           .border(fade(#colorMap[grey], 50), t);
           padding: 16px 0 0;
           margin: 16px 0 0;
@@ -162,7 +169,7 @@
         margin: 0 0 3px;
       }
 
-      & + .oneyForm_group {
+      & + .oneyRequired_group {
         margin: 10px 0 0;
       }
     }
@@ -219,6 +226,7 @@
       border: none;
       font-size: 15px;
       margin: 10px 0;
+      cursor: pointer;
     }
 
     &_submit {
@@ -285,22 +293,6 @@
             content: "";
             margin: 0 0 15px;
           }
-        }
-      }
-
-      button {
-        &.oneyForm_close {
-          .borderRadius(2px);
-          background: #colorMap[payplug];
-          width: auto;
-          height: 32px;
-          padding: 0 16px;
-          color: #fff;
-          border: none;
-          font-size: 15px;
-          outline: none;
-          margin: 15px 0 0;
-          cursor: pointer;
         }
       }
 
