@@ -234,13 +234,13 @@ var $document, $window, payplugModule = {
             enable: function () {
                 var popin = payplugModule.oney.cta.popin.props.identifier,
                     cta = payplugModule.oney.cta.props.identifier;
-                $('.' + cta + '_button').removeClass(cta + '_button-disabled');
+                $('.' + cta + '_button').removeClass('-disabled');
                 $('.' + popin).removeClass(popin + '-error');
             },
             disable: function () {
                 var popin = payplugModule.oney.cta.popin.props.identifier,
                     cta = payplugModule.oney.cta.props.identifier;
-                $('.' + cta + '_button').addClass(cta + '_button-disabled');
+                $('.' + cta + '_button').addClass('-disabled');
                 $('.' + popin).addClass(popin + '-error');
             },
             popin: {
@@ -257,7 +257,7 @@ var $document, $window, payplugModule = {
                         .on('click', '.' + popin.props.identifier + '_navigation button', popin.select)
                         .on('click', function (event) {
                             var $clicked = $(event.target);
-                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('.' + cta.props.identifier + '-open')) {
+                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('-open')) {
                                 popin.close();
                             }
                         });

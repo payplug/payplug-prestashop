@@ -186,7 +186,7 @@
   z-index: 3;
   display: inline-block;
 }
-.oneyCta-checkout {
+.oneyCta.-checkout {
   margin: 16px 0 0;
 }
 @media (max-width: 767px) {
@@ -234,10 +234,10 @@
     height: 32px;
   }
 }
-.oneyCta_button-disabled {
+.oneyCta_button.-disabled {
   color: #b2b2b2;
 }
-.oneyCta_button-disabled:hover {
+.oneyCta_button.-disabled:hover {
   color: #b2b2b2;
 }
 .oneyCta_button span {
@@ -255,14 +255,14 @@
   background-size: 110%;
   margin: 0 0 0 0.25em;
 }
-.oneyCta_button-disabled .oneyCta_logo {
+.-disabled .oneyCta_logo {
   background-image: url(../img/oney/3x4x-alt.svg);
 }
 .oneyCta_tooltip {
   width: 14px;
   height: 14px;
 }
-.oneyCta_button-disabled .oneyCta_tooltip {
+.-disabled .oneyCta_tooltip {
   background-image: url(../img/oney/tooltip-alt.svg);
 }
 .table tfoot tr.oneyCta_row {
