@@ -139,7 +139,11 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $this->type = 'installment';
                     try {
                         $this->logger->addLog('Retrieving installment...', 'info');
-                        $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                        $installment = $this->payplug->retrieveInstallment($inst_id);
+                        if (!$installment) {
+                            return false;
+                        }
+
                         $this->logger->addLog('Current amount: ' . $amount, 'info');
                         $pay_id = false;
                         if (isset($installment->schedule)) {

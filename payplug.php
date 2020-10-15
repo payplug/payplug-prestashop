@@ -5990,7 +5990,7 @@ class Payplug extends PaymentModule
      * @param string $inst_id
      * @return PayplugInstallment
      */
-    protected function retrieveInstallment($inst_id)
+    public function retrieveInstallment($inst_id)
     {
         if(!$inst_id) {
             return false;
