@@ -235,13 +235,13 @@ var $document, $window, payplugModule = {
                 var popin = payplugModule.oney.cta.popin.props.identifier,
                     cta = payplugModule.oney.cta.props.identifier;
                 $('.' + cta + '_button').removeClass('-disabled');
-                $('.' + popin).removeClass(popin + '-error');
+                $('.' + popin).removeClass('-error');
             },
             disable: function () {
                 var popin = payplugModule.oney.cta.popin.props.identifier,
                     cta = payplugModule.oney.cta.props.identifier;
                 $('.' + cta + '_button').addClass('-disabled');
-                $('.' + popin).addClass(popin + '-error');
+                $('.' + popin).addClass('-error');
             },
             popin: {
                 props: {
@@ -271,7 +271,7 @@ var $document, $window, payplugModule = {
                         $('.' + cta.props.identifier).append('<span class="' + popin.props.identifier + '" />');
                     }
                     oney.loader.set('.' + popin.props.identifier);
-                    $('.' + popin.props.identifier).addClass(popin.props.identifier + '-loading');
+                    $('.' + popin.props.identifier).addClass('-loading');
                 },
                 hydrate: function (content) {
                     if (typeof content == 'undefined' || !content) {
@@ -281,7 +281,7 @@ var $document, $window, payplugModule = {
                         {popin} = oney.cta,
                         {identifier, open} = popin.props;
 
-                    $('.' + identifier).replaceWith(content).removeClass(identifier + '-loading');
+                    $('.' + identifier).replaceWith(content).removeClass('-loading');
                     oney.props.loaded = true;
 
                     var $button = $('.' + identifier + '_navigation button').eq(0);
@@ -310,8 +310,8 @@ var $document, $window, payplugModule = {
                     $('.' + identifier + '_navigation button[data-type=' + option + ']').parent('li').addClass('selected');
 
                     // option
-                    $('.' + identifier + '_option').removeClass(identifier + '_option-show');
-                    $('.' + identifier + '_option[data-type=' + option + ']').addClass(identifier + '_option-show');
+                    $('.' + identifier + '_option').removeClass('-show');
+                    $('.' + identifier + '_option[data-type=' + option + ']').addClass('-show');
                 },
                 toggle: function (event) {
                     event.preventDefault();
@@ -319,7 +319,7 @@ var $document, $window, payplugModule = {
                     var popin = payplugModule.oney.cta.popin,
                         identifier = popin.props.identifier;
 
-                    var is_open = $('.' + identifier + '-open').length > 0;
+                    var is_open = $('-open').length > 0;
                     if (is_open) {
                         popin.close();
                     } else {
@@ -346,11 +346,11 @@ var $document, $window, payplugModule = {
                         oney.load(true);
                     }
 
-                    $('.' + cta.props.identifier).addClass(cta.props.identifier + '-open');
-                    $('.' + popin.props.identifier).addClass(popin.props.identifier + '-open');
+                    $('.' + cta.props.identifier).addClass('-open');
+                    $('.' + popin.props.identifier).addClass('-open');
 
                     setTimeout(function () {
-                        $('.' + popin.props.identifier).addClass(popin.props.identifier + '-show');
+                        $('.' + popin.props.identifier).addClass('-show');
                         popin.props.open = true;
                     }, 0);
                 },
@@ -359,11 +359,11 @@ var $document, $window, payplugModule = {
                         {cta} = oney,
                         {popin} = cta;
 
-                    $('.' + popin.props.identifier).removeClass(popin.props.identifier + '-show');
-                    $('.' + popin.props.identifier).removeClass(popin.props.identifier + '-open');
+                    $('.' + popin.props.identifier).removeClass('-show');
+                    $('.' + popin.props.identifier).removeClass('-open');
 
                     setTimeout(function () {
-                        $('.' + cta.props.identifier).removeClass(cta.props.identifier + '-open');
+                        $('.' + cta.props.identifier).removeClass('-open');
                         popin.props.open = false;
                     }, 0);
                 },

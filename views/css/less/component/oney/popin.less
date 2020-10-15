@@ -29,7 +29,7 @@
     right: -2px;
     z-index: -1;
 
-    .oneyPopin-error& {
+    .-error& {
       border-color: #colorMap[grey];
     }
 
@@ -55,13 +55,13 @@
       margin: 15px 0;
       display: none;
 
-      .oneyCta-open & {
+      .-open & {
         display: flex;
       }
     }
   }
 
-  &-open {
+  &.-open {
     display: block;
 
     @media (@mobile) {
@@ -71,11 +71,11 @@
     }
   }
 
-  &-show {
+  &.-show {
     opacity: 1;
   }
 
-  &-error {
+  &.-error {
     .transform(translateY(-50%));
     top: 50%;
     width: auto;
@@ -104,7 +104,7 @@
     }
   }
 
-  &-loading {
+  &.-loading {
     .transform(translateY(-50%));
     top: 50%;
     width: auto;
@@ -206,7 +206,7 @@
     line-height: 17px;
     width: 100%;
 
-    &-show {
+    &.-show {
       display: block;
     }
 
