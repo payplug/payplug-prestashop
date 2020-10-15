@@ -1624,7 +1624,7 @@ class Payplug extends PaymentModule
             'with_msg_button' => $with_msg_button
         ]);
 
-        return $this->display(__FILE__, 'messages.tpl');
+        return $this->display(__FILE__, '_partials/messages.tpl');
     }
 
     /**
@@ -4227,7 +4227,7 @@ class Payplug extends PaymentModule
             'payplug_cards_url' => $payplug_cards_url
         ));
 
-        return $this->display(__FILE__, 'my_account.tpl');
+        return $this->display(__FILE__, 'customer/my_account.tpl');
     }
 
     /**
@@ -4432,7 +4432,7 @@ class Payplug extends PaymentModule
             $context['reference'] = $order->reference;
         }
         $this->smarty->assign($context);
-        return $this->display(__FILE__, 'confirmation.tpl');
+        return $this->display(__FILE__, 'checkout/order-confirmation.tpl');
     }
 
     public function hookRegisterGDPRConsent()
