@@ -399,7 +399,7 @@ label.cb_label b {
   border: none;
   margin: 15px 0 20px 0;
 }
-#payplug_admin_form input[type="submit"].green-button:hover{
+#payplug_admin_form input[type="submit"].green-button:hover {
   background: #49a482;
 }
 #payplug_admin_form input[type="submit"].red-button {
@@ -855,8 +855,7 @@ span.ppclose {
 }
 #installment_config_error,
 #oney_config_error,
-#deferred_config_error,
-#error_invalid_url {
+#deferred_config_error {
   color: #dd2525;
   padding: 0 0 0 10px;
 }
@@ -920,12 +919,3 @@ label.vertical-top {
   padding-top: 8px;
 }
 /*# sourceMappingURL=admin.css.map */
-
-#payplug_admin_form .payplug_oney_tos_url_desc {
-  width: 85%;
-}
-#payplug_admin_form .payplug_oney_tos_url {
-  margin: initial;
-  display: inline-block;
-  width: 57%;
-}

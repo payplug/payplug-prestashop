@@ -536,7 +536,7 @@ var $document, $window, payplugModule = {
             $document.on('click', '.' + props.identifier + '_close', popup.close)
                 .on('click', function (event) {
                     var $clicked = $(event.target);
-                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('.' + props.identifier + '-open')) {
+                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('-open')) {
                         popup.close();
                     }
                 });
@@ -556,18 +556,18 @@ var $document, $window, payplugModule = {
         open: function () {
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
-            popin.addClass(props.identifier + '-open');
+            popin.addClass('-open');
             window.setTimeout(function () {
-                popin.addClass(props.identifier + '-show');
+                popin.addClass('-show');
             }, 0);
         },
         close: function () {
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
 
-            popin.removeClass(props.identifier + '-show');
+            popin.removeClass('-show');
             window.setTimeout(function () {
-                popin.removeClass(props.identifier + '-open');
+                popin.removeClass('-open');
             }, 500);
         },
         create: function () {

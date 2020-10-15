@@ -131,10 +131,10 @@
   -o-transform: translate(-50%, -50%) rotate(-45deg);
   transform: translate(-50%, -50%) rotate(-45deg);
 }
-.payplugPopin-open {
+.payplugPopin.-open {
   display: block;
 }
-.payplugPopin-show {
+.payplugPopin.-show {
   opacity: 1;
 }
 /* Payplug message */
