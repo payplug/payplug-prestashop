@@ -367,16 +367,16 @@
   -webkit-background-size: 100%;
   background-size: 100%;
 }
-.oneyLogo-x3 {
+.oneyLogo.-x3 {
   background-image: url(../img/oney/x3_with_fees.svg);
 }
-.oneyLogo-x3x4 {
+.oneyLogo.-x3x4 {
   background-image: url(../img/oney/3x4x.svg);
 }
-.oneyLogo-x4 {
+.oneyLogo.-x4 {
   background-image: url(../img/oney/x4_with_fees.svg);
 }
-.oneyLogo-tooltip {
+.oneyLogo.-tooltip {
   background-image: url(../img/oney/tooltip.svg);
 }
 /* Oney popin */
