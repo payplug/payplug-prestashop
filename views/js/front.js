@@ -437,12 +437,6 @@ var $document, $window, payplugModule = {
 
                     is_valid = is_valid && valid_input;
                 });
-
-                if (is_valid) {
-                    $('.oneyPayment_button').removeClass('oneyPayment_button-disabled').addClass('oneyPayment_button-validate');
-                } else {
-                    $('.oneyPayment_button').addClass('oneyPayment_button-disabled').removeClass('oneyPayment_button-validate');
-                }
             },
             close: function (event) {
                 event.preventDefault();

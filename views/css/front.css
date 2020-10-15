@@ -837,14 +837,6 @@
 .oneyRequired_wrapper .oneyRequired_fieldset {
   max-width: calc(50% - 50px);
 }
-.oneyPayment-mobile .oneyRequired_fieldset {
-  width: 100%;
-}
-.oneyPayment-mobile .oneyRequired_fieldset + .oneyRequired_fieldset {
-  border-top: 1px solid rgba(178, 178, 178, 0.5);
-  padding: 16px 0 0;
-  margin: 16px 0 0;
-}
 @media (max-width: 767px) {
   .payplugPopin .oneyRequired_fieldset {
     padding: 16px 0 0;
@@ -1036,8 +1028,5 @@
   display: block;
   font-weight: 400;
   width: 100%;
-}
-.oneyPayment-mobile .oneySchedule ul li {
-  padding: 8px 0;
 }
 /*# sourceMappingURL=front.css.map */
