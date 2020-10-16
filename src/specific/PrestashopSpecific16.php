@@ -132,6 +132,7 @@ class PrestashopSpecific16
                 // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
                 // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
+                    && !empty($payplug_cards)
                     && ($payment_option['name'] == 'standard')) {
                         continue;
                 } else {
@@ -165,9 +166,6 @@ class PrestashopSpecific16
                 }
             }
         }
-
-        d($paymentOptions);
-
 
         return $paymentOptions;
     }
