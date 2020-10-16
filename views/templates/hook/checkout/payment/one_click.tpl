@@ -19,15 +19,17 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="row">
-    <div class="col-xs-12">
-        {if isset($payplug_cards) && $payplug_cards}
+{if isset($payplug_cards) && $payplug_cards}
+    <div class="row">
+        <div class="col-xs-12">
             <div class="payplug-wrapper">
                 <p class="payment_module">
                     <a href="{$payment_controller_url|escape:'htmlall':'UTF-8'}"
                        class="payplug{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}"
                        title="{l s='Credit card payment' mod='payplug'}">
-                        <img class="payment_option_standard_payment_logo" src="{$payplug_payment_option.logo_url|escape:'html'|replace:'none.png':'logos_schemes_default.png'}" alt="{$payplug_payment_option.label|escape:'html'}" />
+                        <img class="payment_option_standard_payment_logo"
+                             src="{$payplug_payment_option.logo_url|escape:'html'|replace:'none.png':'logos_schemes_default.png'}"
+                             alt="{$payplug_payment_option.label|escape:'html'}"/>
                         {l s='Credit card checkout' mod='payplug'}
                     </a>
                 </p>
@@ -45,9 +47,6 @@
                                     <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.png"/>
                                     <div class="info-wrapper">
                                         <div>
-{*                                            **** **** **** {$card.last4|escape:'htmlall':'UTF-8'}*}
-{*                                            ({if $card.brand == 'none'}{l s='Card' mod='payplug'}{else}{$card.brand|escape:'htmlall':'UTF-8'}{/if}*}
-{*                                            )*}
                                             {$payplug_payment_option.label|escape:'html'}
                                         </div>
                                         <div class="payplug_expiry_date">{l s='Expiry date' mod='payplug'} {$card.expiry_date|escape:'htmlall':'UTF-8'}</div>
@@ -80,15 +79,7 @@
                     </div>
                 </form>
             </div>
-        {else}
-            <p class="payment_module">
-                <a href="{$payment_controller_url|escape:'htmlall':'UTF-8'}"
-                   class="payplug{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}"
-                   title="{l s='Credit card payment' mod='payplug'}">
-                    {l s='Credit card checkout' mod='payplug'}
-                </a>
-            </p>
-        {/if}
-        <p class="ppfail ppfail-default"></p>
+            <p class="ppfail ppfail-default"></p>
+        </div>
     </div>
-</div>
+{/if}
