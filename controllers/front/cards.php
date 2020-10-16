@@ -78,9 +78,9 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             $this->context->smarty->assign(array(
                 'version' => 1.6,
             ));
-            $this->setTemplate('cards_list_1_6.tpl');
+            $this->setTemplate('customer/cards_1_6.tpl');
         } else {
-            $this->setTemplate('module:payplug/views/templates/front/customer/cards_list.tpl');
+            $this->setTemplate('module:payplug/views/templates/front/customer/cards.tpl');
         }
     }
 }

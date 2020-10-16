@@ -5619,6 +5619,11 @@ class Payplug extends PaymentModule
      */
     public function preparePayment($options, $id_card = null)
     {
+        return [
+            'result' => false,
+            'response' => 'test force error'
+        ];
+
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
             return [
