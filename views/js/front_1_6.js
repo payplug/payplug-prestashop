@@ -547,7 +547,7 @@ var $document,
                         dataType: 'json',
                         data: data,
                         success: function (data) {
-                            if (!data.result) {
+                            if (!data.result && data.error) {
                                 if ($('.oneyError').length) {
                                     $('.oneyError').html(data.error).fadeIn();
                                 } else {

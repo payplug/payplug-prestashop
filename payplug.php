@@ -7093,7 +7093,7 @@ class Payplug extends PaymentModule
             'this_path' => $this->_path,
         ));
 
-        return $this->display(__FILE__, 'payment_options_display.tpl');
+        return $this->display(__FILE__, 'checkout/payment/display.tpl');
     }
 
     /**
