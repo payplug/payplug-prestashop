@@ -7407,7 +7407,7 @@ class Payplug extends PaymentModule
             'oney_required_fields' => $fields
         ));
 
-        return $this->display(__FILE__, 'oney_form.tpl');
+        return $this->display(__FILE__, 'oney/required.tpl');
     }
 
     /**
