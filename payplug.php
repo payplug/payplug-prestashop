@@ -2642,7 +2642,7 @@ class Payplug extends PaymentModule
             'payplug_oney_loading_msg' => $this->l('Loading')
         ));
 
-        return $this->display(__FILE__, 'oney_cta.tpl');
+        return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
     /**
@@ -3334,7 +3334,7 @@ class Payplug extends PaymentModule
                 'value' => 'standard',
             ),
         );
-        $paymentOption['standard']['tpl'] = 'standard_payment.tpl';
+        $paymentOption['standard']['tpl'] = 'standard.tpl';
         $paymentOption['standard']['extra_classes'] = 'payplug default';
         $paymentOption['standard']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',
             array('type' => 'standard'));
@@ -3373,7 +3373,7 @@ class Payplug extends PaymentModule
                         'value' => 'installment',
                     ),
                 );
-                $paymentOption['installment']['tpl'] = 'installment_payment.tpl';
+                $paymentOption['installment']['tpl'] = 'installment.tpl';
                 //            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
                 $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
                     'payment', array('type' => 'installment', 'i' => 1), true);
@@ -3468,12 +3468,12 @@ class Payplug extends PaymentModule
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
 
-                $oneyTpl = 'unified_payment.tpl';
+                $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.svg';
                 $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 if ($optimized) {
-                    $oneyTpl = 'oney_payment.tpl';
+                    $oneyTpl = 'oney.tpl';
 
                     if ((class_exists($this->PrestashopSpecificClass))
                         && (method_exists($this->PrestashopSpecificObject, 'getPaymentOption'))) {
@@ -7430,14 +7430,20 @@ class Payplug extends PaymentModule
     public function displayOneyPaymentOptions()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
+
+            $payplug_payment_option = [
+                'label' => $this->l('Pay by card in 3 or 4'),
+                'logo_url' => Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/3x4x.svg')
+            ];
+
             $this->smarty->assign(array(
                 'payplug_module_dir' => _PS_MODULE_DIR_,
                 'payplug_oney_loading_msg' => $this->l('Loading'),
                 'oney_required_fields' => $this->displayOneyRequiredFields(),
-                'oneyLogo' => $this->oneyLogoUrl
+                'payplug_payment_option' => $payplug_payment_option
             ));
 
-            return $this->display(__FILE__, 'oney_payment.tpl');
+            return $this->display(__FILE__, 'oney/payment/payment.tpl');
         }
     }
 

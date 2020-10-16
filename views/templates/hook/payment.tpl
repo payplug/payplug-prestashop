@@ -102,7 +102,7 @@
 {if isset($payplug_oney) && $payplug_oney}
 	<div class="row">
 		<div class="col-xs-12">
-			{include file=$payplug_module_dir|cat:'payplug/views/templates/hook/oney_payment.tpl'}
+			{include file="./oney/payment/payment.tpl"}
 			<p class="ppfail ppfail-oney"></p>
 		</div>
 	</div>

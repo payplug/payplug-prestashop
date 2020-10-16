@@ -4,10 +4,6 @@
   z-index: 3;
   display: inline-block;
 
-  &.-checkout {
-    margin: 16px 0 0;
-  }
-
   &_button {
     .Poppins();
     .transition(~"color @{dur}");
@@ -20,6 +16,7 @@
     text-transform: uppercase;
     color: #2F2930;
     cursor: pointer;
+    font-size: 11px;
 
     &:hover {
       color: #colorMap[oney];
@@ -71,20 +68,6 @@
 
     .-disabled & {
       background-image: url(~"@{img_oney}tooltip-alt.svg");
-    }
-  }
-
-  &_row {
-    .table tfoot tr& {
-      background: none;
-    }
-
-    td {
-      &:first-child {
-        border-left: 1px solid #fff;
-        border-bottom: 1px solid #fff;
-        background: none;
-      }
     }
   }
 

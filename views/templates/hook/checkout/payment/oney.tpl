@@ -19,10 +19,4 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="oneyCta">
-    <button type="button" class="oneyCta_button oneyCta_button-{$env|escape:'htmlall':'UTF-8'}{if !$payplug_oney_allowed} oneyCta_button-disabled{/if}">
-        <span>{l s='Or pay in' mod='payplug'}</span>
-        <span class="oneyCta_logo oneyLogo oneyLogo-x3x4"></span>
-        <span class="oneyCta_tooltip oneyLogo oneyLogo-tooltip"></span>
-    </button>
-</div>
+{include file=$payplug_module_dir|cat:'payplug/views/templates/hook/oney/payment/payment.tpl'}

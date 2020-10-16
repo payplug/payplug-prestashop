@@ -360,7 +360,7 @@ var $document,
                                 payplugModule.oney.payment.set(response.payment);
                             } else if (typeof response.error != 'undefined') {
                                 var payment_error = '<span class="oneyPayment_error">' + response.error + '</span>';
-                                $('.oneyPayment').addClass('oneyPayment-disabled').removeClass('oneyPayment-open');
+                                $('.oneyPayment').addClass('-disabled').removeClass('-open');
 
                                 if ($('.oneyPayment_label').find('.oneyPayment_error').length) {
                                     $('.oneyPayment_label').find('.oneyPayment_error').replaceWith(payment_error);
@@ -588,7 +588,7 @@ var $document,
                 send: function (event) {
                     event.preventDefault();
                     // if invalid carrier return
-                    if (!payment_allowed || $('.oneyPayment').is('.oneyPayment-invalidCarrier')) {
+                    if (!payment_allowed || $('.oneyPayment').is('.-invalidCarrier')) {
                         return false;
                     }
 
@@ -623,7 +623,7 @@ var $document,
                     event.preventDefault();
                     event.stopPropagation();
 
-                    if ($('.oneyPayment').is('.oneyPayment-disabled')) {
+                    if ($('.oneyPayment').is('.-disabled')) {
                         return false;
                     }
 
@@ -641,7 +641,7 @@ var $document,
                     }
                 },
                 open: function () {
-                    $('.oneyPayment').addClass('oneyPayment-open');
+                    $('.oneyPayment').addClass('-open');
                     if (!payplugModule.oney.payment.props.open) {
                         payplugModule.oney.payment.props.open = true;
                         var oney_position = parseInt($('.oneyPayment').offset().top) - 15;
@@ -650,7 +650,7 @@ var $document,
                 },
                 close: function () {
                     payplugModule.oney.payment.props.open = false;
-                    $('.oneyPayment').removeClass('oneyPayment-open');
+                    $('.oneyPayment').removeClass('-open');
                 },
                 handleCheckoutCGV: function () {
                     if (typeof updatePaymentMethods != 'function') {
@@ -862,13 +862,13 @@ var $document,
                     current = false;
 
                 sizes.map(function (size, key) {
-                    container.removeClass('oneyPayment-' + size.format);
+                    container.removeClass('-' + size.format);
                     if (width < size.limit && !current) {
                         current = size.format;
                     }
                 });
 
-                container.addClass('oneyPayment-' + current);
+                container.addClass('-' + current);
             },
         },
         popup: {

@@ -21,13 +21,13 @@
 *}
 {if isset($oney_payment_options) && $oney_payment_options}
     {foreach $oney_payment_options as $oney_type=>$oney_payment_option}
-        <label class="oneyOption oneyOption-{$oney_type|escape:'htmlall':'UTF-8'}">
+        <label class="oneyOption -{$oney_type|escape:'htmlall':'UTF-8'}">
             <div class="oneyOption_title">
-                <span class="oneyOption_logo oneyLogo oneyLogo-x{$oney_payment_option.split|escape:'htmlall':'UTF-8'}"></span>
+                <span class="oneyOption_logo oneyLogo -x{$oney_payment_option.split|escape:'htmlall':'UTF-8'}"></span>
                 {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
             </div>
             <div class="oneyOption_prices">
-                {include file="./oney_payment_detail.tpl" oney_payment_option=$oney_payment_option}
+                {include file="./detail.tpl" oney_payment_option=$oney_payment_option}
             </div>
             <div class="oneyOption_radio"><input type="radio" name="oney_type" value="{$oney_type|escape:'htmlall':'UTF-8'}"></div>
         </label>

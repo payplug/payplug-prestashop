@@ -36,7 +36,7 @@
 
         {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
             <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
-			    {include file="./payment_detail.tpl" oney_payment_option=$oney_payment_option}
+			    {include file="./payment/detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
         {/foreach}
 
