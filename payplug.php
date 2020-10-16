@@ -3274,7 +3274,6 @@ class Payplug extends PaymentModule
 
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
-
             foreach ($payplug_cards as $card) {
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                 $paymentOption['one_click_'.$card['id_payplug_card']]['name'] = 'one_click';
@@ -3300,7 +3299,7 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
-                $paymentOption['one_click_'.$card['id_payplug_card']]['tpl'] = 'one_click_payment.tpl';
+                $paymentOption['one_click_'.$card['id_payplug_card']]['tpl'] = 'one_click.tpl';
                 $paymentOption['one_click_'.$card['id_payplug_card']]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,'payment', array(), true);
                 $paymentOption['one_click_'.$card['id_payplug_card']]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
                 $paymentOption['one_click_'.$card['id_payplug_card']]['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'];
