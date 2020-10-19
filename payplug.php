@@ -326,7 +326,11 @@ class Payplug extends PaymentModule
     public function addPayplugInstallment($installment, $order)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = $this->retrieveInstallment($installment);
+        }
+
+        if (!$installment) {
+            return false;
         }
 
         if ($this->getStoredInstallment($installment)) {
@@ -3466,7 +3470,7 @@ class Payplug extends PaymentModule
         }
 
         if ($payment->installment_plan_id !== null) {
-            $installment = \Payplug\InstallmentPlan::retrieve($payment->installment_plan_id);
+            $installment = $this->retrieveInstallment($payment->installment_plan_id);
         } else {
             $installment = null;
         }
@@ -3549,8 +3553,13 @@ class Payplug extends PaymentModule
     public function getStoredInstallment($installment)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = $this->retrieveInstallment($installment);
         }
+
+        if (!$installment) {
+            return false;
+        }
+
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
@@ -3573,8 +3582,13 @@ class Payplug extends PaymentModule
     public function getStoredInstallmentTransaction($installment, $step)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = $this->retrieveInstallment($installment);
         }
+
+        if(!$installment) {
+            return false;
+        }
+
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
@@ -4951,7 +4965,7 @@ class Payplug extends PaymentModule
     {
         switch ($type) {
             case 'installment':
-                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                $installment = $this->retrieveInstallment($payment_id);
                 if ($installment && $installment->is_active) {
                     $schedules = $installment->schedule;
                     foreach ($schedules as $schedule) {
@@ -5275,8 +5289,8 @@ class Payplug extends PaymentModule
         if ($pay_id == null) {
             if ($inst_id != null) {
                 try {
-                    $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
-                    if (isset($installment->schedule)) {
+                    $installment = $this->retrieveInstallment($inst_id);
+                    if ($installment && isset($installment->schedule)) {
                         $total_amount = $amount;
                         $refund_to_go = array();
                         $truly_refundable_amount = 0;
@@ -5515,11 +5529,11 @@ class Payplug extends PaymentModule
         $is_installment = $is_installment && $config['installment'];
 
         // defined which is current payment method
-        if($is_one_click) {
+        if ($is_one_click) {
             $payment_method = 'oneclick';
-        } elseif($is_oney) {
+        } elseif ($is_oney) {
             $payment_method = 'oney';
-        } elseif($is_installment) {
+        } elseif ($is_installment) {
             $payment_method = 'installment';
         } else {
             $payment_method = 'standard';
@@ -5973,11 +5987,14 @@ class Payplug extends PaymentModule
     /**
      * Retrieve payment informations
      *
-     * @param string $pay_id
+     * @param string $inst_id
      * @return PayplugInstallment
      */
     public function retrieveInstallment($inst_id)
     {
+        if(!$inst_id) {
+            return false;
+        }
         try {
             $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
         } catch (Exception $e) {
@@ -6812,9 +6829,9 @@ class Payplug extends PaymentModule
     public function updatePayplugInstallment($installment)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = $this->retrieveInstallment($installment);
         }
-        if (isset($installment->schedule)) {
+        if ($installment && isset($installment->schedule)) {
             $step_count = count($installment->schedule);
             $index = 0;
             foreach ($installment->schedule as $schedule) {
