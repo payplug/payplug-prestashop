@@ -15,59 +15,30 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of PayPlug SAS
  */
-
-use PayPlug\classes\MyLogPHP;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_0_0($object)
+function upgrade_module_2_31_0($object)
 {
-    $flag = true;
-
-    // install payplug payment cart
-    $sql = '
-        ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
-        ADD COLUMN `date_upd` DATETIME NULL
-        AFTER `is_pending`';
-    $flag = $flag && Db::getInstance()->execute($sql);
-
-    // install table `payplug_logger`
-    $sql = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
-            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `process` VARCHAR(255) NOT NULL,
-            `content` TEXT NOT NULL,
-            `date_add` DATETIME NULL,
-            `date_upd` DATETIME NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-
-    $flag = $flag && Db::getInstance()->execute($sql);
-
-    /*
-     * Voir PayPlugCard : Auto Increment sur id_payplug_card (différent 1.6 1.7)
-     * Voir pour migrations cartes existantes
-     */
-
-    /*
-     * Ajouter la greffe vers le hook displayBeforeShoppingCartBlock pour les 1.6
-     * et verifier qu'il n'y ait pas de conflit avec 1.7
-     *
-     * installOneyHook : rajouter displayBeforeShoppingCartBlock
-     */
-
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
 
     if (!defined('_PS_OS_PENDING_')) {
         define('_PS_OS_PENDING_', 0);
     }
 
-    $states = [
+    $flag = true;
+
+    $states = array(
         'auth_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
         'auth_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),
         'exp_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'),
@@ -80,7 +51,8 @@ function upgrade_module_3_0_0($object)
         'error_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
         'oney_pending' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
         'oney_pending_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),
-    ];
+    );
+
     foreach ($states as $state) {
         if ($state != null) {
             $s = new OrderState((int)$state);
@@ -110,8 +82,50 @@ function upgrade_module_3_0_0($object)
         $flag = false;
     }
 
-    $flag = $flag && Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
+    try {
+        // check if lock exists on id_cart
+        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+        $res_describe = Db::getInstance()->executeS($req_describe);
+        $lock_exists = false;
+        if ($res_describe) {
+            foreach ($res_describe as $field) {
+                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                    $lock_exists = true;
+                }
+            }
+        }
 
+        // check doesn't exist then add it
+        if(!$lock_exists) {
+            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
+            $res_truncate = Db::getInstance()->execute($req_truncate);
+            if (!$res_truncate) {
+                $flag = false;
+            }
+            if ($flag) {
+                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
+                $res_alter = Db::getInstance()->execute($req_alter);
+                if (!$res_alter) {
+                    $flag = false;
+                }
+            }
+            if ($flag) {
+                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+                $res_describe = Db::getInstance()->executeS($req_describe);
+                if ($res_describe) {
+                    foreach ($res_describe as $field) {
+                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                            $flag = $flag && true;
+                        }
+                    }
+                } else {
+                    $flag = false;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        $flag = false;
+    }
 
-    return true;
+    return $flag;
 }

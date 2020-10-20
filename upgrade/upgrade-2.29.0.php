@@ -21,11 +21,18 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_0($object)
+/**
+ * @description Install PayPlug Cache DB in case of an upgrade of the module.
+ *
+ * @return boolean
+ */
+function upgrade_module_2_29_0()
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
@@ -34,29 +41,17 @@ function upgrade_module_2_27_0($object)
 
     $flag = true;
 
-    // run the method who install Oney feature
-    $flag = $object->installOney();
+    // install table `payplug_cache`
+    $sql = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_cache` (
+            `id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `cache_key` VARCHAR(255) NOT NULL,
+            `cache_value` TEXT NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
 
-    //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $flag = false;
-    }
-
-    // Update payplug lock table
-    $sql_requests = array(
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
-    );
-
-    try {
-        foreach ($sql_requests as $sql_request) {
-            $request = Db::getInstance()->execute($sql_request);
-            if (!$request) {
-                $flag = false;
-            }
-        }
-    } catch (PrestaShopDatabaseException $e) {
-        $flag = false;
-    }
+    $flag = $flag && Db::getInstance()->execute($sql);
 
     return $flag;
 }
