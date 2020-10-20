@@ -1000,53 +1000,6 @@
   font-weight: 400;
   width: 100%;
 }
-p.payment_module a.payplug {
-  padding-left: 240px;
-  cursor: pointer;
-}
-p.payment_module a.payplug.it {
-  background-image: url('../img/logos_schemes_it.png');
-}
-p.payment_module a.payplug.installment_2 {
-  background: url('../img/logos_schemes_installment_2_default.png') 15px center no-repeat #FBFBFB;
-}
-p.payment_module a.payplug.installment_2.it {
-  background-image: url('../img/logos_schemes_installment_2_it.png');
-}
-p.payment_module a.payplug.installment_2.en {
-  background-image: url('../img/logos_schemes_installment_2_en.png');
-}
-p.payment_module a.payplug.installment_3.it {
-  background-image: url('../img/logos_schemes_installment_3_it.png');
-}
-p.payment_module a.payplug.installment_3.en {
-  background-image: url('../img/logos_schemes_installment_3_en.png');
-}
-p.payment_module a.payplug.installment_4 {
-  background: url('../img/logos_schemes_installment_4_default.png') 15px center no-repeat #FBFBFB;
-}
-p.payment_module a.payplug.installment_4.it {
-  background-image: url('../img/logos_schemes_installment_4_it.png');
-}
-p.payment_module a.payplug.installment_4.en {
-  background-image: url('../img/logos_schemes_installment_4_en.png');
-}
-p.payment_module a.payplug:hover {
-  background-color: #F6F6F6;
-}
-p.payment_module a.payplug:after {
-  display: block;
-  content: "\f054";
-  position: absolute;
-  right: 15px;
-  margin-top: -11px;
-  top: 50%;
-  font-family: "FontAwesome";
-  font-size: 25px;
-  height: 22px;
-  width: 14px;
-  color: #777;
-}
 div.payplug-wrapper {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -1261,6 +1214,31 @@ a.ppdeletecard {
 a.payplug.call.pphide {
   display: none;
 }
+/* Payplug payment */
+.payplugPayment a {
+  padding-left: 15px !important;
+}
+.payplugPayment a img {
+  position: relative;
+  left: auto;
+  margin: 0 8px 0 0;
+}
+.payplugPayment a:hover {
+  background-color: #F6F6F6;
+}
+.payplugPayment a:after {
+  display: block;
+  content: "\f054";
+  position: absolute;
+  right: 15px;
+  margin-top: -11px;
+  top: 50%;
+  font-family: "FontAwesome";
+  font-size: 25px;
+  height: 22px;
+  width: 14px;
+  color: #777;
+}
 /* Oney payment */
 .oneyPayment {
   -webkit-border-radius: 4px;
@@ -1297,7 +1275,7 @@ a.payplug.call.pphide {
   color: #333;
   font-size: 17px;
   font-weight: bold;
-  padding: 0 95px 0 215px;
+  padding: 0 95px 0 15px;
   letter-spacing: -1px;
 }
 .-disabled .oneyPayment_trigger {
@@ -1375,18 +1353,10 @@ a.payplug.call.pphide {
   margin: 0 0 16px;
 }
 .oneyPayment_logo {
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
   display: block;
-  position: absolute;
-  left: 15px;
-  top: 50%;
   background-size: 110%;
   max-width: 100%;
-  margin: 0 15px 0 0;
+  margin: 0 8px 0 0;
 }
 .-disabled .oneyPayment_logo {
   background-image: url(../img/oney/3x4x-alt.svg);
@@ -1417,7 +1387,7 @@ a.payplug.call.pphide {
   cursor: default;
   outline: none;
 }
-/* Oney style */
+/* Oney option */
 .oneyOption {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
@@ -1618,349 +1588,5 @@ a.payplug.call.pphide {
   position: static;
   border: none;
   background: none;
-}
-.oneyForm {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
-  flex-wrap: wrap;
-  background: transparent;
-  font-size: 15px;
-  padding: 0;
-  width: 100%;
-}
-@media (max-width: 767px) {
-  .payplugPopin .oneyForm {
-    width: calc(100vw - 30px);
-    max-width: 100%;
-  }
-}
-.oneyForm:focus {
-  outline: 0;
-}
-.oneyForm_overlay {
-  -webkit-transition: max-height 0.4s;
-  -moz-transition: max-height 0.4s;
-  -ms-transition: max-height 0.4s;
-  -o-transition: max-height 0.4s;
-  transition: max-height 0.4s;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  overflow: hidden;
-  padding: 0 16px;
-  max-height: 0;
-}
-.oneyForm_overlay-show {
-  max-height: 10000vh;
-}
-.oneyForm_wrapper {
-  position: relative;
-  padding: 24px 0 0;
-}
-.oneyForm_wrapper:before {
-  border-top: 1px solid #7ebd00;
-  -webkit-transform: translateX(-50%);
-  -moz-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  -o-transform: translateX(-50%);
-  transform: translateX(-50%);
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  height: 0;
-  width: 150px;
-}
-.oneyForm_close {
-  display: block;
-  width: 100px;
-  height: 24px;
-  line-height: 24px;
-  background: none;
-  border: none;
-  text-align: center;
-  color: #7ebd00;
-  margin: 0 0 15px;
-}
-.oneyForm_close:focus {
-  outline: 0;
-}
-.oneyForm_close:before {
-  -webkit-transform: translate(-50%, -50%) rotate(45deg);
-  -moz-transform: translate(-50%, -50%) rotate(45deg);
-  -ms-transform: translate(-50%, -50%) rotate(45deg);
-  -o-transform: translate(-50%, -50%) rotate(45deg);
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-.oneyForm_close:after {
-  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
-  -moz-transform: translate(-50%, -50%) rotate(-45deg);
-  -ms-transform: translate(-50%, -50%) rotate(-45deg);
-  -o-transform: translate(-50%, -50%) rotate(-45deg);
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-.payplugPopin .oneyForm_close {
-  color: #00ab7a;
-}
-.oneyForm_title {
-  display: block;
-  padding: 8px 0 16px;
-  color: #00ab7a;
-  font-size: 14px;
-  text-transform: uppercase;
-}
-.oneyForm_content {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  position: relative;
-  width: 100%;
-}
-.oneyForm_fieldset {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-  max-width: 330px;
-  padding: 0 15px;
-  margin: 0 0 15px;
-}
-.oneyForm_fieldset-same {
-  margin: auto;
-}
-.oneyForm_wrapper .oneyForm_fieldset {
-  max-width: calc(50% - 50px);
-}
-.oneyPayment-mobile .oneyForm_fieldset {
-  width: 100%;
-}
-.oneyPayment-mobile .oneyForm_fieldset + .oneyForm_fieldset {
-  border-top: 1px solid rgba(178, 178, 178, 0.5);
-  padding: 16px 0 0;
-  margin: 16px 0 0;
-}
-@media (max-width: 767px) {
-  .payplugPopin .oneyForm_fieldset {
-    padding: 16px 0 0;
-  }
-}
-.oneyForm_sectionName {
-  margin: 0 0 4px;
-  font-size: 15px;
-  color: #7ebd00;
-  text-align: center;
-}
-.payplugPopin .oneyForm_sectionName {
-  color: #00ab7a;
-}
-.oneyForm_group {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-.oneyForm_group p {
-  width: 100%;
-  font-weight: 400;
-  font-size: 12px;
-  margin: 0 0 3px;
-}
-.oneyForm_group + .oneyForm_group {
-  margin: 10px 0 0;
-}
-.oneyForm_field {
-  width: 100%;
-}
-.oneyForm_field-firstname,
-.oneyForm_field-lastname,
-.oneyForm_field-postcode,
-.oneyForm_field-city {
-  width: calc(50% - 2.5px);
-}
-.oneyForm_input {
-  border: 1px solid #b2b2b2;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  font-size: 12px;
-  padding: 0 8px;
-  margin: 0 0 5px;
-  width: 100%;
-  height: 36px;
-}
-.oneyForm_input-error {
-  border: 1px solid #e56876;
-}
-.oneyForm_validate {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-.oneyForm_button {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  background: #7ebd00;
-  width: 200px;
-  height: 50px;
-  color: #fff;
-  border: none;
-  font-size: 15px;
-  margin: 10px 0;
-}
-.oneyForm_submit {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  background: #00ab7a;
-  width: 200px;
-  height: 50px;
-  color: #fff;
-  border: none;
-  font-size: 15px;
-  margin: 16px 0 8px;
-  outline: none;
-}
-.oneyForm_message {
-  text-align: center;
-  font-size: 13px;
-  margin: 10px 0 0;
-  display: none;
-}
-.oneyForm_message-error {
-  display: block;
-  color: #e56876;
-}
-.oneyForm_message-success {
-  display: block;
-  color: #00ab7a;
-}
-.oneyForm_validation {
-  -webkit-transition: opacity 0.4s;
-  -moz-transition: opacity 0.4s;
-  -ms-transition: opacity 0.4s;
-  -o-transition: opacity 0.4s;
-  transition: opacity 0.4s;
-  opacity: 0;
-  position: absolute;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #fff;
-}
-.oneyForm_validation span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  font-size: 15px;
-}
-.oneyForm_validation span:first-child {
-  color: #00ab7a;
-  font-size: 12px;
-  margin: 0 0 15px;
-}
-.oneyForm_validation span:first-child:before {
-  border: 4px solid #00ab7a;
-  border-top: none;
-  border-right: none;
-  -webkit-transform: rotate(-45deg);
-  -moz-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  -o-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-  display: block;
-  width: 30px;
-  height: 15px;
-  content: "";
-  margin: 0 0 15px;
-}
-.oneyForm_validation-show {
-  display: flex;
-}
-.oneyForm_validation-appear {
-  opacity: 1;
-}
-.oneyError {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  width: 100%;
-  color: #a91526;
-  clear: both;
-  padding: 0 15px;
-  margin: 0 0 16px;
-  display: none;
-}
-.oneyLoader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-.oneyLoader_spinner {
-  display: flex;
-  font-size: 30px;
-  width: 1em;
-  height: 1em;
-  position: relative;
-  justify-content: center;
-  align-items: center;
-}
-.oneyLoader_spinner span,
-.oneyLoader_spinner:before,
-.oneyLoader_spinner:after {
-  -webkit-border-radius: 100%;
-  -moz-border-radius: 100%;
-  border-radius: 100%;
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: 90%;
-  height: 90%;
-  border: 0.1em solid #7ebd00;
-  border-color: #7ebd00 transparent transparent transparent;
-  animation: pp-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-}
-.oneyLoader_spinner:before,
-.oneyLoader_spinner:after {
-  content: "";
-}
-.oneyLoader_spinner:before {
-  animation-delay: -0.45s;
-}
-.oneyLoader_spinner span {
-  animation-delay: -0.3s;
-}
-.oneyLoader_spinner:after {
-  animation-delay: -0.15s;
-}
-.oneyLoader_message {
-  display: flex;
-  justify-content: center;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  padding: 8px 8px 0;
-  font-size: 16px;
-}
-.oneyLoader_message i {
-  animation: pp-opacity 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
-}
-.oneyLoader_message i:nth-child(1) {
-  animation-delay: -0.6s;
-}
-.oneyLoader_message i:nth-child(2) {
-  animation-delay: -0.4s;
-}
-.oneyLoader_message i:nth-child(3) {
-  animation-delay: -0.2s;
 }
 /*# sourceMappingURL=front_1_6.css.map */

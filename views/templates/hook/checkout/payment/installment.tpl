@@ -22,7 +22,7 @@
 
 <div class="row">
 	<div class="col-xs-12">
-		<p class="payment_module">
+		<p class="payment_module payplugPayment">
 			{if isset($front_ajax_url)}
 				<a href="{$installment_controller_url|escape:'htmlall':'UTF-8'}" class="payplug installment installment_{$installment_mode|escape:'htmlall':'UTF-8'}{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}" title="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}">
 					<img class="payment_option_installment_3_logo" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}" />{$payplug_payment_option.label|escape:'html'}

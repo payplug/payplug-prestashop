@@ -20,8 +20,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h1>checkout payment display</h1>
-
 <script type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1/form.latest.js"></script>
 <script type="text/javascript" data-keepinline="true">
     var spinner_url = '{$spinner_url|escape:'htmlall':'UTF-8'}';

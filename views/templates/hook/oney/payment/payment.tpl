@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payment_module oneyPayment{if !$payplug_oney_allowed} -disabled{/if}{if isset($payplug_carrier_error) && $payplug_carrier_error} -invalidCarrier{/if}">
+<div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}{if isset($payplug_carrier_error) && $payplug_carrier_error} -invalidCarrier{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
         <span class="oneyPayment_logo oneyLogo -x3x4">
             <img src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />

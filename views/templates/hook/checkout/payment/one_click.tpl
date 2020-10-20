@@ -23,7 +23,7 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="payplug-wrapper">
-                <p class="payment_module">
+                <p class="payment_module payplugPayment">
                     <a href="{$payment_controller_url|escape:'htmlall':'UTF-8'}"
                        class="payplug{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}"
                        title="{l s='Credit card payment' mod='payplug'}">

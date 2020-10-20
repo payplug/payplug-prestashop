@@ -24,7 +24,7 @@
     {foreach $payplug_options as $payplug_option}
         <div class="row">
             <div class="col-xs-12">
-                <p class="payment_module">
+                <p class="payment_module payplugPayment">
                     <a href="{$payplug_option.url|escape:'htmlall':'UTF-8'}" class="payplug{if isset($extra_class) && $extra_class} {$payplug_option.extra_class|escape:'htmlall':'UTF-8'}{/if}" title="{$payplug_option.label|escape:'htmlall':'UTF-8'}">
                         {$payplug_option.label|escape:'htmlall':'UTF-8'}
                     </a>
