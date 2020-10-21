@@ -24,6 +24,8 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\LoggerEntity;
+use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\DatabaseSpecific;
 
 class LoggerRepository
 {
@@ -32,9 +34,18 @@ class LoggerRepository
      */
     private $LoggerEntity;
 
+    private $database;
+
+    private $configuration;
+
     public function __construct()
     {
         $this->LoggerEntity = new LoggerEntity();
+        $this->database = new DatabaseSpecific();
+        $this->configuration = new ConfigurationSpecific();
+
+//        var_dump($this->configuration->get('ONEY_TOS')); exit;
+
     }
 
     public function addLog($niveau, $message)

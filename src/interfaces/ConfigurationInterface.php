@@ -1,8 +1,6 @@
 <?php
 
-
 namespace PayPlug\src\interfaces;
-
 
 interface ConfigurationInterface
 {
