@@ -49,8 +49,7 @@ class LoggerRepository
         $this->loggerEntity
             ->setLimitNumber(4000)
             ->setLimitDate('P1M')
-        ;
-        $this->loggerEntity::setDefinition(
+            ->setDefinition(
             [
                 'table' => 'payplug_logger',
                 'primary' => 'id_payplug_logger',

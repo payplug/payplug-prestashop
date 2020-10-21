@@ -52,7 +52,7 @@ class LoggerEntity
     /**
      * @var array $definition
      */
-    private static $definition;
+    private $definition;
 
     /**
      * @var int $limitNumber
@@ -149,17 +149,19 @@ class LoggerEntity
     /**
      * @return array
      */
-    public static function getDefinition()
+    public function getDefinition(): array
     {
-        return self::$definition;
+        return $this->definition;
     }
 
     /**
      * @param array $definition
+     * @return LoggerEntity
      */
-    public static function setDefinition(array $definition)
+    public function setDefinition(array $definition): LoggerEntity
     {
-        self::$definition = $definition;
+        $this->definition = $definition;
+        return $this;
     }
 
     /**
