@@ -45,6 +45,7 @@ class PayPlugNotifications
         $this->except = null;
         $this->resp = array();
         $this->payplug = new Payplug();
+        $this->plugin = $this->payplug->getPlugin();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
 
