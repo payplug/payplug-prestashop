@@ -65,6 +65,16 @@ class LoggerEntity
     private $limitDate;
 
     /**
+     * @var string $id
+     */
+    private $id;
+
+    /**
+     * @var string $type
+     */
+    private $type;
+
+    /**
      * @return string
      */
     public function getProcess()
@@ -74,7 +84,7 @@ class LoggerEntity
 
     /**
      * @param string $process
-     * @return PayPlugLoggerEntity
+     * @return LoggerEntity
      */
     public function setProcess(string $process)
     {
@@ -91,10 +101,10 @@ class LoggerEntity
     }
 
     /**
-     * @param text $content
-     * @return PayPlugLoggerEntity
+     * @param $content
+     * @return LoggerEntity
      */
-    public function setContent(text $content)
+    public function setContent($content)
     {
         $this->content = $content;
         return $this;
@@ -109,10 +119,10 @@ class LoggerEntity
     }
 
     /**
-     * @param datetime $date_add
-     * @return PayPlugLoggerEntity
+     * @param string $date_add
+     * @return LoggerEntity
      */
-    public function setDateAdd(datetime $date_add)
+    public function setDateAdd(string $date_add)
     {
         $this->date_add = $date_add;
         return $this;
@@ -127,10 +137,10 @@ class LoggerEntity
     }
 
     /**
-     * @param datetime $date_upd
-     * @return PayPlugLoggerEntity
+     * @param $date_upd
+     * @return LoggerEntity
      */
-    public function setDateUpd(datetime $date_upd)
+    public function setDateUpd($date_upd)
     {
         $this->date_upd = $date_upd;
         return $this;
@@ -162,7 +172,7 @@ class LoggerEntity
 
     /**
      * @param int $limit_number
-     * @return PayPlugLoggerEntity
+     * @return LoggerEntity
      */
     public function setLimitNumber(int $limit_number)
     {
@@ -180,11 +190,47 @@ class LoggerEntity
 
     /**
      * @param string $limitDate
-     * @return PayPlugLoggerEntity
+     * @return LoggerEntity
      */
     public function setLimitDate(string $limitDate)
     {
         $this->limitDate = $limitDate;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     * @return LoggerEntity
+     */
+    public function setId(string $id): LoggerEntity
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return LoggerEntity
+     */
+    public function setType(string $type): LoggerEntity
+    {
+        $this->type = $type;
         return $this;
     }
 }

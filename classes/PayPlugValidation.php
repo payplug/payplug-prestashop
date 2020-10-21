@@ -33,16 +33,20 @@ class PayPlugValidation
     public $debug;
     public $type;
     public $api_key;
+    private $plugin;
 
     public function __construct()
     {
         $this->payplug = new Payplug();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->type = 'payment';
+        $this->plugin = $this->payplug->getPlugin();
     }
 
     public function setLogger() {
-        $this->logger = new PayPlugLogger('validation');
+        $this->logger = $this->plugin->getLogger();
+        $params['process'] = 'validation';
+        $this->logger->setParams($params);
         $this->logger->addLog('New validation');
     }
 

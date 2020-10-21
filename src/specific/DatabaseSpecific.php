@@ -7,18 +7,24 @@ use Db;
 
 class DatabaseSpecific implements DatabaseInterface
 {
+    private $db;
+
     public function __construct()
     {
         try {
-            $db = Db::getInstance();
-            $res = $db->executeS('SELECT * FROM '._DB_PREFIX_.'configuration');
-            var_dump($res);
-            exit;
+            $this->db = Db::getInstance();
         }
         catch (\Exception $e){
             var_dump($e);
         }
+    }
 
-        
+    public function query($action, $command = null)
+    {
+        try {
+            return $this->db->$action($command);
+        } catch (\Exception $e){
+            var_dump($e);
+        }
     }
 }

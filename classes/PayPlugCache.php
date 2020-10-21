@@ -74,7 +74,7 @@ class PayPlugCache extends ObjectModel
     public function __construct($id = null, $id_lang = null)
     {
         parent::__construct($id, $id_lang);
-
+        $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
         $this->logger = new PayPlugLogger('cache');
     }
 

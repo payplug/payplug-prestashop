@@ -33,20 +33,6 @@ require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.ph
 @include_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCard.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugLogger.php');
-
-
-/*
-use libphonenumber\NumberParseException;
-use libphonenumber\PhoneNumberUtil;
-use PayPlug\classes\MyLogPHP;
-use PayPlug\repositories\LoggerRepository;/*
-use PayPlug\src\entities\ConfigurationEntity as PayPlugConfiguration;
-use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\repositories\PluginRepository;*/
-//use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-/*use Symfony\Component\VarDumper\VarDumper;
-*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -6467,7 +6453,11 @@ class Payplug extends PaymentModule
     {
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
-        $this->logger = new Payplug\classes\PayPlugLogger('payplug');
+//        $this->logger = new Payplug\classes\PayPlugLogger('payplug');
+
+        $this->logger = $this->plugin->getLogger();
+        $params['process'] = 'payplug';
+        $this->logger->setParams($params);
 
         if ($this->active) {
             $this->logger->flush();
