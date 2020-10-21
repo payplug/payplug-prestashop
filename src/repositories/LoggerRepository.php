@@ -23,7 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\entities\loggerEntity;
+use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\DatabaseSpecific;
 
