@@ -175,13 +175,13 @@ class LoggerRepository
 
     public function flush($all = false) {
         try {
-            $this->database->query('getValue','SELECT * FROM `'._DB_PREFIX_.self::$definition['table'].'`');
+            $this->database->query('getValue','SELECT * FROM `'._DB_PREFIX_.'payplug_logger`');
         } catch (Exception $exception) {
             return false;
         }
 
         if($all) {
-            return $this->database->query('execute','TRUNCATE `'._DB_PREFIX_.self::$definition['table'].'`');
+            return $this->database->query('execute','TRUNCATE `'._DB_PREFIX_.'payplug_logger`');
         }
 
         $limits = $this->getLimit();
@@ -192,11 +192,11 @@ class LoggerRepository
         $flag = true;
 
         // clean old log
-        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` WHERE `date_add` < "'.$date_limit->format('Y-m-d').'"';
+        $sql = 'DELETE FROM `'._DB_PREFIX_.'payplug_logger` WHERE `date_add` < "'.$date_limit->format('Y-m-d').'"';
         $flag = $flag && $this->database->query('execute',$sql);
 
         // clean log beyong the limit
-        $sql = 'SELECT `id_payplug_logger` FROM `'._DB_PREFIX_.self::$definition['table'].'` ORDER BY `id_payplug_logger` DESC LIMIT '.($limits['number'] - 1).',1';
+        $sql = 'SELECT `id_payplug_logger` FROM `'._DB_PREFIX_.'payplug_logger` ORDER BY `id_payplug_logger` DESC LIMIT '.($limits['number'] - 1).',1';
         $last_logs_valid = $this->database->query('executeS',$sql);
 
         // si there is no more log
@@ -204,7 +204,7 @@ class LoggerRepository
             return $flag;
         }
 
-        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` WHERE `id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'];
+        $sql = 'DELETE FROM `'._DB_PREFIX_.'payplug_logger` WHERE `id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'];
         $flag = $flag && $this->database->query('execute',$sql);
 
         return $flag;
