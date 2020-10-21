@@ -25,38 +25,23 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_0($object)
+function upgrade_module_2_10_0()
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
-    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+    if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
-    $flag = true;
-
-    // run the method who install Oney feature
-    $flag = $object->installOney();
-
-    //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $flag = false;
-    }
-
-    // Update payplug lock table
-    $sql_requests = array(
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
-    );
-
+    //sql
+    $req_payplug_payment_cart = '
+        ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
+        ADD COLUMN `is_pending` TINYINT(1) NOT NULL DEFAULT 0
+        AFTER `id_cart`';
     try {
-        foreach ($sql_requests as $sql_request) {
-            $request = Db::getInstance()->execute($sql_request);
-            if (!$request) {
-                $flag = false;
-            }
-        }
+        $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
     } catch (PrestaShopDatabaseException $e) {
-        $flag = false;
+        return true;
     }
 
-    return $flag;
+    return $res_payplug_payment_cart;
 }

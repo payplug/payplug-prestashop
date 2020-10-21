@@ -123,18 +123,16 @@ class PrestashopSpecific16
             // Pour n'affiche qu'un template OneClick
             // Sinon, si x CB d'enregistrées : affiche x temmplates avec x CB dans chaque
             if ((isset($payment_option['name']))) {
-                if (($payment_option['name'] == 'one_click') && $i <=1 ) {
-                    $i++;
-                    continue;
-                }
+                $payment_method = $payment_option['name'];
 
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
 
                 // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
                 // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
-                    && ($payment_option['name'] == 'standard')) {
-                        continue;
+                    && !empty($payplug_cards)
+                    && ($payment_method == 'standard')) {
+                    continue;
                 } else {
                     /*var_dump($payment_option['tpl']); :
                     one_click_payment.tpl (oneClick activé)
@@ -143,10 +141,10 @@ class PrestashopSpecific16
                     oney_payment.tpl (Oney optimisé)
                     unified_payment.tpl (Oney non optimisé)
                     */
-                    $paymentOptions[] = array(
+                    $paymentOptions[$payment_method] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
-                        'logo_url' => $payment_option['logo'],
+                        'logo_url' => $payment_method == 'one_click' ? $payment_options['standard']['logo'] : $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
                     );
@@ -160,7 +158,7 @@ class PrestashopSpecific16
                 }
 
                 // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
-                if ($oneyOptimized && ($payment_option['name'] == 'oney')) {
+                if ($oneyOptimized && ($payment_method == 'oney')) {
                     break;
                 }
             }

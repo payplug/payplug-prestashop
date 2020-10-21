@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -25,21 +25,17 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_0($object)
+function upgrade_module_2_26_1($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
-    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+    if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
     $flag = true;
 
-    // run the method who install Oney feature
-    $flag = $object->installOney();
-
-    //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $flag = false;
+    if (!$object->checkVersion()) {
+        return $flag;
     }
 
     // Update payplug lock table
@@ -50,12 +46,20 @@ function upgrade_module_2_27_0($object)
     try {
         foreach ($sql_requests as $sql_request) {
             $request = Db::getInstance()->execute($sql_request);
+            /*
+             * Exceptionally we don't want to block update after request execution
+             * because the constraint may be duplicated for beta testers
             if (!$request) {
                 $flag = false;
             }
+            */
         }
     } catch (PrestaShopDatabaseException $e) {
+        /*
+         * Exceptionally we don't want to block update after request execution
+         * because the constraint may be duplicated for beta testers
         $flag = false;
+        */
     }
 
     return $flag;

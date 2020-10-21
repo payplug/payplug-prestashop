@@ -215,17 +215,42 @@ class PayPlugValidation
                     $this->payplug->setPaymentErrorsCookie(array($this->payplug->l('The transaction was not completed and your card was not charged.')));
                     Payplug::redirectForVersion($redirect_url_error);
                 }
+
                 if (
                     ((isset($payment->save_card) && (int)$payment->save_card == 1))
                     ||
                     ((isset($payment->card->id) && $payment->card->id != '')
                         && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
                 ) {
-                    $this->logger->addLog('Saving card...', 'info');
+                    $this->logger->addLog('[Save Card] Saving card...', 'info');
                     $res_payplug_card = $this->payplug->saveCard($payment);
 
                     if (!$res_payplug_card) {
-                        $this->logger->addLog('Card cannot be saved.', 'error');
+                        $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');
+
+                        if (!isset($payment->save_card)) {
+                            $this->logger->addLog('[Save Card] $payment->save_card is not set', 'debug');
+                        }
+
+                        if (isset($payment->save_card) && $payment->save_card !== 1) {
+                            $this->logger->addLog('[Save Card] $payment->save_card is set but not equal to 1', 'debug');
+                        }
+
+                        if (!isset($payment->card->id)) {
+                            $this->logger->addLog('[Save Card] $payment->card->id is not set', 'debug');
+                        }
+
+                        if (isset($payment->card->id) && $payment->card->id == '') {
+                            $this->logger->addLog('[Save Card] $payment->card->id is set but empty', 'debug');
+                        }
+
+                        if (!isset($payment->hosted_payment)) {
+                            $this->logger->addLog('[Save Card] $payment->hosted_payment is not set', 'debug');
+                        }
+
+                        if ((isset($payment->hosted_payment)) && $payment->hosted_payment == '') {
+                            $this->logger->addLog('[Save Card] $payment->hosted_payment is set but empty', 'debug');
+                        }
                     }
                 }
             }
