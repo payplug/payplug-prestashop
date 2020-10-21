@@ -149,7 +149,7 @@ class LoggerEntity
     /**
      * @return array
      */
-    public function getDefinition(): array
+    public function getDefinition()
     {
         return $this->definition;
     }
@@ -158,7 +158,7 @@ class LoggerEntity
      * @param array $definition
      * @return LoggerEntity
      */
-    public function setDefinition(array $definition): LoggerEntity
+    public function setDefinition(array $definition)
     {
         $this->definition = $definition;
         return $this;
@@ -212,7 +212,7 @@ class LoggerEntity
      * @param string $id
      * @return LoggerEntity
      */
-    public function setId(string $id): LoggerEntity
+    public function setId(string $id)
     {
         $this->id = $id;
         return $this;
@@ -221,7 +221,7 @@ class LoggerEntity
     /**
      * @return string
      */
-    public function getType(): string
+    public function getType()
     {
         return $this->type;
     }
@@ -230,7 +230,7 @@ class LoggerEntity
      * @param string $type
      * @return LoggerEntity
      */
-    public function setType(string $type): LoggerEntity
+    public function setType(string $type)
     {
         $this->type = $type;
         return $this;
