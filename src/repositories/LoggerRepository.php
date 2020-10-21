@@ -47,7 +47,7 @@ class LoggerRepository
     public function setStdParams()
     {
         $this->loggerEntity
-            ->setLimitNumber(4000)
+            ->setLimitNumber((int)4000)
             ->setLimitDate('P1M')
             ->setDefinition(
             [
