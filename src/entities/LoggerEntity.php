@@ -86,7 +86,7 @@ class LoggerEntity
      * @param string $process
      * @return LoggerEntity
      */
-    public function setProcess(string $process)
+    public function setProcess($process)
     {
         $this->process = $process;
         return $this;
@@ -122,7 +122,7 @@ class LoggerEntity
      * @param string $date_add
      * @return LoggerEntity
      */
-    public function setDateAdd(string $date_add)
+    public function setDateAdd($date_add)
     {
         $this->date_add = $date_add;
         return $this;
@@ -176,7 +176,7 @@ class LoggerEntity
      * @param int $limit_number
      * @return LoggerEntity
      */
-    public function setLimitNumber(int $limit_number)
+    public function setLimitNumber($limit_number)
     {
         $this->limit_number = $limit_number;
         return $this;
@@ -194,7 +194,7 @@ class LoggerEntity
      * @param string $limitDate
      * @return LoggerEntity
      */
-    public function setLimitDate(string $limitDate)
+    public function setLimitDate($limitDate)
     {
         $this->limitDate = $limitDate;
         return $this;
@@ -212,7 +212,7 @@ class LoggerEntity
      * @param string $id
      * @return LoggerEntity
      */
-    public function setId(string $id)
+    public function setId($id)
     {
         $this->id = $id;
         return $this;
@@ -230,7 +230,7 @@ class LoggerEntity
      * @param string $type
      * @return LoggerEntity
      */
-    public function setType(string $type)
+    public function setType($type)
     {
         $this->type = $type;
         return $this;
