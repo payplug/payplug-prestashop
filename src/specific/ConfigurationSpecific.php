@@ -9,6 +9,7 @@ class ConfigurationSpecific implements ConfigurationInterface
 {
     public function get($configuration_name)
     {
-        return (new Configuration())::get($configuration_name);
+        $psConfiguration = new Configuration();
+        return $psConfiguration::get($configuration_name);
     }
 }
