@@ -224,6 +224,27 @@ class Payplug extends PaymentModule
         ),
     );
 
+    public $oney_order_state = array(
+        'oney_pg' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#a1f8a1',
+            'name' => array(
+                'en' => 'Oney - Pending',
+                'fr' => 'Oney - En attente',
+                'es' => 'Oney - Pending',
+                'it' => 'Oney - Pending',
+            ),
+        ),
+    );
+
     /** @var object */
     public $logger;
 
@@ -243,6 +264,10 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->initializeCache();
+
+        if (Tools::getValue('order_state')) {
+            $this->checkOrderStates();
+        }
     }
 
     public function abortPayment()
@@ -1072,6 +1097,33 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Check if payplug order state are well installed
+     */
+    public function checkOrderStates()
+    {
+        $order_states = array_merge($this->order_states, $this->oney_order_state);
+
+        foreach($order_states as $key => $state) {
+            // Check live OrderState
+            $key_config_live = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
+            $id_order_state_live = Configuration::get($key_config_live);
+            $order_state_live = new OrderState((int)$id_order_state_live);
+            if (!Validate::isLoadedObject($order_state_live)) {
+                $this->createOrderState($key, $state, false, true);
+            }
+
+            // Check sandbox OrderState
+            $key_config_sandbox = $key_config_live . '_TEST';
+            $id_order_state_sandbox = Configuration::get($key_config_sandbox);
+            $order_state_sandbox = new OrderState((int)$id_order_state_sandbox);
+
+            if (!Validate::isLoadedObject($order_state_sandbox)) {
+                $this->createOrderState($key, $state, true, true);
+            }
+        }
+    }
+
+    /**
      * @return array
      */
     private function checkRequirements()
@@ -1178,7 +1230,7 @@ class Payplug extends PaymentModule
         );
     }
 
-    public function createOrderState($name, $state, $sandbox = true)
+    public function createOrderState($name, $state, $sandbox = true, $force = false)
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
@@ -1193,12 +1245,12 @@ class Payplug extends PaymentModule
                 $os = constant($state['cfg']);
             } elseif (!$sandbox && $state['template'] != null) {
                 $sql = 'SELECT DISTINCT `id_order_state`
-                        FROM `' . _DB_PREFIX_ . 'order_state_lang` 
+                        FROM `' . _DB_PREFIX_ . 'order_state_lang`
                         WHERE `template` = \'' . pSQL($state['template']) . '\'';
                 $os = Db::getInstance()->getValue($sql);
             }
         }
-        if (!$os) {
+        if (!$os || $force) {
             $log->info('Creating new order state.');
             $order_state = new OrderState();
             $order_state->logable = $state['logable'];
@@ -2305,7 +2357,6 @@ class Payplug extends PaymentModule
 
         return Db::getInstance()->executeS($sql);
     }
-
 
     /**
      * @return string
@@ -3585,7 +3636,7 @@ class Payplug extends PaymentModule
             $installment = $this->retrieveInstallment($installment);
         }
 
-        if(!$installment) {
+        if (!$installment) {
             return false;
         }
 
@@ -4610,32 +4661,9 @@ class Payplug extends PaymentModule
      */
     private function installOneyOrderStates()
     {
-        $oney_order_state = array(
-            'oney_pg' => array(
-                'cfg' => null,
-                'template' => null,
-
-                // OS have to be "logable" to register transaction_id
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#a1f8a1',
-                'name' => array(
-                    'en' => 'Oney - Pending',
-                    'fr' => 'Oney - En attente',
-                    'es' => 'Oney - Pending',
-                    'it' => 'Oney - Pending',
-                ),
-            ),
-        );
-
         $flag = true;
 
-        foreach ($oney_order_state as $key => $state) {
+        foreach ($this->oney_order_state as $key => $state) {
             $flag = $flag && $this->createOrderState($key, $state, true) && $this->createOrderState($key, $state,
                     false);
         }
@@ -5992,7 +6020,7 @@ class Payplug extends PaymentModule
      */
     public function retrieveInstallment($inst_id)
     {
-        if(!$inst_id) {
+        if (!$inst_id) {
             return false;
         }
         try {
@@ -6018,6 +6046,20 @@ class Payplug extends PaymentModule
         }
 
         return $payment;
+    }
+
+    /**
+     * Run the upgrade for a given module name and version.
+     *
+     * @return array
+     */
+    public function runUpgradeModule()
+    {
+        $upgrade = parent::runUpgradeModule();
+
+        $this->checkOrderStates();
+
+        return $upgrade;
     }
 
     public function saveConfiguration()
