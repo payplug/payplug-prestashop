@@ -264,10 +264,6 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->initializeCache();
-
-        if (Tools::getValue('order_state')) {
-            $this->checkOrderStates();
-        }
     }
 
     public function abortPayment()
