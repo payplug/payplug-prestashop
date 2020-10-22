@@ -24,23 +24,20 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\LoggerEntity;
-use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\DatabaseSpecific;
 
 class LoggerRepository
 {
     /**
-     * @var object $LoggerEntity
+     * @var object LoggerEntity
      */
     private $loggerEntity;
     private $database;
-    private $configuration;
 
     public function __construct()
     {
         $this->loggerEntity = new loggerEntity();
         $this->database = new DatabaseSpecific();
-        $this->configuration = new ConfigurationSpecific();
         $this->setStdParams();
     }
 

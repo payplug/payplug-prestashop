@@ -41,7 +41,6 @@ if (!defined('_PS_VERSION_')) {
 require_once(_PS_MODULE_DIR_ . 'payplug/lib/init.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCache.php');
 
 class Payplug extends PaymentModule
 {
@@ -3094,12 +3093,11 @@ class Payplug extends PaymentModule
             (string)implode('_', $operation) . '_' .
             (Configuration::get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
 
-        $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
-
         // Checks if the current simulation is already saved in the database
         // If not, we do a simulation for Oney, and we will store it to the DB
-        if (Validate::isLoadedObject($cache_from_bdd)) {
-            return Tools::jsonDecode($cache_from_bdd->cache_value, true);
+        $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
+        if ($cache_from_bdd) {
+            return Tools::jsonDecode($cache_from_bdd[0]['cache_value'], true);
         }
 
         try {
@@ -3126,7 +3124,11 @@ class Payplug extends PaymentModule
                         'simulations' => $simulations
                     );
 
+                    // $cache_id = cache_key in db
+                    // $to_cache = cache_value in db
                     if (!$this->payplug_cache->setCache($cache_id, $to_cache)) {
+                        $params['process'] = 'payplug.php setCache';
+                        $this->logger->setParams($params);
                         $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                         $error_level = 'error';
                         $this->logger->addLog($error_message, $error_level);
@@ -6453,7 +6455,6 @@ class Payplug extends PaymentModule
     {
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
-//        $this->logger = new Payplug\classes\PayPlugLogger('payplug');
 
         $this->logger = $this->plugin->getLogger();
         $params['process'] = 'payplug';
@@ -6549,7 +6550,7 @@ class Payplug extends PaymentModule
      */
     private function initializeCache()
     {
-        $this->payplug_cache = new PayPlugCache();
+        $this->payplug_cache = $this->plugin->getCache();
     }
 
     /**

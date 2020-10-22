@@ -9,6 +9,7 @@ class PluginEntity
 {
     private $api_version;
     private $logger;
+    private $cache;
 
     /**
      * @return mixed
@@ -46,4 +47,21 @@ class PluginEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    /**
+     * @param mixed $cache
+     * @return PluginEntity
+     */
+    public function setCache($cache)
+    {
+        $this->cache = $cache;
+        return $this;
+    }
 }
