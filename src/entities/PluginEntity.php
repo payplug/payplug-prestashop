@@ -10,6 +10,7 @@ class PluginEntity
     private $api_version;
     private $logger;
     private $cache;
+    private $query;
 
     /**
      * @return mixed
@@ -62,6 +63,24 @@ class PluginEntity
     public function setCache($cache)
     {
         $this->cache = $cache;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * @param mixed $query
+     * @return PluginEntity
+     */
+    public function setQuery($query)
+    {
+        $this->query = $query;
         return $this;
     }
 }

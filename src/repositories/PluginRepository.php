@@ -30,16 +30,19 @@ class PluginRepository extends Repository
     private $plugin;
     private $logger;
     private $cache;
+    private $query;
 
     public function __construct()
     {
         $this->plugin = new PluginEntity();
         $this->logger = new LoggerRepository();
         $this->cache = new CacheRepository();
+        $this->query = new QueryRepository();
         $this->plugin
             ->setApiVersion('2019-08-06')
             ->setLogger($this->logger)
             ->setCache($this->cache)
+            ->setQuery($this->query)
         ;
         $this->setEntity($this->plugin);
     }

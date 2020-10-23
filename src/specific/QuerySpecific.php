@@ -2,10 +2,10 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\DatabaseInterface;
+use PayPlug\src\interfaces\QueryInterface;
 use Db;
 
-class DatabaseSpecific implements DatabaseInterface
+class QuerySpecific implements QueryInterface
 {
     private $db;
 
@@ -26,5 +26,11 @@ class DatabaseSpecific implements DatabaseInterface
         } catch (\Exception $e){
             var_dump($e);
         }
+    }
+
+    public function select($table, $data, $limit)
+    {
+        $req = 'SELECT ' . $data . ' FROM `' . $table . '`';
+        return Db::getInstance()->executeS($req);
     }
 }

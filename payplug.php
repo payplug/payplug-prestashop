@@ -25,6 +25,8 @@
  * Core file of PayPlug module
  */
 
+use PayPlug\src\repositories\QueryRepository;
+
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
@@ -50,6 +52,8 @@ class Payplug extends PaymentModule
 
     /** @var PluginEntity */
     private $plugin;
+
+    private $query;
 
     private $paymentOption;
 
@@ -264,7 +268,7 @@ class Payplug extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '3.0.0';
 
-        $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
+        $this->initializeAccessors();
 
         $this->setLoggers();
         $this->loadEntities();
@@ -276,6 +280,20 @@ class Payplug extends PaymentModule
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
         $this->initializeCache();
+
+        $this->testTonCode();
+    }
+
+    private function initializeAccessors()
+    {
+        $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
+        $this->logger = $this->plugin->getLogger();
+        $this->query = $this->plugin->getQuery();
+    }
+
+    public function testTonCode()
+    {
+
     }
 
     public function loadSpecificPrestaClasses()
@@ -6456,7 +6474,6 @@ class Payplug extends PaymentModule
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
-        $this->logger = $this->plugin->getLogger();
         $params['process'] = 'payplug';
         $this->logger->setParams($params);
 
