@@ -1,5 +1,50 @@
 <?php
 
+/*
+ * (Petit rappel, avant de créer la doc)
+ * Comment ça marche :
+ *
+ * Dans n'importe quelle classe :
+ * public function __construct()
+ * {
+ *      $this->query = new QueryRepository();
+ * }
+ *
+ * SELECT * FROM ma_table :
+ * $this->query
+ * ->select()
+ * ->fields('*')
+ * ->from('ma_table')
+ * ->build()
+ *
+ * INSERT INTO ma_table (champ_1, champ_2) VALUES (donnee_1, donnee_2) :
+ * $this->query
+ * ->insert()
+ * ->into('ma_table')
+ * ->fields('champ_1, champ_2')
+ * ->values('donnee_1, donnee_2')
+ * ->build()
+ *
+ * UPDATE ma_table SET champ_1 = donnee_1 WHERE id = 3 :
+ * ->update()
+ * ->table('ma_table')
+ * ->set('ma_table.champ_1 = donnee_1')
+ * ->where(id = 3)
+ * ->build()
+ *
+ * DELETE FROM ma_table WHERE id = 3 :
+ * $this->query
+ * ->delete()
+ * ->from('ma_table')
+ * ->where('id = 3')
+ * ->build()
+ *
+ * TRUNCATE TABLE ma_table :
+ * $this->query
+ * ->truncate()
+ * ->table('ma_table')
+ */
+
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\specific\QuerySpecific;
