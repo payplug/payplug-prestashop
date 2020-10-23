@@ -3128,7 +3128,7 @@ class Payplug extends PaymentModule
         // If not, we do a simulation for Oney, and we will store it to the DB
         $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
         if ($cache_from_bdd) {
-            //return Tools::jsonDecode($cache_from_bdd[0]['cache_value'], true);
+            return Tools::jsonDecode($cache_from_bdd[0]['cache_value'], true);
         }
 
         try {
