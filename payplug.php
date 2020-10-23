@@ -293,18 +293,20 @@ class Payplug extends PaymentModule
 
     public function testTonCode()
     {
-       var_dump(
-
-           $this->query
-           ->select()
-           ->fields('*')
-           ->from('payplug_cache')
-           ->build()
-
-       ); exit;
-       
-            ;
-        exit;
+//       var_dump(
+//
+//           $this->query
+////           ->select()
+////           ->fields('*')
+////           ->from('ps_payplug_cache')
+//            ->insert()
+//               ->into()
+//           ->build()
+//
+//       ); exit;
+//
+//            ;
+//        exit;
     }
 
     public function loadSpecificPrestaClasses()

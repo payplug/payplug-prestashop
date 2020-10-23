@@ -50,6 +50,9 @@ class CacheEntity
     /** @var array */
     private $definition;
 
+    /** @var string */
+    private $table;
+
     /**
      * @return string
      */
@@ -173,6 +176,24 @@ class CacheEntity
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param string $table
+     * @return CacheEntity
+     */
+    public function setTable(string $table)
+    {
+        $this->table = $table;
         return $this;
     }
 }

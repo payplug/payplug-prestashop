@@ -24,7 +24,6 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\LoggerEntity;
-use PayPlug\src\specific\DatabaseSpecific;
 
 class LoggerRepository
 {
@@ -32,24 +31,25 @@ class LoggerRepository
      * @var object LoggerEntity
      */
     private $loggerEntity;
-    private $database;
+    private $query;
 
     public function __construct()
     {
         $this->loggerEntity = new loggerEntity();
-        $this->database = new DatabaseSpecific();
+        $this->query = new QueryRepository();
         $this->setStdParams();
     }
 
     public function setStdParams()
     {
         $this->loggerEntity
+            ->setTable('payplug_logger')
             ->setLimitNumber((int)4000)
             ->setLimitDate('P1M')
             ->setDefinition(
             [
-                'table' => 'payplug_logger',
-                'primary' => 'id_payplug_logger',
+                'table' => $this->loggerEntity->getTable(),
+                'primary' => 'id_'.$this->loggerEntity->getTable(),
                 'fields' => [
                     /*
                      * Different types,
@@ -94,8 +94,8 @@ class LoggerRepository
             $content = [];
         }
 
-        $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s.u T'));
-        $entry = ['date' => $this->loggerEntity->getDateAdd(), 'message' => $message, 'level' => $level];
+        $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T
+        $entry = ['date' => $this->udate('Y-m-d H:i:s.u T'), 'message' => $message, 'level' => $level];
         array_push($content, $entry);
 
         $this->loggerEntity->setContent(json_encode($content));
@@ -108,7 +108,7 @@ class LoggerRepository
     public function save()
     {
         if ((int)$this->loggerEntity->getId() > 0) {
-            $this->loggerEntity->setDateUpd($this->udate('Y-m-d H:i:s.u T'));
+            $this->loggerEntity->setDateUpd($this->udate('Y-m-d H:i:s'));
             return $this->updateLog();
         }
 
@@ -117,36 +117,45 @@ class LoggerRepository
 
     public function addToDb()
     {
-        $req_add_log = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_logger (process, content, date_add, date_upd)
-                VALUES (\'' . pSQL($this->loggerEntity->getProcess()) . '\', 
-                        \'' . pSQL($this->loggerEntity->getContent()) . '\', 
-                        \'' . pSQL($this->loggerEntity->getDateAdd()) . '\', 
-                        \'' . pSQL($this->loggerEntity->getDateAdd()) . '\')';
-        $res_add_log = $this->database->query('execute',$req_add_log);
+        $logger = $this->loggerEntity;
+        $values =   '\''.pSQL($logger->getProcess()).'\','.
+                    '\''.pSQL($logger->getContent()).'\','.
+                    '\''.pSQL($logger->getDateAdd()).'\','.
+                    '\''.pSQL($logger->getDateAdd()).'\'';
+        $this->query
+            ->insert()
+            ->into(_DB_PREFIX_.$logger->getTable())
+            ->fields('process, content, date_add, date_upd')
+            ->values($values)
+        ;
 
-        $this->loggerEntity->setId($this->database->query('Insert_ID'));
-
-        if (!$res_add_log) {
+        if (!$this->query->build()) {
             return false;
         }
+
+        $this->loggerEntity->setId($this->query->lastId());
     }
 
     public function updateLog()
     {
-        $req_upd_log = '
-                UPDATE ' . _DB_PREFIX_ . 'payplug_logger log  
-                SET log.process = \'' . pSQL($this->loggerEntity->getProcess()) . '\', 
-                    log.content = \'' . pSQL($this->loggerEntity->getContent()) . '\', 
-                    log.date_upd = \'' . pSQL($this->loggerEntity->getDateUpd()) . '\'
-                WHERE log.id_payplug_logger = ' . (int)$this->loggerEntity->getId();
-        $res_upd_log = $this->database->query('execute',$req_upd_log);
+        $logger = $this->loggerEntity;
+        $table = _DB_PREFIX_.$logger->getTable();
+        $set =  $table.'.process =  \''.pSQL($logger->getProcess()).'\','.
+                $table.'.content =  \''.pSQL($logger->getContent()).'\','.
+                $table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'';
 
-        if (!$res_upd_log) {
+        $this->query
+            ->update()
+            ->table($table)
+            ->set($set)
+            ->where($table.'.id_'.$logger->getTable().' = '.(int)$logger->getId())
+            ;
+
+        if (!$this->query->build()) {
             return false;
         }
 
-        return $res_upd_log;
+        return true;
     }
 
     public function udate($format = 'u', $utimestamp = null)
@@ -171,13 +180,26 @@ class LoggerRepository
 
     public function flush($all = false) {
         try {
-            $this->database->query('getValue','SELECT * FROM `'._DB_PREFIX_.'payplug_logger`');
+            $logger = $this->loggerEntity;
+            $this->query
+                ->select()
+                ->fields('*')
+                ->from(_DB_PREFIX_.$logger->getTable())
+            ;
         } catch (Exception $exception) {
             return false;
         }
 
         if($all) {
-            return $this->database->query('execute','TRUNCATE `'._DB_PREFIX_.'payplug_logger`');
+            $this->query
+                ->truncate()
+                ->table(_DB_PREFIX_.$logger->getTable())
+            ;
+
+            if (!$this->query->build()) {
+                return false;
+            }
+            return true;
         }
 
         $limits = $this->getLimit();
@@ -188,20 +210,39 @@ class LoggerRepository
         $flag = true;
 
         // clean old log
-        $sql = 'DELETE FROM `'._DB_PREFIX_.'payplug_logger` WHERE `date_add` < "'.$date_limit->format('Y-m-d').'"';
-        $flag = $flag && $this->database->query('execute',$sql);
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_.$logger->getTable())
+            ->where('`date_add` < "'.$date_limit->format('Y-m-d').'"')
+        ;
 
-        // clean log beyong the limit
-        $sql = 'SELECT `id_payplug_logger` FROM `'._DB_PREFIX_.'payplug_logger` ORDER BY `id_payplug_logger` DESC LIMIT '.($limits['number'] - 1).',1';
-        $last_logs_valid = $this->database->query('executeS',$sql);
-
-        // si there is no more log
-        if(!$last_logs_valid) {
-            return $flag;
+        if (!$this->query->build()) {
+            $flag = false;
         }
 
-        $sql = 'DELETE FROM `'._DB_PREFIX_.'payplug_logger` WHERE `id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'];
-        $flag = $flag && $this->database->query('execute',$sql);
+        // clean log beyong the limit
+        $last_logs_valid =
+            $this->query
+                ->select()
+                ->fields('`id_payplug_logger`')
+                ->from(_DB_PREFIX_.$logger->getTable())
+                ->orderBy('`id_payplug_logger` DESC')
+                ->limit(($limits['number'] - 1),1)
+            ;
+
+        if (!$last_logs_valid || !$this->query->build()) {
+            $flag = false;
+        }
+
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_.$logger->getTable())
+            ->where('`id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'])
+        ;
+
+        if (!$this->query->build()) {
+            $flag = false;
+        }
 
         return $flag;
     }
