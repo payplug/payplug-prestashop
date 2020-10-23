@@ -274,19 +274,31 @@ div.ppoverlay {
 }
 
 .payplug-payment-option {
+  body#checkout section.checkout-step .payment-options & {
+    label {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 0;
+    }
+    img {
+      margin: 0 12px 0 0;
+    }
 
-}
 
-body#checkout section.checkout-step .payment-options .payplug-payment-option label {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  justify-content: flex-end;
-  margin: 0;
-}
-
-body#checkout section.checkout-step .payment-options .payplug-payment-option img {
-  margin: 0 12px 0 0;
+    @media (max-width: 768px) {
+      display: flex;
+      align-items: center;
+      label {
+        max-width: calc(100% - 40px);
+        text-align: left;
+      }
+      img {
+        display: none;
+      }
+    }
+  }
 }
 
 .payplug {
