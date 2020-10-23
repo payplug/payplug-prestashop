@@ -19,10 +19,12 @@ class QuerySpecific implements QueryInterface
         }
     }
 
-    public function query($action, $command = null)
+    public function query($SQLRequest)
     {
         try {
-            return $this->db->$action($command);
+                $action = 'executeS';
+                return $this->db->$action($SQLRequest);
+
         } catch (\Exception $e){
             var_dump($e);
         }
