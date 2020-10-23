@@ -215,14 +215,14 @@ class QueryRepository extends Repository
     public function build()
     {
         if ($this->query['type'] == 'SELECT') {
-            var_dump($this->query['fields']);
-            $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '')."\n";
-
+            $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
+            $this->query['fields'] = null;
             if (!$this->query['from']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
             }
 
             $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
+            $this->query['from'] = null;
 
         } elseif ($this->query['type'] == 'INSERT') {
             $sql = 'INSERT INTO '.implode(",\n", $this->query['into'])."\n";
@@ -260,7 +260,9 @@ class QueryRepository extends Repository
         }
 
         if ($this->query['where']) {
+//            $sql .= 'WHERE '.$this->query['where'][0]."\n";
             $sql .= 'WHERE ('.implode(') AND (', $this->query['where']).")\n";
+            $this->query['where'] = null;
         }
 
         if ($this->query['group']) {

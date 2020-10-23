@@ -95,18 +95,18 @@ class CacheRepository
         if (!$cache) {
             $this->cacheEntity->setDateAdd($this->logger->udate('Y-m-d H:i:s'));
             
-            $logger = $this->loggerEntity;
+            $cache = $this->cacheEntity;
             
             $values =   '\''.pSQL($cache_key).'\','.
                 '\''.json_encode($cache_value).'\','.
-                '\''.pSQL($logger->getDateAdd()).'\','.
-                '\''.pSQL($logger->getDateAdd()).'\'';
+                '\''.pSQL($cache->getDateAdd()).'\','.
+                '\''.pSQL($cache->getDateAdd()).'\'';
             
             $this->query
                 ->insert()
                 ->into(_DB_PREFIX_ .$this->cacheEntity->getTable())
                 ->fields('cache_key, cache_value, date_add, date_upd')
-                ->values()
+                ->values($values)
             ;
 
             if (!$this->query->build()) {

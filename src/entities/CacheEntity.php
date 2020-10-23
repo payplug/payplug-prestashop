@@ -119,7 +119,7 @@ class CacheEntity
      * @param datetime $date_add
      * @return CacheEntity
      */
-    public function setDateAdd(datetime $date_add)
+    public function setDateAdd($date_add)
     {
         $this->date_add = $date_add;
         return $this;
@@ -137,7 +137,7 @@ class CacheEntity
      * @param datetime $date_upd
      * @return CacheEntity
      */
-    public function setDateUpd(datetime $date_upd)
+    public function setDateUpd($date_upd)
     {
         $this->date_upd = $date_upd;
         return $this;
