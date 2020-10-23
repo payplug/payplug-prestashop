@@ -21,8 +21,6 @@ class QuerySpecific implements QueryInterface
 
     public function query($SQLRequest)
     {
-        var_dump($SQLRequest);
-        
 //        if (stripos($SQLRequest,'UPDATE') !== false) {
 //            var_dump($SQLRequest); exit;
 //

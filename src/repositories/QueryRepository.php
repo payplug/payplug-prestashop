@@ -216,13 +216,11 @@ class QueryRepository extends Repository
     {
         if ($this->query['type'] == 'SELECT') {
             $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
-            $this->query['fields'] = null;
             if (!$this->query['from']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
             }
 
             $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
-            $this->query['from'] = null;
 
         } elseif ($this->query['type'] == 'INSERT') {
             $sql = 'INSERT INTO '.implode(",\n", $this->query['into'])."\n";
@@ -255,33 +253,36 @@ class QueryRepository extends Repository
             $sql = $this->query['type'].' ';
         }
 
-        if ($this->query['join']) {
+        if (isset($this->query['join']) && (!empty($this->query['join']))) {
             $sql .= implode("\n", $this->query['join'])."\n";
         }
 
-        if ($this->query['where']) {
-//            $sql .= 'WHERE '.$this->query['where'][0]."\n";
+        if (isset($this->query['where']) && (!empty($this->query['where']))) {
             $sql .= 'WHERE ('.implode(') AND (', $this->query['where']).")\n";
-            $this->query['where'] = null;
         }
 
-        if ($this->query['group']) {
+        if (isset($this->query['group']) && (!empty($this->query['group']))) {
             $sql .= 'GROUP BY '.implode(', ', $this->query['group'])."\n";
         }
 
-        if ($this->query['having']) {
+        if (isset($this->query['having']) && (!empty($this->query['having']))) {
             $sql .= 'HAVING ('.implode(') AND (', $this->query['having']).")\n";
         }
 
-        if ($this->query['order']) {
+        if (isset($this->query['order']) && (!empty($this->query['order']))) {
             $sql .= 'ORDER BY '.implode(', ', $this->query['order'])."\n";
         }
 
-        if ($this->query['limit']['limit']) {
+        if (
+            (isset($this->query['limit']))
+            &&
+            (($this->query['limit']['limit'] > 0) || ($this->query['limit']['offset'] > 0))
+        ) {
             $limit = $this->query['limit'];
             $sql .= 'LIMIT '.($limit['offset'] ? $limit['offset'].', ' : '').$limit['limit'];
         }
 
+        $this->query = null;
         return $this->specific_class->query($sql);
     }
 
