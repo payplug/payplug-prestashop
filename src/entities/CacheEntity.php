@@ -107,7 +107,7 @@ class CacheEntity
     /**
      * @return datetime
      */
-    public function getDateAdd(): datetime
+    public function getDateAdd()
     {
         return $this->date_add;
     }
