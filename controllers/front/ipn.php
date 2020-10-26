@@ -443,112 +443,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
                             header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                             die;
-                        }
-                        elseif (in_array($current_state, array($pending_state, $auth_state, $oney_state))) {
-                            $this->logger->addLog('Order is currently pending.');
-                            $this->logger->addLog('Payment amount: ' . $payment->amount, 'debug');
-                            $is_amount_correct = false;
-                            if ($payment->installment_plan_id !== null) {
-                                $is_amount_correct = (bool)$payment->is_paid;
-                            } else {
-                                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($payment->amount / 100,
-                                    $order);
-                            }
-                            if ($is_amount_correct) {
-                                $this->logger->addLog('Order new status will be \'paid\'.');
-                                $new_order_state = $paid_state;
-                            } else {
-                                $this->logger->addLog('Payment amount is not correct.', 'error');
-                                $new_order_state = $error_state;
-                                $this->logger->addLog('Order new status will be \'error\'.', 'error');
-                                $message = new Message();
-                                $message->message = $this->payplug->l('The amount collected by PayPlug is not the same')
-                                    . $this->payplug->l(' as the total value of the order');
-                                $message->id_order = $order->id;
-                                $message->id_cart = $order->id_cart;
-                                $message->private = true;
-                                try {
-                                    $message->save();
-                                } catch (Exception $exception) {
-                                    $this->logger->addLog(
-                                        'The message cannot be saved: ' . $exception->getMessage(),
-                                        'error');
-                                    $response = array(
-                                        'exception' => $exception->getMessage(),
-                                    );
-                                    header(
-                                        $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                                        true,
-                                        $exception->getCode()
-                                    );
-                                    die(json_encode($response));
-                                }
-                            }
-
-                            if (!$payment->is_paid) {
-                                $this->logger->addLog('The payment is not paid yet.');
-                                if (!PayplugLock::deleteLockG2($cart->id)) {
-                                    $this->logger->addLog('Lock cannot be deleted.', 'error');
-                                } else {
-                                    $this->logger->addLog('Lock deleted.', 'debug');
-                                }
-                                header(
-                                    $_SERVER['SERVER_PROTOCOL'] . ' 200 The payment is not paid yet.',
-                                    true,
-                                    200
-                                );
-                                die;
-                            }
-
-                            $order_history = new OrderHistory();
-                            $order_history->id_order = (int)$id_order;
-                            try {
-                                $order_history->changeIdOrderState((int)$new_order_state, $id_order);
-                                $order_history->save();
-                            } catch (Exception $exception) {
-                                $this->logger->addLog(
-                                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
-                                $this->logger->addLog(
-                                    'Please check if order state ' . (int)$new_order_state . ' exists.',
-                                    'error');
-                                $response = array(
-                                    'exception' => $exception->getMessage(),
-                                );
-                                header(
-                                    $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                                    true,
-                                    $exception->getCode()
-                                );
-                                die(json_encode($response));
-                            }
-                            if (count($order->getOrderPayments()) == 0) {
-                                $order->addOrderPayment($payment->amount / 100);
-                            }
-                            $order->current_state = $order_history->id_order_state;
-                            try {
-                                $order->update();
-                            } catch (Exception $exception) {
-                                $this->logger->addLog(
-                                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
-                                $response = array(
-                                    'exception' => $exception->getMessage(),
-                                );
-                                header(
-                                    $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                                    true,
-                                    $exception->getCode()
-                                );
-                                die(json_encode($response));
-                            }
-                            $this->logger->addLog('Order updated.');
-                            if (!PayplugLock::deleteLockG2($cart->id)) {
-                                $this->logger->addLog('Lock cannot be deleted.', 'error');
-                            } else {
-                                $this->logger->addLog('Lock deleted.', 'debug');
-                            }
-                            header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
-                            die;
-                        } elseif (in_array($current_state, array($pending_state, $auth_state, $oney_state)) || !$order->valid) {
+                        } elseif (in_array($current_state,
+                                array($pending_state, $auth_state, $oney_state)) || !$order->valid) {
                             $this->logger->addLog('Order is currently pending.');
                             $this->logger->addLog('Payment amount: ' . $payment->amount, 'debug');
 
@@ -575,12 +471,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 }
                             }
                             if (!$f) {
+                                $this->logger->addLog('The payment is not related to this order.', 'debug');
                                 if (!PayplugLock::deleteLockG2($cart->id)) {
                                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
                                 }
-                                $this->logger->addLog('The payment is not related to this order.', 'debug');
                                 header(
                                     $_SERVER['SERVER_PROTOCOL'] . ' 200 The payment is not related to this order.',
                                     true,
@@ -591,16 +487,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                             if (!$payment->is_paid) {
                                 if (isset($payment->failure) && $payment->failure !== null) {
-                                    //todo : Gerer le cas oney refusé
                                     $this->logger->addLog('The payment has failed.');
                                     $this->logger->addLog('Order new status will be \'cancel\'.');
                                     $new_order_state = $cancelled_state;
-                                    $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                                    if (!$cart_unlock) {
-                                        $this->logger->addLog('Lock cannot be deleted.', 'error');
-                                    } else {
-                                        $this->logger->addLog('Lock deleted.', 'debug');
-                                    }
                                     $order_history = new OrderHistory();
                                     $order_history->id_order = (int)$id_order;
                                     try {
@@ -615,6 +504,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $this->response = array(
                                             'exception' => $exception->getMessage(),
                                         );
+                                        if (!PayplugLock::deleteLockG2($cart->id)) {
+                                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                                        } else {
+                                            $this->logger->addLog('Lock deleted.', 'debug');
+                                        }
                                         header(
                                             $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' '
                                             . $exception->getMessage(),
@@ -622,6 +516,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             $exception->getCode()
                                         );
                                         die(Tools::jsonEncode($this->response));
+                                    }
+
+                                    if (!PayplugLock::deleteLockG2($cart->id)) {
+                                        $this->logger->addLog('Lock cannot be deleted.', 'error');
+                                    } else {
+                                        $this->logger->addLog('Lock deleted.', 'debug');
                                     }
                                     header(
                                         $_SERVER['SERVER_PROTOCOL']
@@ -632,8 +532,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     die;
                                 }
                                 $this->logger->addLog('The payment is not paid yet.');
-                                $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-                                if (!$cart_unlock) {
+                                if (!PayplugLock::deleteLockG2($cart->id)) {
                                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
