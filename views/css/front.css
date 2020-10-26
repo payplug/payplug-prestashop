@@ -258,6 +258,19 @@ body#checkout section.checkout-step .payment-options .payplug-payment-option lab
 body#checkout section.checkout-step .payment-options .payplug-payment-option img {
   margin: 0 12px 0 0;
 }
+@media (max-width: 768px) {
+  body#checkout section.checkout-step .payment-options .payplug-payment-option {
+    display: flex;
+    align-items: center;
+  }
+  body#checkout section.checkout-step .payment-options .payplug-payment-option label {
+    max-width: calc(100% - 40px);
+    text-align: left;
+  }
+  body#checkout section.checkout-step .payment-options .payplug-payment-option img {
+    display: none;
+  }
+}
 .payplugPopin {
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);

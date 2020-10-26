@@ -139,7 +139,11 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $this->type = 'installment';
                     try {
                         $this->logger->addLog('Retrieving installment...', 'info');
-                        $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                        $installment = $this->payplug->retrieveInstallment($inst_id);
+                        if (!$installment) {
+                            return false;
+                        }
+
                         $this->logger->addLog('Current amount: ' . $amount, 'info');
                         $pay_id = false;
                         if (isset($installment->schedule)) {
@@ -317,50 +321,19 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if ($amount != $total) {
                     $this->logger->addLog('Cart amount is different and may occured an error', 'info');
                     $this->logger->addLog('Order create with amount:' . $total, 'info');
-
-                    $validateOrder_result = $this->payplug->validateOrder(
-                        $cart->id,
-                        $order_state,
-                        $total,
-                        $module_name,
-                        false,
-                        $extra_vars,
-                        (int)$cart->id_currency,
-                        false,
-                        $secure_key
-                    );
-
-                    if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
-                        $order = Order::getByCartId($cart->id);
-                    } else {
-                        $id_order = Order::getOrderByCartId($cart->id);
-                        $order = new Order($id_order);
-                    }
-
-                    $this->logger->addLog('Order payment patch with amount:' . $amount, 'info');
-                    $order->total_paid = $amount;
-                    $order->total_paid_real = $amount;
-                    $order->total_paid_tax_incl = $amount;
-                    $order->update();
-
-                    $sql = 'UPDATE `
-}' . _DB_PREFIX_ . 'order_payment` SET `amount` = ' . (float)$amount . ' WHERE  `transaction_id` = "' . pSQL($pay_id) . '"';
-                    Db::getInstance()->execute($sql);
-
-                    $this->logger->addLog('Order amount is patched' . $total, 'info');
-                } else {
-                    $validateOrder_result = $this->payplug->validateOrder(
-                        $cart->id,
-                        $order_state,
-                        $total,
-                        $module_name,
-                        false,
-                        $extra_vars,
-                        (int)$cart->id_currency,
-                        false,
-                        $secure_key
-                    );
                 }
+
+                $validateOrder_result = $this->payplug->validateOrder(
+                    $cart->id,
+                    $order_state,
+                    $total,
+                    $module_name,
+                    false,
+                    $extra_vars,
+                    (int)$cart->id_currency,
+                    false,
+                    $secure_key
+                );
 
                 $id_order = $this->payplug->currentOrder;
                 $order = new Order($id_order);
@@ -376,37 +349,25 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     Tools::redirect($this->url['error']);
                 } else {
                     $this->logger->addLog('Order validated', 'info');
+
                     if ($this->type == 'payment') {
                         $api_key = Payplug::setAPIKey();
                         $data = array();
                         $data['metadata'] = $payment->metadata;
                         $data['metadata']['Order'] = $id_order;
                         $this->payplug->patchPayment($api_key, $payment->id, $data);
+
+                        if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
+                            $this->logger->addLog('Unable to create order payment.', 'error');
+                        }
                     } elseif ($this->type == 'installment') {
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
-                    }
-
-                    //
-                    if ($order_state == $oney_state) {
-                        $order_payments = OrderPayment::getByOrderReference($order->reference);
-                        if ($order_payments) {
-                            $order_payment = end($order_payments);
-                            if (!$order_payment->transaction_id) {
-                                $order_payment->transaction_id = $transaction_id;
-                                $order_payment->update();
-                            }
-                        } else {
-                            $order->addOrderPayment($order->total_paid, null, $transaction_id);
-                        }
                     }
                 }
 
                 $this->logger->addLog('Checking number of order passed with this id_cart...', 'info');
-                $req_nb_orders = '
-            SELECT o.* 
-            FROM ' . _DB_PREFIX_ . 'orders o 
-            WHERE o.id_cart = ' . $cart->id;
-                $res_nb_orders = Db::getInstance()->executeS($req_nb_orders);
+                $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'orders WHERE id_cart = ' . $cart->id;
+                $res_nb_orders = Db::getInstance()->executeS($sql);
                 if (!$res_nb_orders) {
                     $this->logger->addLog('No order can be found using id_cart ' . (int)$cart->id, 'error');
                     $cart_unlock = PayplugLock::deleteLockG2($cart->id);
@@ -427,9 +388,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
 
                 $this->logger->addLog('Checking number of transaction validated for this order...', 'info');
-                $order = new Order((int)$id_order);
-                $payments = $order->getOrderPaymentCollection();
-
+                $payments = $this->payplug->getPayplugOrderPayments($order->id);
                 if (!$payments) {
                     $this->logger->addLog('No transaction can be found using id_order ' . (int)$id_order,
                         'error');
@@ -448,8 +407,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
             }
 
-            $cart_unlock = PayplugLock::deleteLockG2($cart->id);
-            if (!$cart_unlock) {
+            if (!PayplugLock::deleteLockG2($cart->id)) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
