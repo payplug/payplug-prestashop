@@ -141,7 +141,7 @@ class PayPlugNotifications
                 && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
         ) {
             $this->logger->addLog('[Save Card] Saving card...', 'info');
-            $res_payplug_card = $this->payplug->saveCard($payment);
+            $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
 
             if (!$res_payplug_card) {
                 $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');

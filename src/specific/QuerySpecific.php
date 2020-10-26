@@ -19,6 +19,11 @@ class QuerySpecific implements QueryInterface
         }
     }
 
+    /**
+     * @description Called from src/repositories/QueryRepository.php
+     * @param $SQLRequest
+     * @return mixed
+     */
     public function query($SQLRequest)
     {
 //        if (stripos($SQLRequest,'UPDATE') !== false) {

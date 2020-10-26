@@ -153,6 +153,7 @@ class PayPlugCard extends ObjectModel
         $this->brand = $this->validateBrandCard();
         $this->country = $this->validateCountry();
 
+        var_dump('save PPC'); exit;
         if ($id_playplug_card = $this->exists()) {
             $this->id = $id_playplug_card;
         }
@@ -165,11 +166,14 @@ class PayPlugCard extends ObjectModel
      * @return integer
      */
     public function exists(){
+        var_dump('exists PPC'); exit;
         $sql = 'SELECT `id_payplug_card` 
                 FROM `'._DB_PREFIX_.'payplug_card`
                 WHERE `id_company` = '.(int)$this->id_company.' 
                 AND `id_customer` = '.(int)$this->id_customer.' 
                 AND `id_card` = "'.(string)$this->id_card.'"';
+        var_dump(Db::getInstance()->getValue($sql)); exit;
+        
         return Db::getInstance()->getValue($sql);
     }
 

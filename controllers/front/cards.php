@@ -58,7 +58,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $context = Context::getContext();
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_card = new PayPlugCard();
+            $payplug_card = new \PayPlug\src\repositories\CardRepository();
             $payplug_cards = $payplug_card->getByCustomer($context->customer);
         } else {
             $customer = $context->customer;
