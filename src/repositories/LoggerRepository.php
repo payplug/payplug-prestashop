@@ -140,14 +140,13 @@ class LoggerRepository
     {
         $logger = $this->loggerEntity;
         $table = _DB_PREFIX_.$logger->getTable();
-        $set =  $table.'.process =  \''.pSQL($logger->getProcess()).'\','.
-                $table.'.content =  \''.pSQL($logger->getContent()).'\','.
-                $table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'';
 
         $this->query
             ->update()
             ->table($table)
-            ->set($set)
+            ->set($table.'.process =  \''.pSQL($logger->getProcess()).'\'')
+            ->set($table.'.content =  \''.pSQL($logger->getContent()).'\'')
+            ->set($table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'')
             ->where($table.'.id_'.$logger->getTable().' = '.(int)$logger->getId())
             ;
 

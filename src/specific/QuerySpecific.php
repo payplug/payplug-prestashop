@@ -25,6 +25,7 @@ class QuerySpecific implements QueryInterface
 //            var_dump($SQLRequest); exit;
 //
 //        }
+
         try {
             $action = 'execute';
 
@@ -42,5 +43,12 @@ class QuerySpecific implements QueryInterface
     {
         return $this->db->Insert_ID();
     }
+
+    // @todo : A optimiser dans QueryRepository
+    public function getValue($id)
+    {
+        return $this->db->getValue($id);
+    }
+
 
 }

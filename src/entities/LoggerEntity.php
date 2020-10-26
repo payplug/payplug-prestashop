@@ -23,10 +23,6 @@
 
 namespace PayPlug\src\entities;
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
 class LoggerEntity
 {
     /**

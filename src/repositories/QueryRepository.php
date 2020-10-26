@@ -10,11 +10,13 @@
  *      $this->query = new QueryRepository();
  * }
  *
- * SELECT * FROM ma_table :
+ * SELECT * FROM ma_table WHERE (champ_1 = donnee_1, champ_2 = donnee_2) :
  * $this->query
  * ->select()
  * ->fields('*')
  * ->from('ma_table')
+ * ->where('champ_1 = donnee_1')
+ * ->where('champ_2 = donnee_2')
  * ->build()
  *
  * INSERT INTO ma_table (champ_1, champ_2) VALUES (donnee_1, donnee_2) :
@@ -25,10 +27,11 @@
  * ->values('donnee_1, donnee_2')
  * ->build()
  *
- * UPDATE ma_table SET champ_1 = donnee_1 WHERE id = 3 :
+ * UPDATE ma_table SET champ_1 = donnee_1, champ_2 = donnee_2 WHERE id = 3 :
  * ->update()
  * ->table('ma_table')
  * ->set('ma_table.champ_1 = donnee_1')
+ * ->set('ma_table.champ_2 = donnee_2')
  * ->where(id = 3)
  * ->build()
  *
@@ -256,6 +259,11 @@ class QueryRepository extends Repository
         return $this->specific_class->getLastId();
     }
 
+    public function getValue($id)
+    {
+        return $this->specific_class->getValue($id);
+    }
+
 
     public function build()
     {
@@ -278,8 +286,8 @@ class QueryRepository extends Repository
         } elseif ($this->query['type'] == 'UPDATE') {
             $sql = 'UPDATE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
 
-            if ($this->query['set']) {
-                $sql .= 'SET '.implode("\n", $this->query['set'])."\n";
+            if ($this->query['set'] && (!empty($this->query['set']))) {
+                $sql .= 'SET '.implode(','."\n", $this->query['set'])."\n";
             }
 
         } elseif ($this->query['type'] == 'TRUNCATE') {
