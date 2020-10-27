@@ -259,8 +259,6 @@ class Payplug extends PaymentModule
         'oney_pg' => array(
             'cfg' => null,
             'template' => null,
-
-            // OS have to be "logable" to register transaction_id
             'logable' => false,
             'send_email' => false,
             'paid' => false,
