@@ -3104,7 +3104,7 @@ class Payplug extends PaymentModule
      */
     public function getOneySimulations($amount, $country, $operation)
     {
-        return array('result' => false, 'error' => 'force error');
+        $cache_id = 'Payplug::OneySimulations_' .
         $cache_id = 'Payplug::OneySimulations_' .
             (int)$amount . '_' .
             (string)$country . '_' .
@@ -3416,7 +3416,6 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-
                 $paymentOption['oney_' . $oney_payment]['name'] = 'oney';
                 $paymentOption['oney_' . $oney_payment]['inputs'] = array(
                     'pc' => array(
@@ -3496,10 +3495,9 @@ class Payplug extends PaymentModule
                     'dispatcher', array(), true);
                 $paymentOption['oney_' . $oney_payment]['moduleName'] = 'payplug';
                 $paymentOption['oney_' . $oney_payment]['err_label'] = $err_label;
-                if ($optimized) {
+                if ($optimized && isset($payment_schedule[$oney_payment]['installments'])) {
                     $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption['oney_' . $oney_payment]['additionalInformation'] = $schedules;
-
                 }
             }
         }
