@@ -3105,7 +3105,6 @@ class Payplug extends PaymentModule
     public function getOneySimulations($amount, $country, $operation)
     {
         $cache_id = 'Payplug::OneySimulations_' .
-        $cache_id = 'Payplug::OneySimulations_' .
             (int)$amount . '_' .
             (string)$country . '_' .
             (string)implode('_', $operation) . '_' .
