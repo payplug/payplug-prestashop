@@ -3,21 +3,22 @@
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
-final class GetDateAddTest extends TestCase
+final class SetDateUpdTest extends TestCase
 {
     protected $cache;
 
     protected function setUp(): void
     {
         $this->cache = new CacheEntity();
-        $this->cache->setDateAdd('test_date');
+        $this->cache->setDateUpd('test_date');
     }
 
-    public function testReturnDateAdd(): void
+    public function testUpdateDateUpd(): void
     {
+        $this->cache->setDateUpd('another_date');
         $this->assertSame(
-            'test_date',
-            $this->cache->getDateAdd()
+            'another_date',
+            $this->cache->getDateUpd()
         );
     }
 }

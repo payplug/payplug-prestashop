@@ -41,7 +41,7 @@ class CacheEntity
     /** @var datetime */
     private $date_upd;
 
-    /** @var PayPlugLogger  */
+    /** @var LoggerEntity  */
     private $logger;
 
     /** @var array */
@@ -141,7 +141,7 @@ class CacheEntity
     }
 
     /**
-     * @return PayPlugLogger
+     * @return LoggerEntity
      */
     public function getLogger()
     {
@@ -149,10 +149,10 @@ class CacheEntity
     }
 
     /**
-     * @param PayPlugLogger $logger
+     * @param LoggerEntity $logger
      * @return CacheEntity
      */
-    public function setLogger(PayPlugLogger $logger)
+    public function setLogger(LoggerEntity $logger)
     {
         $this->logger = $logger;
         return $this;

@@ -3,7 +3,7 @@
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
-final class GetDateAddTest extends TestCase
+final class SetDateAddTest extends TestCase
 {
     protected $cache;
 
@@ -13,10 +13,11 @@ final class GetDateAddTest extends TestCase
         $this->cache->setDateAdd('test_date');
     }
 
-    public function testReturnDateAdd(): void
+    public function testUpdateDateAdd(): void
     {
+        $this->cache->setDateAdd('another_date');
         $this->assertSame(
-            'test_date',
+            'another_date',
             $this->cache->getDateAdd()
         );
     }
