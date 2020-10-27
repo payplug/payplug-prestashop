@@ -288,7 +288,7 @@ class QueryRepository extends Repository
         return $this->specific_class->getValue($id);
     }
 
-    public function build()
+    public function build($debug = false)
     {
         if ($this->query['type'] == 'SELECT') {
             $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
@@ -337,7 +337,13 @@ class QueryRepository extends Repository
             }
 
             $sql = 'CREATE TABLE IF NOT EXISTS '.$this->query['table'];
-            $sql .= '('.implode(',', $this->query['fields']).")\n";
+
+            $condition = (isset($this->query['condition']) && (!empty($this->query['condition']))) ? $this->query['condition'] : '';
+            $sql .= '('.implode(',', $this->query['fields'])." $condition)\n";
+            if (isset($this->query['engine']) && (!empty($this->query['engine']))) {
+                $sql .= 'ENGINE = '.$this->query['engine'];
+            }
+
 
         } else {
             $sql = $this->query['type'].' ';
@@ -370,6 +376,11 @@ class QueryRepository extends Repository
         ) {
             $limit = $this->query['limit'];
             $sql .= 'LIMIT '.($limit['offset'] ? $limit['offset'].', ' : '').$limit['limit'];
+        }
+
+        if (isset($debug) && $debug !== false) {
+            var_dump($sql);
+            exit;
         }
 
         $result = $this->specific_class->query($sql);
