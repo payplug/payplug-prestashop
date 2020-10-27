@@ -8,10 +8,13 @@ class PluginEntity
     private $api_url;
     private $api_version;
 
-    // Classes
+    // Our classes
     private $card;
     private $logger;
     private $cache;
+
+    // Specific classes
+    private $tools;
     private $query;
 
     /**
@@ -101,6 +104,24 @@ class PluginEntity
     public function setCache($cache)
     {
         $this->cache = $cache;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTools()
+    {
+        return $this->tools;
+    }
+
+    /**
+     * @param mixed $tools
+     * @return PluginEntity
+     */
+    public function setTools($tools)
+    {
+        $this->tools = $tools;
         return $this;
     }
 

@@ -56,6 +56,8 @@ class Payplug extends PaymentModule
 
     private $query; // 3.0
 
+    private $tools; // 3.0
+
     private $paymentOption;
 
     private $PrestashopSpecificClass; // 3.0
@@ -287,7 +289,7 @@ class Payplug extends PaymentModule
         $this->card     = $this->plugin->getCard();
         $this->logger   = $this->plugin->getLogger();
         $this->query    = $this->plugin->getQuery();
-
+        $this->tools    = $this->plugin->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -2904,7 +2906,7 @@ class Payplug extends PaymentModule
         // If not, we do a simulation for Oney, and we will store it to the DB
         $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
         if ($cache_from_bdd) {
-            return Tools::jsonDecode($cache_from_bdd[0]['cache_value'], true);
+            return $this->tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
         }
 
         try {
