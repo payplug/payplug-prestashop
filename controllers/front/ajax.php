@@ -63,7 +63,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     }
                     $id_payplug_card = Tools::getValue('pc');
                     $valid_key = Payplug::setAPIKey();
-                    $deleted = $payplug->deleteCard($id_customer, $id_payplug_card, $valid_key);
+                    $deleted = $payplug->getPlugin()->getCard()->deleteCard($id_customer, $id_payplug_card, $valid_key);
                     if ($deleted) {
                         die(true);
                     } else {

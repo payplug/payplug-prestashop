@@ -118,15 +118,13 @@ class LoggerRepository
     public function addToDb()
     {
         $logger = $this->loggerEntity;
-        $values =   '\''.pSQL($logger->getProcess()).'\','.
-                    '\''.pSQL($logger->getContent()).'\','.
-                    '\''.pSQL($logger->getDateAdd()).'\','.
-                    '\''.pSQL($logger->getDateAdd()).'\'';
         $this->query
             ->insert()
             ->into(_DB_PREFIX_.$logger->getTable())
-            ->fields('process, content, date_add, date_upd')
-            ->values($values)
+            ->fields('process')     ->values(pSQL($logger->getProcess()))
+            ->fields('content')     ->values(pSQL($logger->getContent()))
+            ->fields('date_add')    ->values(pSQL($logger->getDateAdd()))
+            ->fields('date_upd')    ->values(pSQL($logger->getDateAdd()))
         ;
 
         if (!$this->query->build()) {
@@ -140,14 +138,13 @@ class LoggerRepository
     {
         $logger = $this->loggerEntity;
         $table = _DB_PREFIX_.$logger->getTable();
-        $set =  $table.'.process =  \''.pSQL($logger->getProcess()).'\','.
-                $table.'.content =  \''.pSQL($logger->getContent()).'\','.
-                $table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'';
 
         $this->query
             ->update()
             ->table($table)
-            ->set($set)
+            ->set($table.'.process =  \''.pSQL($logger->getProcess()).'\'')
+            ->set($table.'.content =  \''.pSQL($logger->getContent()).'\'')
+            ->set($table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'')
             ->where($table.'.id_'.$logger->getTable().' = '.(int)$logger->getId())
             ;
 

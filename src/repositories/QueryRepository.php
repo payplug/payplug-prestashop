@@ -10,11 +10,13 @@
  *      $this->query = new QueryRepository();
  * }
  *
- * SELECT * FROM ma_table :
+ * SELECT * FROM ma_table WHERE (champ_1 = donnee_1, champ_2 = donnee_2) :
  * $this->query
  * ->select()
  * ->fields('*')
  * ->from('ma_table')
+ * ->where('champ_1 = donnee_1')
+ * ->where('champ_2 = donnee_2')
  * ->build()
  *
  * INSERT INTO ma_table (champ_1, champ_2) VALUES (donnee_1, donnee_2) :
@@ -25,10 +27,11 @@
  * ->values('donnee_1, donnee_2')
  * ->build()
  *
- * UPDATE ma_table SET champ_1 = donnee_1 WHERE id = 3 :
+ * UPDATE ma_table SET champ_1 = donnee_1, champ_2 = donnee_2 WHERE id = 3 :
  * ->update()
  * ->table('ma_table')
  * ->set('ma_table.champ_1 = donnee_1')
+ * ->set('ma_table.champ_2 = donnee_2')
  * ->where(id = 3)
  * ->build()
  *
@@ -115,8 +118,8 @@ class QueryRepository extends Repository
 
     public function values($values)
     {
-        if (!empty($values)) {
-            $this->query['values'][] = $values;
+        if (!empty($values) || $values == 0) {
+            $this->query['values'][] = '\''.$values.'\'';
         }
         return $this;
     }
@@ -256,13 +259,19 @@ class QueryRepository extends Repository
         return $this->specific_class->getLastId();
     }
 
+    public function getValue($id)
+    {
+        return $this->specific_class->getValue($id);
+    }
 
     public function build()
     {
         if ($this->query['type'] == 'SELECT') {
             $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
             if (!$this->query['from']) {
-                throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
+                die('Table name not set in QueryRepository (->from() is empty / not set / null). Cannot build a valid SQL query.');
+                $this->query = null;
+                exit;
             }
 
             $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
@@ -272,27 +281,26 @@ class QueryRepository extends Repository
             $sql .= '('.implode(",\n", $this->query['fields']).')'."\n";
 
             if ($this->query['values']) {
-                $sql .= 'VALUES ('.implode("\n", $this->query['values']).')'."\n";
+                $sql .= 'VALUES ('."\n".implode(",\n", $this->query['values']).')'."\n";
             }
 
         } elseif ($this->query['type'] == 'UPDATE') {
             $sql = 'UPDATE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
 
-            if ($this->query['set']) {
-                $sql .= 'SET '.implode("\n", $this->query['set'])."\n";
+            if ($this->query['set'] && (!empty($this->query['set']))) {
+                $sql .= 'SET '.implode(','."\n", $this->query['set'])."\n";
             }
 
         } elseif ($this->query['type'] == 'TRUNCATE') {
             $sql = 'TRUNCATE TABLE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
 
         } elseif ($this->query['type'] == 'DELETE') {
-            $sql = 'DELETE FROM '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['from']))."\n";
 
             if (!$this->query['from']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
             }
 
-            $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
+            $sql = 'DELETE FROM '.((isset($this->query['table']) && (!empty($this->query['table']))) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['from']))."\n";
 
         } else {
             $sql = $this->query['type'].' ';
@@ -327,8 +335,10 @@ class QueryRepository extends Repository
             $sql .= 'LIMIT '.($limit['offset'] ? $limit['offset'].', ' : '').$limit['limit'];
         }
 
+        $result = $this->specific_class->query($sql);
         $this->query = null;
-        return $this->specific_class->query($sql);
+        $sql = null;
+        return $result;
     }
 
     /**

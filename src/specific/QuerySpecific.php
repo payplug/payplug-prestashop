@@ -19,12 +19,18 @@ class QuerySpecific implements QueryInterface
         }
     }
 
+    /**
+     * @description Called from src/repositories/QueryRepository.php
+     * @param $SQLRequest
+     * @return mixed
+     */
     public function query($SQLRequest)
     {
 //        if (stripos($SQLRequest,'UPDATE') !== false) {
 //            var_dump($SQLRequest); exit;
 //
 //        }
+
         try {
             $action = 'execute';
 
@@ -42,5 +48,12 @@ class QuerySpecific implements QueryInterface
     {
         return $this->db->Insert_ID();
     }
+
+    // @todo : A optimiser dans QueryRepository
+    public function getValue($id)
+    {
+        return $this->db->getValue($id);
+    }
+
 
 }

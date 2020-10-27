@@ -5,8 +5,8 @@ namespace PayPlug\src\specific;
 use Media;
 
 use Context;
+use PayPlug\src\repositories\CardRepository;
 use PayplugBackward;
-use PayPlugCard;
 use PayPlugCarrier;
 use Validate;
 
@@ -113,8 +113,9 @@ class PrestashopSpecific16
             ));
         }
 
-        $payplug_card = new PayPlugCard();
+        $payplug_card = new CardRepository();
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
         $i = 0;
 
