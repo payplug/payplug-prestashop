@@ -108,6 +108,12 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function create()
+    {
+        $this->query['type'] = 'CREATE';
+        return $this;
+    }
+
     public function fields($fields)
     {
         if (!empty($fields)) {
@@ -301,6 +307,19 @@ class QueryRepository extends Repository
             }
 
             $sql = 'DELETE FROM '.((isset($this->query['table']) && (!empty($this->query['table']))) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['from']))."\n";
+
+        } elseif ($this->query['type'] == 'CREATE') {
+
+            if (!$this->query['table']) {
+                throw new PrestaShopException('Can\'t create table because ->table() is not set or empty');
+            }
+
+            if (!$this->query['fields']) {
+                throw new PrestaShopException('Can\'t create table because ->fields() is not set or empty');
+            }
+
+            $sql = 'CREATE TABLE IF NOT EXISTS '.$this->query['table'];
+            $sql .= '('.implode(',', $this->query['fields']).")\n";
 
         } else {
             $sql = $this->query['type'].' ';
