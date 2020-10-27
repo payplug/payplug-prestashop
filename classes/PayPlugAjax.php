@@ -21,6 +21,8 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\src\repositories\CardRepository;
+
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
 class PayPlugAjax
@@ -58,7 +60,7 @@ class PayPlugAjax
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $payplug_card = new \PayPlug\src\repositories\CardRepository();
+                    $payplug_card = new CardRepository();
 
                     if ($payplug_card->delete(Tools::getValue('pc'))) {
                         die(true);

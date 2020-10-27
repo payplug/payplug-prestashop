@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -20,6 +21,8 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
+use PayPlug\src\repositories\CardRepository;
 
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
@@ -58,7 +61,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $context = Context::getContext();
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_card = new \PayPlug\src\repositories\CardRepository();
+            $payplug_card = new CardRepository();
             $payplug_cards = $payplug_card->getByCustomer($context->customer);
         } else {
             $customer = $context->customer;
