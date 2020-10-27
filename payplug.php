@@ -25,8 +25,6 @@
  * Core file of PayPlug module
  */
 
-use PayPlug\src\repositories\QueryRepository;
-
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
@@ -4237,7 +4235,26 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Flush PayPlugCache, when PrestaShop cache cleared
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
+     * @param array $params
+     */
+    public function hookActionAdminPerformanceControllerAfter($params)
+    {
+//        if ($this->tools->tool('getValue', 'empty_smarty_cache')) {
+//            return false;
+//        }
+
+        // Purge PayPlug cache
+        if (!$this->payplug_cache->flushCache()) {
+            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
+            $error_level = 'error';
+            $this->payplug_cache->logger->addLog($error_message, $error_level);
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param array $params
      */
