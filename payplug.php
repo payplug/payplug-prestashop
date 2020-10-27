@@ -1758,28 +1758,30 @@ class Payplug extends PaymentModule
         $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
 
         // format price
-        $total_cost = $this->convertAmount($resource['total_cost'], true);
-        $resource['total_cost'] = [
-            'amount' => $total_cost,
-            'value' => Tools::displayPrice($total_cost),
-        ];
-        $down_payment_amount = $this->convertAmount($resource['down_payment_amount'], true);
-        $resource['down_payment_amount'] = [
-            'amount' => $down_payment_amount,
-            'value' => Tools::displayPrice($down_payment_amount),
-        ];
-        foreach ($resource['installments'] as &$installment) {
-            $amount = $this->convertAmount($installment['amount'], true);
-            $installment['amount'] = $amount;
-            $installment['value'] = Tools::displayPrice($amount);
-        }
+        if (isset($resource['installments']) && $resource['installments']) {
+            $total_cost = $this->convertAmount($resource['total_cost'], true);
+            $resource['total_cost'] = [
+                'amount' => $total_cost,
+                'value' => Tools::displayPrice($total_cost),
+            ];
+            $down_payment_amount = $this->convertAmount($resource['down_payment_amount'], true);
+            $resource['down_payment_amount'] = [
+                'amount' => $down_payment_amount,
+                'value' => Tools::displayPrice($down_payment_amount),
+            ];
+            foreach ($resource['installments'] as &$installment) {
+                $amount = $this->convertAmount($installment['amount'], true);
+                $installment['amount'] = $amount;
+                $installment['value'] = Tools::displayPrice($amount);
+            }
 
-        $total_amount = $this->convertAmount($total_amount, true);
-        $total_amount += $total_cost;
-        $resource['total_amount'] = [
-            'amount' => $total_amount,
-            'value' => Tools::displayPrice($total_amount),
-        ];
+            $total_amount = $this->convertAmount($total_amount, true);
+            $total_amount += $total_cost;
+            $resource['total_amount'] = [
+                'amount' => $total_amount,
+                'value' => Tools::displayPrice($total_amount),
+            ];
+        }
 
         return $resource;
     }
@@ -2737,13 +2739,15 @@ class Payplug extends PaymentModule
         $oney_sims = $this->getOneySimulations($amount, $country, $this->available_oney_payments);
 
         if (!$oney_sims['result']) {
-            return $payment_list;
+            foreach ($this->available_oney_payments as $available_oney_payments) {
+                $oney_sims['simulations'][$available_oney_payments] = array(
+                    'without_price' => true
+                );
+            }
         }
 
         foreach ($oney_sims['simulations'] as $method => $oney_sim) {
-            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
-            }
+            $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
         }
 
         return $payment_list;
@@ -2774,18 +2778,16 @@ class Payplug extends PaymentModule
             $error = $is_elligible['error'] ? $is_elligible['error'] : $this->l('Oney is momentarily unavailable.');
         }
 
-        $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
-        );
+        $valid_payment_option = false;
+        foreach ($oney_payment_options as $oney_option) {
+            if (isset($oney_option['installments']) && $oney_option['installments']) {
+                $valid_payment_option = true;
+            }
+        }
 
-//        $this->smarty->assign(array(
-//            'payplug_oney_amount' => [
-//                'amount' => $amount,
-//                'value' => Tools::displayPrice($amount),
-//            ],
-//            'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
-//            'payplug_oney_error' => $error
-//        ));
+        $error = $is_elligible['error'] ? $is_elligible['error'] : (
+            $oney_payment_options && $valid_payment_option ? false : $this->l('Oney is momentarily unavailable.')
+        );
 
         $this->smarty->assign(array(
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
@@ -3413,7 +3415,6 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-
                 $paymentOption['oney_' . $oney_payment]['name'] = 'oney';
                 $paymentOption['oney_' . $oney_payment]['inputs'] = array(
                     'pc' => array(
@@ -3493,10 +3494,9 @@ class Payplug extends PaymentModule
                     'dispatcher', array(), true);
                 $paymentOption['oney_' . $oney_payment]['moduleName'] = 'payplug';
                 $paymentOption['oney_' . $oney_payment]['err_label'] = $err_label;
-                if ($optimized) {
+                if ($optimized && isset($payment_schedule[$oney_payment]['installments'])) {
                     $schedules = $this->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption['oney_' . $oney_payment]['additionalInformation'] = $schedules;
-
                 }
             }
         }

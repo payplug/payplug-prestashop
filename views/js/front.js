@@ -182,7 +182,11 @@ var $document, $window, payplugModule = {
                     if (data.result) {
                         if (typeof data.popin != 'undefined' && data.popin && oney.cta.props.loaded) {
                             oney.cta.popin.hydrate(data.popin);
-                            oney.cta.enable();
+                            if (typeof data.error != 'undefined' && data.error) {
+                                oney.cta.disable();
+                            } else {
+                                oney.cta.enable();
+                            }
                         }
                     } else if (oney.cta.props.loaded) {
                         if (typeof data.popin != 'undefined') {
