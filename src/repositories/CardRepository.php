@@ -27,18 +27,21 @@ namespace PayPlug\src\repositories;
 use Payplug\Customer;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ToolsSpecific;
 
 class CardRepository
 {
     private $cardEntity;
     private $configurationSpecific;
     private $query;
+    private $tools;
 
     public function __construct()
     {
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->query = new QueryRepository();
+        $this->tools = new ToolsSpecific();
         $this->setParams();
     }
     
@@ -355,9 +358,7 @@ class CardRepository
         ;
 
         if ((isset($dbCard) && (!empty($dbCard)))) {
-            if ($this->query->getValue($dbCard)) {
-                return false;
-            }
+            return false;
         }
 
         // insert the new card in database
@@ -410,9 +411,7 @@ class CardRepository
                 ->build()
             ;
 
-            // @todo  #### Temporary : Force to reload after delete a card ####
-            // Test with
-            // Payplug::redirectForVersion($link_redirect);
+//            $this->tools->tool('redirect',$_SERVER['HTTP_REFERER']); exit;
             return '<script type="text/javascript">document.location.reload(true);</script>';
 
         } catch (Exception $e) {
