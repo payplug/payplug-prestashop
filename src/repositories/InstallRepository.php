@@ -113,6 +113,17 @@ class InstallRepository extends \Payplug
             define('_MYSQL_ENGINE_', 'InnoDB');
         }
 
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_lock')
+            ->fields('`id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`id_order` VARCHAR(100)')
+            ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
+            ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
+            ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
+        ;
+
         $req_payplug_lock = '
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_lock` (
             `id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
