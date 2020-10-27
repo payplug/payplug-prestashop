@@ -9,7 +9,7 @@ final class GetApiVersionTest extends TestCase
     {
         $plugin = new PluginEntity();
         $plugin->setApiVersion('test_version');
-        $this->assertEquals(
+        $this->assertSame(
             'test_version',
             $plugin->getApiVersion()
         );

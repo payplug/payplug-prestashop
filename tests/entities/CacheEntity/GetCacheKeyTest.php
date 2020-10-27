@@ -3,21 +3,21 @@
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
-final class GetIdPayPlugCacheTest extends TestCase
+final class GetCacheKeyTest extends TestCase
 {
     protected $cache;
 
     protected function setUp(): void
     {
         $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->cache->setCacheKey('test_key');
     }
 
-    public function testReturnCacheId(): void
+    public function testReturnCacheKey(): void
     {
         $this->assertSame(
-            'test_id',
-            $this->cache->getIdPayplugCache()
+            'test_key',
+            $this->cache->getCacheKey()
         );
     }
 }

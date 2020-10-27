@@ -3,7 +3,7 @@
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
-final class GetIdPayPlugCacheTest extends TestCase
+final class GetDateAddTest extends TestCase
 {
     protected $cache;
 
@@ -13,10 +13,11 @@ final class GetIdPayPlugCacheTest extends TestCase
         $this->cache->setIdPayplugCache('test_id');
     }
 
-    public function testReturnCacheId(): void
+    public function testUpdateCacheId(): void
     {
+        $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
-            'test_id',
+            'another_id',
             $this->cache->getIdPayplugCache()
         );
     }

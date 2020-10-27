@@ -16,7 +16,7 @@ final class SetIdPayPlugCacheTest extends TestCase
     public function testUpdateCacheId(): void
     {
         $this->cache->setIdPayplugCache('another_id');
-        $this->assertEquals(
+        $this->assertSame(
             'another_id',
             $this->cache->getIdPayplugCache()
         );
