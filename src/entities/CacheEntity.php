@@ -65,7 +65,7 @@ class CacheEntity
      * @param string $id_payplug_cache
      * @return CacheEntity
      */
-    public function setIdPayplugCache(string $id_payplug_cache)
+    public function setIdPayplugCache($id_payplug_cache)
     {
         $this->id_payplug_cache = $id_payplug_cache;
         return $this;
@@ -83,7 +83,7 @@ class CacheEntity
      * @param string $cache_key
      * @return CacheEntity
      */
-    public function setCacheKey(string $cache_key)
+    public function setCacheKey($cache_key)
     {
         $this->cache_key = $cache_key;
         return $this;
@@ -101,7 +101,7 @@ class CacheEntity
      * @param string $cache_value
      * @return CacheEntity
      */
-    public function setCacheValue(string $cache_value)
+    public function setCacheValue($cache_value)
     {
         $this->cache_value = $cache_value;
         return $this;
@@ -191,7 +191,7 @@ class CacheEntity
      * @param string $table
      * @return CacheEntity
      */
-    public function setTable(string $table)
+    public function setTable($table)
     {
         $this->table = $table;
         return $this;
