@@ -97,16 +97,13 @@ class CacheRepository
             
             $cache = $this->cacheEntity;
             
-            $values =   '\''.pSQL($cache_key).'\','.
-                '\''.json_encode($cache_value).'\','.
-                '\''.pSQL($cache->getDateAdd()).'\','.
-                '\''.pSQL($cache->getDateAdd()).'\'';
-            
             $this->query
                 ->insert()
                 ->into(_DB_PREFIX_ .$this->cacheEntity->getTable())
-                ->fields('cache_key, cache_value, date_add, date_upd')
-                ->values($values)
+                ->fields('cache_key')   ->values(pSQL($cache_key))
+                ->fields('cache_value') ->values(json_encode($cache_value))
+                ->fields('date_add')    ->values(pSQL($cache->getDateAdd()))
+                ->fields('date_upd')    ->values(pSQL($cache->getDateAdd()))
             ;
 
             if (!$this->query->build()) {
@@ -133,11 +130,13 @@ class CacheRepository
             ->where('`cache_key` = "' . (string)$cache_key . '"')
         ;
 
-        if (!$this->query->build()) {
+        $cache = $this->query->build();
+
+        if (!$cache) {
             return false;
         }
 
-        return true;
+        return $cache;
     }
 
     /**

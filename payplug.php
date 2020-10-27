@@ -54,6 +54,8 @@ class Payplug extends PaymentModule
 
     private $query; // 3.0
 
+    private $tools; // 3.0
+
     private $paymentOption;
 
     private $PrestashopSpecificClass; // 3.0
@@ -285,7 +287,7 @@ class Payplug extends PaymentModule
         $this->card     = $this->plugin->getCard();
         $this->logger   = $this->plugin->getLogger();
         $this->query    = $this->plugin->getQuery();
-
+        $this->tools    = $this->plugin->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -2902,7 +2904,7 @@ class Payplug extends PaymentModule
         // If not, we do a simulation for Oney, and we will store it to the DB
         $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
         if ($cache_from_bdd) {
-            return Tools::jsonDecode($cache_from_bdd[0]['cache_value'], true);
+            return $this->tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
         }
 
         try {
@@ -4233,7 +4235,26 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Flush PayPlugCache, when PrestaShop cache cleared
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
+     * @param array $params
+     */
+    public function hookActionAdminPerformanceControllerAfter($params)
+    {
+//        if ($this->tools->tool('getValue', 'empty_smarty_cache')) {
+//            return false;
+//        }
+
+        // Purge PayPlug cache
+        if (!$this->payplug_cache->flushCache()) {
+            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
+            $error_level = 'error';
+            $this->payplug_cache->logger->addLog($error_message, $error_level);
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param array $params
      */
