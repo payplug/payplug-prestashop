@@ -184,6 +184,15 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function engine($engine)
+    {
+        if (!empty($engine)) {
+            $this->query['engine'][] = $engine;
+        }
+
+        return $this;
+    }
+
     public function join($join)
     {
         if (!empty($join)) {
