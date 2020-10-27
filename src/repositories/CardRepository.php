@@ -397,6 +397,10 @@ class CardRepository
      */
     public function delete($idPayplugCard)
     {
+        if (!$idPayplugCard) {
+            return false;
+        }
+
         try {
             $table = $this->cardEntity->getTable();
             $this->query

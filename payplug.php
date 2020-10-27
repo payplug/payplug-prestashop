@@ -7050,7 +7050,6 @@ class Payplug extends PaymentModule
         'PayPlugPayment/PayPlugPaymentInstallment',
         'PayPlugPayment/PayPlugPaymentOney',
         'PayPlugCache',
-        'CardRepository',
         'PayPlugCarrier',
         'PayPlugNotifications',
         'PayplugLock',
