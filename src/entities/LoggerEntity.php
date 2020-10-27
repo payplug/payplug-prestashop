@@ -23,10 +23,6 @@
 
 namespace PayPlug\src\entities;
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
 class LoggerEntity
 {
     /**
@@ -73,6 +69,10 @@ class LoggerEntity
      * @var string $type
      */
     private $type;
+ /**
+     * @var string $table
+     */
+    private $table;
 
     /**
      * @return string
@@ -235,4 +235,24 @@ class LoggerEntity
         $this->type = $type;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param string $table
+     * @return LoggerEntity
+     */
+    public function setTable(string $table)
+    {
+        $this->table = $table;
+        return $this;
+    }
+
+
 }

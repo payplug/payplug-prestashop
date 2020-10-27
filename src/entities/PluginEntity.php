@@ -1,16 +1,39 @@
 <?php
 
-
 namespace PayPlug\src\entities;
-
-
 
 class PluginEntity
 {
+    // Vars
+    private $api_url;
     private $api_version;
+
+    // Our classes
+    private $card;
     private $logger;
     private $cache;
+
+    // Specific classes
+    private $tools;
     private $query;
+
+    /**
+     * @return mixed
+     */
+    public function getApiUrl()
+    {
+        return $this->api_url;
+    }
+
+    /**
+     * @param mixed $api_url
+     * @return PluginEntity
+     */
+    public function setApiUrl($api_url)
+    {
+        $this->api_url = $api_url;
+        return $this;
+    }
 
     /**
      * @return mixed
@@ -27,6 +50,24 @@ class PluginEntity
     public function setApiVersion($api_version)
     {
         $this->api_version = $api_version;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCard()
+    {
+        return $this->card;
+    }
+
+    /**
+     * @param mixed $card
+     * @return PluginEntity
+     */
+    public function setCard($card)
+    {
+        $this->card = $card;
         return $this;
     }
 
@@ -63,6 +104,24 @@ class PluginEntity
     public function setCache($cache)
     {
         $this->cache = $cache;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTools()
+    {
+        return $this->tools;
+    }
+
+    /**
+     * @param mixed $tools
+     * @return PluginEntity
+     */
+    public function setTools($tools)
+    {
+        $this->tools = $tools;
         return $this;
     }
 

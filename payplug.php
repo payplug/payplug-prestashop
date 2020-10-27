@@ -1,4 +1,4 @@
-<?php
+<?php // 26.10.20 : 7469L
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -25,15 +25,12 @@
  * Core file of PayPlug module
  */
 
-use PayPlug\src\repositories\QueryRepository;
-
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
 @include_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCard.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
 
 if (!defined('_PS_VERSION_')) {
@@ -51,15 +48,19 @@ class Payplug extends PaymentModule
     const INST_MIN_AMOUNT = 4;
 
     /** @var PluginEntity */
-    private $plugin;
+    private $plugin; // 3.0
 
-    private $query;
+    private $card; // 3.0
+
+    private $query; // 3.0
+
+    private $tools; // 3.0
 
     private $paymentOption;
 
-    private $PrestashopSpecificClass;
+    private $PrestashopSpecificClass; // 3.0
 
-    private $PrestashopSpecificObject;
+    private $PrestashopSpecificObject; // 3.0
 
     /**
      * @var To inject logo_url in oney_payment.tpl
@@ -71,9 +72,6 @@ class Payplug extends PaymentModule
 
     /** @var string */
     private $api_test;
-
-    /** @var string */
-    private $api_url;
 
     /** @var array */
     public $check_configuration = array();
@@ -280,31 +278,16 @@ class Payplug extends PaymentModule
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
         $this->initializeCache();
-
-        $this->testTonCode();
     }
 
     private function initializeAccessors()
     {
-        $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
-        $this->logger = $this->plugin->getLogger();
-        $this->query = $this->plugin->getQuery();
-    }
+        $this->plugin   = (new PayPlug\src\repositories\PluginRepository())->getEntity();
 
-    public function testTonCode()
-    {
-       var_dump(
-
-           $this->query
-           ->select()
-           ->fields('*')
-           ->from('payplug_cache')
-           ->build()
-
-       ); exit;
-       
-            ;
-        exit;
+        $this->card     = $this->plugin->getCard();
+        $this->logger   = $this->plugin->getLogger();
+        $this->query    = $this->plugin->getQuery();
+        $this->tools    = $this->plugin->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -315,12 +298,10 @@ class Payplug extends PaymentModule
         }
     }
 
-
     public function setPaymentOption()
     {
         return new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
     }
-
 
     public function getPlugin()
     {
@@ -736,7 +717,7 @@ class Payplug extends PaymentModule
 
         $pay_status = $this->payment_status[$pay_status];
 
-        $pay_brand = $this->getCardBrandByPayment($payment);
+        $pay_brand = $this->card->getCardBrandByPayment($payment);
         if ($payment->card->country != '') {
             $pay_brand .= ' ' . $this->l('Card') . ' (' . $payment->card->country . ')';
         }
@@ -748,8 +729,8 @@ class Payplug extends PaymentModule
             'status_class' => $status_class,
             'amount' => (int)$payment->amount / 100,
             'card_brand' => $pay_brand,
-            'card_mask' => $this->getCardMaskByPayment($payment),
-            'card_date' => $this->getCardExpiryDateByPayment($payment),
+            'card_mask' => $this->card->getCardMaskByPayment($payment),
+            'card_date' => $this->card->getCardExpiryDateByPayment($payment),
             'mode' => $payment->is_live ? $this->l('LIVE') : $this->l('TEST'),
             'paid' => (bool)$payment->is_paid,
         );
@@ -838,7 +819,7 @@ class Payplug extends PaymentModule
         $capture = $payment->capture();
         $payment->refresh();
         if ($payment->resource->card->id !== null) {
-            $this->saveCard($payment->resource);
+            $this->card->saveCard($payment->resource);
         }
         if ($capture['code'] >= 300) {
             die(json_encode(array(
@@ -1339,70 +1320,6 @@ class Payplug extends PaymentModule
      * @param string $api_key
      * @return bool
      */
-    public function deleteCard($id_customer, $id_payplug_card, $api_key)
-    {
-        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
-        $id_company = (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
-        $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
-        $url = $this->api_url . '/v1/cards/' . $id_card;
-        $curl_version = curl_version();
-
-        $process = curl_init($url);
-        curl_setopt($process, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $api_key));
-        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'DELETE');
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        // CURL const are in uppercase
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
-        $error_curl = curl_errno($process);
-
-        curl_close($process);
-
-        // if no error
-        if ($error_curl == 0) {
-            $req_payplug_card = '
-            DELETE FROM ' . _DB_PREFIX_ . 'payplug_card
-            WHERE ' . _DB_PREFIX_ . 'payplug_card.id_card = \'' . pSQL($id_card) . '\'';
-            $res_payplug_card = Db::getInstance()->Execute($req_payplug_card);
-            if (!$res_payplug_card) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Delete all cards for a given customer
-     *
-     * @param int $id_customer
-     * @param string $api_key
-     * @return bool
-     */
-    private function deleteCards($id_customer)
-    {
-        $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        $cardsToDelete = $this->getCardsByCustomer($id_customer, false);
-        if (isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
-            foreach ($cardsToDelete as $card) {
-                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->deleteCard($id_customer, $card['id_payplug_card'], $api_key)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     /**
      * Delete basic configuration
@@ -1888,7 +1805,7 @@ class Payplug extends PaymentModule
      */
     public function getAccount($api_key, $sandbox = true)
     {
-        $url = $this->api_url . $this->routes['account'];
+        $url = $this->plugin->getApiUrl().$this->routes['account'];
         $curl_version = curl_version();
         $process = curl_init($url);
         curl_setopt($process, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $api_key));
@@ -2037,145 +1954,6 @@ class Payplug extends PaymentModule
         }
 
         return $available_options;
-    }
-
-    /**
-     * @param $payment
-     * @return Exception|string
-     */
-    public function getCardBrandByPayment($payment)
-    {
-        if (!is_object($payment)) {
-            try {
-                $payment = \Payplug\Payment::retrieve($payment);
-            } catch (Exception $exception) {
-                return $exception;
-            }
-        }
-
-        if ($payment->card->brand != '') {
-            $brand = $payment->card->brand;
-        } else {
-            $brand = $this->l('Unavailable');
-        }
-        return $brand;
-    }
-
-    /**
-     * @param $payment
-     * @return Exception|false|string
-     */
-    public function getCardExpiryDateByPayment($payment)
-    {
-        if (!is_object($payment)) {
-            try {
-                $payment = \Payplug\Payment::retrieve($payment);
-            } catch (Exception $exception) {
-                return $exception;
-            }
-        }
-
-        if ($payment->card->exp_month === null) {
-            $card_expiry_date = $this->l('Unavailable');
-        } else {
-            $card_expiry_date = date('m/y',
-                strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
-        }
-        return $card_expiry_date;
-    }
-
-    /**
-     * get card id
-     *
-     * @param int $id_customer
-     * @param int $id_payplug_card
-     * @param int $id_company
-     * @return string
-     */
-    private function getCardId($id_customer, $id_payplug_card, $id_company)
-    {
-        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
-
-        $req_card_id = new DbQuery();
-        $req_card_id->select('pc.id_card');
-        $req_card_id->from('payplug_card', 'pc');
-        $req_card_id->where('pc.id_customer = ' . (int)$id_customer);
-        $req_card_id->where('pc.id_payplug_card = ' . (int)$id_payplug_card);
-        $req_card_id->where('pc.id_company = ' . (int)$id_company);
-        $req_card_id->where('pc.is_sandbox = ' . (int)$is_sandbox);
-        $res_card_id = Db::getInstance()->getValue($req_card_id);
-
-        if (!$res_card_id) {
-            return false;
-        } else {
-            return $res_card_id;
-        }
-    }
-
-    /**
-     * @param $payment
-     * @return Exception|string
-     */
-    public function getCardMaskByPayment($payment)
-    {
-        if (!is_object($payment)) {
-            try {
-                $payment = \Payplug\Payment::retrieve($payment);
-            } catch (Exception $exception) {
-                return $exception;
-            }
-        }
-
-        if ($payment->card->last4 != '') {
-            $card_mask = '**** **** **** ' . $payment->card->last4;
-        } else {
-            $card_mask = $this->l('Unavailable');
-        }
-        return $card_mask;
-    }
-
-    /**
-     * @description
-     * Get collection of cards
-     *
-     * @param int $id_customer
-     * @param bool $active_only
-     * @return array OR bool
-     */
-    public function getCardsByCustomer($id_customer, $active_only = false)
-    {
-        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
-
-        $req_payplug_card = new DbQuery();
-        $req_payplug_card->select('pc.id_customer, pc.id_payplug_card, pc.id_company, pc.last4, 
-              pc. exp_month, pc.exp_year, pc.brand, pc.country, pc.metadata');
-        $req_payplug_card->from('payplug_card', 'pc');
-        $req_payplug_card->where('pc.id_customer = ' . (int)$id_customer);
-        $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')));
-        $req_payplug_card->where('pc.is_sandbox = ' . (int)$is_sandbox);
-        $res_payplug_card = Db::getInstance()->executeS($req_payplug_card);
-
-        if (!$res_payplug_card) {
-            return [];
-        } else {
-            foreach ($res_payplug_card as $key => &$value) {
-                if ((int)$value['exp_year'] < (int)date('Y')
-                    || ((int)$value['exp_year'] == (int)date('Y') && (int)$value['exp_month'] < (int)date('m'))) {
-                    $value['expired'] = true;
-                    if ($active_only) {
-                        unset($res_payplug_card[$key]);
-                        continue;
-                    }
-                } else {
-                    $value['expired'] = false;
-                }
-                $value['expiry_date'] = date(
-                    'm / y',
-                    mktime(0, 0, 0, (int)$value['exp_month'], 1, (int)$value['exp_year'])
-                );
-            }
-            return $res_payplug_card;
-        }
     }
 
     /**
@@ -3126,7 +2904,7 @@ class Payplug extends PaymentModule
         // If not, we do a simulation for Oney, and we will store it to the DB
         $cache_from_bdd = $this->payplug_cache->getCacheByKey($cache_id);
         if ($cache_from_bdd) {
-            return Tools::jsonDecode($cache_from_bdd[0]['cache_value'], true);
+            return $this->tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
         }
 
         try {
@@ -3287,7 +3065,7 @@ class Payplug extends PaymentModule
 
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
-        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$id_customer, true) : [];
+        $payplug_cards = $options['one_click'] ? $this->card->getCardsByCustomer((int)$id_customer, true) : [];
 
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
@@ -3823,7 +3601,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionDeleteGDPRCustomer($customer)
     {
-        if (!$this->deleteCards((int)$customer['id'])) {
+        if (!$this->card->deleteCards((int)$customer['id'])) {
             return json_encode($this->l('PayPlug : Unable to delete customer saved cards.'));
         }
         return json_encode(true);
@@ -3887,7 +3665,7 @@ class Payplug extends PaymentModule
                 $payment->capture();
                 $payment->refresh();
                 if ($payment->resource->card->id !== null) {
-                    $this->saveCard($payment->resource);
+                    $this->card->saveCard($payment->resource);
                 }
             }
         }
@@ -4356,7 +4134,7 @@ class Payplug extends PaymentModule
                 else {
                     $this->context->smarty->assign(array(
                         'payment_url' => $payment['return_url'],
-                        'api_url' => $this->api_url,
+                        'api_url' => $this->plugin->getApiUrl(),
                     ));
                     return $this->display(__FILE__, 'embedded.tpl');
                 }
@@ -4399,7 +4177,7 @@ class Payplug extends PaymentModule
         }
 
         $this->context->smarty->assign(array(
-            'api_url' => $this->api_url,
+            'api_url' => $this->plugin->getApiUrl(),
         ));
 
         $payment_options = $this->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
@@ -4457,7 +4235,26 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Flush PayPlugCache, when PrestaShop cache cleared
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
+     * @param array $params
+     */
+    public function hookActionAdminPerformanceControllerAfter($params)
+    {
+//        if ($this->tools->tool('getValue', 'empty_smarty_cache')) {
+//            return false;
+//        }
+
+        // Purge PayPlug cache
+        if (!$this->payplug_cache->flushCache()) {
+            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
+            $error_level = 'error';
+            $this->payplug_cache->logger->addLog($error_message, $error_level);
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param array $params
      */
@@ -5367,7 +5164,7 @@ class Payplug extends PaymentModule
         );
         $data_string = json_encode($data);
 
-        $url = $this->api_url . $this->routes['login'];
+        $url = $this->plugin->getApiUrl() . $this->routes['login'];
         $curl_version = curl_version();
         $process = curl_init($url);
         curl_setopt(
@@ -5506,7 +5303,7 @@ class Payplug extends PaymentModule
     public function patchPayment($api_key, $pay_id, $data)
     {
         $data_string = json_encode($data);
-        $url = $this->api_url . $this->routes['patch'] . '/' . $pay_id;
+        $url = $this->plugin->getApiUrl() . $this->routes['patch'] . '/' . $pay_id;
         $curl_version = curl_version();
         $process = curl_init($url);
         curl_setopt(
@@ -5865,8 +5662,8 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer,
-                $id_card, $config['company']) : null;
+            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->card->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
+
         }
 
         // check payment tab from current payment method
@@ -6274,71 +6071,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description
-     * Determine witch environnement is used
-     *
-     * @param PayplugPayment $payment
-     * @return bool
-     */
-    public function saveCard($payment)
-    {
-        $brand = $payment->card->brand;
-        if (Tools::strtolower($brand) != 'mastercard' && Tools::strtolower($brand) != 'visa') {
-            $brand = 'none';
-        }
-
-        $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
-        $is_sandbox = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
-        $company_id = (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
-
-        // if card exists then return false
-        $db = new DbQuery();
-        $db->select('id_card');
-        $db->from('payplug_card');
-        $db->where('id_card = "' . $payment->card->id . '"');
-        $db->where('id_company = ' . (int)$company_id);
-        $db->where('is_sandbox = ' . (int)$is_sandbox);
-
-        if (Db::getInstance()->getValue($db)) {
-            return false;
-        }
-
-        // else get next card position
-//        $db = new DbQuery();
-////        $db->select('COUNT(pc.id_payplug_card)');
-////        $db->from('payplug_card', 'pc');
-////        $db->where('pc.id_customer = ' . (int)$customer_id);
-////        $db->where('pc.id_company = ' . (int)$company_id);
-////        $db->where('pc.is_sandbox = ' . (int)$is_sandbox);
-//        $db->select('id_payplug_card');
-//        $db->from('payplug_card', 'pc');
-//        $db->where('pc.id_customer = ' . (int)$customer_id);
-//        $card_index = Db::getInstance()->getValue($db);
-//
-//        $card_index = (int)$card_index + 1;
-
-        // insert the new card in database
-        $card = [
-            'id_customer' => (int)$customer_id,
-            'id_payplug_card' => null, // On utilise l'auto increment
-//            'id_payplug_card' => (int)$card_index + 1,
-            'id_company' => (int)$company_id,
-            'is_sandbox' => (int)$is_sandbox,
-            'id_card' => pSQL($payment->card->id),
-            'last4' => pSQL($payment->card->last4),
-            'exp_month' => pSQL($payment->card->exp_month),
-            'exp_year' => pSQL($payment->card->exp_year),
-            'brand' => pSQL($brand),
-            'country' => pSQL($payment->card->country),
-            'metadata' => serialize($payment->card->metadata),
-        ];
-
-        $return = Db::getInstance()->insert('payplug_card', $card);
-
-        return (bool)$return;
-    }
-
-    /**
      * Determine wich API key to use
      *
      * @return string
@@ -6446,9 +6178,10 @@ class Payplug extends PaymentModule
     private function setEnvironment()
     {
         if (isset($_SERVER['PAYPLUG_API_URL'])) {
-            $this->api_url = $_SERVER['PAYPLUG_API_URL'];
+            $this->plugin->setApiUrl($_SERVER['PAYPLUG_API_URL']);
         } else {
-            $this->api_url = 'https://api.payplug.com';
+            $this->plugin->setApiUrl('https://api.payplug.com');
+
         }
 
         if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
@@ -6869,7 +6602,7 @@ class Payplug extends PaymentModule
                 $id_customer = $card['id_customer'];
                 $id_payplug_card = $card['id_payplug_card'];
                 $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->deleteCard($id_customer, $id_payplug_card, $api_key)) {
+                if (!$this->card->deleteCard($id_customer, $id_payplug_card, $api_key)) {
                     return false;
                 }
             }
@@ -7107,7 +6840,7 @@ class Payplug extends PaymentModule
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => PayplugBackward::getHttpHost(true) . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
             'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', array(), true),
-            'api_url' => $this->api_url,
+            'api_url' => $this->plugin->getApiUrl(),
             'price2display' => $price2display,
             'this_path' => $this->_path,
         ));
@@ -7132,9 +6865,10 @@ class Payplug extends PaymentModule
 
         $path_ssl = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/';
 
-        $payplug_card = new PayPlugCard();
+        $payplug_card = $this->card;
 
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+
         $use_taxes = $this->getConfiguration('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
         $base_total_tax_exc = $cart->getOrderTotal(false);
@@ -7160,7 +6894,7 @@ class Payplug extends PaymentModule
 
         $this->smarty->assign(array(
             'front_ajax_url' => $front_ajax_url,
-            'api_url' => $this->api_url
+            'api_url' => $this->plugin->getApiUrl(),
         ));
 
         if (!empty($payplug_cards) && $one_click == 1) {
@@ -7312,7 +7046,7 @@ class Payplug extends PaymentModule
 
         // check if one click allowed
         $one_click = $this->getConfiguration('PAYPLUG_ONE_CLICK');
-        $payplug_card = new PayPlugCard();
+        $payplug_card = $this->card;
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
@@ -7336,8 +7070,6 @@ class Payplug extends PaymentModule
         'PayPlugPayment/PayPlugPaymentOneClick',
         'PayPlugPayment/PayPlugPaymentInstallment',
         'PayPlugPayment/PayPlugPaymentOney',
-        'PayPlugCache',
-        'PayPlugCard',
         'PayPlugCarrier',
         'PayPlugNotifications',
         'PayplugLock',
@@ -7345,7 +7077,6 @@ class Payplug extends PaymentModule
         'PayPlugAjax',
         'PPPayment',
         'PPPaymentInstallment',
-        'PayPlugLogger',
     );
 
     /**

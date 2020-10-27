@@ -24,25 +24,32 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\specific\ToolsSpecific;
 
 class PluginRepository extends Repository
 {
-    private $plugin;
-    private $logger;
     private $cache;
+    private $card;
+    private $logger;
+    private $plugin;
     private $query;
+    private $tools;
 
     public function __construct()
     {
-        $this->plugin = new PluginEntity();
-        $this->logger = new LoggerRepository();
-        $this->cache = new CacheRepository();
-        $this->query = new QueryRepository();
+        $this->cache    = new CacheRepository();
+        $this->card     = new CardRepository();
+        $this->logger   = new LoggerRepository();
+        $this->plugin   = new PluginEntity();
+        $this->query    = new QueryRepository();
+        $this->tools    = new ToolsSpecific();
         $this->plugin
             ->setApiVersion('2019-08-06')
-            ->setLogger($this->logger)
             ->setCache($this->cache)
+            ->setCard($this->card)
+            ->setLogger($this->logger)
             ->setQuery($this->query)
+            ->setTools($this->tools)
         ;
         $this->setEntity($this->plugin);
     }

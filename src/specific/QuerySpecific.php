@@ -19,20 +19,41 @@ class QuerySpecific implements QueryInterface
         }
     }
 
+    /**
+     * @description Called from src/repositories/QueryRepository.php
+     * @param $SQLRequest
+     * @return mixed
+     */
     public function query($SQLRequest)
     {
+//        if (stripos($SQLRequest,'UPDATE') !== false) {
+//            var_dump($SQLRequest); exit;
+//
+//        }
+
         try {
+            $action = 'execute';
+
+            if (stripos($SQLRequest,'SELECT') !== false) {
                 $action = 'executeS';
-                return $this->db->$action($SQLRequest);
+            }
+            return $this->db->$action($SQLRequest);
 
         } catch (\Exception $e){
             var_dump($e);
         }
     }
 
-    public function select($table, $data, $limit)
+    public function getLastId()
     {
-        $req = 'SELECT ' . $data . ' FROM `' . $table . '`';
-        return Db::getInstance()->executeS($req);
+        return $this->db->Insert_ID();
     }
+
+    // @todo : A optimiser dans QueryRepository
+    public function getValue($id)
+    {
+        return $this->db->getValue($id);
+    }
+
+
 }
