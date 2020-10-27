@@ -175,6 +175,15 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function condition($condition)
+    {
+        if (!empty($condition)) {
+            $this->query['condition'][] = $condition;
+        }
+
+        return $this;
+    }
+
     public function join($join)
     {
         if (!empty($join)) {
