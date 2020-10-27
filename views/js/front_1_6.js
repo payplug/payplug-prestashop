@@ -347,7 +347,13 @@ var $document,
                             if (typeof (response.payment) != 'undefined') {
                                 payplugModule.oney.payment.set(response.payment);
                             }
-                            payplugModule.oney.popin.enable();
+
+                            if (typeof response.error != 'undefined' && response.error) {
+                                payplugModule.oney.popin.disable();
+                            } else {
+                                payplugModule.oney.popin.enable();
+                            }
+
                         } else {
                             if (typeof response.popin != 'undefined') {
                                 payplugModule.oney.popin.set(response.popin);

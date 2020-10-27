@@ -1208,6 +1208,11 @@ a.payplug.call.pphide {
         padding: 0;
       }
 
+      .oneyOption-withoutSchedule & {
+        padding: 0;
+      }
+
+      //
       .oneyPayment-mobile .oneyOption:nth-child(2) & {
         left: 50%;
         border-right: none;
@@ -1216,6 +1221,14 @@ a.payplug.call.pphide {
 
       .oneyPayment-mobile .oneyOption-selected & {
         border-bottom: 5px solid #colorMap[oney];
+      }
+      .oneyPayment-mobile .oneyOption-withoutSchedule & {
+        border-bottom: 1px solid #dce0e8;
+        padding: 0 0 4px;
+      }
+      .oneyPayment-mobile .oneyOption-withoutSchedule.oneyOption-selected & {
+        border-bottom: 5px solid #colorMap[oney];
+        padding: 0;
       }
     }
 
@@ -1311,6 +1324,10 @@ a.payplug.call.pphide {
       position: static;
       border: none;
       background: none;
+
+      &.oneyOption-withoutSchedule {
+        margin: 0 0 16px;
+      }
     }
   }
 
