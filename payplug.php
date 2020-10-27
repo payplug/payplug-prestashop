@@ -7049,7 +7049,6 @@ class Payplug extends PaymentModule
         'PayPlugPayment/PayPlugPaymentOneClick',
         'PayPlugPayment/PayPlugPaymentInstallment',
         'PayPlugPayment/PayPlugPaymentOney',
-        'PayPlugCache',
         'PayPlugCarrier',
         'PayPlugNotifications',
         'PayplugLock',
@@ -7057,7 +7056,6 @@ class Payplug extends PaymentModule
         'PayPlugAjax',
         'PPPayment',
         'PPPaymentInstallment',
-        'PayPlugLogger',
     );
 
     /**
