@@ -23,6 +23,7 @@ return array(
     'PayPlug\\src\\repositories\\PluginRepository' => $baseDir . '/src/repositories/PluginRepository.php',
     'PayPlug\\src\\repositories\\QueryRepository' => $baseDir . '/src/repositories/QueryRepository.php',
     'PayPlug\\src\\repositories\\Repository' => $baseDir . '/src/repositories/Repository.php',
+    'PayPlug\\src\\repositories\\SQLtableRepository' => $baseDir . '/src/repositories/SQLtableRepository.php',
     'PayPlug\\src\\specific\\ConfigurationSpecific' => $baseDir . '/src/specific/ConfigurationSpecific.php',
     'PayPlug\\src\\specific\\PrestashopSpecific16' => $baseDir . '/src/specific/PrestashopSpecific16.php',
     'PayPlug\\src\\specific\\PrestashopSpecific17' => $baseDir . '/src/specific/PrestashopSpecific17.php',

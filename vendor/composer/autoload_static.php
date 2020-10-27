@@ -66,6 +66,7 @@ class ComposerStaticInit41d1eee5399c0a3712f65a673ae5e665
         'PayPlug\\src\\repositories\\PluginRepository' => __DIR__ . '/../..' . '/src/repositories/PluginRepository.php',
         'PayPlug\\src\\repositories\\QueryRepository' => __DIR__ . '/../..' . '/src/repositories/QueryRepository.php',
         'PayPlug\\src\\repositories\\Repository' => __DIR__ . '/../..' . '/src/repositories/Repository.php',
+        'PayPlug\\src\\repositories\\SQLtableRepository' => __DIR__ . '/../..' . '/src/repositories/SQLtableRepository.php',
         'PayPlug\\src\\specific\\ConfigurationSpecific' => __DIR__ . '/../..' . '/src/specific/ConfigurationSpecific.php',
         'PayPlug\\src\\specific\\PrestashopSpecific16' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific16.php',
         'PayPlug\\src\\specific\\PrestashopSpecific17' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific17.php',
