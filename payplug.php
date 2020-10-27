@@ -25,8 +25,6 @@
  * Core file of PayPlug module
  */
 
-use PayPlug\src\repositories\QueryRepository;
-
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');

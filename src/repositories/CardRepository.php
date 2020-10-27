@@ -47,6 +47,9 @@ class CardRepository
     
     private function setParams() {
         $config = $this->configurationSpecific;
+        $idCompany = $config->get('PAYPLUG_COMPANY_ID');
+        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
+
         $this->cardEntity
             ->setAllowedBrand(['mastercard','visa'])
             ->setDefinition([])
@@ -55,8 +58,6 @@ class CardRepository
             ->setFieldsValidate([])
             ->setTable('payplug_card')
             ->setIdentifier('')
-            ->setIdCompany($config->get('PAYPLUG_COMPANY_ID'))
-            ->setIsSandbox($config->get('PAYPLUG_SANDBOX_MODE'))
             ->setDefinition([
                 'table' => $this->cardEntity->getTable(),
                 'primary' => 'id_'.$this->cardEntity->getTable(),
@@ -92,6 +93,13 @@ class CardRepository
                 ]
             ]);
 
+        if ($idCompany && (!empty($idCompany))) {
+            $this->cardEntity->setIdCompany($idCompany);
+        }
+
+        if ($isSandbox) {
+            $this->cardEntity->setIsSandbox((int)$isSandbox);
+        }
     }
 
     /**
