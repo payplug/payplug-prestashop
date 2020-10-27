@@ -24,7 +24,6 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\specific\DatabaseSpecific;
 use Tools;
 use Validate;
 
@@ -34,22 +33,24 @@ class CacheRepository
      * @var object CacheEntity
      */
     public $cacheEntity;
-    private $database;
+    private $query;
     private $logger;
 
     public function __construct()
     {
         $this->cacheEntity = new CacheEntity();
-        $this->database = new DatabaseSpecific();
+        $this->query = new QueryRepository();
         $this->setStdParams();
         $this->setLogger();
     }
 
     public function setStdParams()
     {
-        $this->cacheEntity->setDefinition([
-            'table' => 'payplug_cache',
-            'primary' => 'id_payplug_cache',
+        $this->cacheEntity
+            ->setTable('payplug_cache')
+            ->setDefinition([
+            'table' => $this->cacheEntity->getTable(),
+            'primary' => 'id_'.$this->cacheEntity->getTable(),
             'fields' => [
                 /*
                  * Different types,
@@ -74,7 +75,7 @@ class CacheRepository
     private function setLogger()
     {
         $this->logger = new LoggerRepository();
-        $params['process'] = 'payplug_cache';
+        $params['process'] = $this->cacheEntity->getTable();
         $this->logger->setParams($params);
     }
 
@@ -92,10 +93,28 @@ class CacheRepository
         $cache = $this->getCacheByKey($cache_key);
 
         if (!$cache) {
-            $date_add = $this->logger->udate('Y-m-d H:i:s');
-            $req_cache = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_cache (cache_key, cache_value, date_add, date_upd)
-                VALUES (\'' . pSQL($cache_key) . '\', \'' . json_encode($cache_value) . '\', \'' . pSQL($date_add) . '\', \'' . pSQL($date_add) . '\')';
-            return $this->database->query('execute',$req_cache);
+            $this->cacheEntity->setDateAdd($this->logger->udate('Y-m-d H:i:s'));
+            
+            $cache = $this->cacheEntity;
+            
+            $values =   '\''.pSQL($cache_key).'\','.
+                '\''.json_encode($cache_value).'\','.
+                '\''.pSQL($cache->getDateAdd()).'\','.
+                '\''.pSQL($cache->getDateAdd()).'\'';
+            
+            $this->query
+                ->insert()
+                ->into(_DB_PREFIX_ .$this->cacheEntity->getTable())
+                ->fields('cache_key, cache_value, date_add, date_upd')
+                ->values($values)
+            ;
+
+            if (!$this->query->build()) {
+                return false;
+            }
+            
+            return true;
+            
         }
     }
 
@@ -107,23 +126,18 @@ class CacheRepository
      */
     public function getCacheByKey($cache_key)
     {
-        $req_cache = 'SELECT *  FROM `' . _DB_PREFIX_ . 'payplug_cache` WHERE `cache_key` = "' . (string)$cache_key . '"';
-        return $this->database->query('executeS',$req_cache);
-    }
+        $this->query
+            ->select()
+            ->fields('*')
+            ->from(_DB_PREFIX_.$this->cacheEntity->getTable())
+            ->where('`cache_key` = "' . (string)$cache_key . '"')
+        ;
 
-    /**
-     * @description Remove ONE specific Oney simulation (identified by id_payplug_cache in parameter).
-     *
-     * @param $cache_key
-     * @return boolean
-     */
-    public function deleteCacheByKey($cache_key)
-    {
-        $cache = $this->getCacheByKey($cache_key);
-        if (Validate::isLoadedObject(!$cache)) {
+        if (!$this->query->build()) {
             return false;
         }
-        return $cache->delete();
+
+        return true;
     }
 
     /**
@@ -134,15 +148,19 @@ class CacheRepository
      */
     public function flushCache()
     {
-        $req_cache = 'TRUNCATE' . _DB_PREFIX_ . 'payplug_cache ';
-        $res_cache = $this->database->query('execute',$req_cache);
-        if (!$res_cache) {
+        $this->query
+            ->truncate()
+            ->table(_DB_PREFIX_ .$this->cacheEntity->getTable())
+        ;
+
+        if (!$this->query->build()) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
             $error_level = 'error';
             $this->logger->addLog($error_message,$error_level);
             return false;
-        } else {
-            return true;
         }
+        
+       return true;
+
     }
 }

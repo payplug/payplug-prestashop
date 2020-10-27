@@ -50,6 +50,9 @@ class CacheEntity
     /** @var array */
     private $definition;
 
+    /** @var string */
+    private $table;
+
     /**
      * @return string
      */
@@ -116,7 +119,7 @@ class CacheEntity
      * @param datetime $date_add
      * @return CacheEntity
      */
-    public function setDateAdd(datetime $date_add)
+    public function setDateAdd($date_add)
     {
         $this->date_add = $date_add;
         return $this;
@@ -134,7 +137,7 @@ class CacheEntity
      * @param datetime $date_upd
      * @return CacheEntity
      */
-    public function setDateUpd(datetime $date_upd)
+    public function setDateUpd($date_upd)
     {
         $this->date_upd = $date_upd;
         return $this;
@@ -173,6 +176,24 @@ class CacheEntity
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param string $table
+     * @return CacheEntity
+     */
+    public function setTable(string $table)
+    {
+        $this->table = $table;
         return $this;
     }
 }

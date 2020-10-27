@@ -21,18 +21,26 @@ class QuerySpecific implements QueryInterface
 
     public function query($SQLRequest)
     {
+//        if (stripos($SQLRequest,'UPDATE') !== false) {
+//            var_dump($SQLRequest); exit;
+//
+//        }
         try {
+            $action = 'execute';
+
+            if (stripos($SQLRequest,'SELECT') !== false) {
                 $action = 'executeS';
-                return $this->db->$action($SQLRequest);
+            }
+            return $this->db->$action($SQLRequest);
 
         } catch (\Exception $e){
             var_dump($e);
         }
     }
 
-    public function select($table, $data, $limit)
+    public function getLastId()
     {
-        $req = 'SELECT ' . $data . ' FROM `' . $table . '`';
-        return Db::getInstance()->executeS($req);
+        return $this->db->Insert_ID();
     }
+
 }

@@ -280,8 +280,6 @@ class Payplug extends PaymentModule
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
         $this->initializeCache();
-
-        $this->testTonCode();
     }
 
     private function initializeAccessors()
@@ -289,22 +287,6 @@ class Payplug extends PaymentModule
         $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
         $this->logger = $this->plugin->getLogger();
         $this->query = $this->plugin->getQuery();
-    }
-
-    public function testTonCode()
-    {
-       var_dump(
-
-           $this->query
-           ->select()
-           ->fields('*')
-           ->from('payplug_cache')
-           ->build()
-
-       ); exit;
-       
-            ;
-        exit;
     }
 
     public function loadSpecificPrestaClasses()

@@ -1,22 +1,72 @@
 <?php
 
+/*
+ * (Petit rappel, avant de créer la doc)
+ * Comment ça marche :
+ *
+ * Dans n'importe quelle classe :
+ * public function __construct()
+ * {
+ *      $this->query = new QueryRepository();
+ * }
+ *
+ * SELECT * FROM ma_table :
+ * $this->query
+ * ->select()
+ * ->fields('*')
+ * ->from('ma_table')
+ * ->build()
+ *
+ * INSERT INTO ma_table (champ_1, champ_2) VALUES (donnee_1, donnee_2) :
+ * $this->query
+ * ->insert()
+ * ->into('ma_table')
+ * ->fields('champ_1, champ_2')
+ * ->values('donnee_1, donnee_2')
+ * ->build()
+ *
+ * UPDATE ma_table SET champ_1 = donnee_1 WHERE id = 3 :
+ * ->update()
+ * ->table('ma_table')
+ * ->set('ma_table.champ_1 = donnee_1')
+ * ->where(id = 3)
+ * ->build()
+ *
+ * DELETE FROM ma_table WHERE id = 3 :
+ * $this->query
+ * ->delete()
+ * ->from('ma_table')
+ * ->where('id = 3')
+ * ->build()
+ *
+ * TRUNCATE TABLE ma_table :
+ * $this->query
+ * ->truncate()
+ * ->table('ma_table')
+ */
+
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\specific\QuerySpecific;
 
 class QueryRepository extends Repository
 {
-    protected $query = array(
-        'type'   => array(),
-        'fields' => array(),
-        'from'   => array(),
-        'join'   => array(),
-        'where'  => array(),
-        'group'  => array(),
-        'having' => array(),
-        'order'  => array(),
-        'limit'  => array('offset' => 0, 'limit' => 0),
-    );
+    protected $query = [
+        'type'   => [],
+        'fields' => [],
+        'values' => [],
+        'from'   => [],
+        'into'   => [],
+        'table'  => [],
+        'set'    => [],
+        'join'   => [],
+        'where'  => [],
+        'group'  => [],
+        'having' => [],
+        'order'  => [],
+        'limit'  => ['offset' => 0, 'limit' => 0],
+        'lastId' => [],
+    ];
 
     private $specific_class;
 
@@ -31,6 +81,30 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function insert()
+    {
+        $this->query['type'] = 'INSERT';
+        return $this;
+    }
+
+    public function update()
+    {
+        $this->query['type'] = 'UPDATE';
+        return $this;
+    }
+
+    public function truncate()
+    {
+        $this->query['type'] = 'TRUNCATE';
+        return $this;
+    }
+
+    public function delete()
+    {
+        $this->query['type'] = 'DELETE';
+        return $this;
+    }
+
     public function fields($fields)
     {
         if (!empty($fields)) {
@@ -39,13 +113,54 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function values($values)
+    {
+        if (!empty($values)) {
+            $this->query['values'][] = $values;
+        }
+        return $this;
+    }
+
     public function from($table, $alias = null)
     {
         if (!empty($table)) {
             if (empty($this->query['from'])) {
-                $this->query['from'] = array();
+                $this->query['from'] = [];
             }
-            $this->query['from'][] = '`'._DB_PREFIX_.$table.'`'.($alias ? ' '.$alias : '');
+            $this->query['from'][] = '`'.$table.'`'.($alias ? ' '.$alias : '');
+        }
+
+        return $this;
+    }
+
+    public function into($table, $alias = null)
+    {
+        if (!empty($table)) {
+            if (empty($this->query['into'])) {
+                $this->query['into'] = [];
+            }
+            $this->query['into'][] = '`'.$table.'`'.($alias ? ' '.$alias : '');
+        }
+
+        return $this;
+    }
+
+    public function table($table, $alias = null)
+    {
+        if (!empty($table)) {
+            if (empty($this->query['table'])) {
+                $this->query['table'] = [];
+            }
+            $this->query['table'][] = '`'.$table.'`'.($alias ? ' '.$alias : '');
+        }
+
+        return $this;
+    }
+
+    public function set($set)
+    {
+        if (!empty($set)) {
+            $this->query['set'][] = $set;
         }
 
         return $this;
@@ -62,27 +177,27 @@ class QueryRepository extends Repository
 
     public function leftJoin($table, $alias = null, $on = null)
     {
-        return $this->join('LEFT JOIN `'._DB_PREFIX_.bqSQL($table).'`'.($alias ? ' `'.pSQL($alias).'`' : '').($on ? ' ON '.$on : ''));
+        return $this->join('LEFT JOIN `'.bqSQL($table).'`'.($alias ? ' `'.pSQL($alias).'`' : '').($on ? ' ON '.$on : ''));
     }
 
     public function innerJoin($table, $alias = null, $on = null)
     {
-        return $this->join('INNER JOIN `'._DB_PREFIX_.bqSQL($table).'`'.($alias ? ' '.pSQL($alias) : '').($on ? ' ON '.$on : ''));
+        return $this->join('INNER JOIN `'.bqSQL($table).'`'.($alias ? ' '.pSQL($alias) : '').($on ? ' ON '.$on : ''));
     }
 
     public function leftOuterJoin($table, $alias = null, $on = null)
     {
-        return $this->join('LEFT OUTER JOIN `'._DB_PREFIX_.bqSQL($table).'`'.($alias ? ' '.pSQL($alias) : '').($on ? ' ON '.$on : ''));
+        return $this->join('LEFT OUTER JOIN `'.bqSQL($table).'`'.($alias ? ' '.pSQL($alias) : '').($on ? ' ON '.$on : ''));
     }
 
     public function naturalJoin($table, $alias = null)
     {
-        return $this->join('NATURAL JOIN `'._DB_PREFIX_.bqSQL($table).'`'.($alias ? ' '.pSQL($alias) : ''));
+        return $this->join('NATURAL JOIN `'.bqSQL($table).'`'.($alias ? ' '.pSQL($alias) : ''));
     }
 
     public function rightJoin($table, $alias = null, $on = null)
     {
-        return $this->join('RIGHT JOIN `'._DB_PREFIX_.bqSQL($table).'`'.($alias ? ' `'.pSQL($alias).'`' : '').($on ? ' ON '.$on : ''));
+        return $this->join('RIGHT JOIN `'.bqSQL($table).'`'.($alias ? ' `'.pSQL($alias).'`' : '').($on ? ' ON '.$on : ''));
     }
 
     public function where($restriction)
@@ -128,52 +243,91 @@ class QueryRepository extends Repository
             $offset = 0;
         }
 
-        $this->query['limit'] = array(
+        $this->query['limit'] = [
             'offset' => $offset,
             'limit'  => (int)$limit,
-        );
+        ];
 
         return $this;
     }
+
+    public function lastId()
+    {
+        return $this->specific_class->getLastId();
+    }
+
 
     public function build()
     {
         if ($this->query['type'] == 'SELECT') {
             $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
+            if (!$this->query['from']) {
+                throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
+            }
+
+            $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
+
+        } elseif ($this->query['type'] == 'INSERT') {
+            $sql = 'INSERT INTO '.implode(",\n", $this->query['into'])."\n";
+            $sql .= '('.implode(",\n", $this->query['fields']).')'."\n";
+
+            if ($this->query['values']) {
+                $sql .= 'VALUES ('.implode("\n", $this->query['values']).')'."\n";
+            }
+
+        } elseif ($this->query['type'] == 'UPDATE') {
+            $sql = 'UPDATE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
+
+            if ($this->query['set']) {
+                $sql .= 'SET '.implode("\n", $this->query['set'])."\n";
+            }
+
+        } elseif ($this->query['type'] == 'TRUNCATE') {
+            $sql = 'TRUNCATE TABLE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
+
+        } elseif ($this->query['type'] == 'DELETE') {
+            $sql = 'DELETE FROM '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['from']))."\n";
+
+            if (!$this->query['from']) {
+                throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
+            }
+
+            $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
+
         } else {
             $sql = $this->query['type'].' ';
         }
 
-        if (!$this->query['from']) {
-            throw new PrestaShopException('Table name not set in DbQuery object. Cannot build a valid SQL query.');
-        }
-
-        $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
-
-        if ($this->query['join']) {
+        if (isset($this->query['join']) && (!empty($this->query['join']))) {
             $sql .= implode("\n", $this->query['join'])."\n";
         }
 
-        if ($this->query['where']) {
+        if (isset($this->query['where']) && (!empty($this->query['where']))) {
             $sql .= 'WHERE ('.implode(') AND (', $this->query['where']).")\n";
         }
 
-        if ($this->query['group']) {
+        if (isset($this->query['group']) && (!empty($this->query['group']))) {
             $sql .= 'GROUP BY '.implode(', ', $this->query['group'])."\n";
         }
 
-        if ($this->query['having']) {
+        if (isset($this->query['having']) && (!empty($this->query['having']))) {
             $sql .= 'HAVING ('.implode(') AND (', $this->query['having']).")\n";
         }
 
-        if ($this->query['order']) {
+        if (isset($this->query['order']) && (!empty($this->query['order']))) {
             $sql .= 'ORDER BY '.implode(', ', $this->query['order'])."\n";
         }
 
-        if ($this->query['limit']['limit']) {
+        if (
+            (isset($this->query['limit']))
+            &&
+            (($this->query['limit']['limit'] > 0) || ($this->query['limit']['offset'] > 0))
+        ) {
             $limit = $this->query['limit'];
             $sql .= 'LIMIT '.($limit['offset'] ? $limit['offset'].', ' : '').$limit['limit'];
         }
+
+        $this->query = null;
         return $this->specific_class->query($sql);
     }
 
@@ -184,7 +338,7 @@ class QueryRepository extends Repository
      */
     public function __toString()
     {
-//        return $this->specific_class->query($this->build());
+        return $this->build();
     }
 
 }
