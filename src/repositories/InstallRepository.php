@@ -122,6 +122,7 @@ class InstallRepository extends \Payplug
             ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
             ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
             ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
+            ->engine(_MYSQL_ENGINE_)
         ;
 
         $req_payplug_lock = '
