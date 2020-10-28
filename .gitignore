@@ -2,3 +2,4 @@ log/*.csv
 config*.xml
 .DS_Store
 .idea
+vendor/
