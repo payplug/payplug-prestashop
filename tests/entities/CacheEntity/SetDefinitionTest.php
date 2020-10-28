@@ -33,4 +33,18 @@ final class SetDefinitionTest extends TestCase
             $this->cache->getDefinition()
         );
     }
+
+    public function testReturnCacheEntity(): void
+    {
+        $this->assertInstanceOf(
+            CacheEntity::class,
+            $this->cache->setDefinition($this->definition_alt)
+        );
+    }
+
+    public function testThrowExceptionWhenNotAnArray(): void
+    {
+        $this->expectException(TypeError::class);
+        $this->cache->setDefinition(42);
+    }
 }

@@ -21,4 +21,18 @@ final class SetIdPayPlugCacheTest extends TestCase
             $this->cache->getIdPayplugCache()
         );
     }
+
+    public function testReturnCacheEntity(): void
+    {
+        $this->assertInstanceOf(
+            CacheEntity::class,
+            $this->cache->setIdPayplugCache('another_id')
+        );
+    }
+
+    public function testThrowExceptionWhenNotAString(): void
+    {
+        $this->expectException(TypeError::class);
+        $this->cache->setIdPayplugCache(42);
+    }
 }

@@ -21,4 +21,18 @@ final class SetTableTest extends TestCase
             $this->cache->getTable()
         );
     }
+
+    public function testReturnCacheEntity(): void
+    {
+        $this->assertInstanceOf(
+            CacheEntity::class,
+            $this->cache->setTable('another_table')
+        );
+    }
+
+    public function testThrowExceptionWhenNotAString(): void
+    {
+        $this->expectException(TypeError::class);
+        $this->cache->setTable(42);
+    }
 }

@@ -162,22 +162,22 @@ class CacheEntity
     }
 
     /**
+     * @param array $definition
+     * @return CacheEntity
+     */
+    public function setDefinition(array $definition)
+    {
+        $this->definition = $definition;
+        return $this;
+    }
+
+    /**
      * @param string $id_payplug_cache
      * @return CacheEntity
      */
     public function setIdPayPlugCache(string $id_payplug_cache)
     {
         $this->id_payplug_cache = $id_payplug_cache;
-        return $this;
-    }
-
-    /**
-     * @param array $definition
-     * @return CacheEntity
-     */
-    public function setDefinition($definition)
-    {
-        $this->definition = $definition;
         return $this;
     }
 
