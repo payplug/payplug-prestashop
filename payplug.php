@@ -1735,11 +1735,6 @@ class Payplug extends PaymentModule
         }
 
         try {
-            //load libphonenumber
-            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
-                include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
-            }
-
             $iso_code = $this->getIsoCodeByCountryId($country->id);
             $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
@@ -4796,12 +4791,6 @@ class Payplug extends PaymentModule
     public function isValidMobilePhoneNumber($phone_number, $iso_code)
     {
         try {
-            //load libphonenumber
-            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
-                include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
-            }
-
-            // then format code
             $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
             $is_mobile = $phone_util->getNumberType($parsed);
