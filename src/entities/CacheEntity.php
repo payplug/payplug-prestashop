@@ -24,6 +24,8 @@
 namespace PayPlug\src\entities;
 
 
+use PayPlug\src\repositories\LoggerRepository;
+
 class CacheEntity
 {
     /** @var string */
@@ -40,9 +42,6 @@ class CacheEntity
 
     /** @var datetime */
     private $date_upd;
-
-    /** @var LoggerEntity  */
-    private $logger;
 
     /** @var array */
     private $definition;
@@ -137,24 +136,6 @@ class CacheEntity
     public function setDateUpd($date_upd)
     {
         $this->date_upd = $date_upd;
-        return $this;
-    }
-
-    /**
-     * @return LoggerEntity
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @param LoggerEntity $logger
-     * @return CacheEntity
-     */
-    public function setLogger(LoggerEntity $logger)
-    {
-        $this->logger = $logger;
         return $this;
     }
 
