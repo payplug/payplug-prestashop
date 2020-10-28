@@ -52,6 +52,12 @@ class Payplug extends PaymentModule
 
     private $card; // 3.0
 
+    protected $configurationSpecific; // 3.0
+
+    protected $hook; // 3.0
+
+    private $oneyRepository; // 3.0
+
     protected $query; // 3.0
 
     private $tools; // 3.0
@@ -285,7 +291,10 @@ class Payplug extends PaymentModule
         $this->plugin   = (new PayPlug\src\repositories\PluginRepository())->getEntity();
 
         $this->card     = $this->plugin->getCard();
+        $this->configurationSpecific = new \PayPlug\src\specific\ConfigurationSpecific();
+//        $this->hook     = new \PayPlug\src\repositories\HookRepository();
         $this->logger   = $this->plugin->getLogger();
+//        $this->oneyRepository = new \PayPlug\src\repositories\OneyRepository();
         $this->query    = $this->plugin->getQuery();
         $this->tools    = $this->plugin->getTools();
     }
@@ -1373,21 +1382,6 @@ class Payplug extends PaymentModule
             && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO')
             && Configuration::deleteByName('PAYPLUG_DEFERRED_STATE')
         );
-    }
-
-    /**
-     * Delete basic configuration
-     *
-     * @return bool
-     */
-    private function deleteOneyConfig()
-    {
-        return (Configuration::deleteByName('PAYPLUG_ONEY')
-            && Configuration::deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_ONEY_TOS')
-            && Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL'));
     }
 
     /**
@@ -4370,11 +4364,11 @@ class Payplug extends PaymentModule
             $log->error('Install failed: configuration.');
         } elseif (!$this->createOrderStates()) {
             $log->error('Install failed: order states.');
-        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL()) {
+        } elseif (!(new \PayPlug\src\repositories\SQLtableRepository())->installSQL()) {
             $log->error('Install failed: sql.');
         } elseif (!$this->installTab()) {
             $log->error('Install failed: tab.');
-        } elseif (!$this->installOney()) {
+        } elseif (!(new \PayPlug\src\repositories\OneyRepository())->installOney()) {
             $log->error('Install failed: Oney.');
         } else {
             $log->info('Install succeeded.');
@@ -4424,20 +4418,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Install Oney feature
-     */
-    public function installOney()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
-        $log->info('Install Oney feature');
-        return $this->installOneyHook()
-            && $this->installOneyConfig()
-            && $this->installOneyOrderStates()
-            && $this->installOneySql()
-            && $this->installOneyCarriers();
-    }
-
-    /**
      * Install Oney Carriers
      * @return bool
      */
@@ -4449,122 +4429,6 @@ class Payplug extends PaymentModule
             $flag = $flag && $carrier->save();
         }
         return $flag;
-    }
-
-    /**
-     * Install Oney Config
-     * @return bool
-     */
-    private function installOneyConfig()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $flag = true;
-        if (!Configuration::updateValue('PAYPLUG_ONEY', 0) ||
-            !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
-            !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-            !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
-            !Configuration::updateValue('PAYPLUG_ONEY_TOS', 0) ||
-            !Configuration::updateValue('PAYPLUG_ONEY_TOS_URL', '')
-        ) {
-            $log->error('Installation failed: oney configurations failed.');
-            $flag = false;
-        }
-        return $flag;
-    }
-
-    /**
-     * Install Oney Hooks
-     * @return bool
-     */
-    private function installOneyHook()
-    {
-        $hooks = array(
-            'actionObjectCarrierAddAfter',
-            'actionCarrierUpdate',
-            'displayProductPriceBlock',
-            'displayExpressCheckout',
-            'actionClearCompileCache',
-        );
-
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $hooks[] = 'displayBeforeShoppingCartBlock';
-        }
-
-        $flag = true;
-        foreach ($hooks as $hook) {
-            $flag = $this->registerHook($hook) && $flag;
-        }
-
-        return $flag;
-    }
-
-    /**
-     * Install Oney Order State
-     */
-    private function installOneyOrderStates()
-    {
-        $oney_order_state = array(
-            'oney_pg' => array(
-                'cfg' => null,
-                'template' => null,
-
-                // OS have to be "logable" to register transaction_id
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#a1f8a1',
-                'name' => array(
-                    'en' => 'Oney - Pending',
-                    'fr' => 'Oney - En attente',
-                    'es' => 'Oney - Pending',
-                    'it' => 'Oney - Pending',
-                ),
-            ),
-        );
-
-        $flag = true;
-
-        foreach ($oney_order_state as $key => $state) {
-            $flag = $flag && $this->createOrderState($key, $state, true) && $this->createOrderState($key, $state,
-                    false);
-        }
-
-        return $flag;
-    }
-
-    /**
-     * Install Oney SQL
-     * @return bool
-     */
-    private function installOneySql()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-
-        // install payplug carrier db
-        $requests = array(
-            'PAYPLUG_CARRIER' => 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_carrier` (
-                `id_payplug_carrier` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                `id_carrier` INT(11) UNSIGNED NOT NULL,
-                `delay` INT(11) UNSIGNED NOT NULL DEFAULT 3,
-                `delivery_type` VARCHAR(250) NOT NULL DEFAULT \'carrier\',
-                `date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
-                `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'
-                ) ENGINE=' . _MYSQL_ENGINE_,
-        );
-
-        foreach ($requests as $key => $request) {
-            $result = Db::getInstance()->Execute($request);
-            if (!$result) {
-                $log->error('Installation SQL failed: ' . $key);
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -6405,7 +6269,7 @@ class Payplug extends PaymentModule
             if (!$this->uninstallCards()) {
                 $log->error('Unable to delete saved cards.');
             } else {
-                $log->error('Saved cards successfully deleted.');
+                $log->info('Saved cards successfully deleted.');
             }
         } else {
             $log->info('Cards will be kept.');
@@ -6415,11 +6279,11 @@ class Payplug extends PaymentModule
             $log->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $log->error('Uninstall failed: configuration.');
-        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->uninstallSQL($keep_cards)) {
+        } elseif (!(new \PayPlug\src\repositories\SQLtableRepository())->uninstallSQL($keep_cards)) {
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
-        } elseif (!$this->uninstallOney()) {
+        } elseif (!(new \PayPlug\src\repositories\OneyRepository())->uninstallOney()) {
             $log->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
@@ -6456,32 +6320,6 @@ class Payplug extends PaymentModule
             }
         }
         return true;
-    }
-
-    /**
-     * Install Oney feature
-     */
-    public function uninstallOney()
-    {
-        return $this->deleteOneyConfig() && $this->uninstallOneySql();
-    }
-
-    /**
-     * Install Oney SQL
-     * @return bool
-     */
-    private function uninstallOneySql()
-    {
-        $flag = true;
-        $queries = [
-            'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_carrier`'
-        ];
-
-        foreach ($queries as $query) {
-            $flag = $flag && Db::getInstance()->execute($query);
-        }
-
-        return $flag;
     }
 
     /**
