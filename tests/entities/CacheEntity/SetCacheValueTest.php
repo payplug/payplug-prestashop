@@ -13,12 +13,26 @@ final class SetCacheValueTest extends TestCase
         $this->cache->setCacheValue('test_value');
     }
 
-    public function testReturnCacheValue(): void
+    public function testUpdateCacheValue(): void
     {
         $this->cache->setCacheValue('another_value');
         $this->assertSame(
             'another_value',
             $this->cache->getCacheValue()
         );
+    }
+
+    public function testReturnCacheEntity(): void
+    {
+        $this->assertInstanceOf(
+            CacheEntity::class,
+            $this->cache->setCacheValue('another_key')
+        );
+    }
+
+    public function testThrowExceptionWhenNotAString(): void
+    {
+        $this->expectException(TypeError::class);
+        $this->cache->setCacheValue(42);
     }
 }

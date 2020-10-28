@@ -26,4 +26,11 @@ final class GetDefinitionTest extends TestCase
             $this->cache->getDefinition()
         );
     }
+
+    public function testDefinitionIsAnArray(): void
+    {
+        $this->assertIsArray(
+            $this->cache->getDefinition()
+        );
+    }
 }

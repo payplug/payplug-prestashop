@@ -20,4 +20,11 @@ final class GetTableTest extends TestCase
             $this->cache->getTable()
         );
     }
+
+    public function testTableIsAString(): void
+    {
+        $this->assertIsString(
+            $this->cache->getTable()
+        );
+    }
 }

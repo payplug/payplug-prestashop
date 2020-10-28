@@ -10,13 +10,28 @@ final class GetDateUpdTest extends TestCase
     protected function setUp(): void
     {
         $this->cache = new CacheEntity();
-        $this->cache->setDateUpd('test_date');
+        $this->cache->setDateUpd('2020-12-31 23:59:42');
     }
 
     public function testReturnDateUpd(): void
     {
         $this->assertSame(
-            'test_date',
+            '2020-12-31 23:59:42',
+            $this->cache->getDateUpd()
+        );
+    }
+
+    public function testDateUpdIsAString(): void
+    {
+        $this->assertIsString(
+            $this->cache->getDateUpd()
+        );
+    }
+
+    public function testDateUpdHaveAValidDatetimeFormat(): void
+    {
+        $this->assertMatchesRegularExpression(
+            '/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/',
             $this->cache->getDateUpd()
         );
     }

@@ -10,14 +10,21 @@ final class GetIdPayPlugCacheTest extends TestCase
     protected function setUp(): void
     {
         $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->cache->setIdPayPlugCache('test_id');
     }
 
     public function testReturnCacheId(): void
     {
         $this->assertSame(
             'test_id',
-            $this->cache->getIdPayplugCache()
+            $this->cache->getIdPayPlugCache()
+        );
+    }
+
+    public function testCacheIdIsAString(): void
+    {
+        $this->assertIsString(
+            $this->cache->getIdPayPlugCache()
         );
     }
 }

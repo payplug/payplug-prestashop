@@ -20,4 +20,11 @@ final class GetCacheKeyTest extends TestCase
             $this->cache->getCacheKey()
         );
     }
+
+    public function testCacheKeyIsAString(): void
+    {
+        $this->assertIsString(
+            $this->cache->getCacheKey()
+        );
+    }
 }

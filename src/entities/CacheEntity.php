@@ -24,27 +24,25 @@
 namespace PayPlug\src\entities;
 
 
-use PayPlug\src\repositories\LoggerRepository;
-
 class CacheEntity
 {
-    /** @var string */
-    private $id_payplug_cache;
-
     /** @var string */
     private $cache_key;
 
     /** @var string */
     private $cache_value;
 
-    /** @var datetime */
+    /** @var string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss' */
     private $date_add;
 
-    /** @var datetime */
+    /** @var string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss' */
     private $date_upd;
 
     /** @var array */
     private $definition;
+
+    /** @var string */
+    private $id_payplug_cache;
 
     /** @var string */
     private $table;
@@ -52,27 +50,57 @@ class CacheEntity
     /**
      * @return string
      */
-    public function getIdPayplugCache()
+    public function getCacheKey()
     {
-        return $this->id_payplug_cache;
-    }
-
-    /**
-     * @param string $id_payplug_cache
-     * @return CacheEntity
-     */
-    public function setIdPayplugCache(string $id_payplug_cache)
-    {
-        $this->id_payplug_cache = $id_payplug_cache;
-        return $this;
+        return $this->cache_key;
     }
 
     /**
      * @return string
      */
-    public function getCacheKey()
+    public function getCacheValue()
     {
-        return $this->cache_key;
+        return $this->cache_value;
+    }
+
+    /**
+     * @return string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     */
+    public function getDateAdd()
+    {
+        return $this->date_add;
+    }
+
+    /**
+     * @return string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     */
+    public function getDateUpd()
+    {
+        return $this->date_upd;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdPayPlugCache()
+    {
+        return $this->id_payplug_cache;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
     }
 
     /**
@@ -86,14 +114,6 @@ class CacheEntity
     }
 
     /**
-     * @return string
-     */
-    public function getCacheValue()
-    {
-        return $this->cache_value;
-    }
-
-    /**
      * @param string $cache_value
      * @return CacheEntity
      */
@@ -104,47 +124,51 @@ class CacheEntity
     }
 
     /**
-     * @return datetime
+     * @param string $date_add with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     * @return CacheEntity
+     * @throws BadParameterExceptionEntity
      */
-    public function getDateAdd()
+    public function setDateAdd(string $date_add)
     {
-        return $this->date_add;
+        if (!preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
+            throw (
+                new BadParameterExceptionEntity(
+                    'Invalid datetime format, param $date_add must be like \'yyyy-mm-dd hh:mm:ss\''
+                )
+            );
+        } else {
+            $this->date_add = $date_add;
+            return $this;
+        }
     }
 
     /**
-     * @param datetime $date_add
+     * @param string $date_upd with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     * @return CacheEntity
+     * @throws BadParameterExceptionEntity
+     */
+    public function setDateUpd(string $date_upd)
+    {
+        if (!preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
+            throw (
+                new BadParameterExceptionEntity(
+                    'Invalid datetime format, param $date_upd must be like \'yyyy-mm-dd hh:mm:ss\''
+                )
+            );
+        } else {
+            $this->date_upd = $date_upd;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string $id_payplug_cache
      * @return CacheEntity
      */
-    public function setDateAdd($date_add)
+    public function setIdPayPlugCache(string $id_payplug_cache)
     {
-        $this->date_add = $date_add;
+        $this->id_payplug_cache = $id_payplug_cache;
         return $this;
-    }
-
-    /**
-     * @return datetime
-     */
-    public function getDateUpd()
-    {
-        return $this->date_upd;
-    }
-
-    /**
-     * @param datetime $date_upd
-     * @return CacheEntity
-     */
-    public function setDateUpd($date_upd)
-    {
-        $this->date_upd = $date_upd;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
     }
 
     /**
@@ -155,14 +179,6 @@ class CacheEntity
     {
         $this->definition = $definition;
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
     }
 
     /**
