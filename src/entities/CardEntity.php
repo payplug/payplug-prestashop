@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
+
 class CardEntity
 {
     /** @var string card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
@@ -154,13 +156,13 @@ class CardEntity
     /**
      * @param string $id_card card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
      * @return CardEntity
-     * @throws BadParameterExceptionEntity
+     * @throws BadParameterException
      */
     public function setIdCard(string $id_card)
     {
         if (!preg_match('/card_[a-z0-9]{32}/', $id_card)) {
             throw (
-                new BadParameterExceptionEntity(
+                new BadParameterException(
                     'Invalid card token format, param $id_card must be like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''
                 )
             );

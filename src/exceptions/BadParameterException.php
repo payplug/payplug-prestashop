@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\entities;
+namespace PayPlug\src\exceptions;
 
 
-class BadParameterExceptionEntity extends \Exception
+class BadParameterException extends \Exception
 {
 
 }

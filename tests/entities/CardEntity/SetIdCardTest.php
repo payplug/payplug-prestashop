@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
-use PayPlug\src\entities\BadParameterExceptionEntity;
 use PayPlug\src\entities\CardEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 final class SetIdCardTest extends TestCase
@@ -39,7 +39,7 @@ final class SetIdCardTest extends TestCase
 
     public function testThrowExceptionWhenNotWellFormatted(): void
     {
-        $this->expectException(BadParameterExceptionEntity::class);
+        $this->expectException(BadParameterException::class);
         $this->card->setIdCard('Kart_AZERT&é"');
     }
 }

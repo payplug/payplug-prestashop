@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
-use PayPlug\src\entities\BadParameterExceptionEntity;
 use PayPlug\src\entities\CacheEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 final class SetDateUpdTest extends TestCase
@@ -39,7 +39,7 @@ final class SetDateUpdTest extends TestCase
 
     public function testThrowExceptionWhenNotWellFormatted(): void
     {
-        $this->expectException(BadParameterExceptionEntity::class);
+        $this->expectException(BadParameterException::class);
         $this->cache->setDateUpd('1er Janvier 1970');
     }
 }

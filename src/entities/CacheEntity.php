@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
+
 class CacheEntity
 {
     /** @var string */
@@ -125,13 +127,13 @@ class CacheEntity
     /**
      * @param string $date_add with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
      * @return CacheEntity
-     * @throws BadParameterExceptionEntity
+     * @throws BadParameterException
      */
     public function setDateAdd(string $date_add)
     {
         if (!preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
             throw (
-                new BadParameterExceptionEntity(
+                new BadParameterException(
                     'Invalid datetime format, param $date_add must be like \'yyyy-mm-dd hh:mm:ss\''
                 )
             );
@@ -144,13 +146,13 @@ class CacheEntity
     /**
      * @param string $date_upd with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
      * @return CacheEntity
-     * @throws BadParameterExceptionEntity
+     * @throws BadParameterException
      */
     public function setDateUpd(string $date_upd)
     {
         if (!preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
             throw (
-                new BadParameterExceptionEntity(
+                new BadParameterException(
                     'Invalid datetime format, param $date_upd must be like \'yyyy-mm-dd hh:mm:ss\''
                 )
             );
