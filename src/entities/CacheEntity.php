@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\entities;
 
-
 class CacheEntity
 {
     /** @var string */

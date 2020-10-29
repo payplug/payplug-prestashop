@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -26,20 +25,20 @@ namespace PayPlug\src\entities;
 
 class CardEntity
 {
+    /** @var string card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
+    private $id_card;
+
     /** @var int */
-    private $id;
+    private $id_company;
 
     /** @var int */
     private $id_customer;
 
     /** @var int */
-    private $id_company;
+    private $id;
 
     /** @var bool */
     private $is_sandbox;
-
-    /** @var string */
-    private $id_card;
 
     /** @var string */
     private $last4;
@@ -73,21 +72,19 @@ class CardEntity
     private $identifier;
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getIdCard()
     {
-        return $this->id;
+        return $this->id_card;
     }
 
     /**
-     * @param int $id
-     * @return CardEntity
+     * @return int
      */
-    public function setId(int $id)
+    public function getIdCompany()
     {
-        $this->id = $id;
-        return $this;
+        return $this->id_company;
     }
 
     /**
@@ -99,21 +96,19 @@ class CardEntity
     }
 
     /**
-     * @param int $id_customer
-     * @return CardEntity
+     * @return int
      */
-    public function setIdCustomer(int $id_customer)
+    public function getId()
     {
-        $this->id_customer = $id_customer;
-        return $this;
+        return $this->id;
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getIdCompany()
+    public function isSandbox()
     {
-        return $this->id_company;
+        return $this->is_sandbox;
     }
 
     /**
@@ -127,11 +122,23 @@ class CardEntity
     }
 
     /**
-     * @return bool
+     * @param int $id_customer
+     * @return CardEntity
      */
-    public function isIsSandbox()
+    public function setIdCustomer(int $id_customer)
     {
-        return $this->is_sandbox;
+        $this->id_customer = $id_customer;
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return CardEntity
+     */
+    public function setId(int $id)
+    {
+        $this->id = $id;
+        return $this;
     }
 
     /**
@@ -145,21 +152,22 @@ class CardEntity
     }
 
     /**
-     * @return string
-     */
-    public function getIdCard()
-    {
-        return $this->id_card;
-    }
-
-    /**
-     * @param string $id_card
+     * @param string $id_card card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
      * @return CardEntity
+     * @throws BadParameterExceptionEntity
      */
     public function setIdCard(string $id_card)
     {
-        $this->id_card = $id_card;
-        return $this;
+        if (!preg_match('/card_[a-z0-9]{32}/', $id_card)) {
+            throw (
+                new BadParameterExceptionEntity(
+                    'Invalid card token format, param $id_card must be like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''
+                )
+            );
+        } else {
+            $this->id_card = $id_card;
+            return $this;
+        }
     }
 
     /**
