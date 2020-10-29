@@ -22,6 +22,7 @@
  */
 
 use PayPlug\src\repositories\CardRepository;
+use PayPlug\src\repositories\OneyRepository;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -74,7 +75,11 @@ class PayPlugAjax
                 }
                 $id_shipping = Tools::getValue('id_address_delivery');
                 $id_billing = Tools::getValue('id_address_invoice');
-                die(Tools::jsonEncode($payplug->isValidOneyAddresses($id_shipping, $id_billing)));
+                try {
+                    die(Tools::jsonEncode((new OneyRepository($payplug))->isValidOneyAddresses($id_shipping, $id_billing)));
+                } catch (Exception $e) {
+                    var_dump($e); exit;
+                }
             } elseif (Tools::getIsset('isOneyElligible')) {
                 $use_taxes = (bool)$payplug->getConfiguration('PS_TAX');
 
@@ -93,11 +98,11 @@ class PayPlugAjax
                     );
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
-                    $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = (new OneyRepository($payplug))->isValidOneyAmount($amount, $id_currency);
                 } elseif ((int)Tools::getValue('is_summary_cta') === 1) {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $id_currency = $context->currency->id;
-                    $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = (new OneyRepository($payplug))->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $cart = $context->cart;
@@ -106,10 +111,10 @@ class PayPlugAjax
                     $iso_code = $delivery_country->iso_code;
 
                     if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                        $is_elligible = $payplug->isOneyElligible($cart, $amount, $iso_code);
+                        $is_elligible = (new OneyRepository($payplug))->isOneyElligible($cart, $amount, $iso_code);
                     } else {
                         $id_currency = $context->currency->id;
-                        $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency, $iso_code);
+                        $is_elligible = (new OneyRepository($payplug))->isValidOneyAmount($amount, $id_currency, $iso_code);
                     }
                 }
 
@@ -145,7 +150,12 @@ class PayPlugAjax
                     $cart = $context->cart;
                 }
 
-                $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+                try {
+                    $payment_options = (new OneyRepository($payplug))->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+                } catch (Exception $e) {
+                    var_dump($e); exit;
+
+                }
 
                 die(Tools::jsonEncode($payment_options));
             } elseif (Tools::getIsset('getPaymentErrors')) {
@@ -160,16 +170,20 @@ class PayPlugAjax
             } elseif (Tools::getIsset('savePaymentData')) {
                 $payment_data = Tools::getValue('payment_data');
 
-                if (empty($payment_data)) {
-                    die(Tools::jsonEncode(array(
-                        'result' => false,
-                        'message' => $payplug->l('Empty payment data')
-                    )));
-                } elseif ($payplug->checkOneyRequiredFields($payment_data)) {
-                    die(Tools::jsonEncode(array(
-                        'result' => false,
-                        'message' => $payplug->l('At least one of the fields is not correctly completed.')
-                    )));
+                try {
+                    if (empty($payment_data)) {
+                        die(Tools::jsonEncode(array(
+                            'result' => false,
+                            'message' => $payplug->l('Empty payment data')
+                        )));
+                    } elseif ((new OneyRepository($payplug))->checkOneyRequiredFields($payment_data)) {
+                        die(Tools::jsonEncode(array(
+                            'result' => false,
+                            'message' => $payplug->l('At least one of the fields is not correctly completed.')
+                        )));
+                    }
+                } catch (Exception $e) {
+                    var_dump('Fatal Error'.$e); exit;
                 }
 
                 $result = $payplug->setPaymentDataCookie($payment_data);

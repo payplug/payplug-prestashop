@@ -14,8 +14,11 @@ class PluginEntity
     private $cache;
 
     // Specific classes
+    private $configuration;
+    private $country;
     private $tools;
     private $query;
+    private $validate;
 
     /**
      * @return mixed
@@ -110,6 +113,42 @@ class PluginEntity
     /**
      * @return mixed
      */
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * @param mixed $configuration
+     * @return PluginEntity
+     */
+    public function setConfiguration($configuration)
+    {
+        $this->configuration = $configuration;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @param mixed $country
+     * @return PluginEntity
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getTools()
     {
         return $this->tools;
@@ -140,6 +179,24 @@ class PluginEntity
     public function setQuery($query)
     {
         $this->query = $query;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValidate()
+    {
+        return $this->validate;
+    }
+
+    /**
+     * @param mixed $validate
+     * @return PluginEntity
+     */
+    public function setValidate($validate)
+    {
+        $this->validate = $validate;
         return $this;
     }
 }

@@ -6,6 +6,7 @@ use Media;
 
 use Context;
 use PayPlug\src\repositories\CardRepository;
+use PayPlug\src\repositories\OneyRepository;
 use PayplugBackward;
 use PayPlugCarrier;
 use Validate;
@@ -89,7 +90,7 @@ class PrestashopSpecific16
             }
 
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                $is_elligible = $this->payplug->isOneyElligible($cart);
+                $is_elligible = (new OneyRepository($this->payplug))->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
                 $id_currency = $this->context->currency->id;
@@ -99,18 +100,22 @@ class PrestashopSpecific16
             }
 
             if (!$error && $has_valid_carrier) {
-                $is_elligible = $this->payplug->isValidOneyCarrier($cart);
+                $is_elligible = (new OneyRepository($this->payplug))->isValidOneyCarrier($cart);
                 $error = !$is_elligible['result'];
             }
 
-            $this->context->smarty->assign(array(
-                'payplug_module_dir' => _PS_MODULE_DIR_,
-                'payplug_oney' => true,
-                'payplug_oney_required_field' => $this->payplug->displayOneyRequiredFields(),
-                'payplug_oney_allowed' => $is_elligible['result'],
-                'payplug_oney_error' => $is_elligible['error'],
-                'payplug_oney_loading_msg' => $this->payplug->l('Loading')
-            ));
+            try {
+                $this->context->smarty->assign(array(
+                    'payplug_module_dir' => _PS_MODULE_DIR_,
+                    'payplug_oney' => true,
+                    'payplug_oney_required_field' => (new OneyRepository($this->payplug))->displayOneyRequiredFields(),
+                    'payplug_oney_allowed' => $is_elligible['result'],
+                    'payplug_oney_error' => $is_elligible['error'],
+                    'payplug_oney_loading_msg' => $this->payplug->l('Loading')
+                ));
+            } catch (\Exception $e) {
+                var_dump($e); exit;
+            }
         }
 
         $payplug_card = new CardRepository();
