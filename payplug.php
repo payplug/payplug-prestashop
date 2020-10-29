@@ -67,7 +67,7 @@ class Payplug extends PaymentModule
     /**
      * @var To inject logo_url in oney_payment.tpl
      */
-    private $oneyLogoUrl;
+    protected $oneyLogoUrl;
 
     /** @var string */
     private $api_live;
@@ -5466,7 +5466,7 @@ class Payplug extends PaymentModule
         $cart = $params['cart'];
 
         if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-            $this->assignOneyPaymentOptions($cart);
+            (new \PayPlug\src\repositories\OneyRepository($this))->assignOneyPaymentOptions($cart);
         }
 
         $payment_options = $this->getPaymentOptions($cart); // $payment_options = Données sous forme de tableau (pour 1.6 et 1.7)
@@ -5732,39 +5732,6 @@ class Payplug extends PaymentModule
     public function checkVersion($min = '1.6')
     {
         return (bool)version_compare(_PS_VERSION_, $min, '>=');
-    }
-
-    // Let's go 4 Oney in 1.6 :-)
-
-    /**
-     * Assign Oney javascript variable
-     */
-    public function assignOneyJSVar()
-    {
-        $js_var = array(
-            'loading_msg' => $this->l('Loading'),
-            'can_use_oney' => $this->getConfiguration('PAYPLUG_ONEY'),
-        );
-        return Media::addJsDef($js_var);
-    }
-
-    /**
-     * Display Oney popin payment option
-     *
-     * @return mixed
-     */
-    public function displayOneyPaymentOptions()
-    {
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->smarty->assign(array(
-                'payplug_module_dir' => _PS_MODULE_DIR_,
-                'payplug_oney_loading_msg' => $this->l('Loading'),
-                'oney_required_fields' => (new \PayPlug\src\repositories\OneyRepository($this))->displayOneyRequiredFields(),
-                'oneyLogo' => $this->oneyLogoUrl
-            ));
-
-            return $this->display(__FILE__, 'oney_payment.tpl');
-        }
     }
 
     /**

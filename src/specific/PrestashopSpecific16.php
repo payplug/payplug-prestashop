@@ -31,7 +31,7 @@ class PrestashopSpecific16
         Media::addJsDef(array(
             'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', array(), true),
         ));
-        $this->payplug->assignOneyJSVar();
+        (new OneyRepository($this->payplug))->assignOneyJSVar();
     }
 
     public function hookCustomerAccount()

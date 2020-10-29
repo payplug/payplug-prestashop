@@ -24,6 +24,18 @@ class OneyRepository extends \Payplug
     }
 
     /**
+     * Assign Oney javascript variable
+     */
+    public function assignOneyJSVar()
+    {
+        $js_var = [
+            'loading_msg' => $this->payplug->l('Loading'),
+            'can_use_oney' => $this->payplug->getConfiguration('PAYPLUG_ONEY'),
+        ];
+        return \Media::addJsDef($js_var);
+    }
+
+    /**
      * ONLY PS 1.6
      * Assign Oney var
      *
@@ -279,6 +291,25 @@ class OneyRepository extends \Payplug
             ],
         ));
         return $this->display(__FILE__, 'oney/schedule.tpl');
+    }
+
+    /**
+     * Display Oney popin payment option
+     *
+     * @return mixed
+     */
+    public function displayOneyPaymentOptions()
+    {
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $this->payplug->smarty->assign(array(
+                'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
+                'payplug_oney_loading_msg' => $this->l('Loading'),
+                'oney_required_fields' => $this->displayOneyRequiredFields(),
+                'oneyLogo' => $this->oneyLogoUrl
+            ));
+
+            return $this->display(__FILE__, 'oney_payment.tpl');
+        }
     }
 
     /**
