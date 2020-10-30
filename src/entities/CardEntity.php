@@ -120,7 +120,7 @@ class CardEntity
      * @param int $id_company
      * @return CardEntity
      */
-    public function setIdCompany(int $id_company)
+    public function setIdCompany($id_company)
     {
         $this->id_company = $id_company;
         return $this;
