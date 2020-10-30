@@ -248,7 +248,7 @@ class LoggerEntity
      * @param string $table
      * @return LoggerEntity
      */
-    public function setTable(string $table)
+    public function setTable($table)
     {
         $this->table = $table;
         return $this;

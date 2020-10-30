@@ -390,7 +390,7 @@ class CardEntity
      * @param string $table
      * @return CardEntity
      */
-    public function setTable(string $table)
+    public function setTable($table)
     {
         $this->table = $table;
         return $this;
@@ -408,7 +408,7 @@ class CardEntity
      * @param string $identifier
      * @return CardEntity
      */
-    public function setIdentifier(string $identifier)
+    public function setIdentifier($identifier)
     {
         $this->identifier = $identifier;
         return $this;
