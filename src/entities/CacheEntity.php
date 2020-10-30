@@ -107,21 +107,39 @@ class CacheEntity
     /**
      * @param string $cache_key
      * @return CacheEntity
+     * @throws BadParameterException
      */
-    public function setCacheKey(string $cache_key)
+    public function setCacheKey($cache_key)
     {
-        $this->cache_key = $cache_key;
-        return $this;
+        if (!is_string($cache_key)) {
+            throw (
+                new BadParameterException(
+                    'Invalid value, param $cache_key must be a string.'
+                )
+            );
+        } else {
+            $this->cache_key = $cache_key;
+            return $this;
+        }
     }
 
     /**
      * @param string $cache_value
      * @return CacheEntity
+     * @throws BadParameterException
      */
-    public function setCacheValue(string $cache_value)
+    public function setCacheValue($cache_value)
     {
-        $this->cache_value = $cache_value;
-        return $this;
+        if (!is_string($cache_value)) {
+            throw (
+                new BadParameterException(
+                    'Invalid value, param $cache_value must be a string.'
+                )
+            );
+        } else {
+            $this->cache_value = $cache_value;
+            return $this;
+        }
     }
 
     /**
@@ -129,12 +147,12 @@ class CacheEntity
      * @return CacheEntity
      * @throws BadParameterException
      */
-    public function setDateAdd(string $date_add)
+    public function setDateAdd($date_add)
     {
-        if (!preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
+        if (!is_string($date_add) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
             throw (
                 new BadParameterException(
-                    'Invalid datetime format, param $date_add must be like \'yyyy-mm-dd hh:mm:ss\''
+                    'Invalid datetime format, param $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
                 )
             );
         } else {
@@ -148,12 +166,12 @@ class CacheEntity
      * @return CacheEntity
      * @throws BadParameterException
      */
-    public function setDateUpd(string $date_upd)
+    public function setDateUpd($date_upd)
     {
-        if (!preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
+        if (!is_string($date_upd) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
             throw (
                 new BadParameterException(
-                    'Invalid datetime format, param $date_upd must be like \'yyyy-mm-dd hh:mm:ss\''
+                    'Invalid datetime format, param $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
                 )
             );
         } else {
@@ -165,30 +183,45 @@ class CacheEntity
     /**
      * @param array $definition
      * @return CacheEntity
+     * @throws BadParameterException
      */
-    public function setDefinition(array $definition)
+    public function setDefinition($definition)
     {
-        $this->definition = $definition;
-        return $this;
+        if (!is_array($definition)) {
+            throw (new BadParameterException('Invalid id, param $definition must be an array'));
+        } else {
+            $this->definition = $definition;
+            return $this;
+        }
     }
 
     /**
      * @param string $id_payplug_cache
      * @return CacheEntity
+     * @throws BadParameterException
      */
-    public function setIdPayPlugCache(string $id_payplug_cache)
+    public function setIdPayPlugCache($id_payplug_cache)
     {
-        $this->id_payplug_cache = $id_payplug_cache;
-        return $this;
+        if (!is_string($id_payplug_cache)) {
+            throw (new BadParameterException('Invalid id, param $id_payplug_cache must be a string'));
+        } else {
+            $this->id_payplug_cache = $id_payplug_cache;
+            return $this;
+        }
     }
 
     /**
      * @param string $table
      * @return CacheEntity
+     * @throws BadParameterException
      */
-    public function setTable(string $table)
+    public function setTable($table)
     {
-        $this->table = $table;
-        return $this;
+        if (!is_string($table)) {
+            throw (new BadParameterException('Invalid id, param $table must be a string'));
+        } else {
+            $this->table = $table;
+            return $this;
+        }
     }
 }

@@ -33,7 +33,7 @@ final class SetIdCardTest extends TestCase
 
     public function testThrowExceptionWhenNotAString(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(BadParameterException::class);
         $this->card->setIdCard(42);
     }
 

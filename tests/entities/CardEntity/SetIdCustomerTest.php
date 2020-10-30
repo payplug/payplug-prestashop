@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use PayPlug\src\entities\CardEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 final class SetIdCustomerTest extends TestCase
@@ -32,7 +33,7 @@ final class SetIdCustomerTest extends TestCase
 
     public function testThrowExceptionWhenNotAnInt(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(BadParameterException::class);
         $this->card->setIdCustomer('test');
     }
 }

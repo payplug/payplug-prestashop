@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use PayPlug\src\entities\CacheEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 final class SetTableTest extends TestCase
@@ -32,7 +33,7 @@ final class SetTableTest extends TestCase
 
     public function testThrowExceptionWhenNotAString(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(BadParameterException::class);
         $this->cache->setTable(42);
     }
 }

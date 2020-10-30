@@ -116,41 +116,61 @@ class CardEntity
     /**
      * @param int $id_company
      * @return CardEntity
+     * @throws BadParameterException
      */
-    public function setIdCompany(int $id_company)
+    public function setIdCompany($id_company)
     {
-        $this->id_company = $id_company;
-        return $this;
+        if (!is_int($id_company)) {
+            throw (new BadParameterException('Invalid id, param $id_company must be an integer'));
+        } else {
+            $this->id_company = $id_company;
+            return $this;
+        }
     }
 
     /**
      * @param int $id_customer
      * @return CardEntity
+     * @throws BadParameterException
      */
-    public function setIdCustomer(int $id_customer)
+    public function setIdCustomer($id_customer)
     {
-        $this->id_customer = $id_customer;
-        return $this;
+        if (!is_int($id_customer)) {
+            throw (new BadParameterException('Invalid id, param $id_customer must be an integer'));
+        } else {
+            $this->id_customer = $id_customer;
+            return $this;
+        }
     }
 
     /**
      * @param int $id
      * @return CardEntity
+     * @throws BadParameterException
      */
-    public function setId(int $id)
+    public function setId($id)
     {
-        $this->id = $id;
-        return $this;
+        if (!is_int($id)) {
+            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+        } else {
+            $this->id = $id;
+            return $this;
+        }
     }
 
     /**
      * @param bool $is_sandbox
      * @return CardEntity
+     * @throws BadParameterException
      */
-    public function setIsSandbox(bool $is_sandbox)
+    public function setIsSandbox($is_sandbox)
     {
-        $this->is_sandbox = $is_sandbox;
-        return $this;
+        if (!is_bool($is_sandbox)) {
+            throw (new BadParameterException('Param $id_card must be a boolean'));
+        } else {
+            $this->is_sandbox = $is_sandbox;
+            return $this;
+        }
     }
 
     /**
@@ -160,12 +180,8 @@ class CardEntity
      */
     public function setIdCard($id_card)
     {
-        if (!preg_match('/card_[a-z0-9]{32}/', $id_card)) {
-            throw (
-                new BadParameterException(
-                    'Invalid card token format, param $id_card must be like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''
-                )
-            );
+        if (!is_string($id_card) || !preg_match('/card_[a-z0-9]{32}/', $id_card)) {
+            throw (new BadParameterException('Invalid card token format, param $id_card must be a string looking like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''));
         } else {
             $this->id_card = $id_card;
             return $this;
@@ -256,7 +272,7 @@ class CardEntity
      * @param array $allowed_brand
      * @return CardEntity
      */
-    public function setAllowedBrand(array $allowed_brand)
+    public function setAllowedBrand($allowed_brand)
     {
         $this->allowed_brand = $allowed_brand;
         return $this;
@@ -310,7 +326,7 @@ class CardEntity
      * @param Module $module
      * @return CardEntity
      */
-    public function setModule(Module $module)
+    public function setModule($module)
     {
         $this->module = $module;
         return $this;
@@ -328,7 +344,7 @@ class CardEntity
      * @param array $definition
      * @return CardEntity
      */
-    public function setDefinition(array $definition)
+    public function setDefinition($definition)
     {
         $this->definition = $definition;
         return $this;
@@ -346,7 +362,7 @@ class CardEntity
      * @param array $fieldsRequired
      * @return CardEntity
      */
-    public function setFieldsRequired(array $fieldsRequired)
+    public function setFieldsRequired($fieldsRequired)
     {
         $this->fieldsRequired = $fieldsRequired;
         return $this;
@@ -364,7 +380,7 @@ class CardEntity
      * @param array $fieldsSize
      * @return CardEntity
      */
-    public function setFieldsSize(array $fieldsSize)
+    public function setFieldsSize($fieldsSize)
     {
         $this->fieldsSize = $fieldsSize;
         return $this;
@@ -382,7 +398,7 @@ class CardEntity
      * @param array $fieldsValidate
      * @return CardEntity
      */
-    public function setFieldsValidate(array $fieldsValidate)
+    public function setFieldsValidate($fieldsValidate)
     {
         $this->fieldsValidate = $fieldsValidate;
         return $this;

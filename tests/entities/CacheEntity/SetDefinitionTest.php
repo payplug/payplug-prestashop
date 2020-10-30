@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use PayPlug\src\entities\CacheEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 final class SetDefinitionTest extends TestCase
@@ -44,7 +45,7 @@ final class SetDefinitionTest extends TestCase
 
     public function testThrowExceptionWhenNotAnArray(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(BadParameterException::class);
         $this->cache->setDefinition(42);
     }
 }

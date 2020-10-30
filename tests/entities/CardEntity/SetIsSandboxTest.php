@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use PayPlug\src\entities\CardEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 final class SetIsSandboxTest extends TestCase
@@ -32,7 +33,7 @@ final class SetIsSandboxTest extends TestCase
 
     public function testThrowExceptionWhenNotABool(): void
     {
-        $this->expectException(TypeError::class);
-        $this->card->setIdCompany('test');
+        $this->expectException(BadParameterException::class);
+        $this->card->setIsSandbox('test');
     }
 }

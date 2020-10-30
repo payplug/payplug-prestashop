@@ -33,7 +33,7 @@ final class SetDateUpdTest extends TestCase
 
     public function testThrowExceptionWhenNotAString(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(BadParameterException::class);
         $this->cache->setDateUpd(42);
     }
 
