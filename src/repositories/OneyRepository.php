@@ -290,7 +290,7 @@ class OneyRepository extends \Payplug
                 'value' => $this->toolsSpecific->tool('displayPrice',$amount),
             ],
         ));
-        return $this->display(__FILE__, 'oney/schedule.tpl');
+        return $this->payplug->display($this->payplug->constantFile, 'oney/schedule.tpl');
     }
 
     /**
@@ -308,7 +308,7 @@ class OneyRepository extends \Payplug
                 'oneyLogo' => $this->oneyLogoUrl
             ));
 
-            return $this->display(__FILE__, 'oney_payment.tpl');
+            return $this->payplug->display($this->payplug->constantFile, 'oney_payment.tpl');
         }
     }
 
