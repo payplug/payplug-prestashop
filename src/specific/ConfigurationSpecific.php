@@ -16,16 +16,21 @@ class ConfigurationSpecific implements ConfigurationInterface
 
     public function get($configuration_name)
     {
-        return $this->psConfiguration::get($configuration_name);
+        // Old PHP configs can't accept $this->classVar::staticMethod()
+        // But only $var::staticMethod()
+        $config = $this->psConfiguration;
+        return $config::get($configuration_name);
     }
 
     public function updateValue($key, $value)
     {
-        return $this->psConfiguration::updateValue($key, $value);
+        $config = $this->psConfiguration;
+        return $config::updateValue($key, $value);
     }
 
     public function deleteByName($key)
     {
-        return $this->psConfiguration::deleteByName($key);
+        $config = $this->psConfiguration;
+        return $config::deleteByName($key);
     }
 }
