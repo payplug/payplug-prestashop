@@ -282,7 +282,7 @@ var $document,
             },
             init: function () {
                 var oney = this;
-                if ($('.oneyCta_wrapper').length) {
+                if ($('.oneyCta').length) {
                     oney.setCheckout();
                 }
 

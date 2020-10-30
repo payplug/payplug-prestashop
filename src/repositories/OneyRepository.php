@@ -923,6 +923,29 @@ class OneyRepository extends \Payplug
     }
 
     /**
+     * Install Oney Config
+     * @return bool
+     */
+    public function installOneyConfig()
+    {
+        $this->log->info('Install Oney config');
+
+        $config = $this->configurationSpecific;
+        $flag = true;
+        if (!$config->updateValue('PAYPLUG_ONEY', 0) ||
+            !$config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
+            !$config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
+            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
+            !$config->updateValue('PAYPLUG_ONEY_TOS', 0) ||
+            !$config->updateValue('PAYPLUG_ONEY_TOS_URL', '')
+        ) {
+            $this->log->error('Installation failed: Oney config');
+            $flag = false;
+        }
+        return $flag;
+    }
+
+    /**
      * Check if Oney allow a given currency
      *
      * @param $id_currency
@@ -950,33 +973,11 @@ class OneyRepository extends \Payplug
     }
 
     /**
-     * Install Oney Config
-     * @return bool
-     */
-    public function installOneyConfig()
-    {
-        $this->log->info('Install Oney config');
-
-        $config = $this->configurationSpecific;
-        $flag = true;
-        if (!$config->updateValue('PAYPLUG_ONEY', 0) ||
-            !$config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
-            !$config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
-            !$config->updateValue('PAYPLUG_ONEY_TOS', 0) ||
-            !$config->updateValue('PAYPLUG_ONEY_TOS_URL', '')
-        ) {
-            $this->log->error('Installation failed: Oney config');
-            $flag = false;
-        }
-        return $flag;
-    }
-
-    /**
      * Check if a valid Cart for Oney
      *
      * @param $cart Cart
-     * @param int $amount
+     * @param bool $amount
+     * @param bool $country
      * @return array
      */
     public function isOneyElligible($cart, $amount = false, $country = false)

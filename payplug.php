@@ -5768,7 +5768,7 @@ class Payplug extends PaymentModule
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
         ));
-
+        
         return $this->oneyRepository->getOneyCTA('checkout');
     }
 }
