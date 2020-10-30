@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\repositories\OneyRepository;
-
 /**
  * @description
  * Treat ajax call
@@ -47,7 +45,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         }
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-//        require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
         require_once(_PS_MODULE_DIR_ . '../init.php');
         include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 
@@ -75,7 +72,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             } elseif (Tools::getIsset('getOneyCta')) {
                 die(json_encode(array(
                     'result' => true,
-                    'tpl' => (new OneyRepository($payplug))->getOneyCTA(),
+                    'tpl' => $payplug->oneyRepository->getOneyCTA(),
                 )));
             } elseif (Tools::getIsset('isOneyElligible')) {
                 $use_taxes = (bool)Configuration::get('PS_TAX');
@@ -92,14 +89,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
-                    $is_elligible = (new OneyRepository($payplug))->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $payplug->oneyRepository->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $delivery_address = new Address($context->cart->id_address_delivery);
                     $delivery_country = new Country($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
                     $cart = $context->cart;
-                    $is_elligible = (new OneyRepository($payplug))->isOneyElligible($cart, $amount, $iso_code);
+                    $is_elligible = $payplug->oneyRepository->isOneyElligible($cart, $amount, $iso_code);
                 }
 
                 die(json_encode($is_elligible));
@@ -119,7 +116,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $cart = $context->cart;
                 }
 
-                $payment_options = (new OneyRepository($payplug))->getOneyPriceAndPaymentOptions($cart, $amount);
+                $payment_options = $payplug->oneyRepository->getOneyPriceAndPaymentOptions($cart, $amount);
                 die(json_encode($payment_options));
             } elseif (Tools::getIsset('getPaymentErrors')) {
                 // check if errors
@@ -138,7 +135,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'result' => false,
                         'message' => [$payplug->l('Empty payment data')]
                     ]));
-                } elseif ((new OneyRepository($payplug))->checkOneyRequiredFields($payment_data)) {
+                } elseif ($payplug->oneyRepository->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
                         'message' => [$payplug->l('At least one of the fields is not correctly completed.')]
