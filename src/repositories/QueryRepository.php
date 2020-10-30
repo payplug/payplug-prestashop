@@ -46,6 +46,16 @@
  * $this->query
  * ->truncate()
  * ->table('ma_table')
+ * ->build()
+ *
+ * CREATE IF NOT EXIST ma_table :
+ * $this->query
+ * ->create()
+ * ->table('ma_table')
+ * ->fields('`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+ * ->fields('`champ_2` VARCHAR(255) NOT NULL')
+ * ->engine(_MYSQL_ENGINE_)
+ * ->build()
  */
 
 namespace PayPlug\src\repositories;
@@ -108,6 +118,18 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function create()
+    {
+        $this->query['type'] = 'CREATE';
+        return $this;
+    }
+
+    public function drop()
+    {
+        $this->query['type'] = 'DROP';
+        return $this;
+    }
+
     public function fields($fields)
     {
         if (!empty($fields)) {
@@ -164,6 +186,24 @@ class QueryRepository extends Repository
     {
         if (!empty($set)) {
             $this->query['set'][] = $set;
+        }
+
+        return $this;
+    }
+
+    public function condition($condition)
+    {
+        if (!empty($condition)) {
+            $this->query['condition'][] = $condition;
+        }
+
+        return $this;
+    }
+
+    public function engine($engine)
+    {
+        if (!empty($engine)) {
+            $this->query['engine'][] = $engine;
         }
 
         return $this;
@@ -264,7 +304,7 @@ class QueryRepository extends Repository
         return $this->specific_class->getValue($id);
     }
 
-    public function build()
+    public function build($param = false)
     {
         if ($this->query['type'] == 'SELECT') {
             $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
@@ -302,6 +342,33 @@ class QueryRepository extends Repository
 
             $sql = 'DELETE FROM '.((isset($this->query['table']) && (!empty($this->query['table']))) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['from']))."\n";
 
+        } elseif ($this->query['type'] == 'CREATE') {
+
+            if (!$this->query['table']) {
+                throw new PrestaShopException('Can\'t create table because ->table() is not set or empty');
+            }
+
+            if (!$this->query['fields']) {
+                throw new PrestaShopException('Can\'t create table because ->fields() is not set or empty');
+            }
+
+            $sql = 'CREATE TABLE IF NOT EXISTS '.implode($this->query['table']);
+
+            $condition = (isset($this->query['condition']) && (!empty($this->query['condition']))) ? ', '.implode(' ', $this->query['condition']) : '';
+            $sql .= '('.implode(",\n", $this->query['fields'])."\n $condition)\n";
+            if (isset($this->query['engine']) && (!empty($this->query['engine']))) {
+                $sql .= "\n".'ENGINE = '.implode($this->query['engine']);
+            }
+
+
+        } elseif ($this->query['type'] == 'DROP') {
+
+            if (!$this->query['table']) {
+                throw new PrestaShopException('Table name not set in QueryRepository. Cannot drop it.');
+            }
+
+            $sql = 'DROP TABLE IF EXISTS '.implode($this->query['table'])."\n";
+
         } else {
             $sql = $this->query['type'].' ';
         }
@@ -333,6 +400,11 @@ class QueryRepository extends Repository
         ) {
             $limit = $this->query['limit'];
             $sql .= 'LIMIT '.($limit['offset'] ? $limit['offset'].', ' : '').$limit['limit'];
+        }
+
+        if (isset($param) && $param == 'debug') {
+            var_dump($sql);
+            exit;
         }
 
         $result = $this->specific_class->query($sql);

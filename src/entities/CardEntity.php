@@ -158,7 +158,7 @@ class CardEntity
      * @return CardEntity
      * @throws BadParameterException
      */
-    public function setIdCard(string $id_card)
+    public function setIdCard($id_card)
     {
         if (!preg_match('/card_[a-z0-9]{32}/', $id_card)) {
             throw (
@@ -184,7 +184,7 @@ class CardEntity
      * @param string $last4
      * @return CardEntity
      */
-    public function setLast4(string $last4)
+    public function setLast4($last4)
     {
         $this->last4 = $last4;
         return $this;
@@ -202,7 +202,7 @@ class CardEntity
      * @param string $exp_month
      * @return CardEntity
      */
-    public function setExpMonth(string $exp_month)
+    public function setExpMonth($exp_month)
     {
         $this->exp_month = $exp_month;
         return $this;
@@ -220,7 +220,7 @@ class CardEntity
      * @param string $exp_year
      * @return CardEntity
      */
-    public function setExpYear(string $exp_year)
+    public function setExpYear($exp_year)
     {
         $this->exp_year = $exp_year;
         return $this;
@@ -238,7 +238,7 @@ class CardEntity
      * @param string $brand
      * @return CardEntity
      */
-    public function setBrand(string $brand)
+    public function setBrand($brand)
     {
         $this->brand = $brand;
         return $this;
@@ -274,7 +274,7 @@ class CardEntity
      * @param string $country
      * @return CardEntity
      */
-    public function setCountry(string $country)
+    public function setCountry($country)
     {
         $this->country = $country;
         return $this;
@@ -292,7 +292,7 @@ class CardEntity
      * @param string $metadata
      * @return CardEntity
      */
-    public function setMetadata(string $metadata)
+    public function setMetadata($metadata)
     {
         $this->metadata = $metadata;
         return $this;
@@ -400,7 +400,7 @@ class CardEntity
      * @param string $table
      * @return CardEntity
      */
-    public function setTable(string $table)
+    public function setTable($table)
     {
         $this->table = $table;
         return $this;
@@ -418,7 +418,7 @@ class CardEntity
      * @param string $identifier
      * @return CardEntity
      */
-    public function setIdentifier(string $identifier)
+    public function setIdentifier($identifier)
     {
         $this->identifier = $identifier;
         return $this;
