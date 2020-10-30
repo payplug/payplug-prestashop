@@ -138,7 +138,7 @@ class CardEntity
      * @param bool $is_sandbox
      * @return CardEntity
      */
-    public function setIsSandbox(bool $is_sandbox)
+    public function setIsSandbox($is_sandbox)
     {
         $this->is_sandbox = $is_sandbox;
         return $this;
