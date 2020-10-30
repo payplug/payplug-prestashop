@@ -1,0 +1,206 @@
+<?php
+
+namespace PayPlug\src\repositories;
+
+class SQLtableRepository extends \Payplug
+{
+    /**
+     * Install SQL tables used by module
+     *
+     * @return bool
+     */
+    public function installSQL()
+    {
+        // Use old log system, because PayPlug Cache table doesn't exist yet.
+        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log->info('Installation SQL Starting.');
+
+        if (!defined('_MYSQL_ENGINE_')) {
+            define('_MYSQL_ENGINE_', 'InnoDB');
+        }
+
+        // Create PayPlug Lock table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_lock')
+            ->fields('`id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`id_order` VARCHAR(100)')
+            ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
+            ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
+            ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_LOCK.');
+            return false;
+        }
+
+        // Create PayPlug Card table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_card')
+            ->fields('`id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_customer` int(11) UNSIGNED NOT NULL')
+            ->fields('`id_company` int(11) UNSIGNED NOT NULL')
+            ->fields('`is_sandbox` int(1) UNSIGNED NOT NULL')
+            ->fields('`id_card` varchar(255) NOT NULL')
+            ->fields('`last4` varchar(4) NOT NULL')
+            ->fields('`exp_month` varchar(4) NOT NULL')
+            ->fields('`exp_year` varchar(4) NOT NULL')
+            ->fields('`brand` varchar(255) DEFAULT NULL')
+            ->fields('`country` varchar(3) NOT NULL')
+            ->fields('`metadata` varchar(255) DEFAULT NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_CARD.');
+            return false;
+        }
+
+        // Create PayPlug Payment Cart table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_payment_cart')
+            ->fields('`id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_payment` VARCHAR(255) NOT NULL')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
+            ->fields('`date_upd` DATETIME NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_PAYMENT_CART.');
+            return false;
+        }
+
+        // Create PayPlug Installment Cart table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_ . 'payplug_installment_cart')
+            ->fields('`id_payplug_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_installment` VARCHAR(255) NOT NULL')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
+            ->fields('`date_upd` DATETIME NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENT_CART.');
+            return false;
+        }
+
+        // Create PayPlug Installment table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_installment')
+            ->fields('`id_payplug_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_installment` VARCHAR(255) NOT NULL')
+            ->fields('`id_payment` VARCHAR(255) NULL')
+            ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
+            ->fields('`id_customer` INT(11) UNSIGNED NOT NULL')
+            ->fields('`order_total` INT(11) UNSIGNED NOT NULL')
+            ->fields('`step` VARCHAR(11) NOT NULL')
+            ->fields('`amount` INT(11) UNSIGNED NOT NULL')
+            ->fields('`status` INT(11) UNSIGNED NOT NULL')
+            ->fields('`scheduled_date` DATETIME NOT NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENT.');
+            return false;
+        }
+
+        // Create PayPlug Logger table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_logger')
+            ->fields('`id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`process` VARCHAR(255) NOT NULL')
+            ->fields('`content` TEXT NOT NULL')
+            ->fields('`date_add` DATETIME NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_LOGGER.');
+            return false;
+        }
+
+        // Create PayPlug Logger table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_cache')
+            ->fields('`id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`cache_key` VARCHAR(255) NOT NULL')
+            ->fields('`cache_value` TEXT NOT NULL')
+            ->fields('`date_add` DATETIME NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_CACHE.');
+            return false;
+        }
+
+        // Create PayPlug Order Payment table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_order_payment')
+            ->fields('`id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
+            ->fields('`id_payment` VARCHAR(255) NOT NULL')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
+            return false;
+        }
+
+        $log->info('Installation SQL ended.');
+        return true;
+    }
+
+    /**
+     * Remove SQL tables used by module
+     *
+     * @return bool
+     */
+    public function uninstallSQL($keep_cards = false)
+    {
+        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log->info('Uninstallation SQL starting.');
+
+        $flag = true;
+
+        $tables = [
+            _DB_PREFIX_.'payplug_lock',
+            _DB_PREFIX_.'payplug_payment_cart',
+            _DB_PREFIX_.'payplug_installment',
+            _DB_PREFIX_.'payplug_installment_cart',
+            _DB_PREFIX_.'payplug_logger',
+            _DB_PREFIX_.'payplug_cache',
+            _DB_PREFIX_.'payplug_order_payment',
+        ];
+
+        if (!$keep_cards) {
+            array_push($tables,_DB_PREFIX_.'payplug_card');
+        }
+
+        foreach ($tables as $table) {
+            $flag = $flag && $this->query->drop()->table($table)->build();
+        }
+
+        $log->info('Uninstallation SQL ended.');
+        return $flag;
+    }
+
+}

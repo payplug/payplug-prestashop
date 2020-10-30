@@ -52,15 +52,15 @@ class Payplug extends PaymentModule
 
     private $card; // 3.0
 
-    private $query; // 3.0
+    protected $query; // 3.0
 
     private $tools; // 3.0
 
     private $paymentOption;
 
-    private $PrestashopSpecificClass; // 3.0
+    protected $PrestashopSpecificClass; // 3.0
 
-    private $PrestashopSpecificObject; // 3.0
+    protected $PrestashopSpecificObject; // 3.0
 
     /**
      * @var To inject logo_url in oney_payment.tpl
@@ -1129,7 +1129,7 @@ class Payplug extends PaymentModule
     /**
      * @return array
      */
-    private function checkRequirements()
+    protected function checkRequirements()
     {
         $php_min_version = 50300;
         $curl_min_version = '7.21';
@@ -1205,7 +1205,7 @@ class Payplug extends PaymentModule
      *
      * @return bool
      */
-    private function createConfig()
+    protected function createConfig()
     {
         return (Configuration::updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
             && Configuration::updateValue('PAYPLUG_COMPANY_ID', null)
@@ -1735,13 +1735,8 @@ class Payplug extends PaymentModule
         }
 
         try {
-            //load libphonenumber
-            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
-                include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
-            }
-
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!$phone_util->isValidNumber($parsed)) {
@@ -1749,7 +1744,7 @@ class Payplug extends PaymentModule
                 return null;
             }
 
-            $formated = $phone_util->format($parsed, \libphonenumber\PhoneNumberFormat::E164);
+            $formated = $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164);
             return $formated;
         } catch (Exception $e) {
             // todo: add log
@@ -4370,7 +4365,7 @@ class Payplug extends PaymentModule
             $log->error('Install failed: configuration.');
         } elseif (!$this->createOrderStates()) {
             $log->error('Install failed: order states.');
-        } elseif (!$this->installSQL()) {
+        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL()) {
             $log->error('Install failed: sql.');
         } elseif (!$this->installTab()) {
             $log->error('Install failed: tab.');
@@ -4564,159 +4559,6 @@ class Payplug extends PaymentModule
             }
         }
 
-        return true;
-    }
-
-    /**
-     * Install SQL tables used by module
-     *
-     * @return bool
-     */
-    private function installSQL()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Installation SQL Starting.');
-
-        if (!defined('_MYSQL_ENGINE_')) {
-            define('_MYSQL_ENGINE_', 'InnoDB');
-        }
-
-        $req_payplug_lock = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_lock` (
-            `id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `id_cart` INT(11) UNSIGNED NOT NULL,
-            `id_order` VARCHAR(100),
-            `date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
-            `date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\',
-            CONSTRAINT lock_cart_unique UNIQUE (id_cart)
-            ) ENGINE=' . _MYSQL_ENGINE_;
-        $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
-
-        if (!$res_payplug_lock) {
-            $log->error('Installation SQL failed: PAYPLUG_LOCK.');
-            return false;
-        }
-
-        $req_payplug_card = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_card` (
-            `id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `id_customer` int(11) UNSIGNED NOT NULL,
-            `id_company` int(11) UNSIGNED NOT NULL,
-            `is_sandbox` int(1) UNSIGNED NOT NULL,
-            `id_card` varchar(255) NOT NULL,
-            `last4` varchar(4) NOT NULL,
-            `exp_month` varchar(4) NOT NULL,
-            `exp_year` varchar(4) NOT NULL,
-            `brand` varchar(255) DEFAULT NULL,
-            `country` varchar(3) NOT NULL,
-            `metadata` varchar(255) DEFAULT NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-        $res_payplug_card = DB::getInstance()->Execute($req_payplug_card);
-
-        if (!$res_payplug_card) {
-            $log->error('Installation SQL failed: PAYPLUG_CARD.');
-            return false;
-        }
-
-        $req_payplug_payment_cart = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_payment_cart` (
-            `id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `id_payment` VARCHAR(255) NOT NULL,
-            `id_cart` INT(11) UNSIGNED NOT NULL,
-            `is_pending` TINYINT(1) NOT NULL DEFAULT 0, 
-            `date_upd` DATETIME NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-        $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
-
-        if (!$res_payplug_payment_cart) {
-            $log->error('Installation SQL failed: PAYPLUG_PAYMENT_CART.');
-            return false;
-        }
-
-        $req_payplug_installment_cart = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart` (
-            `id_payplug_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `id_installment` VARCHAR(255) NOT NULL,
-            `id_cart` INT(11) UNSIGNED NOT NULL,
-            `is_pending` TINYINT(1) NOT NULL DEFAULT 0, 
-            `date_upd` DATETIME NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-        $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
-
-        if (!$res_payplug_installment_cart) {
-            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENT_CART.');
-            return false;
-        }
-
-        $req_payplug_installment = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_installment` (
-            `id_payplug_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `id_installment` VARCHAR(255) NOT NULL,
-            `id_payment` VARCHAR(255) NULL,
-            `id_order` INT(11) UNSIGNED NOT NULL,
-            `id_customer` INT(11) UNSIGNED NOT NULL,
-            `order_total` INT(11) UNSIGNED NOT NULL,
-            `step` VARCHAR(11) NOT NULL,
-            `amount` INT(11) UNSIGNED NOT NULL,
-            `status` INT(11) UNSIGNED NOT NULL,
-            `scheduled_date` DATETIME NOT NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-        $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
-
-        if (!$res_payplug_installment) {
-            $log->error('Installation SQL failed: PAYPLUG_INSTALLMENTS.');
-            return false;
-        }
-
-        // install table `payplug_logger`
-        $req_payplug_logger = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
-            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `process` VARCHAR(255) NOT NULL,
-            `content` TEXT NOT NULL,
-            `date_add` DATETIME NULL,
-            `date_upd` DATETIME NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-
-        $res_payplug_logger = Db::getInstance()->execute($req_payplug_logger);
-
-        if (!$res_payplug_logger) {
-            $log->error('Installation SQL failed: PAYPLUG_LOGGERS.');
-            return false;
-        }
-
-        // install table `payplug_cache`
-        $req_payplug_cache = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_cache` (
-            `id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `cache_key` VARCHAR(255) NOT NULL,
-            `cache_value` TEXT NOT NULL,
-            `date_add` DATETIME NULL,
-            `date_upd` DATETIME NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-
-        $res_payplug_cache = Db::getInstance()->execute($req_payplug_cache);
-
-        if (!$res_payplug_cache) {
-            $log->error('Installation SQL failed: PAYPLUG_CACHE.');
-            return false;
-        }
-
-        $req_payplug_order_payment = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
-            `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `id_order` INT(11) UNSIGNED NOT NULL,
-            `id_payment` VARCHAR(255) NOT NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
-
-        $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
-
-        if (!$res_payplug_order_payment) {
-            $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
-            return false;
-        }
-
-        $log->info('Installation SQL ended.');
         return true;
     }
 
@@ -4949,13 +4791,7 @@ class Payplug extends PaymentModule
     public function isValidMobilePhoneNumber($phone_number, $iso_code)
     {
         try {
-            //load libphonenumber
-            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
-                include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
-            }
-
-            // then format code
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, array(1, 2)));
@@ -6568,7 +6404,7 @@ class Payplug extends PaymentModule
             $log->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $log->error('Uninstall failed: configuration.');
-        } elseif (!$this->uninstallSQL($keep_cards)) {
+        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->uninstallSQL($keep_cards)) {
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
@@ -6589,6 +6425,7 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
+        return true;
         $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
         $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
 
@@ -6654,41 +6491,6 @@ class Payplug extends PaymentModule
             return true;
         }
         return false;
-    }
-
-    /**
-     * Remove SQL tables used by module
-     *
-     * @return bool
-     */
-    private function uninstallSQL($keep_cards = false)
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Uninstallation SQL starting.');
-
-        $flag = true;
-        $queries = [
-            'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_lock`'
-        ];
-
-
-        if (!$keep_cards) {
-            $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_card`';
-        }
-
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_payment_cart`';
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment_cart`';
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_installment`';
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_logger`';
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_cache`';
-        $queries[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment`';
-
-        foreach ($queries as $query) {
-            $flag = $flag && Db::getInstance()->execute($query);
-        }
-
-        $log->info('Uninstallation SQL ended.');
-        return $flag;
     }
 
     /**
@@ -6994,7 +6796,7 @@ class Payplug extends PaymentModule
      * Install the required hooks
      * @return bool
      */
-    private function installHook()
+    protected function installHook()
     {
         $hooks = array(
             'adminOrder',
