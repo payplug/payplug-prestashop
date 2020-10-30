@@ -1725,12 +1725,12 @@ class Payplug extends PaymentModule
 
         $available_options = array(
             'standard' => true,
-            'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0 ? true : false,
-            'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1 ? true : false,
-            'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1 ? true : false,
-            'installment' => (int)Configuration::get('PAYPLUG_INST') === 1 ? true : false,
-            'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1 ? true : false,
-            'oney' => (int)Configuration::get('PAYPLUG_ONEY') === 1 ? true : false,
+            'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0,
+            'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1,
+            'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1,
+            'installment' => (int)Configuration::get('PAYPLUG_INST') === 1,
+            'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1,
+            'oney' => (int)Configuration::get('PAYPLUG_ONEY') === 1,
         );
 
         if (Configuration::get('PAYPLUG_EMAIL') === null
@@ -3294,7 +3294,7 @@ class Payplug extends PaymentModule
             $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null,
                 false, true, $quantity);
             $amount = $product_price * $quantity;
-            $is_elligible = (new OneyRepository($this))->isValidOneyAmount($amount, $this->context->currency->id);
+            $is_elligible = $this->oneyRepository->isValidOneyAmount($amount, $this->context->currency->id);
 
             if ($is_elligible['error']) {
                 $this->smarty->assign(array(
