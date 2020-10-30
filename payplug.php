@@ -3622,7 +3622,7 @@ class Payplug extends PaymentModule
         } elseif (!$this->createOrderStates() && $install['flag'] !== false) {
             $log->error('Install failed: order states.');
             $install['flag'] =  false;
-        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() && $install['flag'] !== false) {
+        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag'] !== false*/) {
             $log->error('Install failed: SQL.');
             $install['flag'] =  false;
             $install['error'] = 'Création des tables SQL';
