@@ -45,46 +45,6 @@
   max-width: 1000px;
   margin: 0 0 20px;
 }
-.payplugButton {
-  border: 1px solid #cccccc;
-  -webkit-border-radius: 0.25em;
-  -moz-border-radius: 0.25em;
-  border-radius: 0.25em;
-  -webkit-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  -ms-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  transition: all 0.4s;
-  background: transparent;
-  cursor: pointer;
-  margin: 0;
-  text-align: center;
-  padding: 0.4em 0.5em;
-  text-transform: uppercase;
-  font-size: 12px;
-  outline: none;
-  min-width: 6.5em;
-}
-.payplugButton-green {
-  border-color: #00ab7a;
-  background: #00ab7a;
-  color: #fff;
-}
-.payplugButton-green:hover {
-  border-color: #009268;
-  background: #009268;
-  color: #fff;
-}
-.payplugButton-disabled,
-.payplugButton-disabled:hover {
-  border-color: #b2b2b2;
-  background: #b2b2b2;
-  color: #fff;
-  cursor: default;
-}
-.panel-footer .payplugButton {
-  margin: 10px 0 0;
-}
 .payplugInterpanel {
   width: 100%;
   max-width: 1000px;

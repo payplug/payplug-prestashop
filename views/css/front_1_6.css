@@ -1058,9 +1058,6 @@ div.payplug-wrapper form div label img {
 div.payplug-wrapper form div label div.info-wrapper {
   float: left;
 }
-div.payplug-wrapper label[for=payplug_card_new] {
-  /*padding: 10px 0 0 0;*/
-}
 .payment_option_standard_payment_logo,
 .payment_option_installment_3_logo,
 .payment_option_oney_3_4 {
@@ -1238,6 +1235,135 @@ a.payplug.call.pphide {
   height: 22px;
   width: 14px;
   color: #777;
+}
+/* Payplug payment */
+.payplugOneClick {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #d6d4d4;
+  background: #fbfbfb;
+  color: #333;
+  display: block;
+  font-size: 17px;
+  font-weight: bold;
+  line-height: 23px;
+  position: relative;
+  margin: 0 0 10px;
+}
+.payplugOneClick > button {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+  border: 1px solid #d6d4d4;
+  font-size: 17px;
+  line-height: 23px;
+  color: #333;
+  font-weight: bold;
+  padding: 33px 40px 34px 15px;
+  letter-spacing: -1px;
+  position: relative;
+  background: none;
+  text-align: left;
+}
+.payplugOneClick > button:after {
+  display: block;
+  content: "\f054";
+  position: absolute;
+  right: 15px;
+  margin-top: -11px;
+  top: 50%;
+  font-family: "FontAwesome";
+  font-size: 25px;
+  height: 22px;
+  width: 14px;
+  color: #777;
+}
+.payplugOneClick form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 15px;
+}
+.payplugOneClick form .radio {
+  padding: 6px 0 0;
+}
+.payplugOneClick form label {
+  display: flex;
+  align-self: flex-start;
+  cursor: pointer;
+}
+.payplugOneClick form label img {
+  display: block;
+  widht: auto;
+  height: 22px;
+  margin: 0 8px;
+}
+.payplugOneClick form label span {
+  display: flex;
+  flex-direction: column;
+}
+.payplugOneClick form label span span {
+  font-size: 0.8em;
+  line-height: 0.8em;
+  font-weight: normal;
+}
+.payplugOneClick form label + label {
+  margin: 10px 0 0;
+}
+/* Payplug button */
+.payplugButton {
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  border-radius: 0.25em;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -ms-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+  text-align: center;
+  padding: 0.4em 0.5em;
+  text-transform: uppercase;
+  font-size: 12px;
+  outline: none;
+  min-width: 6.5em;
+}
+.payplugButton.-payment {
+  min-width: 11em;
+  height: 3em;
+  font-size: 14px;
+  font-weight: 700;
+  margin: -3em 0 0;
+  align-self: flex-end;
+}
+@media (max-width: 767px) {
+  .payplugButton.-payment {
+    margin: 15px 0 0;
+    align-self: center;
+  }
+}
+.payplugButton.-green {
+  border-color: #00ab7a;
+  background: #00ab7a;
+  color: #fff;
+}
+.payplugButton.-green:hover {
+  border-color: #009268;
+  background: #009268;
+  color: #fff;
+}
+.payplugButton.-disabled,
+.payplugButton.-disabled:hover {
+  border-color: #b2b2b2;
+  background: #b2b2b2;
+  color: #fff;
+  cursor: default;
 }
 /* Oney payment */
 .oneyPayment {
