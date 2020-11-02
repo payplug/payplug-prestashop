@@ -1,0 +1,50 @@
+/* Payplug Admin Alert */
+.payplugAlert {
+  .border(transparent, l, 3px);
+  display: flex;
+  background: #fff;
+  color: #000000;
+  padding: 10px 20px;
+  position: relative;
+
+  &.-success {
+    background: fade(#colorMap[payplug], 15%);
+    border-color: #colorMap[payplug];
+
+    a {
+      &,
+      &:hover,
+      &:active,
+      &:visited,
+      &:focus {
+        color: #colorMap[payplug];
+      }
+    }
+  }
+
+  &.-warning {
+    background: fade(#colorMap[warning], 15%);
+    border-color: #colorMap[warning];
+    color: fade(darken(#colorMap[warning], 10%), 80%);
+
+    &:before {
+      content: "";
+      display: block;
+      background: 50% url(~"@{img_admin}icon-lock.png") no-repeat;
+      background-size: contain;
+      width: 11px;
+      height: 15px;
+      margin: 0 8px 0 -8px;
+    }
+
+    a {
+      &,
+      &:hover,
+      &:active,
+      &:visited,
+      &:focus {
+        color: #colorMap[warning];
+      }
+    }
+  }
+}

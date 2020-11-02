@@ -24,6 +24,6 @@
 <input type="password" name="reload_password"/>
 <p class="payplugPopup_error"></p>
 <div class="payplugPopup_footer">
-    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton payplugButton-green" name="password">{l s='Ok' mod='payplug'}</button>
+    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton -green" name="password">{l s='Ok' mod='payplug'}</button>
 </div>

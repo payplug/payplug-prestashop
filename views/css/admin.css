@@ -35,6 +35,7 @@
     opacity: 1;
   }
 }
+/* Payplug Admin */
 .payplug {
   display: flex;
   align-items: center;
@@ -45,6 +46,7 @@
   max-width: 1000px;
   margin: 0 0 20px;
 }
+/* Payplug Admin Interpanel */
 .payplugInterpanel {
   width: 100%;
   max-width: 1000px;
@@ -53,6 +55,7 @@
 p.payplugInterpanel {
   margin: 0 auto 20px;
 }
+/* Payplug Admin Alert */
 .payplugAlert {
   border-left: 3px solid transparent;
   display: flex;
@@ -61,23 +64,23 @@ p.payplugInterpanel {
   padding: 10px 20px;
   position: relative;
 }
-.payplugAlert-success {
+.payplugAlert.-success {
   background: rgba(0, 171, 122, 0.15);
   border-color: #00ab7a;
 }
-.payplugAlert-success a,
-.payplugAlert-success a:hover,
-.payplugAlert-success a:active,
-.payplugAlert-success a:visited,
-.payplugAlert-success a:focus {
+.payplugAlert.-success a,
+.payplugAlert.-success a:hover,
+.payplugAlert.-success a:active,
+.payplugAlert.-success a:visited,
+.payplugAlert.-success a:focus {
   color: #00ab7a;
 }
-.payplugAlert-warning {
+.payplugAlert.-warning {
   background: rgba(247, 160, 0, 0.15);
   border-color: #f7a000;
   color: rgba(196, 127, 0, 0.8);
 }
-.payplugAlert-warning:before {
+.payplugAlert.-warning:before {
   content: "";
   display: block;
   background: 50% url(../img/admin/icon-lock.png) no-repeat;
@@ -86,13 +89,14 @@ p.payplugInterpanel {
   height: 15px;
   margin: 0 8px 0 -8px;
 }
-.payplugAlert-warning a,
-.payplugAlert-warning a:hover,
-.payplugAlert-warning a:active,
-.payplugAlert-warning a:visited,
-.payplugAlert-warning a:focus {
+.payplugAlert.-warning a,
+.payplugAlert.-warning a:hover,
+.payplugAlert.-warning a:active,
+.payplugAlert.-warning a:visited,
+.payplugAlert.-warning a:focus {
   color: #f7a000;
 }
+/* Payplug Admin Loader */
 .payplugLoader {
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
@@ -112,12 +116,13 @@ p.payplugInterpanel {
   z-index: -1;
   opacity: 0;
 }
-.payplugLoader-on {
+.payplugLoader.-on {
   z-index: 1;
 }
-.payplugLoader-visible {
+.payplugLoader.-visible {
   opacity: 1;
 }
+/* Payplug Admin Switch */
 .payplugSwitch {
   -webkit-border-radius: 0.25em;
   -moz-border-radius: 0.25em;
@@ -149,7 +154,7 @@ label.payplugSwitch_label {
   align-items: center;
   cursor: pointer;
 }
-.payplugSwitch_label-left {
+.payplugSwitch_label.-left {
   color: #fff;
 }
 .payplugSwitch:before {
@@ -172,20 +177,20 @@ label.payplugSwitch_label {
   width: 50%;
   height: 100%;
 }
-.payplugSwitch-right .payplugSwitch_label-left {
+.payplugSwitch.-right .payplugSwitch_label.-left {
   color: inherit;
 }
-.payplugSwitch-right .payplugSwitch_label-right {
+.payplugSwitch.-right .payplugSwitch_label.-right {
   color: #fff;
 }
-.payplugSwitch-right:before {
+.payplugSwitch.-right:before {
   left: 50%;
 }
-.payplugSwitch-disabled:before {
+.payplugSwitch.-disabled:before {
   border-color: #bfbfbf;
   background: #ccc;
 }
-.payplugSwitch-small {
+.payplugSwitch.-small {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
@@ -206,13 +211,13 @@ label.payplugSwitch_label {
   cursor: pointer;
   background: #00ab7a;
 }
-.payplugSwitch-small label {
+.payplugSwitch.-small label {
   display: none;
 }
-.payplugSwitch-small + label {
+.payplugSwitch.-small + label {
   margin: 0;
 }
-.payplugSwitch-small:before {
+.payplugSwitch.-small:before {
   -webkit-border-radius: 100%;
   -moz-border-radius: 100%;
   border-radius: 100%;
@@ -236,19 +241,20 @@ label.payplugSwitch_label {
   width: 16px;
   height: 16px;
 }
-.payplugSwitch-small.payplugSwitch-right {
+.payplugSwitch.-small.-right {
   background: #b2b2b2;
 }
-.payplugSwitch-small.payplugSwitch-right:before {
+.payplugSwitch.-small.-right:before {
   left: 2px;
 }
-.payplugSwitch-small.payplugSwitch-disabled {
+.payplugSwitch.-small.-disabled {
   cursor: default;
   background: rgba(178, 178, 178, 0.5);
 }
 .payplugSwitch input {
   display: none;
 }
+/* Payplug Admin Link */
 a.payplugLink,
 button.payplugLink {
   border: none;
@@ -263,10 +269,12 @@ button.payplugLink:hover {
   text-decoration: underline;
   color: #00ab7a;
 }
+/* Payplug Admin Pipe */
 .payplugPipe {
   color: #00ab7a;
   margin: 0 0.5em;
 }
+/* Payplug Admin Panel */
 .payplugPanel {
   display: flex;
   padding: 0 0 15px;
@@ -319,9 +327,10 @@ button.payplugLink:hover {
   flex-wrap: wrap;
   margin: 20px 0 0;
 }
-.payplugPanel_section-nowrap {
+.payplugPanel_section.-nowrap {
   flex-wrap: nowrap;
 }
+/* Payplug Admin Config */
 .payplugConfig {
   position: relative;
 }
@@ -338,24 +347,25 @@ button.payplugLink:hover {
   margin: 0 4px 0 0;
   background: transparent 50% no-repeat;
 }
-.payplugConfig_item-error {
+.payplugConfig_item.-error {
   color: #e56876;
 }
-.payplugConfig_item-error:before {
+.payplugConfig_item.-error:before {
   background-image: url(../img/admin/icon-error.png);
 }
-.payplugConfig_item-success {
+.payplugConfig_item.-success {
   color: #00ab7a;
 }
-.payplugConfig_item-success:before {
+.payplugConfig_item.-success:before {
   background-image: url(../img/admin/icon-success.png);
 }
-.payplugConfig_item-warning {
+.payplugConfig_item.-warning {
   color: #f7a000;
 }
-.payplugConfig_item-warning:before {
+.payplugConfig_item.-warning:before {
   background-image: url(../img/admin/icon-warn.png);
 }
+/* Payplug Admin Loading */
 .payplugLogin_email {
   color: #00ab7a;
   font-weight: 700;
@@ -383,12 +393,13 @@ button.payplugLink:hover {
   z-index: -1;
   opacity: 0;
 }
-.payplugLogin .loader-on {
+.payplugLogin .loader.-on {
   z-index: 1;
 }
-.payplugLogin .loader-visible {
+.payplugLogin .loader.-visible {
   opacity: 1;
 }
+/* Payplug Admin Settings */
 .payplugSettings_separator {
   border-top: 1px solid #e6e6e6;
   font-weight: 700;
@@ -396,6 +407,7 @@ button.payplugLink:hover {
   padding: 15px 0 20px 0;
   line-height: 2.2em;
 }
+/* Payplug Admin Config */
 .payplugOney_error {
   display: none;
   color: #e56876;
@@ -420,9 +432,10 @@ p.payplugOneyTOS_text {
   color: #dd2525;
   padding: 0 0 0 10px;
 }
-.payplugOneyTOS_error-show {
+.payplugOneyTOS_error.-show {
   display: block;
 }
+/* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
   font-weight: 400;
@@ -463,164 +476,63 @@ p.payplugOneyTOS_text {
 .payplugInstallment_schedule {
   display: none;
 }
-.payplugInstallment_schedule-select {
+.payplugInstallment_schedule.-select {
   display: block;
 }
+/* Payplug Admin Config */
 .payplugDeferred label {
   font-weight: 400;
 }
-.payplugPopup {
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  -webkit-transition: opacity 0.4s;
-  -moz-transition: opacity 0.4s;
-  -ms-transition: opacity 0.4s;
-  -o-transition: opacity 0.4s;
-  transition: opacity 0.4s;
-  opacity: 0;
-  position: fixed;
-  display: none;
-  top: 50%;
-  left: 50%;
-  max-width: 80vw;
-  z-index: 5004;
-}
-@media (max-width: 767px) {
-  .payplugPopup {
-    max-width: 98vw;
-  }
-}
-.payplugPopup:before {
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  content: "";
-  background: rgba(0, 0, 0, 0.2);
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-}
-.payplugPopup_content {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  z-index: 1;
-  background: #fff;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 0;
-}
-@media (max-width: 767px) {
-  .payplugPopup_content {
-    max-height: 98vh;
-  }
-}
-.payplugPopup_close {
-  z-index: 1;
-  display: block;
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 30px;
-  height: 30px;
-  line-height: 24px;
-  text-indent: 24px;
-  background: none;
-  border: none;
-  overflow: hidden;
-  padding: 0;
+/* Payplug button */
+.payplugButton {
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  border-radius: 0.25em;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -ms-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  background: transparent;
   cursor: pointer;
-}
-.payplugPopup_close:focus {
-  outline: 0;
-}
-.payplugPopup_close:before,
-.payplugPopup_close:after {
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 50%;
-  height: 2px;
-  content: "";
-  background: #303030;
-}
-.payplugPopup_close:before {
-  -webkit-transform: translate(-50%, -50%) rotate(45deg);
-  -moz-transform: translate(-50%, -50%) rotate(45deg);
-  -ms-transform: translate(-50%, -50%) rotate(45deg);
-  -o-transform: translate(-50%, -50%) rotate(45deg);
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-.payplugPopup_close:after {
-  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
-  -moz-transform: translate(-50%, -50%) rotate(-45deg);
-  -ms-transform: translate(-50%, -50%) rotate(-45deg);
-  -o-transform: translate(-50%, -50%) rotate(-45deg);
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-.payplugPopup-open {
-  display: block;
-}
-.payplugPopup-show {
-  opacity: 1;
-}
-.payplugPopup_heading {
-  border-bottom: 1px solid #e6e6e6;
-  padding: 10px 20px;
-  font-weight: 700;
-}
-.payplugPopup_row {
+  margin: 0;
   text-align: center;
-  padding: 20px 20px 15px;
+  padding: 0.4em 0.5em;
+  text-transform: uppercase;
+  font-size: 12px;
+  outline: none;
+  min-width: 6.5em;
 }
-.payplugPopup_row ul {
-  padding: 20px 0;
-  margin: 0;
-  text-align: left;
-  list-style: none;
+.payplugButton.-payment {
+  min-width: 11em;
+  height: 3em;
+  font-size: 14px;
+  font-weight: 700;
+  margin: -3em 0 0;
+  align-self: flex-end;
 }
-.payplugPopup_row input[type=email],
-.payplugPopup_row input[type=password],
-.payplugPopup_row input[type=search],
-.payplugPopup_row input[type=tel],
-.payplugPopup_row input[type=text] {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-  max-width: 100%;
-  background: transparent;
-  margin: 0;
-  display: inline-block;
-  height: 22px;
+@media (max-width: 767px) {
+  .payplugButton.-payment {
+    margin: 15px 0 0;
+    align-self: center;
+  }
 }
-.payplugPopup_row input[type=email]:focus,
-.payplugPopup_row input[type=password]:focus,
-.payplugPopup_row input[type=search]:focus,
-.payplugPopup_row input[type=tel]:focus,
-.payplugPopup_row input[type=text]:focus {
-  background: transparent;
+.payplugButton.-green {
+  border-color: #00ab7a;
+  background: #00ab7a;
+  color: #fff;
 }
-.payplugPopup_error {
-  margin: 0 0 8px;
-  color: #e56876;
+.payplugButton.-green:hover {
+  border-color: #009268;
+  background: #009268;
+  color: #fff;
 }
-.payplugPopup_footer {
-  border-top: 1px solid #e6e6e6;
-  padding: 15px 0 0;
-  display: flex;
-  justify-content: space-between;
-}
-.payplugPopup_footer-center {
-  justify-content: center;
+.payplugButton.-disabled,
+.payplugButton.-disabled:hover {
+  border-color: #b2b2b2;
+  background: #b2b2b2;
+  color: #fff;
+  cursor: default;
 }
 /*# sourceMappingURL=admin.css.map */

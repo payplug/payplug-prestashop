@@ -41,7 +41,7 @@
     </div>
 
     {include file='./panel/fieldset.tpl'}
-    <p class="payplugInterpanel payplugAlert payplugAlert-success">
+    <p class="payplugInterpanel payplugAlert -success">
         <span>{l s='For more information about installing and configuring the plugin, please consult' mod='payplug'} <a class="payplugLink" href="{$faq_links.guide|escape:'htmlall':'UTF-8'}" target="_blank">{l s='this support article' mod='payplug'}</a>.</span>
     </p>
     {include file='./panel/show.tpl'}
