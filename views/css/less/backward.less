@@ -1,85 +1,4 @@
-div.payplug-wrapper {
-  .borderRadius(4px);
-  border: 1px solid #d6d4d4;
-  background: #fbfbfb;
-  color: #333;
-  display: block;
-  font-size: 17px;
-  font-weight: bold;
-  line-height: 23px;
-  position: relative;
-  margin: 0 0 10px;
-}
 
-div.payplug-wrapper .payment_module {
-  letter-spacing: -1px;
-}
-
-div.payplug-wrapper .payment_module span {
-  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
-  /*padding-left: 197px;*/
-  padding: 33px 40px 34px 240px;
-  display: block;
-}
-
-div.payplug-wrapper .payment_module span.it {
-  background-image: url('../img/logos_schemes_it.png');
-}
-
-div.payplug-wrapper form {
-  padding: 0 0 10px 16px;
-  position: relative;
-}
-
-div.payplug-wrapper form div.card-wrapper {
-  overflow: hidden;
-  line-height: normal;
-  padding: 0 0 10px 0;
-}
-
-div.payplug-wrapper div:first-child {
-  float: left;
-  padding: 10px 15px 0 0;
-}
-
-div.info-wrapper div:first-child {
-  padding: 0;
-}
-
-div.payplug-wrapper form input[name=payplug_card] {
-  float: left;
-  margin: 10px 10px 0 0;
-  cursor: pointer;
-}
-
-div.payplug-wrapper form div label {
-  float: left;
-  cursor: pointer;
-}
-
-div.payplug-wrapper form div label img {
-  float: left;
-  padding: 0 8px 0 0;
-}
-
-div.payplug-wrapper form div label div.info-wrapper {
-  float: left;
-}
-
-
-.payment_option_standard_payment_logo, .payment_option_installment_3_logo, .payment_option_oney_3_4 {
-  position: absolute;
-  left: 15px;
-  //min-width: 142px;
-}
-
-.payplug_expiry_date {
-  display: block;
-  font-size: 0.8em;
-  font-weight: normal;
-  /*padding: 0 0 0 19px;*/
-  padding: 0 0 0 0;
-}
 
 .ppdelete {
   display: block;
@@ -95,29 +14,6 @@ div.payplug-wrapper form div label div.info-wrapper {
 .ppdelete:visited,
 .ppdelete:focus {
   text-decoration: underline;
-}
-
-.ppsubmit {
-  .borderRadius(0.25em);
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #colorMap[payplug];
-  color: #ffffff;
-  font-weight: 700;
-  height: 3em;
-  margin: 1em auto 0 auto;
-  padding: 0;
-  text-transform: uppercase;
-  min-width: 11em;
-  border: none;
-
-  &:hover {
-    background: darken(#colorMap[payplug],5);
-  }
-  &.disable {
-    background: #dddddd none repeat scroll 0 0;
-  }
 }
 
 .ppOneClickStatus {
@@ -221,6 +117,7 @@ div.ppoverlay {
   width: 100%;
   z-index: 9999999;
   /*opacity: 0.5;*/
+  display: none;
 }
 
 .ppbold {

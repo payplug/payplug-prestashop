@@ -27,29 +27,37 @@ var $document,
     payment_allowed = true,
     payplugModule = {
         init: function () {
-            $document.on('click', 'a.ppdeletecard', function (event) {
+            $document.on('click', '.payplugCard_delete', function (event) {
                 event.preventDefault();
-                var id_payplug_card = $(this).parent().parent().attr('id');
-                id_payplug_card = id_payplug_card.replace('id_payplug_card_', '');
-                var url = $(this).attr('href') + '&pc=' + id_payplug_card;
+                var $card = $(this).parents('.payplugCard').eq(0),
+                    id_payplug_card = $card.data('id_card'),
+                    url = $(this).attr('href') + '&pc=' + id_payplug_card;
+
                 payplugModule.deleleCard(id_payplug_card, url);
             });
             payplugModule.payment.init();
             payplugModule.popup.init();
         },
         payment: {
+            props : {
+                pending: false,
+            },
             init: function () {
                 $document.on('click', '.payment_module a.payplug', payplugModule.payment.pay)
-                    .on('submit', '#form_payplug_payment', payplugModule.payment.oneclick);
+                    .on('submit', '.payplugOneClick form', payplugModule.payment.oneclick);
 
                 $(window).on('load', payplugModule.payment.clean)
                     .on('load', payplugModule.payment.checkerrors);
 
-                if (can_use_oney) {
+                if (typeof can_use_oney != 'undefined' && can_use_oney) {
                     payplugModule.oney.init();
                 }
             },
             send: function (options) {
+                if(payplugModule.payment.props.pending) {
+                    return false;
+                }
+
                 var default_options = {
                     id_card: 'new_card',
                     is_inst: null,
@@ -88,6 +96,8 @@ var $document,
                             $('.ppwait').show();
                         }
 
+                        payplugModule.payment.props.pending = true;
+
                         if ($submitOneClick.length) {
                             $submitOneClick.addClass('disable').attr('disabled', 'disabled');
                         }
@@ -100,11 +110,10 @@ var $document,
                         if ($submitOneClick.length) {
                             $submitOneClick.removeClass('disable').removeAttr('disabled');
                         }
-
-                        $('div.ppoverlay').remove();
                     },
                     error: function () {
                         payment_allowed = true;
+                        payplugModule.payment.props.pending = false;
                     },
                     success: function (data) {
                         if (data.result) {
@@ -135,6 +144,7 @@ var $document,
                             } else if (data.embedded) {
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
+                                payplugModule.payment.props.pending = false;
                             } else {
                                 window.location.href = data.return_url;
                             }
@@ -179,6 +189,8 @@ var $document,
                                     $errorWrapper.stop().fadeOut();
                                 }, delay
                             );
+
+                            payplugModule.payment.props.pending = false;
                         }
                     }
                 });
@@ -263,7 +275,7 @@ var $document,
                 dataType: 'json',
                 success: function (result) {
                     if (result) {
-                        $('#id_payplug_card_' + id_card).remove();
+                        $('.payplugCard[data-id_card=' + id_card + ']').remove();
                         $('#module-payplug-cards p.message').show();
                         $('#module-payplug-controllers-front-cards_1_4 p.message').show();
                     }
