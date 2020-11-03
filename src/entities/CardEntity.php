@@ -120,7 +120,7 @@ class CardEntity
      * @param int $id_company
      * @return CardEntity
      */
-    public function setIdCompany(int $id_company)
+    public function setIdCompany($id_company)
     {
         $this->id_company = $id_company;
         return $this;
@@ -138,7 +138,7 @@ class CardEntity
      * @param bool $is_sandbox
      * @return CardEntity
      */
-    public function setIsSandbox(bool $is_sandbox)
+    public function setIsSandbox($is_sandbox)
     {
         $this->is_sandbox = $is_sandbox;
         return $this;

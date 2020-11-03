@@ -98,7 +98,7 @@ class CardRepository
         }
 
         if ($isSandbox) {
-            $this->cardEntity->setIsSandbox((int)$isSandbox);
+            $this->cardEntity->setIsSandbox((bool)$isSandbox);
         }
     }
 

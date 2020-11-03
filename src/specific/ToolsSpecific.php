@@ -7,11 +7,8 @@ use Tools;
 
 class ToolsSpecific implements ToolsInterface
 {
-
-    function tool($action, $param1, $param2 = null)
+    function tool($action, $param1 = null, $param2 = null)
     {
-//        var_dump($action,$param1,$param2); exit;
-        
         return Tools::$action($param1, $param2);
     }
 }
