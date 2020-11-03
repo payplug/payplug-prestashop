@@ -24,22 +24,24 @@
 
 namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
+
 class CardEntity
 {
+    /** @var string card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
+    private $id_card;
+
     /** @var int */
-    private $id;
+    private $id_company;
 
     /** @var int */
     private $id_customer;
 
     /** @var int */
-    private $id_company;
+    private $id;
 
     /** @var bool */
     private $is_sandbox;
-
-    /** @var string */
-    private $id_card;
 
     /** @var string */
     private $last4;
@@ -73,39 +75,11 @@ class CardEntity
     private $identifier;
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getIdCard()
     {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return CardEntity
-     */
-    public function setId(int $id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIdCustomer()
-    {
-        return $this->id_customer;
-    }
-
-    /**
-     * @param int $id_customer
-     * @return CardEntity
-     */
-    public function setIdCustomer(int $id_customer)
-    {
-        $this->id_customer = $id_customer;
-        return $this;
+        return $this->id_card;
     }
 
     /**
@@ -117,49 +91,101 @@ class CardEntity
     }
 
     /**
-     * @param int $id_company
-     * @return CardEntity
+     * @return int
      */
-    public function setIdCompany($id_company)
+    public function getIdCustomer()
     {
-        $this->id_company = $id_company;
-        return $this;
+        return $this->id_customer;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
      * @return bool
      */
-    public function isIsSandbox()
+    public function isSandbox()
     {
         return $this->is_sandbox;
     }
 
     /**
+     * @param int $id_company
+     * @return CardEntity
+     * @throws BadParameterException
+     */
+    public function setIdCompany($id_company)
+    {
+        if (!is_int($id_company)) {
+            throw (new BadParameterException('Invalid id, param $id_company must be an integer'));
+        } else {
+            $this->id_company = $id_company;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int $id_customer
+     * @return CardEntity
+     * @throws BadParameterException
+     */
+    public function setIdCustomer($id_customer)
+    {
+        if (!is_int($id_customer)) {
+            throw (new BadParameterException('Invalid id, param $id_customer must be an integer'));
+        } else {
+            $this->id_customer = $id_customer;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return CardEntity
+     * @throws BadParameterException
+     */
+    public function setId($id)
+    {
+        if (!is_int($id)) {
+            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+        } else {
+            $this->id = $id;
+            return $this;
+        }
+    }
+
+    /**
      * @param bool $is_sandbox
      * @return CardEntity
+     * @throws BadParameterException
      */
     public function setIsSandbox($is_sandbox)
     {
-        $this->is_sandbox = $is_sandbox;
-        return $this;
+        if (!is_bool($is_sandbox)) {
+            throw (new BadParameterException('Param $id_card must be a boolean'));
+        } else {
+            $this->is_sandbox = $is_sandbox;
+            return $this;
+        }
     }
 
     /**
-     * @return string
-     */
-    public function getIdCard()
-    {
-        return $this->id_card;
-    }
-
-    /**
-     * @param string $id_card
+     * @param string $id_card card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
      * @return CardEntity
      */
     public function setIdCard($id_card)
     {
-        $this->id_card = $id_card;
-        return $this;
+        if (!is_string($id_card) || !preg_match('/card_[a-z0-9]{32}/', $id_card)) {
+            throw (new BadParameterException('Invalid card token format, param $id_card must be a string looking like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''));
+        } else {
+            $this->id_card = $id_card;
+            return $this;
+        }
     }
 
     /**
@@ -246,7 +272,7 @@ class CardEntity
      * @param array $allowed_brand
      * @return CardEntity
      */
-    public function setAllowedBrand(array $allowed_brand)
+    public function setAllowedBrand($allowed_brand)
     {
         $this->allowed_brand = $allowed_brand;
         return $this;
@@ -300,7 +326,7 @@ class CardEntity
      * @param Module $module
      * @return CardEntity
      */
-    public function setModule(Module $module)
+    public function setModule($module)
     {
         $this->module = $module;
         return $this;
@@ -318,7 +344,7 @@ class CardEntity
      * @param array $definition
      * @return CardEntity
      */
-    public function setDefinition(array $definition)
+    public function setDefinition($definition)
     {
         $this->definition = $definition;
         return $this;
@@ -336,7 +362,7 @@ class CardEntity
      * @param array $fieldsRequired
      * @return CardEntity
      */
-    public function setFieldsRequired(array $fieldsRequired)
+    public function setFieldsRequired($fieldsRequired)
     {
         $this->fieldsRequired = $fieldsRequired;
         return $this;
@@ -354,7 +380,7 @@ class CardEntity
      * @param array $fieldsSize
      * @return CardEntity
      */
-    public function setFieldsSize(array $fieldsSize)
+    public function setFieldsSize($fieldsSize)
     {
         $this->fieldsSize = $fieldsSize;
         return $this;
@@ -372,7 +398,7 @@ class CardEntity
      * @param array $fieldsValidate
      * @return CardEntity
      */
-    public function setFieldsValidate(array $fieldsValidate)
+    public function setFieldsValidate($fieldsValidate)
     {
         $this->fieldsValidate = $fieldsValidate;
         return $this;

@@ -23,32 +23,27 @@
 
 namespace PayPlug\src\entities;
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
+use PayPlug\src\exceptions\BadParameterException;
 
 class CacheEntity
 {
-    /** @var string */
-    private $id_payplug_cache;
-
     /** @var string */
     private $cache_key;
 
     /** @var string */
     private $cache_value;
 
-    /** @var datetime */
+    /** @var string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss' */
     private $date_add;
 
-    /** @var datetime */
+    /** @var string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss' */
     private $date_upd;
-
-    /** @var PayPlugLogger  */
-    private $logger;
 
     /** @var array */
     private $definition;
+
+    /** @var string */
+    private $id_payplug_cache;
 
     /** @var string */
     private $table;
@@ -56,37 +51,9 @@ class CacheEntity
     /**
      * @return string
      */
-    public function getIdPayplugCache()
-    {
-        return $this->id_payplug_cache;
-    }
-
-    /**
-     * @param string $id_payplug_cache
-     * @return CacheEntity
-     */
-    public function setIdPayplugCache($id_payplug_cache)
-    {
-        $this->id_payplug_cache = $id_payplug_cache;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getCacheKey()
     {
         return $this->cache_key;
-    }
-
-    /**
-     * @param string $cache_key
-     * @return CacheEntity
-     */
-    public function setCacheKey($cache_key)
-    {
-        $this->cache_key = $cache_key;
-        return $this;
     }
 
     /**
@@ -98,17 +65,7 @@ class CacheEntity
     }
 
     /**
-     * @param string $cache_value
-     * @return CacheEntity
-     */
-    public function setCacheValue($cache_value)
-    {
-        $this->cache_value = $cache_value;
-        return $this;
-    }
-
-    /**
-     * @return datetime
+     * @return string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
      */
     public function getDateAdd()
     {
@@ -116,49 +73,11 @@ class CacheEntity
     }
 
     /**
-     * @param datetime $date_add
-     * @return CacheEntity
-     */
-    public function setDateAdd($date_add)
-    {
-        $this->date_add = $date_add;
-        return $this;
-    }
-
-    /**
-     * @return datetime
+     * @return string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
      */
     public function getDateUpd()
     {
         return $this->date_upd;
-    }
-
-    /**
-     * @param datetime $date_upd
-     * @return CacheEntity
-     */
-    public function setDateUpd($date_upd)
-    {
-        $this->date_upd = $date_upd;
-        return $this;
-    }
-
-    /**
-     * @return PayPlugLogger
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @param PayPlugLogger $logger
-     * @return CacheEntity
-     */
-    public function setLogger(PayPlugLogger $logger)
-    {
-        $this->logger = $logger;
-        return $this;
     }
 
     /**
@@ -170,13 +89,11 @@ class CacheEntity
     }
 
     /**
-     * @param array $definition
-     * @return CacheEntity
+     * @return string
      */
-    public function setDefinition($definition)
+    public function getIdPayPlugCache()
     {
-        $this->definition = $definition;
-        return $this;
+        return $this->id_payplug_cache;
     }
 
     /**
@@ -188,12 +105,123 @@ class CacheEntity
     }
 
     /**
+     * @param string $cache_key
+     * @return CacheEntity
+     * @throws BadParameterException
+     */
+    public function setCacheKey($cache_key)
+    {
+        if (!is_string($cache_key)) {
+            throw (
+                new BadParameterException(
+                    'Invalid value, param $cache_key must be a string.'
+                )
+            );
+        } else {
+            $this->cache_key = $cache_key;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string $cache_value
+     * @return CacheEntity
+     * @throws BadParameterException
+     */
+    public function setCacheValue($cache_value)
+    {
+        if (!is_string($cache_value)) {
+            throw (
+                new BadParameterException(
+                    'Invalid value, param $cache_value must be a string.'
+                )
+            );
+        } else {
+            $this->cache_value = $cache_value;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string $date_add with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     * @return CacheEntity
+     * @throws BadParameterException
+     */
+    public function setDateAdd($date_add)
+    {
+        if (!is_string($date_add) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
+            throw (
+                new BadParameterException(
+                    'Invalid datetime format, param $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
+                )
+            );
+        } else {
+            $this->date_add = $date_add;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string $date_upd with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     * @return CacheEntity
+     * @throws BadParameterException
+     */
+    public function setDateUpd($date_upd)
+    {
+        if (!is_string($date_upd) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
+            throw (
+                new BadParameterException(
+                    'Invalid datetime format, param $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
+                )
+            );
+        } else {
+            $this->date_upd = $date_upd;
+            return $this;
+        }
+    }
+
+    /**
+     * @param array $definition
+     * @return CacheEntity
+     * @throws BadParameterException
+     */
+    public function setDefinition($definition)
+    {
+        if (!is_array($definition)) {
+            throw (new BadParameterException('Invalid id, param $definition must be an array'));
+        } else {
+            $this->definition = $definition;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string $id_payplug_cache
+     * @return CacheEntity
+     * @throws BadParameterException
+     */
+    public function setIdPayPlugCache($id_payplug_cache)
+    {
+        if (!is_string($id_payplug_cache)) {
+            throw (new BadParameterException('Invalid id, param $id_payplug_cache must be a string'));
+        } else {
+            $this->id_payplug_cache = $id_payplug_cache;
+            return $this;
+        }
+    }
+
+    /**
      * @param string $table
      * @return CacheEntity
+     * @throws BadParameterException
      */
     public function setTable($table)
     {
-        $this->table = $table;
-        return $this;
+        if (!is_string($table)) {
+            throw (new BadParameterException('Invalid id, param $table must be a string'));
+        } else {
+            $this->table = $table;
+            return $this;
+        }
     }
 }
