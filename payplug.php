@@ -246,6 +246,27 @@ class Payplug extends PaymentModule
         ),
     );
 
+    public $oney_order_state = array(
+        'oney_pg' => array(
+            'cfg' => null,
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#a1f8a1',
+            'name' => array(
+                'en' => 'Oney - Pending',
+                'fr' => 'Oney - En attente',
+                'es' => 'Oney - Pending',
+                'it' => 'Oney - Pending',
+            ),
+        ),
+    );
+
     /** @var object */
     public $logger;
 
@@ -1162,7 +1183,7 @@ class Payplug extends PaymentModule
         );
     }
 
-    public function createOrderState($name, $state, $sandbox = true)
+    public function createOrderState($name, $state, $sandbox = true, $force = false)
     {
         $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
@@ -1182,7 +1203,7 @@ class Payplug extends PaymentModule
                 $os = Db::getInstance()->getValue($sql);
             }
         }
-        if (!$os) {
+        if (!$os || $force) {
             $log->info('Creating new order state.');
             $order_state = new OrderState();
             $order_state->logable = $state['logable'];
@@ -2421,7 +2442,6 @@ class Payplug extends PaymentModule
             }
 
             foreach ($this->available_oney_payments as $oney_payment) {
-
                 $paymentOption['oney_' . $oney_payment]['name'] = 'oney';
                 $paymentOption['oney_' . $oney_payment]['inputs'] = array(
                     'pc' => array(
@@ -2501,10 +2521,10 @@ class Payplug extends PaymentModule
                     'dispatcher', array(), true);
                 $paymentOption['oney_' . $oney_payment]['moduleName'] = 'payplug';
                 $paymentOption['oney_' . $oney_payment]['err_label'] = $err_label;
+
                 if ($optimized) {
                     $schedules = $this->oneyRepository->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption['oney_' . $oney_payment]['additionalInformation'] = $schedules;
-
                 }
             }
         }
@@ -4736,6 +4756,18 @@ class Payplug extends PaymentModule
         }
 
         return $payment;
+    }
+
+    /**
+     * Run update module
+     */
+    public function runUpgradeModule()
+    {
+        $upgrade = parent::runUpgradeModule();
+
+        $this->checkOrderStates();
+
+        return $upgrade;
     }
 
     public function saveConfiguration()

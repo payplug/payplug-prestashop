@@ -24,7 +24,6 @@
 // (function ($) {
 var $document,
     $window,
-    payment_allowed = true,
     payplugModule = {
         init: function () {
             $document.on('click', 'a.ppdeletecard', function (event) {
@@ -38,6 +37,9 @@ var $document,
             payplugModule.popup.init();
         },
         payment: {
+            props: {
+                pending: false,
+            },
             init: function () {
                 $document.on('click', '.payment_module a.payplug', payplugModule.payment.pay)
                     .on('submit', '#form_payplug_payment', payplugModule.payment.oneclick);
@@ -50,6 +52,11 @@ var $document,
                 }
             },
             send: function (options) {
+                if (payplugModule.payment.props.pending) {
+                    return false;
+                }
+                payplugModule.payment.props.pending = true;
+
                 var default_options = {
                     id_card: 'new_card',
                     is_inst: null,
@@ -104,7 +111,7 @@ var $document,
                         $('div.ppoverlay').remove();
                     },
                     error: function () {
-                        payment_allowed = true;
+                        payplugModule.payment.props.pending = false;
                     },
                     success: function (data) {
                         if (data.result) {
@@ -135,14 +142,13 @@ var $document,
                             } else if (data.embedded) {
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
+                                payplugModule.payment.props.pending = false;
                             } else {
                                 window.location.href = data.return_url;
                             }
 
                             payplugModule.oney.payment.form.close();
                         } else if (typeof data.response != 'undefined') {
-                            payment_allowed = true;
-
                             var $errorWrapper;
                             $('p.ppfail').hide();
                             if (options['is_inst']) {
@@ -179,6 +185,8 @@ var $document,
                                     $errorWrapper.stop().fadeOut();
                                 }, delay
                             );
+
+                            payplugModule.payment.props.pending = false;
                         }
                     }
                 });
@@ -192,11 +200,9 @@ var $document,
                 var $link = $(this),
                     is_inst = $link.is('.installment');
 
-                if (!payment_allowed || ($('#form_payplug_payment').length && !is_inst)) {
+                if (($('#form_payplug_payment').length && !is_inst)) {
                     return false;
                 }
-
-                payment_allowed = false;
 
                 if (!$('.ppoverlay').length) {
                     $('body').append('<div class="ppoverlay"><img class="loader" src="' + spinner_url + '" /></div>');
@@ -209,12 +215,6 @@ var $document,
             oneclick: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!payment_allowed) {
-                    return false;
-                }
-
-                payment_allowed = false;
-
                 if (!$('.ppoverlay').length) {
                     $('body').append('<div class="ppoverlay"></div>');
                 }
@@ -347,7 +347,13 @@ var $document,
                             if (typeof (response.payment) != 'undefined') {
                                 payplugModule.oney.payment.set(response.payment);
                             }
-                            payplugModule.oney.popin.enable();
+
+                            if (typeof response.error != 'undefined' && response.error) {
+                                payplugModule.oney.popin.disable();
+                            } else {
+                                payplugModule.oney.popin.enable();
+                            }
+
                         } else {
                             if (typeof response.popin != 'undefined') {
                                 payplugModule.oney.popin.set(response.popin);
@@ -586,12 +592,9 @@ var $document,
                 send: function (event) {
                     event.preventDefault();
                     // if invalid carrier return
-                    if (!payment_allowed || $('.oneyPayment').is('.oneyPayment-invalidCarrier')) {
+                    if ($('.oneyPayment').is('.oneyPayment-invalidCarrier')) {
                         return false;
                     }
-
-                    payment_allowed = false;
-
                     if ($('.oneyForm').length) {
                         payplugModule.oney.payment.form.open();
                     } else {
@@ -694,7 +697,6 @@ var $document,
                         });
                     },
                     close: function () {
-                        payment_allowed = true;
                         payplugModule.popup.close();
                         $('.oneyPayment_button').removeClass('oneyPayment_button-disabled').removeClass('oneyPayment_button-validate');
                         $('.oneyForm_overlay').removeClass('oneyForm_overlay-show');
