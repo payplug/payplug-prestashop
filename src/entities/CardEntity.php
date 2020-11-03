@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -176,7 +177,6 @@ class CardEntity
     /**
      * @param string $id_card card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
      * @return CardEntity
-     * @throws BadParameterException
      */
     public function setIdCard($id_card)
     {
