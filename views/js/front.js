@@ -322,7 +322,7 @@ var $document, $window, payplugModule = {
                     var oney = payplugModule.oney,
                         popin = oney.cta.popin,
                         identifier = popin.props.identifier,
-                        open = popin.props.identifier.open;
+                        open = popin.props.open;
 
 
                     oney.props.loaded = $('.' + identifier).length > 0;
