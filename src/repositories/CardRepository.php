@@ -93,7 +93,7 @@ class CardRepository
             ]);
 
         if ($idCompany && (!empty($idCompany))) {
-            $this->cardEntity->setIdCompany($idCompany);
+            $this->cardEntity->setIdCompany((int)$idCompany);
         }
 
         if ($isSandbox) {
