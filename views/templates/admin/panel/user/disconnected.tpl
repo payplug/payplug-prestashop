@@ -46,7 +46,7 @@
 </div>
 <div class="payplugPanel">
     <div class="payplugPanel_content">
-        <button type="button" class="payplugButton -green payplugLogin_login">{l s='Connect account' mod='payplug'}</button>
+        <button type="button" class="payplugButton -green payplugLogin_login" data-e2e-login="true">{l s='Connect account' mod='payplug'}</button>
     </div>
 </div>
 <div class="payplugPanel">
