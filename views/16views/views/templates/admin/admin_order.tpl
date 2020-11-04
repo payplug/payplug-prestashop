@@ -32,17 +32,17 @@
                 {if $single_payment.can_be_captured && isset($single_payment.date)}
                     <span class="pp_block">{$single_payment.expiration_display}</span>
                 {/if}
-                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/payment_details.tpl' payment=$single_payment}
+                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/details.tpl' payment=$single_payment}
             {/if}
             {if $display_refund}
                 <hr />
-                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_refund.tpl'}
+                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/refund/refund.tpl'}
             {elseif $show_menu_refunded}
                 <hr />
-                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_refunded.tpl'}
+                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/refunded.tpl'}
             {elseif $show_menu_update}
                 <hr />
-                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_update.tpl'}
+                {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/update.tpl'}
             {/if}
         </fieldset>
     </div>
@@ -57,17 +57,17 @@
             {if $single_payment.can_be_captured && isset($single_payment.date)}
                 <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
             {/if}
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/payment_details.tpl' payment=$single_payment}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/details.tpl' payment=$single_payment}
         {/if}
         {if $display_refund}
             <hr />
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_refund.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/refund/refund.tpl'}
         {elseif $show_menu_refunded}
             <hr />
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_refunded.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/refunded.tpl'}
         {elseif $show_menu_update}
             <hr />
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_update.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/update.tpl'}
         {/if}
     </fieldset>
 {elseif $version >= 1.6}
@@ -77,23 +77,23 @@
         </div>
         <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
         {if $show_menu_installment}
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_installment.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/installment.tpl'}
         {/if}
         {if $display_single_payment}
             {if $single_payment.can_be_captured && isset($single_payment.date)}
                 <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
             {/if}
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/payment_details.tpl' payment=$single_payment}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/details.tpl' payment=$single_payment}
         {/if}
         {if $display_refund}
             <hr />
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_refund.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/refund/refund.tpl'}
         {elseif $show_menu_refunded}
             <hr />
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_refunded.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/refunded.tpl'}
         {elseif $show_menu_update}
             <hr />
-            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/admin_order_update.tpl'}
+            {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/update.tpl'}
         {/if}
     </div>
 {else}

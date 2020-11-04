@@ -60,7 +60,7 @@
                     {if isset($payment['id'])}
                         <tr class="payment_information" style="display: none;">
                             <td colspan="5">
-                                {include file='./payment_details.tpl' payment=$payment}
+                                {include file='./details.tpl' payment=$payment}
                             </td>
                         </tr>
                     {/if}
@@ -84,17 +84,17 @@
         {if $single_payment.can_be_captured && isset($single_payment.date)}
             <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
         {/if}
-        {include file='./payment_details.tpl' payment=$single_payment}
+        {include file='./details.tpl' payment=$single_payment}
     {/if}
     {if $display_refund}
         <hr />
-        {include file='./admin_order_refund.tpl'}
+        {include file='./refund/refund.tpl'}
     {elseif $show_menu_refunded}
         <hr />
-        {include file='./admin_order_refunded.tpl'}
+        {include file='./refunded.tpl'}
     {elseif $show_menu_update}
         <hr />
-        {include file='./admin_order_update.tpl'}
+        {include file='./update.tpl'}
     {/if}
 
 </div>

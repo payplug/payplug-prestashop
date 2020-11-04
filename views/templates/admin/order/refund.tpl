@@ -32,7 +32,16 @@
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="pay_mode" value="{$pay_mode|escape:'htmlall':'UTF-8'}" />
     <div class="pp_list">
-        {include file='./admin_order_refund_data.tpl' amount_refunded_payplug=$amount_refunded_payplug amount_available=$amount_available}
+        <ul>
+            <li>
+                {l s='Amount already refunded with Payplug : ' mod='payplug'}
+                <span id="amount_refunded_payplug">{displayPrice price=$amount_refunded_payplug}</span>
+            </li>
+            <li>
+                {l s='Amount still refundable with Payplug : ' mod='payplug'}
+                <span id="amount_available">{displayPrice price=$amount_available}</span>
+            </li>
+        </ul>
     </div>
     <div class="form-group">
         <label class="control-label" for="pp_amount2refund">{l s='Amount to be refunded' mod='payplug'} ({$currency->name|escape:'htmlall':'UTF-8'}) :</label>
@@ -40,5 +49,5 @@
         <label for="change_order_state">{l s='Change Prestashop order state to "Refunded"' mod='payplug'}</label>
         <input class="control-label" type="checkbox" value="{$id_new_order_state|escape:'htmlall':'UTF-8'}" name="change_order_state" >
     </div>
-    {include file='./button_with_loader.tpl' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
+    {include file='./button.tpl' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
 </form>

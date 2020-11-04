@@ -323,6 +323,6 @@ function hookAdminOrder($params)
     $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
     $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
 
-    $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin_order.tpl');
+    $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
     return $this->html;
 }
