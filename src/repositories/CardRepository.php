@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -44,7 +43,7 @@ class CardRepository
         $this->tools = new ToolsSpecific();
         $this->setParams();
     }
-    
+
     private function setParams() {
         $config = $this->configurationSpecific;
         $idCompany = $config->get('PAYPLUG_COMPANY_ID');
@@ -117,7 +116,7 @@ class CardRepository
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
         $url = (new \Payplug())->getPlugin()->getApiUrl() . '/v1/cards/' . $id_card;
-        
+
         $curl_version = curl_version();
 
         $process = curl_init($url);

@@ -25,8 +25,15 @@ use PayPlug\src\repositories\CardRepository;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
+/**
+ * Class PayPlugAjax
+ * use for treat ajax on prestashop 1.6
+ */
 class PayPlugAjax
 {
+    /**
+     * @description entry point
+     */
     public function run()
     {
         //todo: split code into different functions if needed
@@ -34,6 +41,9 @@ class PayPlugAjax
     }
 
 
+    /**
+     * Manage ajax processing
+     */
     public function postProcess()
     {
         if (Tools::getValue('_ajax') == 1) {
@@ -152,8 +162,7 @@ class PayPlugAjax
                 try {
                     $payment_options = $payplug->oneyRepository->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 } catch (Exception $e) {
-                    var_dump($e); exit;
-
+                    throw Exception($e);
                 }
 
                 die(Tools::jsonEncode($payment_options));
@@ -182,7 +191,7 @@ class PayPlugAjax
                         )));
                     }
                 } catch (Exception $e) {
-                    var_dump('Fatal Error'.$e); exit;
+                    throw Exception($e);
                 }
 
                 $result = $payplug->setPaymentDataCookie($payment_data);

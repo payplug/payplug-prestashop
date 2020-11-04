@@ -238,7 +238,7 @@ class Payplug extends PaymentModule
             'invoice' => false,
             'color' => '#8f0621',
             'name' => array(
-                'en' => 'Authorization expired',
+                'en' => 'Authoriation expired',
                 'es' => 'Autorización vencida',
                 'fr' => 'Autorisation expirée',
                 'it' => 'Autorizzazione scaduta',
@@ -308,7 +308,7 @@ class Payplug extends PaymentModule
         try {
             $this->oneyRepository = new \PayPlug\src\repositories\OneyRepository($this);
         } catch (Exception $e) {
-            var_dump($e); exit;
+            throw Exception($e);
         }
     }
 
@@ -3474,10 +3474,6 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-//        if ($this->tools->tool('getValue', 'empty_smarty_cache')) {
-//            return false;
-//        }
-
         // Purge PayPlug cache
         if (!$this->payplug_cache->flushCache()) {
             $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
@@ -3866,8 +3862,6 @@ class Payplug extends PaymentModule
     {
         $this->registerHook($hook);
         $this->context->controller->warnings[] = $this->l($hook);
-//       $this->registerHook($hook);
-
     }
 
     /**
@@ -4385,7 +4379,6 @@ class Payplug extends PaymentModule
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->card->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
-
         }
 
         // check payment tab from current payment method
@@ -4915,7 +4908,6 @@ class Payplug extends PaymentModule
             $this->plugin->setApiUrl($_SERVER['PAYPLUG_API_URL']);
         } else {
             $this->plugin->setApiUrl('https://api.payplug.com');
-
         }
 
         if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
@@ -5603,14 +5595,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Assign Oney var
-     *
-     * @param $cart Cart
-     * @return bool
-     * @throws Exception
-     */
-
-    /**
      * Install the required hooks
      * @return bool
      */
@@ -5789,7 +5773,7 @@ class Payplug extends PaymentModule
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
         ));
-        
+
         return $this->oneyRepository->getOneyCTA('checkout');
     }
 }
