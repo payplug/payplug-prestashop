@@ -41,19 +41,19 @@
 </div>
 <div class="payplugPanel">
     <div class="payplugPanel_content">
-        <a class="payplugLink" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" target="_blank">{l s='Forgot your password?' mod='payplug'}</a>
+        <a class="payplugLink" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" target="_blank" data-e2e-link="forgot_password">{l s='Forgot your password?' mod='payplug'}</a>
     </div>
 </div>
 <div class="payplugPanel">
     <div class="payplugPanel_content">
-        <button type="button" class="payplugButton -green payplugLogin_login" data-e2e-login="true">{l s='Connect account' mod='payplug'}</button>
+        <button type="button" class="payplugButton -green payplugLogin_login" data-e2e-type="button" data-e2e-action="login">{l s='Connect account' mod='payplug'}</button>
     </div>
 </div>
 <div class="payplugPanel">
     <div class="payplugPanel_content">
         <p>
             {l s='Don\'t have an account?' mod='payplug'}<br>
-            <a class="payplugLink" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" target="_blank">{l s='Sign up' mod='payplug'}</a>
+            <a class="payplugLink" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" data-e2e-link="create_account" target="_blank">{l s='Sign up' mod='payplug'}</a>
         </p>
     </div>
 </div>

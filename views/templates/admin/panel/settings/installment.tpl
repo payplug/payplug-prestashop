@@ -28,7 +28,7 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
 
             <div class="payplugTips -{$payplug_switch.installment.name|escape:'htmlall':'UTF-8'}">
@@ -36,13 +36,13 @@
                     <p class="payplugAlert -warning"><span>{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</span></p>
                     <p>
                         {l s='You can consult all your past and pending installment payments in' mod='payplug'}
-                        <a class="payplugLink" href="{$installments_panel_url|escape:'htmlall':'UTF-8'}"> {l s='a dedicated menu' mod='payplug'}</a>
+                        <a class="payplugLink" href="{$installments_panel_url|escape:'htmlall':'UTF-8'}" data-e2e-link="installment"> {l s='a dedicated menu' mod='payplug'}</a>
                         {l s='made accessible from the navigation bar, and in the details of each order within the' mod='payplug'}
                         <i> {l s='Payment with PayPlug' mod='payplug'}</i> {l s='bloc.' mod='payplug'}
                     </p>
                     <p>
                         {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
-                        <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                        <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                     </p>
 
                     <div class="payplugInstallment_fieldset payplugPanel">

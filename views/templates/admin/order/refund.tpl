@@ -49,5 +49,5 @@
         <label for="change_order_state">{l s='Change Prestashop order state to "Refunded"' mod='payplug'}</label>
         <input class="control-label" type="checkbox" value="{$id_new_order_state|escape:'htmlall':'UTF-8'}" name="change_order_state" >
     </div>
-    {include file='./button.tpl' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
+    {include file='./button.tpl' e2e_action='refund' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
 </form>
