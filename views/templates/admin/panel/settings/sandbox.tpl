@@ -29,7 +29,7 @@
             <div class="payplugTips -{$payplug_switch.sandbox.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item -left" {if !$payplug_switch.sandbox.checked}style="display: none;"{/if}>
                     {l s='In TEST mode all payments will be simulations and will not generate real transactions.' mod='payplug'}
-                    <a class="payplugLink" href="http://support.payplug.com/customer/portal/articles/1701656" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                    <a class="payplugLink" href="http://support.payplug.com/customer/portal/articles/1701656" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                 </div>
                 <div class="payplugTips_item -right"{if $payplug_switch.sandbox.checked}style="display: none;"{/if}>
                     {l s='In LIVE mode the payments will generate real transactions.' mod='payplug'}
