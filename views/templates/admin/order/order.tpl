@@ -88,7 +88,7 @@
     {/if}
     {if $display_refund}
         <hr />
-        {include file='./refund/refund.tpl'}
+        {include file='./refund.tpl'}
     {elseif $show_menu_refunded}
         <hr />
         {include file='./refunded.tpl'}
