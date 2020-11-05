@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugLogger;
-
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
 class PayPlugValidation
@@ -33,16 +31,20 @@ class PayPlugValidation
     public $debug;
     public $type;
     public $api_key;
+    private $plugin;
 
     public function __construct()
     {
         $this->payplug = new Payplug();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->type = 'payment';
+        $this->plugin = $this->payplug->getPlugin();
     }
 
     public function setLogger() {
-        $this->logger = new PayPlugLogger('validation');
+        $this->logger = $this->plugin->getLogger();
+        $params['process'] = 'validation';
+        $this->logger->setParams($params);
         $this->logger->addLog('New validation');
     }
 
@@ -219,7 +221,7 @@ class PayPlugValidation
                         && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
                 ) {
                     $this->logger->addLog('[Save Card] Saving card...', 'info');
-                    $res_payplug_card = $this->payplug->saveCard($payment);
+                    $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
 
                     if (!$res_payplug_card) {
                         $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');

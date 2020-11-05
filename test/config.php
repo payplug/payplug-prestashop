@@ -1,6 +1,5 @@
 <?php
 
-
 define('PAYPLUG_TEST_VERSION', '2019-08-06');
 define('PAYPLUG_TEST_ONEY_MIN', '100');
 define('PAYPLUG_TEST_ONEY_MAX', '3000');

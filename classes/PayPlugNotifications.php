@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugLogger;
-
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
 class PayPlugNotifications
@@ -45,6 +43,7 @@ class PayPlugNotifications
         $this->except = null;
         $this->resp = array();
         $this->payplug = new Payplug();
+        $this->plugin = $this->payplug->getPlugin();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
 
@@ -71,7 +70,9 @@ class PayPlugNotifications
     }
 
     public function setLogger() {
-        $this->logger = new PayPlugLogger('notification');
+        $this->logger = $this->plugin->getLogger();
+        $params['process'] = 'notification';
+        $this->logger->setParams($params);
         $this->logger->addLog('New notification');
     }
 
@@ -140,7 +141,7 @@ class PayPlugNotifications
                 && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
         ) {
             $this->logger->addLog('[Save Card] Saving card...', 'info');
-            $res_payplug_card = $this->payplug->saveCard($payment);
+            $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
 
             if (!$res_payplug_card) {
                 $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');

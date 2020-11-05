@@ -282,7 +282,7 @@ var $document,
             },
             init: function () {
                 var oney = this;
-                if ($('.oneyCta_wrapper').length) {
+                if ($('.oneyCta').length || $('.oneyCta_wrapper').length) {
                     oney.setCheckout();
                 }
 
@@ -420,10 +420,8 @@ var $document,
                     }
                     var is_open = $('.oneyCta').is('.oneyCta-open');
                     $('.oneyPopin').replaceWith(content).removeClass('oneyPopin-loading');
-
                     var $button = $('.oneyPopin_navigation button').eq(0);
                     payplugModule.oney.popin.choose($button.data('type'));
-
                     if (is_open) {
                         setTimeout(payplugModule.oney.popin.open, 0);
                     }
