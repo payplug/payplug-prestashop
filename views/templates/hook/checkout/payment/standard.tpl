@@ -19,19 +19,13 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
-<div id="pp_error_one_click">
-	<div class="ppOneClickStatus">
-		<p class="ppfail"><i class="material-icons">&#xE5CD;</i>{l s='The transaction was not completed and your card was not charged.' mod='payplug'}</p>
+<div class="row">
+	<div class="col-xs-12">
+		<p class="payment_module payplugPayment">
+			<a href="{$payplug_payment_option.payment_url|escape:'html'}" class="{$payplug_payment_option.extra_classes|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">
+				<img class="payment_option_standard_payment_logo" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />{$payplug_payment_option.label|escape:'html'}
+			</a>
+		</p>
+		<p class="ppfail ppfail-default"></p>
 	</div>
 </div>
-{if isset($error) && $error == 1}
-{literal}
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$('#payment-confirmation').before($('#pp_error_one_click').html());
-			$('#pp_error_one_click').remove();
-		});
-	</script>
-{/literal}
-{/if}

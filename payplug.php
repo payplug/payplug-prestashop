@@ -1388,7 +1388,7 @@ class Payplug extends PaymentModule
     public function displayGDPRConsent()
     {
         $this->context->smarty->assign(array('id_module' => $this->id));
-        return $this->display(__FILE__, 'gdpr_consent.tpl');
+        return $this->display(__FILE__, 'customer/gdpr_consent.tpl');
     }
 
     /**
@@ -1415,7 +1415,7 @@ class Payplug extends PaymentModule
                 ]);
                 $payment_messages[] = [
                     'type' => 'template',
-                    'value' => 'oney/form.tpl'
+                    'value' => 'oney/required.tpl'
                 ];
             } else {
                 $with_msg_button = true;
@@ -1431,7 +1431,7 @@ class Payplug extends PaymentModule
             'with_msg_button' => $with_msg_button
         ]);
 
-        return $this->display(__FILE__, 'messages.tpl');
+        return $this->display(__FILE__, '_partials/messages.tpl');
     }
 
     /**
@@ -2303,7 +2303,6 @@ class Payplug extends PaymentModule
 
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
-
             foreach ($payplug_cards as $card) {
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                 $paymentOption['one_click_'.$card['id_payplug_card']]['name'] = 'one_click';
@@ -2329,7 +2328,7 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
-                $paymentOption['one_click_'.$card['id_payplug_card']]['tpl'] = 'one_click_payment.tpl';
+                $paymentOption['one_click_'.$card['id_payplug_card']]['tpl'] = 'one_click.tpl';
                 $paymentOption['one_click_'.$card['id_payplug_card']]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,'payment', array(), true);
                 $paymentOption['one_click_'.$card['id_payplug_card']]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
                 $paymentOption['one_click_'.$card['id_payplug_card']]['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'];
@@ -2363,7 +2362,7 @@ class Payplug extends PaymentModule
                 'value' => 'standard',
             ),
         );
-        $paymentOption['standard']['tpl'] = 'standard_payment.tpl';
+        $paymentOption['standard']['tpl'] = 'standard.tpl';
         $paymentOption['standard']['extra_classes'] = 'payplug default';
         $paymentOption['standard']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',
             array('type' => 'standard'));
@@ -2402,7 +2401,7 @@ class Payplug extends PaymentModule
                         'value' => 'installment',
                     ),
                 );
-                $paymentOption['installment']['tpl'] = 'installment_payment.tpl';
+                $paymentOption['installment']['tpl'] = 'installment.tpl';
                 //            $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name, 'payment',array('i' => 1), true);
                 $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
                     'payment', array('type' => 'installment', 'i' => 1), true);
@@ -2496,12 +2495,12 @@ class Payplug extends PaymentModule
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
 
-                $oneyTpl = 'unified_payment.tpl';
+                $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.svg';
                 $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 if ($optimized) {
-                    $oneyTpl = 'oney_payment.tpl';
+                    $oneyTpl = 'oney.tpl';
 
                     if ((class_exists($this->PrestashopSpecificClass))
                         && (method_exists($this->PrestashopSpecificObject, 'getPaymentOption'))) {
@@ -3255,7 +3254,7 @@ class Payplug extends PaymentModule
             'payplug_cards_url' => $payplug_cards_url
         ));
 
-        return $this->display(__FILE__, 'my_account.tpl');
+        return $this->display(__FILE__, 'customer/my_account.tpl');
     }
 
     /**
@@ -3369,7 +3368,7 @@ class Payplug extends PaymentModule
                         'payment_url' => $payment['return_url'],
                         'api_url' => $this->plugin->getApiUrl(),
                     ));
-                    return $this->display(__FILE__, 'embedded.tpl');
+                    return $this->display(__FILE__, 'checkout/embedded.tpl');
                 }
             } else {
                 $this->setPaymentErrorsCookie([$this->l('The transaction was not completed and your card was not charged.')]);
@@ -3460,7 +3459,7 @@ class Payplug extends PaymentModule
             $context['reference'] = $order->reference;
         }
         $this->smarty->assign($context);
-        return $this->display(__FILE__, 'confirmation.tpl');
+        return $this->display(__FILE__, 'checkout/order-confirmation.tpl');
     }
 
     public function hookRegisterGDPRConsent()
@@ -5511,7 +5510,7 @@ class Payplug extends PaymentModule
             'this_path' => $this->_path,
         ));
 
-        return $this->display(__FILE__, 'payment_options_display.tpl');
+        return $this->display(__FILE__, 'checkout/payment/display.tpl');
     }
 
     /**

@@ -1,3 +1,4 @@
+<?php
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -20,10 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-@import "less/include";
-@import "less/front";
-@import "less/component/payplug/payment";
-@import "less/component/payplug/oneclick";
-@import "less/component/payplug/button";
-@import "less/component/oney/payment";
-@import "less/component/oney/option";
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
+
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+header("Location: ../../../../");
+exit;

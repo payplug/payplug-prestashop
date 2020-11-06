@@ -29,11 +29,6 @@
 
 {block name='page_content'}
     <h6>{l s='Here are the cards you have saved.' mod='payplug'}</h6>
-    <div class="col-xs-12 message alert alert-success hide">
-        <ul>
-            <li>{l s='Card sucessfuly deleted.' mod='payplug'}</li>
-        </ul>
-    </div>
 
     {if isset($payplug_cards) AND !empty($payplug_cards) AND sizeof($payplug_cards)}
         <table class="table table-striped table-bordered table-labeled hidden-sm-down">

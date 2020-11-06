@@ -131,10 +131,10 @@
   -o-transform: translate(-50%, -50%) rotate(-45deg);
   transform: translate(-50%, -50%) rotate(-45deg);
 }
-.payplugPopin-open {
+.payplugPopin.-open {
   display: block;
 }
-.payplugPopin-show {
+.payplugPopin.-show {
   opacity: 1;
 }
 /* Payplug message */
@@ -186,23 +186,6 @@
   z-index: 3;
   display: inline-block;
 }
-.oneyCta-checkout {
-  margin: 16px 0 0;
-}
-@media (max-width: 767px) {
-  .oneyCta {
-    align-items: flex-start;
-  }
-  .oneyCta,
-  #order-detail-content #cart_summary .oneyCta {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  #order-detail-content #cart_summary .oneyCta {
-    align-items: flex-end;
-  }
-}
 .oneyCta_button {
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
@@ -221,6 +204,7 @@
   text-transform: uppercase;
   color: #2F2930;
   cursor: pointer;
+  font-size: 11px;
 }
 .oneyCta_button:hover {
   color: #7ebd00;
@@ -234,10 +218,10 @@
     height: 32px;
   }
 }
-.oneyCta_button-disabled {
+.oneyCta_button.-disabled {
   color: #b2b2b2;
 }
-.oneyCta_button-disabled:hover {
+.oneyCta_button.-disabled:hover {
   color: #b2b2b2;
 }
 .oneyCta_button span {
@@ -255,23 +239,15 @@
   background-size: 110%;
   margin: 0 0 0 0.25em;
 }
-.oneyCta_button-disabled .oneyCta_logo {
+.-disabled .oneyCta_logo {
   background-image: url(../img/oney/3x4x-alt.svg);
 }
 .oneyCta_tooltip {
   width: 14px;
   height: 14px;
 }
-.oneyCta_button-disabled .oneyCta_tooltip {
+.-disabled .oneyCta_tooltip {
   background-image: url(../img/oney/tooltip-alt.svg);
-}
-.table tfoot tr.oneyCta_row {
-  background: none;
-}
-.oneyCta_row td:first-child {
-  border-left: 1px solid #fff;
-  border-bottom: 1px solid #fff;
-  background: none;
 }
 .oneyCta_field {
   height: 46px;
@@ -367,16 +343,16 @@
   -webkit-background-size: 100%;
   background-size: 100%;
 }
-.oneyLogo-x3 {
+.oneyLogo.-x3 {
   background-image: url(../img/oney/x3_with_fees.svg);
 }
-.oneyLogo-x3x4 {
+.oneyLogo.-x3x4 {
   background-image: url(../img/oney/3x4x.svg);
 }
-.oneyLogo-x4 {
+.oneyLogo.-x4 {
   background-image: url(../img/oney/x4_with_fees.svg);
 }
-.oneyLogo-tooltip {
+.oneyLogo.-tooltip {
   background-image: url(../img/oney/tooltip.svg);
 }
 /* Oney popin */
@@ -424,7 +400,7 @@
   right: -2px;
   z-index: -1;
 }
-.oneyPopin-error.oneyPopin:after {
+.-error.oneyPopin:after {
   border-color: #b2b2b2;
 }
 @media (max-width: 767px) {
@@ -458,24 +434,24 @@
     margin: 15px 0;
     display: none;
   }
-  .oneyCta-open .oneyPopin .oneyLoader {
+  .-open .oneyPopin .oneyLoader {
     display: flex;
   }
 }
-.oneyPopin-open {
+.oneyPopin.-open {
   display: block;
 }
 @media (max-width: 767px) {
-  .oneyPopin-open {
+  .oneyPopin.-open {
     border: 1px solid #7ebd00;
     max-height: 500px;
     background: #fff;
   }
 }
-.oneyPopin-show {
+.oneyPopin.-show {
   opacity: 1;
 }
-.oneyPopin-error {
+.oneyPopin.-error {
   -webkit-transform: translateY(-50%);
   -moz-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
@@ -488,11 +464,11 @@
   width: 100vw;
   max-width: 300px;
 }
-.oneyPopin-error:after {
+.oneyPopin.-error:after {
   top: 50%;
 }
 @media (max-width: 767px) {
-  .oneyPopin-error {
+  .oneyPopin.-error {
     -webkit-transform: none;
     -moz-transform: none;
     -ms-transform: none;
@@ -504,13 +480,13 @@
     padding: 0 8px;
     background: transparent;
   }
-  .oneyPopin-open.oneyPopin-error {
+  .oneyPopin-open.oneyPopin.-error {
     padding: 8px;
     border-color: #b2b2b2;
     background: rgba(178, 178, 178, 0.1);
   }
 }
-.oneyPopin-loading {
+.oneyPopin.-loading {
   -webkit-transform: translateY(-50%);
   -moz-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
@@ -520,11 +496,11 @@
   width: auto;
   height: auto;
 }
-.oneyPopin-loading:after {
+.oneyPopin.-loading:after {
   top: 50%;
 }
 @media (max-width: 767px) {
-  .oneyPopin-loading {
+  .oneyPopin.-loading {
     -webkit-transform: none;
     -moz-transform: none;
     -ms-transform: none;
@@ -571,6 +547,7 @@
   -ms-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
+  padding: 0;
 }
 .oneyPopin_navigation li:first-child {
   -webkit-border-radius: 2px 2px 0 0;
@@ -603,7 +580,7 @@
 }
 .oneyPopin_navigation li:hover button,
 .oneyPopin_navigation li.selected button {
-  color: #777;
+  color: #b2b2b2;
 }
 .oneyPopin_navigation li.selected {
   background: rgba(126, 189, 0, 0.15);
@@ -617,7 +594,7 @@
   line-height: 17px;
   width: 100%;
 }
-.oneyPopin_option-show {
+.oneyPopin_option.-show {
   display: block;
 }
 .oneyPopin_option ul,
@@ -719,7 +696,7 @@
   font-weight: 400;
 }
 /* Oney Form */
-.oneyForm {
+.oneyRequired {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -731,15 +708,15 @@
   width: 100%;
 }
 @media (max-width: 767px) {
-  .payplugPopin .oneyForm {
+  .oneyRequired {
     width: calc(100vw - 30px);
     max-width: 100%;
   }
 }
-.oneyForm:focus {
+.oneyRequired:focus {
   outline: 0;
 }
-.oneyForm_overlay {
+.oneyRequired_overlay {
   -webkit-transition: max-height 0.4s;
   -moz-transition: max-height 0.4s;
   -ms-transition: max-height 0.4s;
@@ -754,14 +731,14 @@
   padding: 0 16px;
   max-height: 0;
 }
-.oneyForm_overlay-show {
+.oneyRequired_overlay.-show {
   max-height: 10000vh;
 }
-.oneyForm_wrapper {
+.oneyRequired_wrapper {
   position: relative;
   padding: 24px 0 0;
 }
-.oneyForm_wrapper:before {
+.oneyRequired_wrapper:before {
   border-top: 1px solid #7ebd00;
   -webkit-transform: translateX(-50%);
   -moz-transform: translateX(-50%);
@@ -775,7 +752,7 @@
   height: 0;
   width: 150px;
 }
-.oneyForm_close {
+.oneyRequired_close {
   display: block;
   width: 100px;
   height: 24px;
@@ -783,44 +760,43 @@
   background: none;
   border: none;
   text-align: center;
-  color: #7ebd00;
+  color: #00ab7a;
   margin: 0 0 15px;
+  cursor: pointer;
 }
-.oneyForm_close:focus {
+.oneyRequired_close:focus {
   outline: 0;
 }
-.oneyForm_close:before {
-  -webkit-transform: translate(-50%, -50%) rotate(45deg);
-  -moz-transform: translate(-50%, -50%) rotate(45deg);
-  -ms-transform: translate(-50%, -50%) rotate(45deg);
-  -o-transform: translate(-50%, -50%) rotate(45deg);
-  transform: translate(-50%, -50%) rotate(45deg);
+.oneyRequired_close.-button {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  background: #00ab7a;
+  width: auto;
+  height: 32px;
+  padding: 0 16px;
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  outline: none;
+  margin: 15px 0 0;
+  cursor: pointer;
 }
-.oneyForm_close:after {
-  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
-  -moz-transform: translate(-50%, -50%) rotate(-45deg);
-  -ms-transform: translate(-50%, -50%) rotate(-45deg);
-  -o-transform: translate(-50%, -50%) rotate(-45deg);
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-.payplugPopin .oneyForm_close {
-  color: #00ab7a;
-}
-.oneyForm_title {
+.oneyRequired_title {
   display: block;
   padding: 8px 0 16px;
   color: #00ab7a;
   font-size: 14px;
   text-transform: uppercase;
 }
-.oneyForm_content {
+.oneyRequired_content {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   position: relative;
   width: 100%;
 }
-.oneyForm_fieldset {
+.oneyRequired_fieldset {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -829,58 +805,47 @@
   padding: 0 15px;
   margin: 0 0 15px;
 }
-.oneyForm_fieldset-same {
+.oneyRequired_fieldset.-same {
   margin: auto;
 }
-.oneyForm_wrapper .oneyForm_fieldset {
+.oneyRequired_wrapper .oneyRequired_fieldset {
   max-width: calc(50% - 50px);
 }
-.oneyPayment-mobile .oneyForm_fieldset {
-  width: 100%;
-}
-.oneyPayment-mobile .oneyForm_fieldset + .oneyForm_fieldset {
-  border-top: 1px solid rgba(178, 178, 178, 0.5);
-  padding: 16px 0 0;
-  margin: 16px 0 0;
-}
 @media (max-width: 767px) {
-  .payplugPopin .oneyForm_fieldset {
+  .payplugPopin .oneyRequired_fieldset {
     padding: 16px 0 0;
   }
 }
-.oneyForm_sectionName {
+.oneyRequired_sectionName {
   margin: 0 0 4px;
   font-size: 15px;
-  color: #7ebd00;
+  color: #00ab7a;
   text-align: center;
 }
-.payplugPopin .oneyForm_sectionName {
-  color: #00ab7a;
-}
-.oneyForm_group {
+.oneyRequired_group {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
 }
-.oneyForm_group p {
+.oneyRequired_group p {
   width: 100%;
   font-weight: 400;
   font-size: 12px;
   margin: 0 0 3px;
 }
-.oneyForm_group + .oneyForm_group {
+.oneyRequired_group + .oneyRequired_group {
   margin: 10px 0 0;
 }
-.oneyForm_field {
+.oneyRequired_field {
   width: 100%;
 }
-.oneyForm_field-firstname,
-.oneyForm_field-lastname,
-.oneyForm_field-postcode,
-.oneyForm_field-city {
+.oneyRequired_field.-firstname,
+.oneyRequired_field.-lastname,
+.oneyRequired_field.-postcode,
+.oneyRequired_field.-city {
   width: calc(50% - 2.5px);
 }
-.oneyForm_input {
+.oneyRequired_input {
   border: 1px solid #b2b2b2;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -891,15 +856,15 @@
   width: 100%;
   height: 36px;
 }
-.oneyForm_input-error {
+.oneyRequired_input.-error {
   border: 1px solid #e56876;
 }
-.oneyForm_validate {
+.oneyRequired_validate {
   display: flex;
   justify-content: center;
   width: 100%;
 }
-.oneyForm_button {
+.oneyRequired_button {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -910,8 +875,9 @@
   border: none;
   font-size: 15px;
   margin: 10px 0;
+  cursor: pointer;
 }
-.oneyForm_submit {
+.oneyRequired_submit {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -924,21 +890,21 @@
   margin: 16px 0 8px;
   outline: none;
 }
-.oneyForm_message {
+.oneyRequired_message {
   text-align: center;
   font-size: 13px;
   margin: 10px 0 0;
   display: none;
 }
-.oneyForm_message-error {
+.oneyRequired_message.-error {
   display: block;
   color: #e56876;
 }
-.oneyForm_message-success {
+.oneyRequired_message.-success {
   display: block;
   color: #00ab7a;
 }
-.oneyForm_validation {
+.oneyRequired_validation {
   -webkit-transition: opacity 0.4s;
   -moz-transition: opacity 0.4s;
   -ms-transition: opacity 0.4s;
@@ -956,19 +922,19 @@
   height: 100%;
   background: #fff;
 }
-.oneyForm_validation span {
+.oneyRequired_validation span {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   font-size: 15px;
 }
-.oneyForm_validation span:first-child {
+.oneyRequired_validation span:first-child {
   color: #00ab7a;
   font-size: 12px;
   margin: 0 0 15px;
 }
-.oneyForm_validation span:first-child:before {
+.oneyRequired_validation span:first-child:before {
   border: 4px solid #00ab7a;
   border-top: none;
   border-right: none;
@@ -983,25 +949,10 @@
   content: "";
   margin: 0 0 15px;
 }
-.oneyForm_validation button.oneyForm_close {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  background: #00ab7a;
-  width: auto;
-  height: 32px;
-  padding: 0 16px;
-  color: #fff;
-  border: none;
-  font-size: 15px;
-  outline: none;
-  margin: 15px 0 0;
-  cursor: pointer;
-}
-.oneyForm_validation-show {
+.oneyRequired_validation.-show {
   display: flex;
 }
-.oneyForm_validation-appear {
+.oneyRequired_validation.-appear {
   opacity: 1;
 }
 /* Oney schedule */
@@ -1048,8 +999,5 @@
   display: block;
   font-weight: 400;
   width: 100%;
-}
-.oneyPayment-mobile .oneySchedule ul li {
-  padding: 8px 0;
 }
 /*# sourceMappingURL=front.css.map */

@@ -69,7 +69,6 @@ class PrestashopSpecific16
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
         $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
-
         $error = false;
 
         $current_lang = explode('-', $this->context->language->language_code);
@@ -150,7 +149,6 @@ class PrestashopSpecific16
             // Sinon, si x CB d'enregistrées : affiche x temmplates avec x CB dans chaque
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
-
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
 
                 // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
@@ -160,19 +158,20 @@ class PrestashopSpecific16
                     && ($payment_method == 'standard')) {
                     continue;
                 } else {
-                    /*var_dump($payment_option['tpl']); :
-                    one_click_payment.tpl (oneClick activé)
-                    standard_payment.tpl (oneClick désactivé)
-                    installment_payment.tpl
-                    oney_payment.tpl (Oney optimisé)
-                    unified_payment.tpl (Oney non optimisé)
-                    */
+                    /*
+                     * var_dump($payment_option['tpl']); :
+                     * one_click.tpl (oneClick activé)
+                     * standard.tpl (oneClick désactivé)
+                     * installment.tpl
+                     * oney.tpl (Oney optimisé)
+                     * unified.tpl (Oney non optimisé)
+                     */
                     $paymentOptions[$payment_method] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_method == 'one_click' ? $payment_options['standard']['logo'] : $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
-                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/hook_16/' . $payment_option['tpl'],
+                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' . $payment_option['tpl'],
                     );
                 }
 

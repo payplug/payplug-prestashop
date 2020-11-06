@@ -1,5 +1,5 @@
 /* Oney Form */
-.oneyForm {
+.oneyRequired {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -10,11 +10,9 @@
     padding: 0;
     width: 100%;
 
-    .payplugPopin & {
-      @media (@mobile) {
-        width: calc(100vw - 30px);
-        max-width: 100%;
-      }
+    @media (@mobile) {
+      width: calc(100vw - 30px);
+      max-width: 100%;
     }
 
     &:focus {
@@ -32,7 +30,7 @@
       padding: 0 16px;
       max-height: 0;
 
-      &-show {
+      &.-show {
         max-height: 10000vh;
       }
     }
@@ -61,23 +59,26 @@
       background: none;
       border: none;
       text-align: center;
-      color: #colorMap[oney];
+      color: #colorMap[payplug];
       margin: 0 0 15px;
+      cursor: pointer;
 
       &:focus {
         outline: 0;
       }
 
-      &:before {
-        .transform(translate(-50%, -50%) rotate(45deg));
-      }
-
-      &:after {
-        .transform(translate(-50%, -50%) rotate(-45deg));
-      }
-
-      .payplugPopin & {
-        color: #colorMap[payplug];
+      &.-button {
+        .borderRadius(2px);
+        background: #colorMap[payplug];
+        width: auto;
+        height: 32px;
+        padding: 0 16px;
+        color: #fff;
+        border: none;
+        font-size: 15px;
+        outline: none;
+        margin: 15px 0 0;
+        cursor: pointer;
       }
     }
 
@@ -106,24 +107,12 @@
       padding: 0 15px;
       margin: 0 0 15px;
 
-      &-same {
+      &.-same {
         margin: auto;
       }
 
-      .oneyForm_wrapper & {
+      .oneyRequired_wrapper & {
         max-width: calc(~"50% - 50px");
-      }
-
-      .oneyPayment-mobile & {
-        width: 100%;
-      }
-
-      .oneyPayment-mobile & {
-        & + .oneyForm_fieldset {
-          .border(fade(#colorMap[grey], 50), t);
-          padding: 16px 0 0;
-          margin: 16px 0 0;
-        }
       }
 
       .payplugPopin & {
@@ -136,12 +125,8 @@
     &_sectionName {
       margin: 0 0 4px;
       font-size: 15px;
-      color: #colorMap[oney];
+      color: #colorMap[payplug];
       text-align: center;
-
-      .payplugPopin & {
-        color: #colorMap[payplug];
-      }
     }
 
     &_group {
@@ -156,7 +141,7 @@
         margin: 0 0 3px;
       }
 
-      & + .oneyForm_group {
+      & + .oneyRequired_group {
         margin: 10px 0 0;
       }
     }
@@ -164,10 +149,10 @@
     &_field {
       width: 100%;
 
-      &-firstname,
-      &-lastname,
-      &-postcode,
-      &-city {
+      &.-firstname,
+      &.-lastname,
+      &.-postcode,
+      &.-city {
         width: calc(~"50% - 2.5px");
       }
     }
@@ -193,7 +178,7 @@
       &:-webkit-autofill:focus {
       }
 
-      &-error {
+      &.-error {
         .border(#colorMap[error]);
       }
     }
@@ -213,6 +198,7 @@
       border: none;
       font-size: 15px;
       margin: 10px 0;
+      cursor: pointer;
     }
 
     &_submit {
@@ -233,12 +219,12 @@
       margin: 10px 0 0;
       display: none;
 
-      &-error {
+      &.-error {
         display: block;
         color: #colorMap[error];
       }
 
-      &-success {
+      &.-success {
         display: block;
         color: #colorMap[payplug];
       }
@@ -282,27 +268,11 @@
         }
       }
 
-      button {
-        &.oneyForm_close {
-          .borderRadius(2px);
-          background: #colorMap[payplug];
-          width: auto;
-          height: 32px;
-          padding: 0 16px;
-          color: #fff;
-          border: none;
-          font-size: 15px;
-          outline: none;
-          margin: 15px 0 0;
-          cursor: pointer;
-        }
-      }
-
-      &-show {
+      &.-show {
         display: flex;
       }
 
-      &-appear {
+      &.-appear {
         opacity: 1;
       }
     }

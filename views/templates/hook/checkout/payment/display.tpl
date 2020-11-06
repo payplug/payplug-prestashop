@@ -19,6 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
 <script type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1/form.latest.js"></script>
 <script type="text/javascript" data-keepinline="true">
     var spinner_url = '{$spinner_url|escape:'htmlall':'UTF-8'}';
