@@ -30,7 +30,6 @@ if (!defined('_PS_VERSION_')) {
  */
 class PayPlugCache extends ObjectModel
 {
-
     /** @var string */
     public $id_payplug_cache;
 
@@ -139,7 +138,7 @@ class PayPlugCache extends ObjectModel
         if (!$res_cache) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
             $error_level = 'error';
-            $this->logger->addLog($error_message,$error_level);
+            $this->logger->addLog($error_message, $error_level);
             return false;
         } else {
             return true;

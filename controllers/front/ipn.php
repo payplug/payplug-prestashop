@@ -214,7 +214,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 if (!$id_cart) {
                     $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->installment_plan_id;
                     $this->logger->addLog($error_msg, 'error');
-                    header($_SERVER['SERVER_PROTOCOL'] . ' 500 ' . $error_msg,
+                    header(
+                        $_SERVER['SERVER_PROTOCOL'] . ' 500 ' . $error_msg,
                         true,
                         500
                     );
@@ -302,8 +303,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         $response = array(
                             'exception' => $exception->getMessage(),
                         );
-                        header($_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                            true, $exception->getCode());
+                        header(
+                            $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
+                            true, $exception->getCode()
+                        );
                         die(json_encode($response));
                     }
                     if (!Validate::isLoadedObject($order)) {
@@ -443,16 +446,19 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
                             header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                             die;
-                        } elseif (in_array($current_state,
-                                array($pending_state, $auth_state, $oney_state)) || !$order->valid) {
+                        } elseif (in_array($current_state, array($pending_state, $auth_state, $oney_state))
+                            || !$order->valid
+                        ) {
                             $this->logger->addLog('Order is currently pending.');
                             $this->logger->addLog('Payment amount: ' . $payment->amount, 'debug');
 
                             if ($payment->installment_plan_id !== null) {
                                 $is_amount_correct = (bool)$payment->is_paid;
                             } else {
-                                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($payment->amount / 100,
-                                    $order);
+                                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect(
+                                    $payment->amount / 100,
+                                    $order
+                                );
                             }
 
                             $this->logger->addLog('Order ID: ' . (int)$order->id, 'debug');
@@ -587,8 +593,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                             $order_history = new OrderHistory();
                             if (count($order->getOrderPayments()) == 0) {
-                                $this->logger->addLog('Add new orderPayment - ' . count($order->getOrderPayments()),
-                                    'debug');
+                                $this->logger->addLog(
+                                    'Add new orderPayment - ' . count($order->getOrderPayments()),
+                                    'debug'
+                                );
                                 $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                                 $order->setInvoice(true);
                             }
@@ -661,8 +669,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order is already paid.', true, 200);
                             die;
                         } elseif ($installment = $this->payplug->retrieveInstallment($payment->installment_plan_id)) {
-                            $this->logger->addLog('Order is currently pending for installment.',
-                                'info');
+                            $this->logger->addLog(
+                                'Order is currently pending for installment.',
+                                'info'
+                            );
                             $this->logger->addLog('Payment amount: ' . $payment->amount, 'debug');
                             if ((int)$installment->is_fully_paid == 1) {
                                 $this->logger->addLog('Installment is fully paid.');
@@ -701,8 +711,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
                             }
-                            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Current order state is in conflict with IPN.',
-                                true, 500);
+                            header(
+                                $_SERVER['SERVER_PROTOCOL'] . ' 500 Current order state is in conflict with IPN.',
+                                true,
+                                500
+                            );
                             die('500 Current order state is in conflict with IPN.');
                         }
                     }

@@ -24,7 +24,7 @@
     <p class="ppfail">
         <i class="material-icons">&#xE5CD;</i>
         {if isset($payplug_errors) && $payplug_errors}
-            {$payplug_errors}
+            {$payplug_errors|escape:'htmlall':'UTF-8'}
         {else}
             {l s='The transaction was not completed and your card was not charged.' mod='payplug'}
         {/if}

@@ -123,6 +123,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         return Tools::displayPrice(($amount / 100), (int)$order->id_currency);
     }
 
+    //we have to name it that way otherwise it's not triggered by Prestashop
     public function viewpayplug_installment()
     {
         $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));

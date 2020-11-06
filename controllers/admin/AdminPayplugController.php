@@ -116,7 +116,7 @@ class AdminPayplugController extends ModuleAdminController
         $admin_ajax_url = $payplug->getAdminAjaxUrl();
 
         $login_infos = array(
-            //'p_error'	=> $p_error,
+            //'p_error' => $p_error,
         );
 
         $this->context->smarty->assign(array(
@@ -202,7 +202,7 @@ class AdminPayplugController extends ModuleAdminController
 
         if (count($this->validationErrors && !$connected)) {
             $this->context->smarty->assign(array(
-                'validationErrors'	=> $this->validationErrors,
+                'validationErrors' => $this->validationErrors,
             ));
         }
 
@@ -235,11 +235,11 @@ class AdminPayplugController extends ModuleAdminController
                 $p_error .= $this->validationErrors['login'];
             }
             $this->context->smarty->assign(array(
-                'p_error'	=> $p_error,
+                'p_error' => $p_error,
             ));
         } else {
             $this->context->smarty->assign(array(
-                'PAYPLUG_EMAIL'	=> $PAYPLUG_EMAIL,
+                'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
             ));
         }
 
@@ -250,7 +250,7 @@ class AdminPayplugController extends ModuleAdminController
         //$admin_ajax_url = $this->getAdminAjaxUrl();
 
         $login_infos = array(
-            //'p_error'	=> $p_error,
+            //'p_error' => $p_error,
         );
 
         $this->context->smarty->assign(array(
@@ -258,10 +258,10 @@ class AdminPayplugController extends ModuleAdminController
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
-            'connected'	=> $connected,
-            'verified'	=> $verified,
-            'premium'	=> $premium,
-            'is_active'	=> $is_active,
+            'connected' => $connected,
+            'verified' => $verified,
+            'premium' => $premium,
+            'is_active' => $is_active,
             'site_url' => $this->site_url,
             'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
             'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
