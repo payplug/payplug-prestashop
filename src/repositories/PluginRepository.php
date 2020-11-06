@@ -43,10 +43,10 @@ class PluginRepository extends Repository
     private $tools;
     private $validate;
 
-    public function __construct()
+    public function __construct($payplug)
     {
         $this->cache    = new CacheRepository();
-        $this->card     = new CardRepository();
+        $this->card     = new CardRepository($payplug);
         $this->configuration = new ConfigurationSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();

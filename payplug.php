@@ -316,7 +316,7 @@ class Payplug extends PaymentModule
 
     private function initializeAccessors()
     {
-        $this->plugin = (new PayPlug\src\repositories\PluginRepository())->getEntity();
+        $this->plugin = (new PayPlug\src\repositories\PluginRepository($this))->getEntity($this);
 
         $this->card = $this->plugin->getCard();
         $this->logger = $this->plugin->getLogger();
@@ -784,6 +784,7 @@ class Payplug extends PaymentModule
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
             }
+            $payment_details['type_code'] = $payment->payment_method['type'];
         }
         if ($payment->authorization !== null) {
             $payment_details['authorization'] = true;
@@ -3003,6 +3004,8 @@ class Payplug extends PaymentModule
                     $payment_list_new[] = array(
                         'id' => null,
                         'status' => $inst_status = $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
+                        'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
+                        'status_code' => 'incoming',
                         'amount' => (int)$schedule->amount / 100,
                         'card_brand' => null,
                         'card_mask' => null,
@@ -3010,7 +3013,6 @@ class Payplug extends PaymentModule
                         'card_date' => null,
                         'mode' => null,
                         'authorization' => null,
-                        'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
                         'date' => date('d/m/Y', strtotime($schedule->date)),
                     );
                 }
