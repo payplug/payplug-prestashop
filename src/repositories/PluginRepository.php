@@ -33,6 +33,7 @@ class PluginRepository extends Repository
 {
     private $cache;
     private $card;
+    private $oney;
     private $logger;
     private $plugin;
 
@@ -47,6 +48,7 @@ class PluginRepository extends Repository
     {
         $this->cache    = new CacheRepository();
         $this->card     = new CardRepository($payplug);
+        $this->oney     = new OneyRepository($payplug);
         $this->configuration = new ConfigurationSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();

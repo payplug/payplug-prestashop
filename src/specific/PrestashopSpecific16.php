@@ -51,7 +51,7 @@ class PrestashopSpecific16
         Media::addJsDef(array(
             'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', array(), true),
         ));
-        $this->payplug->oneyRepository->assignOneyJSVar();
+        $this->payplug->oney->assignOneyJSVar();
     }
 
     public function hookCustomerAccount()
@@ -109,17 +109,17 @@ class PrestashopSpecific16
             }
 
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                $is_elligible = $this->payplug->oneyRepository->isOneyElligible($cart);
+                $is_elligible = $this->payplug->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
                 $id_currency = $this->context->currency->id;
                 $amount = $cart->getOrderTotal(true, Cart::BOTH);
-                $is_elligible = $this->payplug->oneyRepository->isValidOneyAmount($amount, $id_currency);
+                $is_elligible = $this->payplug->oney->isValidOneyAmount($amount, $id_currency);
                 $error = !$is_elligible['result'];
             }
 
             if (!$error && $has_valid_carrier) {
-                $is_elligible = $this->payplug->oneyRepository->isValidOneyCarrier($cart);
+                $is_elligible = $this->payplug->oney->isValidOneyCarrier($cart);
                 $error = !$is_elligible['result'];
             }
 
@@ -127,7 +127,7 @@ class PrestashopSpecific16
                 $this->context->smarty->assign(array(
                     'payplug_module_dir' => _PS_MODULE_DIR_,
                     'payplug_oney' => true,
-                    'payplug_oney_required_field' => $this->payplug->oneyRepository->displayOneyRequiredFields(),
+                    'payplug_oney_required_field' => $this->payplug->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
                     'payplug_oney_loading_msg' => $this->payplug->l('Loading')

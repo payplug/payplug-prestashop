@@ -55,7 +55,7 @@ class Payplug extends PaymentModule
 
     private $paymentOption;
 
-    public $oneyRepository;
+    public $oney;
 
     protected $constantFile; // 3.0
 
@@ -318,6 +318,7 @@ class Payplug extends PaymentModule
     {
         $this->plugin = (new PayPlug\src\repositories\PluginRepository($this))->getEntity();
 
+        $this->oney = $this->plugin->getOney();
         $this->card = $this->plugin->getCard();
         $this->logger = $this->plugin->getLogger();
         $this->query = $this->plugin->getQuery();
@@ -1411,7 +1412,7 @@ class Payplug extends PaymentModule
         foreach ($errors as $error) {
             if (strpos($error, 'oney_required_field') !== false) {
                 $this->smarty->assign(['is_popin_tpl' => true]);
-                $fields = $this->oneyRepository->getOneyRequiredFields();
+                $fields = $this->oney->getOneyRequiredFields();
                 $this->smarty->assign([
                     'oney_type' => str_replace('oney_required_field_', '', $error),
                     'oney_required_fields' => $fields,
@@ -2059,7 +2060,7 @@ class Payplug extends PaymentModule
         //remove deleted carrier from PayPlugCarrier list
         $this->removeDeletedCarriers();
 
-        $amounts = $this->oneyRepository->getOneyPriceLimit();
+        $amounts = $this->oney->getOneyPriceLimit();
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
 
@@ -2430,7 +2431,7 @@ class Payplug extends PaymentModule
             $use_taxes = (bool)Configuration::get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
 
-            $is_elligible = $this->oneyRepository->isOneyElligible($this->context->cart, $cart_amount, true);
+            $is_elligible = $this->oney->isOneyElligible($this->context->cart, $cart_amount, true);
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
             $payment_schedule = false;
 
@@ -2440,7 +2441,7 @@ class Payplug extends PaymentModule
                 $delivery_address = new Address($this->context->cart->id_address_delivery);
                 $delivery_country = new Country($delivery_address->id_country);
                 $iso_code = $delivery_country->iso_code;
-                $payment_schedule = $this->oneyRepository->getOneyPaymentOptionsList($cart_amount, $iso_code);
+                $payment_schedule = $this->oney->getOneyPaymentOptionsList($cart_amount, $iso_code);
                 if (empty($payment_schedule)) {
                     $optimized = false;
                 }
@@ -2528,7 +2529,7 @@ class Payplug extends PaymentModule
                 $paymentOption['oney_' . $oney_payment]['err_label'] = $err_label;
 
                 if ($optimized) {
-                    $schedules = $this->oneyRepository->displayOneySchedule($payment_schedule[$oney_payment],
+                    $schedules = $this->oney->displayOneySchedule($payment_schedule[$oney_payment],
                         $cart_amount);
                     $paymentOption['oney_' . $oney_payment]['additionalInformation'] = $schedules;
                 }
@@ -3271,7 +3272,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayExpressCheckout($param)
     {
-        if (!$this->oneyRepository->isOneyAllowed()) {
+        if (!$this->oney->isOneyAllowed()) {
             return false;
         }
 
@@ -3283,7 +3284,7 @@ class Payplug extends PaymentModule
     {
         if (
             (!$this->getConfiguration('PAYPLUG_ONEY'))
-            || (!$this->oneyRepository->isOneyAllowed())
+            || (!$this->oney->isOneyAllowed())
             || (Dispatcher::getInstance()->getController() == 'category')
             || (Dispatcher::getInstance()->getController() == 'index')
         ) {
@@ -3316,7 +3317,7 @@ class Payplug extends PaymentModule
             $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null,
                 false, true, $quantity);
             $amount = $product_price * $quantity;
-            $is_elligible = $this->oneyRepository->isValidOneyAmount($amount, $this->context->currency->id);
+            $is_elligible = $this->oney->isValidOneyAmount($amount, $this->context->currency->id);
 
             if ($is_elligible['error']) {
                 $this->smarty->assign(array(
@@ -3660,7 +3661,7 @@ class Payplug extends PaymentModule
             $install['flag'] = false;
             $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
         }
-        elseif (!$this->oneyRepository->installOney() && $install['flag']) {
+        elseif (!$this->oney->installOney() && $install['flag']) {
             $log->error('Install failed: Oney.');
             $install['flag'] = false;
             $install['error'] = 'Oney ($this->installOney)';
@@ -4399,7 +4400,7 @@ class Payplug extends PaymentModule
         if ($is_oney) {
 
             // check if oney was elligible then return if not
-            $is_elligible = $this->oneyRepository->isOneyElligible($this->context->cart, false, true);
+            $is_elligible = $this->oney->isOneyElligible($this->context->cart, false, true);
 
             if (!$is_elligible['result']) {
                 $this->setPaymentErrorsCookie([$is_elligible['error']]);
@@ -4425,7 +4426,7 @@ class Payplug extends PaymentModule
                 }
             }
 
-            if ($this->oneyRepository->hasOneyRequiredFields($payment_tab)) {
+            if ($this->oney->hasOneyRequiredFields($payment_tab)) {
                 // check oney required fields
 
                 $payment_data = $this->getPaymentDataCookie();
@@ -4440,7 +4441,7 @@ class Payplug extends PaymentModule
 
 
                     // then recheck
-                    if ($this->oneyRepository->hasOneyRequiredFields($payment_tab)) {
+                    if ($this->oney->hasOneyRequiredFields($payment_tab)) {
                         $this->setPaymentErrorsCookie(array('oney_required_field_' . $is_oney));
                         return ['result' => false, 'response' => false];
                     }
@@ -4455,7 +4456,7 @@ class Payplug extends PaymentModule
             $payment_tab['force_3ds'] = false;
             $payment_tab['auto_capture'] = true;
             $payment_tab['payment_method'] = 'oney_' . $is_oney;
-            $payment_tab['payment_context'] = $this->oneyRepository->getOneyPaymentContext();
+            $payment_tab['payment_context'] = $this->oney->getOneyPaymentContext();
 
             $return_url_params = ['ps' => 1, 'cartid' => (int)$cart->id, 'isoney' => $is_oney];
             $return_url = $this->context->link->getModuleLink($this->name, 'validation', $return_url_params,
@@ -5312,7 +5313,7 @@ class Payplug extends PaymentModule
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
-        } elseif (!$this->oneyRepository->uninstallOney()) {
+        } elseif (!$this->oney->uninstallOney()) {
             $log->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
@@ -5502,7 +5503,7 @@ class Payplug extends PaymentModule
         $cart = $params['cart'];
 
         if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
-            $this->oneyRepository->assignOneyPaymentOptions($cart);
+            $this->oney->assignOneyPaymentOptions($cart);
         }
 
         $payment_options = $this->getPaymentOptions($cart); // $payment_options = Données sous forme de tableau (pour 1.6 et 1.7)
@@ -5776,12 +5777,12 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayBeforeShoppingCartBlock($params)
     {
-        if (!$this->oneyRepository->isOneyAllowed()) {
+        if (!$this->oney->isOneyAllowed()) {
             return false;
         }
 
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
-        $is_valid_amount = $this->oneyRepository->isValidOneyAmount($amount, $params['cart']->id_currency);
+        $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
         $this->smarty->assign(array(
             'payplug_oney_amount' => $amount,
@@ -5789,6 +5790,6 @@ class Payplug extends PaymentModule
             'payplug_oney_error' => $is_valid_amount['error'],
         ));
 
-        return $this->oneyRepository->getOneyCTA('checkout');
+        return $this->oney->getOneyCTA('checkout');
     }
 }
