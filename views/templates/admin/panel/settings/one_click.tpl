@@ -28,7 +28,7 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Allow customers to save their credit card information for later purchases' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.one_click}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.one_click}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
         </div>
     </div>

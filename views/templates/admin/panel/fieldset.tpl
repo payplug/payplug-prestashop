@@ -47,6 +47,6 @@
         <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>
     <div class="panel-footer">
-        <button type="button" class="payplugButton payplugConfig_check">{l s='Check' mod='payplug'}</button>
+        <button type="button" class="payplugButton payplugConfig_check" data-e2e-type="button" data-e2e-action="check">{l s='Check' mod='payplug'}</button>
     </div>
 </div>

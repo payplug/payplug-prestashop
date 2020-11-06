@@ -27,8 +27,8 @@
 </div>
 <div class="payplugPanel">
     <div class="payplugPanel_content">
-        <a class="payplugLink" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Payplug Portal' mod='payplug'}</a>
+        <a class="payplugLink" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal" data-e2e-link="portal">{l s='Payplug Portal' mod='payplug'}</a>
         <span class="payplugPipe">|</span>
-        <button type="button" class="payplugLink payplugLogin_logout" data-e2e-logout="true">{l s='Disconnect' mod='payplug'}</button>
+        <button type="button" class="payplugLink payplugLogin_logout" data-e2e-type="button" data-e2e-action="logout">{l s='Disconnect' mod='payplug'}</button>
     </div>
 </div>
