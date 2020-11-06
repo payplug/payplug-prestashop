@@ -24,19 +24,47 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\CountrySpecific;
+use PayPlug\src\specific\ToolsSpecific;
+use PayPlug\src\specific\ValidateSpecific;
 
 class PluginRepository extends Repository
 {
-    private $plugin;
+    private $cache;
+    private $card;
     private $logger;
+    private $plugin;
+
+    // Specific classes
+    private $configuration;
+    private $country;
+    private $query;
+    private $tools;
+    private $validate;
 
     public function __construct()
     {
-        $this->plugin = new PluginEntity();
-        $this->logger = new LoggerRepository();
+        $this->cache    = new CacheRepository();
+        $this->card     = new CardRepository();
+        $this->configuration = new ConfigurationSpecific();
+        $this->country  = new CountrySpecific();
+        $this->logger   = new LoggerRepository();
+        $this->plugin   = new PluginEntity();
+        $this->query    = new QueryRepository();
+        $this->tools    = new ToolsSpecific();
+        $this->validate = new ValidateSpecific();
         $this->plugin
             ->setApiVersion('2019-08-06')
-            ->setLogger($this->logger);
+            ->setCache($this->cache)
+            ->setCard($this->card)
+            ->setConfiguration($this->configuration)
+            ->setCountry($this->country)
+            ->setLogger($this->logger)
+            ->setQuery($this->query)
+            ->setTools($this->tools)
+            ->setValidate($this->validate)
+        ;
         $this->setEntity($this->plugin);
     }
 }

@@ -28,80 +28,131 @@ use PayPlug\src\entities\LoggerEntity;
 class LoggerRepository
 {
     /**
-     * @var object $PayPlugLoggerEntity
+     * @var object LoggerEntity
      */
-    private $LoggerEntity;
+    private $loggerEntity;
+    private $query;
 
     public function __construct()
     {
-        $this->LoggerEntity = new LoggerEntity();
+        $this->loggerEntity = new loggerEntity();
+        $this->query = new QueryRepository();
+        $this->setStdParams();
     }
 
-    public function addLog($niveau, $message)
+    public function setStdParams()
     {
-        die($niveau.', '.$message);
-    }
-
-    /*
-
-    public function __construct($process = '', $id = null, $id_lang = null, $type = 'notification')
-    {
-//        parent::__construct($id, $id_lang);
-        $this->PayPlugLoggerEntity = new PayPlugLoggerEntity();
-        $this->setStandardVars();
-        $this->PayPlugLoggerEntity->setProcess($process);
-    }
-
-    public function setStandardVars()
-    {
-        $this->PayPlugLoggerEntity::setDefinition(
+        $this->loggerEntity
+            ->setTable('payplug_logger')
+            ->setLimitNumber((int)4000)
+            ->setLimitDate('P1M')
+            ->setDefinition(
             [
-                'table' => 'payplug_logger',
-                'primary' => 'id_payplug_logger',
+                'table' => $this->loggerEntity->getTable(),
+                'primary' => 'id_'.$this->loggerEntity->getTable(),
                 'fields' => [
-                    'process' => [
-                        'type' => self::TYPE_STRING,
-                        'validate' => 'isCatalogName',
-                        'required' => true,
-                        'size' => 128
-                    ],
-                    'content' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'required' => true],
-                    'date_add' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
-                    'date_upd' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
+                    /*
+                     * Different types,
+                     * according to modules/gamification/tests/mocks/ObjectModel.php :
+                     * TYPE_INT = 1;
+                     * TYPE_BOOL = 2;
+                     * TYPE_STRING = 3;
+                     * TYPE_FLOAT = 4;
+                     * TYPE_DATE = 5;
+                     * TYPE_HTML = 6;
+                     * TYPE_NOTHING = 7;
+                     * TYPE_SQL = 8;
+                     */
+                    'process' => ['type' => 3, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128],
+                    'content' => ['type' => 6, 'validate' => 'isCleanHtml', 'required' => true],
+                    'date_add' => ['type' => 5, 'validate' => 'isDate'],
+                    'date_upd' => ['type' => 5, 'validate' => 'isDate']
                 ]
-            ]
-        );
-
-        $this->PayPlugLoggerEntity
-            ->setLimitNumber(500)
-            ->setLimitDate('P1M');
+            ]);
     }
-    
 
-    public function setLoggers()
+
+    /**
+     * Used to set $process and $type since other classes
+     */
+    public function setParams($params)
     {
-        $this->logger = new PayPlugLogger('payplug');
-        $this->logger->flush();
+        $this->loggerEntity
+            ->setProcess('')
+            ->setType('notification')
+        ;
+
+        if (isset($params['process']))  { $this->loggerEntity->setProcess($params['process']);  }
+        if (isset($params['type']))     { $this->loggerEntity->setType($params['type']);        }
     }
 
     public function addLog($message, $level = 'info')
     {
         // get content
-        $content = $this->PayPlugLoggerEntity->getContent();
-        $content = json_decode($content, true);
-
+        $content = json_decode($this->loggerEntity->getContent(), true);
         if (!$content) {
             $content = [];
         }
 
-        $date = $this->udate('Y-m-d H:i:s.u T');
-        $entry = ['date' => $date, 'message' => $message, 'level' => $level];
+        $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T
+        $entry = ['date' => $this->udate('Y-m-d H:i:s.u T'), 'message' => $message, 'level' => $level];
         array_push($content, $entry);
 
-        $this->content = json_encode($content);
+        $this->loggerEntity->setContent(json_encode($content));
+
         $this->save();
 
         return $this;
+    }
+
+    public function save()
+    {
+        if ((int)$this->loggerEntity->getId() > 0) {
+            $this->loggerEntity->setDateUpd($this->udate('Y-m-d H:i:s'));
+            return $this->updateLog();
+        }
+
+        $this->addToDb();
+    }
+
+    public function addToDb()
+    {
+        $logger = $this->loggerEntity;
+        $this->query
+            ->insert()
+            ->into(_DB_PREFIX_.$logger->getTable())
+            ->fields('process')     ->values(pSQL($logger->getProcess()))
+            ->fields('content')     ->values(pSQL($logger->getContent()))
+            ->fields('date_add')    ->values(pSQL($logger->getDateAdd()))
+            ->fields('date_upd')    ->values(pSQL($logger->getDateAdd()))
+        ;
+
+        if (!$this->query->build()) {
+            return false;
+        }
+
+        $this->loggerEntity->setId($this->query->lastId());
+    }
+
+    public function updateLog()
+    {
+        $logger = $this->loggerEntity;
+        $table = _DB_PREFIX_.$logger->getTable();
+
+        $this->query
+            ->update()
+            ->table($table)
+            ->set($table.'.process =  \''.pSQL($logger->getProcess()).'\'')
+            ->set($table.'.content =  \''.pSQL($logger->getContent()).'\'')
+            ->set($table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'')
+            ->where($table.'.id_'.$logger->getTable().' = '.(int)$logger->getId())
+            ;
+
+        if (!$this->query->build()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function udate($format = 'u', $utimestamp = null)
@@ -118,23 +169,34 @@ class LoggerRepository
 
     protected function getLimit()
     {
-        $limitNumber = $this->PayPlugLoggerEntity->getLimitNumber();
-        $limitDate = $this->PayPlugLoggerEntity->getLimitDate();
         return [
-            'number' => $limitNumber,
-            'date' => $limitDate,
+            'number' => $this->limit_number,
+            'date' => $this->limit_date,
         ];
     }
 
-    public function flush($all = false){
+    public function flush($all = false) {
         try {
-            Db::getInstance()->getValue('SELECT 1 FROM `'._DB_PREFIX_.self::$definition['table'].'` LIMIT 1');
+            $logger = $this->loggerEntity;
+            $this->query
+                ->select()
+                ->fields('*')
+                ->from(_DB_PREFIX_.$logger->getTable())
+            ;
         } catch (Exception $exception) {
             return false;
         }
 
         if($all) {
-            return Db::getInstance()->execute('TRUNCATE `'._DB_PREFIX_.self::$definition['table'].'`');
+            $this->query
+                ->truncate()
+                ->table(_DB_PREFIX_.$logger->getTable())
+            ;
+
+            if (!$this->query->build()) {
+                return false;
+            }
+            return true;
         }
 
         $limits = $this->getLimit();
@@ -145,23 +207,40 @@ class LoggerRepository
         $flag = true;
 
         // clean old log
-        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` WHERE `date_add` < "'.$date_limit->format('Y-m-d').'"';
-        $flag = $flag && Db::getInstance()->execute($sql);
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_.$logger->getTable())
+            ->where('`date_add` < "'.$date_limit->format('Y-m-d').'"')
+        ;
 
-        // clean log beyong the limit
-        $sql = 'SELECT `id_payplug_logger` FROM `'._DB_PREFIX_.self::$definition['table'].'` ORDER BY `id_payplug_logger` DESC LIMIT '.($limits['number'] - 1).',1';
-        $last_logs_valid = Db::getInstance()->executeS($sql);
-
-        // si there is no more log
-        if(!$last_logs_valid) {
-            return $flag;
+        if (!$this->query->build()) {
+            $flag = false;
         }
 
-        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` WHERE `id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'];
-        $flag = $flag && Db::getInstance()->execute($sql);
+        // clean log beyong the limit
+        $last_logs_valid =
+            $this->query
+                ->select()
+                ->fields('`id_payplug_logger`')
+                ->from(_DB_PREFIX_.$logger->getTable())
+                ->orderBy('`id_payplug_logger` DESC')
+                ->limit(($limits['number'] - 1),1)
+            ;
+
+        if (!$last_logs_valid || !$this->query->build()) {
+            $flag = false;
+        }
+
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_.$logger->getTable())
+            ->where('`id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'])
+        ;
+
+        if (!$this->query->build()) {
+            $flag = false;
+        }
 
         return $flag;
     }
-
-    */
 }

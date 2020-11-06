@@ -21,14 +21,16 @@
 *}
 {if isset($oney_payment_options) && $oney_payment_options}
     {foreach $oney_payment_options as $oney_type=>$oney_payment_option}
-        <label class="oneyOption -{$oney_type|escape:'htmlall':'UTF-8'}">
+        <label class="oneyOption -{$oney_type|escape:'htmlall':'UTF-8'}{if !isset($oney_payment_option.installments) || !$oney_payment_option.installments} -withoutSchedule{/if}">
             <div class="oneyOption_title">
                 <span class="oneyOption_logo oneyLogo -x{$oney_payment_option.split|escape:'htmlall':'UTF-8'}"></span>
                 {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
             </div>
-            <div class="oneyOption_prices">
-                {include file="./detail.tpl" oney_payment_option=$oney_payment_option}
-            </div>
+            {if isset($oney_payment_option.installments) && $oney_payment_option.installments}
+                <div class="oneyOption_prices">
+                    {include file="./detail.tpl" oney_payment_option=$oney_payment_option}
+                </div>
+            {/if}
             <div class="oneyOption_radio"><input data-e2e-type="payment" data-e2e-method="{$oney_type|escape:'htmlall':'UTF-8'}" type="radio" name="oney_type" value="{$oney_type|escape:'htmlall':'UTF-8'}"></div>
         </label>
     {/foreach}

@@ -1,0 +1,1711 @@
+/**
+ * 2013 - 2020 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2020 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+@import "less/include";
+
+p.payment_module a.payplug {
+  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
+  padding-left: 240px;
+  cursor: pointer;
+}
+
+p.payment_module a.payplug.it {
+  background-image: url('../img/logos_schemes_it.png');
+}
+
+p.payment_module a.payplug.installment_2 {
+  background: url('../img/logos_schemes_installment_2_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_2.it {
+  background-image: url('../img/logos_schemes_installment_2_it.png');
+}
+
+p.payment_module a.payplug.installment_2.en {
+  background-image: url('../img/logos_schemes_installment_2_en.png');
+}
+
+p.payment_module a.payplug.installment_3 {
+  background: url('../img/logos_schemes_installment_3_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_3.it {
+  background-image: url('../img/logos_schemes_installment_3_it.png');
+}
+
+p.payment_module a.payplug.installment_3.en {
+  background-image: url('../img/logos_schemes_installment_3_en.png');
+}
+
+p.payment_module a.payplug.installment_4 {
+  background: url('../img/logos_schemes_installment_4_default.png') 15px center no-repeat #FBFBFB;
+}
+
+p.payment_module a.payplug.installment_4.it {
+  background-image: url('../img/logos_schemes_installment_4_it.png');
+}
+
+p.payment_module a.payplug.installment_4.en {
+  background-image: url('../img/logos_schemes_installment_4_en.png');
+}
+
+p.payment_module a.payplug:hover {
+  background-color: #F6F6F6;
+}
+
+p.payment_module a.payplug:after {
+  display: block;
+  content: "\f054";
+  position: absolute;
+  right: 15px;
+  margin-top: -11px;
+  top: 50%;
+  font-family: "FontAwesome";
+  font-size: 25px;
+  height: 22px;
+  width: 14px;
+  color: #777;
+}
+
+div.payplug-wrapper {
+  .borderRadius(4px);
+  border: 1px solid #d6d4d4;
+  background: #fbfbfb;
+  color: #333;
+  display: block;
+  font-size: 17px;
+  font-weight: bold;
+  line-height: 23px;
+  position: relative;
+  margin: 0 0 10px;
+}
+
+div.payplug-wrapper .payment_module {
+  letter-spacing: -1px;
+}
+
+div.payplug-wrapper .payment_module span {
+  background: url('../img/logos_schemes_default.png') 15px center no-repeat #FBFBFB;
+  /*padding-left: 197px;*/
+  padding: 33px 40px 34px 240px;
+  display: block;
+}
+
+div.payplug-wrapper .payment_module span.it {
+  background-image: url('../img/logos_schemes_it.png');
+}
+
+div.payplug-wrapper form {
+  padding: 0 0 10px 16px;
+  position: relative;
+}
+
+div.payplug-wrapper form div.card-wrapper {
+  overflow: hidden;
+  line-height: normal;
+  padding: 0 0 10px 0;
+}
+
+div.payplug-wrapper div:first-child {
+  float: left;
+  padding: 10px 15px 0 0;
+}
+
+div.info-wrapper div:first-child {
+  padding: 0;
+}
+
+div.payplug-wrapper form input[name=payplug_card] {
+  float: left;
+  margin: 10px 10px 0 0;
+  cursor: pointer;
+}
+
+div.payplug-wrapper form div label {
+  float: left;
+  cursor: pointer;
+}
+
+div.payplug-wrapper form div label img {
+  float: left;
+  padding: 0 8px 0 0;
+}
+
+div.payplug-wrapper form div label div.info-wrapper {
+  float: left;
+}
+
+div.payplug-wrapper label[for=payplug_card_new] {
+  /*padding: 10px 0 0 0;*/
+}
+
+.payplug_expiry_date {
+  display: block;
+  font-size: 0.8em;
+  font-weight: normal;
+  /*padding: 0 0 0 19px;*/
+  padding: 0 0 0 0;
+}
+
+.ppdelete {
+  display: block;
+  padding: 0 0 0 19px;
+  text-decoration: underline;
+  font-weight: normal;
+  font-size: 0.8em;
+  width: 160px;
+}
+
+.ppdelete:hover,
+.ppdelete:active,
+.ppdelete:visited,
+.ppdelete:focus {
+  text-decoration: underline;
+}
+
+.ppsubmit {
+  .borderRadius(0.25em);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #colorMap[payplug];
+  color: #ffffff;
+  font-weight: 700;
+  height: 3em;
+  margin: 1em auto 0 auto;
+  padding: 0;
+  text-transform: uppercase;
+  min-width: 11em;
+  border: none;
+
+  &:hover {
+    background: darken(#colorMap[payplug],5);
+  }
+  &.disable {
+    background: #dddddd none repeat scroll 0 0;
+  }
+}
+
+.ppOneClickStatus {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+  font-size: 14px;
+}
+
+.ppOneClickStatus p {
+  bottom: 3em;
+  font-weight: normal;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  width: 325px;
+  display: none;
+  text-align: right;
+}
+
+
+@media (max-width: 700px) {
+  .ppOneClickStatus p {
+    width: 250px;
+  }
+}
+
+@media (max-width: 600px) {
+  .card-wrapper,
+  .info-wrapper {
+    font-size: 14px;
+  }
+
+  .ppsubmit {
+    position: relative;
+    display: block;
+  }
+
+  .ppOneClickStatus {
+    position: relative;
+    bottom: 0;
+    right: 0;
+  }
+
+  .ppOneClickStatus p {
+    bottom: 0;
+    position: relative;
+    text-align: center;
+    width: auto;
+  }
+}
+
+.loader {
+  left: 50%;
+  margin-right: -30px;
+  position: absolute;
+  top: 50%;
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  .borderRadius(11px);
+  z-index: 9999;
+  background: #000000;
+}
+
+.ppOneClickStatus .loader {
+  width: 30px;
+  height: 30px;
+  background: none;
+  position: relative;
+  top: auto;
+  left: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.ppsuccess {
+  color: #colorMap[payplug];
+}
+
+.ppfail {
+  color: #dd2525;
+}
+
+.ppfail-default,
+.ppfail-installment {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+div.ppoverlay {
+  /*background: url('../img/admin/spinner.gif') no-repeat #000000 center;*/
+  background-color: transparent;
+  background-size: 30px 30px;
+  /*background: transparent none repeat scroll 0 0;*/
+  display: block;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9999999;
+  /*opacity: 0.5;*/
+}
+
+.ppbold {
+  font-weight: bold;
+}
+
+a.ppdeletecard {
+  text-decoration: underline;
+}
+
+#module-payplug-cards p.message {
+  display: none;
+}
+
+a.payplug.call.pphide {
+  display: none;
+}
+
+
+.payplug {
+  &Popin {
+    .transform(translate(-50%, -50%));
+    .transition(opacity @dur);
+    opacity: 0;
+    position: fixed;
+    display: none;
+    top: 50%;
+    left: 50%;
+    max-width: 80vw;
+    z-index: 5004;
+
+    @media (@mobile) {
+      max-width: 98vw;
+    }
+
+    &:before {
+      .transform(translate(-50%, -50%));
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      content: "";
+      background: rgba(0, 0, 0, .2);
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+    }
+
+    &_content {
+      z-index: 1;
+      background: #fff;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 15px 30px;
+
+      @media (@mobile) {
+        max-height: 98vh;
+      }
+    }
+
+    &_close {
+      z-index: 1;
+      display: block;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 20px;
+      height: 20px;
+      line-height: 24px;
+      text-indent: 24px;
+      background: none;
+      border: none;
+      overflow: hidden;
+      padding: 0;
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:before,
+      &:after {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        content: "";
+        background: #colorMap[dark];
+      }
+
+      &:before {
+        .transform(translate(-50%, -50%) rotate(45deg));
+      }
+
+      &:after {
+        .transform(translate(-50%, -50%) rotate(-45deg));
+      }
+
+      @media (@mobile) {
+        display: none;
+      }
+    }
+
+    &-open {
+      display: block;
+    }
+    &-show {
+      opacity: 1;
+    }
+  }
+
+  &Msg {
+    &_wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    &_error {
+      color: #colorMap[error];
+      text-align: center;
+      @media (@mobile) {
+        .payplugPopin & {
+          width: calc(100vw - 30px);
+          max-width: 100%;
+        }
+      }
+    }
+
+    &_button {
+      .borderRadius(2px);
+      background: #colorMap[payplug];
+      width: auto;
+      height: 32px;
+      padding: 0 16px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      outline: none;
+      margin: 5px 0 0;
+    }
+  }
+}
+
+/* Oney style */
+.oney {
+  // Oney logo
+  &Logo {
+    background: 50% no-repeat;
+    -webkit-background-size: 100%;
+    background-size: 100%;
+
+    &-x3 {
+      background-image: url(~"@{img_oney}3x.svg");
+
+      &x4 {
+        background-image: url(~"@{img_oney}3x4x.svg");
+      }
+    }
+
+    &-x4 {
+      background-image: url(~"@{img_oney}4x.svg");
+    }
+
+    &-tooltip {
+      background-image: url(~"@{img_oney}tooltip.svg");
+    }
+  }
+
+  // Oney CTA
+  &Cta {
+    position: relative;
+    z-index: 3;
+    display: inline-block;
+
+    @media (@mobile) {
+      &,
+      #order-detail-content #cart_summary & {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      & {
+        align-items: flex-start;
+      }
+
+      #order-detail-content #cart_summary & {
+        align-items: flex-end;
+      }
+    }
+
+    &_button {
+      .Poppins();
+      .transition(~"color @{dur}");
+      display: flex;
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      align-items: center;
+      text-transform: uppercase;
+      color: #2F2930;
+
+      &:hover {
+        color: #colorMap[oney];
+      }
+
+      &:focus {
+        outline: 0;
+      }
+
+      @media (@mobile) {
+        position: relative;
+        height: 32px;
+      }
+
+      &-disabled {
+        color: #colorMap[grey];
+
+        &:hover {
+          color: #colorMap[grey];
+        }
+      }
+
+      &-product {
+        max-width: 100%;
+        font-size: 10px;
+
+        @media (@mobile) {
+          position: relative;
+          height: 32px;
+          font-size: 13px;
+        }
+      }
+
+      &-checkout {
+        display: none;
+      }
+
+      span {
+        font: inherit;
+        white-space: nowrap;
+      }
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    &_logo {
+      width: 106px;
+      height: 25px;
+      background-size: 110%;
+      margin: 0 0 0 .25em;
+
+      .oneyCta_button-disabled & {
+        background-image: url(~"@{img_oney}3x4x-alt.svg");
+      }
+    }
+
+    &_tooltip {
+      width: 14px;
+      height: 14px;
+
+      .oneyCta_button-disabled & {
+        background-image: url(~"@{img_oney}tooltip-alt.svg");
+      }
+    }
+
+    &_row {
+      .table tfoot tr& {
+        background: none;
+      }
+    }
+
+    &_field {
+      height: 46px;
+      background: rgba(128, 188, 0, 0.1);
+      text-align: right;
+      padding: 0 8px !important;
+
+      @media (@mobile) {
+        height: auto;
+        background: transparent;
+      }
+    }
+
+    &_wrapper {
+      display: flex !important;
+      justify-content: flex-end;
+
+      .oneyCta_button-checkout {
+        display: flex;
+      }
+    }
+  }
+
+  // Oney popin
+  &Popin {
+    .Poppins;
+    .transition(~"opacity @{dur}");
+    color: #777;
+    display: none;
+    position: absolute;
+    right: 35px;
+    top: 0;
+    border: 2px solid #colorMap[oney];
+    background: #fff;
+    width: 350px;
+    padding: 15px;
+    opacity: 0;
+    opacity: 1;
+    text-align: left;
+    .transform(translateY(-15%));
+
+    &:after {
+      .transform(translate(50%, -50%) rotate(45deg));
+      position: absolute;
+      border: 2px solid #colorMap[oney];
+      border-bottom: none;
+      border-left: none;
+      background: #fff;
+      width: 24px;
+      height: 24px;
+      content: "";
+      top: 17.5%;
+      right: -2px;
+
+      .oneyPopin-error& {
+        border-color: #colorMap[grey];
+      }
+
+      @media (@mobile) {
+        display: none;
+      }
+    }
+
+    @media (@mobile) {
+      .transition(~"max-height @{dur}, border @{dur}, padding @{dur}");
+      .transform;
+      .border(transparent);
+      display: block;
+      position: relative;
+      right: auto;
+      width: 100%;
+      background: transparent;
+      padding: 0 15px;
+      max-height: 0;
+      overflow: hidden;
+
+      .oneyLoader {
+        margin: 15px 0;
+        display: none;
+
+        .oneyCta-open & {
+          display: flex;
+        }
+      }
+    }
+
+    &-open {
+      display: block;
+
+      @media (@mobile) {
+        .border(#colorMap[oney]);
+        max-height: 500px;
+      }
+    }
+
+    &-show {
+      opacity: 1;
+    }
+
+    &-error {
+      .transform(translateY(-50%));
+      top: 50%;
+      width: auto;
+      padding: 8px;
+      border-color: #colorMap[grey];
+      width: 100vw;
+      max-width: 300px;
+
+      &:after {
+        top: 50%;
+      }
+
+      @media (@mobile) {
+        .transform;
+        .border(transparent);
+        top: 0;
+        width: 100%;
+        padding: 0 8px;
+        background: transparent;
+
+        .oneyPopin-open& {
+          padding: 8px;
+          border-color: #colorMap[grey];
+          background: rgba(178, 178, 178, 0.1);
+        }
+      }
+    }
+
+    &-loading {
+      .transform(translateY(-50%));
+      top: 50%;
+      width: auto;
+      height: auto;
+
+      &:after {
+        top: 50%;
+      }
+
+      @media (@mobile) {
+        .transform;
+        top: 0;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    &_title {
+      display: block;
+      background: url(~"@{img_oney}logo.svg") -11px 0 no-repeat;
+      -webkit-background-size: auto 38px;
+      background-size: auto 36px;
+      padding: 36px 0 0;
+      color: #colorMap[oney];
+      font-size: 18px;
+      line-height: 20px;
+      text-transform: uppercase;
+      margin: 0 0 18px;
+
+      strong {
+        display: block;
+      }
+
+      @media (@mobile) {
+        margin: 15px 0 24px;
+      }
+    }
+
+    &_navigation {
+      ul& {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: 0;
+
+        li {
+          .border(lighten(#colorMap[grey], 20%));
+          .transition;
+          padding: 0;
+
+          &:first-child {
+            .borderRadius(2px 2px 0 0);
+          }
+
+          &:last-child {
+            .borderRadius(0 0 2px 2px);
+          }
+
+          &:before {
+            display: none;
+          }
+
+          & + li {
+            margin: -1px 0 0;
+          }
+
+          button {
+            background: transparent !important;
+            border: none;
+            width: 100%;
+            height: 32px;
+            text-align: left;
+            padding: 0 16px;
+            outline: 0;
+            color: #colorMap[grey] !important;
+            text-transform: none;
+          }
+
+          &:hover,
+          &.selected {
+            .border(#colorMap[oney]);
+            z-index: 2;
+
+            button {
+              color: #colorMap[grey] !important;
+            }
+          }
+
+          &.selected {
+            background: fade(#colorMap[oney], 15);
+          }
+        }
+      }
+    }
+
+    &_option {
+      .border(#colorMap[oney], b);
+      display: none;
+      position: relative;
+      padding: 4px;
+      font-size: 12px;
+      line-height: 17px;
+      width: 100%;
+
+      &-show {
+        display: block;
+      }
+
+      ul, p {
+        margin: 0;
+
+        p,
+        li {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+          flex-wrap: wrap;
+          line-height: 17px;
+          padding: 0;
+
+          &:first-child,
+          &:last-child {
+            padding: 4px 0;
+          }
+          &:before {
+            display: none;
+          }
+
+          span {
+            display: flex;
+            padding: 0;
+            font: inherit;
+            color: inherit;
+            width: auto;
+          }
+        }
+      }
+
+      p {
+        padding: 4px 0;
+      }
+
+      &[data-type="3x"] {
+        ul {
+          li {
+            &:last-child {
+              padding: 21px 0 4px;
+            }
+          }
+        }
+      }
+    }
+
+    &_legal {
+      display: block;
+      font-size: 10px;
+      line-height: 1.2em;
+      color: #8a8a8a;
+      margin: 8px 0 0;
+      white-space: normal;
+
+      @media (@mobile) {
+        padding: 0 0 15px;
+      }
+    }
+
+    &_close {
+      display: block;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      text-indent: 24px;
+      background: none;
+      border: none;
+      overflow: hidden;
+      padding: 0;
+
+      &:hover{
+        background: none;
+      }
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:before,
+      &:after {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        content: "";
+        background: #colorMap[oney];
+      }
+
+      &:before {
+        .transform(translate(-50%, -50%) rotate(45deg));
+      }
+
+      &:after {
+        .transform(translate(-50%, -50%) rotate(-45deg));
+      }
+
+      @media (@mobile) {
+        display: none;
+      }
+    }
+
+    &_error {
+      margin: 0;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 400;
+    }
+  }
+
+  // Oney payment
+  &Payment {
+    .borderRadius(4px);
+    .Poppins();
+    .transition(~"max-height @{dur}");
+    border: 1px solid #d6d4d4;
+    background: #fbfbfb;
+    max-height: 90px;
+    overflow: hidden;
+
+    &-disabled {
+      max-height: none;
+    }
+
+    &-open {
+      max-height: 10000vh;
+    }
+
+    &_trigger {
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: 88px;
+      align-items: center;
+      border: none;
+      background: none;
+      text-align: left;
+      color: #333;
+      font-size: 17px;
+      font-weight: bold;
+      padding: 0 15px;
+      letter-spacing: -1px;
+
+      .oneyPayment-disabled & {
+        color: #colorMap[grey];
+        cursor: default;
+
+        &:hover {
+          background: #fbfbfb;
+        }
+
+        .oneyPayment-mobile& {
+          padding: 8px 15px;
+          height: auto;
+        }
+      }
+
+      &:hover {
+        background: #f6f6f6;
+
+        .oneyPayment-open & {
+          background: #fbfbfb;
+        }
+      }
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:after {
+        .transition(~"transform @{dur}");
+        .transform(translateY(-50%));
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        content: "\f054";
+        position: absolute;
+        right: 7px;
+        top: 50%;
+        font-family: "FontAwesome";
+        font-size: 25px;
+        height: 30px;
+        width: 30px;
+        color: #777;
+
+        .oneyPayment-open & {
+          .transform(translateY(-50%) rotate(90deg));
+        }
+
+        .oneyPayment-disabled & {
+          display: none;
+        }
+      }
+
+      .oneyPayment-mobile & {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+      }
+    }
+
+    &_label {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3em;
+    }
+
+    &_error {
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 400;
+
+      &-invalidCarrier {
+        padding: 0 15px;
+        color: #colorMap[error];
+        font-size: 13px;
+        font-style: normal;
+        margin: 0 0 16px;
+      }
+    }
+
+    &_logo {
+      display: block;
+      width: 165px;
+      height: 45px;
+      background-size: 110%;
+      max-width: 100%;
+      margin: 0 15px 0 0;
+
+      .oneyPayment-disabled & {
+        background-image: url(~"@{img_oney}3x4x-alt.svg");
+      }
+    }
+
+    &_cta {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin: 0 0 30px;
+    }
+
+    &_button {
+      background: #colorMap[oney];
+      width: 254px;
+      height: 50px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      .borderRadius(2px);
+
+      &-disabled,
+      .oneyPayment-invalidCarrier & {
+        background: #colorMap[grey];
+        cursor: default;
+        outline: none;
+      }
+    }
+  }
+
+  // Oney payment option
+  &Option {
+    .transition();
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: calc(50% - 16px);
+    border: 1px solid #dce0e8;
+    padding: 30px;
+    cursor: pointer;
+    margin: 0 8px 50px;
+    position: relative;
+
+    &:after {
+      .transition(~"opacity @{dur}");
+      content: "";
+      position: absolute;
+      display: block;
+      bottom: -14px;
+      right: 0;
+      left: 0;
+      height: 13px;
+      background: #colorMap[oney];
+      opacity: 0;
+      -webkit-box-shadow: 0px -5px 10px 5px #fff inset;
+      -moz-box-shadow: 0px -5px 10px 5px #fff inset;
+      box-shadow: 0px -5px 10px 5px #fff inset;
+
+      .oneyPayment-mobile & {
+        display: none;
+      }
+    }
+
+    &:hover {
+      border-color: #colorMap[oney];
+
+      &:after {
+        opacity: 1;
+      }
+    }
+
+    &-selected {
+      border-color: #colorMap[oney];
+      background: fade(#colorMap[oney], 15);
+
+      &:after {
+        opacity: 1;
+      }
+
+      .oneyPayment-mobile & {
+        border: none;
+        background: none;
+      }
+    }
+
+    &_wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 0 8px;
+      flex-wrap: wrap;
+      position: relative;
+
+      .oneyPayment-mobile & {
+        padding: 89px 0 0;
+        position: relative;
+      }
+
+      &-loading {
+        justify-content: center;
+        padding: 16px;
+
+        & + .oneyPayment_cta {
+          display: none;
+        }
+
+        .oneyPayment-mobile & {
+          padding: 16px;
+        }
+      }
+    }
+
+    &_logo {
+      display: block;
+      width: 135px;
+      height: 35px;
+      max-width: 100%;
+
+      .oneyPayment-mobile & {
+        width: 100px;
+        height: 30px;
+      }
+
+      .oneyPayment-invalidCarrier &.oneyLogo-x3 {
+        background-image: url(~"@{img_oney}3x-alt.svg");
+      }
+
+      .oneyPayment-invalidCarrier &.oneyLogo-x4 {
+        background-image: url(~"@{img_oney}4x-alt.svg");
+      }
+    }
+
+    &_title {
+      display: flex;
+      height: 90px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: #2f2930;
+      padding: 0 0 35px;
+
+      .oneyPayment-mobile & {
+        width: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: transparent;
+        border: 1px solid #dce0e8;
+        border-left: none;
+        border-bottom: 5px solid transparent;
+        padding: 0;
+      }
+
+      .oneyOption-withoutSchedule & {
+        padding: 0;
+      }
+
+      //
+      .oneyPayment-mobile .oneyOption:nth-child(2) & {
+        left: 50%;
+        border-right: none;
+        border-left: none;
+      }
+
+      .oneyPayment-mobile .oneyOption-selected & {
+        border-bottom: 5px solid #colorMap[oney];
+      }
+      .oneyPayment-mobile .oneyOption-withoutSchedule & {
+        border-bottom: 1px solid #dce0e8;
+        padding: 0 0 4px;
+      }
+      .oneyPayment-mobile .oneyOption-withoutSchedule.oneyOption-selected & {
+        border-bottom: 5px solid #colorMap[oney];
+        padding: 0;
+      }
+    }
+
+    &_prices {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .oneyPayment-mobile & {
+        display: none;
+        height: auto;
+        padding: 30px 16px;
+        border-top: 1px solid #dce0e8;
+      }
+
+      .oneyPayment-mobile .oneyOption-selected & {
+        display: block;
+      }
+
+      // Oney Detail
+      ul {
+        display: flex;
+        flex-direction: column;
+        font-weight: 600;
+        font-size: 15px;
+        color: #2F2930;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+
+        li {
+          .border(#dce0e8, b);
+          display: flex;
+          justify-content: space-between;
+          line-height: 21px;
+          padding: 0 0 16px;
+          flex-wrap: wrap;
+
+          & + li {
+            padding: 16px 0;
+          }
+
+          &:last-child {
+            padding: 16px 0 0;
+            margin: auto 0 0;
+            border: none;
+          }
+
+          span {
+            display: flex;
+            font-weight: 600;
+
+            &:first-child {
+              font-weight: 500;
+            }
+          }
+
+          small {
+            display: block;
+            font-weight: 400;
+            width: 100%;
+          }
+
+          .oneyPayment-mobile & {
+            padding: 8px 0;
+          }
+        }
+      }
+    }
+
+    &_legend {
+      text-align: center;
+      font-weight: 400;
+      margin: auto 0 0;
+      color: #2f2930;
+    }
+
+    &_radio {
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .oneyPayment-mobile & {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      position: static;
+      border: none;
+      background: none;
+
+      &.oneyOption-withoutSchedule {
+        margin: 0 0 16px;
+      }
+    }
+  }
+
+  // Oney Form
+  &Form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    background: transparent;
+    font-size: 15px;
+    padding: 0;
+    width: 100%;
+
+    .payplugPopin & {
+      @media (@mobile) {
+        width: calc(100vw - 30px);
+        max-width: 100%;
+      }
+    }
+
+    &:focus {
+      outline: 0;
+    }
+
+    &_overlay {
+      .transition(~"max-height @{dur}");
+      background: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      overflow: hidden;
+      padding: 0 16px;
+      max-height: 0;
+
+      &-show {
+        max-height: 10000vh;
+      }
+    }
+
+    &_wrapper {
+      position: relative;
+      padding: 24px 0 0;
+
+      &:before {
+        .border(#colorMap[oney], t);
+        .transform(translateX(-50%));
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        height: 0;
+        width: 150px;
+      }
+    }
+
+    &_close {
+      display: block;
+      width: 100px;
+      height: 24px;
+      line-height: 24px;
+      background: none;
+      border: none;
+      text-align: center;
+      color: #colorMap[oney];
+      margin: 0 0 15px;
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:before {
+        .transform(translate(-50%, -50%) rotate(45deg));
+      }
+
+      &:after {
+        .transform(translate(-50%, -50%) rotate(-45deg));
+      }
+
+      .payplugPopin & {
+        color: #colorMap[payplug];
+      }
+    }
+
+    &_title {
+      display: block;
+      padding: 8px 0 16px;
+      color: #colorMap[payplug];
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    &_content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      position: relative;
+      width: 100%;
+    }
+
+    &_fieldset {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      position: relative;
+      max-width: 330px;
+      padding: 0 15px;
+      margin: 0 0 15px;
+
+      &-same {
+        margin: auto;
+      }
+
+      .oneyForm_wrapper & {
+        max-width: calc(~"50% - 50px");
+      }
+
+      .oneyPayment-mobile & {
+        width: 100%;
+      }
+
+      .oneyPayment-mobile & {
+        & + .oneyForm_fieldset {
+          .border(fade(#colorMap[grey], 50), t);
+          padding: 16px 0 0;
+          margin: 16px 0 0;
+        }
+      }
+
+      .payplugPopin & {
+        @media (@mobile) {
+          padding: 16px 0 0;
+        }
+      }
+    }
+
+    &_sectionName {
+      margin: 0 0 4px;
+      font-size: 15px;
+      color: #colorMap[oney];
+      text-align: center;
+
+      .payplugPopin & {
+        color: #colorMap[payplug];
+      }
+    }
+
+    &_group {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      p {
+        width: 100%;
+        font-weight: 400;
+        font-size: 12px;
+        margin: 0 0 3px;
+      }
+
+      & + .oneyForm_group {
+        margin: 10px 0 0;
+      }
+    }
+
+    &_field {
+      width: 100%;
+
+      &-firstname,
+      &-lastname,
+      &-postcode,
+      &-city {
+        width: calc(~"50% - 2.5px");
+      }
+    }
+
+    &_input {
+      .border(#colorMap[grey]);
+      .borderRadius(2px);
+      font-size: 12px;
+      padding: 0 8px;
+      margin: 0 0 5px;
+      width: 100%;
+      height: 36px;
+
+      &,
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus {
+      }
+
+      &-error {
+        .border(#colorMap[error]);
+      }
+    }
+
+    &_validate {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    &_button {
+      .borderRadius(2px);
+      background: #colorMap[oney];
+      width: 200px;
+      height: 50px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      margin: 10px 0;
+    }
+
+    &_submit {
+      .borderRadius(2px);
+      background: #colorMap[payplug];
+      width: 200px;
+      height: 50px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      margin: 16px 0 8px;
+      outline: none;
+    }
+
+    &_message {
+      text-align: center;
+      font-size: 13px;
+      margin: 10px 0 0;
+      display: none;
+
+      &-error {
+        display: block;
+        color: #colorMap[error];
+      }
+
+      &-success {
+        display: block;
+        color: #colorMap[payplug];
+      }
+    }
+
+    &_validation {
+      .transition(opacity @dur);
+      opacity: 0;
+      position: absolute;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+
+      span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        font-size: 15px;
+
+        &:first-child {
+          color: #colorMap[payplug];
+          font-size: 12px;
+          margin: 0 0 15px;
+
+          &:before{
+            .border(#colorMap[payplug],bl,4px);
+            .rotate(-45deg);
+            display: block;
+            width: 30px;
+            height: 15px;
+            content: "";
+            margin: 0 0 15px;
+          }
+        }
+      }
+
+      &-show{
+        display: flex;
+      }
+      &-appear{
+        opacity: 1;
+      }
+    }
+  }
+
+  // Oney Error
+  &Error {
+    .Poppins();
+    width: 100%;
+    color: #a91526;
+    clear: both;
+    padding: 0 15px;
+    margin: 0 0 16px;
+    display: none;
+  }
+
+  // Oney Loader
+  &Loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &_spinner {
+      display: flex;
+      font-size: 30px;
+      width: 1em;
+      height: 1em;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+
+      span,
+      &:before,
+      &:after {
+        .borderRadius();
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        border: .1em solid #colorMap[oney];
+        border-color: #colorMap[oney] transparent transparent transparent;
+        animation: pp-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      }
+
+      &:before,
+      &:after {
+        content: "";
+      }
+
+      &:before {
+        animation-delay: -0.45s;
+      }
+
+      span {
+        animation-delay: -0.30s;
+      }
+
+      &:after {
+        animation-delay: -0.15s;
+      }
+    }
+
+    &_message {
+      display: flex;
+      justify-content: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      padding: 8px 8px 0;
+      font-size: 16px;
+
+      i {
+        animation: pp-opacity 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+
+        &:nth-child(1) {
+          animation-delay: -0.6s;
+        }
+
+        &:nth-child(2) {
+          animation-delay: -0.4s;
+        }
+
+        &:nth-child(3) {
+          animation-delay: -0.2s;
+        }
+      }
+    }
+  }
+}

@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugLogger;
-
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
 class PayPlugValidation
@@ -33,16 +31,20 @@ class PayPlugValidation
     public $debug;
     public $type;
     public $api_key;
+    private $plugin;
 
     public function __construct()
     {
         $this->payplug = new Payplug();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->type = 'payment';
+        $this->plugin = $this->payplug->getPlugin();
     }
 
     public function setLogger() {
-        $this->logger = new PayPlugLogger('validation');
+        $this->logger = $this->plugin->getLogger();
+        $params['process'] = 'validation';
+        $this->logger->setParams($params);
         $this->logger->addLog('New validation');
     }
 
@@ -211,17 +213,42 @@ class PayPlugValidation
                     $this->payplug->setPaymentErrorsCookie(array($this->payplug->l('The transaction was not completed and your card was not charged.')));
                     Payplug::redirectForVersion($redirect_url_error);
                 }
+
                 if (
                     ((isset($payment->save_card) && (int)$payment->save_card == 1))
                     ||
                     ((isset($payment->card->id) && $payment->card->id != '')
                         && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
                 ) {
-                    $this->logger->addLog('Saving card...', 'info');
-                    $res_payplug_card = $this->payplug->saveCard($payment);
+                    $this->logger->addLog('[Save Card] Saving card...', 'info');
+                    $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
 
                     if (!$res_payplug_card) {
-                        $this->logger->addLog('Card cannot be saved.', 'error');
+                        $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');
+
+                        if (!isset($payment->save_card)) {
+                            $this->logger->addLog('[Save Card] $payment->save_card is not set', 'debug');
+                        }
+
+                        if (isset($payment->save_card) && $payment->save_card !== 1) {
+                            $this->logger->addLog('[Save Card] $payment->save_card is set but not equal to 1', 'debug');
+                        }
+
+                        if (!isset($payment->card->id)) {
+                            $this->logger->addLog('[Save Card] $payment->card->id is not set', 'debug');
+                        }
+
+                        if (isset($payment->card->id) && $payment->card->id == '') {
+                            $this->logger->addLog('[Save Card] $payment->card->id is set but empty', 'debug');
+                        }
+
+                        if (!isset($payment->hosted_payment)) {
+                            $this->logger->addLog('[Save Card] $payment->hosted_payment is not set', 'debug');
+                        }
+
+                        if ((isset($payment->hosted_payment)) && $payment->hosted_payment == '') {
+                            $this->logger->addLog('[Save Card] $payment->hosted_payment is set but empty', 'debug');
+                        }
                     }
                 }
             }

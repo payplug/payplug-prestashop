@@ -1,12 +1,33 @@
 <?php
+/**
+ * 2013 - 2020 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
 
 namespace PayPlug\src\specific;
 
 use Media;
 
 use Context;
+use PayPlug\src\repositories\CardRepository;
 use PayplugBackward;
-use PayPlugCard;
 use PayPlugCarrier;
 use Validate;
 
@@ -30,7 +51,7 @@ class PrestashopSpecific16
         Media::addJsDef(array(
             'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', array(), true),
         ));
-        $this->payplug->assignOneyJSVar();
+        $this->payplug->oneyRepository->assignOneyJSVar();
     }
 
     public function hookCustomerAccount()
@@ -88,32 +109,37 @@ class PrestashopSpecific16
             }
 
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                $is_elligible = $this->payplug->isOneyElligible($cart);
+                $is_elligible = $this->payplug->oneyRepository->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
                 $id_currency = $this->context->currency->id;
                 $amount = $cart->getOrderTotal(true, Cart::BOTH);
-                $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+                $is_elligible = $this->payplug->oneyRepository->isValidOneyAmount($amount, $id_currency);
                 $error = !$is_elligible['result'];
             }
 
             if (!$error && $has_valid_carrier) {
-                $is_elligible = $this->payplug->isValidOneyCarrier($cart);
+                $is_elligible = $this->payplug->oneyRepository->isValidOneyCarrier($cart);
                 $error = !$is_elligible['result'];
             }
 
-            $this->context->smarty->assign(array(
-                'payplug_module_dir' => _PS_MODULE_DIR_,
-                'payplug_oney' => true,
-                'payplug_oney_required_field' => $this->payplug->displayOneyRequiredFields(),
-                'payplug_oney_allowed' => $is_elligible['result'],
-                'payplug_oney_error' => $is_elligible['error'],
-                'payplug_oney_loading_msg' => $this->payplug->l('Loading')
-            ));
+            try {
+                $this->context->smarty->assign(array(
+                    'payplug_module_dir' => _PS_MODULE_DIR_,
+                    'payplug_oney' => true,
+                    'payplug_oney_required_field' => $this->payplug->oneyRepository->displayOneyRequiredFields(),
+                    'payplug_oney_allowed' => $is_elligible['result'],
+                    'payplug_oney_error' => $is_elligible['error'],
+                    'payplug_oney_loading_msg' => $this->payplug->l('Loading')
+                ));
+            } catch (\Exception $e) {
+                var_dump($e); exit;
+            }
         }
 
-        $payplug_card = new PayPlugCard();
+        $payplug_card = new CardRepository();
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
         $i = 0;
 
@@ -130,7 +156,7 @@ class PrestashopSpecific16
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
                     && ($payment_method == 'standard')) {
-                        continue;
+                    continue;
                 } else {
                     /*
                      * var_dump($payment_option['tpl']); :
