@@ -29,7 +29,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_0_0($object)
 {
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     // install payplug payment cart
@@ -108,61 +107,11 @@ function upgrade_module_3_0_0($object)
     $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
 
     if (!$res_payplug_order_payment) {
-        $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
-        $flag = false;
-    }
-
-    try {
-        // check if lock exists on id_cart
-        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
-        $res_describe = Db::getInstance()->executeS($req_describe);
-        $lock_exists = false;
-        if ($res_describe) {
-            foreach ($res_describe as $field) {
-                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
-                    $lock_exists = true;
-                }
-            }
-        }
-
-        // check doesn't exist then add it
-        if(!$lock_exists) {
-            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
-            $res_truncate = Db::getInstance()->execute($req_truncate);
-            if (!$res_truncate) {
-                $flag = false;
-                $log->error('Can\'t truncate payplug_lock');
-            }
-            if ($flag) {
-                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
-                $res_alter = Db::getInstance()->execute($req_alter);
-                if (!$res_alter) {
-                    $flag = false;
-                    $log->error('Can\'t alter table payplug_lock');
-                }
-            }
-            if ($flag) {
-                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
-                $res_describe = Db::getInstance()->executeS($req_describe);
-                if ($res_describe) {
-                    foreach ($res_describe as $field) {
-                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
-                            $flag = $flag && true;
-                        }
-                    }
-                } else {
-                    $flag = false;
-                    $log->error('Wrong table describe payplug_lock');
-                }
-            }
-        }
-    } catch (Exception $e) {
-        $log->error('Exception: ' . $e->getMessage());
         $flag = false;
     }
 
     $flag = $flag && Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
 
 
-    return $flag;
+    return true;
 }

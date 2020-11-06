@@ -3,9 +3,33 @@
     "require": {
         "giggsey/libphonenumber-for-php": "^8.12"
     },
+    "require-dev": {
+        "phpunit/phpunit": "9.*"
+    },
     "autoload": {
         "psr-4": {
-            "PayPlug\\": "./"
+            "PayPlug\\": "./",
+            "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "rm -rf vendor/giggsey/libphonenumberlight",
+            "rm -rf vendor/giggsey/libphonenumber-for-php/src/carrier",
+            "rm -rf vendor/giggsey/libphonenumber-for-php/src/geocoding",
+            "rm -rf vendor/giggsey/libphonenumber-for-php/src/prefixmapper",
+            "mv vendor/giggsey/libphonenumber-for-php vendor/giggsey/libphonenumberlight",
+            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/namespace libphonenumber;/namespace libphonenumberlight;/g'",
+            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/use libphonenumber/use libphonenumberlight/g'"
+        ],
+        "post-update-cmd": [
+            "rm -rf vendor/giggsey/libphonenumberlight",
+            "rm -rf vendor/giggsey/libphonenumber-for-php/src/carrier",
+            "rm -rf vendor/giggsey/libphonenumber-for-php/src/geocoding",
+            "rm -rf vendor/giggsey/libphonenumber-for-php/src/prefixmapper",
+            "mv vendor/giggsey/libphonenumber-for-php vendor/giggsey/libphonenumberlight",
+            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/namespace libphonenumber;/namespace libphonenumberlight;/g'",
+            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/use libphonenumber/use libphonenumberlight/g'"
+        ]
     }
 }

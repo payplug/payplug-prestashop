@@ -1182,6 +1182,9 @@ ul.oneyPopin_navigation li.selected {
   border-bottom: 5px solid transparent;
   padding: 0;
 }
+.oneyOption-withoutSchedule .oneyOption_title {
+  padding: 0;
+}
 .oneyPayment-mobile .oneyOption:nth-child(2) .oneyOption_title {
   left: 50%;
   border-right: none;
@@ -1189,6 +1192,14 @@ ul.oneyPopin_navigation li.selected {
 }
 .oneyPayment-mobile .oneyOption-selected .oneyOption_title {
   border-bottom: 5px solid #7ebd00;
+}
+.oneyPayment-mobile .oneyOption-withoutSchedule .oneyOption_title {
+  border-bottom: 1px solid #dce0e8;
+  padding: 0 0 4px;
+}
+.oneyPayment-mobile .oneyOption-withoutSchedule.oneyOption-selected .oneyOption_title {
+  border-bottom: 5px solid #7ebd00;
+  padding: 0;
 }
 .oneyOption_prices {
   display: flex;
@@ -1268,6 +1279,9 @@ ul.oneyPopin_navigation li.selected {
   position: static;
   border: none;
   background: none;
+}
+.oneyPayment-mobile .oneyOption.oneyOption-withoutSchedule {
+  margin: 0 0 16px;
 }
 .oneyForm {
   display: flex;
