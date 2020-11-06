@@ -23,19 +23,19 @@
     {if isset($payment.id)}
         <li>
             <span class="pp_col1">{l s='Transaction ID' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.id|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="id">{$payment.id|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.type)}
         <li>
             <span class="pp_col1">{l s='Type' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.type|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="type">{$payment.type|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.status)}
         <li data-e2e-state_code="{$payment.status_code}">
             <span class="pp_col1">{l s='Status' mod='payplug'} :</span>
-            <span class="pp_col2">
+            <span class="pp_col2" data-e2e-payment-details="status">
                 <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">{$payment.status|escape:'htmlall':'UTF-8'}</span>
                 <span>{if isset($payment.status_message)}{$payment.status_message|escape:'htmlall':'UTF-8'}{/if}</span>
                 <span>{if isset($payment.error)} {$payment.error|escape:'htmlall':'UTF-8'}{/if}</span>
@@ -45,52 +45,52 @@
     {if isset($payment.amount)}
         <li>
             <span class="pp_col1">{l s='Amount' mod='payplug'} :</span>
-            <span class="pp_col2">{displayPrice price=$payment.amount}</span>
+            <span class="pp_col2" data-e2e-payment-details="amount">{displayPrice price=$payment.amount}</span>
         </li>
     {/if}
     {if isset($payment.authorization) && $payment.can_be_captured === true}
         {if isset($payment.date)}
             <li>
                 <span class="pp_col1">{l s='Authorized on' mod='payplug'} :</span>
-                <span class="pp_col2">{$payment.date|escape:'htmlall':'UTF-8'}</span>
+                <span class="pp_col2" data-e2e-payment-details="date">{$payment.date|escape:'htmlall':'UTF-8'}</span>
             </li>
         {/if}
     {else}
         {if isset($payment.date)}
             <li>
                 <span class="pp_col1">{l s='Paid at' mod='payplug'} :</span>
-                <span class="pp_col2">{$payment.date|escape:'htmlall':'UTF-8'}</span>
+                <span class="pp_col2" data-e2e-payment-details="date">{$payment.date|escape:'htmlall':'UTF-8'}</span>
             </li>
         {/if}
     {/if}
     {if isset($payment.card_brand)}
         <li>
             <span class="pp_col1">{l s='Credit card' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.card_brand|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="card_brand">{$payment.card_brand|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.card_mask)}
         <li>
             <span class="pp_col1">{l s='Card mask' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.card_mask|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="card_mask">{$payment.card_mask|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.tds)}
         <li>
             <span class="pp_col1">{l s='3-D Secure' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.tds|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="tds">{$payment.tds|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.card_date)}
         <li>
             <span class="pp_col1">{l s='Expiry Date' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.card_date|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="card_date">{$payment.card_date|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.mode)}
         <li>
             <span class="pp_col1">{l s='Mode' mod='payplug'} :</span>
-            <span class="pp_col2">{$payment.mode|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="mode">{$payment.mode|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
 </ul>
