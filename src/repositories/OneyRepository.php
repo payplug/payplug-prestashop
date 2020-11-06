@@ -329,7 +329,7 @@ class OneyRepository extends \Payplug
                 'oneyLogo' => $this->payplug->oneyLogoUrl
             ));
 
-            return $this->payplug->display($this->payplug->constantFile, 'oney_payment.tpl');
+            return $this->payplug->display($this->payplug->constantFile, 'oney/payment/payment.tpl');
         }
     }
 
@@ -408,7 +408,7 @@ class OneyRepository extends \Payplug
             'payplug_oney_loading_msg' => $this->payplug->l('Loading')
         ));
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney_cta.tpl');
+        return $this->payplug->display($this->payplug->constantFile, 'oney/cta.tpl');
     }
 
     /**
@@ -928,7 +928,7 @@ class OneyRepository extends \Payplug
             'oney_required_fields' => $fields
         ));
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney_form.tpl');
+        return $this->payplug->display($this->payplug->constantFile, 'oney/form.tpl');
     }
 
     /**
