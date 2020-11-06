@@ -316,7 +316,7 @@ class Payplug extends PaymentModule
 
     private function initializeAccessors()
     {
-        $this->plugin = (new PayPlug\src\repositories\PluginRepository($this))->getEntity($this);
+        $this->plugin = (new PayPlug\src\repositories\PluginRepository($this))->getEntity();
 
         $this->card = $this->plugin->getCard();
         $this->logger = $this->plugin->getLogger();
