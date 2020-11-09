@@ -517,8 +517,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                         $order_history->save();
                                     } catch (Exception $exception) {
-                                        $this->logger->addLog(
-                                            'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                                        $this->logger->addLog('Order history cannot be saved: ' . $exception->getMessage(), 'error');
                                         $this->logger->addLog(
                                             'Please check if order state ' . (int)$new_order_state . ' exists.',
                                             'error'
@@ -724,9 +723,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 'Pending state: ' . (int)$pending_state,
                                 'debug'
                             );
-                            $this->logger->addLog(
-                                'Paid state: ' . (int)$paid_state, 'debug'
-                            );
+                            $this->logger->addLog('Paid state: ' . (int)$paid_state, 'debug');
                             $this->logger->addLog('Current order state is in conflict with IPN.', 'error');
                             if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
@@ -845,12 +842,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                             if ($is_oney) {
                                 switch ($this->resource->payment_method['type']) {
-                                    case 'oney_x3_with_fees' :
-                                    case 'oney_x3_without_fees' :
+                                    case 'oney_x3_with_fees':
+                                    case 'oney_x3_without_fees':
                                         $module_name = $this->payplug->l('Oney 3x');
                                         break;
-                                    case 'oney_x4_with_fees' :
-                                    case 'oney_x4_without_fees' :
+                                    case 'oney_x4_with_fees':
+                                    case 'oney_x4_without_fees':
                                         $module_name = $this->payplug->l('Oney 4x');
                                         break;
                                     default:
