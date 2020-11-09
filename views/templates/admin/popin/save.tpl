@@ -21,5 +21,5 @@
 *}
 <p>{l s='Your configuration have been saved' mod='payplug'}</p>
 <div class="payplugPopup_footer payplugPopup_footer-center">
-    <button type="button" class="payplugButton payplugButton-close payplugButton-green">{l s='Ok' mod='payplug'}</button>
+    <button type="button" class="payplugButton -close -green">{l s='Ok' mod='payplug'}</button>
 </div>

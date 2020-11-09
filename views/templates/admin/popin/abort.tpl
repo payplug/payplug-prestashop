@@ -24,6 +24,6 @@
 <p>{l s='Are you sure you want to suspend the installment plan on this order?' mod='payplug'}</p>
 <p>{l s='Your customer won’t be charged on the due dates.' mod='payplug'}</p>
 <div class="payplugPopup_footer">
-    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton payplugButton-green" name="confirmPayplugAbort">{l s='Suspend' mod='payplug'}</button>
+    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton -green" name="confirmPayplugAbort">{l s='Suspend' mod='payplug'}</button>
 </div>

@@ -34,7 +34,7 @@
                     {foreach from=$payplug_cards item=card name=ppcards}
                         {if !$card.expired}
                             <label>
-                                <input type="radio" name="payplug_card" id="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" value="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" {if $smarty.foreach.ppcards.first}checked="checked" {/if}/>
+                                <input data-e2e-type="payment" data-e2e-method="oneclick" type="radio" name="payplug_card" id="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" value="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" {if $smarty.foreach.ppcards.first}checked="checked" {/if}/>
                                 <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.png"/>
                                 <span>
                                     {$payplug_payment_option.label|escape:'html'}

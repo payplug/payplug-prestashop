@@ -47,6 +47,6 @@
     </li>
 </ul>
 <div class="payplugPopup_footer">
-    <button type="button" class="payplugButton payplugButton-close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton payplugButton-green" name="confirm">{l s='SAVE SETTINGS' mod='payplug'}</button>
+    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton -green" name="confirm">{l s='SAVE SETTINGS' mod='payplug'}</button>
 </div>

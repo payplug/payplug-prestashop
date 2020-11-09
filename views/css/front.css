@@ -170,6 +170,11 @@
   cursor: pointer;
 }
 /* Payplug payment option */
+@media (max-width: 767px) {
+  .payplugPaymentOption {
+    display: flex;
+  }
+}
 .payplugPaymentOption label {
   display: flex !important;
   flex-direction: row-reverse;
@@ -179,6 +184,11 @@
 }
 .payplugPaymentOption img {
   margin: 0 12px 0 0;
+}
+@media (max-width: 767px) {
+  .payplugPaymentOption img {
+    display: none;
+  }
 }
 /* Oney cta */
 .oneyCta {

@@ -67,7 +67,7 @@ class Payplug extends PaymentModule
     protected $PrestashopSpecificObject; // 3.0
 
     /**
-     * @var To inject logo_url in oney_payment.tpl
+     * @var To inject logo_url in oney payment template
      */
     protected $oneyLogoUrl;
 
@@ -2670,7 +2670,7 @@ class Payplug extends PaymentModule
             'amount_available' => $amount_available,
         ));
 
-        $this->html = $this->fetchTemplateRC('/views/templates/admin/admin_order_refund_data.tpl');
+        $this->html = $this->fetchTemplateRC('/views/templates/admin//order/refund_data.tpl');
 
         return $this->html;
     }
@@ -3227,7 +3227,7 @@ class Payplug extends PaymentModule
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
 
-        $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin_order.tpl');
+        $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
         return $this->html;
     }
 

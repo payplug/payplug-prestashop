@@ -22,7 +22,7 @@
 <div class="panel payplugShow">
     <div class="panel-heading">{l s='Display to customers' mod='payplug'}</div>
     {if !$connected}
-        <p class="payplugAlert payplugAlert-warning">{l s='Before being able to display PayPlug to your customers you need to connect your PayPlug account below.' mod='payplug'}</p>
+        <p class="payplugAlert -warning">{l s='Before being able to display PayPlug to your customers you need to connect your PayPlug account below.' mod='payplug'}</p>
     {/if}
     <div class="panel-row">
         <div class="payplugPanel">
