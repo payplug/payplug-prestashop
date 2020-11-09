@@ -80,7 +80,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
                     }
                     $quantity = (int)Tools::getValue('qty', 1);
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
+                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
                     $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency);
@@ -102,7 +102,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
                     // Some integration will not use qty data but quantity_wanted
                     $quantity = (int)Tools::getValue('qty', (int)Tools::getValue('quantity_wanted', 1));
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
+                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $cart = false;
                 } else {

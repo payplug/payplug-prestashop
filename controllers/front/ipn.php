@@ -299,7 +299,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         $order = new Order((int)$id_order);
                     } catch (Exception $exception) {
                         $this->logger->addLog(
-                            'The order cannot be loaded: ' . $exception->getMessage(), 'error');
+                            'The order cannot be loaded: ' . $exception->getMessage(),
+                            'error'
+                        );
                         $response = array(
                             'exception' => $exception->getMessage(),
                         );
@@ -724,8 +726,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                     if (isset($payment->failure) && $payment->failure !== null) {
                         $this->logger->addLog('The payment has failed.');
-                        header($_SERVER['SERVER_PROTOCOL'] . ' 200 No treatment because payment has failed.', true,
-                            200);
+                        header(
+                            $_SERVER['SERVER_PROTOCOL'] . ' 200 No treatment because payment has failed.',
+                            true,
+                            200
+                        );
                         die;
                     }
 
@@ -770,7 +775,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         $customer = new Customer((int)$cart->id_customer);
                     } catch (Exception $exception) {
                         $this->logger->addLog(
-                            'Customer cannot be loaded: ' . $exception->getMessage(), 'error');
+                            'Customer cannot be loaded: ' . $exception->getMessage(),
+                            'error'
+                        );
                         if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
@@ -962,20 +969,27 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         }
                     }
 
-                    $this->logger->addLog('Checking number of order passed with this id_cart',
-                        'info');
+                    $this->logger->addLog(
+                        'Checking number of order passed with this id_cart',
+                        'info'
+                    );
                     $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'orders WHERE `id_cart` = ' . $cart->id;
                     $res_nb_orders = Db::getInstance()->executeS($sql);
                     if (!$res_nb_orders) {
-                        $this->logger->addLog('No order can be found using id_cart ' . (int)$cart->id,
-                            'error');
+                        $this->logger->addLog(
+                            'No order can be found using id_cart ' . (int)$cart->id,
+                            'error'
+                        );
                         if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'debug');
                         }
-                        header($_SERVER['SERVER_PROTOCOL'] . ' 500 No order can be found using id_cart ' . (int)$cart->id,
-                            true, 500);
+                        header(
+                            $_SERVER['SERVER_PROTOCOL'] . ' 500 No order can be found using id_cart ' . (int)$cart->id,
+                            true,
+                            500
+                        );
                         die;
                     } elseif (count($res_nb_orders) > 1) {
                         $this->logger->addLog(
@@ -988,27 +1002,37 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         } else {
                             $this->logger->addLog('Lock deleted.', 'debug');
                         }
-                        header($_SERVER['SERVER_PROTOCOL'] . ' 500 There is more than one order using id_cart ' . (int)$cart->id,
-                            true, 500);
+                        header(
+                            $_SERVER['SERVER_PROTOCOL'] . ' 500 There is more than one order using id_cart ' . (int)$cart->id,
+                            true,
+                            500
+                        );
                         die;
                     } else {
                         $this->logger->addLog('OK');
                         $id_order = (int)$res_nb_orders[0]['id_order'];
                     }
 
-                    $this->logger->addLog('Checking number of transaction validated for this order',
-                        'info');
+                    $this->logger->addLog(
+                        'Checking number of transaction validated for this order',
+                        'info'
+                    );
                     $payments = $this->payplug->getPayplugOrderPayments($order->id);
                     if (!$payments) {
                         $this->logger->addLog(
-                            'No transaction can be found using id_order ' . (int)$id_order, 'error');
+                            'No transaction can be found using id_order ' . (int)$id_order,
+                            'error'
+                        );
                         if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'debug');
                         }
-                        header($_SERVER['SERVER_PROTOCOL'] . ' 500 No transaction can be found using id_order ' . (int)$id_order,
-                            true, 500);
+                        header(
+                            $_SERVER['SERVER_PROTOCOL'] . ' 500 No transaction can be found using id_order ' . (int)$id_order,
+                            true,
+                            500
+                        );
                         die;
                     } elseif (count($payments) > 1) {
                         $this->logger->addLog(
@@ -1018,8 +1042,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         } else {
                             $this->logger->addLog('Lock deleted.', 'debug');
                         }
-                        header($_SERVER['SERVER_PROTOCOL'] . ' 500 There is more than one transaction using id_order ' . (int)$id_order,
-                            true, 500);
+                        header(
+                            $_SERVER['SERVER_PROTOCOL'] . ' 500 There is more than one transaction using id_order ' . (int)$id_order,
+                            true,
+                            500
+                        );
                         die;
                     } else {
                         $this->logger->addLog('OK');
