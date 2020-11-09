@@ -386,8 +386,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                     Tools::redirect($this->url['error']);
                 } elseif (count($res_nb_orders) > 1) {
-                    $this->logger->addLog('There is more than one order using id_cart ' . (int)$cart->id,
-                        'error');
+                    $this->logger->addLog(
+                        'There is more than one order using id_cart ' . (int)$cart->id,
+                        'error'
+                    );
                     foreach ($res_nb_orders as $o) {
                         $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
                     }

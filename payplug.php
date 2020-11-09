@@ -749,8 +749,7 @@ class Payplug extends PaymentModule
                         $this->l('Capture of this payment is authorized before %s. After this date, you will not be able to get paid.'),
                         $expiration
                     );
-                } elseif (
-                    isset($payment->authorization->authorized_at)
+                } elseif (isset($payment->authorization->authorized_at)
                     && $payment->authorization->authorized_at != null
                 ) {
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
@@ -1031,7 +1030,7 @@ class Payplug extends PaymentModule
             $type = $parsed[0];
             $field = $parsed[1];
             switch ($field) {
-                case 'email' :
+                case 'email':
                     if (Tools::strlen($data) > 100 && strpos($data, '+') !== false) {
                         $text = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
                         $errors[] = $text;
@@ -1043,7 +1042,7 @@ class Payplug extends PaymentModule
                         $errors[] = $text;
                     }
                     break;
-                case 'mobile_phone_number' :
+                case 'mobile_phone_number':
                     $id_address = $type == 'shipping' ? $this->context->cart->id_address_delivery : $this->context->cart->id_address_invoice;
                     $address = new Address($id_address);
                     $country = new Country($address->id_country);
@@ -1052,31 +1051,31 @@ class Payplug extends PaymentModule
                         $errors[] = $this->l('Please enter your mobile phone number.');
                     }
                     break;
-                case 'first_name' :
+                case 'first_name':
                     if (!Validate::isPostCode($data)) {
                         $text = $type == 'shipping' ? $this->l('Please enter your shipping firstname.') : $this->l('Please enter your billing firstname.');
                         $errors[] = $text;
                     }
                     break;
-                case 'last_name' :
+                case 'last_name':
                     if (!Validate::isPostCode($data)) {
                         $text = $type == 'shipping' ? $this->l('Please enter your shipping lastname.') : $this->l('Please enter your billing lastname.');
                         $errors[] = $text;
                     }
                     break;
-                case 'address1' :
+                case 'address1':
                     if (!Validate::isPostCode($data)) {
                         $text = $type == 'shipping' ? $this->l('Please enter your shipping address.') : $this->l('Please enter your billing address.');
                         $errors[] = $text;
                     }
                     break;
-                case 'postcode' :
+                case 'postcode':
                     if (!Validate::isPostCode($data)) {
                         $text = $type == 'shipping' ? $this->l('Please enter your shipping postcode.') : $this->l('Please enter your billing postcode.');
                         $errors[] = $text;
                     }
                     break;
-                case 'city' :
+                case 'city':
                     if (!Validate::isCityName($data)) {
                         $text = $type == 'shipping' ? $this->l('Please enter your shipping city.') : $this->l('Please enter your billing city.');
                         $errors[] = $text;
@@ -1099,7 +1098,7 @@ class Payplug extends PaymentModule
     {
         $order_states = array_merge($this->order_states, $this->oney_order_state);
 
-        foreach($order_states as $key => $state) {
+        foreach ($order_states as $key => $state) {
             // Check live OrderState
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
             $id_order_state_live = Configuration::get($key_config_live);
@@ -3314,12 +3313,7 @@ class Payplug extends PaymentModule
                 $paymentOption
                     ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'))
                     ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                    ->setAction($this->context->link->getModuleLink(
-                        $this->name,
-                        'dispatcher',
-                        array('def' => (int)$options['deferred']),
-                        true
-                    ))
+                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
                 $payment_list[] = $paymentOption;
@@ -3351,17 +3345,9 @@ class Payplug extends PaymentModule
             ),
         );
         $paymentOption
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/'
-                . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang)
-                . '.png'
-            ))
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang) . '.png'))
             ->setCallToActionText(count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card'))
-            ->setAction($this->context->link->getModuleLink(
-                $this->name,
-                'dispatcher',
-                array('def' => (int)$options['deferred']),
-                true
-            ))
+            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
             ->setModuleName('payplug')
             ->setInputs($input_options);
 
@@ -3395,12 +3381,7 @@ class Payplug extends PaymentModule
             $paymentOption
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
                 ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-                ->setAction($this->context->link->getModuleLink(
-                    $this->name,
-                    'dispatcher',
-                    array('def' => (int)$options['deferred']),
-                    true)
-                )
+                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true))
                 ->setModuleName('payplug')
                 ->setInputs($input_options);
 
@@ -3468,11 +3449,11 @@ class Payplug extends PaymentModule
                         case 'invalid_amount_top':
                             $err_label = $this->l('Between 100€ and 3000€ only');
                             break;
-                        case 'invalid_carrier' :
+                        case 'invalid_carrier':
                             $err_label = $this->l('Unavailable for this shipping method');
                             break;
                         default:
-                        case 'invalid_cart' :
+                        case 'invalid_cart':
                             $err_label = $this->l('Your cart is unavailable');
                             break;
                     }
@@ -3550,8 +3531,7 @@ class Payplug extends PaymentModule
         $pay_status = 1; //not paid
         if ((int)$payment->is_paid == 1) {
             $pay_status = 2; //paid
-        } elseif (
-            isset($payment->payment_method)
+        } elseif (isset($payment->payment_method)
             && isset($payment->payment_method['is_pending'])
             && (int)$payment->payment_method['is_pending'] == 1
         ) {
@@ -4376,8 +4356,7 @@ class Payplug extends PaymentModule
     {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
-        if (
-            preg_match(
+        if (preg_match(
                 '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
                 $useragent
             )
@@ -4501,13 +4480,13 @@ class Payplug extends PaymentModule
 
             if (strpos($field_name, 'phone') != false) {
                 switch ($type) {
-                    case 'billing' :
+                    case 'billing':
                         $id_country = Country::getByIso($payment_tab['billing']['country']);
                         $country = new Country($id_country);
                         $field = $this->formatPhoneNumber($field, $country);
                         break;
-                    case 'same' :
-                    case 'shipping' :
+                    case 'same':
+                    case 'shipping':
                     default:
                         $id_country = Country::getByIso($payment_tab['shipping']['country']);
                         $country = new Country($id_country);
@@ -5686,8 +5665,7 @@ class Payplug extends PaymentModule
             'company_name' => !empty($billing_address->company) ? $billing_address->company : $billing_address->firstname . ' ' . $billing_address->lastname,
             'email' => $customer->email,
             'landline_phone_number' => $this->formatPhoneNumber($billing_address->phone, $billing_address->id_country),
-            'mobile_phone_number' => $this->formatPhoneNumber($billing_address->phone_mobile,
-                $billing_address->id_country),
+            'mobile_phone_number' => $this->formatPhoneNumber($billing_address->phone_mobile, $billing_address->id_country),
             'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
             'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
             'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
@@ -5709,10 +5687,8 @@ class Payplug extends PaymentModule
             'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
             'company_name' => !empty($shipping_address->company) ? $shipping_address->company : $shipping_address->firstname . ' ' . $shipping_address->lastname,
             'email' => $customer->email,
-            'landline_phone_number' => $this->formatPhoneNumber($shipping_address->phone,
-                $shipping_address->id_country),
-            'mobile_phone_number' => $this->formatPhoneNumber($shipping_address->phone_mobile,
-                $shipping_address->id_country),
+            'landline_phone_number' => $this->formatPhoneNumber($shipping_address->phone, $shipping_address->id_country),
+            'mobile_phone_number' => $this->formatPhoneNumber($shipping_address->phone_mobile, $shipping_address->id_country),
             'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
             'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
             'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
@@ -5777,8 +5753,7 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer,
-                $id_card, $config['company']) : null;
+            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
         }
 
         // check payment tab from current payment method
@@ -5794,19 +5769,15 @@ class Payplug extends PaymentModule
             }
 
             // check billing phonenumber
-            if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
-                $payment_tab['billing']['country'])) {
-                if ($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'],
-                    $payment_tab['billing']['country'])) {
+            if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'], $payment_tab['billing']['country'])) {
+                if ($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'], $payment_tab['billing']['country'])) {
                     $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
                 }
             }
 
             // check shipping phonenumber
-            if (!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'],
-                $payment_tab['shipping']['country'])) {
-                if ($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'],
-                    $payment_tab['shipping']['country'])) {
+            if (!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'], $payment_tab['shipping']['country'])) {
+                if ($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'], $payment_tab['shipping']['country'])) {
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
             }
@@ -5836,8 +5807,7 @@ class Payplug extends PaymentModule
             $payment_tab['payment_context'] = $this->getOneyPaymentContext();
 
             $return_url_params = ['ps' => 1, 'cartid' => (int)$cart->id, 'isoney' => $is_oney];
-            $return_url = $this->context->link->getModuleLink($this->name, 'validation', $return_url_params,
-                true);
+            $return_url = $this->context->link->getModuleLink($this->name, 'validation', $return_url_params, true);
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
@@ -5872,7 +5842,7 @@ class Payplug extends PaymentModule
         }
 
         switch ($payment_method) {
-            case 'oneclick' :
+            case 'oneclick':
                 $redirect = $payment->is_paid;
                 if (!$redirect && $is_deferred) {
                     $redirect = (bool)$payment->authorization->authorized_at;
@@ -5884,15 +5854,15 @@ class Payplug extends PaymentModule
                         $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
                 );
                 break;
-            case 'oney' :
+            case 'oney':
                 $payment_return = array(
                     'result' => 'new_card',
                     'redirect' => true,
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
                 break;
-            case 'standard' :
-            case 'installment' :
+            case 'standard':
+            case 'installment':
             default:
                 $payment_return = array(
                     'result' => 'new_card',
@@ -6873,8 +6843,9 @@ class Payplug extends PaymentModule
         $cancelled_state = Configuration::get('PS_OS_CANCELED');
 
         $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-        $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
-                $oney_payment_methods);
+        $is_oney = isset($payment->payment_method)
+            && isset($payment->payment_method['type'])
+            && in_array($payment->payment_method['type'], $oney_payment_methods);
 
         if ($is_oney) {
             if ($order->getCurrentState() == $oney_state && $payment->is_paid) {
@@ -6883,8 +6854,7 @@ class Payplug extends PaymentModule
                 $order_history->id_order = $order->id;
                 $order_history->changeIdOrderState($new_order_state, $order->id, true);
                 return $order_history->save();
-            } elseif (
-                $order->getCurrentState() == $oney_state
+            } elseif ($order->getCurrentState() == $oney_state
                 && isset($payment->failure)
                 && $payment->failure !== null
             ) {

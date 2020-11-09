@@ -307,7 +307,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         );
                         header(
                             $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
-                            true, $exception->getCode()
+                            true,
+                            $exception->getCode()
                         );
                         die(json_encode($response));
                     }
@@ -326,7 +327,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             $this->logger->addLog('Get the current state: ' . $current_state, 'info');
                         } catch (Exception $exception) {
                             $this->logger->addLog(
-                                'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
+                                'The current state cannot be loaded: ' . $exception->getMessage(),
+                                'error'
+                            );
                             $response = array(
                                 'exception' => $exception->getMessage(),
                             );
@@ -354,10 +357,13 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order_history->save();
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                                    'Order history cannot be saved: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 $this->logger->addLog(
                                     'Please check if order state ' . (int)$new_order_state . ' exists.',
-                                    'error');
+                                    'error'
+                                );
                                 $response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -374,7 +380,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order->update();
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                                    'Order cannot be updated: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 $response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -409,7 +417,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order_history->save();
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                                    'Order history cannot be saved: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 $this->logger->addLog(
                                     'Please check if order state ' . (int)$new_order_state . ' exists.',
                                     'error');
@@ -429,7 +439,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order->update();
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                                    'Order cannot be updated: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 $response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -508,7 +520,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                             'Order history cannot be saved: ' . $exception->getMessage(), 'error');
                                         $this->logger->addLog(
                                             'Please check if order state ' . (int)$new_order_state . ' exists.',
-                                            'error');
+                                            'error'
+                                        );
                                         $this->response = array(
                                             'exception' => $exception->getMessage(),
                                         );
@@ -574,7 +587,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     $message->save();
                                 } catch (Exception $exception) {
                                     $this->logger->addLog(
-                                        'The message cannot be saved: ' . $exception->getMessage(), 'error');
+                                        'The message cannot be saved: ' . $exception->getMessage(),
+                                        'error'
+                                    );
                                     $this->response = array(
                                         'exception' => $exception->getMessage(),
                                     );
@@ -612,7 +627,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     'Order history cannot be saved: ' . $exception->getMessage(), 'error');
                                 $this->logger->addLog(
                                     'Please check if order state ' . (int)$new_order_state . ' exists.',
-                                    'error');
+                                    'error'
+                                );
                                 $this->response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -622,8 +638,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     $this->logger->addLog('Lock deleted.', 'debug');
                                 }
                                 header(
-                                    $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' '
-                                    . $exception->getMessage(),
+                                    $_SERVER['SERVER_PROTOCOL'] . ' ' . $exception->getCode() . ' ' . $exception->getMessage(),
                                     true,
                                     $exception->getCode()
                                 );
@@ -861,7 +876,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             );
                         } catch (Exception $exception) {
                             $this->logger->addLog(
-                                'Order cannot be validated: ' . $exception->getMessage(), 'error');
+                                'Order cannot be validated: ' . $exception->getMessage(),
+                                'error'
+                            );
                             if (!PayplugLock::deleteLockG2($cart->id)) {
                                 $this->logger->addLog('Lock cannot be deleted.', 'error');
                             } else {
@@ -884,8 +901,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             } else {
                                 $this->logger->addLog('Lock deleted.', 'debug');
                             }
-                            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be validated.', true,
-                                500);
+                            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be validated.', true, 500);
                             die;
                         } else {
                             $id_order = $this->payplug->currentOrder;
@@ -905,7 +921,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $this->logger->addLog('Payment patched');
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Payment cannot be patched: ' . $exception->getMessage(), 'error');
+                                    'Payment cannot be patched: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 if (!PayplugLock::deleteLockG2($cart->id)) {
                                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                                 } else {
@@ -929,8 +947,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
                                 }
-                                header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be loaded.', true,
-                                    500);
+                                header($_SERVER['SERVER_PROTOCOL'] . ' 500 Order cannot be loaded.', true, 500);
                                 die;
                             }
 
@@ -942,8 +959,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
                                 }
-                                header($_SERVER['SERVER_PROTOCOL'] . ' 200 Installment correctly registered.',
-                                    true, 200);
+                                header($_SERVER['SERVER_PROTOCOL'] . ' 200 Installment correctly registered.', true, 200);
                                 die;
                             } else {
                                 if (!$this->payplug->addPayplugOrderPayment($order->id, $payment->id)) {
@@ -959,8 +975,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     } else {
                                         $this->logger->addLog('Lock deleted.', 'debug');
                                     }
-                                    header($_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to create order payment.',
-                                        true, 500);
+                                    header($_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to create order payment.', true, 500);
                                     die;
                                 } else {
                                     $this->logger->addLog('Order payment created.');
