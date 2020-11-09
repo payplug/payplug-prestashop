@@ -383,7 +383,7 @@ class CardRepository
             ->fields('country')     ->values(pSQL($payment->card->country))
             ->fields('metadata')    ->values(pSQL(serialize($payment->card->metadata)))
         ;
-        if (!$this->query->build(true)) {
+        if (!$this->query->build()) {
             return false;
         }
 
