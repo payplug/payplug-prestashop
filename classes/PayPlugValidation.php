@@ -58,11 +58,8 @@ class PayPlugValidation
     public function postProcess()
     {
         $redirect_url_error = 'index.php?controller=order&step=1&error=1';
-        if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            $order_confirmation_url = 'order-confirmation.php?';
-        } else {
-            $order_confirmation_url = 'index.php?controller=order-confirmation&';
-        }
+        $cancel_url = 'index.php?controller=order';
+        $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
         //Cancelling
         if (!($cart_id = Tools::getValue('cartid'))) {
@@ -72,10 +69,11 @@ class PayPlugValidation
         } elseif (!($ps = Tools::getValue('ps')) || $ps != 1) {
             if ($ps == 2) {
                 $this->logger->addLog('Order has been cancelled on PayPlug page', 'info');
-            } else {
-                $this->logger->addLog('Wrong GET parameter ps = ' . $ps, 'error');
-                $this->payplug->setPaymentErrorsCookie(array($this->payplug->l('The transaction was not completed and your card was not charged.')));
+                Payplug::redirectForVersion($cancel_url);
             }
+
+            $this->logger->addLog('Wrong GET parameter ps = ' . $ps, 'error');
+            $this->payplug->setPaymentErrorsCookie(array($this->payplug->l('The transaction was not completed and your card was not charged.')));
             Payplug::redirectForVersion($redirect_url_error);
         }
         //Treatment
