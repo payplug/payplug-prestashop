@@ -306,23 +306,17 @@ class Payplug extends PaymentModule
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
         $this->initializeCache();
-
-        try {
-            $this->oneyRepository = new \PayPlug\src\repositories\OneyRepository($this);
-        } catch (Exception $e) {
-            throw Exception($e);
-        }
     }
 
     private function initializeAccessors()
     {
         $this->plugin = (new PayPlug\src\repositories\PluginRepository($this))->getEntity();
-
-        $this->oney = $this->plugin->getOney();
         $this->card = $this->plugin->getCard();
         $this->logger = $this->plugin->getLogger();
         $this->query = $this->plugin->getQuery();
         $this->tools = $this->plugin->getTools();
+
+        $this->oney = new \PayPlug\src\repositories\OneyRepository($this);
     }
 
     public function loadSpecificPrestaClasses()
