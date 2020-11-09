@@ -422,7 +422,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 );
                                 $this->logger->addLog(
                                     'Please check if order state ' . (int)$new_order_state . ' exists.',
-                                    'error');
+                                    'error'
+                                );
                                 $response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -624,7 +625,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order_history->save();
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                                    'Order history cannot be saved: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 $this->logger->addLog(
                                     'Please check if order state ' . (int)$new_order_state . ' exists.',
                                     'error'
@@ -650,7 +653,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 $order->update();
                             } catch (Exception $exception) {
                                 $this->logger->addLog(
-                                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                                    'Order cannot be updated: ' . $exception->getMessage(),
+                                    'error'
+                                );
                                 $this->response = array(
                                     'exception' => $exception->getMessage(),
                                 );
@@ -828,10 +833,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             if (isset($cart->secure_key) && !empty($cart->secure_key) && $cart->secure_key !== $customer->secure_key) {
                                 $secure_key = $cart->secure_key;
                                 $this->logger->addLog('Secure keys do not match.', 'error');
-                                $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key,
-                                    'error');
-                                $this->logger->addLog('Cart Secure Key: ' . $cart->secure_key,
-                                    'error');
+                                $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key, 'error');
+                                $this->logger->addLog('Cart Secure Key: ' . $cart->secure_key, 'error');
                             } else {
                                 $secure_key = $customer->secure_key;
                             }
@@ -952,8 +955,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                             if ($this->resource->installment_plan_id != null) {
-                                $this->logger->addLog('Installment correctly registered.',
-                                    'info');
+                                $this->logger->addLog('Installment correctly registered.', 'info');
                                 if (!PayplugLock::deleteLockG2($cart->id)) {
                                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                                 } else {
@@ -1008,7 +1010,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         die;
                     } elseif (count($res_nb_orders) > 1) {
                         $this->logger->addLog(
-                            'There is more than one order using id_cart ' . (int)$cart->id, 'error');
+                            'There is more than one order using id_cart ' . (int)$cart->id,
+                            'error'
+                        );
                         foreach ($res_nb_orders as $o) {
                             $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
                         }
@@ -1050,8 +1054,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         );
                         die;
                     } elseif (count($payments) > 1) {
-                        $this->logger->addLog(
-                            'There is more than one transaction using id_order ' . (int)$id_order, 'error');
+                        $this->logger->addLog('There is more than one transaction using id_order ' . (int)$id_order, 'error');
                         if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
@@ -1143,10 +1146,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         header($_SERVER['SERVER_PROTOCOL'] . ' 200 Changing status to \'refunded\'', true, 200);
                         die();
                     } catch (Exception $exception) {
-                        $this->logger->addLog(
-                            'Order history cannot be saved: ' . $exception->getMessage(), 'error');
-                        $this->logger->addLog(
-                            'Please check if order state ' . (int)$new_order_state . ' exists.', 'error');
+                        $this->logger->addLog('Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                        $this->logger->addLog('Please check if order state ' . (int)$new_order_state . ' exists.', 'error');
                         $response = array(
                             'exception' => $exception->getMessage(),
                         );

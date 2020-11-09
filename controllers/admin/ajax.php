@@ -82,7 +82,7 @@ if (Tools::getValue('_ajax') == 1) {
         $payplug->displayPopin(Tools::getValue('type'), $args);
     }
     if (Tools::getValue('submit') == 'submitPopin_pwd') {
-        $payplug->submitPopinPwd(Tools::getValue('pwd'));
+        $payplug->submitPopinPwd($_POST['pwd']);
     }
     if (Tools::getValue('has_live_key')) {
         die(Tools::jsonEncode(['result' => $payplug->hasLiveKey()]));
