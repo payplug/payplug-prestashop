@@ -1254,8 +1254,7 @@ class OneyRepository extends \Payplug
         }
 
         // check if the shipping country are different then return false
-        $iso_code = $this->getOneyCountry(strtoupper($shipping_iso));
-
+        $iso_code = strtoupper($shipping_iso);
         $allow_countries = strtoupper($this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES'));
         if (!$allow_countries) {
             return array(
