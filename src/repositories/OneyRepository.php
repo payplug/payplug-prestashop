@@ -23,9 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\specific\ConfigurationSpecific;
-use Context;
-
 class OneyRepository extends Repository
 {
     private $log;
