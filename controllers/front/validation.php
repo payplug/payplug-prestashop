@@ -159,8 +159,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                             }
                         }
                         if ($installment->failure) {
-                            $this->logger->addLog('Installment failure : ' . $installment->failure->message,
-                                'error');
+                            $this->logger->addLog(
+                                'Installment failure : ' . $installment->failure->message,
+                                'error'
+                            );
                             Tools::redirect($this->url['error']);
                         }
                     } catch (Exception $e) {
@@ -180,8 +182,12 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $is_paid = $payment->is_paid;
 
                     $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-                    $is_oney = isset($payment->payment_method) && isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
-                            $oney_payment_methods);
+                    $is_oney = isset($payment->payment_method)
+                        && isset($payment->payment_method['type'])
+                        && in_array(
+                            $payment->payment_method['type'],
+                            $oney_payment_methods
+                        );
                     $is_authorized = isset($payment->authorization) && isset($payment->authorization->authorized_at);
 
                     $amount = (int)$payment->amount;
@@ -228,8 +234,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 if ($this->type == 'payment') {
                     $this->logger->addLog('Deleting stored payment.', 'info');
                     if ($this->payplug->isTransactionPending((int)$cart_id)) {
-                        $this->logger->addLog('Transaction is pending so stored payment will not be deleted.',
-                            'info');
+                        $this->logger->addLog(
+                            'Transaction is pending so stored payment will not be deleted.',
+                            'info'
+                        );
                     }
                 }
             } else {
@@ -305,12 +313,12 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
                 switch (Tools::getValue('isoney')) {
-                    case 'x3_with_fees' :
-                    case 'x3_without_fees' :
+                    case 'x3_with_fees':
+                    case 'x3_without_fees':
                         $module_name = $this->payplug->l('Oney 3x');
                         break;
-                    case 'x4_with_fees' :
-                    case 'x4_without_fees' :
+                    case 'x4_with_fees':
+                    case 'x4_without_fees':
                         $module_name = $this->payplug->l('Oney 4x');
                         break;
                     default:
@@ -378,8 +386,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                     Tools::redirect($this->url['error']);
                 } elseif (count($res_nb_orders) > 1) {
-                    $this->logger->addLog('There is more than one order using id_cart ' . (int)$cart->id,
-                        'error');
+                    $this->logger->addLog(
+                        'There is more than one order using id_cart ' . (int)$cart->id,
+                        'error'
+                    );
                     foreach ($res_nb_orders as $o) {
                         $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
                     }
@@ -390,8 +400,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $this->logger->addLog('Checking number of transaction validated for this order...', 'info');
                 $payments = $this->payplug->getPayplugOrderPayments($order->id);
                 if (!$payments) {
-                    $this->logger->addLog('No transaction can be found using id_order ' . (int)$id_order,
-                        'error');
+                    $this->logger->addLog(
+                        'No transaction can be found using id_order ' . (int)$id_order,
+                        'error'
+                    );
                     $cart_unlock = PayplugLock::deleteLockG2($cart->id);
                     if (!$cart_unlock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
@@ -400,8 +412,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                     Tools::redirect($this->url['error']);
                 } elseif (count($payments) > 1) {
-                    $this->logger->addLog('There is more than one transaction using id_order ' . (int)$id_order,
-                        'error');
+                    $this->logger->addLog(
+                        'There is more than one transaction using id_order ' . (int)$id_order,
+                        'error'
+                    );
                 } else {
                     $this->logger->addLog('Everything looks good.', 'info');
                 }
