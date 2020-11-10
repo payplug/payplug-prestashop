@@ -23,10 +23,6 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         array (
             'PayPlug\\' => 8,
         ),
-        'G' => 
-        array (
-            'Giggsey\\Locale\\' => 15,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -42,14 +38,9 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         array (
             0 => __DIR__ . '/../..' . '/',
         ),
-        'Giggsey\\Locale\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/giggsey/locale/src',
-        ),
     );
 
     public static $classMap = array (
-        'Giggsey\\Locale\\Locale' => __DIR__ . '/..' . '/giggsey/locale/src/Locale.php',
         'PayPlug\\backward\\PayPlugBackward' => __DIR__ . '/../..' . '/backward/PayPlugBackward.php',
         'PayPlug\\classes\\MyLogPHP' => __DIR__ . '/../..' . '/classes/MyLogPHP.class.php',
         'PayPlug\\src\\entities\\CacheEntity' => __DIR__ . '/../..' . '/src/entities/CacheEntity.php',

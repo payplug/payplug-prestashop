@@ -21,15 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\interfaces;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
-
-class ToolsSpecific implements ToolsInterface
+interface ContextInterface
 {
-    public function tool($action, $param1 = null, $param2 = null)
-    {
-        return Tools::$action($param1, $param2);
-    }
+    function getContext();
 }

@@ -25,6 +25,7 @@ namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\ToolsSpecific;
 use PayPlug\src\specific\ValidateSpecific;
@@ -38,6 +39,7 @@ class PluginRepository extends Repository
 
     // Specific classes
     private $configuration;
+    private $context;
     private $country;
     private $query;
     private $tools;
@@ -48,6 +50,7 @@ class PluginRepository extends Repository
         $this->cache    = new CacheRepository();
         $this->card     = new CardRepository();
         $this->configuration = new ConfigurationSpecific();
+        $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();
         $this->plugin   = new PluginEntity();
@@ -59,6 +62,7 @@ class PluginRepository extends Repository
             ->setCache($this->cache)
             ->setCard($this->card)
             ->setConfiguration($this->configuration)
+            ->setContext($this->context)
             ->setCountry($this->country)
             ->setLogger($this->logger)
             ->setQuery($this->query)

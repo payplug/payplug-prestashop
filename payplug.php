@@ -55,7 +55,7 @@ class Payplug extends PaymentModule
 
     public $oneyRepository;
 
-    protected $constantFile; // 3.0
+    public $constantFile; // 3.0
 
     /** @var PluginEntity */
     protected $plugin; // 3.0

@@ -30,12 +30,13 @@ class PluginEntity
     private $api_version;
 
     // Our classes
+    private $cache;
     private $card;
     private $logger;
-    private $cache;
 
     // Specific classes
     private $configuration;
+    private $context;
     private $country;
     private $tools;
     private $query;
@@ -146,6 +147,24 @@ class PluginEntity
     public function setConfiguration($configuration)
     {
         $this->configuration = $configuration;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param mixed $context
+     * @return PluginEntity
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
         return $this;
     }
 

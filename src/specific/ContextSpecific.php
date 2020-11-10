@@ -23,13 +23,13 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
+use PayPlug\src\interfaces\ContextInterface;
+use Context;
 
-class ToolsSpecific implements ToolsInterface
+class ContextSpecific implements ContextInterface
 {
-    public function tool($action, $param1 = null, $param2 = null)
+    public function getContext()
     {
-        return Tools::$action($param1, $param2);
+        return Context::getContext();
     }
 }

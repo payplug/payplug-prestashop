@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Giggsey\\Locale\\Locale' => $vendorDir . '/giggsey/locale/src/Locale.php',
     'PayPlug\\backward\\PayPlugBackward' => $baseDir . '/backward/PayPlugBackward.php',
     'PayPlug\\classes\\MyLogPHP' => $baseDir . '/classes/MyLogPHP.class.php',
     'PayPlug\\src\\entities\\CacheEntity' => $baseDir . '/src/entities/CacheEntity.php',
