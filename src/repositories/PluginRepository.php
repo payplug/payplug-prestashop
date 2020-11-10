@@ -49,7 +49,9 @@ class PluginRepository extends Repository
     public function __construct($payplug, $from)
     {
         $this->cache    = new CacheRepository();
-        $this->card     = new CardRepository();
+        if ($from !== 'card') {
+            $this->card = new CardRepository($payplug);
+        }
         $this->configuration = new ConfigurationSpecific();
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();

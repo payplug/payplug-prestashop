@@ -74,7 +74,7 @@ class PayPlugAjax
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $payplug_card = new CardRepository();
+                    $payplug_card = new CardRepository($payplug);
 
                     if ($payplug_card->delete((int)Tools::getValue('pc'))) {
                         die(true);
