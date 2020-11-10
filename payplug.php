@@ -3215,10 +3215,11 @@ class Payplug extends PaymentModule
     public function getPaymentDataCookie()
     {
         // get payplug data
-        $payplug_data = !empty(Context::getContext()->cookie('payplug_data')) ? Context::getContext()->cookie('payplug_data') : false;
+        $cookie_data = $this->context->cookie->__get('payplug_data');
+        $payplug_data = !empty($cookie_data) ? $cookie_data : false;
 
         // then flush to avoid repetition
-        setcookie('payplug_data', '', time() - 3600);
+        $this->context->cookie->__set('payplug_data','');
 
         // if no error all good then return true
         return json_decode($payplug_data, true);
@@ -3231,11 +3232,12 @@ class Payplug extends PaymentModule
      */
     public function getPaymentErrorsCookie()
     {
-        // get payplug error
-        $payplug_errors = !empty(Context::getContext()->cookie('payplug_errors')) ? Context::getContext()->cookie('payplug_errors') : false;
+        // get payplug errors
+        $cookie_errors = $this->context->cookie->__get('payplug_errors');
+        $payplug_errors = !empty($cookie_errors) ? $cookie_errors : false;
 
         // then flush to avoid repetition
-        setcookie('payplug_errors', '', time() - 3600);
+        $this->context->cookie->__set('payplug_errors','');
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
@@ -5468,8 +5470,9 @@ class Payplug extends PaymentModule
         $curl_exists = extension_loaded('curl');
         $openssl_exists = extension_loaded('openssl');
         if (Tools::isSubmit('submitAccount')) {
-            $password = Tools::isset(Tools::getValue('PAYPLUG_PASSWORD')) && Tools::getValue('PAYPLUG_PASSWORD') ? Tools::getValue('PAYPLUG_PASSWORD') : false;
+            $password = Tools::getValue('PAYPLUG_PASSWORD');
             $email = Tools::getValue('PAYPLUG_EMAIL');
+
             if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
                 $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
             } elseif ($curl_exists && $openssl_exists) {
@@ -6310,7 +6313,8 @@ class Payplug extends PaymentModule
 
         $value = json_encode($payplug_data);
 
-        return setcookie('payplug_data', $value, time() + 120);
+        $this->context->cookie->__set('payplug_data', $value);
+        return (bool)$this->context->cookie->__get('payplug_data');
     }
 
     /**
@@ -6326,7 +6330,8 @@ class Payplug extends PaymentModule
 
         $value = json_encode($payplug_errors);
 
-        return setcookie('payplug_errors', $value, time() + 12000);
+        $this->context->cookie->__set('payplug_errors', $value);
+        return (bool)$this->context->cookie->__get('payplug_errors');
     }
 
     /**
