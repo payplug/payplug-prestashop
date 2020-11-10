@@ -33,6 +33,7 @@ class PluginEntity
     private $cache;
     private $card;
     private $logger;
+    private $oney;
 
     // Specific classes
     private $configuration;
@@ -111,6 +112,24 @@ class PluginEntity
     public function setLogger($logger)
     {
         $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOney()
+    {
+        return $this->oney;
+    }
+
+    /**
+     * @param mixed $oney
+     * @return PluginEntity
+     */
+    public function setOney($oney)
+    {
+        $this->oney = $oney;
         return $this;
     }
 

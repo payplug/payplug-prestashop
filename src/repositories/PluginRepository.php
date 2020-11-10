@@ -35,6 +35,7 @@ class PluginRepository extends Repository
     private $cache;
     private $card;
     private $logger;
+    private $oney;
     private $plugin;
 
     // Specific classes
@@ -45,7 +46,7 @@ class PluginRepository extends Repository
     private $tools;
     private $validate;
 
-    public function __construct()
+    public function __construct($payplug, $from)
     {
         $this->cache    = new CacheRepository();
         $this->card     = new CardRepository();
@@ -53,6 +54,9 @@ class PluginRepository extends Repository
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();
+        if ($from !== 'oney') {
+            $this->oney = new OneyRepository($payplug);
+        }
         $this->plugin   = new PluginEntity();
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
@@ -65,6 +69,7 @@ class PluginRepository extends Repository
             ->setContext($this->context)
             ->setCountry($this->country)
             ->setLogger($this->logger)
+            ->setOney($this->oney)
             ->setQuery($this->query)
             ->setTools($this->tools)
             ->setValidate($this->validate)

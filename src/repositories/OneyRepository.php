@@ -37,7 +37,7 @@ class OneyRepository extends Repository
 
     public function __construct($payplug)
     {
-        $this->plugin   = (new PluginRepository())->getEntity();
+        $this->plugin   = (new PluginRepository($payplug, 'oney'))->getEntity();
 
         $this->configurationSpecific = $this->plugin->getConfiguration();
         $this->countrySpecific = $this->plugin->getCountry();
@@ -808,7 +808,7 @@ class OneyRepository extends Repository
 
         // Checks if the current simulation is already saved in the database
         // If not, we do a simulation for Oney, and we will store it to the DB
-        $cache_from_bdd = $this->payplug->payplug_cache->getCacheByKey($cache_id);
+        $cache_from_bdd = $this->plugin->getCache()->getCacheByKey($cache_id);
         if ($cache_from_bdd) {
             return $tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
         }
