@@ -3673,11 +3673,6 @@ class Payplug extends PaymentModule
             return true;
         }
 
-        echo '<pre>';
-        var_dump($install);
-        echo '</pre>';
-        die();
-
         $log->info('Install failed.');
 
         // revert installation
