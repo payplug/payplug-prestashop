@@ -58,9 +58,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->payplug = new \Payplug();
             $this->plugin = $this->payplug->getPlugin();
             $this->card = $this->plugin->getCard();
-            $this->contextSpecific = $this->plugin->getContext();
+            $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
             $this->oney = $this->plugin->getOney();
-            $context = $this->contextSpecific->getContext();
+            $context = $this->contextSpecific->getContext(); // get the method
 
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('delete') == 1) {
