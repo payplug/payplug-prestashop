@@ -5254,9 +5254,6 @@ class Payplug extends PaymentModule
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
-        // todo: Remove this while API can manage overseas phone numbers
-        $configuration['oney_allowed_countries'] = 'FR';
-
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
