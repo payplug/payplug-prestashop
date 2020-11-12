@@ -517,8 +517,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                         $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                                         $order_history->save();
                                     } catch (Exception $exception) {
-                                        $this->logger->addLog('Order history cannot be saved: ' . $exception->getMessage(),
-                                            'error');
+                                        $this->logger->addLog(
+                                            'Order history cannot be saved: ' . $exception->getMessage(),
+                                            'error'
+                                        );
                                         $this->logger->addLog(
                                             'Please check if order state ' . (int)$new_order_state . ' exists.',
                                             'error'
@@ -610,14 +612,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
 
                             $order_history = new OrderHistory();
-                            if (count($order->getOrderPayments()) == 0) {
-                                $this->logger->addLog(
-                                    'Add new orderPayment - ' . count($order->getOrderPayments()),
-                                    'debug'
-                                );
-                                $order->addOrderPayment($payment->amount / 100, null, $payment->id);
-                                $order->setInvoice(true);
-                            }
                             $order_history->id_order = (int)$id_order;
 
                             try {
@@ -986,12 +980,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         }
                     }
 
-                    $deferred = $payment->authorization !== null;
-                    if ($deferred && count($order->getOrderPayments()) == 0) {
-                        $this->logger->addLog(
-                            'Add new orderPayment for deferred - ' . count($order->getOrderPayments()),
-                            'debug'
-                        );
+                    if (!$order->getOrderPayments()) {
+                        $this->logger->addLog('Add new orderPayment for deferred - ' . count($order->getOrderPayments()), 'debug');
                         $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                     }
 
@@ -1063,8 +1053,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         );
                         die;
                     } elseif (count($payments) > 1) {
-                        $this->logger->addLog('There is more than one transaction using id_order ' . (int)$id_order,
-                            'error');
+                        $this->logger->addLog(
+                            'There is more than one transaction using id_order ' . (int)$id_order,
+                            'error'
+                        );
                         if (!PayplugLock::deleteLockG2($cart->id)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
@@ -1157,8 +1149,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         die();
                     } catch (Exception $exception) {
                         $this->logger->addLog('Order history cannot be saved: ' . $exception->getMessage(), 'error');
-                        $this->logger->addLog('Please check if order state ' . (int)$new_order_state . ' exists.',
-                            'error');
+                        $this->logger->addLog(
+                            'Please check if order state ' . (int)$new_order_state . ' exists.',
+                            'error'
+                        );
                         $response = array(
                             'exception' => $exception->getMessage(),
                         );
