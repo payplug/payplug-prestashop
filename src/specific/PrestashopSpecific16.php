@@ -69,7 +69,7 @@ class PrestashopSpecific16
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
         $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
-        $oney = $this->payplug->getPlugin()->getOney();
+        $oney = $this->oney;
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -110,17 +110,17 @@ class PrestashopSpecific16
             }
 
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                $is_elligible = $oney->isOneyElligible($cart);
+                $is_elligible = $this->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
                 $id_currency = $this->contextSpecific->currency->id;
                 $amount = $cart->getOrderTotal(true, Cart::BOTH);
-                $is_elligible = $oney->isValidOneyAmount($amount, $id_currency);
+                $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 $error = !$is_elligible['result'];
             }
 
             if (!$error && $has_valid_carrier) {
-                $is_elligible = $oney->isValidOneyCarrier($cart);
+                $is_elligible = $this->oney->isValidOneyCarrier($cart);
                 $error = !$is_elligible['result'];
             }
 
@@ -128,7 +128,7 @@ class PrestashopSpecific16
                 $this->contextSpecific->smarty->assign(array(
                     'payplug_module_dir' => _PS_MODULE_DIR_,
                     'payplug_oney' => true,
-                    'payplug_oney_required_field' => $oney->displayOneyRequiredFields(),
+                    'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
                     'payplug_oney_loading_msg' => $this->payplug->l('Loading')
