@@ -33,6 +33,7 @@ class PluginEntity
     private $card;
     private $logger;
     private $cache;
+    private $oney;
 
     // Specific classes
     private $configuration;
@@ -218,6 +219,24 @@ class PluginEntity
     public function setValidate($validate)
     {
         $this->validate = $validate;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOney()
+    {
+        return $this->oney;
+    }
+
+    /**
+     * @param mixed $card
+     * @return PluginEntity
+     */
+    public function setOney($oney)
+    {
+        $this->oney = $oney;
         return $this;
     }
 }

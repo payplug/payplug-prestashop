@@ -28,56 +28,7 @@
     <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
 
     {if $show_menu_installment}
-        <div>
-            <p class="ppwarning">{l s='This order is subjected to an installment plan, whose status is' mod='payplug'} <span class="pp_inst_status">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
-            <p>{l s='Payment schedule ID' mod='payplug'} : {$inst_id|escape:'htmlall':'UTF-8'}</p>
-        </div>
-        <div class="table-responsive half-width">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th><span class="title_box ">{l s='Date' mod='payplug'}</span></th>
-                    <th><span class="title_box ">{l s='Amount' mod='payplug'}</span></th>
-                    <th><span class="title_box ">{l s='Status' mod='payplug'}</span></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {foreach from=$payment_list_new item=payment}
-                    <tr class="pp_fixed_height">
-                        <td>{$payment['date']|escape:'htmlall':'UTF-8'}</td>
-                        <td>{displayPrice price=$payment['amount']}</td>
-                        <td class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
-                        {if isset($payment['id'])}
-                            <td class="actions">
-                                <button class="btn btn-default open_payment_information">
-                                    <i class="icon-search"></i>
-                                    {l s='Details' mod='payplug'}
-                                </button>
-                            </td>
-                        {/if}
-                    </tr>
-                    {if isset($payment['id'])}
-                        <tr class="payment_information" style="display: none;">
-                            <td colspan="5">
-                                {include file='./details.tpl' payment=$payment}
-                            </td>
-                        </tr>
-                    {/if}
-                {/foreach}
-                </tbody>
-            </table>
-            {if !$inst_paid}
-                {if $inst_aborted}
-                    <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
-                {elseif $inst_can_be_aborted}
-                    <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
-                    <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
-                    <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
-                {/if}
-                <br class="clear" />
-            {/if}
-        </div>
+        {include file='./installment.tpl'}
     {/if}
 
     {if $display_single_payment}
