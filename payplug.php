@@ -3634,41 +3634,53 @@ class Payplug extends PaymentModule
             $install['error'] = $installHook16['error'];
         }
 
-        $log->info('----------------> Install end: hooks. <----------------');
-
+        $log->info('----------------> Install configuration. <----------------');
         if (!$this->createConfig() && $install['flag']) {
             $log->error('Install failed: configuration.');
             $install['flag'] = false;
             $install['error'] = 'Création des éléments de configuration  ($this->createConfig)';
         }
-        elseif (!$this->createOrderStates() && $install['flag']) {
+
+        $log->info('----------------> Install order states. <----------------');
+        if (!$this->createOrderStates() && $install['flag']) {
             $log->error('Install failed: order states.');
             $install['flag'] = false;
         }
-        elseif (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
+
+        $log->info('----------------> Install SQL. <----------------');
+        if (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
             $log->error('Install failed: SQL.');
             $install['flag'] = false;
             $install['error'] = 'Création des tables SQL';
         }
-        elseif (!$this->installTab() && $install['flag']) {
+
+        $log->info('----------------> Install tab. <----------------');
+        if (!$this->installTab() && $install['flag']) {
             $log->error('Install failed: tab.');
             $install['flag'] = false;
             $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
         }
-        elseif (!$this->oney->installOney() && $install['flag']) {
+
+        $log->info('----------------> Install Oney. <----------------');
+        if (!$this->oney->installOney() && $install['flag']) {
             $log->error('Install failed: Oney.');
             $install['flag'] = false;
             $install['error'] = 'Oney ($this->installOney)';
         }
-        elseif ($install['flag']) {
+
+
+        if ($install['flag']) {
             $log->info('Install succeeded.');
             $install['flag'] = true;
+        } else {
+            $log->info('Install failed.');
         }
 
         if ($install['flag']) {
             return true;
         }
 
+        // revert installation
         $this->uninstall();
         $install['error'] = (isset($install['error'])) ? 'Élément en cause : ' . $install['error'] : '';
         $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé en raison d\'une erreur. Les modifications apportées ont bien été annulées. ' . $install['error']);
