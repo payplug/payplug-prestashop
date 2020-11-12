@@ -31,6 +31,8 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
  */
 class PayPlugAjax
 {
+    private $oney;
+
     /**
      * @description entry point
      */
@@ -53,6 +55,7 @@ class PayPlugAjax
                 throw Exception($e);
             }
             $context = Context::getContext();
+            $this->oney = $payplug->getPlugin()->getOney();
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('pay') == 1) {
                     $is_installment = Tools::getValue('i');
@@ -88,7 +91,7 @@ class PayPlugAjax
                 }
                 $id_shipping = Tools::getValue('id_address_delivery');
                 $id_billing = Tools::getValue('id_address_invoice');
-                die(Tools::jsonEncode($payplug->getPlugin()->getOney()->isValidOneyAddresses($id_shipping, $id_billing)));
+                die(Tools::jsonEncode($this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif (Tools::getIsset('isOneyElligible')) {
                 $use_taxes = (bool)$payplug->getConfiguration('PS_TAX');
 
@@ -107,11 +110,11 @@ class PayPlugAjax
                     );
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
-                    $is_elligible = $payplug->getPlugin()->getOney()->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } elseif ((int)Tools::getValue('is_summary_cta') === 1) {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $id_currency = $context->currency->id;
-                    $is_elligible = $payplug->getPlugin()->getOney()->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $cart = $context->cart;
@@ -120,10 +123,10 @@ class PayPlugAjax
                     $iso_code = $delivery_country->iso_code;
 
                     if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                        $is_elligible = $payplug->getPlugin()->getOney()->isOneyElligible($cart, $amount, $iso_code);
+                        $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
                     } else {
                         $id_currency = $context->currency->id;
-                        $is_elligible = $payplug->getPlugin()->getOney()->isValidOneyAmount($amount, $id_currency, $iso_code);
+                        $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency, $iso_code);
                     }
                 }
 
@@ -160,7 +163,7 @@ class PayPlugAjax
                 }
 
                 try {
-                    $payment_options = $payplug->getPlugin()->getOney()->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
+                    $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 } catch (Exception $e) {
                     throw Exception($e);
                 }
@@ -184,7 +187,7 @@ class PayPlugAjax
                             'result' => false,
                             'message' => $payplug->l('Empty payment data')
                         )));
-                    } elseif ($payplug->getPlugin()->getOney()->checkOneyRequiredFields($payment_data)) {
+                    } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                         die(Tools::jsonEncode(array(
                             'result' => false,
                             'message' => $payplug->l('At least one of the fields is not correctly completed.')
