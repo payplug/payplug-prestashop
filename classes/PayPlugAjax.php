@@ -220,7 +220,6 @@ class PayPlugAjax
                 )));
             }
         }
-
         die(false);
     }
 }
