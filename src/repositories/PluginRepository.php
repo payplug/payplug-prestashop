@@ -36,7 +36,6 @@ class PluginRepository extends Repository
     private $card;
     private $logger;
     private $oney;
-    private $payplug;
     private $plugin;
 
     // Specific classes
@@ -75,10 +74,4 @@ class PluginRepository extends Repository
         ;
         $this->setEntity($this->plugin);
     }
-
-    public function getPayplug()
-    {
-        return (new \Payplug());
-    }
-
 }

@@ -69,7 +69,7 @@ class Payplug extends PaymentModule
     /**
      * @var To inject logo_url in oney payment template
      */
-    protected $oneyLogoUrl;
+    public $oneyLogoUrl;
 
     /** @var string */
     private $api_live;
@@ -291,6 +291,7 @@ class Payplug extends PaymentModule
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.8');
         $this->tab = 'payments_gateways';
         $this->version = '3.0.0';
+        $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
 
