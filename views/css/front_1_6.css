@@ -1084,7 +1084,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 15px;
+  padding: 30px 15px 15px;
 }
 .payplugOneClick form .radio {
   padding: 6px 0 0;
@@ -1112,6 +1112,52 @@
 .payplugOneClick form label + label {
   margin: 10px 0 0;
 }
+.payplugOneClick_submit {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  max-width: 325px;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+@media (max-width: 767px) {
+  .payplugOneClick_submit {
+    position: relative;
+    right: 0;
+    bottom: 0;
+    margin: 15px 0 0;
+    align-self: center;
+  }
+}
+.payplugOneClick_message {
+  text-align: right;
+  font-size: 14px;
+  font-weight: 400;
+  max-width: 325px;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  line-height: 0.8em;
+}
+.payplugOneClick_message.-show {
+  display: flex;
+}
+.payplugOneClick_message.-success img {
+  display: inline-block;
+  margin: 0 6px 0 0;
+}
+.payplugOneClick_loader {
+  display: block;
+  top: 50%;
+  left: 50%;
+  width: 25px;
+  height: 25px;
+  margin: 0 0 0 16px;
+}
 /* Payplug button */
 .payplugButton {
   border: 1px solid #cccccc;
@@ -1138,14 +1184,6 @@
   height: 3em;
   font-size: 14px;
   font-weight: 700;
-  margin: -3em 0 0;
-  align-self: flex-end;
-}
-@media (max-width: 767px) {
-  .payplugButton.-payment {
-    margin: 15px 0 0;
-    align-self: center;
-  }
 }
 .payplugButton.-green {
   border-color: #00ab7a;

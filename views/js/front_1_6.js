@@ -93,7 +93,7 @@ var $document,
                     data: data,
                     beforeSend: function () {
                         if (options['is_inst'] != true) {
-                            $('.ppwait').show();
+                            $('.payplugOneClick_message.-wait').addClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -102,7 +102,7 @@ var $document,
                     },
                     complete: function () {
                         if (options['is_inst'] != true) {
-                            $('.ppwait').hide();
+                            $('.payplugOneClick_message.-wait').removeClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -133,7 +133,7 @@ var $document,
 
                             // redirect to success url
                             if (data.redirect) {
-                                $('.ppsuccess').stop().fadeIn();
+                                $('.payplugOneClick_message.-success').addClass('-show');
                                 setTimeout(function () {
                                     $('.ppsuccess').stop().fadeOut();
                                 }, 9000);

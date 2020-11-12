@@ -664,14 +664,6 @@ p.payplugOneyTOS_text {
   height: 3em;
   font-size: 14px;
   font-weight: 700;
-  margin: -3em 0 0;
-  align-self: flex-end;
-}
-@media (max-width: 767px) {
-  .payplugButton.-payment {
-    margin: 15px 0 0;
-    align-self: center;
-  }
 }
 .payplugButton.-green {
   border-color: #00ab7a;
