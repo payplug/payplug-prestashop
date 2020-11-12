@@ -385,7 +385,7 @@ class CardRepository
             ->fields('country')     ->values(pSQL($payment->card->country))
             ->fields('metadata')    ->values(pSQL(serialize($payment->card->metadata)))
         ;
-        if (!$this->query->build(true)) {
+        if (!$this->query->build()) {
             return false;
         }
 
@@ -503,7 +503,7 @@ class CardRepository
             ->from(_DB_PREFIX_.$this->cardEntity->getTable())
             ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id) ) ? $customer->id : $customer ))
             ->where('`id_company` = ' . (int)$this->cardEntity->getIdCompany())
-            ->where('`is_sandbox` = ' . (int)$this->cardEntity->isIsSandbox())
+            ->where('`is_sandbox` = ' . (int)$this->cardEntity->isSandbox())
         ;
 
         $cards = $this->query->build();
