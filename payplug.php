@@ -4503,6 +4503,7 @@ class Payplug extends PaymentModule
             default:
                 $payment_return = array(
                     'result' => 'new_card',
+                    'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
                     'redirect' => $this->isMobiledevice(),
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
