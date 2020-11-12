@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -24,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use Payplug\Customer;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
@@ -39,14 +37,14 @@ class CardRepository
 
     public function __construct($payplug)
     {
-        $this->payplug = $payplug;
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
+        $this->payplug = $payplug;
         $this->query = new QueryRepository();
         $this->tools = new ToolsSpecific();
         $this->setParams();
     }
-    
+
     private function setParams() {
         $config = $this->configurationSpecific;
         $idCompany = $config->get('PAYPLUG_COMPANY_ID');
@@ -119,7 +117,7 @@ class CardRepository
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
         $url = (new \Payplug())->getPlugin()->getApiUrl() . '/v1/cards/' . $id_card;
-        
+
         $curl_version = curl_version();
 
         $process = curl_init($url);
@@ -284,7 +282,7 @@ class CardRepository
         if ($payment->card->brand != '') {
             $brand = $payment->card->brand;
         } else {
-            $brand = $this->payplug->l('Unavailable');
+            $brand = $this->l('Unavailable');
         }
         return $brand;
     }
@@ -304,7 +302,7 @@ class CardRepository
         }
 
         if ($payment->card->exp_month === null) {
-            $card_expiry_date = $this->payplug->l('Unavailable');
+            $card_expiry_date = $this->l('Unavailable');
         } else {
             $card_expiry_date = date('m/y', strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
         }
@@ -328,7 +326,7 @@ class CardRepository
         if ($payment->card->last4 != '') {
             $card_mask = '**** **** **** ' . $payment->card->last4;
         } else {
-            $card_mask = $this->payplug->l('Unavailable');
+            $card_mask = $this->l('Unavailable');
         }
         return $card_mask;
     }
@@ -386,7 +384,7 @@ class CardRepository
             ->fields('country')     ->values(pSQL($payment->card->country))
             ->fields('metadata')    ->values(pSQL(serialize($payment->card->metadata)))
         ;
-        if (!$this->query->build()) {
+        if (!$this->query->build(true)) {
             return false;
         }
 
@@ -495,7 +493,7 @@ class CardRepository
     public function getByCustomer($customer, $active_only = false)
     {
 //        if (!is_object($customer)) {
-//            $customer = new Customer((int)$customer);
+//            $customer = new \Payplug\Customer((int)$customer);
 //        }
 
         $this->query
@@ -504,7 +502,7 @@ class CardRepository
             ->from(_DB_PREFIX_.$this->cardEntity->getTable())
             ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id) ) ? $customer->id : $customer ))
             ->where('`id_company` = ' . (int)$this->cardEntity->getIdCompany())
-            ->where('`is_sandbox` = ' . (int)$this->cardEntity->isSandbox())
+            ->where('`is_sandbox` = ' . (int)$this->cardEntity->isIsSandbox())
         ;
 
         $cards = $this->query->build();

@@ -308,13 +308,13 @@ class Payplug extends PaymentModule
 
     private function initializeAccessors()
     {
-        $this->plugin   = (new PayPlug\src\repositories\PluginRepository($this, 'payplug'))->getEntity();
+        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->card     = $this->plugin->getCard();
-        $this->logger   = $this->plugin->getLogger();
-        $this->oney     = $this->plugin->getOney();
-        $this->query    = $this->plugin->getQuery();
-        $this->tools    = $this->plugin->getTools();
+        $this->card     = $this->getPlugin()->getCard();
+        $this->logger   = $this->getPlugin()->getLogger();
+        $this->oney     = $this->getPlugin()->getOney();
+        $this->query    = $this->getPlugin()->getQuery();
+        $this->tools    = $this->getPlugin()->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -338,7 +338,7 @@ class Payplug extends PaymentModule
     public function setPlugin($plugin)
     {
         $this->plugin = $plugin;
-        return $this;
+//        return $this;
     }
 
     public function abortPayment()
