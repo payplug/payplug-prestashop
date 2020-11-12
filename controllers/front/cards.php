@@ -34,7 +34,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->auth = true;
         parent::__construct();
 
-        $this->payplug = Module::getInstanceByName('payplug');
+        $this->payplug = new \Payplug();
         $this->plugin = $this->payplug->getPlugin();
         $this->card = $this->plugin->getCard();
         $this->contextSpecific = $this->plugin->getContext();
