@@ -83,7 +83,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             ));
             $this->setTemplate('customer/cards_1_6.tpl');
         } else {
-            $this->setTemplate('module:payplug/views/templates/front/customer/cards.tpl');
+            $this->setTemplate('module:payplug/views/templates/front/customer/cards_list.tpl');
         }
     }
 }
