@@ -3668,15 +3668,17 @@ class Payplug extends PaymentModule
             $install['error'] = 'Oney ($this->installOney)';
         }
 
+        dump($install);
+        die('line ' . __LINE__);
 
         if ($install['flag']) {
-            $log->info('Install succeeded.');
             $install['flag'] = true;
         } else {
             $log->info('Install failed.');
         }
 
         if ($install['flag']) {
+            $log->info('Install succeeded.');
             return true;
         }
 
