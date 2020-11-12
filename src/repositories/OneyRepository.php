@@ -39,8 +39,6 @@ class OneyRepository
     private $toolsSpecific;
     private $validateSpecific;
 
-    private $plugin;
-
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
