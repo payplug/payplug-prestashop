@@ -371,6 +371,15 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     } elseif ($this->type == 'installment') {
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
                     }
+
+                    $deferred = $payment->authorization !== null;
+                    if ($deferred && count($order->getOrderPayments()) == 0) {
+                        $this->logger->addLog(
+                            'Add new orderPayment for deferred - ' . count($order->getOrderPayments()),
+                            'debug'
+                        );
+                        $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                    }
                 }
 
                 $this->logger->addLog('Checking number of order passed with this id_cart...', 'info');
