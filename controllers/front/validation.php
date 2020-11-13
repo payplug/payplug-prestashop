@@ -125,6 +125,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             Tools::redirect($this->url['error']);
         } else {
             $amount = 0;
+            $amount_for_transaction = 0;
+            $deferred = false;
             if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
                 if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->logger->addLog('Payment is not stored or is already consumed.', 'error');
@@ -287,8 +289,11 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $transaction_id = null;
                 if ($this->type == 'payment') {
                     $transaction_id = $payment->id;
+                    $deferred = $payment->authorization !== null;
+                    $amount_for_transaction = $amount;
                 } elseif ($this->type == 'installment') {
                     $transaction_id = $inst_id;
+                    $amount_for_transaction = $amount * 100;
                 }
                 $extra_vars = array(
                     'transaction_id' => $transaction_id
@@ -372,12 +377,12 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
                     }
 
-                    if ($order->getOrderPayments()) {
+                    if ($deferred && count($order->getOrderPayments()) == 0) {
                         $this->logger->addLog(
                             'Add new orderPayment for deferred - ' . count($order->getOrderPayments()),
                             'debug'
                         );
-                        $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                        $order->addOrderPayment($amount_for_transaction / 100, null, $transaction_id);
                     }
                 }
 
