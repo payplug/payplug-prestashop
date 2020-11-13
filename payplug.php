@@ -802,12 +802,23 @@ class Payplug extends PaymentModule
 
             $order = new Order((int)$id_order);
             if (Validate::isLoadedObject($order)) {
+                $order->setInvoice(true);
+
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
                     $history = new OrderHistory();
                     $history->id_order = (int)$order->id;
                     $history->changeIdOrderState($new_state, (int)$order->id);
                     $history->addWithemail();
+                }
+
+                // Update id transaction on last order payment.
+                if ($transaction_id = $this->getPayplugOrderPayment($order->id)) {
+                    if ($orderPayments = $order->getOrderPayments()) {
+                        $order_payment = end($orderPayments);
+                        $order_payment->transaction_id = $transaction_id;
+                        $order_payment->update();
+                    }
                 }
             }
 
