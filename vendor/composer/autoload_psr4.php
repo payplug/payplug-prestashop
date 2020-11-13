@@ -9,5 +9,4 @@ return array(
     'libphonenumberlight\\' => array($vendorDir . '/giggsey/libphonenumberlight'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'PayPlug\\' => array($baseDir . '/'),
-    'Giggsey\\Locale\\' => array($vendorDir . '/giggsey/locale/src'),
 );

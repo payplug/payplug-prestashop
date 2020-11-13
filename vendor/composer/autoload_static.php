@@ -23,10 +23,6 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         array (
             'PayPlug\\' => 8,
         ),
-        'G' => 
-        array (
-            'Giggsey\\Locale\\' => 15,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -42,14 +38,9 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         array (
             0 => __DIR__ . '/../..' . '/',
         ),
-        'Giggsey\\Locale\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/giggsey/locale/src',
-        ),
     );
 
     public static $classMap = array (
-        'Giggsey\\Locale\\Locale' => __DIR__ . '/..' . '/giggsey/locale/src/Locale.php',
         'PayPlug\\backward\\PayPlugBackward' => __DIR__ . '/../..' . '/backward/PayPlugBackward.php',
         'PayPlug\\classes\\MyLogPHP' => __DIR__ . '/../..' . '/classes/MyLogPHP.class.php',
         'PayPlug\\src\\entities\\CacheEntity' => __DIR__ . '/../..' . '/src/entities/CacheEntity.php',
@@ -60,6 +51,7 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         'PayPlug\\src\\entities\\PluginEntity' => __DIR__ . '/../..' . '/src/entities/PluginEntity.php',
         'PayPlug\\src\\exceptions\\BadParameterException' => __DIR__ . '/../..' . '/src/exceptions/BadParameterException.php',
         'PayPlug\\src\\interfaces\\ConfigurationInterface' => __DIR__ . '/../..' . '/src/interfaces/ConfigurationInterface.php',
+        'PayPlug\\src\\interfaces\\ContextInterface' => __DIR__ . '/../..' . '/src/interfaces/ContextInterface.php',
         'PayPlug\\src\\interfaces\\CountryInterface' => __DIR__ . '/../..' . '/src/interfaces/CountryInterface.php',
         'PayPlug\\src\\interfaces\\QueryInterface' => __DIR__ . '/../..' . '/src/interfaces/QueryInterface.php',
         'PayPlug\\src\\interfaces\\ToolsInterface' => __DIR__ . '/../..' . '/src/interfaces/ToolsInterface.php',
@@ -74,6 +66,7 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         'PayPlug\\src\\repositories\\Repository' => __DIR__ . '/../..' . '/src/repositories/Repository.php',
         'PayPlug\\src\\repositories\\SQLtableRepository' => __DIR__ . '/../..' . '/src/repositories/SQLtableRepository.php',
         'PayPlug\\src\\specific\\ConfigurationSpecific' => __DIR__ . '/../..' . '/src/specific/ConfigurationSpecific.php',
+        'PayPlug\\src\\specific\\ContextSpecific' => __DIR__ . '/../..' . '/src/specific/ContextSpecific.php',
         'PayPlug\\src\\specific\\CountrySpecific' => __DIR__ . '/../..' . '/src/specific/CountrySpecific.php',
         'PayPlug\\src\\specific\\PrestashopSpecific16' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific16.php',
         'PayPlug\\src\\specific\\PrestashopSpecific17' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific17.php',

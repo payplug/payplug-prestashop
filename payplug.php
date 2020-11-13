@@ -57,7 +57,7 @@ class Payplug extends PaymentModule
 
     public $oney;
 
-    protected $constantFile; // 3.0
+    public $constantFile; // 3.0
 
     /** @var PluginEntity */
     protected $plugin; // 3.0
@@ -71,7 +71,7 @@ class Payplug extends PaymentModule
     /**
      * @var To inject logo_url in oney payment template
      */
-    protected $oneyLogoUrl;
+    public $oneyLogoUrl;
 
     /** @var string */
     private $api_live;
@@ -293,6 +293,7 @@ class Payplug extends PaymentModule
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.8');
         $this->tab = 'payments_gateways';
         $this->version = '3.0.0';
+        $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
 
@@ -310,13 +311,13 @@ class Payplug extends PaymentModule
 
     private function initializeAccessors()
     {
-        $this->plugin = (new PayPlug\src\repositories\PluginRepository($this))->getEntity();
-        $this->card = $this->plugin->getCard();
-        $this->logger = $this->plugin->getLogger();
-        $this->query = $this->plugin->getQuery();
-        $this->tools = $this->plugin->getTools();
+        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->oney = new \PayPlug\src\repositories\OneyRepository($this);
+        $this->card     = $this->getPlugin()->getCard();
+        $this->logger   = $this->getPlugin()->getLogger();
+        $this->oney     = $this->getPlugin()->getOney();
+        $this->query    = $this->getPlugin()->getQuery();
+        $this->tools    = $this->getPlugin()->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -340,7 +341,6 @@ class Payplug extends PaymentModule
     public function setPlugin($plugin)
     {
         $this->plugin = $plugin;
-        return $this;
     }
 
     public function abortPayment()
@@ -2523,8 +2523,7 @@ class Payplug extends PaymentModule
                 $paymentOption['oney_' . $oney_payment]['err_label'] = $err_label;
 
                 if ($optimized) {
-                    $schedules = $this->oney->displayOneySchedule($payment_schedule[$oney_payment],
-                        $cart_amount);
+                    $schedules = $this->oney->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
                     $paymentOption['oney_' . $oney_payment]['additionalInformation'] = $schedules;
                 }
             }
@@ -3745,9 +3744,12 @@ class Payplug extends PaymentModule
         );
 
         $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
-        $install['flag'] = ($install['flag'] && $this->installModuleTab('AdminPayPlugInstallment',
+        $install['flag'] = $install['flag']
+            && $this->installModuleTab('AdminPayPlugInstallment',
                 $translationsAdminPayPlugInstallment,
-                $adminPayPlugId, $this->name));
+                $adminPayPlugId,
+                $this->name
+            );
 
         return $install['flag'];
     }
@@ -4393,8 +4395,9 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->card->getCardId((int)$cart->id_customer,
-                $id_card, $config['company']) : null;
+            $payment_tab['payment_method'] = $id_card && $id_card != 'new_card' ?
+                $this->card->getCardId((int)$cart->id_customer, $id_card, $config['company'])
+                : null;
         }
 
         // check payment tab from current payment method
@@ -4520,6 +4523,7 @@ class Payplug extends PaymentModule
             default:
                 $payment_return = array(
                     'result' => 'new_card',
+                    'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
                     'redirect' => $this->isMobiledevice(),
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
@@ -5270,9 +5274,6 @@ class Payplug extends PaymentModule
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
-        // todo: Remove this while API can manage overseas phone numbers
-        $configuration['oney_allowed_countries'] = 'FR';
-
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
@@ -5509,8 +5510,11 @@ class Payplug extends PaymentModule
 
         $payment_options = $this->getPaymentOptions($cart); // $payment_options = Données sous forme de tableau (pour 1.6 et 1.7)
 
-        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options,
-            $cart); // Transforme tableau en TPL
+        // Transforme tableau en TPL
+        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption(
+            $payment_options,
+            $cart
+        );
 
         foreach ($paymentOptions as $paymentOption) {
             $find = 'oney';

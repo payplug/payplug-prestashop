@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use Payplug\Customer;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
@@ -32,6 +31,7 @@ class CardRepository
 {
     private $cardEntity;
     private $configurationSpecific;
+    private $payplug;
     private $query;
     private $tools;
     public $payplug;
@@ -40,6 +40,7 @@ class CardRepository
     {
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
+        $this->payplug = $payplug;
         $this->query = new QueryRepository();
         $this->tools = new ToolsSpecific();
         $this->payplug = $payplug;
@@ -494,7 +495,7 @@ class CardRepository
     public function getByCustomer($customer, $active_only = false)
     {
 //        if (!is_object($customer)) {
-//            $customer = new Customer((int)$customer);
+//            $customer = new \Payplug\Customer((int)$customer);
 //        }
 
         $this->query
