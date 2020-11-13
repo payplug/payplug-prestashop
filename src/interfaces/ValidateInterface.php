@@ -25,5 +25,5 @@ namespace PayPlug\src\interfaces;
 
 interface ValidateInterface
 {
-    function validate($action, $object);
+    public function validate($action, $object);
 }

@@ -21,11 +21,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\specific;
 
-interface ConfigurationInterface
+use PayPlug\src\interfaces\ProductInterface;
+use Product;
+
+class ProductSpecific implements ProductInterface
 {
-    public function get($configuration_name);
-    public function updateValue($key, $value);
-    public function deleteByName($key);
+    public function product($method)
+    {
+        return Product::$method;
+    }
+
 }
