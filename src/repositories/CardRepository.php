@@ -34,7 +34,6 @@ class CardRepository
     private $payplug;
     private $query;
     private $tools;
-    public $payplug;
 
     public function __construct($payplug)
     {
