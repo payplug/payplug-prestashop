@@ -127,6 +127,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             $amount = 0;
             $amount_for_transaction = 0;
             $deferred = false;
+            $is_oney = false;
             if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
                 if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->logger->addLog('Payment is not stored or is already consumed.', 'error');
@@ -293,6 +294,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $transaction_id = $payment->id;
                     $deferred = $payment->authorization !== null;
                     $amount_for_transaction = $amount;
+                    if ($is_oney) {
+                        $amount_for_transaction = $amount * 100;
+                    }
                 } elseif ($this->type == 'installment') {
                     $transaction_id = $inst_id;
                     $amount_for_transaction = $amount * 100;
