@@ -953,8 +953,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                 } else {
                                     $this->logger->addLog('Lock deleted.', 'debug');
                                 }
-                                header($_SERVER['SERVER_PROTOCOL'] . ' 200 Installment correctly registered.', true,
-                                    200);
+                                header(
+                                    $_SERVER['SERVER_PROTOCOL'] . ' 200 Installment correctly registered.', 
+                                    true,
+                                    200
+                                );
                                 die;
                             } else {
                                 if (!$this->payplug->addPayplugOrderPayment($order->id, $payment->id)) {
@@ -970,8 +973,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                                     } else {
                                         $this->logger->addLog('Lock deleted.', 'debug');
                                     }
-                                    header($_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to create order payment.',
-                                        true, 500);
+                                    header(
+                                        $_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to create order payment.',
+                                        true, 
+                                        500
+                                    );
                                     die;
                                 } else {
                                     $this->logger->addLog('Order payment created.');
