@@ -1534,9 +1534,9 @@ class Payplug extends PaymentModule
             $req_order_state->select('DISTINCT osl.id_order_state');
             $req_order_state->from('order_state_lang', 'osl');
             $req_order_state->where('osl.name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
+                OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
             $res_order_state = Db::getInstance()->getValue($req_order_state);
 
             if (!$res_order_state) {
@@ -3557,34 +3557,45 @@ class Payplug extends PaymentModule
     {
         $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to install.');
-        $install['flag'] = true;
-        $install['error'] = false;
+        $install = [
+            'flag' => true,
+            'error' => false
+        ];
 
         $report = $this->checkRequirements();
-        if (!$report['php']['up2date'] && $install['flag'] !== false) {
+        if (!$report['php']['up2date'] && $install['flag']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
             $log->error('Install failed: PHP Requirement.');
             $install['flag'] = false;
             $install['error'] = 'Configuration PHP inf. version 5.3';
+        } else {
+            $log->info('Install success: PHP Requirement.');
         }
-        if (!$report['curl']['up2date'] && $install['flag'] !== false) {
+
+        if (!$report['curl']['up2date'] && $install['flag']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
             $log->error('Install failed: cURL Requirement.');
             $install['flag'] = false;
             $install['error'] = 'cURL Requirement';
+        } else {
+            $log->info('Install success: cURL Requirement.');
         }
-        if (!$report['openssl']['up2date'] && $install['flag'] !== false) {
+
+        if (!$report['openssl']['up2date'] && $install['flag']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
             $log->error('Install failed: OpenSSL Requirement.');
             $install['flag'] = false;
             $install['error'] = 'OpenSSL Requirement';
+        } else {
+            $log->info('Install success: OpenSSL Requirement.');
         }
+
         if (Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
         $log->info('Starting to install parent::install().');
-        if (!parent::install() && $install['flag'] !== false) {
+        if (!parent::install() && $install['flag']) {
             $log->error('Install failed: parent::install().');
             $install['flag'] = false;
             $install['error'] = 'parent::install()';
@@ -3592,8 +3603,7 @@ class Payplug extends PaymentModule
             $log->info('Install success: parent::install().');
         }
 
-        $log->info('----------------> Starting to install hooks. <----------------');
-
+        $log->info('----------------> Install hooks. <----------------');
         $hooksToRegister = [
             'paymentReturn',
             'Header',
@@ -3616,7 +3626,7 @@ class Payplug extends PaymentModule
 
         foreach ($hooksToRegister as $hookToRegister) {
             $log->info('Try to install Hook ' . $hookToRegister . '.');
-            if (!$this->registerHook($hookToRegister) && $install['flag'] !== false) {
+            if (!$this->registerHook($hookToRegister) && $install['flag']) {
                 $log->error('Install failed: Hook ' . $hookToRegister . '.');
                 $install['flag'] = false;
                 $install['error'] = 'Hook ' . $hookToRegister . ' non greffé';
@@ -3627,11 +3637,13 @@ class Payplug extends PaymentModule
         }
 
         //install hook 1.6
+        $log->info('----------------> Install hooks 1.6. <----------------');
         if ($install['flag']) {
             $installHook16 = $this->installHook();
             $install['flag'] = $installHook16['flag'];
             $install['error'] = $installHook16['error'];
         }
+        $log->info('----------------> Install hooks: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install configuration. <----------------');
         if (!$this->createConfig() && $install['flag']) {
@@ -3639,12 +3651,14 @@ class Payplug extends PaymentModule
             $install['flag'] = false;
             $install['error'] = 'Création des éléments de configuration  ($this->createConfig)';
         }
+        $log->info('----------------> Install configuration: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install order states. <----------------');
         if (!$this->createOrderStates() && $install['flag']) {
             $log->error('Install failed: order states.');
             $install['flag'] = false;
         }
+        $log->info('----------------> Install order states: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install SQL. <----------------');
         if (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
@@ -3652,6 +3666,7 @@ class Payplug extends PaymentModule
             $install['flag'] = false;
             $install['error'] = 'Création des tables SQL';
         }
+        $log->info('----------------> Install SQL: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install tab. <----------------');
         if (!$this->installTab() && $install['flag']) {
@@ -3659,6 +3674,7 @@ class Payplug extends PaymentModule
             $install['flag'] = false;
             $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
         }
+        $log->info('----------------> Install tab: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install Oney. <----------------');
         if (!$this->oney->installOney() && $install['flag']) {
@@ -3666,6 +3682,7 @@ class Payplug extends PaymentModule
             $install['flag'] = false;
             $install['error'] = 'Oney ($this->installOney)';
         }
+        $log->info('----------------> Install Oney: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         if ($install['flag']) {
             $log->info('Install succeeded.');
@@ -3673,6 +3690,7 @@ class Payplug extends PaymentModule
         }
 
         $log->info('Install failed.');
+        $log->info('Install error: ' . $install['error']);
 
         // revert installation
         $this->uninstall();
@@ -5632,6 +5650,11 @@ class Payplug extends PaymentModule
             'moduleRoutes'
         ];
 
+        $install = [
+            'flag' => true,
+            'error' => false
+        ];
+
         foreach ($hooksToRegister as $hookToRegister) {
             $install['flag'] = true;
             $log->info('Try to install Hook ' . $hookToRegister . '.');
@@ -5646,7 +5669,7 @@ class Payplug extends PaymentModule
                 $install['flag'] = true;
             }
         }
-        return $install['flag'];
+        return $install;
     }
 
     public function getConfiguration($key)
