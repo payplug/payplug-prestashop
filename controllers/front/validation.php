@@ -264,8 +264,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $installment = new PPPaymentInstallment($inst_id);
                     $first_payment = $installment->getFirstPayment();
                     if ($first_payment->isDeferred()) {
+                        $deferred = true;
                         $order_state = $auth_state;
                     } else {
+                        $deferred = false;
                         $order_state = $inst_state;
                     }
                 } elseif ($is_paid) {
