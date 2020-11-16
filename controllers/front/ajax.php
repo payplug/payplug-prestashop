@@ -160,7 +160,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => [$payplug->l('At least one of the fields is not correctly completed.')]
+                        'message' => [$this->payplug->l('At least one of the fields is not correctly completed.')]
                     ]));
                 }
 
