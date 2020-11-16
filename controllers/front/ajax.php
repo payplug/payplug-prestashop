@@ -36,18 +36,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $productSpecific;
     private $toolsSpecific;
 
-    public function __construct()
-    {
-        $this->payplug = new \Payplug();
-        $this->plugin = $this->payplug->getPlugin();
-        $this->card = $this->plugin->getCard();
-        $this->configurationSpecific = $this->plugin->getConfiguration();
-        $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
-        $this->oney = $this->plugin->getOney();
-        $this->productSpecific = $this->plugin->getProduct();
-        $this->toolsSpecific = $this->plugin->getTools();
-    }
-
     /**
      * @description
      * Method that is executed after init() and checkAccess().
@@ -68,7 +56,16 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         require_once(_PS_MODULE_DIR_ . '../init.php');
         include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 
+        $this->payplug = new \Payplug();
+        $this->plugin = $this->payplug->getPlugin();
+        $this->toolsSpecific = $this->plugin->getTools();
+
         if ($this->toolsSpecific->tool('getValue','_ajax') == 1) {
+            $this->card = $this->plugin->getCard();
+            $this->configurationSpecific = $this->plugin->getConfiguration();
+            $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
+            $this->oney = $this->plugin->getOney();
+            $this->productSpecific = $this->plugin->getProduct();
 
             $config = $this->configurationSpecific;
             $context = $this->contextSpecific->getContext(); // get the method
