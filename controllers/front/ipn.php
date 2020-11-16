@@ -464,8 +464,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
                             header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                             die;
-                        } elseif (in_array($current_state,
-                                array($pending_state, $auth_state, $oney_state)) || !$order->valid) {
+                        } elseif (
+                            in_array($current_state, array($pending_state, $auth_state, $oney_state))
+                            || !$order->valid
+                        ) {
                             $this->logger->addLog('Order is currently pending.');
                             $this->logger->addLog('Payment amount: ' . $payment->amount, 'debug');
 
