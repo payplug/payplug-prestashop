@@ -66,6 +66,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
     public $api_key;
 
+    public $type;
+
     /**
      * @description
      * Set Config to process the notification
@@ -93,6 +95,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $authentication = $this->payplug->setSecretKey($this->api_key);
             $this->logger->addLog('set api key: ' . $this->api_key);
             $this->resource = \Payplug\Notification::treat($body, $authentication);
+            $this->type = $this->resource->installment_plan_id != null ? 'installment' : 'payment';
             $this->logger->addLog('resource id: ' . $this->resource->id);
         } catch (Exception $exception) {
             $this->logger->addLog('An error occured while getting resource: ' . $exception->getMessage(), 'error');
@@ -146,7 +149,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     {
         $this->logger->addLog('process payment');
 
-        if ($this->resource->installment_plan_id != null) {
+        if ($this->type == 'installment') {
             $this->logger->addLog('Installment ID: ' . $this->resource->installment_plan_id);
         }
 
@@ -205,7 +208,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 }
             }
 
-            if ($this->resource->installment_plan_id != null) {
+            if ($this->type == 'installment') {
                 $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
                 $meta = $installment->metadata;
                 $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
@@ -293,7 +296,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $refund_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
                 $oney_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
 
-                // order update
                 if ($id_order) {
                     $this->logger->addLog('UPDATE MODE');
                     try {
@@ -462,9 +464,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             }
                             header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order updated.', true, 200);
                             die;
-                        } elseif (in_array($current_state, array($pending_state, $auth_state, $oney_state))
-                            || !$order->valid
-                        ) {
+                        } elseif (in_array($current_state,
+                                array($pending_state, $auth_state, $oney_state)) || !$order->valid) {
                             $this->logger->addLog('Order is currently pending.');
                             $this->logger->addLog('Payment amount: ' . $payment->amount, 'debug');
 
@@ -711,14 +712,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             header($_SERVER['SERVER_PROTOCOL'] . ' 200 Order has been refunded.', true, 200);
                             die;
                         } else {
-                            $this->logger->addLog(
-                                'Current state: ' . (int)$current_state,
-                                'debug'
-                            );
-                            $this->logger->addLog(
-                                'Pending state: ' . (int)$pending_state,
-                                'debug'
-                            );
+                            $this->logger->addLog('Current state: ' . (int)$current_state, 'debug');
+                            $this->logger->addLog('Pending state: ' . (int)$pending_state, 'debug');
                             $this->logger->addLog('Paid state: ' . (int)$paid_state, 'debug');
                             $this->logger->addLog('Current order state is in conflict with IPN.', 'error');
                             if (!PayplugLock::deleteLockG2($cart->id)) {
@@ -734,10 +729,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             die('500 Current order state is in conflict with IPN.');
                         }
                     }
-                }
-
-                // order create
-                else {
+                } else {
                     $this->logger->addLog('CREATE MODE');
 
                     if (isset($payment->failure) && $payment->failure !== null) {
@@ -911,10 +903,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
                     $this->logger->addLog('Order validated: ' . $order->id);
 
-                    if ($this->resource->installment_plan_id != null) {
-                        $this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $order);
-                    }
-
                     try {
                         $data = array();
                         $data['metadata'] = $meta;
@@ -953,53 +941,49 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         die;
                     }
 
-                    // todo: check if a orderPayment has been created
-                    if ($this->resource->installment_plan_id != null) {
-                        $this->logger->addLog('Installment correctly registered.', 'info');
-                        if (!PayplugLock::deleteLockG2($cart->id)) {
-                            $this->logger->addLog('Lock cannot be deleted.', 'error');
-                        } else {
-                            $this->logger->addLog('Lock deleted.', 'debug');
-                        }
-                        header(
-                            $_SERVER['SERVER_PROTOCOL'] . ' 200 Installment correctly registered.',
-                            true,
-                            200
-                        );
-                        die;
-                    }
-
-                    if (!$this->payplug->addPayplugOrderPayment($order->id, $payment->id)) {
-                        $this->logger->addLog(
-                            'IPN Failed: unable to create order payment.',
-                            'error'
-                        );
-                        if (!PayplugLock::deleteLockG2($cart->id)) {
-                            $this->logger->addLog(
-                                'Lock cannot be deleted.',
-                                'error'
+                    if ($this->type == 'payment') {
+                        if (!$this->payplug->addPayplugOrderPayment($order->id, $payment->id)) {
+                            $this->logger->addLog('IPN Failed: unable to create order payment.', 'error');
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
+                                $this->logger->addLog('Lock cannot be deleted.', 'error');
+                            } else {
+                                $this->logger->addLog('Lock deleted.', 'debug');
+                            }
+                            header(
+                                $_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to create order payment.',
+                                true,
+                                500
                             );
-                        } else {
-                            $this->logger->addLog('Lock deleted.', 'debug');
+                            die;
                         }
-                        header(
-                            $_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to create order payment.',
-                            true,
-                            500
-                        );
-                        die;
-                    }
-                    $this->logger->addLog('Order payment created.');
 
-                    if (!$order->getOrderPayments()) {
-                        $this->logger->addLog('Add new orderPayment for deferred - ' . count($order->getOrderPayments()), 'debug');
-                        $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                        $this->logger->addLog('Payplug order payment created.');
+                    } elseif ($this->type == 'installment') {
+                        if (!$this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $order)) {
+                            $this->logger->addLog('IPN Failed: unable to register installment.', 'error');
+                            if (!PayplugLock::deleteLockG2($cart->id)) {
+                                $this->logger->addLog('Lock cannot be deleted.', 'error');
+                            } else {
+                                $this->logger->addLog('Lock deleted.', 'debug');
+                            }
+                            header(
+                                $_SERVER['SERVER_PROTOCOL'] . ' 500 IPN Failed: unable to register installment.',
+                                true,
+                                500
+                            );
+                            die;
+                        }
+
+                        $this->logger->addLog('Installment correctly registered.');
                     }
 
-                    $this->logger->addLog(
-                        'Checking number of order passed with this id_cart',
-                        'info'
-                    );
+                    $order_payments = $order->getOrderPayments();
+                    if (!$order_payments) {
+                        $this->logger->addLog('Add new orderPayment for deferred - ' . count($order_payments), 'debug');
+                        $order->addOrderPayment($amount, null, $payment->id);
+                    }
+
+                    $this->logger->addLog('Checking number of order passed with this id_cart');
                     $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'orders WHERE `id_cart` = ' . $cart->id;
                     $res_nb_orders = Db::getInstance()->executeS($sql);
                     if (!$res_nb_orders) {
@@ -1046,7 +1030,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         'Checking number of transaction validated for this order',
                         'info'
                     );
-                    $payments = $this->payplug->getPayplugOrderPayments($order->id);
+                    $payments = $order->getOrderPayments();
                     if (!$payments) {
                         $this->logger->addLog(
                             'No transaction can be found using id_order ' . (int)$id_order,
