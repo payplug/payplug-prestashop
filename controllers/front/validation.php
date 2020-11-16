@@ -125,6 +125,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             Tools::redirect($this->url['error']);
         } else {
             $amount = 0;
+            $amount_for_transaction = 0;
+            $deferred = false;
+            $is_oney = false;
             if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
                 if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->logger->addLog('Payment is not stored or is already consumed.', 'error');
@@ -144,7 +147,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                             return false;
                         }
 
-                        $this->logger->addLog('Current amount: ' . $amount, 'info');
                         $pay_id = false;
                         if (isset($installment->schedule)) {
                             foreach ($installment->schedule as $k => $schedule) {
@@ -241,7 +243,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                 }
             } else {
-                $this->logger->addLog('Order does\'nt exists yet.', 'info');
+                $this->logger->addLog('Order doesn\'t exists yet.', 'info');
 
                 if ($this->type == 'payment') {
                     $state_addons = ($payment->is_live ? '' : '_TEST');
@@ -262,8 +264,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $installment = new PPPaymentInstallment($inst_id);
                     $first_payment = $installment->getFirstPayment();
                     if ($first_payment->isDeferred()) {
+                        $deferred = true;
                         $order_state = $auth_state;
                     } else {
+                        $deferred = false;
                         $order_state = $inst_state;
                     }
                 } elseif ($is_paid) {
@@ -287,8 +291,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $transaction_id = null;
                 if ($this->type == 'payment') {
                     $transaction_id = $payment->id;
+                    $deferred = $payment->authorization !== null;
+                    $amount_for_transaction = $amount;
+                    if ($is_oney) {
+                        $amount_for_transaction = $amount * 100;
+                    }
                 } elseif ($this->type == 'installment') {
                     $transaction_id = $inst_id;
+                    $amount_for_transaction = $amount * 100;
                 }
                 $extra_vars = array(
                     'transaction_id' => $transaction_id
@@ -372,12 +382,13 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
                     }
 
-                    if ($order->getOrderPayments()) {
+                    $order_payments = $order->getOrderPayments();
+                    if (!$order_payments) {
                         $this->logger->addLog(
-                            'Add new orderPayment for deferred - ' . count($order->getOrderPayments()),
+                            'Add new orderPayment for deferred - ' . count($order_payments),
                             'debug'
                         );
-                        $order->addOrderPayment($payment->amount / 100, null, $payment->id);
+                        $order->addOrderPayment($total, null, $transaction_id);
                     }
                 }
 
@@ -406,7 +417,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
 
                 $this->logger->addLog('Checking number of transaction validated for this order...', 'info');
-                $payments = $this->payplug->getPayplugOrderPayments($order->id);
+                $payments = $order->getOrderPayments();
                 if (!$payments) {
                     $this->logger->addLog(
                         'No transaction can be found using id_order ' . (int)$id_order,

@@ -388,6 +388,8 @@ class Payplug extends PaymentModule
                 }
             }
         }
+
+        return true;
     }
 
     /**
@@ -3230,7 +3232,7 @@ class Payplug extends PaymentModule
         $payplug_data = !empty($cookie_data) ? $cookie_data : false;
 
         // then flush to avoid repetition
-        $this->context->cookie->__set('payplug_data','');
+        $this->context->cookie->__set('payplug_data', '');
 
         // if no error all good then return true
         return json_decode($payplug_data, true);
@@ -3248,7 +3250,7 @@ class Payplug extends PaymentModule
         $payplug_errors = !empty($cookie_errors) ? $cookie_errors : false;
 
         // then flush to avoid repetition
-        $this->context->cookie->__set('payplug_errors','');
+        $this->context->cookie->__set('payplug_errors', '');
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
