@@ -28,8 +28,14 @@ use Country;
 
 class CountrySpecific implements CountryInterface
 {
-    public function getByIso($id_currency)
+    public function getByIso($idCurrency)
     {
-        return Country::getByIso($id_currency);
+        return Country::getByIso($idCurrency);
     }
+
+    public function getCountry($idCountry)
+    {
+        return new Country($idCountry);
+    }
+
 }

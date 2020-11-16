@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
@@ -31,6 +32,7 @@ use PayPlug\src\specific\ValidateSpecific;
 
 class OneyRepository
 {
+    private $addressSpecific;
     private $log;
     private $configurationSpecific;
     private $contextSpecific;
@@ -42,6 +44,7 @@ class OneyRepository
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
+        $this->addressSpecific = new AddressSpecific();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->countrySpecific = new CountrySpecific();
         $this->toolsSpecific = new ToolsSpecific();
@@ -220,8 +223,8 @@ class OneyRepository
                     break;
                 case 'mobile_phone_number' :
                     $id_address = $type == 'shipping' ? $this->contextSpecific->getContext()->cart->id_address_delivery : $this->contextSpecific->getContext()->cart->id_address_invoice;
-                    $address = new Address($id_address);
-                    $country = new Country($address->id_country);
+                    $address = $this->addressSpecific->getAddress($id_address);
+                    $country = $this->countrySpecific->getCountry($address->id_country);
                     $valid = $this->payplug->isValidMobilePhoneNumber($data, $country->iso_code);
                     if (!$valid) {
                         $errors[] = $this->payplug->l('Please enter your mobile phone number.');

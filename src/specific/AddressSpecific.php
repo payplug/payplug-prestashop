@@ -21,10 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\specific;
 
-interface CountryInterface
+use Address;
+use PayPlug\src\interfaces\AddressInterface;
+
+class AddressSpecific implements AddressInterface
 {
-    public function getByIso($idCurrency);
-    public function getCountry($idCountry);
+    public function getAddress($idAddress)
+    {
+        return new Address($idAddress);
+    }
 }
