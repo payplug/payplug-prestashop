@@ -244,7 +244,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     }
                 }
             } else {
-                $this->logger->addLog('Order does\'nt exists yet.', 'info');
+                $this->logger->addLog('Order doesn\'t exists yet.', 'info');
 
                 if ($this->type == 'payment') {
                     $state_addons = ($payment->is_live ? '' : '_TEST');
@@ -383,12 +383,13 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                         $this->payplug->addPayplugInstallment($installment->resource, $order);
                     }
 
-                    if ($deferred && count($order->getOrderPayments()) == 0) {
+                    $order_payments = $order->getOrderPayments();
+                    if (!$order_payments) {
                         $this->logger->addLog(
                             'Add new orderPayment for deferred - ' . count($order->getOrderPayments()),
                             'debug'
                         );
-                        $order->addOrderPayment($amount_for_transaction / 100, null, $transaction_id);
+                        $order->addOrderPayment($total, null, $transaction_id);
                     }
                 }
 
@@ -417,7 +418,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
 
                 $this->logger->addLog('Checking number of transaction validated for this order...', 'info');
-                $payments = $this->payplug->getPayplugOrderPayments($order->id);
+                $payments = $order->getOrderPayments();
                 if (!$payments) {
                     $this->logger->addLog(
                         'No transaction can be found using id_order ' . (int)$id_order,
