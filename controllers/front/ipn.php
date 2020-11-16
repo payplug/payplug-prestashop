@@ -941,6 +941,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         die;
                     }
 
+                    $transaction_id = '';
                     if ($this->type == 'payment') {
                         if (!$this->payplug->addPayplugOrderPayment($order->id, $payment->id)) {
                             $this->logger->addLog('IPN Failed: unable to create order payment.', 'error');
@@ -956,7 +957,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             );
                             die;
                         }
-
+                        $transaction_id = $payment->id;
                         $this->logger->addLog('Payplug order payment created.');
                     } elseif ($this->type == 'installment') {
                         if (!$this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $order)) {
@@ -974,13 +975,14 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                             die;
                         }
 
+                        $transaction_id = $this->resource->installment_plan_id;
                         $this->logger->addLog('Installment correctly registered.');
                     }
 
                     $order_payments = $order->getOrderPayments();
                     if (!$order_payments) {
                         $this->logger->addLog('Add new orderPayment for deferred - ' . count($order_payments), 'debug');
-                        $order->addOrderPayment($amount, null, $payment->id);
+                        $order->addOrderPayment($amount, null, $transaction_id);
                     }
 
                     $this->logger->addLog('Checking number of order passed with this id_cart');

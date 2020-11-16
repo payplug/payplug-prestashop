@@ -388,6 +388,8 @@ class Payplug extends PaymentModule
                 }
             }
         }
+
+        return true;
     }
 
     /**
