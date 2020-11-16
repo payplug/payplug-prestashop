@@ -147,7 +147,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                             return false;
                         }
 
-                        $this->logger->addLog('Current amount: ' . $amount, 'info');
                         $pay_id = false;
                         if (isset($installment->schedule)) {
                             foreach ($installment->schedule as $k => $schedule) {
