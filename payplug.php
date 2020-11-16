@@ -339,7 +339,7 @@ class Payplug extends PaymentModule
     public function setPlugin($plugin)
     {
         $this->plugin = $plugin;
-//        return $this;
+        return $this;
     }
 
     public function abortPayment()
