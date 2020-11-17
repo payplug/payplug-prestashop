@@ -39,20 +39,26 @@ class PayPlugValidation
     {
         $this->payplug = new Payplug();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
-        $this->type = 'payment';
         $this->plugin = $this->payplug->getPlugin();
+        $this->setConfig();
+    }
+
+    public function setConfig()
+    {
+        $this->isDeferred = false;
+        $this->isOney = false;
+        $this->type = 'payment';
+        $this->setLogger();
     }
 
     public function setLogger() {
         $this->logger = $this->plugin->getLogger();
-        $params['process'] = 'validation';
-        $this->logger->setParams($params);
+        $this->logger->setParams($params = ['process' => 'validation']);
         $this->logger->addLog('New validation');
     }
 
     public function treat()
     {
-        $this->setLogger();
         //todo: split code into different functions
         $this->postProcess();
     }
@@ -182,7 +188,6 @@ class PayPlugValidation
                         Payplug::redirectForVersion($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
-                    $this->isOney = false;
                     if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
                         switch ($payment->payment_method['type']) {
                             case 'oney_x3_with_fees':
@@ -196,8 +201,6 @@ class PayPlugValidation
 
                     if ($payment->authorization !== null && !$this->isOney) {
                         $this->isDeferred = true;
-                    } else {
-                        $this->isDeferred = false;
                     }
 
                     $is_authorized = count($payment->authorization) > 0;
