@@ -22,6 +22,7 @@
  */
 
 use PayPlug\src\repositories\CardRepository;
+use \Payplug\Exception;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 

@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
