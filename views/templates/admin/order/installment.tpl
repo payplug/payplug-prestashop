@@ -23,8 +23,8 @@
 <div>
     <p class="{if $inst_paid}ppinstsucces{else}{if $inst_aborted}ppinsterror{else}ppwarning{/if}{/if}">
         {l s='This order is subjected to an installment plan, whose status is' mod='payplug'}
-        <span class="pp_inst_status">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
-    <p>{l s='Payment schedule ID' mod='payplug'} : {$inst_id|escape:'htmlall':'UTF-8'}</p>
+        <span class="pp_inst_status" data-e2e-payment-details="inst_status" data-e2e-payment-details-inst-state="{$inst_status_code|escape:'htmlall':'UTF-8'}">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
+    <p>{l s='Payment schedule ID' mod='payplug'} : <span data-e2e-payment-details="inst_id">{$inst_id|escape:'htmlall':'UTF-8'}</span></p>
 </div>
 <div class="table-responsive half-width">
     <table class="table">

@@ -3015,6 +3015,7 @@ class Payplug extends PaymentModule
             $id_currency = (int)Currency::getIdByIsoCode($installment->currency);
             $show_menu_installment = true;
             $inst_status = $installment->is_active ? $this->l('ongoing') : ($installment->is_fully_paid ? $this->l('paid') : $this->l('suspended'));
+            $inst_status_code = $installment->is_active ? 'ongoing' : ($installment->is_fully_paid ? 'paid' : 'suspended');
             $inst_aborted = !$installment->is_active;
             $ppInstallment = new PPPaymentInstallment($installment->id);
             $instPaymentOne = $ppInstallment->getFirstPayment();
@@ -3023,6 +3024,7 @@ class Payplug extends PaymentModule
             $this->context->smarty->assign(array(
                 'inst_id' => $inst_id,
                 'inst_status' => $inst_status,
+                'inst_status_code' => $inst_status_code,
                 'inst_aborted' => $inst_aborted,
                 'inst_paid' => $inst_paid,
                 'payment_list' => $payment_list,
