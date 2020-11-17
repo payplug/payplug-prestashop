@@ -72,14 +72,14 @@ class PayPlugAjax
         $tools = $this->toolsSpecific;
 
         if (($tools->tool('getValue', '_ajax')) == 1) {
-            if ($tools->tool('getIsset') == 'pc') {
-                if ((int)$tools->tool('getValue', 'pay' == 1)) {
-                    $is_installment = $tools->tool(getValue('i'));
+            if ($tools->tool('getIsset', 'pc')) {
+                if ((int)$tools->tool('getValue', 'pay') == 1) {
+                    $is_installment = $tools->tool('getValue', 'i');
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
                     $is_deferred = $this->payplug->getConfiguration('PAYPLUG_DEFERRED') == 1;
-                    $is_oney = $tools->tool(getValue('io'));
+                    $is_oney = $tools->tool('getValue', 'io');
                     $options = [
-                        'id_card' => $tools->tool(getValue('pc')),
+                        'id_card' => $tools->tool('getValue', 'pc'),
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
                         'is_oney' => $is_oney,
