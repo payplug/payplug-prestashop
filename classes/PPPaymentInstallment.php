@@ -40,7 +40,7 @@ class PPPaymentInstallment extends PPPayment
 
     public function retrieve($id)
     {
-        if(!$id) {
+        if (!$id) {
             return false;
         }
 

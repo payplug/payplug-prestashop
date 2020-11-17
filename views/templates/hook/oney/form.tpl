@@ -41,7 +41,7 @@
                             <p>{$field.text|escape:'htmlall':'UTF-8'}</p>
                             {foreach $field.input as $input}
                                 <div class="oneyForm_field oneyForm_field-{$input.name|escape:'htmlall':'UTF-8'}">
-                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="oneyForm_input{if $name==$input.name} oneyForm_input-tocheck oneyForm_input-error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
+                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="oneyForm_input{if $name==$input.name} oneyForm_input-tocheck oneyForm_input-error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type|escape:'htmlall':'UTF-8'}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
                                 </div>
                             {/foreach}
                         </div>

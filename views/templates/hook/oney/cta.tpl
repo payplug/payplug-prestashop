@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="oneyCta_wrapper">
-    <div class="oneyCta{if isset($env) && $env} oneyCta-{$env}{/if}">
+    <div class="oneyCta{if isset($env) && $env} oneyCta-{$env|escape:'htmlall':'UTF-8'}{/if}">
         <button type="button" class="oneyCta_button{if isset($payplug_oney_error) && $payplug_oney_error} oneyCta_button-disabled{/if}">
             <span>{l s='Or pay in' mod='payplug'}</span>
             <span class="oneyCta_logo oneyLogo oneyLogo-x3x4"></span>

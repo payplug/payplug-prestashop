@@ -26,7 +26,6 @@
  * PayPlugCarrier : This class associate delivery type and delivery time to existing Carrier
  * It's necessary for Oney
  */
-
 class PayPlugCarrier extends ObjectModel
 {
     /** @const int Default delivery delay value in days for new carrier */
@@ -148,8 +147,9 @@ class PayPlugCarrier extends ObjectModel
         $id_payplug_carrier = Db::getInstance()->getValue(
             'SELECT `' . self::$definition['primary']
             . '` FROM `'._DB_PREFIX_ . self::$definition['table']
-            .'` WHERE `id_carrier` = ' . (int)$id_carrier);
-        if($id_payplug_carrier) {
+            .'` WHERE `id_carrier` = ' . (int)$id_carrier
+        );
+        if ($id_payplug_carrier) {
             return new PayPlugCarrier($id_payplug_carrier);
         }
 

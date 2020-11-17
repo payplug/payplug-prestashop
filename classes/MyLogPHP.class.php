@@ -137,7 +137,8 @@ class MyLogPHP
     }
 }
 
-function truncateCSV($glob) {
+function truncateCSV($glob)
+{
     foreach (glob($glob) as $path) {
         $file = fopen($path, "w");
         ftruncate($file, 0);

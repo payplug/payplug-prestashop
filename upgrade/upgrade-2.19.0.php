@@ -67,7 +67,7 @@ function upgrade_module_2_19_0($object)
     $object->uninstallTab();
     $object->uninstallModuleTab('AdminPayplug');
     if (!$object->installTab()) {
-        $this->log_install->error('Fail to add installment tab.');
+        $log->error('Fail to add installment tab.');
         $flag = false;
     }
 

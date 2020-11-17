@@ -114,14 +114,15 @@ class PayPlugLogger extends ObjectModel
         ];
     }
 
-    public function flush($all = false){
+    public function flush($all = false)
+    {
         try {
             $exists = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.self::$definition['table'].'`');
         } catch (Exception $exception) {
             return false;
         }
 
-        if($all) {
+        if ($all) {
             return Db::getInstance()->execute('TRUNCATE `'._DB_PREFIX_.self::$definition['table'].'`');
         }
 
@@ -140,8 +141,8 @@ class PayPlugLogger extends ObjectModel
         $sql = 'SELECT `id_payplug_logger` FROM `'._DB_PREFIX_.self::$definition['table'].'` ORDER BY `id_payplug_logger` DESC LIMIT '.($limits['number'] - 1).',1';
         $last_logs_valid = Db::getInstance()->executeS($sql);
 
-        // si there is no more log
-        if(!$last_logs_valid) {
+        // if there is no more log
+        if (!$last_logs_valid) {
             return $flag;
         }
 
@@ -151,4 +152,3 @@ class PayPlugLogger extends ObjectModel
         return $flag;
     }
 }
-
