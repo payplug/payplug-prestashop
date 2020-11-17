@@ -210,7 +210,7 @@ class LoggerRepository
         $this->query
             ->delete()
             ->from(_DB_PREFIX_.$logger->getTable())
-            ->where('`date_add` < "'.$date_limit->format('Y-m-d').'"')
+            ->where('`date_add` < '.$date_limit->format('Y-m-d').'')
         ;
 
         if (!$this->query->build()) {

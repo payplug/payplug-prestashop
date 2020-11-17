@@ -127,7 +127,7 @@ class CacheRepository
             ->select()
             ->fields('*')
             ->from(_DB_PREFIX_.$this->cacheEntity->getTable())
-            ->where('`cache_key` = "' . (string)$cache_key . '"')
+            ->where('`cache_key` = \'' . (string)$cache_key . '\'')
         ;
 
         $cache = $this->query->build();

@@ -33,7 +33,9 @@ use PayPlug\src\specific\ValidateSpecific;
 class OneyRepository
 {
     private $addressSpecific;
+    private $cache;
     private $log;
+    private $logger;
     private $configurationSpecific;
     private $contextSpecific;
     private $countrySpecific;
@@ -45,8 +47,10 @@ class OneyRepository
     {
         $this->payplug = $payplug;
         $this->addressSpecific = new AddressSpecific();
+        $this->cache = new CacheRepository();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->countrySpecific = new CountrySpecific();
+        $this->logger = new LoggerRepository();
         $this->toolsSpecific = new ToolsSpecific();
         $this->validateSpecific = new ValidateSpecific();
         $this->log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
@@ -813,7 +817,8 @@ class OneyRepository
 
         // Checks if the current simulation is already saved in the database
         // If not, we do a simulation for Oney, and we will store it to the DB
-        $cache_from_bdd = $this->payplug->getPlugin()->getCache()->getCacheByKey($cache_id);
+        $cache_from_bdd = $this->cache->getCacheByKey($cache_id);
+
         if ($cache_from_bdd) {
             return $tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
         }
@@ -844,12 +849,11 @@ class OneyRepository
 
                     // $cache_id = cache_key in db
                     // $to_cache = cache_value in db
-                    if (!$this->payplug->getPlugin()->setCache($cache_id, $to_cache)) {
-                        $params['process'] = 'payplug.php setCache';
-                        $this->payplug->logger->setParams($params);
+                    if (!$this->cache->setCache($cache_id, $to_cache)) {
+                        $this->logger->setParams($params = ['process' => '[Oney Repository] setCache']);
                         $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                         $error_level = 'error';
-                        $this->payplug->logger->addLog($error_message, $error_level);
+                        $this->logger->addLog($error_message, $error_level);
                     }
 
                 }

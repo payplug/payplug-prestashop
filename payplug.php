@@ -51,7 +51,7 @@ class Payplug extends PaymentModule
 
     private $tools; // 3.0
 
-    private $paymentOption;
+    private $logger;
 
     public $oney;
 
@@ -103,9 +103,6 @@ class Payplug extends PaymentModule
 
     /** @var MyLogPHP */
     private $log_install;
-
-    /** @var PayPlugCache */
-    protected $payplug_cache;
 
     /** @var array */
     public $payment_status = array();
@@ -267,9 +264,6 @@ class Payplug extends PaymentModule
         ),
     );
 
-    /** @var object */
-    public $logger;
-
     /**
      * Constructor
      *
@@ -304,7 +298,6 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
-        $this->initializeCache();
     }
 
     private function initializeAccessors()
@@ -3470,10 +3463,13 @@ class Payplug extends PaymentModule
     public function hookActionAdminPerformanceControllerAfter($params)
     {
         // Purge PayPlug cache
-        if (!$this->payplug_cache->flushCache()) {
+        $cache = $this->getPlugin()->getCache();
+        if (!$cache->flushCache()) {
+            $params['process'] = 'PayPlug Cache';
+            $this->logger->setParams($params);
             $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
             $error_level = 'error';
-            $this->payplug_cache->logger->addLog($error_message, $error_level);
+            $this->logger->addLog($error_message, $error_level);
         }
     }
 
@@ -3484,10 +3480,13 @@ class Payplug extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        if (!$this->payplug_cache->flushCache()) {
+        $cache = $this->getPlugin()->getCache();
+        if (!$cache->flushCache()) {
+            $params['process'] = 'PayPlug Cache';
+            $this->logger->setParams($params);
             $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
             $error_level = 'error';
-            $this->payplug_cache->logger->addLog($error_message, $error_level);
+            $this->logger->addLog($error_message, $error_level);
         }
     }
 
@@ -3848,9 +3847,8 @@ class Payplug extends PaymentModule
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, array(1, 2, 10)));
         } catch (Exception $e) {
-            $params['process'] = 'payplug : Is Valid Phone Number';
-            $this->logger->setParams($params);
-            $this->payplug_cache->logger->addLog(
+            $this->logger->setParams($params = ['process' => '[payplug.php] Is Valid Phone Number']);
+            $this->logger->addLog(
                 'function isValidMobilePhoneNumber : Error during validating phone number [payplug.php]',
                 'error');
             return false;
@@ -4944,7 +4942,7 @@ class Payplug extends PaymentModule
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
-        $params['process'] = 'payplug';
+        $params['process'] = 'payplug.php';
         $this->logger->setParams($params);
 
         if ($this->active) {
@@ -5030,14 +5028,6 @@ class Payplug extends PaymentModule
                 'Prestashop/' . _PS_VERSION_
             );
         }
-    }
-
-    /**
-     * @description Initialize the cache (For the API Marketing)
-     */
-    private function initializeCache()
-    {
-        $this->payplug_cache = $this->plugin->getCache();
     }
 
     /**
