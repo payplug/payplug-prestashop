@@ -166,7 +166,7 @@ class PrestashopSpecific16
                      * oney.tpl (Oney optimisé)
                      * unified.tpl (Oney non optimisé)
                      */
-                    $paymentOptions[$payment_method] = array(
+                    $paymentOptions[$payment_method.'-'.$extraClass] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_method == 'one_click' ? $payment_options['standard']['logo'] : $payment_option['logo'],
@@ -188,7 +188,6 @@ class PrestashopSpecific16
                 }
             }
         }
-
         return $paymentOptions;
     }
 

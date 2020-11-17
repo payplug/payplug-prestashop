@@ -3847,10 +3847,7 @@ class Payplug extends PaymentModule
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, array(1, 2, 10)));
         } catch (Exception $e) {
-            $this->logger->setParams($params = ['process' => '[payplug.php] Is Valid Phone Number']);
-            $this->logger->addLog(
-                'function isValidMobilePhoneNumber : Error during validating phone number [payplug.php]',
-                'error');
+            // @todo : Add Log
             return false;
         }
     }
