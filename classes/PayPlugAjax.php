@@ -102,11 +102,11 @@ class PayPlugAjax
                 }
             } elseif ($tools->tool('getIsset', 'checkOneyAddresses')) {
                 if (!$this->payplug->getConfiguration('PAYPLUG_ONEY')) {
-                    return die($tools->tool('jsonEncode', array('result' => false, 'error' => false)));
+                    die ($tools->tool('jsonEncode', array('result' => false, 'error' => false)));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');
                 $id_billing = $tools->tool('getValue', 'id_address_invoice');
-                die($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
+                die ($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$this->payplug->getConfiguration('PS_TAX');
 
