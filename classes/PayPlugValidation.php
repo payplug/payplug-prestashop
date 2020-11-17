@@ -31,6 +31,8 @@ class PayPlugValidation
     public $debug;
     public $type;
     public $api_key;
+    private $isDeferred;
+    private $isOney;
     private $plugin;
 
     public function __construct()
@@ -180,22 +182,22 @@ class PayPlugValidation
                         Payplug::redirectForVersion($redirect_url_error);
                     }
                     $is_paid = $payment->is_paid;
-                    $is_oney = false;
+                    $this->isOney = false;
                     if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
                         switch ($payment->payment_method['type']) {
                             case 'oney_x3_with_fees':
                             case 'oney_x4_with_fees':
-                                $is_oney = true;
+                                $this->isOney = true;
                                 break;
                             default:
-                                $is_oney = false;
+                                $this->isOney = false;
                         }
                     }
 
-                    if ($payment->authorization !== null && !$is_oney) {
-                        $deferred = true;
+                    if ($payment->authorization !== null && !$this->isOney) {
+                        $this->isDeferred = true;
                     } else {
-                        $deferred = false;
+                        $this->isDeferred = false;
                     }
 
                     $is_authorized = count($payment->authorization) > 0;
@@ -307,7 +309,7 @@ class PayPlugValidation
                 } elseif ($is_paid) {
                     $order_state = $paid_state;
                     $this->logger->addLog('Deleting stored payment.', 'info');
-                } elseif ($is_oney) {
+                } elseif ($this->isOney) {
                     $order_state = $oney_state;
                     $this->logger->addLog('Deleting stored payment.', 'info');
                 } elseif ($is_authorized) {
@@ -355,7 +357,7 @@ class PayPlugValidation
                 }
 
                 $module_name = $this->payplug->displayName;
-                if ($is_oney) {
+                if ($this->isOney) {
                     switch ($payment->payment_method['type']) {
                         case 'oney_x3_with_fees' :
                         case 'oney_x3_without_fees' :
@@ -422,7 +424,7 @@ class PayPlugValidation
                 }
 
                 // Add payment line
-                if ($deferred && count($order->getOrderPayments()) == 0) {
+                if ($this->isDeferred && count($order->getOrderPayments()) == 0) {
                     $this->logger->addLog('Add new orderPayment for deferred - ' . count($order->getOrderPayments()), 'debug');
                     $order->addOrderPayment($payment->amount / 100, null, $payment->id);
                 }
