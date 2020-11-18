@@ -27,9 +27,6 @@ use PayPlug\src\entities\LoggerEntity;
 
 class LoggerRepository
 {
-    /**
-     * @var object LoggerEntity
-     */
     private $loggerEntity;
     private $query;
 
@@ -40,6 +37,9 @@ class LoggerRepository
         $this->setStdParams();
     }
 
+    /**
+     * @description Hydrate standard entities
+     */
     public function setStdParams()
     {
         $this->loggerEntity
@@ -71,21 +71,35 @@ class LoggerRepository
             ]);
     }
 
-
     /**
-     * Used to set $process and $type since other classes
+     * @description Used to set $process and $type since other classes
+     *
+     * @param array $params
      */
     public function setParams($params)
     {
-        $this->loggerEntity
-            ->setProcess('')
-            ->setType('notification')
-        ;
+        $logger = $this->loggerEntity;
 
-        if (isset($params['process']))  { $this->loggerEntity->setProcess($params['process']);  }
-        if (isset($params['type']))     { $this->loggerEntity->setType($params['type']);        }
+        if (isset($params['process'])) {
+            $logger->setProcess($params['process']);
+        } else {
+            $logger->setProcess('');
+        }
+
+        if (isset($params['type'])) {
+            $logger->setType($params['type']);
+        } else {
+            $logger->setType('notification');
+        }
     }
 
+    /**
+     * @description Add message to PayPlug Logger
+     *
+     * @param $message
+     * @param string $level
+     * @return $this
+     */
     public function addLog($message, $level = 'info')
     {
         // get content
@@ -105,6 +119,11 @@ class LoggerRepository
         return $this;
     }
 
+    /**
+     * @description Check if log exist to update it or create a new one
+     *
+     * @return bool
+     */
     public function save()
     {
         if ((int)$this->loggerEntity->getId() > 0) {
@@ -115,6 +134,11 @@ class LoggerRepository
         $this->addToDb();
     }
 
+    /**
+     * @description If new log, add it to db
+     *
+     * @return bool
+     */
     public function addToDb()
     {
         $logger = $this->loggerEntity;
@@ -134,6 +158,11 @@ class LoggerRepository
         $this->loggerEntity->setId($this->query->lastId());
     }
 
+    /**
+     * @description Add message in existing log
+     *
+     * @return bool
+     */
     public function updateLog()
     {
         $logger = $this->loggerEntity;
@@ -155,6 +184,13 @@ class LoggerRepository
         return true;
     }
 
+    /**
+     * @description Format date to help for more precisions
+     *
+     * @param string $format
+     * @param null $utimestamp
+     * @return false|string
+     */
     public function udate($format = 'u', $utimestamp = null)
     {
         if (is_null($utimestamp)) {
@@ -167,6 +203,11 @@ class LoggerRepository
         return date(preg_replace('`(?<!\\\\)u`', $milliseconds, $format), $timestamp);
     }
 
+    /**
+     * @description Return the defined date and max elements limits
+     *
+     * @return array
+     */
     protected function getLimit()
     {
         return [
@@ -175,6 +216,12 @@ class LoggerRepository
         ];
     }
 
+    /**
+     * @description Flush PayPlug Logger
+     *
+     * @param bool $all
+     * @return bool
+     */
     public function flush($all = false) {
         try {
             $logger = $this->loggerEntity;
