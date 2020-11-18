@@ -71,8 +71,7 @@ class PayPlugNotifications
 
     public function setLogger() {
         $this->logger = $this->plugin->getLogger();
-        $params['process'] = 'notification';
-        $this->logger->setParams($params);
+        $this->logger->setParams(['process' => 'notification']);
         $this->logger->addLog('New notification');
     }
 

@@ -27,6 +27,7 @@ use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
+use PayPlug\src\specific\ProductSpecific;
 use PayPlug\src\specific\ToolsSpecific;
 use PayPlug\src\specific\ValidateSpecific;
 
@@ -42,6 +43,7 @@ class PluginRepository extends Repository
     private $configuration;
     private $context;
     private $country;
+    private $product;
     private $query;
     private $tools;
     private $validate;
@@ -56,6 +58,7 @@ class PluginRepository extends Repository
         $this->logger   = new LoggerRepository();
         $this->oney     = new OneyRepository($payplug);
         $this->plugin   = new PluginEntity();
+        $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
         $this->validate = new ValidateSpecific();
@@ -67,6 +70,7 @@ class PluginRepository extends Repository
             ->setContext($this->context)
             ->setCountry($this->country)
             ->setLogger($this->logger)
+            ->setProduct($this->product)
             ->setOney($this->oney)
             ->setQuery($this->query)
             ->setTools($this->tools)

@@ -24,7 +24,7 @@
         {if $payment_message.type == 'string'}
             <p class="payplugMsg_error">{$payment_message.value|escape:'htmlall':'UTF-8'}</p>
         {elseif $payment_message.type == 'template'}
-            {include file="./"|cat:$payment_message.value}
+            {include file="../"|cat:$payment_message.value}
         {/if}
     {/foreach}
 

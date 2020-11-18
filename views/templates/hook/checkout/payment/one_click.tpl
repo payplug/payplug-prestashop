@@ -48,9 +48,17 @@
                         <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/none.png"/>
                         <span>{l s='Pay with a different card' mod='payplug'}</span>
                     </label>
-                    <button class="payplugButton -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
+
+                    <div class="payplugOneClick_submit">
+                        <p class="payplugOneClick_message">
+                            {l s='Please wait...' mod='payplug'}
+                            <img class="payplugOneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif"/>
+                        </p>
+                        <button class="payplugButton -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
+                    </div>
                 </form>
             </div>
+            <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
         </div>
     </div>
 {/if}

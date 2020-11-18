@@ -23,8 +23,7 @@
 
 namespace PayPlug\src\interfaces;
 
-interface CountryInterface
+interface AddressInterface
 {
-    public function getByIso($idCurrency);
-    public function getCountry($idCountry);
+    public function getAddress($idAddress);
 }

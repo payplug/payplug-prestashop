@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\repositories\SQLtableRepository;
-
 /**
  * Core file of PayPlug module
  */
@@ -32,7 +30,6 @@ require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
-@include_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
 
 if (!defined('_PS_VERSION_')) {
@@ -53,7 +50,7 @@ class Payplug extends PaymentModule
 
     private $tools; // 3.0
 
-    private $paymentOption;
+    private $logger;
 
     public $oney;
 
@@ -105,9 +102,6 @@ class Payplug extends PaymentModule
 
     /** @var MyLogPHP */
     private $log_install;
-
-    /** @var PayPlugCache */
-    protected $payplug_cache;
 
     /** @var array */
     public $payment_status = array();
@@ -269,9 +263,6 @@ class Payplug extends PaymentModule
         ),
     );
 
-    /** @var object */
-    public $logger;
-
     /**
      * Constructor
      *
@@ -283,7 +274,7 @@ class Payplug extends PaymentModule
         $this->name = 'payplug';
         $this->author = 'PayPlug';
         $this->bootstrap = true;
-        $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
+        $this->constantFile = _PS_MODULE_DIR_.'payplug/payplug.php';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
@@ -306,7 +297,6 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
-        $this->initializeCache();
     }
 
     private function initializeAccessors()
@@ -328,11 +318,6 @@ class Payplug extends PaymentModule
         }
     }
 
-    public function setPaymentOption()
-    {
-        return new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
-    }
-
     public function getPlugin()
     {
         return $this->plugin;
@@ -341,6 +326,7 @@ class Payplug extends PaymentModule
     public function setPlugin($plugin)
     {
         $this->plugin = $plugin;
+        return $this;
     }
 
     public function abortPayment()
@@ -464,8 +450,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description
-     * Add Order Payment
+     * @description Add Order Payment
      *
      * @param int $id_order
      * @param string $id_payment
@@ -482,7 +467,6 @@ class Payplug extends PaymentModule
     /**
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function adminAjaxController()
     {
@@ -668,6 +652,7 @@ class Payplug extends PaymentModule
     /**
      * @param $payment
      * @return array|Exception
+     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function buildPaymentDetails($payment)
     {
@@ -793,7 +778,7 @@ class Payplug extends PaymentModule
             } else {
                 $expiration = date('d/m/Y', $payment->authorization->expires_at);
                 if (isset($payment->authorization->expires_at) && $payment->authorization->expires_at - time() > 0) {
-                    if (isset($payment->failure) && count($payment->failure) > 0) {
+                    if (isset($payment->failure) && $payment->failure) {
                         $payment_details['can_be_cancelled'] = false;
                         $payment_details['can_be_captured'] = false;
                     } else {
@@ -2584,7 +2569,7 @@ class Payplug extends PaymentModule
             && (int)$payment->payment_method['is_pending'] == 1
         ) {
             $pay_status = 10; //oney pending
-        } elseif (count($payment->failure) > 0 && $pay_status != 9) {
+        } elseif (isset($payment->failure) && $payment->failure && $pay_status != 9) {
             if ($payment->failure->code == 'aborted') {
                 $pay_status = 7; //cancelled
             } elseif ($payment->failure->code == 'timeout') {
@@ -3474,29 +3459,30 @@ class Payplug extends PaymentModule
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
      *
      * @param array $params
+     * @return boolean
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        // Purge PayPlug cache
-        if (!$this->payplug_cache->flushCache()) {
-            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
-            $error_level = 'error';
-            $this->payplug_cache->logger->addLog($error_message, $error_level);
-        }
+        return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache()
+                ;
     }
 
     /**
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param array $params
+     * @return boolean
      */
     public function hookActionClearCompileCache($params)
     {
-        if (!$this->payplug_cache->flushCache()) {
-            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
-            $error_level = 'error';
-            $this->payplug_cache->logger->addLog($error_message, $error_level);
-        }
+        return $this
+            ->getPlugin()
+            ->getCache()
+            ->flushCache()
+            ;
     }
 
     /**
@@ -3890,7 +3876,7 @@ class Payplug extends PaymentModule
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, array(1, 2)));
         } catch (Exception $e) {
-            // todo: add log
+            // @todo : Add Log
             return false;
         }
     }
@@ -4526,6 +4512,7 @@ class Payplug extends PaymentModule
                 }
                 $payment_return = array(
                     'result' => true,
+                    'embedded' => true,
                     'redirect' => $redirect, // force `true` we are in 3DS 1
                     'return_url' => $redirect ?
                         $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
@@ -4534,6 +4521,7 @@ class Payplug extends PaymentModule
             case 'oney' :
                 $payment_return = array(
                     'result' => 'new_card',
+                    'embedded' => false,
                     'redirect' => true,
                     'return_url' => $payment->hosted_payment->payment_url,
                 );
@@ -4984,8 +4972,7 @@ class Payplug extends PaymentModule
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
-        $params['process'] = 'payplug';
-        $this->logger->setParams($params);
+        $this->logger->setParams(['process' => 'payplug.php']);
 
         if ($this->active) {
             $this->logger->flush();
@@ -5025,7 +5012,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Set the essential properties of a Prestashop module
+     * @description Set the essential properties of a Prestashop module
      *
      * @return void
      */
@@ -5035,10 +5022,11 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Set the current secret key used to interact with PayPlug API
+     * @description Set the current secret key used to interact with PayPlug API
      *
-     * @return void
-     * @throws Exception
+     * @param bool $token
+     * @return bool|\Payplug\Payplug
+     * @throws \Payplug\Exception\ConfigurationException
      */
     public function setSecretKey($token = false)
     {
@@ -5073,15 +5061,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Initialize the cache (For the API Marketing)
-     */
-    private function initializeCache()
-    {
-        $this->payplug_cache = $this->plugin->getCache();
-    }
-
-    /**
-     * Register installment for later use
+     * @description Register installment for later use
      *
      * @param string $installment_id
      * @param int $id_cart
@@ -5126,7 +5106,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Register payment for later use
+     * @description Register payment for later use
      *
      * @param string $pay_id
      * @param int $id_cart
@@ -5169,7 +5149,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * submit password
+     * @description submit password
      *
      * @param string $pwd
      * @return string
@@ -5206,8 +5186,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description
-     * Read API response and return permissions
+     * @description Read API response and return permissions
      *
      * @param string $json_answer
      * @return array OR bool
@@ -5306,9 +5285,11 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @return bool
-     * @see Module::uninstall()
+     * @description Uninstall plugin
      *
+     * @return bool
+     * @throws Exception
+     * @see Module::uninstall()
      */
     public function uninstall()
     {
@@ -5345,7 +5326,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Delete saved cards when uninstalling module
+     * @description Delete saved cards when uninstalling module
      *
      * @return bool
      * @throws Exception
@@ -5375,6 +5356,8 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description Uninstall module installment tab
+     *
      * @param $tabClass
      * @return bool
      * @throws PrestaShopDatabaseException
@@ -5398,7 +5381,6 @@ class Payplug extends PaymentModule
      * @return bool
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     *
      */
     public function uninstallTab()
     {

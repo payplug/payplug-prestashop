@@ -25,9 +25,10 @@
     <div class="col-xs-12">
         <p class="payment_module payplugPayment">
             <a href="{$payplug_payment_option.payment_url|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">
-                <img class="payment_option_oney_3_4" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}"/>
+                <img src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}"/>
                 {$payplug_payment_option.label|escape:'html'}
             </a>
         </p>
+        <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>
