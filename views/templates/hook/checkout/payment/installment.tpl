@@ -33,6 +33,6 @@
 				</a>
 			{/if}
 		</p>
-		<p class="ppfail ppfail-installment"></p>
+		<p class="payplugPayment_error -installment"></p>
 	</div>
 </div>

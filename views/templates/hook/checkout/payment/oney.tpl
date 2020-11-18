@@ -19,4 +19,8 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-{include file=$payplug_module_dir|cat:'payplug/views/templates/hook/oney/payment/payment.tpl'}
+<div class="row">
+    <div class="col-xs-12">
+        {include file=$payplug_module_dir|cat:'payplug/views/templates/hook/oney/payment/payment.tpl'}
+    </div>
+</div>

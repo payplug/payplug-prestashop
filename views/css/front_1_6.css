@@ -1041,6 +1041,11 @@
   width: 14px;
   color: #777;
 }
+.payplugPayment_error {
+  color: #e56876;
+  font-size: 13px;
+  font-weight: 400;
+}
 /* Payplug payment */
 .payplugOneClick {
   -webkit-border-radius: 4px;
@@ -1151,10 +1156,6 @@
 }
 .payplugOneClick_message.-show {
   display: flex;
-}
-.payplugOneClick_message.-success img {
-  display: inline-block;
-  margin: 0 6px 0 0;
 }
 .payplugOneClick_loader {
   display: block;

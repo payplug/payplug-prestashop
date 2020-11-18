@@ -48,3 +48,4 @@
         {/if}
     {/if}
 </div>
+<div class="payplugPayment_error -oney"></div>

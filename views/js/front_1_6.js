@@ -114,31 +114,8 @@ var $document,
                     },
                     success: function (data) {
                         if (data.result) {
-                            //Support of opcps
-                            if (typeof Fronted !== 'undefined' && $.isFunction(Fronted.showModal)) {
-                                var success_msg = $('p.ppsuccess').contents().filter(function () {
-                                    return this.nodeType == 3;
-                                });
-                                Fronted.showModal({
-                                    title: $('p.ppsuccess span.ppbold').text(),
-                                    title_icon: 'fa-pts-check',
-                                    button_close: false,
-                                    close: false,
-                                    type: 'normal',
-                                    content: success_msg
-                                });
-                            }
-
-                            $('.ppfail').hide();
-
                             // redirect to success url
-                            if (data.redirect) {
-                                $('.payplugOneClick_message.-success').addClass('-show');
-                                setTimeout(function () {
-                                    $('.ppsuccess').stop().fadeOut();
-                                }, 9000);
-                                window.location.href = data.return_url;
-                            } else if (data.embedded) {
+                            if (data.embedded) {
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
@@ -151,11 +128,11 @@ var $document,
                             var $errorWrapper;
                             $('p.ppfail').hide();
                             if (options['is_inst']) {
-                                $errorWrapper = $('p.ppfail-installment');
+                                $errorWrapper = $('.payplugPayment_error.-installment');
                             } else if (options['is_oney']) {
-                                $errorWrapper = $('p.ppfail-oney');
+                                $errorWrapper = $('.payplugPayment_error.-oney');
                             } else {
-                                $errorWrapper = $('p.ppfail-default');
+                                $errorWrapper = $('.payplugPayment_error.-default');
                             }
 
                             var errors;

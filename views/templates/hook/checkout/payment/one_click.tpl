@@ -50,13 +50,9 @@
                     </label>
 
                     <div class="payplugOneClick_submit">
-                        <p class="payplugOneClick_message -wait">
+                        <p class="payplugOneClick_message">
                             {l s='Please wait...' mod='payplug'}
                             <img class="payplugOneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif"/>
-                        </p>
-                        <p class="payplugOneClick_message -success">
-                            <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/admin/icon-success.png"/> <b>{l s='Payment succeeded!' mod='payplug'}</b><br/>
-                            {l s='You will be redirected to the confirmation page' mod='payplug'}
                         </p>
                         <button class="payplugButton -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
                     </div>
