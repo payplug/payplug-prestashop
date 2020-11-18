@@ -53,7 +53,7 @@ class PayPlugValidation
     public function setLogger()
     {
         $this->logger = $this->plugin->getLogger();
-        $this->logger->setParams($params = ['process' => 'validation']);
+        $this->logger->setParams(['process' => 'validation']);
         $this->logger->addLog('New validation');
     }
 

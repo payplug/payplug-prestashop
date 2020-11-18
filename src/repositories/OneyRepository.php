@@ -850,7 +850,7 @@ class OneyRepository
                     // $cache_id = cache_key in db
                     // $to_cache = cache_value in db
                     if (!$this->cache->setCache($cache_id, $to_cache)) {
-                        $this->logger->setParams($params = ['process' => '[Oney Repository] setCache']);
+                        $this->logger->setParams(['process' => '[Oney Repository] setCache']);
                         $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                         $error_level = 'error';
                         $this->logger->addLog($error_message, $error_level);

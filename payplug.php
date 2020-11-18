@@ -456,8 +456,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description
-     * Add Order Payment
+     * @description Add Order Payment
      *
      * @param int $id_order
      * @param string $id_payment
@@ -474,7 +473,6 @@ class Payplug extends PaymentModule
     /**
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function adminAjaxController()
     {
@@ -660,6 +658,7 @@ class Payplug extends PaymentModule
     /**
      * @param $payment
      * @return array|Exception
+     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function buildPaymentDetails($payment)
     {
