@@ -30,7 +30,6 @@ require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
-@include_once(_PS_ROOT_DIR_ . '/src/Core/Payment/PaymentOption.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
 
 if (!defined('_PS_VERSION_')) {
@@ -317,11 +316,6 @@ class Payplug extends PaymentModule
         if (class_exists($this->PrestashopSpecificClass)) {
             $this->PrestashopSpecificObject = new $this->PrestashopSpecificClass($this);
         }
-    }
-
-    public function setPaymentOption()
-    {
-        return new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
     }
 
     public function getPlugin()
