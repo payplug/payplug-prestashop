@@ -479,7 +479,7 @@ var $document,
                 },
                 handleProductEvent: function () {
                     $document.on('change', 'input[name=qty]', function () {
-                        return payplugModule.oney.load();
+                        return payplugModule.oney.load(payplugModule.oney.payment.props.open);
                     });
                 },
                 handleCheckoutEvent: function () {
@@ -818,7 +818,9 @@ var $document,
                 });
 
                 var oney_table = '<tr class="oneyCta_row">' +
-                    '<td class="oneyCta_field" colspan="' + colspan + '"><div class="oneyCta_wrapper"></div></td>' +
+                        '<td class="oneyCta_field" colspan="' + colspan + '">' +
+                            '<div class="oneyCta_wrapper"></div>' +
+                        '</td>' +
                     '</tr>';
 
                 var $cart_voucher = $table.find('#cart_voucher');
