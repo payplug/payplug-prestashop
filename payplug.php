@@ -3462,15 +3462,11 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        // Purge PayPlug cache
-        $cache = $this->getPlugin()->getCache();
-        if (!$cache->flushCache()) {
-            $params['process'] = 'PayPlug Cache';
-            $this->logger->setParams($params);
-            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
-            $error_level = 'error';
-            $this->logger->addLog($error_message, $error_level);
-        }
+        return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache()
+                ;
     }
 
     /**
@@ -3480,14 +3476,11 @@ class Payplug extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        $cache = $this->getPlugin()->getCache();
-        if (!$cache->flushCache()) {
-            $params['process'] = 'PayPlug Cache';
-            $this->logger->setParams($params);
-            $error_message = 'Error during flushing PayPLug DB cache [payplug.php]';
-            $error_level = 'error';
-            $this->logger->addLog($error_message, $error_level);
-        }
+        return $this
+            ->getPlugin()
+            ->getCache()
+            ->flushCache()
+            ;
     }
 
     /**

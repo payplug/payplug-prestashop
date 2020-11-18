@@ -24,8 +24,6 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\CacheEntity;
-use Tools;
-use Validate;
 
 class CacheRepository
 {
