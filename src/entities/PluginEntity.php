@@ -39,6 +39,7 @@ class PluginEntity
     private $configuration;
     private $context;
     private $country;
+    private $product;
     private $tools;
     private $query;
     private $validate;
@@ -202,6 +203,24 @@ class PluginEntity
     public function setCountry($country)
     {
         $this->country = $country;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
+     * @param mixed $product
+     * @return PluginEntity
+     */
+    public function setProduct($product)
+    {
+        $this->product = $product;
         return $this;
     }
 

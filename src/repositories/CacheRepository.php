@@ -24,14 +24,10 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\CacheEntity;
-use Tools;
-use Validate;
+use PayPlug\src\exceptions\BadParameterException;
 
 class CacheRepository
 {
-    /**
-     * @var object CacheEntity
-     */
     public $cacheEntity;
     private $query;
     private $logger;
@@ -44,6 +40,11 @@ class CacheRepository
         $this->setLogger();
     }
 
+    /**
+     * @description Hydrate entities standard parameters
+     *
+     * @throws BadParameterException
+     */
     public function setStdParams()
     {
         $this->cacheEntity
@@ -72,20 +73,22 @@ class CacheRepository
         ]);
     }
 
+    /**
+     * @description Set PayPlug Logger
+     */
     private function setLogger()
     {
         $this->logger = new LoggerRepository();
-        $params['process'] = $this->cacheEntity->getTable();
-        $this->logger->setParams($params);
+        $this->logger->setParams(['process' => $this->cacheEntity->getTable()]);
     }
 
     /**
-     * @description Set the cache in the DB
-     * Every Oney Simulation is stored
+     * @description Set every Oney Simulation in the DB
      *
      * @param string $cache_key
      * @param string $cache_value
      * @return boolean
+     * @throws BadParameterException
      */
     public function setCache($cache_key, $cache_value)
     {
@@ -119,7 +122,7 @@ class CacheRepository
      * @description Get the Oney simulation (identified by id_payplug_cache in parameter).
      *
      * @param string $cache_key
-     * @return object
+     * @return bool|mixed
      */
     public function getCacheByKey($cache_key)
     {
@@ -127,7 +130,7 @@ class CacheRepository
             ->select()
             ->fields('*')
             ->from(_DB_PREFIX_.$this->cacheEntity->getTable())
-            ->where('`cache_key` = "' . (string)$cache_key . '"')
+            ->where('`cache_key` = \'' . (string)$cache_key . '\'')
         ;
 
         $cache = $this->query->build();
@@ -160,6 +163,5 @@ class CacheRepository
         }
         
        return true;
-
     }
 }

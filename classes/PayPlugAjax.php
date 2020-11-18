@@ -22,6 +22,7 @@
  */
 
 use PayPlug\src\repositories\CardRepository;
+use \Payplug\Exception;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -71,14 +72,14 @@ class PayPlugAjax
         $tools = $this->toolsSpecific;
 
         if (($tools->tool('getValue', '_ajax')) == 1) {
-            if ($tools->tool('getIsset') == 'pc') {
-                if ((int)$tools->tool('getValue', 'pay' == 1)) {
-                    $is_installment = $tools->tool(getValue('i'));
+            if ($tools->tool('getIsset', 'pc')) {
+                if ((int)$tools->tool('getValue', 'pay') == 1) {
+                    $is_installment = $tools->tool('getValue', 'i');
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
                     $is_deferred = $this->payplug->getConfiguration('PAYPLUG_DEFERRED') == 1;
-                    $is_oney = $tools->tool(getValue('io'));
+                    $is_oney = $tools->tool('getValue', 'io');
                     $options = [
-                        'id_card' => $tools->tool(getValue('pc')),
+                        'id_card' => $tools->tool('getValue', 'pc'),
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
                         'is_oney' => $is_oney,
@@ -102,11 +103,11 @@ class PayPlugAjax
                 }
             } elseif ($tools->tool('getIsset', 'checkOneyAddresses')) {
                 if (!$this->payplug->getConfiguration('PAYPLUG_ONEY')) {
-                    return die($tools->tool('jsonEncode', array('result' => false, 'error' => false)));
+                    die ($tools->tool('jsonEncode', array('result' => false, 'error' => false)));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');
                 $id_billing = $tools->tool('getValue', 'id_address_invoice');
-                die($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
+                die ($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$this->payplug->getConfiguration('PS_TAX');
 

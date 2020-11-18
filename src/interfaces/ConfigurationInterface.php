@@ -25,7 +25,7 @@ namespace PayPlug\src\interfaces;
 
 interface ConfigurationInterface
 {
-    function get($configuration_name);
-    function updateValue($key, $value);
-    function deleteByName($key);
+    public function get($configuration_name);
+    public function updateValue($key, $value);
+    public function deleteByName($key);
 }

@@ -21,10 +21,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\specific;
 
-interface CountryInterface
+use PayPlug\src\interfaces\ProductInterface;
+use Product;
+
+class ProductSpecific implements ProductInterface
 {
-    public function getByIso($idCurrency);
-    public function getCountry($idCountry);
+    public function product($method)
+    {
+        return Product::$method;
+    }
+
 }
