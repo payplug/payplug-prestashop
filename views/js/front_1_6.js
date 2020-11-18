@@ -92,8 +92,8 @@ var $document,
                     dataType: 'json',
                     data: data,
                     beforeSend: function () {
-                        if (options['is_inst'] != true) {
-                            $('.payplugOneClick_message.-wait').addClass('-show');
+                        if (options['id_card'] != 'new_card') {
+                            $('.payplugOneClick_message').addClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -101,8 +101,8 @@ var $document,
                         }
                     },
                     complete: function () {
-                        if (options['is_inst'] != true) {
-                            $('.payplugOneClick_message.-wait').removeClass('-show');
+                        if (options['id_card'] != 'new_card') {
+                            $('.payplugOneClick_message').removeClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -115,7 +115,7 @@ var $document,
                     success: function (data) {
                         if (data.result) {
                             // redirect to success url
-                            if (data.embedded) {
+                            if (data.embedded && !data.redirect) {
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
