@@ -4933,8 +4933,7 @@ class Payplug extends PaymentModule
         $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
         $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
-        $params['process'] = 'payplug.php';
-        $this->logger->setParams($params);
+        $this->logger->setParams(['process' => 'payplug.php']);
 
         if ($this->active) {
             $this->logger->flush();

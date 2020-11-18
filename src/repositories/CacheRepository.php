@@ -79,8 +79,7 @@ class CacheRepository
     private function setLogger()
     {
         $this->logger = new LoggerRepository();
-        $params['process'] = $this->cacheEntity->getTable();
-        $this->logger->setParams($params);
+        $this->logger->setParams(['process' => $this->cacheEntity->getTable()]);
     }
 
     /**
