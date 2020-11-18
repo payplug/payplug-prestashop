@@ -22,7 +22,9 @@
 <div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}{if isset($payplug_carrier_error) && $payplug_carrier_error} -invalidCarrier{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
         <span class="oneyPayment_logo oneyLogo -x3x4">
-            <img src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />
+            {if isset($payplug_payment_option.logo_url) && isset($payplug_payment_option.logo_url) && $payplug_payment_option.logo_url}
+                <img src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{l s='Pay by card in 3 or 4' mod='payplug'}" />
+            {/if}
         </span>
         <span class="oneyPayment_label">
             {l s='Pay by card in 3 or 4' mod='payplug'}

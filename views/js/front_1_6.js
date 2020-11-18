@@ -355,9 +355,9 @@ var $document,
                             payplugModule.oney.props.loaded = true;
                         }
 
-                        if ($('.oneyPayment .oneyForm').length) {
-                            $('.oneyPayment .oneyForm').wrap('<div class="oneyForm_wrapper" />');
-                            $('.oneyForm_wrapper').wrap('<div class="oneyForm_overlay -disabled" />');
+                        if ($('.oneyPayment .oneyRequired').length) {
+                            $('.oneyPayment .oneyRequired').wrap('<div class="oneyRequired_wrapper" />');
+                            $('.oneyRequired_wrapper').wrap('<div class="oneyRequired_overlay -disabled" />');
                         }
                     }
                 });
@@ -572,7 +572,7 @@ var $document,
                         return false;
                     }
 
-                    if ($('.oneyForm').length) {
+                    if ($('.oneyRequired').length) {
                         payplugModule.oney.payment.form.open();
                     } else {
                         payplugModule.payment.send({
@@ -643,28 +643,28 @@ var $document,
                 form: {
                     init: function () {
                         var form = this;
-                        $document.on('click', '.oneyForm_close', form.close)
-                            .on('click', '.oneyForm_submit', form.submit)
+                        $document.on('click', '.oneyRequired_close', form.close)
+                            .on('click', '.oneyRequired_submit', form.submit)
                             .on('click', '.-validate', form.submit)
-                            .on('submit', '.oneyForm', form.submit)
-                            .on('keyup focusout', '.oneyForm input', form.check);
+                            .on('submit', '.oneyRequired', form.submit)
+                            .on('keyup focusout', '.oneyRequired input', form.check);
                     },
                     open: function () {
-                        var is_mobile = $('.oneyForm_overlay:visible').length;
+                        var is_mobile = $('.oneyRequired_overlay:visible').length;
                         $('.oneyPayment_button').addClass('-disabled');
-                        $('.oneyForm_overlay').removeClass('-disabled');
+                        $('.oneyRequired_overlay').removeClass('-disabled');
 
                         if (is_mobile) {
-                            var oney_position = parseInt($('.oneyForm_overlay').offset().top) - 15;
+                            var oney_position = parseInt($('.oneyRequired_overlay').offset().top) - 15;
                             $('html,body').stop().animate({'scrollTop': oney_position});
                         }
 
                         setTimeout(function () {
-                            $('.oneyForm_overlay').addClass('-show');
+                            $('.oneyRequired_overlay').addClass('-show');
                         }, 0);
                     },
                     reset: function () {
-                        $('.oneyForm').find('input').each(function () {
+                        $('.oneyRequired').find('input').each(function () {
                             var $field = $(this);
                             $field.val('');
 
@@ -676,15 +676,15 @@ var $document,
                     close: function () {
                         payplugModule.popup.close();
                         $('.oneyPayment_button').removeClass('-disabled').removeClass('-validate');
-                        $('.oneyForm_overlay').removeClass('-show');
+                        $('.oneyRequired_overlay').removeClass('-show');
                         setTimeout(function () {
-                            $('.oneyForm_overlay').addClass('-disabled');
+                            $('.oneyRequired_overlay').addClass('-disabled');
                             payplugModule.oney.payment.form.reset();
                         }, 0);
                     },
                     check: function () {
                         var is_valid = true,
-                            $fields = $('.oneyForm_input');
+                            $fields = $('.oneyRequired_input');
 
                         $fields.each(function () {
                             var $input = $(this),
@@ -740,7 +740,7 @@ var $document,
                             payment_data: payment_data
                         };
 
-                        $('.oneyForm_message').removeClass('-success').removeClass('-error');
+                        $('.oneyRequired_message').removeClass('-success').removeClass('-error');
 
                         $.ajax({
                             url: payplug_ajax_url + '?rand=' + new Date().getTime(),
@@ -752,9 +752,9 @@ var $document,
                             data: data,
                             success: function (data) {
                                 if (data.result) {
-                                    $('.oneyForm_validation').addClass('-show');
+                                    $('.oneyRequired_validation').addClass('-show');
                                     window.setTimeout(function () {
-                                        $('.oneyForm_validation').addClass('-appear');
+                                        $('.oneyRequired_validation').addClass('-appear');
                                     });
                                     window.setTimeout(function () {
                                         payplugModule.popup.close();
@@ -765,7 +765,7 @@ var $document,
                                         if (error !== 'indexOf')
                                             errors += $('<p />').html(data.message[error]).text() + "\n";
 
-                                    $('.oneyForm_message').addClass('-error').html(errors);
+                                    $('.oneyRequired_message').addClass('-error').html(errors);
                                 }
                             }
                         });
@@ -778,7 +778,7 @@ var $document,
                                 is_oney: payplugModule.oney.props.type,
                                 oney_form: {}
                             },
-                            $form = $('.oneyForm'),
+                            $form = $('.oneyRequired'),
                             $fields = $form.find('input');
 
                         $fields.each(function () {
@@ -796,7 +796,7 @@ var $document,
                         });
 
 
-                        if ($('.oneyForm').parents('.payplugPopin').length) {
+                        if ($('.oneyRequired').parents('.payplugPopin').length) {
                             return payplugModule.oney.payment.form.save(payment_data.oney_form);
                         }
 

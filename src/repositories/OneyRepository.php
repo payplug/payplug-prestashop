@@ -339,7 +339,6 @@ class OneyRepository
                 'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
                 'payplug_oney_loading_msg' => $this->payplug->l('Loading'),
                 'oney_required_fields' => $this->displayOneyRequiredFields(),
-                'oneyLogo' => $this->payplug->oneyLogoUrl
             ));
 
             return $this->payplug->display($this->payplug->constantFile, 'oney/payment/payment.tpl');
@@ -933,7 +932,7 @@ class OneyRepository
     {
         $fields = $this->getOneyRequiredFields();
 
-        if (empty($fields)) {
+        if (!$fields) {
             return false;
         }
 
@@ -941,7 +940,7 @@ class OneyRepository
             'oney_required_fields' => $fields
         ));
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/form.tpl');
+        return $this->payplug->display($this->payplug->constantFile, 'oney/required.tpl');
     }
 
     /**
