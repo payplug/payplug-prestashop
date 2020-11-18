@@ -126,7 +126,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $group = $tools->tool('getValue','group');
                     $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
                     // Some integration will not use qty data but quantity_wanted
-                    $quantity = (int)$tools->tool('getValue','qty', (int)$tools->tool('getValue','quantity_wanted', 1));
+                    $quantity = (int)$tools->tool('getValue','qty');
+                    $quantity = $quantity ? $quantity : (int)$tools->tool('getValue','quantity_wanted', 1);
                     $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $cart = false;
