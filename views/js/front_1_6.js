@@ -131,8 +131,10 @@ var $document,
                                 $errorWrapper = $('.payplugPayment_error.-installment');
                             } else if (options['is_oney']) {
                                 $errorWrapper = $('.payplugPayment_error.-oney');
+                            } else if (options['id_card'] != 'new_card') {
+                                $errorWrapper = $('.payplugPayment_error.-one_click');
                             } else {
-                                $errorWrapper = $('.payplugPayment_error.-default');
+                                $errorWrapper = $('.payplugPayment_error.-standard');
                             }
 
                             var errors;
@@ -878,16 +880,16 @@ var $document,
             open: function () {
                 var props = payplugModule.popup.props;
                 var popin = $('.' + props.mainClass);
-                popin.addClass(props.mainClass + '-open');
+                popin.addClass('-open');
                 window.setTimeout(function () {
-                    popin.addClass(props.mainClass + '-show');
+                    popin.addClass('-show');
                 }, 0);
             },
             close: function () {
                 var props = payplugModule.popup.props;
                 var popin = $('.' + props.mainClass);
 
-                popin.removeClass(props.mainClass + '-show');
+                popin.removeClass('-show');
                 window.setTimeout(function () {
                     popin.removeClass(props.mainClass + '-open');
                 }, 500);

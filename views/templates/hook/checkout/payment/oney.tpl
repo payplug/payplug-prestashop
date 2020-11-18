@@ -22,5 +22,6 @@
 <div class="row">
     <div class="col-xs-12">
         {include file=$payplug_module_dir|cat:'payplug/views/templates/hook/oney/payment/payment.tpl'}
+        <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>

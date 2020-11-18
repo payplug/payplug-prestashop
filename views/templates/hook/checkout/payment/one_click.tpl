@@ -58,6 +58,7 @@
                     </div>
                 </form>
             </div>
+            <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
         </div>
     </div>
 {/if}
