@@ -2982,8 +2982,8 @@ class Payplug extends PaymentModule
                 } else {
                     $payment_list_new[] = array(
                         'id' => null,
-                        'status' => $inst_status = $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
-                        'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
+                        'status' => $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
+                        'status_class' => $installment->is_active ? 'pp_success' : 'pp_error',
                         'status_code' => 'incoming',
                         'amount' => (int)$schedule->amount / 100,
                         'card_brand' => null,

@@ -42,7 +42,6 @@ class CardRepository
         $this->payplug = $payplug;
         $this->query = new QueryRepository();
         $this->tools = new ToolsSpecific();
-        $this->payplug = $payplug;
         $this->setParams();
     }
 
