@@ -4482,6 +4482,7 @@ class Payplug extends PaymentModule
                 }
                 $payment_return = array(
                     'result' => true,
+                    'embedded' => true,
                     'redirect' => $redirect, // force `true` we are in 3DS 1
                     'return_url' => $redirect ?
                         $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
@@ -4490,6 +4491,7 @@ class Payplug extends PaymentModule
             case 'oney' :
                 $payment_return = array(
                     'result' => 'new_card',
+                    'embedded' => false,
                     'redirect' => true,
                     'return_url' => $payment->hosted_payment->payment_url,
                 );

@@ -25,8 +25,8 @@
     var spinner_url = '{$spinner_url|escape:'htmlall':'UTF-8'}';
 </script>
 {if isset($payplug_payment_options) && $payplug_payment_options}
-    {foreach $payplug_payment_options as $payplug_payment_option}
-        {include file=$payplug_payment_option.tpl payplug_payment_option=$payplug_payment_option}
+    {foreach $payplug_payment_options as $method => $payplug_payment_option}
+        {include file=$payplug_payment_option.tpl payplug_payment_option=$payplug_payment_option method=$method}
     {/foreach}
 {/if}
 

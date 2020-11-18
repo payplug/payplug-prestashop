@@ -33,6 +33,6 @@
 				</a>
 			{/if}
 		</p>
-		<p class="ppfail ppfail-installment"></p>
+		<p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
 	</div>
 </div>

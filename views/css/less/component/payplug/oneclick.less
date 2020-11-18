@@ -45,7 +45,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 15px;
+    padding: 30px 15px 15px;
 
     .radio {
       padding: 6px 0 0;
@@ -78,5 +78,50 @@
         margin: 10px 0 0;
       }
     }
+  }
+
+  &_submit{
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    display: flex;
+    max-width: 325px;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    @media (@mobile) {
+      position: relative;
+      right: 0;
+      bottom: 0;
+      margin: 15px 0 0;
+      align-self: center;
+    }
+  }
+
+  &_message {
+    text-align: right;
+    font-size: 14px;
+    font-weight: 400;
+    max-width: 325px;
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    line-height: .8em;
+
+    &.-show {
+      display: flex;
+    }
+  }
+
+  &_loader {
+    display: block;
+    top: 50%;
+    left: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0 0 0 16px;
   }
 }

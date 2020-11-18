@@ -92,8 +92,8 @@ var $document,
                     dataType: 'json',
                     data: data,
                     beforeSend: function () {
-                        if (options['is_inst'] != true) {
-                            $('.ppwait').show();
+                        if (options['id_card'] != 'new_card') {
+                            $('.payplugOneClick_message').addClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -101,8 +101,8 @@ var $document,
                         }
                     },
                     complete: function () {
-                        if (options['is_inst'] != true) {
-                            $('.ppwait').hide();
+                        if (options['id_card'] != 'new_card') {
+                            $('.payplugOneClick_message').removeClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -114,31 +114,8 @@ var $document,
                     },
                     success: function (data) {
                         if (data.result) {
-                            //Support of opcps
-                            if (typeof Fronted !== 'undefined' && $.isFunction(Fronted.showModal)) {
-                                var success_msg = $('p.ppsuccess').contents().filter(function () {
-                                    return this.nodeType == 3;
-                                });
-                                Fronted.showModal({
-                                    title: $('p.ppsuccess span.ppbold').text(),
-                                    title_icon: 'fa-pts-check',
-                                    button_close: false,
-                                    close: false,
-                                    type: 'normal',
-                                    content: success_msg
-                                });
-                            }
-
-                            $('.ppfail').hide();
-
                             // redirect to success url
-                            if (data.redirect) {
-                                $('.ppsuccess').stop().fadeIn();
-                                setTimeout(function () {
-                                    $('.ppsuccess').stop().fadeOut();
-                                }, 9000);
-                                window.location.href = data.return_url;
-                            } else if (data.embedded) {
+                            if (data.embedded && !data.redirect) {
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
@@ -151,11 +128,13 @@ var $document,
                             var $errorWrapper;
                             $('p.ppfail').hide();
                             if (options['is_inst']) {
-                                $errorWrapper = $('p.ppfail-installment');
+                                $errorWrapper = $('.payplugPayment_error.-installment');
                             } else if (options['is_oney']) {
-                                $errorWrapper = $('p.ppfail-oney');
+                                $errorWrapper = $('.payplugPayment_error.-oney');
+                            } else if (options['id_card'] != 'new_card') {
+                                $errorWrapper = $('.payplugPayment_error.-one_click');
                             } else {
-                                $errorWrapper = $('p.ppfail-default');
+                                $errorWrapper = $('.payplugPayment_error.-standard');
                             }
 
                             var errors;
@@ -901,16 +880,16 @@ var $document,
             open: function () {
                 var props = payplugModule.popup.props;
                 var popin = $('.' + props.mainClass);
-                popin.addClass(props.mainClass + '-open');
+                popin.addClass('-open');
                 window.setTimeout(function () {
-                    popin.addClass(props.mainClass + '-show');
+                    popin.addClass('-show');
                 }, 0);
             },
             close: function () {
                 var props = payplugModule.popup.props;
                 var popin = $('.' + props.mainClass);
 
-                popin.removeClass(props.mainClass + '-show');
+                popin.removeClass('-show');
                 window.setTimeout(function () {
                     popin.removeClass(props.mainClass + '-open');
                 }, 500);
