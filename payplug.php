@@ -783,7 +783,7 @@ class Payplug extends PaymentModule
             } else {
                 $expiration = date('d/m/Y', $payment->authorization->expires_at);
                 if (isset($payment->authorization->expires_at) && $payment->authorization->expires_at - time() > 0) {
-                    if (isset($payment->failure) && !empty($payment->failure)) {
+                    if (isset($payment->failure) && $payment->failure) {
                         $payment_details['can_be_cancelled'] = false;
                         $payment_details['can_be_captured'] = false;
                     } else {
@@ -2571,7 +2571,7 @@ class Payplug extends PaymentModule
             && (int)$payment->payment_method['is_pending'] == 1
         ) {
             $pay_status = 10; //oney pending
-        } elseif (isset($payment->failure) && !empty($payment->failure) && $pay_status != 9) {
+        } elseif (isset($payment->failure) && $payment->failure && $pay_status != 9) {
             if ($payment->failure->code == 'aborted') {
                 $pay_status = 7; //cancelled
             } elseif ($payment->failure->code == 'timeout') {
