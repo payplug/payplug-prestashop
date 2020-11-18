@@ -4973,7 +4973,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Set the essential properties of a Prestashop module
+     * @description Set the essential properties of a Prestashop module
      *
      * @return void
      */
@@ -4983,10 +4983,11 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Set the current secret key used to interact with PayPlug API
+     * @description Set the current secret key used to interact with PayPlug API
      *
-     * @return void
-     * @throws Exception
+     * @param bool $token
+     * @return bool|\Payplug\Payplug
+     * @throws \Payplug\Exception\ConfigurationException
      */
     public function setSecretKey($token = false)
     {
@@ -5021,7 +5022,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Register installment for later use
+     * @description Register installment for later use
      *
      * @param string $installment_id
      * @param int $id_cart
@@ -5066,7 +5067,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Register payment for later use
+     * @description Register payment for later use
      *
      * @param string $pay_id
      * @param int $id_cart
@@ -5109,7 +5110,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * submit password
+     * @description submit password
      *
      * @param string $pwd
      * @return string
@@ -5146,8 +5147,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description
-     * Read API response and return permissions
+     * @description Read API response and return permissions
      *
      * @param string $json_answer
      * @return array OR bool
@@ -5246,9 +5246,11 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @return bool
-     * @see Module::uninstall()
+     * @description Uninstall plugin
      *
+     * @return bool
+     * @throws Exception
+     * @see Module::uninstall()
      */
     public function uninstall()
     {
@@ -5285,7 +5287,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Delete saved cards when uninstalling module
+     * @description Delete saved cards when uninstalling module
      *
      * @return bool
      * @throws Exception
@@ -5315,6 +5317,8 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description Uninstall module installment tab
+     *
      * @param $tabClass
      * @return bool
      * @throws PrestaShopDatabaseException
@@ -5338,7 +5342,6 @@ class Payplug extends PaymentModule
      * @return bool
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     *
      */
     public function uninstallTab()
     {
