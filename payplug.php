@@ -3459,6 +3459,7 @@ class Payplug extends PaymentModule
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
      *
      * @param array $params
+     * @return boolean
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
@@ -3473,6 +3474,7 @@ class Payplug extends PaymentModule
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param array $params
+     * @return boolean
      */
     public function hookActionClearCompileCache($params)
     {

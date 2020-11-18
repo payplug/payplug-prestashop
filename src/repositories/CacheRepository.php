@@ -158,6 +158,5 @@ class CacheRepository
         }
         
        return true;
-
     }
 }
