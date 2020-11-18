@@ -27,7 +27,12 @@
  */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
-
+    private $card;
+    private $contextSpecific;
+    private $oney;
+    private $payplug;
+    private $plugin;
+    
     /**
      * @description
      * Method that is executed after init() and checkAccess().
@@ -49,12 +54,16 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 
         if (Tools::getValue('_ajax') == 1) {
-            $payplug = new Payplug();
-            $context = Context::getContext();
+
+            $this->payplug = new \Payplug();
+            $this->plugin = $this->payplug->getPlugin();
+            $this->card = $this->plugin->getCard();
+            $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
+            $this->oney = $this->plugin->getOney();
+            $context = $this->contextSpecific->getContext(); // get the method
 
             if (Tools::getIsset('pc')) {
                 if ((int)Tools::getValue('delete') == 1) {
-                    $context = Context::getContext();
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;
                     if ((int)$id_customer == 0) {
@@ -62,7 +71,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     }
                     $id_payplug_card = Tools::getValue('pc');
                     $valid_key = Payplug::setAPIKey();
-                    $deleted = $payplug->getPlugin()->getCard()->deleteCard($id_customer, $id_payplug_card, $valid_key);
+                    $deleted = $this->card->deleteCard($id_customer, $id_payplug_card, $valid_key);
                     if ($deleted) {
                         die(true);
                     } else {
@@ -72,7 +81,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             } elseif (Tools::getIsset('getOneyCta')) {
                 die(json_encode(array(
                     'result' => true,
-                    'tpl' => $payplug->oneyRepository->getOneyCTA(),
+                    'tpl' => $this->oney->getOneyCTA(),
                 )));
             } elseif (Tools::getIsset('isOneyElligible')) {
                 $use_taxes = (bool)Configuration::get('PS_TAX');
@@ -89,14 +98,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
-                    $is_elligible = $payplug->oneyRepository->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $delivery_address = new Address($context->cart->id_address_delivery);
                     $delivery_country = new Country($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
                     $cart = $context->cart;
-                    $is_elligible = $payplug->oneyRepository->isOneyElligible($cart, $amount, $iso_code);
+                    $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
                 }
 
                 die(json_encode($is_elligible));
@@ -116,14 +125,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $cart = $context->cart;
                 }
 
-                $payment_options = $payplug->oneyRepository->getOneyPriceAndPaymentOptions($cart, $amount);
+                $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount);
                 die(json_encode($payment_options));
             } elseif (Tools::getIsset('getPaymentErrors')) {
                 // check if errors
-                $errors = $payplug->getPaymentErrorsCookie();
+                $errors = $this->payplug->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die(json_encode(['result' => true, 'template' => $payplug->displayPaymentErrors($errors)]));
+                    die(json_encode(['result' => true, 'template' => $this->payplug->displayPaymentErrors($errors)]));
                 }
 
                 die(json_encode(['result' => false]));
@@ -133,19 +142,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if (empty($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => [$payplug->l('Empty payment data')]
+                        'message' => [$this->payplug->l('Empty payment data')]
                     ]));
-                } elseif ($payplug->oneyRepository->checkOneyRequiredFields($payment_data)) {
+                } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
                         'message' => [$payplug->l('At least one of the fields is not correctly completed.')]
                     ]));
                 }
 
-                $result = $payplug->setPaymentDataCookie($payment_data);
+                $result = $this->payplug->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
-                    'message' => [$result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')]
+                    'message' => [$result ? $this->payplug->l('Your information has been saved') : $this->payplug->l('An error occured. Please retry in few seconds.')]
                 ]));
             }
         }
