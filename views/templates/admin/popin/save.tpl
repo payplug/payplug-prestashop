@@ -20,6 +20,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <p>{l s='Your configuration have been saved' mod='payplug'}</p>
-<div class="payplugPopup_footer payplugPopup_footer-center">
+<div class="payplugPopup_footer -center">
     <button type="button" class="payplugButton -close -green">{l s='Ok' mod='payplug'}</button>
 </div>

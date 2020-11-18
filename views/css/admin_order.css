@@ -601,7 +601,7 @@ span.ppclose {
 	display: flex;
 	justify-content: space-between;
 }
-.payplugPopup_footer-center {
+.payplugPopup_footer.-center {
 	justify-content: center;
 }
 @media (max-width: 767px) {
