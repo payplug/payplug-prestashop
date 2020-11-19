@@ -221,6 +221,7 @@ class PayPlugAjax
                 )));
             }
         }
+
         die(false);
     }
 }

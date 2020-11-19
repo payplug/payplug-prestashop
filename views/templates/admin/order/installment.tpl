@@ -23,8 +23,8 @@
 <div>
     <p class="{if $inst_paid}ppinstsucces{else}{if $inst_aborted}ppinsterror{else}ppwarning{/if}{/if}">
         {l s='This order is subjected to an installment plan, whose status is' mod='payplug'}
-        <span class="pp_inst_status">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
-    <p>{l s='Payment schedule ID' mod='payplug'} : {$inst_id|escape:'htmlall':'UTF-8'}</p>
+        <span class="pp_inst_status" data-e2e-payment-details="inst_status" data-e2e-payment-details-inst-state="{$inst_status_code|escape:'htmlall':'UTF-8'}">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
+    <p>{l s='Payment schedule ID' mod='payplug'} : <span data-e2e-payment-details="inst_id">{$inst_id|escape:'htmlall':'UTF-8'}</span></p>
 </div>
 <div class="table-responsive half-width">
     <table class="table">
@@ -37,14 +37,14 @@
         </tr>
         </thead>
         <tbody>
-        {foreach from=$payment_list_new item=payment}
+        {foreach $payment_list_new as $k=>$payment}
             <tr class="pp_fixed_height">
-                <td>{$payment['date']|escape:'htmlall':'UTF-8'}</td>
-                <td>{displayPrice price=$payment['amount']}</td>
-                <td class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
+                <td data-e2e-payment-details-inst-{$k}="date">{$payment['date']|escape:'htmlall':'UTF-8'}</td>
+                <td data-e2e-payment-details-inst-{$k}="amount">{displayPrice price=$payment['amount']}</td>
+                <td data-e2e-payment-details-inst-{$k}="state" data-e2e-payment-details-inst-{$k}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}" class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
                 {if isset($payment['id'])}
                     <td class="actions">
-                        <button class="btn btn-default open_installment_information">
+                        <button class="btn btn-default open_payment_information">
                             <i class="icon-search"></i>
                             {l s='Details' mod='payplug'}
                         </button>
@@ -54,7 +54,7 @@
             {if isset($payment['id'])}
                 <tr class="payment_information" style="display: none;">
                     <td colspan="5">
-                        {include file=$payplug_module_dir|cat:'payplug/views/templates/admin/order/details.tpl' payment=$payment}
+                        {include file='./details.tpl' payment=$payment}
                     </td>
                 </tr>
             {/if}
@@ -63,9 +63,11 @@
     </table>
     {if !$inst_paid}
         {if $inst_aborted}
-            <input class="btn green-button button abort-button" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
+            <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
         {elseif $inst_can_be_aborted}
-            <input class="btn green-button button abort-button" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
+            <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
+            <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
+            <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
         {/if}
         <br class="clear" />
     {/if}

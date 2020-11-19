@@ -764,6 +764,7 @@ class Payplug extends PaymentModule
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
             }
+            $payment_details['type_code'] = $payment->payment_method['type'];
         }
         if ($payment->authorization !== null) {
             $payment_details['authorization'] = true;
@@ -1025,7 +1026,7 @@ class Payplug extends PaymentModule
 
         // check if oney tos is complete
         $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
-        if($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
+        if ($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
             $this->check_configuration['other'][] = [
                 'text' => $check_oney_tos,
                 'type' => 'warning'
@@ -1518,9 +1519,9 @@ class Payplug extends PaymentModule
             $req_order_state->select('DISTINCT osl.id_order_state');
             $req_order_state->from('order_state_lang', 'osl');
             $req_order_state->where('osl.name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
+                OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
             $res_order_state = Db::getInstance()->getValue($req_order_state);
 
             if (!$res_order_state) {
@@ -1616,7 +1617,7 @@ class Payplug extends PaymentModule
      */
     public function getAccount($api_key, $sandbox = true)
     {
-        $url = $this->plugin->getApiUrl().$this->routes['account'];
+        $url = $this->plugin->getApiUrl() . $this->routes['account'];
         $curl_version = curl_version();
         $process = curl_init($url);
         curl_setopt($process, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $api_key));
@@ -2287,8 +2288,8 @@ class Payplug extends PaymentModule
         if ($options['one_click'] && !empty($payplug_cards)) {
             foreach ($payplug_cards as $card) {
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                $paymentOption['one_click_'.$card['id_payplug_card']]['name'] = 'one_click';
-                $paymentOption['one_click_'.$card['id_payplug_card']]['inputs'] = array(
+                $paymentOption['one_click_' . $card['id_payplug_card']]['name'] = 'one_click';
+                $paymentOption['one_click_' . $card['id_payplug_card']]['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
                         'type' => 'hidden',
@@ -2310,13 +2311,15 @@ class Payplug extends PaymentModule
                         'value' => 'one_click',
                     ),
                 );
-                $paymentOption['one_click_'.$card['id_payplug_card']]['tpl'] = 'one_click.tpl';
-                $paymentOption['one_click_'.$card['id_payplug_card']]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,'payment', array(), true);
-                $paymentOption['one_click_'.$card['id_payplug_card']]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
-                $paymentOption['one_click_'.$card['id_payplug_card']]['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'];
-                $paymentOption['one_click_'.$card['id_payplug_card']]['expiry_date_card'] = $this->l('Expiry date') . ': ' . $card['expiry_date'];
-                $paymentOption['one_click_'.$card['id_payplug_card']]['action'] = $this->context->link->getModuleLink($this->name, 'dispatcher', array('def' => (int)$options['deferred']), true);
-                $paymentOption['one_click_'.$card['id_payplug_card']]['moduleName'] = 'payplug';
+                $paymentOption['one_click_' . $card['id_payplug_card']]['tpl'] = 'one_click.tpl';
+                $paymentOption['one_click_' . $card['id_payplug_card']]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
+                    'payment', array(), true);
+                $paymentOption['one_click_' . $card['id_payplug_card']]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . strtolower($card['brand']) . '.png');
+                $paymentOption['one_click_' . $card['id_payplug_card']]['callToActionText'] = $brand . ' **** **** **** ' . $card['last4'];
+                $paymentOption['one_click_' . $card['id_payplug_card']]['expiry_date_card'] = $this->l('Expiry date') . ': ' . $card['expiry_date'];
+                $paymentOption['one_click_' . $card['id_payplug_card']]['action'] = $this->context->link->getModuleLink($this->name,
+                    'dispatcher', array('def' => (int)$options['deferred']), true);
+                $paymentOption['one_click_' . $card['id_payplug_card']]['moduleName'] = 'payplug';
             }
         }
 
@@ -2394,7 +2397,8 @@ class Payplug extends PaymentModule
                 $paymentOption['installment']['moduleName'] = 'payplug';
 
                 $this->smarty->assign(array(
-                    'installment_controller_url' => PayplugBackward::getModuleLink($this->name, 'payment', array('i' => 1),
+                    'installment_controller_url' => PayplugBackward::getModuleLink($this->name, 'payment',
+                        array('i' => 1),
                         true),
                     'installment_mode' => $installment_mode,
                 ));
@@ -2978,7 +2982,9 @@ class Payplug extends PaymentModule
                 } else {
                     $payment_list_new[] = array(
                         'id' => null,
-                        'status' => $inst_status = $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
+                        'status' => $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
+                        'status_class' => $installment->is_active ? 'pp_success' : 'pp_error',
+                        'status_code' => 'incoming',
                         'amount' => (int)$schedule->amount / 100,
                         'card_brand' => null,
                         'card_mask' => null,
@@ -2986,7 +2992,6 @@ class Payplug extends PaymentModule
                         'card_date' => null,
                         'mode' => null,
                         'authorization' => null,
-                        'status_class' => $inst_status = $installment->is_active ? 'pp_success' : 'pp_error',
                         'date' => date('d/m/Y', strtotime($schedule->date)),
                     );
                 }
@@ -2995,6 +3000,7 @@ class Payplug extends PaymentModule
             $id_currency = (int)Currency::getIdByIsoCode($installment->currency);
             $show_menu_installment = true;
             $inst_status = $installment->is_active ? $this->l('ongoing') : ($installment->is_fully_paid ? $this->l('paid') : $this->l('suspended'));
+            $inst_status_code = $installment->is_active ? 'ongoing' : ($installment->is_fully_paid ? 'paid' : 'suspended');
             $inst_aborted = !$installment->is_active;
             $ppInstallment = new PPPaymentInstallment($installment->id);
             $instPaymentOne = $ppInstallment->getFirstPayment();
@@ -3003,6 +3009,7 @@ class Payplug extends PaymentModule
             $this->context->smarty->assign(array(
                 'inst_id' => $inst_id,
                 'inst_status' => $inst_status,
+                'inst_status_code' => $inst_status_code,
                 'inst_aborted' => $inst_aborted,
                 'inst_paid' => $inst_paid,
                 'payment_list' => $payment_list,
@@ -3538,43 +3545,53 @@ class Payplug extends PaymentModule
     {
         $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to install.');
-        $install['flag'] =  true;
-        $install['error'] = false;
+        $install = [
+            'flag' => true,
+            'error' => false
+        ];
 
         $report = $this->checkRequirements();
-        if (!$report['php']['up2date'] && $install['flag'] !== false) {
+        if (!$report['php']['up2date'] && $install['flag']) {
             $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
             $log->error('Install failed: PHP Requirement.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'Configuration PHP inf. version 5.3';
+        } else {
+            $log->info('Install success: PHP Requirement.');
         }
-        if (!$report['curl']['up2date'] && $install['flag'] !== false) {
+
+        if (!$report['curl']['up2date'] && $install['flag']) {
             $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
             $log->error('Install failed: cURL Requirement.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'cURL Requirement';
+        } else {
+            $log->info('Install success: cURL Requirement.');
         }
-        if (!$report['openssl']['up2date'] && $install['flag'] !== false) {
+
+        if (!$report['openssl']['up2date'] && $install['flag']) {
             $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
             $log->error('Install failed: OpenSSL Requirement.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'OpenSSL Requirement';
+        } else {
+            $log->info('Install success: OpenSSL Requirement.');
         }
+
         if (Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
         $log->info('Starting to install parent::install().');
-        if (!parent::install() && $install['flag'] !== false) {
+        if (!parent::install() && $install['flag']) {
             $log->error('Install failed: parent::install().');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'parent::install()';
         } else {
             $log->info('Install success: parent::install().');
         }
 
-        $log->info('----------------> Starting to install hooks. <----------------');
-
+        $log->info('----------------> Install hooks. <----------------');
         $hooksToRegister = [
             'paymentReturn',
             'Header',
@@ -3596,57 +3613,77 @@ class Payplug extends PaymentModule
         ];
 
         foreach ($hooksToRegister as $hookToRegister) {
-            $log->info('Try to install Hook '.$hookToRegister.'.');
-            if (!$this->registerHook($hookToRegister) && $install['flag'] !== false) {
-                $log->error('Install failed: Hook '.$hookToRegister.'.');
-                $install['flag'] =  false;
-                $install['error'] = 'Hook '.$hookToRegister.' non greffé';
+            $log->info('Try to install Hook ' . $hookToRegister . '.');
+            if (!$this->registerHook($hookToRegister) && $install['flag']) {
+                $log->error('Install failed: Hook ' . $hookToRegister . '.');
+                $install['flag'] = false;
+                $install['error'] = 'Hook ' . $hookToRegister . ' non greffé';
                 break;
             } else {
-                $log->info('Install success: Hook '.$hookToRegister.'.');
+                $log->info('Install success: Hook ' . $hookToRegister . '.');
             }
         }
 
         //install hook 1.6
-        if ($install['flag'] !== false) {
+        $log->info('----------------> Install hooks 1.6. <----------------');
+        if ($install['flag']) {
             $installHook16 = $this->installHook();
             $install['flag'] = $installHook16['flag'];
             $install['error'] = $installHook16['error'];
         }
+        $log->info('----------------> Install hooks: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
-        $log->info('----------------> Install end: hooks. <----------------');
-
-      if (!$this->createConfig() && $install['flag'] !== false) {
+        $log->info('----------------> Install configuration. <----------------');
+        if (!$this->createConfig() && $install['flag']) {
             $log->error('Install failed: configuration.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'Création des éléments de configuration  ($this->createConfig)';
-        } elseif (!$this->createOrderStates() && $install['flag'] !== false) {
+        }
+        $log->info('----------------> Install configuration: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+
+        $log->info('----------------> Install order states. <----------------');
+        if (!$this->createOrderStates() && $install['flag']) {
             $log->error('Install failed: order states.');
-            $install['flag'] =  false;
-        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag'] !== false*/) {
+            $install['flag'] = false;
+        }
+        $log->info('----------------> Install order states: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+
+        $log->info('----------------> Install SQL. <----------------');
+        if (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
             $log->error('Install failed: SQL.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'Création des tables SQL';
-        } elseif (!$this->installTab() && $install['flag'] !== false) {
+        }
+        $log->info('----------------> Install SQL: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+
+        $log->info('----------------> Install tab. <----------------');
+        if (!$this->installTab() && $install['flag']) {
             $log->error('Install failed: tab.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
-        } elseif (!$this->oney->installOney() && $install['flag'] !== false) {
+        }
+        $log->info('----------------> Install tab: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+
+        $log->info('----------------> Install Oney. <----------------');
+        if (!$this->oney->installOney() && $install['flag']) {
             $log->error('Install failed: Oney.');
-            $install['flag'] =  false;
+            $install['flag'] = false;
             $install['error'] = 'Oney ($this->installOney)';
-        } elseif ($install['flag'] !== false) {
+        }
+        $log->info('----------------> Install Oney: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+
+        if ($install['flag']) {
             $log->info('Install succeeded.');
-            $install['flag'] =  true;
+            return true;
         }
 
-      if ($install['flag'] == false) {
-          $this->uninstall();
-          $install['error'] = (isset($install['error'])) ? 'Élément en cause : '.$install['error'] : '';
-          $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé en raison d\'une erreur. Les modifications apportées ont bien été annulées. '.$install['error']);
-      } else {
-          return true;
-      }
+        $log->info('Install failed.');
+        $log->info('Install error: ' . $install['error']);
+
+        // revert installation
+        $this->uninstall();
+        $install['error'] = (isset($install['error'])) ? 'Élément en cause : ' . $install['error'] : '';
+        $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé en raison d\'une erreur. Les modifications apportées ont bien été annulées. ' . $install['error']);
     }
 
     /**
@@ -3703,7 +3740,7 @@ class Payplug extends PaymentModule
             'it' => 'PayPlug',
             'fr' => 'PayPlug'
         );
-        $install['flag'] =  $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
+        $install['flag'] = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
 
         $translationsAdminPayPlugInstallment = array(
             'en' => 'Installment Plans',
@@ -3713,8 +3750,12 @@ class Payplug extends PaymentModule
         );
 
         $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
-        $install['flag'] =  ($install['flag'] && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment,
-                $adminPayPlugId, $this->name));
+        $install['flag'] = $install['flag']
+            && $this->installModuleTab('AdminPayPlugInstallment',
+                $translationsAdminPayPlugInstallment,
+                $adminPayPlugId,
+                $this->name
+            );
 
         return $install['flag'];
     }
@@ -4360,7 +4401,9 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->card->getCardId((int)$cart->id_customer, $id_card, $config['company']) : null;
+            $payment_tab['payment_method'] = $id_card && $id_card != 'new_card' ?
+                $this->card->getCardId((int)$cart->id_customer, $id_card, $config['company'])
+                : null;
         }
 
         // check payment tab from current payment method
@@ -5229,7 +5272,7 @@ class Payplug extends PaymentModule
         if (isset($json_answer->is_live) && !$json_answer->is_live) {
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
-        
+
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
@@ -5469,7 +5512,11 @@ class Payplug extends PaymentModule
 
         $payment_options = $this->getPaymentOptions($cart); // $payment_options = Données sous forme de tableau (pour 1.6 et 1.7)
 
-        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption($payment_options, $cart); // Transforme tableau en TPL
+        // Transforme tableau en TPL
+        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption(
+            $payment_options,
+            $cart
+        );
 
         foreach ($paymentOptions as $paymentOption) {
             $find = 'oney';
@@ -5587,21 +5634,26 @@ class Payplug extends PaymentModule
             'moduleRoutes'
         ];
 
+        $install = [
+            'flag' => true,
+            'error' => false
+        ];
+
         foreach ($hooksToRegister as $hookToRegister) {
             $install['flag'] = true;
-            $log->info('Try to install Hook '.$hookToRegister.'.');
+            $log->info('Try to install Hook ' . $hookToRegister . '.');
             if (!$this->registerHook($hookToRegister)) {
-                $log->error('Install failed: Hook '.$hookToRegister.'.');
+                $log->error('Install failed: Hook ' . $hookToRegister . '.');
                 $install['flag'] = false;
                 $install['error'] = $hookToRegister;
                 return $install;
                 break;
             } else {
-                $log->info('Install success: Hook '.$hookToRegister.'.');
+                $log->info('Install success: Hook ' . $hookToRegister . '.');
                 $install['flag'] = true;
             }
         }
-        return $install['flag'];
+        return $install;
     }
 
     public function getConfiguration($key)
