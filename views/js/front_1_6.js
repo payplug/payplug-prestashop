@@ -92,8 +92,8 @@ var $document,
                     dataType: 'json',
                     data: data,
                     beforeSend: function () {
-                        if (options['is_inst'] != true) {
-                            $('.ppwait').show();
+                        if (options['id_card'] != 'new_card') {
+                            $('.payplugOneClick_message').addClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -101,8 +101,8 @@ var $document,
                         }
                     },
                     complete: function () {
-                        if (options['is_inst'] != true) {
-                            $('.ppwait').hide();
+                        if (options['id_card'] != 'new_card') {
+                            $('.payplugOneClick_message').removeClass('-show');
                         }
 
                         if ($submitOneClick.length) {
@@ -114,31 +114,8 @@ var $document,
                     },
                     success: function (data) {
                         if (data.result) {
-                            //Support of opcps
-                            if (typeof Fronted !== 'undefined' && $.isFunction(Fronted.showModal)) {
-                                var success_msg = $('p.ppsuccess').contents().filter(function () {
-                                    return this.nodeType == 3;
-                                });
-                                Fronted.showModal({
-                                    title: $('p.ppsuccess span.ppbold').text(),
-                                    title_icon: 'fa-pts-check',
-                                    button_close: false,
-                                    close: false,
-                                    type: 'normal',
-                                    content: success_msg
-                                });
-                            }
-
-                            $('.ppfail').hide();
-
                             // redirect to success url
-                            if (data.redirect) {
-                                $('.ppsuccess').stop().fadeIn();
-                                setTimeout(function () {
-                                    $('.ppsuccess').stop().fadeOut();
-                                }, 9000);
-                                window.location.href = data.return_url;
-                            } else if (data.embedded) {
+                            if (data.embedded && !data.redirect) {
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
@@ -151,11 +128,13 @@ var $document,
                             var $errorWrapper;
                             $('p.ppfail').hide();
                             if (options['is_inst']) {
-                                $errorWrapper = $('p.ppfail-installment');
+                                $errorWrapper = $('.payplugPayment_error.-installment');
                             } else if (options['is_oney']) {
-                                $errorWrapper = $('p.ppfail-oney');
+                                $errorWrapper = $('.payplugPayment_error.-oney');
+                            } else if (options['id_card'] != 'new_card') {
+                                $errorWrapper = $('.payplugPayment_error.-one_click');
                             } else {
-                                $errorWrapper = $('p.ppfail-default');
+                                $errorWrapper = $('.payplugPayment_error.-standard');
                             }
 
                             var errors;
@@ -264,7 +243,6 @@ var $document,
                     if (result) {
                         $('.payplugCard[data-id_card=' + id_card + ']').remove();
                         $('#module-payplug-cards p.message').show();
-                        $('#module-payplug-controllers-front-cards_1_4 p.message').show();
                     }
                 }
             });
@@ -337,7 +315,7 @@ var $document,
                     dataType: 'json',
                     data: data,
                     success: function (response) {
-                        $('.oneyOption_wrapper').removeClass('oneyOption_wrapper-loading');
+                        $('.oneyOption_wrapper').removeClass('-loading');
                         if (response.result) {
                             if (typeof (response.popin) != 'undefined') {
                                 payplugModule.oney.popin.set(response.popin);
@@ -379,7 +357,7 @@ var $document,
 
                         if ($('.oneyPayment .oneyForm').length) {
                             $('.oneyPayment .oneyForm').wrap('<div class="oneyForm_wrapper" />');
-                            $('.oneyForm_wrapper').wrap('<div class="oneyForm_overlay oneyForm_overlay-disabled" />');
+                            $('.oneyForm_wrapper').wrap('<div class="oneyForm_overlay -disabled" />');
                         }
                     }
                 });
@@ -404,7 +382,7 @@ var $document,
 
                     $document.on('click', function (event) {
                         var $clicked = $(event.target);
-                        if ((!$clicked.is('.oneyPopin') && !$clicked.parents('.oneyPopin').length) && $('.oneyCta').is('.oneyCta-open')) {
+                        if ((!$clicked.is('.oneyPopin') && !$clicked.parents('.oneyPopin').length) && $('.oneyCta').is('.-open')) {
                             popin.close();
                         }
                     });
@@ -416,8 +394,8 @@ var $document,
                     if (!$('.oneyCta').length) {
                         return false;
                     }
-                    var is_open = $('.oneyCta').is('.oneyCta-open');
-                    $('.oneyPopin').replaceWith(content).removeClass('oneyPopin-loading');
+                    var is_open = $('.oneyCta').is('.-open');
+                    $('.oneyPopin').replaceWith(content).removeClass('-loading');
                     var $button = $('.oneyPopin_navigation button').eq(0);
                     payplugModule.oney.popin.choose($button.data('type'));
                     if (is_open) {
@@ -430,14 +408,14 @@ var $document,
                         $('.oneyCta').append('<span class="oneyPopin" />');
                     }
                     payplugModule.oney.loader.set(target);
-                    $(target).addClass('oneyPopin-loading');
+                    $(target).addClass('-loading');
                 },
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     var oney = payplugModule.oney,
                         popin = oney.popin,
-                        is_active = $('.oneyCta').is('.oneyCta-open');
+                        is_active = $('.oneyCta').is('.-open');
 
                     if (!oney.props.loaded) {
                         oney.load(true);
@@ -450,12 +428,12 @@ var $document,
                     }
                 },
                 enable: function () {
-                    $('.oneyCta_button').removeClass('oneyCta_button-disabled');
-                    $('.oneyPopin').removeClass('oneyPopin-error');
+                    $('.oneyCta_button').removeClass('-disabled');
+                    $('.oneyPopin').removeClass('-error');
                 },
                 disable: function () {
-                    $('.oneyCta_button').addClass('oneyCta_button-disabled');
-                    $('.oneyPopin').addClass('oneyPopin-error');
+                    $('.oneyCta_button').addClass('-disabled');
+                    $('.oneyPopin').addClass('-error');
                     payplugModule.oney.payment.props.open = false;
                 },
                 select: function (event) {
@@ -478,7 +456,7 @@ var $document,
 
                     // option
                     $('.oneyPopin_option').removeClass('-show');
-                    $('.oneyPopin_option[data-type=' + option + ']').addClass('oneyPopin_option-show');
+                    $('.oneyPopin_option[data-type=' + option + ']').addClass('-show');
                 },
                 open: function () {
                     $('.oneyCta').addClass('-open');
@@ -501,7 +479,7 @@ var $document,
                 },
                 handleProductEvent: function () {
                     $document.on('change', 'input[name=qty]', function () {
-                        return payplugModule.oney.load();
+                        return payplugModule.oney.load(payplugModule.oney.payment.props.open);
                     });
                 },
                 handleCheckoutEvent: function () {
@@ -667,14 +645,14 @@ var $document,
                         var form = this;
                         $document.on('click', '.oneyForm_close', form.close)
                             .on('click', '.oneyForm_submit', form.submit)
-                            .on('click', '.oneyPayment_button-validate', form.submit)
+                            .on('click', '.-validate', form.submit)
                             .on('submit', '.oneyForm', form.submit)
                             .on('keyup focusout', '.oneyForm input', form.check);
                     },
                     open: function () {
                         var is_mobile = $('.oneyForm_overlay:visible').length;
-                        $('.oneyPayment_button').addClass('oneyPayment_button-disabled');
-                        $('.oneyForm_overlay').removeClass('oneyForm_overlay-disabled');
+                        $('.oneyPayment_button').addClass('-disabled');
+                        $('.oneyForm_overlay').removeClass('-disabled');
 
                         if (is_mobile) {
                             var oney_position = parseInt($('.oneyForm_overlay').offset().top) - 15;
@@ -682,7 +660,7 @@ var $document,
                         }
 
                         setTimeout(function () {
-                            $('.oneyForm_overlay').addClass('oneyForm_overlay-show');
+                            $('.oneyForm_overlay').addClass('-show');
                         }, 0);
                     },
                     reset: function () {
@@ -690,17 +668,17 @@ var $document,
                             var $field = $(this);
                             $field.val('');
 
-                            if ($field.is('.oneyForm_input-tocheck')) {
-                                $field.addClass('oneyForm_input-error');
+                            if ($field.is('.-tocheck')) {
+                                $field.addClass('-error');
                             }
                         });
                     },
                     close: function () {
                         payplugModule.popup.close();
-                        $('.oneyPayment_button').removeClass('oneyPayment_button-disabled').removeClass('oneyPayment_button-validate');
-                        $('.oneyForm_overlay').removeClass('oneyForm_overlay-show');
+                        $('.oneyPayment_button').removeClass('-disabled').removeClass('-validate');
+                        $('.oneyForm_overlay').removeClass('-show');
                         setTimeout(function () {
-                            $('.oneyForm_overlay').addClass('oneyForm_overlay-disabled');
+                            $('.oneyForm_overlay').addClass('-disabled');
                             payplugModule.oney.payment.form.reset();
                         }, 0);
                     },
@@ -741,18 +719,18 @@ var $document,
                             }
 
                             if (valid_input) {
-                                $input.removeClass('oneyForm_input-error');
+                                $input.removeClass('-error');
                             } else {
-                                $input.addClass('oneyForm_input-error');
+                                $input.addClass('-error');
                             }
 
                             is_valid = is_valid && valid_input;
                         });
 
                         if (is_valid) {
-                            $('.oneyPayment_button').removeClass('oneyPayment_button-disabled').addClass('oneyPayment_button-validate');
+                            $('.oneyPayment_button').removeClass('-disabled').addClass('-validate');
                         } else {
-                            $('.oneyPayment_button').addClass('oneyPayment_button-disabled').removeClass('oneyPayment_button-validate');
+                            $('.oneyPayment_button').addClass('-disabled').removeClass('-validate');
                         }
                     },
                     save: function (payment_data) {
@@ -762,7 +740,7 @@ var $document,
                             payment_data: payment_data
                         };
 
-                        $('.oneyForm_message').removeClass('oneyForm_message-success').removeClass('oneyForm_message-error');
+                        $('.oneyForm_message').removeClass('-success').removeClass('-error');
 
                         $.ajax({
                             url: payplug_ajax_url + '?rand=' + new Date().getTime(),
@@ -774,9 +752,9 @@ var $document,
                             data: data,
                             success: function (data) {
                                 if (data.result) {
-                                    $('.oneyForm_validation').addClass('oneyForm_validation-show');
+                                    $('.oneyForm_validation').addClass('-show');
                                     window.setTimeout(function () {
-                                        $('.oneyForm_validation').addClass('oneyForm_validation-appear');
+                                        $('.oneyForm_validation').addClass('-appear');
                                     });
                                     window.setTimeout(function () {
                                         payplugModule.popup.close();
@@ -787,7 +765,7 @@ var $document,
                                         if (error !== 'indexOf')
                                             errors += $('<p />').html(data.message[error]).text() + "\n";
 
-                                    $('.oneyForm_message').addClass('oneyForm_message-error').html(errors);
+                                    $('.oneyForm_message').addClass('-error').html(errors);
                                 }
                             }
                         });
@@ -840,7 +818,9 @@ var $document,
                 });
 
                 var oney_table = '<tr class="oneyCta_row">' +
-                    '<td class="oneyCta_field" colspan="' + colspan + '"><div class="oneyCta_wrapper"></div></td>' +
+                        '<td class="oneyCta_field" colspan="' + colspan + '">' +
+                            '<div class="oneyCta_wrapper"></div>' +
+                        '</td>' +
                     '</tr>';
 
                 var $cart_voucher = $table.find('#cart_voucher');
@@ -901,16 +881,16 @@ var $document,
             open: function () {
                 var props = payplugModule.popup.props;
                 var popin = $('.' + props.mainClass);
-                popin.addClass(props.mainClass + '-open');
+                popin.addClass('-open');
                 window.setTimeout(function () {
-                    popin.addClass(props.mainClass + '-show');
+                    popin.addClass('-show');
                 }, 0);
             },
             close: function () {
                 var props = payplugModule.popup.props;
                 var popin = $('.' + props.mainClass);
 
-                popin.removeClass(props.mainClass + '-show');
+                popin.removeClass('-show');
                 window.setTimeout(function () {
                     popin.removeClass(props.mainClass + '-open');
                 }, 500);

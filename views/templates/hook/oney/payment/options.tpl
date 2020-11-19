@@ -31,7 +31,7 @@
                     {include file="./detail.tpl" oney_payment_option=$oney_payment_option}
                 </div>
             {/if}
-            <div class="oneyOption_radio"><input type="radio" name="oney_type" value="{$oney_type|escape:'htmlall':'UTF-8'}"></div>
+            <div class="oneyOption_radio"><input data-e2e-type="payment" data-e2e-method="{$oney_type|escape:'htmlall':'UTF-8'}" type="radio" name="oney_type" value="{$oney_type|escape:'htmlall':'UTF-8'}"></div>
         </label>
     {/foreach}
 {else}

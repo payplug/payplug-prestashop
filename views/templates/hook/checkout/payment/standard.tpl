@@ -22,10 +22,10 @@
 <div class="row">
 	<div class="col-xs-12">
 		<p class="payment_module payplugPayment">
-			<a href="{$payplug_payment_option.payment_url|escape:'html'}" class="{$payplug_payment_option.extra_classes|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">
+			<a href="{$payplug_payment_option.payment_url|escape:'html'}" class="{$payplug_payment_option.extra_classes|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}" data-e2e-type="payment" data-e2e-method="standard">
 				<img class="payment_option_standard_payment_logo" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}" />{$payplug_payment_option.label|escape:'html'}
 			</a>
 		</p>
-		<p class="ppfail ppfail-default"></p>
+		<p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
 	</div>
 </div>

@@ -30,13 +30,16 @@ class PluginEntity
     private $api_version;
 
     // Our classes
+    private $cache;
     private $card;
     private $logger;
-    private $cache;
+    private $oney;
 
     // Specific classes
     private $configuration;
+    private $context;
     private $country;
+    private $product;
     private $tools;
     private $query;
     private $validate;
@@ -116,6 +119,24 @@ class PluginEntity
     /**
      * @return mixed
      */
+    public function getOney()
+    {
+        return $this->oney;
+    }
+
+    /**
+     * @param mixed $oney
+     * @return PluginEntity
+     */
+    public function setOney($oney)
+    {
+        $this->oney = $oney;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getCache()
     {
         return $this->cache;
@@ -152,6 +173,24 @@ class PluginEntity
     /**
      * @return mixed
      */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param mixed $context
+     * @return PluginEntity
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getCountry()
     {
         return $this->country;
@@ -164,6 +203,24 @@ class PluginEntity
     public function setCountry($country)
     {
         $this->country = $country;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
+     * @param mixed $product
+     * @return PluginEntity
+     */
+    public function setProduct($product)
+    {
+        $this->product = $product;
         return $this;
     }
 

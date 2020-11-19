@@ -22,16 +22,22 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\repositories\CardRepository;
-
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
+    private $card;
+    private $contextSpecific;
+    private $payplug;
+    private $plugin;
+
     public function __construct()
     {
         $this->auth = true;
         parent::__construct();
 
-        $this->context = Context::getContext();
+        $this->payplug = new \Payplug();
+        $this->plugin = $this->payplug->getPlugin();
+        $this->card = $this->plugin->getCard();
+        $this->contextSpecific = $this->plugin->getContext();
 
         include_once($this->module->getLocalPath() . 'payplug.php');
         include_once($this->module->getLocalPath() . 'lib/init.php');
@@ -52,38 +58,34 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
     public function renderCardList()
     {
-        $payplug = Module::getInstanceByName('payplug');
         \Payplug\Payplug::init([
-            'secretKey' => $payplug->current_api_key,
-            'apiVersion' => $payplug->getPlugin()->getApiVersion()
+            'secretKey' => $this->payplug->current_api_key,
+            'apiVersion' => $this->plugin->getApiVersion()
         ]);
 
-        $context = Context::getContext();
-
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_card = new CardRepository();
-            $payplug_cards = $payplug_card->getByCustomer($context->customer);
+            $payplug_cards = $this->card->getByCustomer($this->contextSpecific->getContext()->customer);
         } else {
-            $customer = $context->customer;
-            $payplug_cards = $payplug->getPlugin()->getCard()->getCardsByCustomer($customer->id);
+            $customer = $this->contextSpecific->getContext()->customer;
+            $payplug_cards = $this->card->getCardsByCustomer($customer->id);
         }
 
-        $payplug_delete_card_url = $this->context->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
-        $this->context->smarty->assign(array(
+        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
+        $this->contextSpecific->getContext()->smarty->assign(array(
             'payplug_cards' => $payplug_cards,
             'payplug_delete_card_url' => $payplug_delete_card_url
         ));
 
-        $card_deleted_msg = $payplug->displayPaymentErrors([$payplug->l('Card sucessfuly deleted.')]);
+        $card_deleted_msg = $this->payplug->displayPaymentErrors([$this->payplug->l('Card sucessfuly deleted.')]);
         Media::addJsDef(['card_deleted_msg' => $card_deleted_msg]);
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->context->smarty->assign(array(
+            $this->contextSpecific->getContext()->smarty->assign(array(
                 'version' => 1.6,
             ));
             $this->setTemplate('customer/cards_1_6.tpl');
         } else {
-            $this->setTemplate('module:payplug/views/templates/front/customer/cards.tpl');
+            $this->setTemplate('module:payplug/views/templates/front/customer/cards_list.tpl');
         }
     }
 }

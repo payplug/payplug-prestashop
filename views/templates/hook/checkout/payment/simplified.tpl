@@ -29,7 +29,7 @@
                         {$payplug_option.label|escape:'htmlall':'UTF-8'}
                     </a>
                 </p>
-                <p class="payplugPayment_error"></p>
+                <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
             </div>
         </div>
     {/foreach}

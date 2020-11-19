@@ -34,7 +34,7 @@
                     {foreach from=$payplug_cards item=card name=ppcards}
                         {if !$card.expired}
                             <label>
-                                <input type="radio" name="payplug_card" id="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" value="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" {if $smarty.foreach.ppcards.first}checked="checked" {/if}/>
+                                <input data-e2e-type="payment" data-e2e-method="oneclick" type="radio" name="payplug_card" id="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" value="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" {if $smarty.foreach.ppcards.first}checked="checked" {/if}/>
                                 <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.png"/>
                                 <span>
                                     {$payplug_payment_option.label|escape:'html'}
@@ -48,9 +48,17 @@
                         <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/none.png"/>
                         <span>{l s='Pay with a different card' mod='payplug'}</span>
                     </label>
-                    <button class="payplugButton -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
+
+                    <div class="payplugOneClick_submit">
+                        <p class="payplugOneClick_message">
+                            {l s='Please wait...' mod='payplug'}
+                            <img class="payplugOneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif"/>
+                        </p>
+                        <button class="payplugButton -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
+                    </div>
                 </form>
             </div>
+            <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
         </div>
     </div>
 {/if}

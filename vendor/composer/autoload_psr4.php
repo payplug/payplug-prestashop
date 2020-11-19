@@ -7,8 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'libphonenumberlight\\' => array($vendorDir . '/giggsey/libphonenumberlight'),
-    'libphonenumber\\' => array($vendorDir . '/giggsey/libphonenumber-for-php/src'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'PayPlug\\' => array($baseDir . '/'),
-    'Giggsey\\Locale\\' => array($vendorDir . '/giggsey/locale/src'),
 );

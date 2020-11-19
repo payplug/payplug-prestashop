@@ -28,7 +28,7 @@ use Tools;
 
 class ToolsSpecific implements ToolsInterface
 {
-    function tool($action, $param1 = null, $param2 = null)
+    public function tool($action, $param1 = null, $param2 = null)
     {
         return Tools::$action($param1, $param2);
     }

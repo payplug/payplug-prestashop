@@ -14,7 +14,6 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         'l' => 
         array (
             'libphonenumberlight\\' => 20,
-            'libphonenumber\\' => 15,
         ),
         'S' => 
         array (
@@ -24,20 +23,12 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         array (
             'PayPlug\\' => 8,
         ),
-        'G' => 
-        array (
-            'Giggsey\\Locale\\' => 15,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'libphonenumberlight\\' => 
         array (
             0 => __DIR__ . '/..' . '/giggsey/libphonenumberlight',
-        ),
-        'libphonenumber\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/giggsey/libphonenumber-for-php/src',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -47,10 +38,73 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         array (
             0 => __DIR__ . '/../..' . '/',
         ),
-        'Giggsey\\Locale\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/giggsey/locale/src',
-        ),
+    );
+
+    public static $classMap = array (
+        'PayPlug\\backward\\PayPlugBackward' => __DIR__ . '/../..' . '/backward/PayPlugBackward.php',
+        'PayPlug\\classes\\MyLogPHP' => __DIR__ . '/../..' . '/classes/MyLogPHP.class.php',
+        'PayPlug\\src\\entities\\CacheEntity' => __DIR__ . '/../..' . '/src/entities/CacheEntity.php',
+        'PayPlug\\src\\entities\\CardEntity' => __DIR__ . '/../..' . '/src/entities/CardEntity.php',
+        'PayPlug\\src\\entities\\ConfigurationEntity' => __DIR__ . '/../..' . '/src/entities/ConfigurationEntity.php',
+        'PayPlug\\src\\entities\\LoggerEntity' => __DIR__ . '/../..' . '/src/entities/LoggerEntity.php',
+        'PayPlug\\src\\entities\\OneyEntity' => __DIR__ . '/../..' . '/src/entities/OneyEntity.php',
+        'PayPlug\\src\\entities\\PluginEntity' => __DIR__ . '/../..' . '/src/entities/PluginEntity.php',
+        'PayPlug\\src\\exceptions\\BadParameterException' => __DIR__ . '/../..' . '/src/exceptions/BadParameterException.php',
+        'PayPlug\\src\\interfaces\\ConfigurationInterface' => __DIR__ . '/../..' . '/src/interfaces/ConfigurationInterface.php',
+        'PayPlug\\src\\interfaces\\ContextInterface' => __DIR__ . '/../..' . '/src/interfaces/ContextInterface.php',
+        'PayPlug\\src\\interfaces\\CountryInterface' => __DIR__ . '/../..' . '/src/interfaces/CountryInterface.php',
+        'PayPlug\\src\\interfaces\\QueryInterface' => __DIR__ . '/../..' . '/src/interfaces/QueryInterface.php',
+        'PayPlug\\src\\interfaces\\ToolsInterface' => __DIR__ . '/../..' . '/src/interfaces/ToolsInterface.php',
+        'PayPlug\\src\\interfaces\\ValidateInterface' => __DIR__ . '/../..' . '/src/interfaces/ValidateInterface.php',
+        'PayPlug\\src\\repositories\\CacheRepository' => __DIR__ . '/../..' . '/src/repositories/CacheRepository.php',
+        'PayPlug\\src\\repositories\\CardRepository' => __DIR__ . '/../..' . '/src/repositories/CardRepository.php',
+        'PayPlug\\src\\repositories\\HookRepository' => __DIR__ . '/../..' . '/src/repositories/HookRepository.php',
+        'PayPlug\\src\\repositories\\LoggerRepository' => __DIR__ . '/../..' . '/src/repositories/LoggerRepository.php',
+        'PayPlug\\src\\repositories\\OneyRepository' => __DIR__ . '/../..' . '/src/repositories/OneyRepository.php',
+        'PayPlug\\src\\repositories\\PluginRepository' => __DIR__ . '/../..' . '/src/repositories/PluginRepository.php',
+        'PayPlug\\src\\repositories\\QueryRepository' => __DIR__ . '/../..' . '/src/repositories/QueryRepository.php',
+        'PayPlug\\src\\repositories\\Repository' => __DIR__ . '/../..' . '/src/repositories/Repository.php',
+        'PayPlug\\src\\repositories\\SQLtableRepository' => __DIR__ . '/../..' . '/src/repositories/SQLtableRepository.php',
+        'PayPlug\\src\\specific\\ConfigurationSpecific' => __DIR__ . '/../..' . '/src/specific/ConfigurationSpecific.php',
+        'PayPlug\\src\\specific\\ContextSpecific' => __DIR__ . '/../..' . '/src/specific/ContextSpecific.php',
+        'PayPlug\\src\\specific\\CountrySpecific' => __DIR__ . '/../..' . '/src/specific/CountrySpecific.php',
+        'PayPlug\\src\\specific\\PrestashopSpecific16' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific16.php',
+        'PayPlug\\src\\specific\\PrestashopSpecific17' => __DIR__ . '/../..' . '/src/specific/PrestashopSpecific17.php',
+        'PayPlug\\src\\specific\\QuerySpecific' => __DIR__ . '/../..' . '/src/specific/QuerySpecific.php',
+        'PayPlug\\src\\specific\\ToolsSpecific' => __DIR__ . '/../..' . '/src/specific/ToolsSpecific.php',
+        'PayPlug\\src\\specific\\ValidateSpecific' => __DIR__ . '/../..' . '/src/specific/ValidateSpecific.php',
+        'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
+        'libphonenumberlight\\AlternateFormatsCountryCodeSet' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/AlternateFormatsCountryCodeSet.php',
+        'libphonenumberlight\\AsYouTypeFormatter' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/AsYouTypeFormatter.php',
+        'libphonenumberlight\\CountryCodeSource' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/CountryCodeSource.php',
+        'libphonenumberlight\\CountryCodeToRegionCodeMap' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/CountryCodeToRegionCodeMap.php',
+        'libphonenumberlight\\CountryCodeToRegionCodeMapForTesting' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/CountryCodeToRegionCodeMapForTesting.php',
+        'libphonenumberlight\\DefaultMetadataLoader' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/DefaultMetadataLoader.php',
+        'libphonenumberlight\\Leniency' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/Leniency.php',
+        'libphonenumberlight\\MatchType' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/MatchType.php',
+        'libphonenumberlight\\Matcher' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/Matcher.php',
+        'libphonenumberlight\\MatcherAPIInterface' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/MatcherAPIInterface.php',
+        'libphonenumberlight\\MetadataLoaderInterface' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/MetadataLoaderInterface.php',
+        'libphonenumberlight\\MetadataSourceInterface' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/MetadataSourceInterface.php',
+        'libphonenumberlight\\MultiFileMetadataSourceImpl' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/MultiFileMetadataSourceImpl.php',
+        'libphonenumberlight\\NumberFormat' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/NumberFormat.php',
+        'libphonenumberlight\\NumberParseException' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/NumberParseException.php',
+        'libphonenumberlight\\PhoneMetadata' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneMetadata.php',
+        'libphonenumberlight\\PhoneNumber' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumber.php',
+        'libphonenumberlight\\PhoneNumberDesc' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberDesc.php',
+        'libphonenumberlight\\PhoneNumberFormat' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberFormat.php',
+        'libphonenumberlight\\PhoneNumberMatch' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberMatch.php',
+        'libphonenumberlight\\PhoneNumberMatcher' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberMatcher.php',
+        'libphonenumberlight\\PhoneNumberToCarrierMapper' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberToCarrierMapper.php',
+        'libphonenumberlight\\PhoneNumberToTimeZonesMapper' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberToTimeZonesMapper.php',
+        'libphonenumberlight\\PhoneNumberType' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberType.php',
+        'libphonenumberlight\\PhoneNumberUtil' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/PhoneNumberUtil.php',
+        'libphonenumberlight\\RegexBasedMatcher' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/RegexBasedMatcher.php',
+        'libphonenumberlight\\RegionCode' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/RegionCode.php',
+        'libphonenumberlight\\ShortNumberCost' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/ShortNumberCost.php',
+        'libphonenumberlight\\ShortNumberInfo' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/ShortNumberInfo.php',
+        'libphonenumberlight\\ShortNumbersRegionCodeSet' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/ShortNumbersRegionCodeSet.php',
+        'libphonenumberlight\\ValidationResult' => __DIR__ . '/..' . '/giggsey/libphonenumberlight/src/ValidationResult.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
@@ -58,6 +112,7 @@ class ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb::$classMap;
 
         }, null, ClassLoader::class);
     }

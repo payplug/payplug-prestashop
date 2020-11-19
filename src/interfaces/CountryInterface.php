@@ -25,5 +25,6 @@ namespace PayPlug\src\interfaces;
 
 interface CountryInterface
 {
-    function getByIso($id_currency);
+    public function getByIso($idCurrency);
+    public function getCountry($idCountry);
 }

@@ -25,21 +25,21 @@ namespace PayPlug\src\specific;
 
 use Media;
 
-use Context;
-use PayPlug\src\repositories\CardRepository;
 use PayplugBackward;
 use PayPlugCarrier;
 use Validate;
 
 class PrestashopSpecific16
 {
-    public $payplug;
-    public $context;
+    private $oney;
+    private $payplug;
+    private $contextSpecific;
 
     public function __construct($payplug)
     {
+        $this->oney = $payplug->getPlugin()->getOney();
         $this->payplug = $payplug;
-        $this->context = Context::getContext();
+        $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
 
@@ -51,14 +51,14 @@ class PrestashopSpecific16
         Media::addJsDef(array(
             'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', array(), true),
         ));
-        $this->payplug->oneyRepository->assignOneyJSVar();
+        $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
     }
 
     public function hookCustomerAccount()
     {
         $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
 
-        $this->context->smarty->assign(array(
+        $this->contextSpecific->smarty->assign(array(
             'payplug_icon_url' => $payplug_icon_url
         ));
     }
@@ -69,9 +69,10 @@ class PrestashopSpecific16
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
         $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
+        $oney = $this->oney;
         $error = false;
 
-        $current_lang = explode('-', $this->context->language->language_code);
+        $current_lang = explode('-', $this->contextSpecific->language->language_code);
         $current_lang = $current_lang[0];
         if (in_array($current_lang, array('it', 'en'))) {
             $img_lang = $current_lang;
@@ -109,25 +110,25 @@ class PrestashopSpecific16
             }
 
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
-                $is_elligible = $this->payplug->oneyRepository->isOneyElligible($cart);
+                $is_elligible = $this->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
-                $id_currency = $this->context->currency->id;
+                $id_currency = $this->contextSpecific->currency->id;
                 $amount = $cart->getOrderTotal(true, Cart::BOTH);
-                $is_elligible = $this->payplug->oneyRepository->isValidOneyAmount($amount, $id_currency);
+                $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 $error = !$is_elligible['result'];
             }
 
             if (!$error && $has_valid_carrier) {
-                $is_elligible = $this->payplug->oneyRepository->isValidOneyCarrier($cart);
+                $is_elligible = $this->oney->isValidOneyCarrier($cart);
                 $error = !$is_elligible['result'];
             }
 
             try {
-                $this->context->smarty->assign(array(
+                $this->contextSpecific->smarty->assign(array(
                     'payplug_module_dir' => _PS_MODULE_DIR_,
                     'payplug_oney' => true,
-                    'payplug_oney_required_field' => $this->payplug->oneyRepository->displayOneyRequiredFields(),
+                    'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
                     'payplug_oney_loading_msg' => $this->payplug->l('Loading')
@@ -137,8 +138,7 @@ class PrestashopSpecific16
             }
         }
 
-        $payplug_card = new CardRepository();
-        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer($cart->id_customer, true);
 
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
         $i = 0;
@@ -166,7 +166,7 @@ class PrestashopSpecific16
                      * oney.tpl (Oney optimisé)
                      * unified.tpl (Oney non optimisé)
                      */
-                    $paymentOptions[$payment_method] = array(
+                    $paymentOptions[$payment_method.'-'.$extraClass] = array(
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_method == 'one_click' ? $payment_options['standard']['logo'] : $payment_option['logo'],
@@ -176,7 +176,7 @@ class PrestashopSpecific16
                 }
 
                 if (isset($payment_option['payment_controller_url'])) {
-                    $this->context->smarty->assign(array(
+                    $this->contextSpecific->smarty->assign(array(
                         'payplug_cards' => $payplug_cards,
                         'payment_controller_url' => $payment_option['payment_controller_url'],
                     ));
@@ -188,7 +188,6 @@ class PrestashopSpecific16
                 }
             }
         }
-
         return $paymentOptions;
     }
 
