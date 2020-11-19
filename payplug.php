@@ -48,6 +48,7 @@ class Payplug extends PaymentModule
 
     private $card; // 3.0
 
+
     private $tools; // 3.0
 
     private $logger;
