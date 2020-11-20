@@ -304,7 +304,7 @@ class OneyRepository
 
         $tos_url = $config->get('PAYPLUG_ONEY_TOS_URL');
         if (strpos($tos_url, 'http://') === false && strpos($tos_url, 'https://') === false && $tos_url) {
-            $tos_url = $tools->tool(getShopProtocol()) . $tos_url;
+            $tos_url = $tools->tool('getShopProtocol') . $tos_url;
         }
 
         $this->contextSpecific->getContext()->smarty->assign(array(
