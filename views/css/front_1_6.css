@@ -1393,7 +1393,7 @@
   -moz-box-shadow: 0px -5px 10px 5px #fff inset;
   box-shadow: 0px -5px 10px 5px #fff inset;
 }
-.oneyPayment-mobile .oneyOption:after {
+.-mobile .oneyOption:after {
   display: none;
 }
 .oneyOption:hover {
@@ -1409,7 +1409,7 @@
 .oneyOption.-selected:after {
   opacity: 1;
 }
-.oneyPayment-mobile .oneyOption.-selected {
+.-mobile .oneyOption.-selected {
   border: none;
   background: none;
 }
@@ -1420,7 +1420,7 @@
   flex-wrap: wrap;
   position: relative;
 }
-.oneyPayment-mobile .oneyOption_wrapper {
+.-mobile .oneyOption_wrapper {
   padding: 89px 0 0;
   position: relative;
 }
@@ -1440,7 +1440,7 @@
   height: 35px;
   max-width: 100%;
 }
-.oneyPayment-mobile .oneyOption_logo {
+.-mobile .oneyOption_logo {
   width: 100px;
   height: 30px;
 }
@@ -1461,7 +1461,7 @@
   color: #2f2930;
   padding: 0 0 35px;
 }
-.oneyPayment-mobile .oneyOption_title {
+.-mobile .oneyOption_title {
   width: 50%;
   position: absolute;
   top: 0;
@@ -1477,7 +1477,7 @@
   border-right: none;
   border-left: none;
 }
-.oneyPayment-mobile .-selected .oneyOption_title {
+.-mobile .-selected .oneyOption_title {
   border-bottom: 5px solid #7ebd00;
 }
 .oneyOption_prices {
