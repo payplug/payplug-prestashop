@@ -861,7 +861,7 @@ var $document,
                 $document.on('click', '.payplugPopin_close, .payplugMsg_button', popup.close)
                     .on('click', function (event) {
                         var $clicked = $(event.target);
-                        if ($clicked.is('.' + props.mainClass) && $('.' + props.mainClass).is('.' + props.mainClass + '-open')) {
+                        if ($clicked.is('.' + props.mainClass) && $('.' + props.mainClass).is('.-open')) {
                             popup.close();
                         }
                     });
@@ -892,7 +892,7 @@ var $document,
 
                 popin.removeClass('-show');
                 window.setTimeout(function () {
-                    popin.removeClass(props.mainClass + '-open');
+                    popin.removeClass('-open');
                 }, 500);
             },
             create: function () {
