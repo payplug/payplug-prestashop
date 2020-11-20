@@ -142,9 +142,9 @@ var $document,
                                 errors = data.response;
                             } else {
                                 errors = [];
-                                data.response.map(function (error, key) {
-                                    errors.push(error);
-                                });
+                                for ($i = 0;$i < data.response.length; $i++) {
+                                    errors.push(data.response[$i]);
+                                }
                                 errors = errors.join('<br />');
                             }
 
