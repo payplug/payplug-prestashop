@@ -134,7 +134,7 @@ class Payplug extends PaymentModule
 
     public $order_states = array(
         'paid' => array(
-            'cfg' => '_PS_OS_PAYMENT_',
+            'cfg' => 'PS_OS_PAYMENT',
             'template' => 'payment',
             'logable' => true,
             'send_email' => true,
@@ -152,7 +152,7 @@ class Payplug extends PaymentModule
             ),
         ),
         'refund' => array(
-            'cfg' => '_PS_OS_REFUND_',
+            'cfg' => 'PS_OS_REFUND',
             'template' => 'refund',
             'logable' => false,
             'send_email' => true,
@@ -170,7 +170,7 @@ class Payplug extends PaymentModule
             ),
         ),
         'pending' => array(
-            'cfg' => '_PS_OS_PENDING_',
+            'cfg' => 'PS_OS_PENDING',
             'template' => null,
             'logable' => false,
             'send_email' => false,
@@ -188,7 +188,7 @@ class Payplug extends PaymentModule
             ),
         ),
         'error' => array(
-            'cfg' => '_PS_OS_ERROR_',
+            'cfg' => 'PS_OS_ERROR',
             'template' => 'payment_error',
             'logable' => false,
             'send_email' => true,
@@ -1175,18 +1175,19 @@ class Payplug extends PaymentModule
         $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
         $os = Configuration::get($key_config);
 
-        if (!$os) {
-            if ($val = $this->findOrderState($state['name'], $sandbox)) {
-                $os = $val;
-            } elseif (!$sandbox && defined($state['cfg'])) {
-                $os = constant($state['cfg']);
-            } elseif (!$sandbox && $state['template'] != null) {
+        // if we can't find order state with payplug key, check with configuration key
+        if (!$os && !$sandbox && $state['cfg']) {
+            $os = Configuration::get($state['cfg']);
+
+            // if we don't find order state either, try with template name
+            if (!$sandbox && $state['template'] != null) {
                 $sql = 'SELECT DISTINCT `id_order_state`
                         FROM `' . _DB_PREFIX_ . 'order_state_lang` 
                         WHERE `template` = \'' . pSQL($state['template']) . '\'';
                 $os = Db::getInstance()->getValue($sql);
             }
         }
+
         if (!$os || $force) {
             $log->info('Creating new order state.');
             $order_state = new OrderState();
