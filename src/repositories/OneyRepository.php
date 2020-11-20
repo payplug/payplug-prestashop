@@ -23,12 +23,18 @@
 
 namespace PayPlug\src\repositories;
 
+use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\ConnectionException;
+use Payplug\Exception\HttpException;
+use Payplug\Exception\UnexpectedAPIResponseException;
+use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\ToolsSpecific;
 use PayPlug\src\specific\ValidateSpecific;
+use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
 class OneyRepository
 {
@@ -58,7 +64,7 @@ class OneyRepository
     }
 
     /**
-     * Assign Oney javascript variable
+     * @description Assign Oney javascript variable
      */
     public function assignOneyJSVar()
     {
@@ -134,12 +140,12 @@ class OneyRepository
     }
 
     /**
-     * Display Oney payment options
+     * @description Display Oney payment options
      *
      * @param $cart Cart
-     * @param float $order_total
-     * @param string $country
-     * @return array
+     * @param $amount
+     * @param bool $country
+     * @return void
      */
     public function assignOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -194,6 +200,8 @@ class OneyRepository
     }
 
     /**
+     * @description Check Oney required fields in form
+     *
      * todo: to clean or update
      * @return array
      */
@@ -275,7 +283,7 @@ class OneyRepository
     }
 
     /**
-     * Display Oney popin template
+     * @description Display Oney popin template
      *
      * @return mixed
      */
@@ -296,7 +304,7 @@ class OneyRepository
 
         $tos_url = $config->get('PAYPLUG_ONEY_TOS_URL');
         if (strpos($tos_url, 'http://') === false && strpos($tos_url, 'https://') === false && $tos_url) {
-            $tos_url = $tools->tool(getShopProtocol()) . $tos_url;
+            $tos_url = $tools->tool('getShopProtocol') . $tos_url;
         }
 
         $this->contextSpecific->getContext()->smarty->assign(array(
@@ -309,11 +317,11 @@ class OneyRepository
     }
 
     /**
-     * Display
+     * @description Display Oney Schedule
      * @param $oney_payment
      * @param $amount
      * @return string
-     * @throws \PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException
+     * @throws LocalizationException
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
@@ -328,7 +336,7 @@ class OneyRepository
     }
 
     /**
-     * Display Oney popin payment option
+     * @description Display Oney popin payment option
      *
      * @return mixed
      */
@@ -346,11 +354,11 @@ class OneyRepository
     }
 
     /**
-     * Format Oney simulation from resource
+     * @description Format Oney simulation from resource
      *
      * @param string $method
      * @param array $resource
-     * @param float $total_amount
+     * @param bool $total_amount
      * @return array
      */
     public function formatOneyResource($method, $resource, $total_amount = false)
@@ -389,7 +397,7 @@ class OneyRepository
     }
 
     /**
-     * Temp get valid iso code for french overseas,
+     * @description Temp get valid iso code for french overseas,
      * todo: remove when it's fix in API
      *
      * @param $iso_country
@@ -405,10 +413,9 @@ class OneyRepository
     }
 
     /**
-     *  Get Oney call to action
+     * @description Get Oney call to action
      *
      * @param string $env
-     * @param bool $allowed
      * @return mixed
      */
     public function getOneyCTA($env = null)
@@ -424,7 +431,8 @@ class OneyRepository
     }
 
     /**
-     * Get Oney Delivery Context
+     * @description Get Oney Delivery Context
+     *
      * @return array
      */
     public function getOneyDeliveryContext()
@@ -447,7 +455,8 @@ class OneyRepository
     }
 
     /**
-     * Get Oney payment Context
+     * @description Get Oney payment Context
+     *
      * @return array
      */
     public function getOneyPaymentContext()
@@ -474,10 +483,10 @@ class OneyRepository
     }
 
     /**
-     * Get Oney payment options
+     * @description Get Oney payment options
      *
-     * @param float $order_total
-     * @param string $country
+     * @param $amount
+     * @param bool $country
      * @return array
      */
     public function getOneyPaymentOptionsList($amount, $country = false)
@@ -510,13 +519,12 @@ class OneyRepository
     }
 
     /**
-     * Display Oney payment options
+     * @description Display Oney payment options
      *
      * @param $cart Cart
-     * @param float $order_total
-     * @param string $country
+     * @param $amount
+     * @param bool $country
      * @return array
-     * @throws Exception
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -567,9 +575,9 @@ class OneyRepository
     }
 
     /**
-     * Get Oney price limit
+     * @description Get Oney price limit
      *
-     * @param int $id_currency
+     * @param boolean $id_currency
      * @return array
      */
     public function getOneyPriceLimit($id_currency = false)
@@ -621,7 +629,8 @@ class OneyRepository
     }
 
     /**
-     * Get the Oney required fields from Context
+     * @description Get the Oney required fields from Context
+     *
      * @return array
      */
     public function getOneyRequiredFields()
@@ -796,12 +805,17 @@ class OneyRepository
     }
 
     /**
-     * Get Oney Payment Simulations
+     * @description Get Oney Payment Simulations
      *
      * @param int $amount
      * @param string $country
      * @param array $operation contain x3|4_with_fees or x3|4_without_fees
      * @return array
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
      */
     public function getOneySimulations($amount, $country, $operation)
     {
@@ -871,7 +885,8 @@ class OneyRepository
     }
 
     /**
-     * Get the Oney required fields from Context
+     * @description Get the Oney required fields from Context
+     *
      * @param array $payment_data
      * @return bool
      */
@@ -944,7 +959,7 @@ class OneyRepository
     }
 
     /**
-     * Install Oney feature
+     * @description Install Oney feature
      */
     public function installOney()
     {
@@ -956,8 +971,9 @@ class OneyRepository
     }
 
     /**
-     * Install Oney Config
-     * @return bool
+     * @description Install Oney Config
+     *
+     * @return boolean
      */
     public function installOneyConfig()
     {
@@ -979,10 +995,10 @@ class OneyRepository
     }
 
     /**
-     * Check if Oney allow a given currency
+     * @description Check if Oney allow a given currency
      *
      * @param $id_currency
-     * @return bool
+     * @return boolean
      */
     public function isOneyAllowedCurrency($id_currency)
     {
@@ -1006,11 +1022,11 @@ class OneyRepository
     }
 
     /**
-     * Check if a valid Cart for Oney
+     * @description Check if a valid Cart for Oney
      *
      * @param $cart Cart
-     * @param bool $amount
-     * @param bool $country
+     * @param boolean $amount
+     * @param boolean $country
      * @return array
      */
     public function isOneyElligible($cart, $amount = false, $country = false)
@@ -1052,7 +1068,7 @@ class OneyRepository
     }
 
     /**
-     * Install Oney Order State
+     * @description Install Oney Order State
      */
     public function installOneyOrderStates()
     {
@@ -1088,8 +1104,9 @@ class OneyRepository
     }
 
     /**
-     * Install Oney Carriers
-     * @return bool
+     * @description Install Oney Carriers
+     *
+     * @return boolean
      */
     public function installOneyCarriers()
     {
@@ -1102,8 +1119,9 @@ class OneyRepository
     }
 
     /**
-     * Check if Oney is allowed
-     * @return bool
+     * @description Check if Oney is allowed
+     *
+     * @return boolean
      */
     public function isOneyAllowed()
     {
@@ -1113,7 +1131,7 @@ class OneyRepository
     }
 
     /**
-     * Check if billing and shipping addresses are valid
+     * @description Check if billing and shipping addresses are valid
      *
      * @param int $id_shipping
      * @param int $id_billing
@@ -1131,10 +1149,10 @@ class OneyRepository
     }
 
     /**
-     * Check if amount is valid for Oney
+     * @description Check if amount is valid for Oney
      *
      * @param float $amount
-     * @param int $id_currency
+     * @param boolean $id_currency
      * @return array
      */
     public function isValidOneyAmount($amount, $id_currency = false)
@@ -1159,7 +1177,7 @@ class OneyRepository
     }
 
     /**
-     * Check if carrier is valid for Oney
+     * @description Check if carrier is valid for Oney
      * Try the current selected then all available carrier
      *
      * @param $cart
@@ -1216,7 +1234,7 @@ class OneyRepository
     }
 
     /**
-     * Check if cart is valid for Oney
+     * @description Check if cart is valid for Oney
      *
      * @param Cart $cart
      * @return array
@@ -1247,7 +1265,7 @@ class OneyRepository
     }
 
     /**
-     * Check if billing and shipping addresses are valid
+     * @description Check if billing and shipping addresses are valid
      *
      * @param string $shipping_iso
      * @param string $billing_iso
@@ -1295,7 +1313,7 @@ class OneyRepository
     }
 
     /**
-     * Install Oney feature
+     * @description Install Oney feature
      */
     public function uninstallOney()
     {
@@ -1303,7 +1321,7 @@ class OneyRepository
     }
 
     /**
-     * Delete basic configuration
+     * @description Delete basic configuration
      *
      * @return bool
      */

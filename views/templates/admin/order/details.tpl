@@ -29,7 +29,7 @@
     {if isset($payment.type)}
         <li>
             <span class="pp_col1">{l s='Type' mod='payplug'} :</span>
-            <span class="pp_col2" data-e2e-payment-details="type">{$payment.type|escape:'htmlall':'UTF-8'}</span>
+            <span class="pp_col2" data-e2e-payment-details="type" data-e2e-payment-details-type="{$payment.type_code|escape:'htmlall':'UTF-8'}">{$payment.type|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
     {if isset($payment.status)}
