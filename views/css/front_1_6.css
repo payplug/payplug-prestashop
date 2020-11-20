@@ -1402,14 +1402,14 @@
 .oneyOption:hover:after {
   opacity: 1;
 }
-.oneyOption-selected {
+.oneyOption.-selected {
   border-color: #7ebd00;
   background: rgba(126, 189, 0, 0.15);
 }
-.oneyOption-selected:after {
+.oneyOption.-selected:after {
   opacity: 1;
 }
-.oneyPayment-mobile .oneyOption-selected {
+.oneyPayment-mobile .oneyOption.-selected {
   border: none;
   background: none;
 }
@@ -1424,14 +1424,14 @@
   padding: 89px 0 0;
   position: relative;
 }
-.oneyOption_wrapper-loading {
+.oneyOption_wrapper.-loading {
   justify-content: center;
   padding: 16px;
 }
-.oneyOption_wrapper-loading + .oneyPayment_cta {
+.oneyOption_wrapper.-loading + .oneyPayment_cta {
   display: none;
 }
-.oneyPayment-mobile .oneyOption_wrapper-loading {
+.-mobile .oneyOption_wrapper.-loading {
   padding: 16px;
 }
 .oneyOption_logo {
@@ -1472,12 +1472,12 @@
   border-bottom: 5px solid transparent;
   padding: 0;
 }
-.oneyPayment-mobile .oneyOption:nth-child(2) .oneyOption_title {
+.-mobile .oneyOption:nth-child(2) .oneyOption_title {
   left: 50%;
   border-right: none;
   border-left: none;
 }
-.oneyPayment-mobile .oneyOption-selected .oneyOption_title {
+.oneyPayment-mobile .-selected .oneyOption_title {
   border-bottom: 5px solid #7ebd00;
 }
 .oneyOption_prices {
@@ -1487,13 +1487,13 @@
   flex-direction: column;
   justify-content: space-between;
 }
-.oneyPayment-mobile .oneyOption_prices {
+.-mobile .oneyOption_prices {
   display: none;
   height: auto;
   padding: 30px 16px;
   border-top: 1px solid #dce0e8;
 }
-.oneyPayment-mobile .oneyOption-selected .oneyOption_prices {
+.-mobile .-selected .oneyOption_prices {
   display: block;
 }
 .oneyOption_prices ul {
@@ -1534,7 +1534,7 @@
   font-weight: 400;
   width: 100%;
 }
-.oneyPayment-mobile .oneyOption_prices ul li {
+.-mobile .oneyOption_prices ul li {
   padding: 8px 0;
 }
 .oneyOption_legend {
@@ -1551,7 +1551,7 @@
   top: 0;
   left: 0;
 }
-.oneyPayment-mobile .oneyOption {
+.-mobile .oneyOption {
   width: 100%;
   margin: 0;
   padding: 0;
