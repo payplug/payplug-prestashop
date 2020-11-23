@@ -309,7 +309,6 @@ class HttpClient
 
         // Error 5XX
         if (substr($httpStatus, 0, 1) === '5') {
-            debug_backtrace();
             throw new Payplug\Exception\PayplugServerException('Unexpected server error during the request.',
                 $httpResponse, $httpStatus
             );
