@@ -23,6 +23,10 @@
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
+/**
+ * Class PayPlugNotifications
+ * Use for treat notification from Payplug API
+ */
 class PayPlugNotifications
 {
     public $resource;
@@ -49,6 +53,11 @@ class PayPlugNotifications
         $this->setConfig();
     }
 
+    /**
+     * @description Set the notification's global configuration
+     *
+     * @throws Exception
+     */
     private function setConfig()
     {
         $this->key = microtime(true) * 10000;
@@ -64,6 +73,9 @@ class PayPlugNotifications
         $this->getResource();
     }
 
+    /**
+     * @description Set the order state from configuration
+     */
     private function setOrderStates()
     {
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
@@ -80,6 +92,9 @@ class PayPlugNotifications
         ];
     }
 
+    /**
+     * @description Get the resource from the notification
+     */
     private function getResource()
     {
         $body = Tools::file_get_contents('php://input');
@@ -98,6 +113,9 @@ class PayPlugNotifications
         }
     }
 
+    /**
+     * @description Set the logger
+     */
     public function setLogger()
     {
         $this->logger = $this->plugin->getLogger();
@@ -105,6 +123,9 @@ class PayPlugNotifications
         $this->logger->addLog('New notification');
     }
 
+    /**
+     * @description Entry point to treat the notification
+     */
     public function treat()
     {
         //Notification identification
@@ -125,6 +146,9 @@ class PayPlugNotifications
         }
     }
 
+    /**
+     * @description Treat the notification has a payment
+     */
     private function treatPayment()
     {
         if ($this->resource->installment_plan_id) {
@@ -311,6 +335,11 @@ class PayPlugNotifications
         }
     }
 
+    /**
+     * @description Update order from the notification
+     *
+     * @param $id_order Identificer of the order to update
+     */
     private function updateOrder($id_order)
     {
         $this->logger->addLog('UPDATE MODE');
@@ -583,6 +612,9 @@ class PayPlugNotifications
         }
     }
 
+    /**
+     * @description Create order from the notification
+     */
     private function createOrder()
     {
         $this->logger->addLog('CREATE MODE');
@@ -801,6 +833,9 @@ class PayPlugNotifications
         $this->exitProcess('Order created.');
     }
 
+    /**
+     * @description Treat the notification has a refund
+     */
     private function treatRefund()
     {
         $this->logger->addLog('REFUND MODE');
@@ -862,6 +897,9 @@ class PayPlugNotifications
         }
     }
 
+    /**
+     * @description Treat the notification has an installment
+     */
     private function treatInstallment()
     {
         $this->logger->addLog('INSTALLMENT MODE');
@@ -871,6 +909,7 @@ class PayPlugNotifications
     }
 
     /**
+     * @description Set the context of the order
      * @param $id_cart
      */
     protected function setContextFromCartID($id_cart)
@@ -890,6 +929,9 @@ class PayPlugNotifications
         }
     }
 
+    /**
+     * @description Entry point to treat the notification
+     */
     private function exitProcess($str = '', $http_code = 200)
     {
         if ($this->lock_key) {
