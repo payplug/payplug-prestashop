@@ -109,7 +109,7 @@ class LoggerRepository
         }
 
         $debugBacktrace = debug_backtrace();
-        $line = $debugBacktrace[2]['line'];
+        $line = $debugBacktrace[0]['line'];
 
         $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T
         $entry = ['date' => $this->udate('Y-m-d H:i:s.u T'), 'line' => $line, 'message' => $message, 'level' => $level];
