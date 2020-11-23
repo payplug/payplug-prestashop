@@ -175,7 +175,6 @@ var $document, $window, payplug = {
                         popup.set(result.popin, 'confirm');
                         $('form.payplug').replaceWith(result.content);
                         var {oney} = payplug;
-                        oney.carrier();
                         $window.trigger('load');
                     }
                 }
@@ -252,7 +251,6 @@ var $document, $window, payplug = {
                     $('.' + identifier).replaceWith(result.content);
                     payplug.tools.loader.hide($('.' + identifier));
                     var {oney} = payplug;
-                    oney.carrier();
                 }
             });
         },
@@ -367,7 +365,6 @@ var $document, $window, payplug = {
                         popup.set(result.popin, 'confirm');
                         $('form.payplug').replaceWith(result.content);
                         var {oney} = payplug;
-                        oney.carrier();
                         $window.trigger('load');
                     }
                 }
