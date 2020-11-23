@@ -315,258 +315,271 @@ class PayPlugNotifications
     {
         $this->logger->addLog('UPDATE MODE');
 
+        // Get the order
         try {
             $order = new Order((int)$id_order);
         } catch (Exception $exception) {
             $this->logger->addLog('The order cannot be loaded: ' . $exception->getMessage(), 'error');
             $this->exitProcess('The order cannot be loaded: ' . $exception->getMessage(), 500);
         }
-
         if (!Validate::isLoadedObject($order)) {
             $this->logger->addLog('Order cannot be loaded.', 'error');
             $this->exitProcess('Order cannot be loaded.', 500);
-        } else {
+        }
+
+        try {
+            $current_state = (int)$order->getCurrentState();
+        } catch (Exception $exception) {
+            $this->logger->addLog(
+                'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
+            $this->exitProcess($exception->getMessage(), $exception->getCode());
+        }
+
+        // if it's a refused oney payment, we switch to cancelled status
+        if ($this->is_oney
+            && isset($this->payment->failure)
+            && $this->payment->failure !== null
+            && !in_array($current_state, array($this->order_states['cancelled'], $this->order_states['paid']))
+        ) {
+            $this->logger->addLog('The payment is refused by Oney.');
+            $new_order_state = $this->order_states['cancelled'];
+
+            $order_history = new OrderHistory();
+            $order_history->id_order = (int)$id_order;
+
             try {
-                $current_state = (int)$order->getCurrentState();
+                $order_history->changeIdOrderState((int)$new_order_state, $id_order);
+                $order_history->save();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
+                    'Order history cannot be saved: ' . $exception->getMessage(),
+                    'error'
+                );
+                $this->logger->addLog(
+                    'Please check if order state ' . (int)$new_order_state . ' exists.',
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode());
             }
 
-            // if it's a refused oney payment, we switch to cancelled status
-            if ($this->is_oney
-                && isset($this->payment->failure)
-                && $this->payment->failure !== null
-                && !in_array($current_state, array($this->order_states['cancelled'], $this->order_states['paid']))
-            ) {
-                $this->logger->addLog('The payment is refused by Oney.');
-                $new_order_state = $this->order_states['cancelled'];
+            $order->current_state = $order_history->id_order_state;
+            try {
+                $order->update();
+            } catch (Exception $exception) {
+                $this->logger->addLog(
+                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                $this->exitProcess($exception->getMessage(), $exception->getCode());
+            }
+            $this->logger->addLog('Order updated.');
+            $this->exitProcess('Order updated.');
+        } // if payment is deferred and expired
+        elseif (
+            $this->is_deferred
+            && $current_state == $this->order_states['auth']
+            && ($this->payment->authorization->expires_at - time()) <= 0
+        ) {
+            $this->logger->addLog('The payment authorization has expired.');
+            $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
+            $this->logger->addLog('Order new status will be \'Authorization expired\'.');
+            $new_order_state = $this->order_states['exp'];
 
-                $order_history = new OrderHistory();
-                $order_history->id_order = (int)$id_order;
+            $order_history = new OrderHistory();
+            $order_history->id_order = (int)$id_order;
 
-                try {
-                    $order_history->changeIdOrderState((int)$new_order_state, $id_order);
-                    $order_history->save();
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order history cannot be saved: ' . $exception->getMessage(),
-                        'error'
-                    );
-                    $this->logger->addLog(
-                        'Please check if order state ' . (int)$new_order_state . ' exists.',
-                        'error'
-                    );
-                    $this->exitProcess($exception->getMessage(), $exception->getCode());
-                }
+            try {
+                $order_history->changeIdOrderState((int)$new_order_state, $id_order);
+                $order_history->save();
+            } catch (Exception $exception) {
+                $this->logger->addLog(
+                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                $this->logger->addLog(
+                    'Please check if order state ' . (int)$new_order_state . ' exists.',
+                    'error');
+                $this->exitProcess($exception->getMessage(), $exception->getCode());
+            }
 
-                $order->current_state = $order_history->id_order_state;
-                try {
-                    $order->update();
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order cannot be updated: ' . $exception->getMessage(), 'error');
-                    $this->exitProcess($exception->getMessage(), $exception->getCode());
-                }
-                $this->logger->addLog('Order updated.');
-                $this->exitProcess('Order updated.');
-            } // if payment is deferred and expired
-            elseif (
-                $this->is_deferred
-                && $current_state == $this->order_states['auth']
-                && ($this->payment->authorization->expires_at - time()) <= 0
-            ) {
-                $this->logger->addLog('The payment authorization has expired.');
-                $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
-                $this->logger->addLog('Order new status will be \'Authorization expired\'.');
-                $new_order_state = $this->order_states['exp'];
+            $order->current_state = $order_history->id_order_state;
+            try {
+                $order->update();
+            } catch (Exception $exception) {
+                $this->logger->addLog(
+                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                $this->exitProcess($exception->getMessage(), $exception->getCode());
+            }
+            $this->logger->addLog('Order updated.');
+            $this->exitProcess('Order updated.');
+        } // if payment is pending or awaiting a capture
+        elseif (in_array($current_state, array(
+                $this->order_states['pending'],
+                $this->order_states['auth'],
+                $this->order_states['oney']
+            )) || !$order->valid) {
+            $this->logger->addLog('Order is currently pending.');
+            $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
 
-                $order_history = new OrderHistory();
-                $order_history->id_order = (int)$id_order;
+            if ($this->payment->installment_plan_id !== null) {
+                $is_amount_correct = (bool)$this->payment->is_paid;
+            } else {
+                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($this->payment->amount / 100,
+                    $order);
+            }
 
-                try {
-                    $order_history->changeIdOrderState((int)$new_order_state, $id_order);
-                    $order_history->save();
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order history cannot be saved: ' . $exception->getMessage(), 'error');
-                    $this->logger->addLog(
-                        'Please check if order state ' . (int)$new_order_state . ' exists.',
-                        'error');
-                    $this->exitProcess($exception->getMessage(), $exception->getCode());
-                }
+            $this->logger->addLog('Order ID: ' . (int)$order->id, 'debug');
+            // We have to check if the payment to update is the one linked to the order
+            // because it's possible to attempt to pay with a method and cancel before payment
+            // then make another attempt with another attempt but still receive previous IPN
 
-                $order->current_state = $order_history->id_order_state;
-                try {
-                    $order->update();
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order cannot be updated: ' . $exception->getMessage(), 'error');
-                    $this->exitProcess($exception->getMessage(), $exception->getCode());
-                }
-                $this->logger->addLog('Order updated.');
-                $this->exitProcess('Order updated.');
-            } // if payment is pending or awaiting a capture
-            elseif (in_array($current_state, array(
-                    $this->order_states['pending'],
-                    $this->order_states['auth'],
-                    $this->order_states['oney']
-                )) || !$order->valid) {
-                $this->logger->addLog('Order is currently pending.');
-                $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
-
-                if ($this->payment->installment_plan_id !== null) {
-                    $is_amount_correct = (bool)$this->payment->is_paid;
-                } else {
-                    $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($this->payment->amount / 100,
-                        $order);
-                }
-
-                $this->logger->addLog('Order ID: ' . (int)$order->id, 'debug');
-                // We have to check if the payment to update is the one linked to the order
-                // because it's possible to attempt to pay with a method and cancel before payment
-                // then make another attempt with another attempt but still receive previous IPN
-                $req_order_payment = '
-                                    SELECT pop.* 
-                                    FROM ' . _DB_PREFIX_ . 'payplug_order_payment pop 
-                                    WHERE pop.id_order = ' . (int)$order->id;
-                $orderPayments = Db::getInstance()->executeS($req_order_payment);
-
-                $f = false;
-                if (count($orderPayments) > 0) {
-                    foreach ($orderPayments as $p) {
-                        if ($p['id_payment'] == $this->payment->id) {
-                            $f = true;
-                        }
+            // Check if the payment is related to the order with payplug order payment
+            // Use prestashop order payment for pre-updated module order
+            $payplug_order_payments = $this->payplug->getPayplugOrderPayments((int)$order->id);
+            $order_payments = $order->getOrderPayments();
+            $related = false;
+            if ($payplug_order_payments) {
+                foreach ($payplug_order_payments as $payment) {
+                    if ($payment['id_payment'] == $this->payment->id) {
+                        $related = true;
                     }
                 }
-                if (!$f) {
-                    $this->exitProcess('The payment is not related to this order.');
-                }
-
-                if (!$this->payment->is_paid) {
-                    if (isset($this->payment->failure) && $this->payment->failure !== null) {
-                        //todo : Gerer le cas oney refusé
-                        $this->logger->addLog('The payment has failed.');
-                        $this->logger->addLog('Order new status will be \'cancel\'.');
-                        $new_order_state = $this->order_states['cancelled'];
-                        $order_history = new OrderHistory();
-                        $order_history->id_order = (int)$id_order;
-                        try {
-                            $order_history->changeIdOrderState((int)$new_order_state, $id_order);
-                            $order_history->save();
-                        } catch (Exception $exception) {
-                            $this->logger->addLog(
-                                'Order history cannot be saved: ' . $exception->getMessage(), 'error');
-                            $this->logger->addLog(
-                                'Please check if order state ' . (int)$new_order_state . ' exists.',
-                                'error');
-                            $this->exitProcess($exception->getMessage(), $exception->getCode());
-                        }
-                        $this->exitProcess('The payment has failed and order has been cancelled.');
+            } elseif ($order_payments) {
+                foreach ($order_payments as $payment) {
+                    if ($payment['transaction_id'] == $this->payment->id) {
+                        $related = true;
                     }
-                    $this->logger->addLog('The payment is not paid yet.');
-                    $this->exitProcess('The payment is not paid yet.');
                 }
+            }
+            if (!$related) {
+                $this->exitProcess('The payment is not related to this order.');
+            }
 
-                if ($is_amount_correct) {
-                    $this->logger->addLog('Order new status will be \'paid\'.');
-                    $new_order_state = $this->order_states['paid'];
-                } else {
-                    $this->logger->addLog('Payment amount is not correct.', 'error');
-                    $new_order_state = $this->order_states['error'];
-                    $this->logger->addLog(
-                        'Order new status will be \'error\'.',
-                        'error'
-                    );
-                    $message = new Message();
-                    $message->message =
-                        $this->payplug->l('The amount collected by PayPlug is not the same')
-                        . $this->payplug->l(' as the total value of the order');
-                    $message->id_order = $order->id;
-                    $message->id_cart = $order->id_cart;
-                    $message->private = true;
+            // Check if payment is paid
+            if (!$this->payment->is_paid) {
+                if (isset($this->payment->failure) && $this->payment->failure !== null) {
+                    //todo : Gerer le cas oney refusé
+                    $this->logger->addLog('The payment has failed.');
+                    $this->logger->addLog('Order new status will be \'cancel\'.');
+                    $new_order_state = $this->order_states['cancelled'];
+                    $order_history = new OrderHistory();
+                    $order_history->id_order = (int)$id_order;
                     try {
-                        $message->save();
+                        $order_history->changeIdOrderState((int)$new_order_state, $id_order);
+                        $order_history->save();
                     } catch (Exception $exception) {
                         $this->logger->addLog(
-                            'The message cannot be saved: ' . $exception->getMessage(), 'error');
+                            'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                        $this->logger->addLog(
+                            'Please check if order state ' . (int)$new_order_state . ' exists.',
+                            'error');
                         $this->exitProcess($exception->getMessage(), $exception->getCode());
                     }
+                    $this->exitProcess('The payment has failed and order has been cancelled.');
                 }
-
-                $order_history = new OrderHistory();
-                if (count($order->getOrderPayments()) == 0) {
-                    $this->logger->addLog('Add new orderPayment - ' . count($order->getOrderPayments()),
-                        'debug');
-                    $order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
-                    $order->setInvoice(true);
-                }
-                $order_history->id_order = (int)$id_order;
-
-                try {
-                    $order_history->changeIdOrderState((int)$new_order_state, $id_order);
-                    $order_history->save();
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order history cannot be saved: ' . $exception->getMessage(), 'error');
-                    $this->logger->addLog(
-                        'Please check if order state ' . (int)$new_order_state . ' exists.',
-                        'error');
-                    $this->exitProcess($exception->getMessage(), $exception->getCode());
-                }
-
-                try {
-                    $order->current_state = $order_history->id_order_state;
-                    $order->update();
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order cannot be updated: ' . $exception->getMessage(), 'error');
-                    $this->exitProcess($exception->getMessage(), $exception->getCode());
-                }
-                $this->logger->addLog('Order updated.');
-                $this->exitProcess('Order updated.');
-            } // if payment is already paid
-            elseif ($current_state == $this->order_states['paid']) {
-                $this->logger->addLog('Order is already paid.');
-                $this->exitProcess('Order is already paid.');
-            } // if payment is already expired
-            elseif ($current_state == $this->order_states['exp']) {
-                $this->logger->addLog('Order is already set as expired.');
-                $this->exitProcess('Order is already set as expired.');
-            } // if payment is already cancelled
-            elseif ($current_state == $this->order_states['cancelled']) {
-                $this->logger->addLog('Order is already set as cancelled.');
-                $this->exitProcess('Order is already set as cancelled.');
-            } // else set error
-            else {
-                $this->logger->addLog(
-                    'Current state: ' . (int)$current_state,
-                    'debug'
-                );
-                $this->logger->addLog(
-                    'Current Cart ID: ' . (int)$this->cart->id,
-                    'debug'
-                );
-                $this->logger->addLog(
-                    'Current Payment ID: ' . (int)$this->payment->id,
-                    'debug'
-                );
-                $this->logger->addLog(
-                    'Pending state: ' . (int)$this->order_states['pending'],
-                    'debug'
-                );
-                $this->logger->addLog(
-                    'Paid state: ' . (int)$this->order_states['paid'],
-                    'debug'
-                );
-                $this->logger->addLog(
-                    'Current order state is in conflict with IPN.',
-                    'error'
-                );
-                $this->exitProcess('Current order state is in conflict with IPN.', 500);
+                $this->logger->addLog('The payment is not paid yet.', 'error');
+                $this->exitProcess('The payment is not paid yet.');
             }
+
+            // if amount not correct, add order message
+            if ($is_amount_correct) {
+                $this->logger->addLog('Order new status will be \'paid\'.');
+                $new_order_state = $this->order_states['paid'];
+            } else {
+                $this->logger->addLog('Payment amount is not correct.', 'error');
+                $new_order_state = $this->order_states['error'];
+                $this->logger->addLog('Order new status will be \'error\'.', 'error');
+                $message = new Message();
+                $message->message =
+                    $this->payplug->l('The amount collected by PayPlug is not the same')
+                    . $this->payplug->l(' as the total value of the order');
+                $message->id_order = $order->id;
+                $message->id_cart = $order->id_cart;
+                $message->private = true;
+                try {
+                    $message->save();
+                } catch (Exception $exception) {
+                    $this->logger->addLog('The message cannot be saved: ' . $exception->getMessage(), 'error');
+                    $this->exitProcess($exception->getMessage(), $exception->getCode());
+                }
+            }
+
+            // Add prestashop OrderPayment if need
+            if (!$order_payments) {
+                $this->logger->addLog('Add new orderPayment for deferred - ' . count($order_payments), 'debug');
+                $order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
+            }
+
+            // If payment is paid, set the invoice
+            if ($new_order_state == $this->order_states['paid']) {
+                $this->logger->addLog('Set order invoice', 'debug');
+                $order->setInvoice(true);
+            }
+
+            // Update the order state
+            $order_history = new OrderHistory();
+            $order_history->id_order = (int)$id_order;
+            try {
+                $use_existings_payment = false;
+                if (!$order->hasInvoice()) {
+                    $use_existings_payment = true;
+                }
+                $order_history->changeIdOrderState((int)$new_order_state, $order, $use_existings_payment);
+                $order_history->save();
+            } catch (Exception $exception) {
+                $this->logger->addLog(
+                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                $this->logger->addLog(
+                    'Please check if order state ' . (int)$new_order_state . ' exists.',
+                    'error');
+                $this->exitProcess($exception->getMessage(), $exception->getCode());
+            }
+
+            try {
+                $order->current_state = $order_history->id_order_state;
+                $order->update();
+            } catch (Exception $exception) {
+                $this->logger->addLog(
+                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                $this->exitProcess($exception->getMessage(), $exception->getCode());
+            }
+            $this->logger->addLog('Order updated.');
+            $this->exitProcess('Order updated.');
+        } // if payment is already paid
+        elseif ($current_state == $this->order_states['paid']) {
+            $this->logger->addLog('Order is already paid.');
+            $this->exitProcess('Order is already paid.');
+        } // if payment is already expired
+        elseif ($current_state == $this->order_states['exp']) {
+            $this->logger->addLog('Order is already set as expired.');
+            $this->exitProcess('Order is already set as expired.');
+        } // if payment is already cancelled
+        elseif ($current_state == $this->order_states['cancelled']) {
+            $this->logger->addLog('Order is already set as cancelled.');
+            $this->exitProcess('Order is already set as cancelled.');
+        } // else set error
+        else {
+            $this->logger->addLog(
+                'Current state: ' . (int)$current_state,
+                'debug'
+            );
+            $this->logger->addLog(
+                'Current Cart ID: ' . (int)$this->cart->id,
+                'debug'
+            );
+            $this->logger->addLog(
+                'Current Payment ID: ' . (int)$this->payment->id,
+                'debug'
+            );
+            $this->logger->addLog(
+                'Pending state: ' . (int)$this->order_states['pending'],
+                'debug'
+            );
+            $this->logger->addLog(
+                'Paid state: ' . (int)$this->order_states['paid'],
+                'debug'
+            );
+            $this->logger->addLog(
+                'Current order state is in conflict with IPN.',
+                'error'
+            );
+            $this->exitProcess('Current order state is in conflict with IPN.', 500);
         }
     }
 
@@ -735,14 +748,14 @@ class PayPlugNotifications
 
         // Add prestashop OrderPayment
         $order_payments = $order->getOrderPayments();
-        if ($order_payments) {
+        if (!$order_payments) {
             $this->logger->addLog('Add new orderPayment for deferred - ' . count($order_payments), 'debug');
-            $order->addOrderPayment($amount, null, $this->payment->id);
+            $order->addOrderPayment($amount, null, $transaction_id);
         }
 
         // Check number of order using this cart
         $this->logger->addLog('Checking number of order passed with this id_cart');
-        $sql = 'SELECT o.* FROM ' . _DB_PREFIX_ . 'orders o WHERE o.id_cart = ' . $this->cart->id;
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_cart` = ' . $this->cart->id;
         $res_nb_orders = Db::getInstance()->executeS($sql);
         if (!$res_nb_orders) {
             $this->logger->addLog(
@@ -765,18 +778,22 @@ class PayPlugNotifications
         }
 
         // Check number of orderPayment using this cart
-        $this->logger->addLog('Checking number of order passed with this id_cart');
-        $sql = 'SELECT o.* FROM ' . _DB_PREFIX_ . 'orders o WHERE o.id_cart = ' . $this->cart->id;
-        $res_nb_orders = Db::getInstance()->executeS($sql);
-        if (!$res_nb_orders) {
-            $this->logger->addLog('No order can be found using id_cart ' . (int)$this->cart->id, 'error');
+        $this->logger->addLog('Checking number of transaction validated for this order');
+        $payments = $order->getOrderPayments();
+        if (!$payments) {
+            $this->logger->addLog(
+                'No transaction can be found using id_order ' . (int)$id_order,
+                'error'
+            );
             $this->exitProcess('No transaction can be found using id_order: ' . (int)$id_order, 500);
-        } elseif (count($res_nb_orders) > 1) {
-            $this->logger->addLog('There is more than one order using id_cart ' . (int)$this->cart->id, 'error');
-            foreach ($res_nb_orders as $o) {
-                $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
-            }
+        } elseif (count($payments) > 1) {
+            $this->logger->addLog(
+                'There is more than one transaction using id_order ' . (int)$id_order,
+                'error'
+            );
             $this->exitProcess('There is more than one transaction using id_order: ' . (int)$id_order, 500);
+        } else {
+            $this->logger->addLog('OK');
         }
 
         //
