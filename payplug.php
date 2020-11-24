@@ -1722,7 +1722,6 @@ class Payplug extends PaymentModule
         }
 
         $permissions = $this->getAccountPermissions();
-        $inst_min_amount = (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'));
 
         $available_options = array(
             'standard' => true,
@@ -1754,9 +1753,7 @@ class Payplug extends PaymentModule
             if (!$permissions['can_save_cards']) {
                 $available_options['one_click'] = false;
             }
-            if (!$permissions['can_create_installment_plan']
-//                || $cart->getOrderTotal(true, Cart::BOTH) < $inst_min_amount
-            ) {
+            if (!$permissions['can_create_installment_plan']) {
                 $available_options['installment'] = false;
             }
             if (!$permissions['can_create_deferred_payment']) {
@@ -2287,6 +2284,8 @@ class Payplug extends PaymentModule
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
         $payplug_cards = $options['one_click'] ? $this->card->getCardsByCustomer((int)$id_customer, true) : [];
+
+        $paymentOption = [];
 
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
@@ -2896,10 +2895,13 @@ class Payplug extends PaymentModule
     /**
      * @param array $params
      * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \Payplug\Exception\ConfigurationException
+     * @throws \Payplug\Exception\ConfigurationNotSetException
      * @see Module::hookAdminOrder()
-     *
      */
-    function hookAdminOrder($params)
+    public function hookAdminOrder($params)
     {
         if (!$this->active) {
             return;
@@ -3058,15 +3060,11 @@ class Payplug extends PaymentModule
                 }
             }
 
-            $this->updateOrderState($payment);
-
             $single_payment = $this->buildPaymentDetails($payment);
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
             $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
-//            $sandbox = ((int)$payment->is_live == 1 ? false : true);
-//            $state_addons = ($sandbox ? '' : '_TEST');
             $state_addons = (!$payment->is_live ? '_TEST' : '');
 
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
@@ -3739,6 +3737,8 @@ class Payplug extends PaymentModule
             return $this->PrestashopSpecificObject->installTab();
         }
 
+        $install = [];
+
         $translationsAdminPayPlug = array(
             'en' => 'PayPlug',
             'gb' => 'PayPlug',
@@ -3783,7 +3783,7 @@ class Payplug extends PaymentModule
      *
      * @return bool
      */
-    function isMobiledevice()
+    public function isMobiledevice()
     {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
@@ -3802,6 +3802,7 @@ class Payplug extends PaymentModule
      * @param string $payment_id
      * @param string $type default payment
      * @return bool
+     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function isPaidPaymentMethod($payment_id, $type = 'payment')
     {
@@ -5341,7 +5342,6 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
-        return true;
         $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
         $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
 
@@ -5397,46 +5397,6 @@ class Payplug extends PaymentModule
             return $this->PrestashopSpecificObject->uninstallTab();
         }
         return ($this->uninstallModuleTab('AdminPayPlug') && $this->uninstallModuleTab('AdminPayPlugInstallment'));
-    }
-
-    public function updateOrderState($payment)
-    {
-//        if (!Validate::isLoadedObject($payment)) {
-//            return false;
-//        }
-//
-//        $id_cart = $payment->metadata['ID Cart'];
-//        $order = \PayPlug\backward\PayPlugBackward::getByCartId($id_cart);
-//
-//        $state_addons = ($payment->is_live ? '' : '_TEST');
-//        $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-//        $oney_state = Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
-//        $cancelled_state = Configuration::get('PS_OS_CANCELED');
-//
-//        $oney_payment_methods = ['oney_x3_with_fees', 'oney_x4_with_fees'];
-//        $is_oney = isset($payment->payment_method['type']) && in_array($payment->payment_method['type'],
-//                $oney_payment_methods);
-//
-//        if ($is_oney) {
-//            if ($order->getCurrentState() == $oney_state && $payment->is_paid) {
-//                $new_order_state = $paid_state;
-//                $order_history = new OrderHistory();
-//                $order_history->id_order = $order->id;
-//                $order_history->changeIdOrderState($new_order_state, $order->id, true);
-//                return $order_history->save();
-//            } elseif (
-//                $order->getCurrentState() == $oney_state
-//                && isset($payment->failure)
-//                && $payment->failure !== null
-//            ) {
-//                $new_order_state = $cancelled_state;
-//                $order_history = new OrderHistory();
-//                $order_history->id_order = $order->id;
-//                $order_history->changeIdOrderState($new_order_state, $order->id, true);
-//                return $order_history->save();
-//            }
-//        }
-//        return true;
     }
 
     /**

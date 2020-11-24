@@ -193,7 +193,7 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('update') == 1) {
         $pay_id = Tools::getValue('pay_id');
-        $payment = $this->retrievePayment($pay_id);
+        $payment = $payplug->retrievePayment($pay_id);
         $id_order = Tools::getValue('id_order');
 
         if ((int)$payment->is_paid == 1) {
@@ -224,7 +224,7 @@ if (Tools::getValue('_ajax') == 1) {
         //$this->deletePayment($pay_id, $order->id_cart);
 
         die(json_encode(array(
-            'message' => $this->l('Order successfully updated.'),
+            'message' => $payplug->l('Order successfully updated.'),
             'reload' => true
         )));
     }

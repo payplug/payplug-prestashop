@@ -36,7 +36,7 @@ class PPPayment
             $this->populateFromPayment($payment);
         } else {
             $id = null;
-            $resource = null;
+            $this->resource = null;
         }
     }
 
@@ -62,7 +62,7 @@ class PPPayment
     public function capture()
     {
         try {
-            $capture = \Payplug\Payment::capture($this->resource->id);
+            \Payplug\Payment::capture($this->resource->id);
             $response = array(
                 'code' => 200,
                 'message' => 'Amount successfully captured.',
@@ -76,6 +76,13 @@ class PPPayment
                 'resource' => $this,
             );
         } catch (Payplug\Exception\ForbiddenException $e) {
+            $httpResponse = json_decode($e->getHttpResponse());
+            $response = array(
+                'code' => (int)$e->getCode(),
+                'message' => $httpResponse->message,
+                'resource' => $this,
+            );
+        } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
             $httpResponse = json_decode($e->getHttpResponse());
             $response = array(
                 'code' => (int)$e->getCode(),

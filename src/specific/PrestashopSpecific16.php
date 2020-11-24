@@ -69,7 +69,6 @@ class PrestashopSpecific16
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
         $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
-        $oney = $this->oney;
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -141,7 +140,6 @@ class PrestashopSpecific16
         $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer($cart->id_customer, true);
 
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
-        $i = 0;
 
         foreach($payment_options as $payment_option) {
 

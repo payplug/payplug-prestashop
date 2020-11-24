@@ -26,7 +26,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-//        require_once(dirname(__FILE__) . './../../../../config/config.inc.php');
 
         /** Call init.php to initialize context */
         require_once(_PS_MODULE_DIR_ . '../init.php');
@@ -40,7 +39,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $payplug->initializeApi();
 
         $context = Context::getContext();
-        $cart = $context->cart;
 
         $id_payplug_card = Tools::getValue('pc', null);
 

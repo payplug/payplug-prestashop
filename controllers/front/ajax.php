@@ -69,7 +69,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
             $config = $this->configurationSpecific;
             $context = $this->contextSpecific->getContext(); // get the method
-            $product = $this->productSpecific;
             $tools = $this->toolsSpecific;
 
             if ($tools->tool('getIsset','pc')) {

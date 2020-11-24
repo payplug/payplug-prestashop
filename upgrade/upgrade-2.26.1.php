@@ -45,7 +45,7 @@ function upgrade_module_2_26_1($object)
 
     try {
         foreach ($sql_requests as $sql_request) {
-            $request = Db::getInstance()->execute($sql_request);
+            Db::getInstance()->execute($sql_request);
             /*
              * Exceptionally we don't want to block update after request execution
              * because the constraint may be duplicated for beta testers

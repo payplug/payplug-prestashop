@@ -444,6 +444,7 @@ class CardRepository
     {
         $card = $this->cardEntity;
         $id = $this->cardEntity->getId();
+        $fields = [];
         if (isset($id)) {
             $fields['id_payplug_card'] = (int)($id);
         }

@@ -36,8 +36,6 @@ function upgrade_module_2_28_0($object)
         define('_PS_OS_PENDING_', 0);
     }
 
-    $flag = true;
-
     $states = array(
         'auth_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
         'auth_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),

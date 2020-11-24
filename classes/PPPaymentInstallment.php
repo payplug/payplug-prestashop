@@ -29,6 +29,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 
 class PPPaymentInstallment extends PPPayment
 {
+
     public function __construct($id = null)
     {
         if ($id != null) {
@@ -36,7 +37,6 @@ class PPPaymentInstallment extends PPPayment
             $this->populateFromInstallment($payment);
         } else {
             $id = null;
-            $resource = null;
         }
     }
 

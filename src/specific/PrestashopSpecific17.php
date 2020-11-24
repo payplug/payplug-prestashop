@@ -42,6 +42,7 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
+        $paymentOptions = [];
         foreach($payment_options as $payment_option)
         {
             /*

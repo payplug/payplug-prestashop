@@ -22,7 +22,6 @@
  */
 
 use PayPlug\src\repositories\CardRepository;
-use \Payplug\Exception;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -65,6 +64,7 @@ class PayPlugAjax
 
     /**
      * Manage ajax processing
+     * @throws Exception
      */
     public function postProcess()
     {
@@ -181,7 +181,7 @@ class PayPlugAjax
                 try {
                     $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 } catch (Exception $e) {
-                    throw Exception($e);
+                    throw new \Exception($e);
                 }
 
                 die($tools->tool('jsonEncode', $payment_options));
@@ -210,7 +210,7 @@ class PayPlugAjax
                         )));
                     }
                 } catch (Exception $e) {
-                    throw Exception($e);
+                    throw new \Exception($e);
                 }
 
                 $result = $this->payplug->setPaymentDataCookie($payment_data);

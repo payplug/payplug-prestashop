@@ -506,7 +506,7 @@ class PayPlugPayment
      * @param array $fields
      * @return array
      */
-    protected function generateAddressTab(Address $address, $fields = array())
+    protected function generateAddressTab(Address $address, $fields = [])
     {
         if (!is_object($address)) {
             $address = new Address((int)$address);
@@ -521,6 +521,7 @@ class PayPlugPayment
         }
 
         unset($address->country);
+        $address_tab = [];
 
         foreach ($fields as $key => $field) {
             $value = $this->getField($address, $key);
@@ -620,10 +621,10 @@ class PayPlugPayment
     private function getAddressTitle(Address $address)
     {
         return null;
-
-        // todo: send later the real gender
-        $id_lang = isset($this->customer->id_lang) ? $this->customer->id_lang : _PS_LANG_DEFAULT_;
-        return PayplugBackward::getCustomerGender($this->customer->id_gender, $id_lang);
+//
+//        // todo: send later the real gender
+//        $id_lang = isset($this->customer->id_lang) ? $this->customer->id_lang : _PS_LANG_DEFAULT_;
+//        return PayplugBackward::getCustomerGender($this->customer->id_gender, $id_lang);
     }
 
     /**
