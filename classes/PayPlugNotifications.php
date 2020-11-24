@@ -195,7 +195,7 @@ class PayPlugNotifications
             ((isset($this->payment->card->id) && $this->payment->card->id != '')
                 && ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment != ''))
         ) {
-            $this->logger->addLog('[Save Card] Saving card...', 'info');
+            $this->logger->addLog('[Save Card] Saving card...');
             $res_payplug_card = $this->plugin->getCard()->saveCard($this->payment);
 
             if (!$res_payplug_card) {
@@ -718,7 +718,7 @@ class PayPlugNotifications
 
             if ($amount != $cart_amount) {
                 $this->logger->addLog('Cart amount is different and may occured an error');
-                $this->logger->addLog('Cart amount:' . $cart_amount, 'info');
+                $this->logger->addLog('Cart amount:' . $cart_amount);
             }
 
             $this->logger->addLog('Order create with amount:' . $amount);
