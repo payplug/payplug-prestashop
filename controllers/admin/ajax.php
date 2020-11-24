@@ -79,6 +79,12 @@ if (Tools::getValue('_ajax') == 1) {
         $payplug->displayPopin(Tools::getValue('type'), $args);
     }
     if (Tools::getValue('submit') == 'submitPopin_pwd') {
+        /*
+         * We have to have $_POST on PrestaShop 1.6 and 1.7,
+         * otherwise Tools::getValue() transforms the password,
+         * and in particular escapes backslashes,
+         * so the password is no longer the one entered by the user
+         */
         $payplug->submitPopinPwd($_POST['pwd']);
     }
     if (Tools::getValue('has_live_key')) {

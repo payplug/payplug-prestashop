@@ -207,6 +207,7 @@ class OneyRepository
      */
     public function checkOneyRequiredFields($payment_data)
     {
+        $tools = $this->toolsSpecific;
         $errors = array();
 
         if (!$payment_data) {
@@ -222,10 +223,10 @@ class OneyRepository
             }
             switch ($field) {
                 case 'email' :
-                    if (strlen($data) > 100 && strpos($data, '+') !== false) {
+                    if ($tools->tool('strlen', $data) > 100 && $tools->tool('strpos', $data, '+') !== false) {
                         $text = $this->payplug->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
                         $errors[] = $text;
-                    } elseif (strlen($data) > 100) {
+                    } elseif ($tools->tool('strlen', $data) > 100) {
                         $text = $this->payplug->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
                         $errors[] = $text;
                     } elseif (strpos($data, '+') !== false) {
@@ -270,7 +271,7 @@ class OneyRepository
                     if (!Validate::isCityName($data)) {
                         $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping city.') : $this->payplug->l('Please enter your billing city.');
                         $errors[] = $text;
-                    } elseif (strlen($data) > 32) {
+                    } elseif ($tools->tool('strlen', $data) > 32) {
                         $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                             . $this->payplug->l('Please change it to another one or select another payment method.');
                         $errors[] = $text;
@@ -501,7 +502,7 @@ class OneyRepository
             $country = reset($iso_list);
         }
 
-        $country = strtoupper($country);
+        $country = $this->toolsSpecific->tool('strtoupper', $country);
 
         $oney_sims = $this->getOneySimulations($amount, $country, $this->payplug->available_oney_payments);
 
@@ -583,6 +584,7 @@ class OneyRepository
     public function getOneyPriceLimit($id_currency = false)
     {
         $config = $this->configurationSpecific;
+        $tools = $this->toolsSpecific;
 
         if ($this->validateSpecific->validate('isLoadedObject', $id_currency)) {
             $currency = $id_currency;
@@ -605,9 +607,9 @@ class OneyRepository
             return $limits;
         }
 
-        $iso_code = strtoupper($currency->iso_code);
+        $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
-        $oney_min_amounts = explode(',', strtoupper($config->get('PAYPLUG_ONEY_MIN_AMOUNTS')));
+        $oney_min_amounts = explode(',', $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MIN_AMOUNTS')));
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -616,7 +618,7 @@ class OneyRepository
             }
         }
 
-        $oney_max_amounts = explode(',', strtoupper($config->get('PAYPLUG_ONEY_MAX_AMOUNTS')));
+        $oney_max_amounts = explode(',', $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MAX_AMOUNTS')));
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
@@ -635,6 +637,7 @@ class OneyRepository
      */
     public function getOneyRequiredFields()
     {
+        $tools = $this->toolsSpecific;
         $is_same = $this->contextSpecific->getContext()->cart->id_address_delivery == $this->contextSpecific->getContext()->cart->id_address_invoice;
 
         $fields = [];
@@ -644,7 +647,7 @@ class OneyRepository
         $shipping_country = new \Country($shipping_address->id_country);
 
         // Validate email format
-        if (strlen($this->contextSpecific->getContext()->customer->email) > 100 && strpos($this->contextSpecific->getContext()->customer->email, '+') !== false) {
+        if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email) > 100 && $tools->tool('strpos', $this->contextSpecific->getContext()->customer->email, '+') !== false) {
             $text = $this->payplug->l('Your email address is too long and the + character is not valid,') .
                 $this->payplug->l(' please change it to another address (max 100 characters).');
             $shipping_fields['email'] = [
@@ -657,7 +660,7 @@ class OneyRepository
                     ]
                 ],
             ];
-        } elseif (strlen($this->contextSpecific->getContext()->customer->email) > 100) {
+        } elseif ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email) > 100) {
             $text = $this->payplug->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
                 'text' => $text,
@@ -700,7 +703,7 @@ class OneyRepository
         }
 
         // Validate address
-        if (strlen($shipping_address->city) > 32) {
+        if ($tools->tool('strlen', $shipping_address->city) > 32) {
             $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                 . $this->payplug->l('Please change it to another one or select another payment method.');
             $shipping_fields['city'] = [
@@ -761,7 +764,7 @@ class OneyRepository
                 ];
             }
 
-            if (strlen($billing_address->city) > 32) {
+            if ($tools->tool('strlen', $billing_address->city) > 32) {
                 $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                     . $this->payplug->l('Please change it to another one or select another payment method.');
                 $billing_fields['city'] = [
@@ -896,13 +899,15 @@ class OneyRepository
             return false;
         }
 
+        $tools = $this->toolsSpecific;
+
         // Check the shipping fields
         $shipping = $payment_data['shipping'];
 
         // Validate email format
-        if (strlen($shipping['email']) > 100 && strpos($shipping['email'], '+') !== false) {
+        if ($tools->tool('strlen', $shipping['email']) > 100 && $tools->tool('$shipping[\'email\']', '+') !== false) {
             return true;
-        } elseif (strlen($shipping['email']) > 100) {
+        } elseif ($tools->tool('strlen', $shipping['email']) > 100) {
             return true;
         } elseif (strpos($shipping['email'], '+') !== false) {
             return true;
@@ -916,7 +921,7 @@ class OneyRepository
         }
 
         // Validate address
-        if (strlen($shipping['city']) > 32) {
+        if ($tools->tool('strlen', $shipping['city']) > 32) {
             return true;
         }
 
@@ -930,7 +935,7 @@ class OneyRepository
         }
 
         // Validate address
-        if (strlen($billing['city']) > 32) {
+        if ($tools->tool('strlen', $billing['city']) > 32) {
             return true;
         }
 
@@ -1015,8 +1020,8 @@ class OneyRepository
         }
 
         // we use the Oney limit to get allowed currencies
-        $oney_min_amounts = strtoupper($this->configurationSpecific->get('PAYPLUG_ONEY_MIN_AMOUNTS'));
-        $iso_code = strtoupper($currency->iso_code);
+        $oney_min_amounts = $this->toolsSpecific->tool('strtoupper', $this->configurationSpecific->get('PAYPLUG_ONEY_MIN_AMOUNTS'));
+        $iso_code = $this->toolsSpecific->tool('strtoupper', $currency->iso_code);
 
         return strpos($oney_min_amounts, $iso_code) !== false;
     }
@@ -1284,8 +1289,8 @@ class OneyRepository
         }
 
         // check if the shipping country are different then return false
-        $iso_code = strtoupper($shipping_iso);
-        $allow_countries = strtoupper($this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES'));
+        $iso_code = $this->toolsSpecific->tool('strtoupper', $shipping_iso);
+        $allow_countries = $this->toolsSpecific->tool('strtoupper', $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES'));
         if (!$allow_countries) {
             return array(
                 'result' => false,

@@ -33,7 +33,7 @@ class CardRepository
     private $configurationSpecific;
     private $payplug;
     private $query;
-    private $tools;
+    private $toolsSpecific;
 
     public function __construct($payplug)
     {
@@ -41,7 +41,7 @@ class CardRepository
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->payplug = $payplug;
         $this->query = new QueryRepository();
-        $this->tools = new ToolsSpecific();
+        $this->toolsSpecific = new ToolsSpecific();
         $this->setParams();
     }
 
@@ -343,7 +343,7 @@ class CardRepository
         $config = $this->configurationSpecific;
 
         $brand = $payment->card->brand;
-        if (strtolower($brand) != 'mastercard' && strtolower($brand) != 'visa') {
+        if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard' && $this->toolsSpecific->tool('strtolower', $brand) != 'visa') {
             $brand = 'none';
         }
 
