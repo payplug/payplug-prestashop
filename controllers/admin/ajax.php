@@ -26,12 +26,6 @@ class PayplugAjaxModuleAdminController extends ModuleAdminController
     /**
      * @see FrontController::initContent()
      */
-/*
-    public function initContent()
-    {
-
-    }
-*/
 }
 
 //require_once(dirname(__FILE__).'/../../../../config/config.inc.php');

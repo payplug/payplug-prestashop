@@ -771,13 +771,13 @@ class PayPlugPayment
             $currency = $this->cart->id_currency;
             $result_currency = Currency::getCurrency($currency);
         }
-        $supported_currencies = explode(';', strtoupper($this->module->getConfiguration('PAYPLUG_CURRENCIES')));
+        $supported_currencies = explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_CURRENCIES')));
 
-        if (!in_array(strtoupper($result_currency['iso_code']), $supported_currencies)) {
+        if (!in_array(Tools::strtoupper($result_currency['iso_code']), $supported_currencies)) {
             return false;
         }
 
-        return strtoupper($result_currency['iso_code']);
+        return Tools::strtoupper($result_currency['iso_code']);
     }
 
     /**
@@ -873,18 +873,18 @@ class PayPlugPayment
     {
         $min_amounts = array();
         $max_amounts = array();
-        foreach (explode(';', strtoupper($this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS'))) as $amount_cur) {
+        foreach (explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS'))) as $amount_cur) {
             $cur = array();
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $min_amounts[$cur[1]] = (int)$cur[2];
         }
-        foreach (explode(';', strtoupper($this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS'))) as $amount_cur) {
+        foreach (explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS'))) as $amount_cur) {
             $cur = array();
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $max_amounts[$cur[1]] = (int)$cur[2];
         }
-        $current_min_amount = $min_amounts[strtoupper($iso_code)];
-        $current_max_amount = $max_amounts[strtoupper($iso_code)];
+        $current_min_amount = $min_amounts[Tools::strtoupper($iso_code)];
+        $current_max_amount = $max_amounts[Tools::strtoupper($iso_code)];
 
         return array('min_amount' => $current_min_amount, 'max_amount' => $current_max_amount);
     }
@@ -1082,6 +1082,6 @@ class PayPlugPayment
             return false;
         }
         $parse = explode('-',$language->language_code);
-        return strtolower($parse[0]);
+        return Tools::strtolower($parse[0]);
     }
 }
