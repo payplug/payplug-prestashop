@@ -12,6 +12,9 @@
             "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
         }
     },
+    "config": {
+        "prepend-autoloader": false
+    },
     "scripts": {
         "post-install-cmd": [
             "rm -rf vendor/giggsey/libphonenumberlight",
