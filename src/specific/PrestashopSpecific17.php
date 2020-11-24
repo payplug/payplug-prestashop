@@ -62,11 +62,13 @@ class PrestashopSpecific17
 
             // load oney schedule on e page loading
             if ($payment_method == 'oney' && $payment_option['is_optimized']) {
-                $payment_schedule = $this->oney->getOneyPaymentOptionsList($payment_option['amount'], $payment_option['iso_code']);
-
+                $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
+                    $payment_option['amount'],
+                    $payment_option['iso_code']
+                );
                 if ($payment_schedule) {
                     $schedules = $this->payplug->oney->displayOneySchedule(
-                        $payment_option['type'],
+                        $payment_schedule[$payment_option['type']],
                         $payment_option['amount']
                     );
                     $payment_option['additionalInformation'] = $schedules;
