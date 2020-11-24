@@ -3020,7 +3020,7 @@ class Payplug extends PaymentModule
             ));
 
             $sandbox = ((int)$installment->is_live == 1 ? false : true);
-            $state_addons = ($sandbox ? '' : '_TEST');
+            $state_addons = ($sandbox ? '_TEST' : '');
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
             $this->updatePayplugInstallment($installment);
