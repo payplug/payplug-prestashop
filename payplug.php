@@ -2233,11 +2233,12 @@ class Payplug extends PaymentModule
      */
     public function getPaymentErrorsCookie()
     {
-        // get payplug error
-        $payplug_errors = !empty($_COOKIE['payplug_errors']) ? $_COOKIE['payplug_errors'] : false;
+        // get payplug errors
+        $cookie_errors = $this->context->cookie->__get('payplug_errors');
+        $payplug_errors = !empty($cookie_errors) ? $cookie_errors : false;
 
         // then flush to avoid repetition
-        setcookie('payplug_errors', '', time() - 3600);
+        $this->context->cookie->__set('payplug_errors', '');
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
@@ -5001,9 +5002,10 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Set payment errors in cookie
+     * @description Set payment errors in cookie
      *
      * @return mixed
+     * @throws Exception
      */
     public function setPaymentErrorsCookie($payplug_errors = array())
     {
@@ -5013,7 +5015,8 @@ class Payplug extends PaymentModule
 
         $value = json_encode($payplug_errors);
 
-        return setcookie('payplug_errors', $value, time() + 12000);
+        $this->context->cookie->__set('payplug_errors', $value);
+        return (bool)$this->context->cookie->__get('payplug_errors');
     }
 
     /**

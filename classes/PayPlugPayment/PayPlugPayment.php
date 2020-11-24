@@ -764,13 +764,8 @@ class PayPlugPayment
      */
     public function getCartCurrency()
     {
-        $result_currency = array();
-        if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            $result_currency['iso_code'] = Currency::getCurrent()->iso_code;
-        } else {
-            $currency = $this->cart->id_currency;
-            $result_currency = Currency::getCurrency($currency);
-        }
+        $currency = $this->cart->id_currency;
+        $result_currency = Currency::getCurrency($currency);
         $supported_currencies = explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_CURRENCIES')));
 
         if (!in_array(Tools::strtoupper($result_currency['iso_code']), $supported_currencies)) {
@@ -1059,11 +1054,11 @@ class PayPlugPayment
 
             // then format code
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             return $phone_util->isValidNumber($parsed) ?
-                $phone_util->format($parsed, \libphonenumber\PhoneNumberFormat::E164) : null;
+                $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164) : null;
         } catch (Exception $e) {
             // todo: add log
             return null;

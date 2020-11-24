@@ -208,6 +208,7 @@ class OneyRepository
     public function checkOneyRequiredFields($payment_data)
     {
         $tools = $this->toolsSpecific;
+        $validate = $this->validateSpecific;
         $errors = array();
 
         if (!$payment_data) {
@@ -244,31 +245,31 @@ class OneyRepository
                     }
                     break;
                 case 'first_name' :
-                    if (!Validate::isPostCode($data)) {
+                    if (!$validate->validate('isPostCode', $data)) {
                         $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping firstname.') : $this->payplug->l('Please enter your billing firstname.');
                         $errors[] = $text;
                     }
                     break;
                 case 'last_name' :
-                    if (!Validate::isPostCode($data)) {
+                    if (!$validate->validate('isPostCode', $data)) {
                         $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping lastname.') : $this->payplug->l('Please enter your billing lastname.');
                         $errors[] = $text;
                     }
                     break;
                 case 'address1' :
-                    if (!Validate::isPostCode($data)) {
+                    if (!$validate->validate('isPostCode', $data)) {
                         $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping address.') : $this->payplug->l('Please enter your billing address.');
                         $errors[] = $text;
                     }
                     break;
                 case 'postcode' :
-                    if (!Validate::isPostCode($data)) {
+                    if (!$validate->validate('isPostCode', $data)) {
                         $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping postcode.') : $this->payplug->l('Please enter your billing postcode.');
                         $errors[] = $text;
                     }
                     break;
                 case 'city' :
-                    if (!Validate::isCityName($data)) {
+                    if (!$validate->validate('isCityName', $data)) {
                         $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping city.') : $this->payplug->l('Please enter your billing city.');
                         $errors[] = $text;
                     } elseif ($tools->tool('strlen', $data) > 32) {
