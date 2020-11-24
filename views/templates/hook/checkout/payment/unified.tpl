@@ -20,13 +20,12 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {assign var=parse_3x_4x value="_"|explode:$payplug_payment_option.logo_url}
-{*{$parse_3x_4x[0]|substr:-1}*}
 <div class="row">
     <div class="col-xs-12">
         <p class="payment_module payplugPayment">
-            <a href="{$payplug_payment_option.payment_url|escape:'html'}" title="{$payplug_payment_option.label|escape:'html'}">
-                <img src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{$payplug_payment_option.label|escape:'html'}"/>
-                {$payplug_payment_option.label|escape:'html'}
+            <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}">
+                <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"/>
+                {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
             </a>
         </p>
         <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>

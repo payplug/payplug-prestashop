@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -25,11 +25,11 @@
 		<p class="payment_module payplugPayment">
 			{if isset($front_ajax_url)}
 				<a data-e2e-type="payment" data-e2e-method="installment" href="{$installment_controller_url|escape:'htmlall':'UTF-8'}" class="payplug installment installment_{$installment_mode|escape:'htmlall':'UTF-8'}{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}" title="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}">
-					<img class="payment_option_installment_3_logo" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}" />{$payplug_payment_option.label|escape:'html'}
+					<img class="payment_option_installment_3_logo" src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}" />{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
 				</a>
 			{else}
 				<a data-e2e-type="payment" data-e2e-method="installment" href="{$installment_controller_url|escape:'htmlall':'UTF-8'}" class="payplug installment_{$installment_mode|escape:'htmlall':'UTF-8'}{if isset($img_lang)} {$img_lang|escape:'htmlall':'UTF-8'}{/if}" title="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}">
-					<img class="payment_option_installment_3_logo" src="{$payplug_payment_option.logo_url|escape:'html'}" alt="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}" />{$payplug_payment_option.label|escape:'html'}
+					<img class="payment_option_installment_3_logo" src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{l s='Pay by card in' mod='payplug'} {$installment_mode|escape:'htmlall':'UTF-8'} {l s='installments' mod='payplug'}" />{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
 				</a>
 			{/if}
 		</p>

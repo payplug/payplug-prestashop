@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,11 +15,11 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<input class="btn green-button button" type="submit" name="{$submitName}" value="{$submitValue}"{if isset($e2e_action) && $e2e_action} data-e2e-type="button" data-e2e-action="{$e2e_action|escape:'htmlall':'UTF-8'}"{/if} />
+<input class="btn green-button button" type="submit" name="{$submitName|escape:'htmlall':'UTF-8'}" value="{$submitValue|escape:'htmlall':'UTF-8'}"{if isset($e2e_action) && $e2e_action} data-e2e-type="button" data-e2e-action="{$e2e_action|escape:'htmlall':'UTF-8'}"{/if} />
 <p class="hide ppaction pperror"></p>
 <p class="hide ppaction ppsuccess"></p>
 <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />

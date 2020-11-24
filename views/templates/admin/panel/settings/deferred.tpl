@@ -40,7 +40,7 @@
                         <select name="payplug_deferred_state" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
                             <option value="0">{l s='-- Choose an order state --' mod='payplug'}</option>
                             {foreach from=$order_states item=order_state}
-                                <option value="{$order_state.id_order_state}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name}</option>
+                                <option value="{$order_state.id_order_state|escape:'htmlall':'UTF-8'}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name|escape:'htmlall':'UTF-8'}</option>
                             {/foreach}
                         </select>
                         <span style="display: none;" data-e2e-error="deferred_state">{l s='You have to choose an order state.' mod='payplug'}</span>

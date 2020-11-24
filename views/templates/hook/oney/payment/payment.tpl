@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -34,7 +34,7 @@
             <div class="oneyOption_wrapper">
                 {include file="./options.tpl"}
             </div>
-            {$payplug_oney_required_field}
+            {$payplug_oney_required_field|escape:'htmlall':'UTF-8'}
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
             </div>

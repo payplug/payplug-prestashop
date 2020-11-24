@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -24,8 +24,8 @@
         <div class="col-xs-12">
             <div class="payment_module payplugPayment payplugOneClick">
                 <button>
-                    <img src="{$payplug_payment_option.logo_url|escape:'html'|replace:'none.png':'logos_schemes_default.png'}"
-                         alt="{$payplug_payment_option.label|escape:'html'}"/>
+                    <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'|replace:'none.png':'logos_schemes_default.png'}"
+                         alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"/>
                     {l s='Credit card checkout' mod='payplug'}
                 </button>
                 <form action="">
@@ -37,7 +37,7 @@
                                 <input data-e2e-type="payment" data-e2e-method="oneclick" type="radio" name="payplug_card" id="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" value="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" {if $smarty.foreach.ppcards.first}checked="checked" {/if}/>
                                 <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.png"/>
                                 <span>
-                                    {$payplug_payment_option.label|escape:'html'}
+                                    {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
                                     <span>{l s='Expiry date' mod='payplug'} {$card.expiry_date|escape:'htmlall':'UTF-8'}</span>
                                 </span>
                             </label>
