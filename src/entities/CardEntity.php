@@ -438,6 +438,4 @@ class CardEntity
         $this->identifier = $identifier;
         return $this;
     }
-    
-    
 }

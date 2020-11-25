@@ -9,7 +9,6 @@ use Payplug;
  */
 class OneySimulationResource extends APIResource
 {
-
     public $x3_with_fees;
     public $x4_with_fees;
 

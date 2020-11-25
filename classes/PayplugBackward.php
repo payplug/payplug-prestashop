@@ -82,21 +82,21 @@ class PayplugBackward
     public static function getModuleLink(
         $module,
         $controller = 'default',
-        array $params = array(),
+        array $params = [],
         $ssl = null,
         $id_lang = null,
         $id_shop = null,
         $relative_protocol = false
     ) {
-                $url = Context::getContext()->link->getModuleLink(
-                $module,
-                $controller,
-                $params,
-                $ssl,
-                $id_lang,
-                $id_shop,
-                $relative_protocol
-            );
+        $url = Context::getContext()->link->getModuleLink(
+            $module,
+            $controller,
+            $params,
+            $ssl,
+            $id_lang,
+            $id_shop,
+            $relative_protocol
+        );
         return $url;
     }
 

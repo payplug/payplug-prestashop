@@ -34,5 +34,4 @@ class ProductSpecific implements ProductInterface
             return Product::$method;
         }
     }
-
 }

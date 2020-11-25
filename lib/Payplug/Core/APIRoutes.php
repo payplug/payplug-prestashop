@@ -34,7 +34,7 @@ class APIRoutes
      *
      * @return  string  the full URL to the resource
      */
-    public static function getRoute($route, $resourceId = null, array $parameters = array(), array $pagination = array())
+    public static function getRoute($route, $resourceId = null, array $parameters = [], array $pagination = [])
     {
         foreach ($parameters as $parameter => $value) {
             $route = str_replace('{' . $parameter . '}', $value, $route);
@@ -43,8 +43,9 @@ class APIRoutes
         $resourceIdUrl = $resourceId ? '/' . $resourceId : '';
 
         $query_pagination = '';
-        if (!empty($pagination))
+        if (!empty($pagination)) {
             $query_pagination = '?' . http_build_query($pagination);
+        }
 
         return self::$API_BASE_URL . '/v' . self::API_VERSION . $route . $resourceIdUrl . $query_pagination;
     }

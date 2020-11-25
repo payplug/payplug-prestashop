@@ -34,14 +34,14 @@ class PayPlugPaymentInstallment extends PayplugPayment
     public $amount;
 
     /** @var array */
-    protected $definition_schedules = array(
+    protected $definition_schedules = [
         'type' => 'iterable',
-        'field' => array(
-            'date' => array('type' => 'date', 'validate' => 'isDate', 'copy_post' => false),
-            'amount' => array('type' => 'int', 'validate' => 'isInt', 'required' => true),
-        ),
+        'field' => [
+            'date' => ['type' => 'date', 'validate' => 'isDate', 'copy_post' => false],
+            'amount' => ['type' => 'int', 'validate' => 'isInt', 'required' => true],
+        ],
         'required' => true
-    );
+    ];
 
     /**
      * Constructor
@@ -49,7 +49,7 @@ class PayPlugPaymentInstallment extends PayplugPayment
      * @param string $id_card
      * @return PayplugPayment
      */
-    public function __construct($id_card = null, $options = array())
+    public function __construct($id_card = null, $options = [])
     {
         parent::__construct($id_card, $options);
 
@@ -73,14 +73,13 @@ class PayPlugPaymentInstallment extends PayplugPayment
      */
     public function create()
     {
-
         if (!$this->is_valid) {
             // todo: add log failure create
-            return array(
+            return [
                 'resource' => null,
                 'error' => true,
                 'message' => 'Cannot create payment, invalid payment method',
-            );
+            ];
         }
 
         $this->register();
@@ -92,17 +91,17 @@ class PayPlugPaymentInstallment extends PayplugPayment
 
         try {
             $installment = \Payplug\InstallmentPlan::create($this->payment_tab);
-            return array(
+            return [
                 'resource' => $installment,
                 'error' => false,
                 'message' => null,
-            );
+            ];
         } catch (Exception $e) {
-            return array(
+            return [
                 'resource' => null,
                 'error' => true,
                 'message' => $e->__toString(),
-            );
+            ];
         }
     }
 
@@ -149,7 +148,7 @@ class PayPlugPaymentInstallment extends PayplugPayment
             return false;
         }
 
-        $schedule = array();
+        $schedule = [];
         for ($i = 0; $i < $this->nb_installment; $i++) {
             if ($i == 0) {
                 $schedule[$i]['date'] = 'TODAY';

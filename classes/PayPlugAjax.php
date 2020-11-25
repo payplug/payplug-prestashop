@@ -85,7 +85,7 @@ class PayPlugAjax
                         'is_oney' => $is_oney,
                         '_ajax' => 1
                     ];
-                    $payment = $this->payplug->preparePayment($options,$tools->tool('getValue', 'pc'));
+                    $payment = $this->payplug->preparePayment($options, $tools->tool('getValue', 'pc'));
                     die($tools->tool('jsonEncode', $payment));
                 } else {
                     $cookie = $context->cookie;
@@ -103,11 +103,11 @@ class PayPlugAjax
                 }
             } elseif ($tools->tool('getIsset', 'checkOneyAddresses')) {
                 if (!$this->payplug->getConfiguration('PAYPLUG_ONEY')) {
-                    die ($tools->tool('jsonEncode', array('result' => false, 'error' => false)));
+                    die($tools->tool('jsonEncode', ['result' => false, 'error' => false]));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');
                 $id_billing = $tools->tool('getValue', 'id_address_invoice');
-                die ($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
+                die($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$this->payplug->getConfiguration('PS_TAX');
 
@@ -190,24 +190,24 @@ class PayPlugAjax
                 $errors = $this->payplug->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die($tools->tool('jsonEncode', array('result' => $this->payplug->displayPaymentErrors($errors))));
+                    die($tools->tool('jsonEncode', ['result' => $this->payplug->displayPaymentErrors($errors)]));
                 }
 
-                die($tools->tool('jsonEncode', array('result' => false)));
+                die($tools->tool('jsonEncode', ['result' => false]));
             } elseif ($tools->tool('getIsset', 'savePaymentData')) {
                 $payment_data = $tools->tool('getValue', 'payment_data');
 
                 try {
                     if (empty($payment_data)) {
-                        die($tools->tool('jsonEncode', array(
+                        die($tools->tool('jsonEncode', [
                             'result' => false,
                             'message' => $this->payplug->l('Empty payment data')
-                        )));
+                        ]));
                     } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
-                        die($tools->tool('jsonEncode', array(
+                        die($tools->tool('jsonEncode', [
                             'result' => false,
                             'message' => $this->payplug->l('At least one of the fields is not correctly completed.')
-                        )));
+                        ]));
                     }
                 } catch (Exception $e) {
                     throw new \Exception($e);
@@ -215,16 +215,13 @@ class PayPlugAjax
 
                 $result = $this->payplug->setPaymentDataCookie($payment_data);
 
-                die($tools->tool('jsonEncode', array(
+                die($tools->tool('jsonEncode', [
                     'result' => $result,
                     'message' => $result ? $this->payplug->l('Your information has been saved') : $this->payplug->l('An error occured. Please retry in few seconds.')
-                )));
+                ]));
             }
         }
 
         die(false);
     }
 }
-
-
-

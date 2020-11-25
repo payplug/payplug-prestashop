@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\exceptions;
 
-
 class BadParameterException extends \Exception
 {
-
 }

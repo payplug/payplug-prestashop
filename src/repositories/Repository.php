@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-
 class Repository
 {
     private $entity;

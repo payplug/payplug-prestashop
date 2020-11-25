@@ -34,5 +34,4 @@ class ValidateSpecific implements ValidateInterface
             return Validate::$action($object);
         }
     }
-
 }

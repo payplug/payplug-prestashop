@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Core;
+
 use Payplug\Exception;
 
 /**
@@ -27,11 +28,11 @@ class Config
      * means that this program requires curl_version() function to work properly and that it corresponds to php5-curl
      * package.
      */
-    public static $REQUIRED_FUNCTIONS = array(
+    public static $REQUIRED_FUNCTIONS = [
         'json_decode'   => 'php5-json',
         'json_encode'   => 'php5-json',
         'curl_version'  => 'php5-curl'
-    );
+    ];
 }
 
 // Check PHP version
@@ -40,7 +41,7 @@ if (version_compare(phpversion(), Config::PHP_MIN_VERSION, "<")) {
 }
 
 // Check PHP configuration
-foreach(Config::$REQUIRED_FUNCTIONS as $key => $value) {
+foreach (Config::$REQUIRED_FUNCTIONS as $key => $value) {
     if (!function_exists($key)) {
         throw new Exception\DependencyException('This library requires ' . $value . '.');
     }

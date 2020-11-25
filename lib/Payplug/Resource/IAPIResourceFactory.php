@@ -13,5 +13,5 @@ interface IAPIResourceFactory
      *
      * @return  APIResource The new resource.
      */
-    static function fromAttributes(array $attributes);
+    public static function fromAttributes(array $attributes);
 }

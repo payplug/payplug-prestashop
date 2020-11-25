@@ -43,8 +43,7 @@ class PrestashopSpecific17
     public function displayPaymentOption($payment_options)
     {
         $paymentOptions = [];
-        foreach($payment_options as $payment_option)
-        {
+        foreach ($payment_options as $payment_option) {
             /*
              * 1è condition : Si OneClick activé mais pas de carte enregistré, on sort
              * 2è condition : Si, dans la boucle, c'est au tour de 'payplug_cards', on sort pour pas instancier PaymentOption()
@@ -61,8 +60,7 @@ class PrestashopSpecific17
                 ->setModuleName($payment_option['moduleName'])
                 ->setInputs($payment_option['inputs']);
 
-            if (isset($payment_option['additionalInformation']))
-            {
+            if (isset($payment_option['additionalInformation'])) {
                 $paymentOption->setAdditionalInformation($payment_option['additionalInformation']); // Échéanciers Oney
             }
 
@@ -71,5 +69,4 @@ class PrestashopSpecific17
 
         return $paymentOptions;
     }
-
 }

@@ -32,9 +32,9 @@ class PayplugToolsModuleFrontController extends ModuleFrontController
     private function displayToolsList()
     {
         $this->context->smarty->assign(
-            array(
-                'remove_payplug_order_states_link' => $this->context->link->getModuleLink('payplug', 'tools', array('action' => 'remove_payplug_order_states'))
-            )
+            [
+                'remove_payplug_order_states_link' => $this->context->link->getModuleLink('payplug', 'tools', ['action' => 'remove_payplug_order_states'])
+            ]
         );
         $this->setTemplate('tools/list.tpl');
     }
@@ -43,10 +43,10 @@ class PayplugToolsModuleFrontController extends ModuleFrontController
     {
         $action = Tools::getValue('action');
         switch ($action) {
-            case 'remove_payplug_order_states' :
+            case 'remove_payplug_order_states':
                 $this->removePayPlugOrderStates();
                 break;
-            default :
+            default:
                 echo 'action invalide';
                 break;
         }

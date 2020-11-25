@@ -38,17 +38,17 @@ class PayPlugPaymentOneClick extends PayplugPaymentStandard
      * @param string $id_card
      * @return PayplugPayment
      */
-    public function __construct($id_card = null, $options = array())
+    public function __construct($id_card = null, $options = [])
     {
         parent::__construct($id_card, $options);
 
         $this->is_allowed = $this->module->getConfiguration('PAYPLUG_ONE_CLICK');
         $this->id_company = $this->module->getConfiguration('PAYPLUG_COMPANY_ID');
-        $this->definition_tab['payment_method'] = array(
+        $this->definition_tab['payment_method'] = [
             'type' => 'string',
             'validate' => 'isCleanHtml',
             'required' => true
-        );
+        ];
 
         $payplug_card = new PayPlugCard($this->card);
         $this->payment_card = Validate::isLoadedObject($payplug_card) ? $payplug_card : null;

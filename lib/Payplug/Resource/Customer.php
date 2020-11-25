@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Resource;
+
 use Payplug;
 
 /**
@@ -133,9 +134,9 @@ class Customer extends APIResource
         }
 
         $httpClient = new Payplug\Core\HttpClient($payplug);
-        $pagination = array('per_page' => $perPage, 'page' => $page);
+        $pagination = ['per_page' => $perPage, 'page' => $page];
         $response = $httpClient->get(
-            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::CUSTOMER_RESOURCE, null, array(), $pagination)
+            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::CUSTOMER_RESOURCE, null, [], $pagination)
         );
 
         if (!array_key_exists('data', $response['httpResponse'])
@@ -146,7 +147,7 @@ class Customer extends APIResource
             );
         }
 
-        $customers = array();
+        $customers = [];
         foreach ($response['httpResponse']['data'] as &$customer) {
             $customers[] = Customer::fromAttributes($customer);
         }

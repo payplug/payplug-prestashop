@@ -33,10 +33,10 @@ spl_autoload_register(function ($class) {
     }
 });
 */
-$files = array();
+$files = [];
 
 // get PHP Payplug Lib
-$payplug_lib_files = array(
+$payplug_lib_files = [
     '/Payplug/Authentication.php',
     '/Payplug/Card.php',
     '/Payplug/Customer.php',
@@ -86,7 +86,7 @@ $payplug_lib_files = array(
     '/Payplug/Resource/PaymentBilling.php',
     '/Payplug/Resource/PaymentShipping.php',
     '/Payplug/Resource/OneySimulationResource.php',
-);
+];
 $files = array_merge($files, $payplug_lib_files);
 
 if (!function_exists('curl_init')) {

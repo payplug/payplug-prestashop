@@ -48,7 +48,7 @@ function upgrade_module_2_30_0()
         }
 
         // check doesn't exist then add it
-        if(!$lock_exists) {
+        if (!$lock_exists) {
             $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {

@@ -6,7 +6,7 @@ namespace Payplug;
  **/
 class Payment
 {
-	/**
+    /**
      * Retrieves a Payment.
      *
      * @param   string                      $paymentId      the payment ID
@@ -18,10 +18,10 @@ class Payment
      */
     public static function retrieve($paymentId, Payplug $payplug = null)
     {
-    	return Resource\Payment::retrieve($paymentId, $payplug);
+        return Resource\Payment::retrieve($paymentId, $payplug);
     }
 
-	/**
+    /**
      * Aborts a Payment.
      *
      * @param   string                      $paymentId      the payment ID
@@ -33,8 +33,8 @@ class Payment
      */
     public static function abort($paymentId, Payplug $payplug = null)
     {
-        $payment = Resource\Payment::fromAttributes(array('id' => $paymentId));
-    	return $payment->abort($payplug);
+        $payment = Resource\Payment::fromAttributes(['id' => $paymentId]);
+        return $payment->abort($payplug);
     }
 
     /**
@@ -49,7 +49,7 @@ class Payment
      */
     public static function capture($paymentId, Payplug $payplug = null)
     {
-        $payment = Resource\Payment::fromAttributes(array('id' => $paymentId));
+        $payment = Resource\Payment::fromAttributes(['id' => $paymentId]);
         return $payment->capture($payplug);
     }
 
@@ -74,7 +74,7 @@ class Payment
      * @param   int                 $perPage  number of results per page
      * @param   int                 $page     the page number
      * @param   Payplug             $payplug  the client configuration
-     * 
+     *
      * @return  null|Resource\Payment[]   the array of payments
      *
      * @throws  Exception\InvalidPaymentException
@@ -82,6 +82,6 @@ class Payment
      */
     public static function listPayments($perPage = null, $page = null, Payplug $payplug = null)
     {
-    	return Resource\Payment::listPayments($perPage, $page, $payplug);
-    }    
+        return Resource\Payment::listPayments($perPage, $page, $payplug);
+    }
 };

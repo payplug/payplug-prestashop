@@ -34,8 +34,7 @@ class QuerySpecific implements QueryInterface
     {
         try {
             $this->db = Db::getInstance();
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             var_dump($e);
         }
     }
@@ -55,12 +54,11 @@ class QuerySpecific implements QueryInterface
         try {
             $action = 'execute';
 
-            if (stripos($SQLRequest,'SELECT') !== false) {
+            if (stripos($SQLRequest, 'SELECT') !== false) {
                 $action = 'executeS';
             }
             return $this->db->$action($SQLRequest);
-
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             var_dump($e);
         }
     }
@@ -75,6 +73,4 @@ class QuerySpecific implements QueryInterface
     {
         return $this->db->getValue($id);
     }
-
-
 }

@@ -335,7 +335,6 @@ class QueryRepository extends Repository
             }
 
             $sql .= 'FROM '.implode(', ', $this->query['from'])."\n";
-
         } elseif ($this->query['type'] == 'INSERT') {
             $sql = 'INSERT INTO '.implode(",\n", $this->query['into'])."\n";
             $sql .= '('.implode(",\n", $this->query['fields']).')'."\n";
@@ -343,27 +342,21 @@ class QueryRepository extends Repository
             if ($this->query['values']) {
                 $sql .= 'VALUES ('."\n".implode(",\n", $this->query['values']).')'."\n";
             }
-
         } elseif ($this->query['type'] == 'UPDATE') {
             $sql = 'UPDATE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
 
             if ($this->query['set'] && (!empty($this->query['set']))) {
                 $sql .= 'SET '.implode(','."\n", $this->query['set'])."\n";
             }
-
         } elseif ($this->query['type'] == 'TRUNCATE') {
             $sql = 'TRUNCATE TABLE '.((($this->query['table'])) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['into']))."\n";
-
         } elseif ($this->query['type'] == 'DELETE') {
-
             if (!$this->query['from']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
             }
 
             $sql = 'DELETE FROM '.((isset($this->query['table']) && (!empty($this->query['table']))) ? implode(",\n", $this->query['table']) : implode(",\n", $this->query['from']))."\n";
-
         } elseif ($this->query['type'] == 'CREATE') {
-
             if (!$this->query['table']) {
                 throw new PrestaShopException('Can\'t create table because ->table() is not set or empty');
             }
@@ -379,16 +372,12 @@ class QueryRepository extends Repository
             if (isset($this->query['engine']) && (!empty($this->query['engine']))) {
                 $sql .= "\n".'ENGINE = '.implode($this->query['engine']);
             }
-
-
         } elseif ($this->query['type'] == 'DROP') {
-
             if (!$this->query['table']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot drop it.');
             }
 
             $sql = 'DROP TABLE IF EXISTS '.implode($this->query['table'])."\n";
-
         } else {
             $sql = $this->query['type'].' ';
         }
@@ -442,5 +431,4 @@ class QueryRepository extends Repository
     {
         return $this->build();
     }
-
 }

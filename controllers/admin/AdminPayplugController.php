@@ -30,12 +30,12 @@ class AdminPayplugController extends ModuleAdminController
             $this->display = 'edit';
         }
     }
-/*
-    public function initContent()
-    {
-        return $this->getContent();
-    }
-*/
+    /*
+        public function initContent()
+        {
+            return $this->getContent();
+        }
+    */
     public function getContent()
     {
         $payplug = new Payplug();
@@ -69,9 +69,9 @@ class AdminPayplugController extends ModuleAdminController
         }
 
         if (count($payplug->validationErrors && !$connected)) {
-            $this->context->smarty->assign(array(
+            $this->context->smarty->assign([
                 'validationErrors' => $payplug->validationErrors,
-            ));
+            ]);
         }
 
         $valid_key = Payplug::setAPIKey();
@@ -100,13 +100,13 @@ class AdminPayplugController extends ModuleAdminController
                 }
                 $p_error .= $this->validationErrors['login'];
             }
-            $this->context->smarty->assign(array(
+            $this->context->smarty->assign([
                 'p_error' => $p_error,
-            ));
+            ]);
         } else {
-            $this->context->smarty->assign(array(
+            $this->context->smarty->assign([
                 'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
-            ));
+            ]);
         }
 
         $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
@@ -115,11 +115,11 @@ class AdminPayplugController extends ModuleAdminController
         //$admin_ajax_url = $this->context->link->getAdminLink('PayplugAjaxModuleAdminController', true, array());
         $admin_ajax_url = $payplug->getAdminAjaxUrl();
 
-        $login_infos = array(
+        $login_infos = [
             //'p_error'	=> $p_error,
-        );
+        ];
 
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
@@ -136,7 +136,7 @@ class AdminPayplugController extends ModuleAdminController
             'PAYPLUG_SHOW' => $PAYPLUG_SHOW,
             'PAYPLUG_DEBUG_MODE' => $PAYPLUG_DEBUG_MODE,
             'login_infos' => $login_infos,
-        ));
+        ]);
 
         $this->html .= $payplug->fetchTemplateRC('/views/templates/admin/admin.tpl');
 
@@ -147,29 +147,29 @@ class AdminPayplugController extends ModuleAdminController
     {
         return $this->getContent();
     }
-/*
-    public function __construct()
-    {
-        $this->bootstrap = true;
-        $this->display = 'view';
+    /*
+        public function __construct()
+        {
+            $this->bootstrap = true;
+            $this->display = 'view';
 
-        parent::__construct();
-        //$this->meta_title = $this->module->getTranslator()->trans('Settings', array(), 'Modules.Payplug.Admin');
+            parent::__construct();
+            //$this->meta_title = $this->module->getTranslator()->trans('Settings', array(), 'Modules.Payplug.Admin');
 
-        $this->name = 'AdminPayplug';
-    }
-
-    public function init()
-    {
-        /*
-        if (Tools::isSubmit('edit'.$this->className)) {
-            $this->display = 'edit';
-        } elseif (Tools::isSubmit('addLinkBlock')) {
-            $this->display = 'add';
+            $this->name = 'AdminPayplug';
         }
 
-        parent::init();
-        */
+        public function init()
+        {
+            /*
+            if (Tools::isSubmit('edit'.$this->className)) {
+                $this->display = 'edit';
+            } elseif (Tools::isSubmit('addLinkBlock')) {
+                $this->display = 'add';
+            }
+
+            parent::init();
+            */
 /*
         if (Tools::getValue('_ajax') == 1) {
             $this->adminAjaxController();

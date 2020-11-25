@@ -45,7 +45,8 @@ class CardRepository
         $this->setParams();
     }
 
-    private function setParams() {
+    private function setParams()
+    {
         $config = $this->configurationSpecific;
         $idCompany = $config->get('PAYPLUG_COMPANY_ID');
         $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
@@ -425,7 +426,6 @@ class CardRepository
 
 //            $this->tools->tool('redirect',$_SERVER['HTTP_REFERER']); exit;
             return '<script type="text/javascript">document.location.reload(true);</script>';
-
         } catch (Exception $e) {
             //@todo: add log
             if ($e->getCode() == '404') { // resource cant be found
@@ -501,7 +501,7 @@ class CardRepository
             ->select()
             ->fields('*')
             ->from(_DB_PREFIX_.$this->cardEntity->getTable())
-            ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id) ) ? $customer->id : $customer ))
+            ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id)) ? $customer->id : $customer))
             ->where('`id_company` = ' . (int)$this->cardEntity->getIdCompany())
             ->where('`is_sandbox` = ' . (int)$this->cardEntity->isSandbox())
         ;

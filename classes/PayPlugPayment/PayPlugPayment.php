@@ -44,7 +44,7 @@ class PayPlugPayment
     public $card;
 
     /** @var array */
-    public $payment_url = array();
+    public $payment_url = [];
 
     /** @var bool */
     public $is_valid = false;
@@ -53,136 +53,136 @@ class PayPlugPayment
     public $type;
 
     /** @var array */
-    public $definition_tab = array(
-        'currency' => array('type' => 'string', 'validate' => 'isLanguageIsoCode', 'required' => true, 'size' => 3),
-        'shipping' => array(
+    public $definition_tab = [
+        'currency' => ['type' => 'string', 'validate' => 'isLanguageIsoCode', 'required' => true, 'size' => 3],
+        'shipping' => [
             'type' => 'array',
-            'fields' => array(
-                'title' => array('type' => 'string', 'validate' => 'isName', 'required' => false, 'size' => 32),
-                'first_name' => array('type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32),
-                'last_name' => array('type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32),
-                'company_name' => array(
+            'fields' => [
+                'title' => ['type' => 'string', 'validate' => 'isName', 'required' => false, 'size' => 32],
+                'first_name' => ['type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32],
+                'last_name' => ['type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32],
+                'company_name' => [
                     'type' => 'string',
                     'validate' => 'isCleanHtml',
                     'required' => false,
                     'size' => 128
-                ),
-                'email' => array('type' => 'string', 'validate' => 'isEmail', 'required' => true, 'size' => 128),
-                'mobile_phone_number' => array(
+                ],
+                'email' => ['type' => 'string', 'validate' => 'isEmail', 'required' => true, 'size' => 128],
+                'mobile_phone_number' => [
                     'type' => 'string',
                     'validate' => 'isPhoneNumber',
                     'required' => false,
                     'size' => 32
-                ),
-                'landline_phone_number' => array(
+                ],
+                'landline_phone_number' => [
                     'type' => 'string',
                     'validate' => 'isPhoneNumber',
                     'required' => false,
                     'size' => 32
-                ),
-                'address1' => array('type' => 'string', 'validate' => 'isAddress', 'required' => true, 'size' => 128),
-                'address2' => array('type' => 'string', 'validate' => 'isAddress', 'required' => false, 'size' => 128),
-                'postcode' => array('type' => 'string', 'validate' => 'isPostCode', 'required' => true, 'size' => 12),
-                'city' => array('type' => 'string', 'validate' => 'isCityName', 'required' => true, 'size' => 64),
-                'state' => array('type' => 'string', 'validate' => 'isCityName', 'required' => false, 'size' => 64),
-                'country' => array(
+                ],
+                'address1' => ['type' => 'string', 'validate' => 'isAddress', 'required' => true, 'size' => 128],
+                'address2' => ['type' => 'string', 'validate' => 'isAddress', 'required' => false, 'size' => 128],
+                'postcode' => ['type' => 'string', 'validate' => 'isPostCode', 'required' => true, 'size' => 12],
+                'city' => ['type' => 'string', 'validate' => 'isCityName', 'required' => true, 'size' => 64],
+                'state' => ['type' => 'string', 'validate' => 'isCityName', 'required' => false, 'size' => 64],
+                'country' => [
                     'type' => 'string',
                     'validate' => 'isLanguageIsoCode',
                     'required' => true,
                     'size' => 2
-                ),
-                'language' => array(
+                ],
+                'language' => [
                     'type' => 'string',
                     'validate' => 'isLanguageIsoCode',
                     'required' => true,
                     'size' => 2
-                ),
-                'delivery_type' => array('type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 16),
-            ),
-        ),
-        'billing' => array(
+                ],
+                'delivery_type' => ['type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 16],
+            ],
+        ],
+        'billing' => [
             'type' => 'array',
-            'fields' => array(
-                'title' => array('type' => 'string', 'validate' => 'isName', 'required' => false, 'size' => 32),
-                'first_name' => array('type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32),
-                'last_name' => array('type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32),
-                'company_name' => array(
+            'fields' => [
+                'title' => ['type' => 'string', 'validate' => 'isName', 'required' => false, 'size' => 32],
+                'first_name' => ['type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32],
+                'last_name' => ['type' => 'string', 'validate' => 'isName', 'required' => true, 'size' => 32],
+                'company_name' => [
                     'type' => 'string',
                     'validate' => 'isCleanHtml',
                     'required' => true,
                     'size' => 128
-                ),
-                'email' => array('type' => 'string', 'validate' => 'isEmail', 'required' => true, 'size' => 128),
-                'mobile_phone_number' => array(
+                ],
+                'email' => ['type' => 'string', 'validate' => 'isEmail', 'required' => true, 'size' => 128],
+                'mobile_phone_number' => [
                     'type' => 'string',
                     'validate' => 'isPhoneNumber',
                     'required' => false,
                     'size' => 32
-                ),
-                'landline_phone_number' => array(
+                ],
+                'landline_phone_number' => [
                     'type' => 'string',
                     'validate' => 'isPhoneNumber',
                     'required' => false,
                     'size' => 32
-                ),
-                'address1' => array('type' => 'string', 'validate' => 'isAddress', 'required' => true, 'size' => 128),
-                'address2' => array('type' => 'string', 'validate' => 'isAddress', 'required' => false, 'size' => 128),
-                'postcode' => array('type' => 'string', 'validate' => 'isPostCode', 'required' => true, 'size' => 12),
-                'city' => array('type' => 'string', 'validate' => 'isCityName', 'required' => true, 'size' => 64),
-                'state' => array('type' => 'string', 'validate' => 'isCityName', 'required' => false, 'size' => 64),
-                'country' => array(
+                ],
+                'address1' => ['type' => 'string', 'validate' => 'isAddress', 'required' => true, 'size' => 128],
+                'address2' => ['type' => 'string', 'validate' => 'isAddress', 'required' => false, 'size' => 128],
+                'postcode' => ['type' => 'string', 'validate' => 'isPostCode', 'required' => true, 'size' => 12],
+                'city' => ['type' => 'string', 'validate' => 'isCityName', 'required' => true, 'size' => 64],
+                'state' => ['type' => 'string', 'validate' => 'isCityName', 'required' => false, 'size' => 64],
+                'country' => [
                     'type' => 'string',
                     'validate' => 'isLanguageIsoCode',
                     'required' => true,
                     'size' => 2
-                ),
-                'language' => array(
+                ],
+                'language' => [
                     'type' => 'string',
                     'validate' => 'isLanguageIsoCode',
                     'required' => true,
                     'size' => 2
-                ),
-            ),
-        ),
-        'hosted_payment' => array(
+                ],
+            ],
+        ],
+        'hosted_payment' => [
             'type' => 'array',
-            'fields' => array(
-                'return_url' => array(
+            'fields' => [
+                'return_url' => [
                     'type' => 'string',
                     'validate' => 'isCleanHtml',
                     'required' => true,
                     'size' => 255
-                ),
-                'cancel_url' => array(
+                ],
+                'cancel_url' => [
                     'type' => 'string',
                     'validate' => 'isCleanHtml',
                     'required' => true,
                     'size' => 255
-                )
-            ),
-        ),
-        'notification_url' => array('type' => 'string', 'validate' => 'isCleanHtml', 'required' => true, 'size' => 255),
-        'metadata' => array(
+                ]
+            ],
+        ],
+        'notification_url' => ['type' => 'string', 'validate' => 'isCleanHtml', 'required' => true, 'size' => 255],
+        'metadata' => [
             'type' => 'array',
-            'fields' => array(
-                'Client' => array('type' => 'int', 'validate' => 'isUnsignedId', 'required' => false),
-                'Cart' => array('type' => 'int', 'validate' => 'isUnsignedId', 'required' => true),
-                'Website' => array('type' => 'string', 'validate' => 'isCleanHtml', 'required' => true, 'size' => 255),
-                'cms_billing_country' => array(
+            'fields' => [
+                'Client' => ['type' => 'int', 'validate' => 'isUnsignedId', 'required' => false],
+                'Cart' => ['type' => 'int', 'validate' => 'isUnsignedId', 'required' => true],
+                'Website' => ['type' => 'string', 'validate' => 'isCleanHtml', 'required' => true, 'size' => 255],
+                'cms_billing_country' => [
                     'type' => 'string',
                     'validate' => 'isLanguageIsoCode',
                     'required' => false,
                     'size' => 2
-                ),
-                'cms_shipping_country' => array(
+                ],
+                'cms_shipping_country' => [
                     'type' => 'string',
                     'validate' => 'isLanguageIsoCode',
                     'required' => false,
                     'size' => 2
-                ),
-            )
-        )
-    );
+                ],
+            ]
+        ]
+    ];
 
     const DELIVERY_TYPE_BILLING = 'BILLING';
     const DELIVERY_TYPE_USED = 'VERIFIED';
@@ -190,7 +190,7 @@ class PayPlugPayment
     const DELIVERY_TYPE_DEFAULT = 'OTHER';
 
     /** @var array */
-    public $payment_tab = array();
+    public $payment_tab = [];
 
     /** @var bool */
     public $debug = false;
@@ -199,13 +199,13 @@ class PayPlugPayment
     public $is_allowed = true;
 
     /** @var array */
-    public $errors = array();
+    public $errors = [];
 
     /** @var bool */
     public $is_deferred = false;
 
     /** @var array */
-    private $metadatas = array();
+    private $metadatas = [];
 
     /** @var Module Payplug */
     protected $module = null;
@@ -218,7 +218,7 @@ class PayPlugPayment
      * @param Context $context
      * @return PayplugPayment
      */
-    public function __construct($id_card = null, $options = array(), Context $context = null)
+    public function __construct($id_card = null, $options = [], Context $context = null)
     {
         $this->context = $context ? $context : Context::getContext();
 
@@ -274,11 +274,11 @@ class PayPlugPayment
     {
         if (!$this->is_valid) {
             // todo: add log failure create
-            return array(
+            return [
                 'resource' => null,
                 'error' => true,
                 'message' => 'Cannot create payment, invalid payment method',
-            );
+            ];
         }
 
         $this->register();
@@ -299,17 +299,17 @@ class PayPlugPayment
 
         try {
             $payment = \Payplug\Payment::create($this->payment_tab);
-            return array(
+            return [
                 'resource' => $payment,
                 'error' => false,
                 'message' => null,
-            );
+            ];
         } catch (Exception $e) {
-            return array(
+            return [
                 'resource' => null,
                 'error' => true,
                 'message' => $e->__toString(),
-            );
+            ];
         }
     }
 
@@ -349,7 +349,7 @@ class PayPlugPayment
      */
     public function generatePaymentTab()
     {
-        $payment_tab = array();
+        $payment_tab = [];
 
         // hydrate addresses tab
         $payment_tab['billing'] = $this->generateBillingTab();
@@ -360,10 +360,10 @@ class PayPlugPayment
 
         // hydrate url
         $payment_tab['notification_url'] = $this->payment_url['notification'];
-        $payment_tab['hosted_payment'] = array(
+        $payment_tab['hosted_payment'] = [
             'return_url' => $this->payment_url['return'],
             'cancel_url' => $this->payment_url['cancel'],
-        );
+        ];
 
         // hydrate metadata
         $payment_tab['metadata'] = $this->getAllMetaDatas();
@@ -378,7 +378,7 @@ class PayPlugPayment
      */
     protected function validatePaymentTab()
     {
-        $this->errors = array();
+        $this->errors = [];
 
         foreach ($this->definition_tab as $key => $tab) {
             if (!isset($this->payment_tab[$key])) {
@@ -416,7 +416,7 @@ class PayPlugPayment
                 }
             }
         } else {
-            if (isset($field['allowed']) && !empty($field['allowed']) && !in_array($value, $field['allowed'])) {
+            if (isset($field['allowed']) && !empty($field['allowed']) && !in_array($value, $field['allowed'], true)) {
                 $this->errors[] = 'Invalid value for field ' . $name . ': ' . $value
                     . ' / allowed: ' . implode('|', $field['allowed']);
             } elseif (!$this->isValidField($field['validate'], $value)) {
@@ -722,7 +722,7 @@ class PayPlugPayment
 
             $iso_code_list = $this->getIsoCodeList();
             $language = new Language($this->module->getConfiguration('PS_LANG_DEFAULT'));
-            if (in_array(Tools::strtoupper($language->iso_code), $iso_code_list)) {
+            if (in_array(Tools::strtoupper($language->iso_code), $iso_code_list, true)) {
                 $iso_code = $language->iso_code;
             } else {
                 $iso_code = 'FR';
@@ -770,7 +770,7 @@ class PayPlugPayment
         $result_currency = Currency::getCurrency($currency);
         $supported_currencies = explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_CURRENCIES')));
 
-        if (!in_array(Tools::strtoupper($result_currency['iso_code']), $supported_currencies)) {
+        if (!in_array(Tools::strtoupper($result_currency['iso_code']), $supported_currencies, true)) {
             return false;
         }
 
@@ -803,30 +803,30 @@ class PayPlugPayment
      */
     public function setPaymentUrl()
     {
-        $this->payment_url = array(
+        $this->payment_url = [
             'return' => PayplugBackward::getModuleLink(
                 'payplug',
                 'validation',
-                array(
+                [
                     'ps' => 1,
-                    'cartid' => (int)$this->cart->id),
-                    true
+                    'cartid' => (int)$this->cart->id],
+                true
             ),
             'cancel' => PayplugBackward::getModuleLink(
                 'payplug',
                 'validation',
-                array(
+                [
                     'ps' => 2,
-                    'cartid' => (int)$this->cart->id),
+                    'cartid' => (int)$this->cart->id],
                 true
             ),
             'notification' => PayplugBackward::getModuleLink(
                 'payplug',
                 'ipn',
-                array(),
+                [],
                 true
             ),
-        );
+        ];
 
         $this->setMetaDatas('Website', Tools::getShopDomainSsl(true));
     }
@@ -840,7 +840,7 @@ class PayPlugPayment
     public function getIsoCodeList()
     {
         $country_list_path = _PS_MODULE_DIR_ . 'payplug/lib/iso_3166-1_alpha-2/data.csv';
-        $iso_code_list = array();
+        $iso_code_list = [];
         if (($handle = fopen($country_list_path, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 $iso_code_list[] = Tools::strtoupper($data[0]);
@@ -872,7 +872,7 @@ class PayPlugPayment
         if (!Validate::isLoadedObject($country)) {
             return false;
         }
-        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list)) {
+        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list, true)) {
             return false;
         } else {
             return Tools::strtoupper($country->iso_code);
@@ -887,27 +887,31 @@ class PayPlugPayment
      */
     public function getAmountsByCurrency($iso_code)
     {
-        $min_amounts = array();
-        $max_amounts = array();
+        $min_amounts = [];
+        $max_amounts = [];
         foreach (explode(';', Tools::strtoupper(
-                $this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS'))) as $amount_cur
+            $this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS')
+        )) as $amount_cur
             ) {
-            $cur = array();
+            $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $min_amounts[$cur[1]] = (int)$cur[2];
         }
-        foreach (explode(';',
-                    Tools::strtoupper(
-                        $this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS'))) as $amount_cur
+        foreach (explode(
+            ';',
+            Tools::strtoupper(
+                        $this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS')
+                    )
+        ) as $amount_cur
             ) {
-            $cur = array();
+            $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $max_amounts[$cur[1]] = (int)$cur[2];
         }
         $current_min_amount = $min_amounts[Tools::strtoupper($iso_code)];
         $current_max_amount = $max_amounts[Tools::strtoupper($iso_code)];
 
-        return array('min_amount' => $current_min_amount, 'max_amount' => $current_max_amount);
+        return ['min_amount' => $current_min_amount, 'max_amount' => $current_max_amount];
     }
 
     /**
