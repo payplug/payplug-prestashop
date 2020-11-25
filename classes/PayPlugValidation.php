@@ -115,7 +115,7 @@ class PayPlugValidation
                 $diff = explode('+', $interval->format('%R%s'));
                 if ($diff[1] >= 10) {
                     $this->logger->addLog(
-                        'Try to create lock (PayplugLock::createLockG2) during '.$diff[1].' seconds, but can\'t proceed',
+                        'Try to create lock (PayplugLock::createLockG2) during '.$diff[1].' sec, but can\'t proceed',
                         'error'
                     );
                     break;
