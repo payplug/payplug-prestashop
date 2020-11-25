@@ -233,12 +233,12 @@ class OneyRepository
             }
             switch ($field) {
                 case 'email':
-                    if ($tools->tool('strlen', $data) > 100
+                    if ($tools->tool('strlen', $data, 'UTF-8') > 100
                         && $tools->tool('strpos', $data, '+') !== false) {
                         $text = $this->payplug->l('Your email address is too long and the + character is not valid, 
                         please change it to another address (max 100 characters).');
                         $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data) > 100) {
+                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100) {
                         $text = $this->payplug->l('Your email address is too long, 
                         please change it to a shorter one (max 100 characters).');
                         $errors[] = $text;
@@ -297,7 +297,7 @@ class OneyRepository
                             $this->payplug->l('Please enter your shipping city.') :
                             $this->payplug->l('Please enter your billing city.');
                         $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data) > 32) {
+                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 32) {
                         $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                             . $this->payplug->l('Please change it to another one or select another payment method.');
                         $errors[] = $text;
@@ -709,7 +709,7 @@ class OneyRepository
         $shipping_country = new \Country($shipping_address->id_country);
 
         // Validate email format
-        if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email) > 100
+        if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100
             && $tools->tool('strpos', $this->contextSpecific->getContext()->customer->email, '+')
             !== false) {
             $text = $this->payplug->l('Your email address is too long and the + character is not valid,') .
@@ -724,7 +724,7 @@ class OneyRepository
                     ]
                 ],
             ];
-        } elseif ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email) > 100) {
+        } elseif ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100) {
             $text = $this->payplug->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
@@ -771,7 +771,7 @@ class OneyRepository
         }
 
         // Validate address
-        if ($tools->tool('strlen', $shipping_address->city) > 32) {
+        if ($tools->tool('strlen', $shipping_address->city, 'UTF-8') > 32) {
             $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                 . $this->payplug->l('Please change it to another one or select another payment method.');
             $shipping_fields['city'] = [
@@ -834,7 +834,7 @@ class OneyRepository
                 ];
             }
 
-            if ($tools->tool('strlen', $billing_address->city) > 32) {
+            if ($tools->tool('strlen', $billing_address->city, 'UTF-8') > 32) {
                 $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                     . $this->payplug->l('Please change it to another one or select another payment method.');
                 $billing_fields['city'] = [
@@ -975,10 +975,10 @@ class OneyRepository
         $shipping = $payment_data['shipping'];
 
         // Validate email format
-        if ($tools->tool('strlen', $shipping['email']) > 100
+        if ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100
             && $tools->tool('$shipping[\'email\']', '+') !== false) {
             return true;
-        } elseif ($tools->tool('strlen', $shipping['email']) > 100) {
+        } elseif ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100) {
             return true;
         } elseif (strpos($shipping['email'], '+') !== false) {
             return true;
@@ -994,7 +994,7 @@ class OneyRepository
         }
 
         // Validate address
-        if ($tools->tool('strlen', $shipping['city']) > 32) {
+        if ($tools->tool('strlen', $shipping['city'], 'UTF-8') > 32) {
             return true;
         }
 
@@ -1011,7 +1011,7 @@ class OneyRepository
         }
 
         // Validate address
-        if ($tools->tool('strlen', $billing['city']) > 32) {
+        if ($tools->tool('strlen', $billing['city'], 'UTF-8') > 32) {
             return true;
         }
 
