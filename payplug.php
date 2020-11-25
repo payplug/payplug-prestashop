@@ -3825,9 +3825,7 @@ class Payplug extends PaymentModule
             default:
                 $payment = \Payplug\Payment::retrieve($payment_id);
                 return $payment && $payment->is_paid;
-                break;
         }
-
         return false;
     }
 
@@ -5615,7 +5613,6 @@ class Payplug extends PaymentModule
                 $install['flag'] = false;
                 $install['error'] = $hookToRegister;
                 return $install;
-                break;
             } else {
                 $log->info('Install success: Hook ' . $hookToRegister . '.');
                 $install['flag'] = true;

@@ -21,9 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 namespace PayPlug\src\repositories;
-
 
 class HookRepository extends \Payplug
 {

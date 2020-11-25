@@ -199,7 +199,7 @@ class PayPlugPayment
     public $is_allowed = true;
 
     /** @var array */
-    public $_errors = array();
+    public $errors = array();
 
     /** @var bool */
     public $is_deferred = false;
@@ -378,7 +378,7 @@ class PayPlugPayment
      */
     protected function validatePaymentTab()
     {
-        $this->_errors = array();
+        $this->errors = array();
 
         foreach ($this->definition_tab as $key => $tab) {
             if (!isset($this->payment_tab[$key])) {
@@ -388,7 +388,7 @@ class PayPlugPayment
             $this->checkField($key, $value, $tab);
         }
 
-        $this->is_valid = empty($this->_errors) && $this->is_allowed;
+        $this->is_valid = empty($this->errors) && $this->is_allowed;
     }
 
     /**
@@ -409,26 +409,26 @@ class PayPlugPayment
             }
         } elseif ($field['type'] == 'iterable') {
             $list = $parent ? $this->payment_tab[$parent][$name] : $this->payment_tab[$name];
-            foreach($list as $row) {
+            foreach ($list as $row) {
                 foreach ($field['fields'] as $key => $child_field) {
                     $child_value = $row[$key];
                     $this->checkField($key, $child_value, $child_field, $name);
                 }
             }
         } else {
-            if(isset($field['allowed']) && !empty($field['allowed']) && !in_array($value, $field['allowed'])) {
-                $this->_errors[] = 'Invalid value for field ' . $name . ': ' . $value
+            if (isset($field['allowed']) && !empty($field['allowed']) && !in_array($value, $field['allowed'])) {
+                $this->errors[] = 'Invalid value for field ' . $name . ': ' . $value
                     . ' / allowed: ' . implode('|', $field['allowed']);
             } elseif (!$this->isValidField($field['validate'], $value)) {
                 if ($field['required']) {
-                    $this->_errors[] = 'Invalid required field ' . $name . ': ' . $value
+                    $this->errors[] = 'Invalid required field ' . $name . ': ' . $value
                         . ' / method: ' . $field['validate'];
                 }
                 return false;
             } elseif (!$value && $field['validate'] != 'isBool') {
                 if ($parent && (isset($this->payment_tab[$parent][$name]) || isset($field['default']))) {
                     $this->payment_tab[$parent][$name] = isset($field['default']) ? $field['default'] : null;
-                } elseif(isset($this->payment_tab[$name]) || isset($field['default'])) {
+                } elseif (isset($this->payment_tab[$name]) || isset($field['default'])) {
                     $this->payment_tab[$name] = isset($field['default']) ? $field['default'] : null;
                 }
             }
@@ -444,8 +444,9 @@ class PayPlugPayment
      * @param $value
      * @return bool
      */
-    public function isValidField($method, $value){
-        switch($method) {
+    public function isValidField($method, $value)
+    {
+        switch ($method) {
             case 'isAddress':
                 return (bool)Validate::isAddress($value);
             case 'isBool':
@@ -803,9 +804,28 @@ class PayPlugPayment
     public function setPaymentUrl()
     {
         $this->payment_url = array(
-            'return' => PayplugBackward::getModuleLink('payplug', 'validation', array('ps' => 1, 'cartid' => (int)$this->cart->id), true),
-            'cancel' => PayplugBackward::getModuleLink('payplug', 'validation', array('ps' => 2, 'cartid' => (int)$this->cart->id), true),
-            'notification' => PayplugBackward::getModuleLink('payplug', 'ipn', array(), true),
+            'return' => PayplugBackward::getModuleLink(
+                'payplug',
+                'validation',
+                array(
+                    'ps' => 1,
+                    'cartid' => (int)$this->cart->id),
+                    true
+            ),
+            'cancel' => PayplugBackward::getModuleLink(
+                'payplug',
+                'validation',
+                array(
+                    'ps' => 2,
+                    'cartid' => (int)$this->cart->id),
+                true
+            ),
+            'notification' => PayplugBackward::getModuleLink(
+                'payplug',
+                'ipn',
+                array(),
+                true
+            ),
         );
 
         $this->setMetaDatas('Website', Tools::getShopDomainSsl(true));
@@ -869,12 +889,17 @@ class PayPlugPayment
     {
         $min_amounts = array();
         $max_amounts = array();
-        foreach (explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS'))) as $amount_cur) {
+        foreach (explode(';', Tools::strtoupper(
+                $this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS'))) as $amount_cur
+            ) {
             $cur = array();
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $min_amounts[$cur[1]] = (int)$cur[2];
         }
-        foreach (explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS'))) as $amount_cur) {
+        foreach (explode(';',
+                    Tools::strtoupper(
+                        $this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS'))) as $amount_cur
+            ) {
             $cur = array();
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $max_amounts[$cur[1]] = (int)$cur[2];
@@ -1049,7 +1074,7 @@ class PayPlugPayment
 
         try {
             //load libphonenumber
-            if(!class_exists('libphonenumber\PhoneNumberUtil')) {
+            if (!class_exists('libphonenumber\PhoneNumberUtil')) {
                 include_once(_PS_MODULE_DIR_ . 'payplug/lib/libphonenumber/init.php');
             }
 
@@ -1067,17 +1092,19 @@ class PayPlugPayment
     }
 
     /**
-     * Get iso code from language code
-     * Language code is like 'fr-be', we explode it in array (0 => 'fr', 1 => 'be') then we use array[0] witch is the language while array[1] is the localization.
+     * @description Get iso code from language code
+     * Language code is like 'fr-be', we explode it in array (0 => 'fr', 1 => 'be')
+     * then we use array[0] witch is the language while array[1] is the localization.
      *
      * @param Language $language
      * @return string
      */
-    public function getIsoFromLanguageCode(Language $language){
-        if(!Validate::isLoadedObject($language)) {
+    public function getIsoFromLanguageCode(Language $language)
+    {
+        if (!Validate::isLoadedObject($language)) {
             return false;
         }
-        $parse = explode('-',$language->language_code);
+        $parse = explode('-', $language->language_code);
         return Tools::strtolower($parse[0]);
     }
 }

@@ -87,16 +87,15 @@ class PayplugBackward
         $id_lang = null,
         $id_shop = null,
         $relative_protocol = false
-    )
-    {
-            $url = Context::getContext()->link->getModuleLink(
-            $module,
-            $controller,
-            $params,
-            $ssl,
-            $id_lang,
-            $id_shop,
-            $relative_protocol
+    ) {
+                $url = Context::getContext()->link->getModuleLink(
+                $module,
+                $controller,
+                $params,
+                $ssl,
+                $id_lang,
+                $id_shop,
+                $relative_protocol
             );
         return $url;
     }
@@ -121,36 +120,36 @@ class PayplugBackward
 
     public static function defineObjectModel(&$object, $props)
     {
-            foreach ($props['fields'] as &$field) {
-                switch ($field['type']) {
-                    case 'int':
-                        $field['type'] = ObjectModel::TYPE_INT;
-                        break;
-                    case 'bool':
-                        $field['type'] = ObjectModel::TYPE_BOOL;
-                        break;
-                    case 'float':
-                        $field['type'] = ObjectModel::TYPE_FLOAT;
-                        break;
-                    case 'date':
-                        $field['type'] = ObjectModel::TYPE_DATE;
-                        break;
-                    case 'html':
-                        $field['type'] = ObjectModel::TYPE_HTML;
-                        break;
-                    case 'nothing':
-                        $field['type'] = ObjectModel::TYPE_NOTHING;
-                        break;
-                    case 'sql':
-                        $field['type'] = ObjectModel::TYPE_SQL;
-                        break;
-                    case 'string':
-                    default:
-                        $field['type'] = ObjectModel::TYPE_STRING;
-                        break;
-                }
+        foreach ($props['fields'] as &$field) {
+            switch ($field['type']) {
+                case 'int':
+                    $field['type'] = ObjectModel::TYPE_INT;
+                    break;
+                case 'bool':
+                    $field['type'] = ObjectModel::TYPE_BOOL;
+                    break;
+                case 'float':
+                    $field['type'] = ObjectModel::TYPE_FLOAT;
+                    break;
+                case 'date':
+                    $field['type'] = ObjectModel::TYPE_DATE;
+                    break;
+                case 'html':
+                    $field['type'] = ObjectModel::TYPE_HTML;
+                    break;
+                case 'nothing':
+                    $field['type'] = ObjectModel::TYPE_NOTHING;
+                    break;
+                case 'sql':
+                    $field['type'] = ObjectModel::TYPE_SQL;
+                    break;
+                case 'string':
+                default:
+                    $field['type'] = ObjectModel::TYPE_STRING;
+                    break;
             }
-            $object::$definition = $props;
+        }
+        $object::$definition = $props;
         return $object;
     }
 }

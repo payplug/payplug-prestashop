@@ -248,22 +248,22 @@ class PayplugLock extends ObjectModel
                 \''.date('Y-m-d H:i:s').'\'
             )';
 
-        // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
-        try {
-        $res_lock = Db::getInstance()->execute($req_lock);
-        } catch (Exception $e) {
-            $res_lock = false;
-        }
-        if (!$res_lock) {
-            return false;
-        } else {
-            $lock = self::existsLockG2($id_cart);
-            if (!$lock) {
+            // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
+            try {
+            $res_lock = Db::getInstance()->execute($req_lock);
+            } catch (Exception $e) {
+                $res_lock = false;
+            }
+            if (!$res_lock) {
                 return false;
             } else {
-                return $lock['id_order'];
+                $lock = self::existsLockG2($id_cart);
+                if (!$lock) {
+                    return false;
+                } else {
+                    return $lock['id_order'];
+                }
             }
-        }
     }
 
     public static function deleteLockG2($id_cart)

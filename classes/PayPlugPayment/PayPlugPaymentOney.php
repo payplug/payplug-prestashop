@@ -113,8 +113,12 @@ class PayPlugPaymentOney extends PayplugPayment
         $this->payment_tab['authorized_amount'] = $this->getCartAmount($this->payment_tab['currency']);
         $this->payment_tab['payment_context'] = $this->generateCartTab();
         $this->payment_tab['payment_method'] = $this->getPaymentMethodFromType();
-        $this->payment_tab['hosted_payment']['return_url'] = PayplugBackward::getModuleLink('payplug', 'validation',
-            array('ps' => 1, 'cartid' => (int)$this->cart->id), true);
+        $this->payment_tab['hosted_payment']['return_url'] =
+            PayplugBackward::getModuleLink(
+                'payplug',
+                'validation',
+                array('ps' => 1, 'cartid' => (int)$this->cart->id), true
+            );
         $this->payment_tab['force_3ds'] = false;
         $this->payment_tab['auto_capture'] = true;
 
@@ -214,7 +218,7 @@ class PayPlugPaymentOney extends PayplugPayment
             return $delivery_data;
         }
 
-        if($this->cart->isVirtualCart()) {
+        if ($this->cart->isVirtualCart()) {
             $delivery_data['delivery_label'] = $this->module->getConfiguration('PS_SHOP_NAME');
             $delivery_data['expected_delivery_date'] = date('Y-m-d');
             $delivery_data['delivery_type'] = 'edelivery';
@@ -257,20 +261,20 @@ class PayPlugPaymentOney extends PayplugPayment
     private function hydrateFromAdditionalFields()
     {
         if ($this->oney_form) {
-            foreach($this->oney_form as $k => $field) {
-                $keys = explode('-',$k);
+            foreach ($this->oney_form as $k => $field) {
+                $keys = explode('-', $k);
                 $type = $keys[0];
                 $field_name = $keys[1];
 
                 if (strpos($field_name, 'phone') != false) {
-                    switch($type) {
-                        case 'billing' :
+                    switch ($type) {
+                        case 'billing':
                             $id_country = Country::getByIso($this->payment_tab['billing']['country']);
                             $country = new Country($id_country);
                             $field = $this->formatPhoneNumber($field, $country);
                             break;
-                        case 'same' :
-                        case 'shipping' :
+                        case 'same':
+                        case 'shipping':
                         default:
                             $id_country = Country::getByIso($this->payment_tab['shipping']['country']);
                             $country = new Country($id_country);
@@ -292,7 +296,8 @@ class PayPlugPaymentOney extends PayplugPayment
         }
     }
 
-    private function checkAddressFields(){
+    private function checkAddressFields()
+    {
         // check company name
         $this->payment_tab['billing']['company_name'] = $this->payment_tab['billing']['company_name'] ?
             $this->payment_tab['billing']['company_name'] :
