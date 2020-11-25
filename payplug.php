@@ -275,7 +275,7 @@ class Payplug extends PaymentModule
         $this->name = 'payplug';
         $this->author = 'PayPlug';
         $this->bootstrap = true;
-        $this->constantFile = _PS_MODULE_DIR_.'payplug/payplug.php';
+        $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
@@ -304,11 +304,11 @@ class Payplug extends PaymentModule
     {
         $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->card     = $this->getPlugin()->getCard();
-        $this->logger   = $this->getPlugin()->getLogger();
-        $this->oney     = $this->getPlugin()->getOney();
-        $this->query    = $this->getPlugin()->getQuery();
-        $this->tools    = $this->getPlugin()->getTools();
+        $this->card = $this->getPlugin()->getCard();
+        $this->logger = $this->getPlugin()->getLogger();
+        $this->oney = $this->getPlugin()->getOney();
+        $this->query = $this->getPlugin()->getQuery();
+        $this->tools = $this->getPlugin()->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -2465,14 +2465,14 @@ class Payplug extends PaymentModule
                     case 'invalid_amount_top':
                         $err_label = $this->l('Between 100€ and 3000€ only');
                         break;
-                    case 'invalid_carrier' :
+                    case 'invalid_carrier':
                         $err_label = $this->l('Unavailable for this shipping method');
                         break;
-                    case 'invalid_cart' :
+                    case 'invalid_cart':
                         $err_label = $this->l('Your cart is unavailable');
                         break;
                     default:
-                        $err_label = '';
+                        $err_label = $this->l('An error has occured');
                         break;
                 }
 
@@ -2481,7 +2481,7 @@ class Payplug extends PaymentModule
 
                 $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.svg';
-                $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
+                $oneyLabel = $error ? $err_label : sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 if ($optimized) {
                     $oneyTpl = 'oney.tpl';
@@ -2490,18 +2490,26 @@ class Payplug extends PaymentModule
                         && (method_exists($this->PrestashopSpecificObject, 'getPaymentOption'))) {
                         $oneyData = $this->PrestashopSpecificObject->getPaymentOption();
                         $oneyLogo = $oneyData['oneyLogo'];
-                        $oneyCallToActionText = $oneyData['oneyCallToActionText'];
+                        $oneyLabel = $oneyData['oneyCallToActionText'];
                     }
                 }
 
                 $paymentOption[$payment_key]['tpl'] = $oneyTpl;
                 $paymentOption[$payment_key]['extra_classes'] = sprintf('oney%sx', $split);
-                $paymentOption[$payment_key]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
-                    'payment', array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
+                $paymentOption[$payment_key]['payment_controller_url'] = PayplugBackward::getModuleLink(
+                    $this->name,
+                    'payment',
+                    ['type' => 'oney', 'io' => sprintf('%s', $split)],
+                    true
+                );
                 $paymentOption[$payment_key]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oneyLogo);
-                $paymentOption[$payment_key]['callToActionText'] = $oneyCallToActionText;
-                $paymentOption[$payment_key]['action'] = $this->context->link->getModuleLink($this->name,
-                    'dispatcher', array(), true);
+                $paymentOption[$payment_key]['callToActionText'] = $oneyLabel;
+                $paymentOption[$payment_key]['action'] = $this->context->link->getModuleLink(
+                    $this->name,
+                    'dispatcher',
+                    [],
+                    true
+                );
                 $paymentOption[$payment_key]['moduleName'] = 'payplug';
                 $paymentOption[$payment_key]['err_label'] = $err_label;
             }
@@ -3457,10 +3465,9 @@ class Payplug extends PaymentModule
     public function hookActionAdminPerformanceControllerAfter($params)
     {
         return $this
-                ->getPlugin()
-                ->getCache()
-                ->flushCache()
-                ;
+            ->getPlugin()
+            ->getCache()
+            ->flushCache();
     }
 
     /**
@@ -3474,8 +3481,7 @@ class Payplug extends PaymentModule
         return $this
             ->getPlugin()
             ->getCache()
-            ->flushCache()
-            ;
+            ->flushCache();
     }
 
     /**
