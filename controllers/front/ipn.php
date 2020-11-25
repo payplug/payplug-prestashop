@@ -65,9 +65,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private $api_key;
 
     /**
-     * @var object $cart
+     * @var object $cartObject
      */
-    private $cart;
+    private $cartObject;
 
     /**
      * @var int $lock_key
@@ -112,8 +112,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         //Settings
-        $this->setConfig();
-        $this->treat();
+        try {
+            $this->setConfig();
+            $this->treat();
+        } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
+            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+        }
     }
 
     /**
@@ -124,8 +128,8 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private function setConfig()
     {
         $this->payplug = new Payplug();
-        $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
-        $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
+        $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
 
         $this->setLogger();
         $this->getResource();
@@ -138,15 +142,15 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     {
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
         $this->order_states = [
-            'pending' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
-            'paid' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'error' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
-            'inst' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'auth' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
-            'exp' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
-            'oney' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
-            'cancelled' => $this->payplug->getConfiguration('PS_OS_CANCELED'),
-            'refund' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
+            'pending' => Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
+            'paid' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
+            'error' => Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
+            'inst' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
+            'auth' => Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
+            'exp' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
+            'oney' => Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
+            'cancelled' => Configuration::get('PS_OS_CANCELED'),
+            'refund' => Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
         ];
     }
 
@@ -297,32 +301,32 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         // Get the cart then check if valid
         try {
-            $this->cart = new Cart($id_cart);
+            $this->cartObject = new Cart($id_cart);
         } catch (Exception $exception) {
             $this->logger->addLog('The cart cannot be loaded: ' . $exception->getMessage(), 'error');
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
-        if (!Validate::isLoadedObject($this->cart)) {
+        if (!Validate::isLoadedObject($this->cartObject)) {
             $this->logger->addLog('The cart cannot be loaded.', 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);
         }
 
-        $this->setContextFromCartID($this->cart->id);
+        $this->setContextFromCartID($this->cartObject->id);
 
         // Set lock in db then set $this->lock_key
         $cart_lock = false;
         do {
-            $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+            $cart_lock = PayplugLock::createLockG2($this->cartObject->id, 'ipn');
             if (!$cart_lock) {
-                PayplugLock::check($this->cart->id);
+                PayplugLock::check($this->cartObject->id);
             } else {
                 $this->logger->addLog('Lock created');
-                $this->lock_key = $this->cart->id;
+                $this->lock_key = $this->cartObject->id;
             }
         } while (!$cart_lock);
 
         try {
-            $address = new Address((int)$this->cart->id_address_invoice);
+            $address = new Address((int)$this->cartObject->id_address_invoice);
         } catch (Exception $exception) {
             $this->logger->addLog('The address cannot be loaded: '
                 . $exception->getMessage(), 'error');
@@ -333,7 +337,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $this->exitProcess('The address cannot be loaded.', 500);
         }
 
-        $id_order = Order::getOrderByCartId($this->cart->id);
+        $id_order = Order::getOrderByCartId($this->cartObject->id);
 
         if ($id_order) {
             $this->updateOrder($id_order);
@@ -599,7 +603,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 'debug'
             );
             $this->logger->addLog(
-                'Current Cart ID: ' . (int)$this->cart->id,
+                'Current Cart ID: ' . (int)$this->cartObject->id,
                 'debug'
             );
             $this->logger->addLog(
@@ -672,9 +676,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         $amount = $this->payplug->convertAmount($amount, true);
 
-        $currency = (int)$this->cart->id_currency;
+        $currency = (int)$this->cartObject->id_currency;
         try {
-            $customer = new Customer((int)$this->cart->id_customer);
+            $customer = new Customer((int)$this->cartObject->id_customer);
         } catch (Exception $exception) {
             $this->logger->addLog('Customer cannot be loaded: ' . $exception->getMessage(),
                 'error');
@@ -692,15 +696,15 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         $secure_key = false;
         if (isset($customer->secure_key) && !empty($customer->secure_key)) {
             if (
-                isset($this->cart->secure_key)
-                && !empty($this->cart->secure_key)
-                && $this->cart->secure_key !== $customer->secure_key
+                isset($this->cartObject->secure_key)
+                && !empty($this->cartObject->secure_key)
+                && $this->cartObject->secure_key !== $customer->secure_key
             ) {
-                $secure_key = $this->cart->secure_key;
+                $secure_key = $this->cartObject->secure_key;
                 $this->logger->addLog('Secure keys do not match.', 'error');
                 $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key,
                     'error');
-                $this->logger->addLog('Cart Secure Key: ' . $this->cart->secure_key, 'error');
+                $this->logger->addLog('Cart Secure Key: ' . $this->cartObject->secure_key, 'error');
             } else {
                 $secure_key = $customer->secure_key;
             }
@@ -724,7 +728,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         // Create Order
         try {
-            $cart_amount = (float)$this->cart->getOrderTotal(true, Cart::BOTH);
+            $cart_amount = (float)$this->cartObject->getOrderTotal(true, Cart::BOTH);
 
             if ($amount != $cart_amount) {
                 $this->logger->addLog('Cart amount is different and may occured an error');
@@ -733,7 +737,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
             $this->logger->addLog('Order create with amount:' . $amount);
             $is_order_validated = $this->payplug->validateOrder(
-                $this->cart->id,
+                $this->cartObject->id,
                 $order_state,
                 $amount,
                 $module_name,
@@ -797,23 +801,23 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         // Check number of order using this cart
         $this->logger->addLog('Checking number of order passed with this id_cart');
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_cart` = ' . $this->cart->id;
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_cart` = ' . $this->cartObject->id;
         $res_nb_orders = Db::getInstance()->executeS($sql);
         if (!$res_nb_orders) {
             $this->logger->addLog(
-                'No order can be found using id_cart ' . (int)$this->cart->id,
+                'No order can be found using id_cart ' . (int)$this->cartObject->id,
                 'error'
             );
-            $this->exitProcess('No order can be found using id_cart: ' . (int)$this->cart->id, 500);
+            $this->exitProcess('No order can be found using id_cart: ' . (int)$this->cartObject->id, 500);
         } elseif (count($res_nb_orders) > 1) {
             $this->logger->addLog(
-                'There is more than one order using id_cart ' . (int)$this->cart->id,
+                'There is more than one order using id_cart ' . (int)$this->cartObject->id,
                 'error'
             );
             foreach ($res_nb_orders as $o) {
                 $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
             }
-            $this->exitProcess('There is more than one order using id_cart: ' . (int)$this->cart->id, 500);
+            $this->exitProcess('There is more than one order using id_cart: ' . (int)$this->cartObject->id, 500);
         } else {
             $this->logger->addLog('OK');
             $id_order = (int)$res_nb_orders[0]['id_order'];
@@ -955,6 +959,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         }
 
         header($_SERVER['SERVER_PROTOCOL'] . ' ' . $http_code . ' ' . $str, true, $http_code);
+        echo $_SERVER['SERVER_PROTOCOL'] . ' ' . $http_code . ' ' . $str;
         die;
     }
 }
