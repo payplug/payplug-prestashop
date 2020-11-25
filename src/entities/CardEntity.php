@@ -183,8 +183,8 @@ class CardEntity
         if (!is_string($id_card) || !preg_match('/card_[a-z0-9]{32}/', $id_card)) {
             throw (new BadParameterException(
                 'Invalid card token format, param $id_card must be a string 
-                looking like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\'')
-            );
+                looking like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''
+            ));
         } else {
             $this->id_card = $id_card;
             return $this;

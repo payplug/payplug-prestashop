@@ -339,9 +339,11 @@ class OneyRepository
         $this->contextSpecific->getContext()->smarty->assign([
             'tos_active' => $config->get('PAYPLUG_ONEY_TOS'),
             'tos_url' => $tos_url,
-            'legal_notice' => sprintf($this->payplug->l($legal_text),
+            'legal_notice' => sprintf(
+                $this->payplug->l($legal_text),
                 $tools->tool('displayPrice', $min_amount),
-                $tools->tool('displayPrice', $max_amount))
+                $tools->tool('displayPrice', $max_amount)
+            )
         ]);
 
         return $this->payplug->display($this->payplug->constantFile, 'oney/popin.tpl');
@@ -375,9 +377,11 @@ class OneyRepository
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->contextSpecific->getContext()->smarty->assign([
-                'payplug_module_dir' => str_replace('payplug/payplug.php',
+                'payplug_module_dir' => str_replace(
+                    'payplug/payplug.php',
                     '',
-                    $this->payplug->constantFile),
+                    $this->payplug->constantFile
+                ),
                 'payplug_oney_loading_msg' => $this->payplug->l('Loading'),
                 'oney_required_fields' => $this->displayOneyRequiredFields(),
             ]);
@@ -482,8 +486,10 @@ class OneyRepository
 
         return [
             'delivery_label' => $carrier->name,
-            'expected_delivery_date' => date('Y-m-d',
-                strtotime('+' . \PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')),
+            'expected_delivery_date' => date(
+                'Y-m-d',
+                strtotime('+' . \PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')
+            ),
             'delivery_type' => \PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE
         ];
     }
@@ -650,8 +656,10 @@ class OneyRepository
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
-        $oney_min_amounts = explode(',',
-            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MIN_AMOUNTS')));
+        $oney_min_amounts = explode(
+            ',',
+            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MIN_AMOUNTS'))
+        );
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -660,8 +668,10 @@ class OneyRepository
             }
         }
 
-        $oney_max_amounts = explode(',',
-            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MAX_AMOUNTS')));
+        $oney_max_amounts = explode(
+            ',',
+            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MAX_AMOUNTS'))
+        );
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
@@ -992,8 +1002,10 @@ class OneyRepository
         $billing = $payment_data['billing'];
 
         // Validate phone number
-        $valid_billing_mobile = $this->payplug->isValidMobilePhoneNumber($billing['mobile_phone_number'],
-            $billing['country']);
+        $valid_billing_mobile = $this->payplug->isValidMobilePhoneNumber(
+            $billing['mobile_phone_number'],
+            $billing['country']
+        );
         if (!$valid_billing_mobile) {
             return true;
         }
@@ -1084,8 +1096,10 @@ class OneyRepository
         }
 
         // we use the Oney limit to get allowed currencies
-        $oney_min_amounts = $this->toolsSpecific->tool('strtoupper',
-            $this->configurationSpecific->get('PAYPLUG_ONEY_MIN_AMOUNTS'));
+        $oney_min_amounts = $this->toolsSpecific->tool(
+            'strtoupper',
+            $this->configurationSpecific->get('PAYPLUG_ONEY_MIN_AMOUNTS')
+        );
         $iso_code = $this->toolsSpecific->tool('strtoupper', $currency->iso_code);
 
         return strpos($oney_min_amounts, $iso_code) !== false;
@@ -1359,8 +1373,10 @@ class OneyRepository
 
         // check if the shipping country are different then return false
         $iso_code = $this->toolsSpecific->tool('strtoupper', $shipping_iso);
-        $allow_countries = $this->toolsSpecific->tool('strtoupper',
-            $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES'));
+        $allow_countries = $this->toolsSpecific->tool(
+            'strtoupper',
+            $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+        );
         if (!$allow_countries) {
             return [
                 'result' => false,

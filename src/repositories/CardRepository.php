@@ -306,8 +306,10 @@ class CardRepository
         if ($payment->card->exp_month === null) {
             $card_expiry_date = $this->payplug->l('Unavailable');
         } else {
-            $card_expiry_date = date('m/y',
-                strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
+            $card_expiry_date = date(
+                'm/y',
+                strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year)
+            );
         }
         return $card_expiry_date;
     }
@@ -524,8 +526,10 @@ class CardRepository
             } else {
                 $card['expired'] = false;
             }
-            $card['expiry_date'] = date('m / y',
-                mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year']));
+            $card['expiry_date'] = date(
+                'm / y',
+                mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
+            );
 
             unset($card['is_sandbox']);
             unset($card['id_card']);

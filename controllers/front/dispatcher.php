@@ -80,8 +80,8 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 } else {
                     Tools::redirect($payment['return_url']);
                 }
-            } // else reload the page with lightbox arg
-            else {
+            } else {
+                // else reload the page with lightbox arg
                 $return_url = 'index.php?controller=order&step=3&lightbox=1'
                     . ($is_installment ? '&inst=1' : '')
                     . ($is_one_click ? '&pc=' . $id_card : '')

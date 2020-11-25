@@ -335,7 +335,7 @@ class QueryRepository extends Repository
             $sql = 'SELECT '.((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*')."\n";
             if (!$this->query['from']) {
                 $this->query = null;
-                die ('Table name not set in QueryRepository (->from() is empty / not set / null). 
+                die('Table name not set in QueryRepository (->from() is empty / not set / null). 
                 Cannot build a valid SQL query.');
             }
 
