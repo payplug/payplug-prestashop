@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -20,6 +20,8 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
+declare(strict_types=1);
 
 use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
