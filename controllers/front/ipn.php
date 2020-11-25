@@ -123,10 +123,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
      */
     private function setConfig()
     {
-        $this->key = microtime(true) * 10000;
-        $this->flag = false;
-        $this->except = null;
-        $this->resp = array();
         $this->payplug = new Payplug();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
