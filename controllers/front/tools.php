@@ -33,7 +33,11 @@ class PayplugToolsModuleFrontController extends ModuleFrontController
     {
         $this->context->smarty->assign(
             [
-                'remove_payplug_order_states_link' => $this->context->link->getModuleLink('payplug', 'tools', ['action' => 'remove_payplug_order_states'])
+                'remove_payplug_order_states_link' => $this->context->link->getModuleLink(
+                    'payplug',
+                    'tools',
+                    ['action' => 'remove_payplug_order_states']
+                )
             ]
         );
         $this->setTemplate('tools/list.tpl');

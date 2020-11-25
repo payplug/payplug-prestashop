@@ -123,11 +123,15 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         return Tools::displayPrice(($amount / 100), (int)$order->id_currency);
     }
 
+    // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
     public function viewpayplug_installment()
     {
         $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
-        Tools::redirectAdmin('index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.Tools::getAdminTokenLite('AdminOrders'));
+        Tools::redirectAdmin(
+            'index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.
+            Tools::getAdminTokenLite('AdminOrders')
+        );
     }
 
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)

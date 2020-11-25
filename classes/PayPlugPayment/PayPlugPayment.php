@@ -900,8 +900,8 @@ class PayPlugPayment
         foreach (explode(
             ';',
             Tools::strtoupper(
-                        $this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS')
-                    )
+                $this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS')
+            )
         ) as $amount_cur
             ) {
             $cur = [];

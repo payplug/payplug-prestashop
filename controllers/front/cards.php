@@ -69,7 +69,12 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             $payplug_cards = $this->card->getCardsByCustomer($customer->id);
         }
 
-        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink('payplug', 'ajax', ['_ajax' => 1], true);
+        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink(
+            'payplug',
+            'ajax',
+            ['_ajax' => 1],
+            true
+        );
         $this->contextSpecific->getContext()->smarty->assign([
             'payplug_cards' => $payplug_cards,
             'payplug_delete_card_url' => $payplug_delete_card_url

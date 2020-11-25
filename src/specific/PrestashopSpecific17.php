@@ -44,14 +44,11 @@ class PrestashopSpecific17
     {
         $paymentOptions = [];
         foreach ($payment_options as $payment_option) {
-            /*
-             * 1è condition : Si OneClick activé mais pas de carte enregistré, on sort
-             * 2è condition : Si, dans la boucle, c'est au tour de 'payplug_cards', on sort pour pas instancier PaymentOption()
-             */
-
             $paymentOption = new PaymentOption();
             if (isset($payment_option['expiry_date_card'])) {
-                $payment_option['callToActionText'] = $payment_option['callToActionText'] .' - '. $payment_option['expiry_date_card'];
+                $payment_option['callToActionText'] = $payment_option['callToActionText'] .
+                    ' - '. $payment_option['expiry_date_card']
+                ;
             }
             $paymentOption
                 ->setLogo($payment_option['logo'])

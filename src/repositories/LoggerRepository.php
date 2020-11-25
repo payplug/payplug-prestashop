@@ -46,8 +46,7 @@ class LoggerRepository
             ->setTable('payplug_logger')
             ->setLimitNumber((int)4000)
             ->setLimitDate('P1M')
-            ->setDefinition(
-                [
+            ->setDefinition([
                 'table' => $this->loggerEntity->getTable(),
                 'primary' => 'id_'.$this->loggerEntity->getTable(),
                 'fields' => [
@@ -68,8 +67,7 @@ class LoggerRepository
                     'date_add' => ['type' => 5, 'validate' => 'isDate'],
                     'date_upd' => ['type' => 5, 'validate' => 'isDate']
                 ]
-            ]
-            );
+            ]);
     }
 
     /**
@@ -113,7 +111,12 @@ class LoggerRepository
         $debug = reset($debugBacktrace);
 
         $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T
-        $entry = ['date' => $this->udate('Y-m-d H:i:s.u T'), 'line' => $debug['line'], 'message' => $message, 'level' => $level];
+        $entry = [
+            'date' => $this->udate('Y-m-d H:i:s.u T'),
+            'line' => $debug['line'],
+            'message' => $message,
+            'level' => $level
+        ];
         array_push($content, $entry);
 
         $this->loggerEntity->setContent(json_encode($content));

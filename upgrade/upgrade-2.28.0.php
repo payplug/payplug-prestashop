@@ -43,9 +43,13 @@ function upgrade_module_2_28_0($object)
         'exp_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP_TEST'),
         'inst_pg_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'),
         'inst_pg_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG_TEST'),
-        'pending_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') != _PS_OS_PENDING_ ? (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') : null,
+        'pending_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') != _PS_OS_PENDING_ ?
+            (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') :
+            null,
         'pending_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
-        'error_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') != _PS_OS_ERROR_ ? (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') : null,
+        'error_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') != _PS_OS_ERROR_ ?
+            (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') :
+            null,
         'error_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
         'oney_pending' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
         'oney_pending_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),

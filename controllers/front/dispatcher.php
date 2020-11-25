@@ -64,8 +64,8 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 } else {
                     Tools::redirect($payment['return_url']);
                 }
-            } // if the payment is redirect and not a one click payment, prepare the payment and redirect
-            elseif (!$options['embedded'] && !$is_one_click) {
+            } elseif (!$options['embedded'] && !$is_one_click) {
+                // if the payment is redirect and not a one click payment, prepare the payment and redirect
                 $payment_options = [
                     'id_card' => $id_card,
                     'is_installment' => $is_installment,
@@ -73,7 +73,9 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 ];
                 $payment = $payplug->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    $payplug->setPaymentErrorsCookie([$payplug->l('The transaction was not completed and your card was not charged.')]);
+                    $payplug->setPaymentErrorsCookie([
+                        $payplug->l('The transaction was not completed and your card was not charged.')
+                    ]);
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);

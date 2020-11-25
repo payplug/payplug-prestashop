@@ -206,7 +206,9 @@ class PayPlugAjax
                     } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                         die($tools->tool('jsonEncode', [
                             'result' => false,
-                            'message' => $this->payplug->l('At least one of the fields is not correctly completed.')
+                            'message' => $this->payplug->l(
+                                'At least one of the fields is not correctly completed.'
+                            )
                         ]));
                     }
                 } catch (Exception $e) {
@@ -217,7 +219,9 @@ class PayPlugAjax
 
                 die($tools->tool('jsonEncode', [
                     'result' => $result,
-                    'message' => $result ? $this->payplug->l('Your information has been saved') : $this->payplug->l('An error occured. Please retry in few seconds.')
+                    'message' => $result ?
+                        $this->payplug->l('Your information has been saved') :
+                        $this->payplug->l('An error occured. Please retry in few seconds.')
                 ]));
             }
         }

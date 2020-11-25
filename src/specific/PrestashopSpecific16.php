@@ -143,15 +143,9 @@ class PrestashopSpecific16
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
         foreach ($payment_options as $payment_option) {
-
-            // Pour n'affiche qu'un template OneClick
-            // Sinon, si x CB d'enregistrées : affiche x temmplates avec x CB dans chaque
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
-
-                // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
-                // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
                     && ($payment_method == 'standard')) {
@@ -166,11 +160,15 @@ class PrestashopSpecific16
                      * unified.tpl (Oney non optimisé)
                      */
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
-                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
+                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
+                            ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
-                        'logo_url' => $payment_method == 'one_click' ? $payment_options['standard']['logo'] : $payment_option['logo'],
+                        'logo_url' => $payment_method == 'one_click' ?
+                            $payment_options['standard']['logo'] :
+                            $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
-                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' . $payment_option['tpl'],
+                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
+                            $payment_option['tpl'],
                     ];
                 }
 
