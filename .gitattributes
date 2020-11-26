@@ -9,3 +9,4 @@ views/css/*.less export-ignore
 views/css/*.map export-ignore
 views/templates/front/tools export-ignore
 controllers/tools export-ignore
+tests/
