@@ -42,16 +42,16 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
-        foreach($payment_options as $payment_option)
-        {
+        foreach ($payment_options as $payment_option) {
             /*
              * 1è condition : Si OneClick activé mais pas de carte enregistré, on sort
              * 2è condition : Si, dans la boucle, c'est au tour de 'payplug_cards', on sort pour pas instancier PaymentOption()
              */
+            $payment_method = $payment_option['name'];
 
             $paymentOption = new PaymentOption();
             if (isset($payment_option['expiry_date_card'])) {
-                $payment_option['callToActionText'] = $payment_option['callToActionText'] .' - '. $payment_option['expiry_date_card'];
+                $payment_option['callToActionText'] = $payment_option['callToActionText'] . ' - ' . $payment_option['expiry_date_card'];
             }
             $paymentOption
                 ->setLogo($payment_option['logo'])
@@ -59,6 +59,21 @@ class PrestashopSpecific17
                 ->setAction($payment_option['action'])
                 ->setModuleName($payment_option['moduleName'])
                 ->setInputs($payment_option['inputs']);
+
+            // load oney schedule on e page loading
+            if ($payment_method == 'oney' && $payment_option['is_optimized']) {
+                $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
+                    $payment_option['amount'],
+                    $payment_option['iso_code']
+                );
+                if ($payment_schedule) {
+                    $schedules = $this->payplug->oney->displayOneySchedule(
+                        $payment_schedule[$payment_option['type']],
+                        $payment_option['amount']
+                    );
+                    $payment_option['additionalInformation'] = $schedules;
+                }
+            }
 
             if (isset($payment_option['additionalInformation']))
             {

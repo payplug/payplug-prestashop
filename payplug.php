@@ -275,7 +275,7 @@ class Payplug extends PaymentModule
         $this->name = 'payplug';
         $this->author = 'PayPlug';
         $this->bootstrap = true;
-        $this->constantFile = _PS_MODULE_DIR_.'payplug/payplug.php';
+        $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
@@ -304,11 +304,11 @@ class Payplug extends PaymentModule
     {
         $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->card     = $this->getPlugin()->getCard();
-        $this->logger   = $this->getPlugin()->getLogger();
-        $this->oney     = $this->getPlugin()->getOney();
-        $this->query    = $this->getPlugin()->getQuery();
-        $this->tools    = $this->getPlugin()->getTools();
+        $this->card = $this->getPlugin()->getCard();
+        $this->logger = $this->getPlugin()->getLogger();
+        $this->oney = $this->getPlugin()->getOney();
+        $this->query = $this->getPlugin()->getQuery();
+        $this->tools = $this->getPlugin()->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -2414,23 +2414,22 @@ class Payplug extends PaymentModule
 
             $is_elligible = $this->oney->isOneyElligible($this->context->cart, $cart_amount, true);
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
-            $payment_schedule = false;
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && !$error;
 
-            if ($optimized && !$error) {
+            foreach ($this->available_oney_payments as $oney_payment) {
+                $payment_key = 'oney_' . $oney_payment;
+
+                $paymentOption[$payment_key]['name'] = 'oney';
+
+                $paymentOption[$payment_key]['is_optimized'] = $optimized;
+                $paymentOption[$payment_key]['type'] = $oney_payment;
+                $paymentOption[$payment_key]['amount'] = $cart_amount;
                 $delivery_address = new Address($this->context->cart->id_address_delivery);
                 $delivery_country = new Country($delivery_address->id_country);
-                $iso_code = $delivery_country->iso_code;
-                $payment_schedule = $this->oney->getOneyPaymentOptionsList($cart_amount, $iso_code);
-                if (empty($payment_schedule)) {
-                    $optimized = false;
-                }
-            }
+                $paymentOption[$payment_key]['iso_code'] = $delivery_country->iso_code;
 
-            foreach ($this->available_oney_payments as $oney_payment) {
-                $paymentOption['oney_' . $oney_payment]['name'] = 'oney';
-                $paymentOption['oney_' . $oney_payment]['inputs'] = array(
+                $paymentOption[$payment_key]['inputs'] = array(
                     'pc' => array(
                         'name' => 'pc',
                         'type' => 'hidden',
@@ -2458,26 +2457,23 @@ class Payplug extends PaymentModule
                     ),
                 );
 
-
-                if ($error) {
-                    switch ($error) {
-                        case 'invalid_addresses':
-                            $err_label = $this->l('Available for France only');
-                            break;
-                        case 'invalid_amount_bottom':
-                        case 'invalid_amount_top':
-                            $err_label = $this->l('Between 100€ and 3000€ only');
-                            break;
-                        case 'invalid_carrier' :
-                            $err_label = $this->l('Unavailable for this shipping method');
-                            break;
-                        default:
-                        case 'invalid_cart' :
-                            $err_label = $this->l('Your cart is unavailable');
-                            break;
-                    }
-                } else {
-                    $err_label = '';
+                switch ($error) {
+                    case 'invalid_addresses':
+                        $err_label = $this->l('Unavailable for the specified country');
+                        break;
+                    case 'invalid_amount_bottom':
+                    case 'invalid_amount_top':
+                        $err_label = $this->l('Between 100€ and 3000€ only');
+                        break;
+                    case 'invalid_carrier':
+                        $err_label = $this->l('Unavailable for this shipping method');
+                        break;
+                    case 'invalid_cart':
+                        $err_label = $this->l('Your cart is unavailable');
+                        break;
+                    default:
+                        $err_label = $this->l('An error has occured');
+                        break;
                 }
 
                 $type = explode('_', $oney_payment);
@@ -2485,7 +2481,7 @@ class Payplug extends PaymentModule
 
                 $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.svg';
-                $oneyCallToActionText = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
+                $oneyLabel = $error ? $err_label : sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 if ($optimized) {
                     $oneyTpl = 'oney.tpl';
@@ -2494,25 +2490,28 @@ class Payplug extends PaymentModule
                         && (method_exists($this->PrestashopSpecificObject, 'getPaymentOption'))) {
                         $oneyData = $this->PrestashopSpecificObject->getPaymentOption();
                         $oneyLogo = $oneyData['oneyLogo'];
-                        $oneyCallToActionText = $oneyData['oneyCallToActionText'];
+                        $oneyLabel = $oneyData['oneyCallToActionText'];
                     }
                 }
 
-                $paymentOption['oney_' . $oney_payment]['tpl'] = $oneyTpl;
-                $paymentOption['oney_' . $oney_payment]['extra_classes'] = sprintf('oney%sx', $split);
-                $paymentOption['oney_' . $oney_payment]['payment_controller_url'] = PayplugBackward::getModuleLink($this->name,
-                    'payment', array('type' => 'oney', 'io' => sprintf('%s', $split)), true);
-                $paymentOption['oney_' . $oney_payment]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oneyLogo);
-                $paymentOption['oney_' . $oney_payment]['callToActionText'] = $oneyCallToActionText;
-                $paymentOption['oney_' . $oney_payment]['action'] = $this->context->link->getModuleLink($this->name,
-                    'dispatcher', array(), true);
-                $paymentOption['oney_' . $oney_payment]['moduleName'] = 'payplug';
-                $paymentOption['oney_' . $oney_payment]['err_label'] = $err_label;
-
-                if ($optimized) {
-                    $schedules = $this->oney->displayOneySchedule($payment_schedule[$oney_payment], $cart_amount);
-                    $paymentOption['oney_' . $oney_payment]['additionalInformation'] = $schedules;
-                }
+                $paymentOption[$payment_key]['tpl'] = $oneyTpl;
+                $paymentOption[$payment_key]['extra_classes'] = sprintf('oney%sx', $split);
+                $paymentOption[$payment_key]['payment_controller_url'] = PayplugBackward::getModuleLink(
+                    $this->name,
+                    'payment',
+                    ['type' => 'oney', 'io' => sprintf('%s', $split)],
+                    true
+                );
+                $paymentOption[$payment_key]['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oneyLogo);
+                $paymentOption[$payment_key]['callToActionText'] = $oneyLabel;
+                $paymentOption[$payment_key]['action'] = $this->context->link->getModuleLink(
+                    $this->name,
+                    'dispatcher',
+                    [],
+                    true
+                );
+                $paymentOption[$payment_key]['moduleName'] = 'payplug';
+                $paymentOption[$payment_key]['err_label'] = $err_label;
             }
         }
         return $paymentOption;
@@ -3466,10 +3465,9 @@ class Payplug extends PaymentModule
     public function hookActionAdminPerformanceControllerAfter($params)
     {
         return $this
-                ->getPlugin()
-                ->getCache()
-                ->flushCache()
-                ;
+            ->getPlugin()
+            ->getCache()
+            ->flushCache();
     }
 
     /**
@@ -3483,8 +3481,7 @@ class Payplug extends PaymentModule
         return $this
             ->getPlugin()
             ->getCache()
-            ->flushCache()
-            ;
+            ->flushCache();
     }
 
     /**

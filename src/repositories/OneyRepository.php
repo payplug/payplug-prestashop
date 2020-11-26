@@ -325,13 +325,14 @@ class OneyRepository
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $vars = [
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => $this->toolsSpecific->tool('displayPrice',$amount),
-            ],
-        ));
+            ]
+        ];
+        $this->contextSpecific->getContext()->smarty->assign($vars);
         return $this->payplug->display($this->payplug->constantFile, 'oney/schedule.tpl');
     }
 
