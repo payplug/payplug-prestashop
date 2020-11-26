@@ -2529,7 +2529,7 @@ class Payplug extends PaymentModule
                 if ($error) {
                     switch ($error) {
                         case 'invalid_addresses':
-                            $err_label = $this->l('Available for France only');
+                            $err_label = $this->l('Unavailable for the specified country');
                             break;
                         case 'invalid_amount_bottom':
                         case 'invalid_amount_top':
