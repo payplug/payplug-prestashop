@@ -2,7 +2,6 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{payplug}prestashop>payplug_1f13848407899d1a6e3b539cb4029ddf'] = 'La solution de paiement en ligne qui combine simplicité et accompagnement pour booster vos ventes.';
 $_MODULE['<{payplug}prestashop>payplug_f157d7333585b8ce4db9722f383d3bcb'] = 'Cannot abort installment.';
 $_MODULE['<{payplug}prestashop>payplug_6339057c04eafb3954cf17cd06847efc'] = 'Settings not updated';
 $_MODULE['<{payplug}prestashop>payplug_8186e25dabeca93837acfc5664c7fd00'] = 'L\'e-mail ou le mot de passe saisi est incorrect.';
@@ -241,4 +240,7 @@ $_MODULE['<{payplug}prestashop>popin_d3d2e617335f08df83599665eef8a418'] = 'Ferme
 $_MODULE['<{payplug}prestashop>popin_99938b17c91170dfb0c2f3f8bc9f2a85'] = 'Payer';
 $_MODULE['<{payplug}prestashop>popin_1c9a3b69a045f449e60f3f2aa06d4588'] = 'par carte bancaire';
 $_MODULE['<{payplug}prestashop>popin_05db6d24e779f385e197ae37aaac54de'] = 'Paiement avec Oney indisponible.';
+$_MODULE['<{payplug}prestashop>options_05db6d24e779f385e197ae37aaac54de'] = 'Paiement avec Oney indisponible.';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Cartes sauvegardées';
+$_MODULE['<{payplug}prestashop>oneyrepository_05db6d24e779f385e197ae37aaac54de'] = 'Paiement avec Oney indisponible.';
+$_MODULE['<{payplug}prestashop>cardrepository_453e6aa38d87b28ccae545967c53004f'] = 'Indisponible';
