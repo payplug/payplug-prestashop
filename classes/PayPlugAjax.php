@@ -221,7 +221,7 @@ class PayPlugAjax
                     'result' => $result,
                     'message' => $result ?
                         $this->payplug->l('Your information has been saved') :
-                        $this->payplug->l('An error occured. Please retry in few seconds.')
+                        $this->payplug->l('An error occurred. Please retry in few seconds.')
                 ]));
             }
         }

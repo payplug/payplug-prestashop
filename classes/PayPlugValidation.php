@@ -403,7 +403,7 @@ class PayPlugValidation
 
             try {
                 if ($amount != $cart_amount) {
-                    $this->logger->addLog('Cart amount is different and may occured an error');
+                    $this->logger->addLog('Cart amount is different and may occurred an error');
                     $this->logger->addLog('Cart amount:' . $cart_amount);
                 }
 

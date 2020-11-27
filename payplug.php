@@ -2537,7 +2537,7 @@ class Payplug extends PaymentModule
                         $err_label = $this->l('Your cart is unavailable');
                         break;
                     default:
-                        $err_label = $this->l('An error has occured');
+                        $err_label = $this->l('An error has occurred');
                         break;
                 }
 

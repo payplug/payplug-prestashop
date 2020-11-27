@@ -735,7 +735,7 @@ class PayPlugNotifications
             $cart_amount = (float)$this->cart->getOrderTotal(true, Cart::BOTH);
 
             if ($amount != $cart_amount) {
-                $this->logger->addLog('Cart amount is different and may occured an error');
+                $this->logger->addLog('Cart amount is different and may occurred an error');
                 $this->logger->addLog('Cart amount:' . $cart_amount);
             }
 

@@ -22,7 +22,7 @@
 {capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}" title="{l s='Manage my account' mod='payplug'}" rel="nofollow">{l s='My account' mod='payplug'}</a><span class="navigation-pipe">{$navigationPipe|escape:'htmlall':'UTF-8'}</span>{l s='Saved cards' mod='payplug'}{/capture}
 
 <h2>{l s='Saved cards' mod='payplug'}</h2>
-<p class="message alert alert-success" style="display: none;">{l s='Card sucessfuly deleted.' mod='payplug'}</p>
+<p class="message alert alert-success" style="display: none;">{l s='Card sucessfully deleted.' mod='payplug'}</p>
 {if isset($payplug_cards) AND !empty($payplug_cards) AND sizeof($payplug_cards)}
     <div class="block-center" id="block-history">
         <table id="card-list" class="std" data-e2e-card="list">

@@ -132,7 +132,7 @@ $_MODULE['<{payplug}prestashop>one_click_status_cef5ffe1ea30cca7818c988c27467aed
 $_MODULE['<{payplug}prestashop>errors_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>cards_list_807bcef3f33f11623310535338ef7afc'] = 'Saved Cards';
 $_MODULE['<{payplug}prestashop>cards_list_4f03f1cd406f90dc896b029ac3d4af76'] = 'Here are the cards you have saved.';
-$_MODULE['<{payplug}prestashop>cards_list_d9a7d06dc9299f71b496c6fecd30b31a'] = 'Card sucessfuly deleted.';
+$_MODULE['<{payplug}prestashop>cards_list_d9a7d06dc9299f71b496c6fecd30b31a'] = 'Card sucessfully deleted.';
 $_MODULE['<{payplug}prestashop>cards_list_1d565b9e5303987bb1b1938d5d458bca'] = 'Card';
 $_MODULE['<{payplug}prestashop>cards_list_1be6f9eb563f3bf85c78b4219bf09de9'] = 'Brand';
 $_MODULE['<{payplug}prestashop>cards_list_c7d4153f748ba1dd21ae002c37c00906'] = 'Card mask';
