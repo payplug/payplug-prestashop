@@ -358,13 +358,14 @@ class OneyRepository
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
-        $this->contextSpecific->getContext()->smarty->assign([
+        $vars = [
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $this->toolsSpecific->tool('displayPrice', $amount),
-            ],
-        ]);
+                'value' => $this->toolsSpecific->tool('displayPrice',$amount),
+            ]
+        ];
+        $this->contextSpecific->getContext()->smarty->assign($vars);
         return $this->payplug->display($this->payplug->constantFile, 'oney/schedule.tpl');
     }
 
@@ -1305,7 +1306,6 @@ class OneyRepository
                     $delivery_type = $this->payplug->l('Store Pickup');
                     break;
             }
-
 
             $error = $this->payplug->l('The ') . $delivery_type .
                 $this->payplug->l(' shipping is conflicting with this payment method. ');

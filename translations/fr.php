@@ -2,6 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
+$_MODULE['<{payplug}prestashop>payplug_1f13848407899d1a6e3b539cb4029ddf'] = 'La solution de paiement en ligne qui combine simplicité et accompagnement pour booster vos ventes.';
 $_MODULE['<{payplug}prestashop>payplug_f157d7333585b8ce4db9722f383d3bcb'] = 'Cannot abort installment.';
 $_MODULE['<{payplug}prestashop>payplug_6339057c04eafb3954cf17cd06847efc'] = 'Settings not updated';
 $_MODULE['<{payplug}prestashop>payplug_8186e25dabeca93837acfc5664c7fd00'] = 'L\'e-mail ou le mot de passe saisi est incorrect.';
