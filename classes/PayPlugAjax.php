@@ -40,16 +40,12 @@ class PayPlugAjax
 
     public function __construct()
     {
-        try {
-            $this->payplug = new \Payplug();
-            $this->plugin = $this->payplug->getPlugin();
-            $this->card = $this->plugin->getCard();
-            $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
-            $this->oney = $this->plugin->getOney();
-            $this->toolsSpecific = $this->plugin->getTools();
-        } catch (Exception $e) {
-            throw new Exception($e);
-        }
+        $this->payplug = new \Payplug();
+        $this->plugin = $this->payplug->getPlugin();
+        $this->card = $this->plugin->getCard();
+        $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
+        $this->oney = $this->plugin->getOney();
+        $this->toolsSpecific = $this->plugin->getTools();
     }
 
     /**
