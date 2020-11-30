@@ -82,7 +82,7 @@ class MyLogPHP
         }
         $file = $debugBacktrace[1]['file'];
         $value = preg_replace('/\s+/', ' ', trim($value));
-        $entry = [$datetime,$errorlevel,$tag,$value,$line,$file];
+        $entry = [$datetime, $errorlevel, $tag, $value, $line, $file];
         fputcsv($fd, $entry, $this->SEPARATOR);
         fclose($fd);
     }
