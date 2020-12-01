@@ -1774,8 +1774,8 @@ class Payplug extends PaymentModule
             $req_order_state->from('order_state_lang', 'osl');
             $req_order_state->where('osl.name LIKE \'' . pSQL($name['en'] . (
                     $test_mode ?
-                    ' [TEST]'
-                    : ' [PayPlug]')
+                        ' [TEST]'
+                        : ' [PayPlug]')
                 ) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
@@ -2193,7 +2193,7 @@ class Payplug extends PaymentModule
         $req_payplug_card->from('payplug_card', 'pc');
         $req_payplug_card->where('pc.id_customer = ' . (int)$id_customer);
         $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get(
-            'PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')
+                'PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')
             ));
         $req_payplug_card->where('pc.is_sandbox = ' . (int)$is_sandbox);
         $res_payplug_card = Db::getInstance()->executeS($req_payplug_card);
@@ -2966,8 +2966,9 @@ class Payplug extends PaymentModule
         $shipping_country = new Country($shipping_address->id_country);
 
         // Validate email format
-        if (Tools::strlen($this->context->customer->email) > 100 && strpos($this->context->customer->email,
-                '+') !== false) {
+        if (Tools::strlen($this->context->customer->email) > 100
+            && strpos($this->context->customer->email, '+') !== false
+        ) {
             $text = $this->l('Your email address is too long and the + character is not valid,') .
                 $this->l(' please change it to another address (max 100 characters).');
             $shipping_fields['email'] = array(
@@ -3448,13 +3449,13 @@ class Payplug extends PaymentModule
         $paymentOption
             ->setLogo(Media::getMediaPath(
                 _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
-                'none'
-                : 'logos_schemes_' . $this->img_lang) . '.png'
+                    'none'
+                    : 'logos_schemes_' . $this->img_lang) . '.png'
             ))
             ->setCallToActionText(
                 count($payplug_cards) > 0 ?
-                $this->l('Pay with a different card')
-                : $this->l('Pay with a credit card')
+                    $this->l('Pay with a different card')
+                    : $this->l('Pay with a credit card')
             )
             ->setAction($this->context->link->getModuleLink(
                 $this->name,
@@ -3497,8 +3498,8 @@ class Payplug extends PaymentModule
                     _PS_MODULE_DIR_
                     . $this->name
                     . '/views/img/logos_schemes_installment_'
-                    . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png')
-                )
+                    . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'
+                ))
                 ->setCallToActionText(
                     $this->l('Pay by card in') . ' '
                     . Configuration::get('PAYPLUG_INST_MODE') . ' '
@@ -3507,8 +3508,9 @@ class Payplug extends PaymentModule
                 ->setAction($this->context->link->getModuleLink(
                     $this->name,
                     'dispatcher',
-                    array('def' => (int)$options['deferred']), true)
-                )
+                    ['def' => (int)$options['deferred']],
+                    true
+                ))
                 ->setModuleName('payplug')
                 ->setInputs($input_options);
 
@@ -3596,10 +3598,15 @@ class Payplug extends PaymentModule
                     ->setLogo(Media::getMediaPath(
                         _PS_MODULE_DIR_ . $this->name . '/views/img/oney/'
                         . $oney_payment
-                        . ($error ? '-alt' : '') . '.svg')
-                    )
+                        . ($error ? '-alt' : '') . '.svg'
+                    ))
                     ->setCallToActionText($label)
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
+                    ->setAction($this->context->link->getModuleLink(
+                        $this->name,
+                        'dispatcher',
+                        array(),
+                        true
+                    ))
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
                 if ($optimized) {
@@ -4507,14 +4514,12 @@ class Payplug extends PaymentModule
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
         if (preg_match(
-                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-                $useragent
-            )
-            || preg_match(
-                '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-                Tools::substr($useragent, 0, 4)
-            )
-        ) {
+            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
+            $useragent
+        ) || preg_match(
+            '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
+            Tools::substr($useragent, 0, 4)
+        )) {
             return true;
         }
 
@@ -5050,7 +5055,8 @@ class Payplug extends PaymentModule
         );
 
         $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
-        $flag = $flag && $this->installModuleTab(
+        $flag = $flag
+            && $this->installModuleTab(
                 'AdminPayPlugInstallment',
                 $translationsAdminPayPlugInstallment,
                 $adminPayPlugId,
@@ -6448,13 +6454,15 @@ class Payplug extends PaymentModule
 
         // Set the uninstall notice according to the "keep_cards" configuration
         $this->confirmUninstall = $this->l(
-                'Are you sure you wish to uninstall this module and delete your settings?'
-            ) . ' ';
+            'Are you sure you wish to uninstall this module and delete your settings?'
+        );
         if ((int)Configuration::get('PAYPLUG_KEEP_CARDS') == 1) {
-            $this->confirmUninstall .= $this->l('All the registered cards of your customer will be kept.');
+            $card_txt = $this->l('All the registered cards of your customer will be kept.');
         } else {
-            $this->confirmUninstall .= $this->l('All the registered cards of your customer will be deleted.');
+            $card_txt = $this->l('All the registered cards of your customer will be deleted.');
+
         }
+        $this->confirmUninstall .= ' ' . $card_txt;
 
         $this->current_api_key = $this->getCurrentApiKey();
         $this->email = Configuration::get('PAYPLUG_EMAIL');
