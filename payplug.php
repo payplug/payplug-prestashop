@@ -377,8 +377,15 @@ class Payplug extends PaymentModule
                     `id_installment`, `id_payment`, `id_order`, `id_customer`, 
                     `order_total`, `step`, `amount`, `status`, `scheduled_date`
                 ) VALUES (
-                    \'' . $installment->id . '\', \'' . $pay_id . '\', \'' . $order->id . '\', \'' . $order->id_customer . '\', 
-                    \'' . (int)(($order->total_paid * 1000) / 10) . '\', \'' . $step . '\', \'' . $amount . '\', \'' . $status . '\', \'' . $date . '\'
+                    \'' . $installment->id . '\', 
+                    \'' . $pay_id . '\', 
+                    \'' . $order->id . '\', 
+                    \'' . $order->id_customer . '\', 
+                    \'' . (int)(($order->total_paid * 1000) / 10) . '\', 
+                    \'' . $step . '\', 
+                    \'' . $amount . '\', 
+                    \'' . $status . '\', 
+                    \'' . $date . '\'
                 )';
                     $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
 
@@ -748,7 +755,9 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->l('Capture of this payment is authorized before %s. After this date, you will not be able to get paid.'),
+                        $this->l(
+                            'Capture of this payment is authorized before %s. After this date, you will not be able to get paid.'
+                        ),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -866,7 +875,9 @@ class Payplug extends PaymentModule
                     $error_key = md5('The transaction was not completed and your card was not charged.');
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
-                        $errors[$error_key] = $this->l('The transaction was not completed and your card was not charged.');
+                        $errors[$error_key] = $this->l(
+                            'The transaction was not completed and your card was not charged.'
+                        );
                     }
             }
         }
@@ -991,7 +1002,10 @@ class Payplug extends PaymentModule
 
         // check if oney tos is complete
         $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
-        if ($is_payplug_connected && Configuration::get('PAYPLUG_ONEY') && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
+        if ($is_payplug_connected
+            && Configuration::get('PAYPLUG_ONEY')
+            && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))
+        ) {
             $this->check_configuration['other'][] = [
                 'text' => $check_oney_tos,
                 'type' => 'warning'
@@ -1045,18 +1059,27 @@ class Payplug extends PaymentModule
             switch ($field) {
                 case 'email':
                     if (Tools::strlen($data) > 100 && strpos($data, '+') !== false) {
-                        $text = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
+                        $text = $this->l(
+                            'Your email address is too long and the + character is not valid, '
+                            . 'please change it to another address (max 100 characters).'
+                        );
                         $errors[] = $text;
                     } elseif (Tools::strlen($data) > 100) {
-                        $text = $this->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
+                        $text = $this->l(
+                            'Your email address is too long, please change it to a shorter one (max 100 characters).'
+                        );
                         $errors[] = $text;
                     } elseif (strpos($data, '+') !== false) {
-                        $text = $this->l('The + character is not valid. Please change your email address (100 characters max).');
+                        $text = $this->l(
+                            'The + character is not valid. Please change your email address (100 characters max).'
+                        );
                         $errors[] = $text;
                     }
                     break;
                 case 'mobile_phone_number':
-                    $id_address = $type == 'shipping' ? $this->context->cart->id_address_delivery : $this->context->cart->id_address_invoice;
+                    $id_address = $type == 'shipping' ?
+                        $this->context->cart->id_address_delivery
+                        : $this->context->cart->id_address_invoice;
                     $address = new Address($id_address);
                     $country = new Country($address->id_country);
                     $valid = $this->isValidMobilePhoneNumber($data, $country->iso_code);
@@ -1066,31 +1089,41 @@ class Payplug extends PaymentModule
                     break;
                 case 'first_name':
                     if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->l('Please enter your shipping firstname.') : $this->l('Please enter your billing firstname.');
+                        $text = $type == 'shipping' ?
+                            $this->l('Please enter your shipping firstname.')
+                            : $this->l('Please enter your billing firstname.');
                         $errors[] = $text;
                     }
                     break;
                 case 'last_name':
                     if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->l('Please enter your shipping lastname.') : $this->l('Please enter your billing lastname.');
+                        $text = $type == 'shipping' ?
+                            $this->l('Please enter your shipping lastname.')
+                            : $this->l('Please enter your billing lastname.');
                         $errors[] = $text;
                     }
                     break;
                 case 'address1':
                     if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->l('Please enter your shipping address.') : $this->l('Please enter your billing address.');
+                        $text = $type == 'shipping' ?
+                            $this->l('Please enter your shipping address.')
+                            : $this->l('Please enter your billing address.');
                         $errors[] = $text;
                     }
                     break;
                 case 'postcode':
                     if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->l('Please enter your shipping postcode.') : $this->l('Please enter your billing postcode.');
+                        $text = $type == 'shipping' ?
+                            $this->l('Please enter your shipping postcode.')
+                            : $this->l('Please enter your billing postcode.');
                         $errors[] = $text;
                     }
                     break;
                 case 'city':
                     if (!Validate::isCityName($data)) {
-                        $text = $type == 'shipping' ? $this->l('Please enter your shipping city.') : $this->l('Please enter your billing city.');
+                        $text = $type == 'shipping' ?
+                            $this->l('Please enter your shipping city.')
+                            : $this->l('Please enter your billing city.');
                         $errors[] = $text;
                     } elseif (Tools::strlen($data) > 32) {
                         $text = $this->l('Your city name is too long (max 32 characters). ')
@@ -1350,7 +1383,8 @@ class Payplug extends PaymentModule
             CURLOPT_SSL_VERIFYHOST,
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
+        //work only wiht cURL 7.10+
+        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
         $error_curl = curl_errno($process);
 
         curl_close($process);
@@ -1568,10 +1602,12 @@ class Payplug extends PaymentModule
         $min_amount = $this->convertAmount($limits['min'], true);
         $max_amount = $this->convertAmount($limits['max'], true);
 
-        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. ';
+        $legal_text = 'Offre de financement avec apport obligatoire, '
+            . 'réservée aux particuliers et valable pour tout achat de %s à %s. ';
         $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
         $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
+        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix '
+            . '- 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
         $tos_url = Configuration::get('PAYPLUG_ONEY_TOS_URL');
@@ -1736,7 +1772,11 @@ class Payplug extends PaymentModule
             $req_order_state = new DbQuery();
             $req_order_state->select('DISTINCT osl.id_order_state');
             $req_order_state->from('order_state_lang', 'osl');
-            $req_order_state->where('osl.name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+            $req_order_state->where('osl.name LIKE \'' . pSQL($name['en'] . (
+                    $test_mode ?
+                    ' [TEST]'
+                    : ' [PayPlug]')
+                ) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
@@ -1895,7 +1935,8 @@ class Payplug extends PaymentModule
             CURLOPT_SSL_VERIFYHOST,
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
+        //work only wiht cURL 7.10+
+        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
         $answer = curl_exec($process);
         $error_curl = curl_errno($process);
 
@@ -1939,7 +1980,8 @@ class Payplug extends PaymentModule
     {
         if ($controller_name == 'AdminModules') {
             $admin_ajax_url = 'index.php?controller=' . $controller_name . '&configure=' . $this->name
-                . '&tab_module=payments_gateways&module_name=payplug&token=' . Tools::getAdminTokenLite($controller_name);
+                . '&tab_module=payments_gateways&module_name=payplug&token='
+                . Tools::getAdminTokenLite($controller_name);
         } elseif ($controller_name == 'AdminOrders') {
             $admin_ajax_url = 'index.php?controller=' . $controller_name . '&id_order=' . $id_order
                 . '&vieworder&token=' . Tools::getAdminTokenLite($controller_name);
@@ -1984,7 +2026,11 @@ class Payplug extends PaymentModule
         }
 
         $permissions = $this->getAccountPermissions();
-        $inst_min_amount = (float)str_replace(',', '.', Configuration::get('PAYPLUG_INST_MIN_AMOUNT'));
+        $inst_min_amount = (float)str_replace(
+            ',',
+            '.',
+            Configuration::get('PAYPLUG_INST_MIN_AMOUNT')
+        );
 
         $available_options = array(
             'standard' => true,
@@ -2146,7 +2192,9 @@ class Payplug extends PaymentModule
               pc. exp_month, pc.exp_year, pc.brand, pc.country, pc.metadata');
         $req_payplug_card->from('payplug_card', 'pc');
         $req_payplug_card->where('pc.id_customer = ' . (int)$id_customer);
-        $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')));
+        $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get(
+            'PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')
+            ));
         $req_payplug_card->where('pc.is_sandbox = ' . (int)$is_sandbox);
         $res_payplug_card = Db::getInstance()->executeS($req_payplug_card);
 
@@ -2155,7 +2203,9 @@ class Payplug extends PaymentModule
         } else {
             foreach ($res_payplug_card as $key => &$value) {
                 if ((int)$value['exp_year'] < (int)date('Y')
-                    || ((int)$value['exp_year'] == (int)date('Y') && (int)$value['exp_month'] < (int)date('m'))) {
+                    || ((int)$value['exp_year'] == (int)date('Y')
+                        && (int)$value['exp_month'] < (int)date('m')
+                    )) {
                     $value['expired'] = true;
                     if ($active_only) {
                         unset($res_payplug_card[$key]);
@@ -2467,7 +2517,8 @@ class Payplug extends PaymentModule
 
         $login_infos = [];
 
-        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
+        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token='
+            . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
         $faq_links = $this->getFAQLinks(Context::getContext()->language->iso_code);
 
@@ -2563,10 +2614,12 @@ class Payplug extends PaymentModule
         $min_amount = $this->convertAmount($limits['min'], true);
         $max_amount = $this->convertAmount($limits['max'], true);
 
-        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. ';
+        $legal_text = 'Offre de financement avec apport obligatoire, '
+            . 'réservée aux particuliers et valable pour tout achat de %s à %s. ';
         $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
         $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
+        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix '
+            . '- 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
         $this->smarty->assign(array(
@@ -2583,7 +2636,8 @@ class Payplug extends PaymentModule
         $switch = [];
 
         // defined if user is connected
-        $connected = !empty($configurations['email']) && (!empty($configurations['test_api_key']) || !empty($configurations['live_api_key']));
+        $connected = !empty($configurations['email'])
+            && (!empty($configurations['test_api_key']) || !empty($configurations['live_api_key']));
 
         // show module to the customer
         $switch['show'] = [
@@ -2709,7 +2763,9 @@ class Payplug extends PaymentModule
             $unit_price = $this->convertAmount($product['price_wt']);
             $item = array(
                 'merchant_item_id' => $product['id_product'],
-                'name' => (string)$product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : ''),
+                'name' => (string)$product['name'] . (isset($product['attributes']) ?
+                        ' - ' . $product['attributes']
+                        : ''),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
@@ -2803,7 +2859,9 @@ class Payplug extends PaymentModule
             $oney_payment_options = $this->getOneyPaymentOptionsList($amount, $country);
         } else {
             $oney_payment_options = false;
-            $error = $is_elligible['error'] ? $is_elligible['error'] : $this->l('Oney is momentarily unavailable.');
+            $error = $is_elligible['error'] ?
+                $is_elligible['error']
+                : $this->l('Oney is momentarily unavailable.');
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
@@ -2866,7 +2924,10 @@ class Payplug extends PaymentModule
 
         $iso_code = Tools::strtoupper($currency->iso_code);
 
-        $oney_min_amounts = explode(',', Tools::strtoupper(Configuration::get('PAYPLUG_ONEY_MIN_AMOUNTS')));
+        $oney_min_amounts = explode(
+            ',',
+            Tools::strtoupper(Configuration::get('PAYPLUG_ONEY_MIN_AMOUNTS'))
+        );
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -2875,7 +2936,10 @@ class Payplug extends PaymentModule
             }
         }
 
-        $oney_max_amounts = explode(',', Tools::strtoupper(Configuration::get('PAYPLUG_ONEY_MAX_AMOUNTS')));
+        $oney_max_amounts = explode(
+            ',',
+            Tools::strtoupper(Configuration::get('PAYPLUG_ONEY_MAX_AMOUNTS'))
+        );
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
@@ -2917,7 +2981,9 @@ class Payplug extends PaymentModule
                 ),
             );
         } elseif (Tools::strlen($this->context->customer->email) > 100) {
-            $text = $this->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
+            $text = $this->l(
+                'Your email address is too long, please change it to a shorter one (max 100 characters).'
+            );
             $shipping_fields['email'] = array(
                 'text' => $text,
                 'input' => array(
@@ -2929,7 +2995,9 @@ class Payplug extends PaymentModule
                 ),
             );
         } elseif (strpos($this->context->customer->email, '+') !== false) {
-            $text = $this->l('The + character is not valid. Please change your email address (100 characters max).');
+            $text = $this->l(
+                'The + character is not valid. Please change your email address (100 characters max).'
+            );
             $shipping_fields['email'] = array(
                 'text' => $text,
                 'input' => array(
@@ -3152,7 +3220,9 @@ class Payplug extends PaymentModule
 
             $simulations = \Payplug\OneySimulation::getSimulations($data);
 
-            if (isset($simulations['details']) && $simulations['details'] == 'Access to this feature is not available.') {
+            if (isset($simulations['details'])
+                && $simulations['details'] == 'Access to this feature is not available.'
+            ) {
                 $this->updatePermissions();
             } elseif (isset($simulations['object']) && $simulations['object'] == 'error') {
                 return array(
@@ -3296,7 +3366,9 @@ class Payplug extends PaymentModule
     {
         $options = $this->getAvailableOptions($cart);
 
-        $payplug_cards = $options['one_click'] ? $this->getCardsByCustomer((int)$cart->id_customer, true) : [];
+        $payplug_cards = $options['one_click'] ?
+            $this->getCardsByCustomer((int)$cart->id_customer, true)
+            : [];
         $payment_list = [];
 
         // OneClick Payment
@@ -3327,10 +3399,22 @@ class Payplug extends PaymentModule
                     ),
                 );
                 $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'))
-                    ->setCallToActionText($brand . ' **** **** **** ' . $card['last4'] . ' - ' . $this->l('Expiry date') . ': ' . $card['expiry_date'])
-                    ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
-                        array('def' => (int)$options['deferred']), true))
+                    ->setLogo(Media::getMediaPath(
+                        _PS_MODULE_DIR_ . $this->name . '/views/img/'
+                        . Tools::strtolower($card['brand']) . '.png'
+                    ))
+                    ->setCallToActionText(
+                        $brand . ' **** **** **** '
+                        . $card['last4'] . ' - '
+                        . $this->l('Expiry date') . ': '
+                        . $card['expiry_date']
+                    )
+                    ->setAction($this->context->link->getModuleLink(
+                        $this->name,
+                        'dispatcher',
+                        ['def' => (int)$options['deferred']],
+                        true
+                    ))
                     ->setModuleName('payplug')
                     ->setInputs($input_options);
                 $payment_list[] = $paymentOption;
@@ -3362,10 +3446,22 @@ class Payplug extends PaymentModule
             ),
         );
         $paymentOption
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ? 'none' : 'logos_schemes_' . $this->img_lang) . '.png'))
-            ->setCallToActionText(count($payplug_cards) > 0 ? $this->l('Pay with a different card') : $this->l('Pay with a credit card'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
-                array('def' => (int)$options['deferred']), true))
+            ->setLogo(Media::getMediaPath(
+                _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
+                'none'
+                : 'logos_schemes_' . $this->img_lang) . '.png'
+            ))
+            ->setCallToActionText(
+                count($payplug_cards) > 0 ?
+                $this->l('Pay with a different card')
+                : $this->l('Pay with a credit card')
+            )
+            ->setAction($this->context->link->getModuleLink(
+                $this->name,
+                'dispatcher',
+                ['def' => (int)$options['deferred']],
+                true
+            ))
             ->setModuleName('payplug')
             ->setInputs($input_options);
 
@@ -3397,10 +3493,22 @@ class Payplug extends PaymentModule
                 ),
             );
             $paymentOption
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_installment_' . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png'))
-                ->setCallToActionText($this->l('Pay by card in') . ' ' . Configuration::get('PAYPLUG_INST_MODE') . ' ' . $this->l('installments'))
-                ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher',
-                    array('def' => (int)$options['deferred']), true))
+                ->setLogo(Media::getMediaPath(
+                    _PS_MODULE_DIR_
+                    . $this->name
+                    . '/views/img/logos_schemes_installment_'
+                    . Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->img_lang . '.png')
+                )
+                ->setCallToActionText(
+                    $this->l('Pay by card in') . ' '
+                    . Configuration::get('PAYPLUG_INST_MODE') . ' '
+                    . $this->l('installments')
+                )
+                ->setAction($this->context->link->getModuleLink(
+                    $this->name,
+                    'dispatcher',
+                    array('def' => (int)$options['deferred']), true)
+                )
                 ->setModuleName('payplug')
                 ->setInputs($input_options);
 
@@ -3485,7 +3593,11 @@ class Payplug extends PaymentModule
                 $label = $err_label ?: sprintf($this->l('Pay by card in %sx with Oney'), $split);
 
                 $paymentOption
-                    ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/oney/' . $oney_payment . ($error ? '-alt' : '') . '.svg'))
+                    ->setLogo(Media::getMediaPath(
+                        _PS_MODULE_DIR_ . $this->name . '/views/img/oney/'
+                        . $oney_payment
+                        . ($error ? '-alt' : '') . '.svg')
+                    )
                     ->setCallToActionText($label)
                     ->setAction($this->context->link->getModuleLink($this->name, 'dispatcher', array(), true))
                     ->setModuleName('payplug')
@@ -3931,7 +4043,11 @@ class Payplug extends PaymentModule
                         } elseif ((int)$p->amount_refunded > 0) {
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_refundable_payment = ($p->amount - $p->amount_refunded);
-                            $amount_available += ($amount_refundable_payment >= 10 ? $amount_refundable_payment / 100 : 0);
+                            $amount_available += (
+                            $amount_refundable_payment >= 10 ?
+                                $amount_refundable_payment / 100
+                                : 0
+                            );
                         } else {
                             $amount_available += ($p->amount >= 10 ? $p->amount / 100 : 0);
                         }
@@ -3947,7 +4063,9 @@ class Payplug extends PaymentModule
                 } else {
                     $payment_list_new[] = array(
                         'id' => null,
-                        'status' => $inst_status = $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
+                        'status' => $inst_status = $installment->is_active ?
+                            $this->payment_status[6]
+                            : $this->payment_status[7],
                         'amount' => (int)$schedule->amount / 100,
                         'card_brand' => null,
                         'card_mask' => null,
@@ -3963,7 +4081,9 @@ class Payplug extends PaymentModule
 
             $id_currency = (int)Currency::getIdByIsoCode($installment->currency);
             $show_menu_installment = true;
-            $inst_status = $installment->is_active ? $this->l('ongoing') : ($installment->is_fully_paid ? $this->l('paid') : $this->l('suspended'));
+            $inst_status = $installment->is_active ?
+                $this->l('ongoing')
+                : ($installment->is_fully_paid ? $this->l('paid') : $this->l('suspended'));
             $inst_aborted = !$installment->is_active;
             $ppInstallment = new PPPaymentInstallment($installment->id);
             $instPaymentOne = $ppInstallment->getFirstPayment();
@@ -4065,7 +4185,9 @@ class Payplug extends PaymentModule
                 if ($current_state != 0 && $current_state == $id_pending_order_state) {
                     $show_menu_update = true;
                 }
-            } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0) && (int)$payment->is_refunded != 1) {
+            } elseif ((((int)$payment->amount_refunded > 0) || $amount_refunded_presta > 0)
+                && (int)$payment->is_refunded != 1
+            ) {
                 $display_refund = true;
             } elseif ((int)$payment->is_refunded == 1) {
                 $show_menu_refunded = true;
@@ -4075,14 +4197,13 @@ class Payplug extends PaymentModule
             }
 
             $conf = (int)Tools::getValue('conf');
-            if (($conf == 30 || $conf == 31) && version_compare(_PS_VERSION_, '1.5', '>=')) {
+            if (($conf == 30 || $conf == 31)
+                && version_compare(_PS_VERSION_, '1.5', '>=')) {
                 $show_popin = true;
 
                 $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
 
-                $this->html .= '
-<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>
-';
+                $this->html .= '<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>';
             }
 
             $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
@@ -4283,8 +4404,16 @@ class Payplug extends PaymentModule
             }
             $quantity = (int)Tools::getValue('qty', 1);
 
-            $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null,
-                false, true, $quantity);
+            $product_price = Product::getPriceStatic(
+                (int)$id_product,
+                $use_taxes,
+                $id_product_attribute,
+                6,
+                null,
+                false,
+                true,
+                $quantity
+            );
             $amount = $product_price * $quantity;
             $is_elligible = $this->isValidOneyAmount($amount, $this->context->currency->id);
 
@@ -4347,7 +4476,9 @@ class Payplug extends PaymentModule
                     return $this->display(__FILE__, 'embedded.tpl');
                 }
             } else {
-                $this->setPaymentErrorsCookie([$this->l('The transaction was not completed and your card was not charged.')]);
+                $this->setPaymentErrorsCookie([
+                    $this->l('The transaction was not completed and your card was not charged.')
+                ]);
                 $error_url = 'index.php?controller=order&step=3&error=1';
                 Tools::redirect($error_url);
             }
@@ -4375,10 +4506,14 @@ class Payplug extends PaymentModule
     {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
-        if (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-                $useragent)
-            || preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-                Tools::substr($useragent, 0, 4))
+        if (preg_match(
+                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
+                $useragent
+            )
+            || preg_match(
+                '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
+                Tools::substr($useragent, 0, 4)
+            )
         ) {
             return true;
         }
@@ -4699,8 +4834,9 @@ class Payplug extends PaymentModule
         $flag = true;
 
         foreach ($this->oney_order_state as $key => $state) {
-            $flag = $flag && $this->createOrderState($key, $state, true) && $this->createOrderState($key, $state,
-                    false);
+            $flag = $flag
+                && $this->createOrderState($key, $state, true)
+                && $this->createOrderState($key, $state, false);
         }
 
         return $flag;
@@ -4914,8 +5050,12 @@ class Payplug extends PaymentModule
         );
 
         $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
-        $flag = ($flag && $this->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment,
-                $adminPayPlugId, $this->name));
+        $flag = $flag && $this->installModuleTab(
+                'AdminPayPlugInstallment',
+                $translationsAdminPayPlugInstallment,
+                $adminPayPlugId,
+                $this->name
+            );
 
         return $flag;
     }
@@ -5217,7 +5357,9 @@ class Payplug extends PaymentModule
 
         if (!$payplug_carrier->delivery_type) {
             $carrier = new Carrier($cart->id_carrier);
-            $error = $this->l('The carrier') . ' ' . $carrier->name . ' ' . $this->l('shipping is conflicting with this payment method. ');
+            $error = $this->l('The carrier') . ' '
+                . $carrier->name . ' '
+                . $this->l('shipping is conflicting with this payment method. ');
             $error .= $this->l('Please change the shipping method chosen at the last step.');
             return array(
                 'result' => false,
@@ -5317,7 +5459,8 @@ class Payplug extends PaymentModule
             CURLOPT_SSL_VERIFYHOST,
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
+        //work only wiht cURL 7.10+
+        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
         $answer = curl_exec($process);
         $error_curl = curl_errno($process);
 
@@ -5497,7 +5640,9 @@ class Payplug extends PaymentModule
             $email = Tools::getValue('PAYPLUG_EMAIL');
 
             if (!Validate::isEmail($email) || !Validate::isPlaintextPassword($password)) {
-                $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
+                $this->validationErrors['username_password'] = $this->l(
+                    'The email and/or password was not correct.'
+                );
             } elseif ($curl_exists && $openssl_exists) {
                 if ($this->login($email, $password)) {
                     Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
@@ -5508,7 +5653,9 @@ class Payplug extends PaymentModule
 
                     die(json_encode(array('content' => $content)));
                 } else {
-                    $this->validationErrors['username_password'] = $this->l('The email and/or password was not correct.');
+                    $this->validationErrors['username_password'] = $this->l(
+                        'The email and/or password was not correct.'
+                    );
                 }
             }
         }
@@ -5567,7 +5714,9 @@ class Payplug extends PaymentModule
         ];
 
         $id_card = isset($options['id_card']) ? $options['id_card'] : $default_options['id_card'];
-        $is_installment = isset($options['is_installment']) ? $options['is_installment'] : $default_options['is_installment'];
+        $is_installment = isset($options['is_installment']) ?
+            $options['is_installment'] :
+            $default_options['is_installment'];
         $is_deferred = isset($options['is_deferred']) ? $options['is_deferred'] : $default_options['is_deferred'];
         $is_oney = isset($options['is_oney']) ? $options['is_oney'] : $default_options['is_oney'];
 
@@ -5637,10 +5786,18 @@ class Payplug extends PaymentModule
 
         // Hosted url
         $hosted_url = [
-            'return' => $this->context->link->getModuleLink($this->name, 'validation',
-                ['ps' => 1, 'cartid' => (int)$cart->id], true),
-            'cancel' => $this->context->link->getModuleLink($this->name, 'validation',
-                ['ps' => 2, 'cartid' => (int)$cart->id], true),
+            'return' => $this->context->link->getModuleLink(
+                $this->name,
+                'validation',
+                ['ps' => 1, 'cartid' => (int)$cart->id],
+                true
+            ),
+            'cancel' => $this->context->link->getModuleLink(
+                $this->name,
+                'validation',
+                ['ps' => 2, 'cartid' => (int)$cart->id],
+                true
+            ),
             'notification' => $this->context->link->getModuleLink($this->name, 'ipn', [], true)
         ];
 
@@ -5683,11 +5840,18 @@ class Payplug extends PaymentModule
             'title' => null,
             'first_name' => !empty($billing_address->firstname) ? $billing_address->firstname : null,
             'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
-            'company_name' => !empty($billing_address->company) ? $billing_address->company : $billing_address->firstname . ' ' . $billing_address->lastname,
+            'company_name' => !empty($billing_address->company) ?
+                $billing_address->company
+                : $billing_address->firstname . ' ' . $billing_address->lastname,
             'email' => $customer->email,
-            'landline_phone_number' => $this->formatPhoneNumber($billing_address->phone, $billing_address->id_country),
-            'mobile_phone_number' => $this->formatPhoneNumber($billing_address->phone_mobile,
-                $billing_address->id_country),
+            'landline_phone_number' => $this->formatPhoneNumber(
+                $billing_address->phone,
+                $billing_address->id_country
+            ),
+            'mobile_phone_number' => $this->formatPhoneNumber(
+                $billing_address->phone_mobile,
+                $billing_address->id_country
+            ),
             'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
             'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
             'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
@@ -5707,12 +5871,18 @@ class Payplug extends PaymentModule
             'title' => null,
             'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
             'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
-            'company_name' => !empty($shipping_address->company) ? $shipping_address->company : $shipping_address->firstname . ' ' . $shipping_address->lastname,
+            'company_name' => !empty($shipping_address->company) ?
+                $shipping_address->company
+                : $shipping_address->firstname . ' ' . $shipping_address->lastname,
             'email' => $customer->email,
-            'landline_phone_number' => $this->formatPhoneNumber($shipping_address->phone,
-                $shipping_address->id_country),
-            'mobile_phone_number' => $this->formatPhoneNumber($shipping_address->phone_mobile,
-                $shipping_address->id_country),
+            'landline_phone_number' => $this->formatPhoneNumber(
+                $shipping_address->phone,
+                $shipping_address->id_country
+            ),
+            'mobile_phone_number' => $this->formatPhoneNumber(
+                $shipping_address->phone_mobile,
+                $shipping_address->id_country
+            ),
             'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
             'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
             'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
@@ -5764,7 +5934,8 @@ class Payplug extends PaymentModule
                     $schedule[$i]['date'] = 'TODAY';
                     $int_part = (int)($amount / $config['inst_mode']);
                     if ($is_deferred) {
-                        $schedule[$i]['authorized_amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
+                        $authorized_amount = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
+                        $schedule[$i]['authorized_amount'] = $authorized_amount;
                     } else {
                         $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
                     }
@@ -5777,8 +5948,9 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ? $this->getCardId((int)$cart->id_customer,
-                $id_card, $config['company']) : null;
+            $payment_tab['payment_method'] = $id_card != null && $id_card != 'new_card' ?
+                $this->getCardId((int)$cart->id_customer, $id_card, $config['company'])
+                : null;
         }
 
         // check payment tab from current payment method
@@ -5794,19 +5966,27 @@ class Payplug extends PaymentModule
             }
 
             // check billing phonenumber
-            if (!$this->isValidMobilePhoneNumber($payment_tab['billing']['mobile_phone_number'],
-                $payment_tab['billing']['country'])) {
-                if ($this->isValidMobilePhoneNumber($payment_tab['billing']['landline_phone_number'],
-                    $payment_tab['billing']['country'])) {
+            if (!$this->isValidMobilePhoneNumber(
+                $payment_tab['billing']['mobile_phone_number'],
+                $payment_tab['billing']['country']
+            )) {
+                if ($this->isValidMobilePhoneNumber(
+                    $payment_tab['billing']['landline_phone_number'],
+                    $payment_tab['billing']['country']
+                )) {
                     $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
                 }
             }
 
             // check shipping phonenumber
-            if (!$this->isValidMobilePhoneNumber($payment_tab['shipping']['mobile_phone_number'],
-                $payment_tab['shipping']['country'])) {
-                if ($this->isValidMobilePhoneNumber($payment_tab['shipping']['landline_phone_number'],
-                    $payment_tab['shipping']['country'])) {
+            if (!$this->isValidMobilePhoneNumber(
+                $payment_tab['shipping']['mobile_phone_number'],
+                $payment_tab['shipping']['country']
+            )) {
+                if ($this->isValidMobilePhoneNumber(
+                    $payment_tab['shipping']['landline_phone_number'],
+                    $payment_tab['shipping']['country']
+                )) {
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
             }
@@ -5836,7 +6016,12 @@ class Payplug extends PaymentModule
             $payment_tab['payment_context'] = $this->getOneyPaymentContext();
 
             $return_url_params = ['ps' => 1, 'cartid' => (int)$cart->id, 'isoney' => $is_oney];
-            $return_url = $this->context->link->getModuleLink($this->name, 'validation', $return_url_params, true);
+            $return_url = $this->context->link->getModuleLink(
+                $this->name,
+                'validation',
+                $return_url_params,
+                true
+            );
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
@@ -5958,7 +6143,12 @@ class Payplug extends PaymentModule
                 if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
                     $new_state = (int)Tools::getValue('id_state');
                     if (!$new_state) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . ($installment->is_live ? '' : '_TEST'));
+                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . (
+                            $installment->is_live ?
+                                ''
+                                : '_TEST'
+                            )
+                        );
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
@@ -5976,7 +6166,12 @@ class Payplug extends PaymentModule
                 $payment = $this->retrievePayment($refund->payment_id);
                 $new_state = (int)Tools::getValue('id_state');
                 if (!$new_state && $payment->is_refunded) {
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . ($payment->is_live ? '' : '_TEST'));
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . (
+                        $payment->is_live ?
+                            ''
+                            : '_TEST'
+                        )
+                    );
                 }
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
@@ -6252,7 +6447,9 @@ class Payplug extends PaymentModule
         $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
 
         // Set the uninstall notice according to the "keep_cards" configuration
-        $this->confirmUninstall = $this->l('Are you sure you wish to uninstall this module and delete your settings?') . ' ';
+        $this->confirmUninstall = $this->l(
+                'Are you sure you wish to uninstall this module and delete your settings?'
+            ) . ' ';
         if ((int)Configuration::get('PAYPLUG_KEEP_CARDS') == 1) {
             $this->confirmUninstall .= $this->l('All the registered cards of your customer will be kept.');
         } else {
@@ -6265,7 +6462,9 @@ class Payplug extends PaymentModule
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->l('In order to accept payments you need to configure your module by connecting your PayPlug account.');
+            $this->warning = $this->l(
+                'In order to accept payments you need to configure your module by connecting your PayPlug account.'
+            );
         }
 
         $this->payment_status = array(
@@ -6462,7 +6661,10 @@ class Payplug extends PaymentModule
             //insert
             $req_installment_cart = '
                 INSERT INTO ' . _DB_PREFIX_ . 'payplug_installment_cart (id_installment, id_cart, is_pending, date_upd)
-                VALUES (\'' . pSQL($installment_id) . '\', ' . (int)$id_cart . ', ' . (int)$is_pending . ', \'' . pSQL($date_upd) . '\')';
+                VALUES (\'' . pSQL($installment_id) . '\', '
+                . (int)$id_cart . ', '
+                . (int)$is_pending . ', \''
+                . pSQL($date_upd) . '\')';
             $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
             if (!$res_installment_cart) {
                 return false;
@@ -6625,7 +6827,11 @@ class Payplug extends PaymentModule
                     foreach ($json_answer->configuration->oney->min_amounts as $key => $value) {
                         $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
                     }
-                    $configuration['oney_min_amounts'] = Tools::substr($configuration['oney_min_amounts'], 0, -1);
+                    $configuration['oney_min_amounts'] = Tools::substr(
+                        $configuration['oney_min_amounts'],
+                        0,
+                        -1
+                    );
                 }
                 if (isset($json_answer->configuration->oney->max_amounts)
                     && !empty($json_answer->configuration->oney->max_amounts)) {
@@ -6633,7 +6839,11 @@ class Payplug extends PaymentModule
                     foreach ($json_answer->configuration->oney->max_amounts as $key => $value) {
                         $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
                     }
-                    $configuration['oney_max_amounts'] = Tools::substr($configuration['oney_max_amounts'], 0, -1);
+                    $configuration['oney_max_amounts'] = Tools::substr(
+                        $configuration['oney_max_amounts'],
+                        0,
+                        -1
+                    );
                 }
             }
         }
@@ -6855,7 +7065,8 @@ class Payplug extends PaymentModule
      */
     public function uninstallTab()
     {
-        return ($this->uninstallModuleTab('AdminPayPlug') && $this->uninstallModuleTab('AdminPayPlugInstallment'));
+        return $this->uninstallModuleTab('AdminPayPlug')
+            && $this->uninstallModuleTab('AdminPayPlugInstallment');
     }
 
     public function updateOrderState($payment)

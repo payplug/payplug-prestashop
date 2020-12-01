@@ -118,7 +118,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     // Some integration will not use qty data but quantity_wanted
                     $quantity = (int)Tools::getValue(
                         'qty',
-                        (int)Tools::getValue('quantity_wanted', 1));
+                        (int)Tools::getValue('quantity_wanted', 1)
+                    );
                     $product_price = Product::getPriceStatic(
                         (int)$id_product,
                         $use_taxes,
