@@ -70,7 +70,7 @@ class PayPlugLogger extends ObjectModel
      * @see ObjectModel::__construct()
      *
      */
-    public function __construct($process = '', $id = null, $id_lang = null, $type = 'notification')
+    public function __construct($process = '', $id = null, $id_lang = null)
     {
         parent::__construct($id, $id_lang);
         $this->process = $process;
@@ -134,11 +134,15 @@ class PayPlugLogger extends ObjectModel
         $flag = true;
 
         // clean old log
-        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` WHERE `date_add` < "'.$date_limit->format('Y-m-d').'"';
+        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` 
+                WHERE `date_add` < "'.$date_limit->format('Y-m-d').'"';
         $flag = $flag && Db::getInstance()->execute($sql);
 
         // clean log beyong the limit
-        $sql = 'SELECT `id_payplug_logger` FROM `'._DB_PREFIX_.self::$definition['table'].'` ORDER BY `id_payplug_logger` DESC LIMIT '.($limits['number'] - 1).',1';
+        $sql = 'SELECT `id_payplug_logger` 
+                FROM `'._DB_PREFIX_.self::$definition['table'].'` 
+                ORDER BY `id_payplug_logger` DESC 
+                LIMIT '.($limits['number'] - 1).',1';
         $last_logs_valid = Db::getInstance()->executeS($sql);
 
         // if there is no more log
@@ -146,7 +150,8 @@ class PayPlugLogger extends ObjectModel
             return $flag;
         }
 
-        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` WHERE `id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'];
+        $sql = 'DELETE FROM `'._DB_PREFIX_.self::$definition['table'].'` 
+                WHERE `id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'];
         $flag = $flag && Db::getInstance()->execute($sql);
 
         return $flag;

@@ -270,8 +270,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         $this->logger->addLog('Payment details:');
 
         if ($this->is_installment) {
-            $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
-            $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
+            $sql = 'SELECT `id_cart` 
+                    FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` 
+                    WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
@@ -280,14 +281,17 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $this->exitProcess($error_msg, 500);
             }
         } else {
-            $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` WHERE `id_payment` = "' . $this->resource->id . '"';
+            $sql = 'SELECT `id_cart` 
+                    FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` 
+                    WHERE `id_payment` = "' . $this->resource->id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
                 $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
                 $this->logger->addLog($error_msg, 'error');
-                //HOTFIX: MR331 We use custom http code to precisely log this case of desync between real payment notification and wrong ones.
+                // HOTFIX: MR331 We use custom http code to precisely log this case of desync
+                // between real payment notification and wrong ones.
                 $response_code = ($this->is_oney ? 242 : 500);
                 $this->exitProcess($error_msg, $response_code);
             }
@@ -328,8 +332,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         try {
             $address = new Address((int)$this->cartObject->id_address_invoice);
         } catch (Exception $exception) {
-            $this->logger->addLog('The address cannot be loaded: '
-                . $exception->getMessage(), 'error');
+            $this->logger->addLog(
+                'The address cannot be loaded: ' . $exception->getMessage(),
+                'error'
+            );
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
         if (!Validate::isLoadedObject($address)) {
@@ -371,7 +377,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             $current_state = (int)$order->getCurrentState();
         } catch (Exception $exception) {
             $this->logger->addLog(
-                'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
+                'The current state cannot be loaded: ' . $exception->getMessage(),
+                'error'
+            );
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
 
@@ -407,17 +415,17 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $order->update();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                    'Order cannot be updated: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
-        } // if payment is deferred and expired
-        elseif (
-            $this->is_deferred
+        } elseif ($this->is_deferred
             && $current_state == $this->order_states['auth']
             && ($this->payment->authorization->expires_at - time()) <= 0
-        ) {
+        ) { // if payment is deferred and expired
             $this->logger->addLog('The payment authorization has expired.');
             $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
             $this->logger->addLog('Order new status will be \'Authorization expired\'.');
@@ -446,25 +454,28 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $order->update();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                    'Order cannot be updated: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
-        } // if payment is pending or awaiting a capture
-        elseif (in_array($current_state, array(
+        } elseif (in_array($current_state, array(
                 $this->order_states['pending'],
                 $this->order_states['auth'],
                 $this->order_states['oney']
-            )) || !$order->valid) {
+            )) || !$order->valid) { // if payment is pending or awaiting a capture
             $this->logger->addLog('Order is currently pending.');
             $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
 
             if ($this->payment->installment_plan_id !== null) {
                 $is_amount_correct = (bool)$this->payment->is_paid;
             } else {
-                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($this->payment->amount / 100,
-                    $order);
+                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect(
+                    $this->payment->amount / 100,
+                    $order
+                );
             }
 
             $this->logger->addLog('Order ID: ' . (int)$order->id, 'debug');
@@ -508,10 +519,13 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                         $order_history->save();
                     } catch (Exception $exception) {
                         $this->logger->addLog(
-                            'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                            'Order history cannot be saved: ' . $exception->getMessage(),
+                            'error'
+                        );
                         $this->logger->addLog(
                             'Please check if order state ' . (int)$new_order_state . ' exists.',
-                            'error');
+                            'error'
+                        );
                         $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
                     }
                     $this->exitProcess('The payment has failed and order has been cancelled.');
@@ -546,7 +560,11 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             // Add prestashop OrderPayment if need
             if (!$order_payments) {
                 $this->logger->addLog('Add new orderPayment for deferred - ' . count($order_payments), 'debug');
-                $order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
+                $order->addOrderPayment(
+                    $this->payment->amount / 100,
+                    null,
+                    $this->payment->id
+                );
             }
 
             // If payment is paid, set the invoice
@@ -567,10 +585,13 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $order_history->save();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                    'Order history cannot be saved: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->logger->addLog(
                     'Please check if order state ' . (int)$new_order_state . ' exists.',
-                    'error');
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
 
@@ -579,25 +600,23 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $order->update();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                    'Order cannot be updated: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
-        } // if payment is already paid
-        elseif ($current_state == $this->order_states['paid']) {
+        } elseif ($current_state == $this->order_states['paid']) { // if payment is already paid
             $this->logger->addLog('Order is already paid.');
             $this->exitProcess('Order is already paid.');
-        } // if payment is already expired
-        elseif ($current_state == $this->order_states['exp']) {
+        } elseif ($current_state == $this->order_states['exp']) { // if payment is already expired
             $this->logger->addLog('Order is already set as expired.');
             $this->exitProcess('Order is already set as expired.');
-        } // if payment is already cancelled
-        elseif ($current_state == $this->order_states['cancelled']) {
+        } elseif ($current_state == $this->order_states['cancelled']) { // if payment is already cancelled
             $this->logger->addLog('Order is already set as cancelled.');
             $this->exitProcess('Order is already set as cancelled.');
-        } // else set error
-        else {
+        } else { // else set error
             $this->logger->addLog(
                 'Current state: ' . (int)$current_state,
                 'debug'
@@ -680,8 +699,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         try {
             $customer = new Customer((int)$this->cartObject->id_customer);
         } catch (Exception $exception) {
-            $this->logger->addLog('Customer cannot be loaded: ' . $exception->getMessage(),
-                'error');
+            $this->logger->addLog(
+                'Customer cannot be loaded: ' . $exception->getMessage(),
+                'error'
+            );
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
         if (!Validate::isLoadedObject($customer)) {
@@ -695,15 +716,16 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
              */
         $secure_key = false;
         if (isset($customer->secure_key) && !empty($customer->secure_key)) {
-            if (
-                isset($this->cartObject->secure_key)
+            if (isset($this->cartObject->secure_key)
                 && !empty($this->cartObject->secure_key)
                 && $this->cartObject->secure_key !== $customer->secure_key
             ) {
                 $secure_key = $this->cartObject->secure_key;
                 $this->logger->addLog('Secure keys do not match.', 'error');
-                $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key,
-                    'error');
+                $this->logger->addLog(
+                    'Customer Secure Key: ' . $customer->secure_key,
+                    'error'
+                );
                 $this->logger->addLog('Cart Secure Key: ' . $this->cartObject->secure_key, 'error');
             } else {
                 $secure_key = $customer->secure_key;
@@ -713,12 +735,12 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         $module_name = $this->payplug->displayName;
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
-                case 'oney_x3_with_fees' :
-                case 'oney_x3_without_fees' :
+                case 'oney_x3_with_fees':
+                case 'oney_x3_without_fees':
                     $module_name = $this->payplug->l('Oney 3x');
                     break;
-                case 'oney_x4_with_fees' :
-                case 'oney_x4_without_fees' :
+                case 'oney_x4_with_fees':
+                case 'oney_x4_without_fees':
                     $module_name = $this->payplug->l('Oney 4x');
                     break;
                 default:
@@ -777,7 +799,9 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 $this->payplug->patchPayment($this->api_key, $this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Payment cannot be patched: ' . $exception->getMessage(), 'error');
+                    'Payment cannot be patched: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
 
@@ -808,7 +832,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 'No order can be found using id_cart ' . (int)$this->cartObject->id,
                 'error'
             );
-            $this->exitProcess('No order can be found using id_cart: ' . (int)$this->cartObject->id, 500);
+            $this->exitProcess(
+                'No order can be found using id_cart: ' . (int)$this->cartObject->id,
+                500
+            );
         } elseif (count($res_nb_orders) > 1) {
             $this->logger->addLog(
                 'There is more than one order using id_cart ' . (int)$this->cartObject->id,
@@ -817,7 +844,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
             foreach ($res_nb_orders as $o) {
                 $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
             }
-            $this->exitProcess('There is more than one order using id_cart: ' . (int)$this->cartObject->id, 500);
+            $this->exitProcess(
+                'There is more than one order using id_cart: ' . (int)$this->cartObject->id,
+                500
+            );
         } else {
             $this->logger->addLog('OK');
             $id_order = (int)$res_nb_orders[0]['id_order'];
@@ -837,7 +867,10 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 'There is more than one transaction using id_order ' . (int)$id_order,
                 'error'
             );
-            $this->exitProcess('There is more than one transaction using id_order: ' . (int)$id_order, 500);
+            $this->exitProcess(
+                'There is more than one transaction using id_order: ' . (int)$id_order,
+                500
+            );
         } else {
             $this->logger->addLog('OK');
         }
@@ -897,10 +930,14 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                     $order_history->save();
                     $this->exitProcess('The order is fully refunded and is status updated to \'refunded\'');
                 } catch (Exception $exception) {
-                    $this->logger->addLog('Order history cannot be saved: ' . $exception->getMessage(),
-                        'error');
                     $this->logger->addLog(
-                        'Please check if order state ' . (int)$new_order_state . ' exists.', 'error');
+                        'Order history cannot be saved: ' . $exception->getMessage(),
+                        'error'
+                    );
+                    $this->logger->addLog(
+                        'Please check if order state ' . (int)$new_order_state . ' exists.',
+                        'error'
+                    );
                     $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
                 }
             } else {

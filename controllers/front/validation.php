@@ -125,8 +125,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             Tools::redirect($this->url['error']);
         } else {
             $amount = 0;
-            $amount_for_transaction = 0;
-            $deferred = false;
             $is_oney = false;
             if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
                 if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
@@ -134,7 +132,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $id_order = Order::getIdByCartId($cart->id);
                     $customer = new Customer((int)$cart->id_customer);
                     $link_redirect = __PS_BASE_URI__ . $this->url['valid'] . 'id_cart=' . $cart->id
-                        . '&id_module=' . $this->payplug->id . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
+                        . '&id_module=' . $this->payplug->id
+                        . '&id_order=' . $id_order
+                        . '&key=' . $customer->secure_key;
                     Tools::redirect($link_redirect);
                 } elseif ($inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
                     $this->logger->addLog('Installment is not consumed yet.', 'info');
@@ -264,10 +264,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     $installment = new PPPaymentInstallment($inst_id);
                     $first_payment = $installment->getFirstPayment();
                     if ($first_payment->isDeferred()) {
-                        $deferred = true;
                         $order_state = $auth_state;
                     } else {
-                        $deferred = false;
                         $order_state = $inst_state;
                     }
                 } elseif ($is_paid) {
@@ -291,14 +289,8 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $transaction_id = null;
                 if ($this->type == 'payment') {
                     $transaction_id = $payment->id;
-                    $deferred = $payment->authorization !== null;
-                    $amount_for_transaction = $amount;
-                    if ($is_oney) {
-                        $amount_for_transaction = $amount * 100;
-                    }
                 } elseif ($this->type == 'installment') {
                     $transaction_id = $inst_id;
-                    $amount_for_transaction = $amount * 100;
                 }
                 $extra_vars = array(
                     'transaction_id' => $transaction_id
@@ -310,7 +302,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                  */
                 $secure_key = false;
                 if (isset($customer->secure_key) && !empty($customer->secure_key)) {
-                    if (isset($cart->secure_key) && !empty($cart->secure_key) && $cart->secure_key !== $customer->secure_key) {
+                    if (isset($cart->secure_key)
+                        && !empty($cart->secure_key)
+                        && $cart->secure_key !== $customer->secure_key
+                    ) {
                         $secure_key = $cart->secure_key;
                         $this->logger->addLog('Secure keys do not match.', 'error');
                         $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key, 'error');
@@ -446,8 +441,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
 
-            $link_redirect = __PS_BASE_URI__ . $this->url['valid'] . 'id_cart=' . $cart->id . '&id_module=' . $this->payplug->id
-                . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
+            $link_redirect = __PS_BASE_URI__ . $this->url['valid'] . 'id_cart=' . $cart->id
+                . '&id_module=' . $this->payplug->id
+                . '&id_order=' . $id_order
+                . '&key=' . $customer->secure_key;
             $this->logger->addLog('Redirecting to :' . $link_redirect, 'info');
             Tools::redirect($link_redirect);
         }
