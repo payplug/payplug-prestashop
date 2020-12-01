@@ -82,7 +82,7 @@ class MyLogPHP
         }
         $file = $debugBacktrace[1]['file'];
         $value = preg_replace('/\s+/', ' ', trim($value));
-        $entry = array($datetime,$errorlevel,$tag,$value,$line,$file);
+        $entry = [$datetime, $errorlevel, $tag, $value, $line, $file];
         fputcsv($fd, $entry, $this->SEPARATOR);
         fclose($fd);
     }
@@ -139,7 +139,8 @@ class MyLogPHP
     }
 }
 
-function truncateCSV($glob) {
+function truncateCSV($glob)
+{
     foreach (glob($glob) as $path) {
         $file = fopen($path, "w");
         ftruncate($file, 0);

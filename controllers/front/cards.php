@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -70,19 +69,24 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             $payplug_cards = $this->card->getCardsByCustomer($customer->id);
         }
 
-        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink('payplug', 'ajax', array('_ajax' => 1), true);
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink(
+            'payplug',
+            'ajax',
+            ['_ajax' => 1],
+            true
+        );
+        $this->contextSpecific->getContext()->smarty->assign([
             'payplug_cards' => $payplug_cards,
             'payplug_delete_card_url' => $payplug_delete_card_url
-        ));
+        ]);
 
-        $card_deleted_msg = $this->payplug->displayPaymentErrors([$this->payplug->l('Card sucessfuly deleted.')]);
+        $card_deleted_msg = $this->payplug->displayPaymentErrors([$this->payplug->l('Card sucessfully deleted.')]);
         Media::addJsDef(['card_deleted_msg' => $card_deleted_msg]);
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->contextSpecific->getContext()->smarty->assign(array(
+            $this->contextSpecific->getContext()->smarty->assign([
                 'version' => 1.6,
-            ));
+            ]);
             $this->setTemplate('customer/cards_1_6.tpl');
         } else {
             $this->setTemplate('module:payplug/views/templates/front/customer/cards_list.tpl');

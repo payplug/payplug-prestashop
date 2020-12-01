@@ -37,5 +37,4 @@ class CountrySpecific implements CountryInterface
     {
         return new Country($idCountry);
     }
-
 }

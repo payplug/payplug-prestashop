@@ -255,7 +255,7 @@ class SQLtableRepository extends \Payplug
         ];
 
         if (!$keep_cards) {
-            array_push($tables,_DB_PREFIX_.'payplug_card');
+            array_push($tables, _DB_PREFIX_.'payplug_card');
         }
 
         foreach ($tables as $table) {
@@ -265,5 +265,4 @@ class SQLtableRepository extends \Payplug
         $log->info('Uninstallation SQL ended.');
         return $flag;
     }
-
 }

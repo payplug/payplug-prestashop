@@ -34,14 +34,14 @@ class PayPlugPaymentInstallment extends PayplugPayment
     public $amount;
 
     /** @var array */
-    protected $definition_schedules = array(
+    protected $definition_schedules = [
         'type' => 'iterable',
-        'field' => array(
-            'date' => array('type' => 'date', 'validate' => 'isDate', 'copy_post' => false),
-            'amount' => array('type' => 'int', 'validate' => 'isInt', 'required' => true),
-        ),
+        'field' => [
+            'date' => ['type' => 'date', 'validate' => 'isDate', 'copy_post' => false],
+            'amount' => ['type' => 'int', 'validate' => 'isInt', 'required' => true],
+        ],
         'required' => true
-    );
+    ];
 
     /**
      * Constructor
@@ -49,7 +49,7 @@ class PayPlugPaymentInstallment extends PayplugPayment
      * @param string $id_card
      * @return PayplugPayment
      */
-    public function __construct($id_card = null, $options = array())
+    public function __construct($id_card = null, $options = [])
     {
         parent::__construct($id_card, $options);
 
@@ -73,14 +73,13 @@ class PayPlugPaymentInstallment extends PayplugPayment
      */
     public function create()
     {
-
         if (!$this->is_valid) {
             // todo: add log failure create
-            return array(
+            return [
                 'resource' => null,
                 'error' => true,
                 'message' => 'Cannot create payment, invalid payment method',
-            );
+            ];
         }
 
         $this->register();
@@ -92,17 +91,17 @@ class PayPlugPaymentInstallment extends PayplugPayment
 
         try {
             $installment = \Payplug\InstallmentPlan::create($this->payment_tab);
-            return array(
+            return [
                 'resource' => $installment,
                 'error' => false,
                 'message' => null,
-            );
+            ];
         } catch (Exception $e) {
-            return array(
+            return [
                 'resource' => null,
                 'error' => true,
                 'message' => $e->__toString(),
-            );
+            ];
         }
     }
 
@@ -149,13 +148,14 @@ class PayPlugPaymentInstallment extends PayplugPayment
             return false;
         }
 
-        $schedule = array();
+        $schedule = [];
         for ($i = 0; $i < $this->nb_installment; $i++) {
             if ($i == 0) {
                 $schedule[$i]['date'] = 'TODAY';
                 $int_part = (int)($this->amount / $this->nb_installment);
                 if ($this->is_deferred) {
-                    $schedule[$i]['authorized_amount'] = (int)($int_part + ($this->amount - ($int_part * $this->nb_installment)));
+                    $schedule[$i]['authorized_amount'] =
+                        (int)($int_part + ($this->amount - ($int_part * $this->nb_installment)));
                 } else {
                     $schedule[$i]['amount'] = (int)($int_part + ($this->amount - ($int_part * $this->nb_installment)));
                 }
@@ -172,7 +172,7 @@ class PayPlugPaymentInstallment extends PayplugPayment
     /**
      * Register installment for later use
      *
-     * @param string $pay_id
+     * @param string $inst_id
      * @return bool
      */
     public function register($inst_id = 'pending')
@@ -181,13 +181,16 @@ class PayPlugPaymentInstallment extends PayplugPayment
             $this->deletePaymentCart($pay_id);
         }
 
-        $exists = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'payplug_installment_cart WHERE `id_cart` = ' . (int)$this->cart->id);
+        $exists = Db::getInstance()->getRow('
+            SELECT * FROM ' . _DB_PREFIX_ . 'payplug_installment_cart 
+            WHERE `id_cart` = ' . (int)$this->cart->id);
         $date_upd = date('Y-m-d H:i:s');
 
         if (!$exists) {
             //insert
-            $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_installment_cart (id_installment, id_cart, is_pending, date_upd)
-                    VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$this->cart->id . ', 0, \'' . pSQL($date_upd) . '\')';
+            $sql = '
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_installment_cart (id_installment, id_cart, is_pending, date_upd)
+                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$this->cart->id . ', 0, \'' . pSQL($date_upd) . '\')';
         } else {
             //update
             $sql = 'UPDATE ' . _DB_PREFIX_ . 'payplug_installment_cart pic  
@@ -197,5 +200,4 @@ class PayPlugPaymentInstallment extends PayplugPayment
 
         return (bool)Db::getInstance()->execute($sql);
     }
-
 }

@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Core;
+
 use Payplug;
 
 /**
@@ -24,7 +25,7 @@ class HttpClient
      * @var array  Default User-Agent products made to improve the User-Agent HTTP header
      * sent for each HTTP request.
      */
-    private static $defaultUserAgentProducts = array();
+    private static $defaultUserAgentProducts = [];
 
     /**
      * @var Payplug\Payplug The configuration for the HTTP Client. This configuration will be used to pass
@@ -140,7 +141,8 @@ class HttpClient
      * @throws  Payplug\Exception\HttpException                   When status code is not 2xx.
      * @throws  Payplug\Exception\ConnectionException             When an error was encountered while connecting to the resource.
      */
-    public function testRemote() {
+    public function testRemote()
+    {
         return $this->request('GET', APIRoutes::getTestRoute(), null, false);
     }
 
@@ -154,7 +156,7 @@ class HttpClient
      */
     public static function addDefaultUserAgentProduct($product, $version = null, $comment = null)
     {
-        self::$defaultUserAgentProducts[] = array($product, $version, $comment);
+        self::$defaultUserAgentProducts[] = [$product, $version, $comment];
     }
 
     /**
@@ -184,10 +186,12 @@ class HttpClient
     public static function getUserAgent()
     {
         $curlVersion = curl_version(); // Do not move this inside $headers even if it is used only there.
-                                       // PHP < 5.4 doesn't support call()['value'] directly.
-        $userAgent = self::formatUserAgentProduct('PayPlug-PHP',
-                                                  Payplug\Core\Config::LIBRARY_VERSION,
-                                                  sprintf('PHP/%s; curl/%s', phpversion(), $curlVersion['version']));
+        // PHP < 5.4 doesn't support call()['value'] directly.
+        $userAgent = self::formatUserAgentProduct(
+            'PayPlug-PHP',
+            Payplug\Core\Config::LIBRARY_VERSION,
+            sprintf('PHP/%s; curl/%s', phpversion(), $curlVersion['version'])
+        );
         foreach (self::$defaultUserAgentProducts as $product) {
             $userAgent .= ' ' . self::formatUserAgentProduct($product[0], $product[1], $product[2]);
         }
@@ -216,17 +220,16 @@ class HttpClient
     {
         if (self::$REQUEST_HANDLER === null) {
             $request = new CurlRequest();
-        }
-        else {
+        } else {
             $request = self::$REQUEST_HANDLER;
         }
 
         $userAgent = self::getUserAgent();
-        $headers = array(
+        $headers = [
             'Accept: application/json',
             'Content-Type: application/json',
             'User-Agent: ' . $userAgent
-        );
+        ];
         if ($authenticated) {
             $headers[] = 'Authorization: Bearer ' . $this->_configuration->getToken();
             $headers[] = 'PayPlug-Version: ' . $this->_configuration->getApiVersion();
@@ -244,10 +247,10 @@ class HttpClient
             $request->setopt(CURLOPT_POSTFIELDS, json_encode($data));
         }
 
-        $result = array(
+        $result = [
             'httpResponse'  => $request->exec(),
             'httpStatus'    => $request->getInfo(CURLINFO_HTTP_CODE)
-        );
+        ];
 
         // We must do this before closing curl
         $errorCode = $request->errno();
@@ -256,19 +259,19 @@ class HttpClient
         $request->close();
 
         // We want manage errors from HTTP in standards cases
-        $curlStatusNotManage = array(
+        $curlStatusNotManage = [
             0, // CURLE_OK
             22 // CURLE_HTTP_NOT_FOUND or CURLE_HTTP_RETURNED_ERROR
-        );
+        ];
 
         // If there was an HTTP error
-        if (in_array($errorCode, $curlStatusNotManage) && substr($result['httpStatus'], 0, 1) !== '2') {
+        if (in_array($errorCode, $curlStatusNotManage, true) && substr($result['httpStatus'], 0, 1) !== '2') {
             $this->throwRequestException($result['httpResponse'], $result['httpStatus']);
         // Unreachable bracket marked as executable by old versions of XDebug
         } // If there was an error with curl
         elseif ($result['httpResponse'] === false || $errorCode) {
             $this->throwConnectionException($result['httpStatus'], $errorMessage);
-        // Unreachable bracket marked as executable by old versions of XDebug
+            // Unreachable bracket marked as executable by old versions of XDebug
         }
 
         $result['httpResponse'] = json_decode($result['httpResponse'], true);
@@ -291,7 +294,8 @@ class HttpClient
     private function throwConnectionException($errorCode, $errorMessage)
     {
         throw new Payplug\Exception\ConnectionException(
-            'Connection to the API failed with the following message: ' . $errorMessage, $errorCode
+            'Connection to the API failed with the following message: ' . $errorMessage,
+            $errorCode
         );
     }
 
@@ -309,8 +313,10 @@ class HttpClient
 
         // Error 5XX
         if (substr($httpStatus, 0, 1) === '5') {
-            throw new Payplug\Exception\PayplugServerException('Unexpected server error during the request.',
-                $httpResponse, $httpStatus
+            throw new Payplug\Exception\PayplugServerException(
+                'Unexpected server error during the request.',
+                $httpResponse,
+                $httpStatus
             );
         }
 
@@ -319,20 +325,32 @@ class HttpClient
                 throw new Payplug\Exception\BadRequestException('Bad request.', $httpResponse, $httpStatus);
                 break;
             case 401:
-                throw new Payplug\Exception\UnauthorizedException('Unauthorized. Please check your credentials.',
-                    $httpResponse, $httpStatus);
+                throw new Payplug\Exception\UnauthorizedException(
+                    'Unauthorized. Please check your credentials.',
+                    $httpResponse,
+                    $httpStatus
+                );
                 break;
             case 403:
-                throw new Payplug\Exception\ForbiddenException('Forbidden error. You are not allowed to access this resource.',
-                    $httpResponse, $httpStatus);
+                throw new Payplug\Exception\ForbiddenException(
+                    'Forbidden error. You are not allowed to access this resource.',
+                    $httpResponse,
+                    $httpStatus
+                );
                 break;
             case 404:
-                throw new Payplug\Exception\NotFoundException('The resource you requested could not be found.',
-                    $httpResponse, $httpStatus);
+                throw new Payplug\Exception\NotFoundException(
+                    'The resource you requested could not be found.',
+                    $httpResponse,
+                    $httpStatus
+                );
                 break;
             case 405:
-                throw new Payplug\Exception\NotAllowedException('The requested method is not supported by this resource.',
-                    $httpResponse, $httpStatus);
+                throw new Payplug\Exception\NotAllowedException(
+                    'The requested method is not supported by this resource.',
+                    $httpResponse,
+                    $httpStatus
+                );
                 break;
         }
 

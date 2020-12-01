@@ -23,7 +23,7 @@ class Authentication
         $httpClient = new Core\HttpClient(null);
         $response = $httpClient->post(
             Core\APIRoutes::getRoute(Core\APIRoutes::KEY_RESOURCE),
-            array('email' => $email, 'password' => $password),
+            ['email' => $email, 'password' => $password],
             false
         );
         return $response;
@@ -86,10 +86,10 @@ class Authentication
     public static function getPermissionsByLogin($email, $password)
     {
         $keys = self::getKeysByLogin($email, $password);
-        $payplug = Payplug::init(array(
+        $payplug = Payplug::init([
             'secretKey' => $keys['httpResponse']['secret_keys']['live'],
             'apiVersion' => null,
-        ));
+        ]);
 
         $httpClient = new Core\HttpClient($payplug);
         $response = $httpClient->get(Core\APIRoutes::getRoute(Core\APIRoutes::ACCOUNT_RESOURCE));

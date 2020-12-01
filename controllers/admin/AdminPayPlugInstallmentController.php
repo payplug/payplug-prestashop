@@ -58,57 +58,57 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->fields_list = array(
-            'id_payplug_installment' => array(
+        $this->fields_list = [
+            'id_payplug_installment' => [
                 'title' => $this->l('ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs',
-            ),
-            'id_installment' => array(
+            ],
+            'id_installment' => [
                 'title' => $this->l('Installment ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
-            ),
-            'id_payment' => array(
+            ],
+            'id_payment' => [
                 'title' => $this->l('Payment ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
-            ),
-            'reference' => array(
+            ],
+            'reference' => [
                 'title' => $this->l('Order reference'),
-            ),
-            'customer' => array(
+            ],
+            'customer' => [
                 'title' => $this->l('Customer'),
                 'havingFilter' => true,
-            ),
-            'order_total' => array(
+            ],
+            'order_total' => [
                 'title' => $this->l('Order total'),
                 'type' => 'price',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
-            ),
-            'step' => array(
+            ],
+            'step' => [
                 'title' => $this->l('Installment payment #'),
-            ),
-            'amount' => array(
+            ],
+            'amount' => [
                 'title' => $this->l('Installment amount'),
                 'type' => 'price',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
-            ),
-            'status' => array(
+            ],
+            'status' => [
                 'title' => $this->l('PayPlug payment status'),
                 'callback' => 'getPaymentStatusById',
                 'type' => 'select',
                 'list' => $this->payplug->payment_status,
                 'filter_key' => 'a!status',
                 'filter_type' => 'int',
-            ),
-            'scheduled_date' => array(
+            ],
+            'scheduled_date' => [
                 'title' => $this->l('Date'),
                 'type' => 'datetime',
-            ),
-        );
+            ],
+        ];
     }
 
     public function getPaymentStatusById($id_status)
@@ -123,11 +123,15 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         return Tools::displayPrice(($amount / 100), (int)$order->id_currency);
     }
 
+    // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
     public function viewpayplug_installment()
     {
         $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
-        Tools::redirectAdmin('index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.Tools::getAdminTokenLite('AdminOrders'));
+        Tools::redirectAdmin(
+            'index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.
+            Tools::getAdminTokenLite('AdminOrders')
+        );
     }
 
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
@@ -155,10 +159,10 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     public function initToolbar()
     {
         if ($this->allow_export) {
-            $this->toolbar_btn['export'] = array(
+            $this->toolbar_btn['export'] = [
                 'href' => self::$currentIndex.'&export'.$this->table.'&token='.$this->token,
                 'desc' => $this->l('Export')
-            );
+            ];
         }
         parent::initToolbar();
         unset($this->toolbar_btn['new']);

@@ -48,14 +48,15 @@ function upgrade_module_2_30_0()
         }
 
         // check doesn't exist then add it
-        if(!$lock_exists) {
+        if (!$lock_exists) {
             $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
             }
             if ($flag) {
-                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
+                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
+                ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
                 $res_alter = Db::getInstance()->execute($req_alter);
                 if (!$res_alter) {
                     $flag = false;

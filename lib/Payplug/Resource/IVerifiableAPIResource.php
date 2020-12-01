@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Resource;
+
 use Payplug;
 
 /**
@@ -18,5 +19,5 @@ interface IVerifiableAPIResource
      *
      * @throws  Payplug\Exception\UndefinedAttributeException when the local resource is invalid.
      */
-    function getConsistentResource(Payplug\Payplug $payplug = null);
+    public function getConsistentResource(Payplug\Payplug $payplug = null);
 }

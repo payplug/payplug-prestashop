@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -33,7 +33,7 @@
         </li>
     {/if}
     {if isset($payment.status)}
-        <li data-e2e-state_code="{$payment.status_code}">
+        <li data-e2e-state_code="{$payment.status_code|escape:'htmlall':'UTF-8'}">
             <span class="pp_col1">{l s='Status' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="status">
                 <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">{$payment.status|escape:'htmlall':'UTF-8'}</span>

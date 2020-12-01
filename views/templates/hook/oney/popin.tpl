@@ -30,7 +30,7 @@
 
         <ul class="oneyPopin_navigation">
             {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
-                <li{if $oney_payment_method == 'x3_with_fees'} class="selected"{/if}><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x" data-e2e-oney-option="{$oney_payment_method}">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
+                <li{if $oney_payment_method == 'x3_with_fees'} class="selected"{/if}><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x" data-e2e-oney-option="{$oney_payment_method|escape:'htmlall':'UTF-8'}">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
             {/foreach}
         </ul>
 

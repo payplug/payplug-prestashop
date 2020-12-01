@@ -46,8 +46,7 @@ class LoggerRepository
             ->setTable('payplug_logger')
             ->setLimitNumber((int)4000)
             ->setLimitDate('P1M')
-            ->setDefinition(
-            [
+            ->setDefinition([
                 'table' => $this->loggerEntity->getTable(),
                 'primary' => 'id_'.$this->loggerEntity->getTable(),
                 'fields' => [
@@ -112,7 +111,12 @@ class LoggerRepository
         $debug = reset($debugBacktrace);
 
         $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T
-        $entry = ['date' => $this->udate('Y-m-d H:i:s.u T'), 'line' => $debug['line'], 'message' => $message, 'level' => $level];
+        $entry = [
+            'date' => $this->udate('Y-m-d H:i:s.u T'),
+            'line' => $debug['line'],
+            'message' => $message,
+            'level' => $level
+        ];
         array_push($content, $entry);
 
         $this->loggerEntity->setContent(json_encode($content));
@@ -225,7 +229,8 @@ class LoggerRepository
      * @param bool $all
      * @return bool
      */
-    public function flush($all = false) {
+    public function flush($all = false)
+    {
         try {
             $logger = $this->loggerEntity;
             $this->query
@@ -237,7 +242,7 @@ class LoggerRepository
             return false;
         }
 
-        if($all) {
+        if ($all) {
             $this->query
                 ->truncate()
                 ->table(_DB_PREFIX_.$logger->getTable())
@@ -274,7 +279,7 @@ class LoggerRepository
                 ->fields('`id_payplug_logger`')
                 ->from(_DB_PREFIX_.$logger->getTable())
                 ->orderBy('`id_payplug_logger` DESC')
-                ->limit(($limits['number'] - 1),1)
+                ->limit(($limits['number'] - 1), 1)
             ;
 
         if (!$last_logs_valid || !$this->query->build()) {

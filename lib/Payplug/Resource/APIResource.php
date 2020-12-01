@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Resource;
+
 use Payplug;
 
 /**
@@ -52,7 +53,7 @@ abstract class APIResource implements IAPIResourceFactory
      *
      * @return  array   The attributes of the resource
      */
-    protected final function getAttributes()
+    final protected function getAttributes()
     {
         return $this->_attributes;
     }

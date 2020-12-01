@@ -53,21 +53,21 @@ class PayPlugCarrier extends ObjectModel
     /** @var string Carrier name */
     public $name;
 
-    public static $definition = array(
+    public static $definition = [
         'table' => 'payplug_carrier',
         'primary' => 'id_payplug_carrier',
-        'fields' => array(
-            'id_carrier' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'delay' => array('type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true, 'size' => 3),
-            'delivery_type' => array(
+        'fields' => [
+            'id_carrier' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
+            'delay' => ['type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true, 'size' => 3],
+            'delivery_type' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isCleanHtml',
                 'size' => 100
-            ),
-            'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-        )
-    );
+            ],
+            'date_add' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
+            'date_upd' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
+        ]
+    ];
 
     /**
      * @description
@@ -115,7 +115,7 @@ class PayPlugCarrier extends ObjectModel
      */
     public static function getAll()
     {
-        $carriers = array();
+        $carriers = [];
         $req_payplug_carriers = '
             SELECT pc.`id_payplug_carrier`, c.`name`
             FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
@@ -148,8 +148,9 @@ class PayPlugCarrier extends ObjectModel
         $id_payplug_carrier = Db::getInstance()->getValue(
             'SELECT `' . self::$definition['primary']
             . '` FROM `'._DB_PREFIX_ . self::$definition['table']
-            .'` WHERE `id_carrier` = ' . (int)$id_carrier);
-        if($id_payplug_carrier) {
+            .'` WHERE `id_carrier` = ' . (int)$id_carrier
+        );
+        if ($id_payplug_carrier) {
             return new PayPlugCarrier($id_payplug_carrier);
         }
 

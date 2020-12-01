@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Resource;
+
 use Payplug;
 
 /**
@@ -52,7 +53,7 @@ class InstallmentPlan extends APIResource implements IVerifiableAPIResource
         if (isset($attributes['notification'])) {
             $this->notification = PaymentNotification::fromAttributes($attributes['notification']);
         }
-        $schedules = array();
+        $schedules = [];
         if (isset($attributes['schedule'])) {
             foreach ($attributes['schedule'] as &$schedule) {
                 $schedules[] = InstallmentPlanSchedule::fromAttributes($schedule);
@@ -79,14 +80,15 @@ class InstallmentPlan extends APIResource implements IVerifiableAPIResource
 
         if (!array_key_exists('id', $this->getAttributes())) {
             throw new Payplug\Exception\UndefinedAttributeException(
-                "This installment plan object has no id. You can't list payments on it.");
+                "This installment plan object has no id. You can't list payments on it."
+            );
         }
         $httpClient = new Payplug\Core\HttpClient($payplug);
         $response = $httpClient->get(
             Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::INSTALLMENT_PLAN_RESOURCE, $this->id)
         );
 
-        $payments = array();
+        $payments = [];
         foreach ($response['httpResponse']['schedule'] as $schedule) {
             foreach ($schedule['payment_ids'] as $payment_id) {
                 $payments[$payment_id] = Payment::retrieve($payment_id, $payplug);
@@ -94,7 +96,6 @@ class InstallmentPlan extends APIResource implements IVerifiableAPIResource
         }
 
         return $payments;
-
     }
 
     /**
@@ -115,7 +116,7 @@ class InstallmentPlan extends APIResource implements IVerifiableAPIResource
         $httpClient = new Payplug\Core\HttpClient($payplug);
         $response = $httpClient->patch(
             Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::INSTALLMENT_PLAN_RESOURCE, $this->id),
-            array('aborted' => true)
+            ['aborted' => true]
         );
 
         return InstallmentPlan::fromAttributes($response['httpResponse']);
@@ -139,8 +140,10 @@ class InstallmentPlan extends APIResource implements IVerifiableAPIResource
 
         $httpClient = new Payplug\Core\HttpClient($payplug);
         $response = $httpClient->get(
-            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::INSTALLMENT_PLAN_RESOURCE,
-                $installmentPlanId)
+            Payplug\Core\APIRoutes::getRoute(
+                Payplug\Core\APIRoutes::INSTALLMENT_PLAN_RESOURCE,
+                $installmentPlanId
+            )
         );
 
         return InstallmentPlan::fromAttributes($response['httpResponse']);
@@ -180,11 +183,12 @@ class InstallmentPlan extends APIResource implements IVerifiableAPIResource
      *
      * @throws  Payplug\Exception\UndefinedAttributeException when the local resource is invalid.
      */
-    function getConsistentResource(Payplug\Payplug $payplug = null)
+    public function getConsistentResource(Payplug\Payplug $payplug = null)
     {
         if (!array_key_exists('id', $this->_attributes)) {
             throw new Payplug\Exception\UndefinedAttributeException(
-                'The id of the installment plan is not set.');
+                'The id of the installment plan is not set.'
+            );
         }
 
         return InstallmentPlan::retrieve($this->_attributes['id'], $payplug);

@@ -11,40 +11,40 @@ interface IHttpRequest
      *
      * @link http://php.net/manual/en/function.curl-setopt.php
      */
-    function setopt($option, $value);
+    public function setopt($option, $value);
 
     /**
      * Simple wrapper for curl_exec
      *
      * @link http://php.net/manual/en/function.curl-exec.php
      */
-    function exec();
+    public function exec();
 
     /**
      * Simple wrapper for curl_getinfo
      *
      * @link http://php.net/manual/en/function.curl-getinfo.php
      */
-    function getinfo($option);
+    public function getinfo($option);
 
     /**
      * Simple wrapper for curl_close
      *
      * @link http://php.net/manual/en/function.curl-close.php
      */
-    function close();
+    public function close();
 
     /**
      * Simple wrapper for curl_error
      *
      * @link http://php.net/manual/en/function.curl-close.php
      */
-    function error();
+    public function error();
 
     /**
      * Simple wrapper for curl_errno
      *
      * @link http://php.net/manual/en/function.curl-close.php
      */
-    function errno();
+    public function errno();
 }

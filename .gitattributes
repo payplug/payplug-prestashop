@@ -2,6 +2,7 @@
 .gitattributes export-ignore
 .gitignore export-ignore
 .gitlab-ci.yml export-ignore
+.php_cs export-ignore
 README.rst export-ignore
 test export-ignore
 views/css/less export-ignore
@@ -9,3 +10,4 @@ views/css/*.less export-ignore
 views/css/*.map export-ignore
 views/templates/front/tools export-ignore
 controllers/tools export-ignore
+tests/ export-ignore

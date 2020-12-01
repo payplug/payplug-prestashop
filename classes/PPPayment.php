@@ -36,7 +36,7 @@ class PPPayment
             $this->populateFromPayment($payment);
         } else {
             $id = null;
-            $resource = null;
+            $this->resource = null;
         }
     }
 
@@ -45,10 +45,10 @@ class PPPayment
         try {
             $payment = \Payplug\Payment::retrieve($id);
         } catch (\Payplug\Exception $e) {
-            $data = array(
+            $data = [
                 'result' => false,
                 'response' => $e->__toString(),
-            );
+            ];
             return $data;
         }
         return $payment;
@@ -62,26 +62,33 @@ class PPPayment
     public function capture()
     {
         try {
-            $capture = \Payplug\Payment::capture($this->resource->id);
-            $response = array(
+            \Payplug\Payment::capture($this->resource->id);
+            $response = [
                 'code' => 200,
                 'message' => 'Amount successfully captured.',
                 'resource' => $this,
-            );
+            ];
         } catch (Payplug\Exception\NotAllowedException $e) {
             $httpResponse = json_decode($e->getHttpResponse());
-            $response = array(
+            $response = [
                 'code' => (int)$e->getCode(),
                 'message' => $httpResponse->message,
                 'resource' => $this,
-            );
+            ];
         } catch (Payplug\Exception\ForbiddenException $e) {
             $httpResponse = json_decode($e->getHttpResponse());
-            $response = array(
+            $response = [
                 'code' => (int)$e->getCode(),
                 'message' => $httpResponse->message,
                 'resource' => $this,
-            );
+            ];
+        } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
+            $httpResponse = json_decode($e->getHttpResponse());
+            $response = [
+                'code' => (int)$e->getCode(),
+                'message' => $httpResponse->message,
+                'resource' => $this,
+            ];
         }
         return $response;
     }

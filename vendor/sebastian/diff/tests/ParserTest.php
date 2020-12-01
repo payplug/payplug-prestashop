@@ -74,15 +74,7 @@ class ParserTest extends TestCase
 
     public function testParseWithRemovedLines()
     {
-        $content = <<<A
-diff --git a/Test.txt b/Test.txt
-index abcdefg..abcdefh 100644
---- a/Test.txt
-+++ b/Test.txt
-@@ -49,9 +49,8 @@
- A
--B
-A;
+        $content = 'abcdefg';
         $diffs = $this->parser->parse($content);
         $this->assertInternalType('array', $diffs);
         $this->assertContainsOnlyInstancesOf('SebastianBergmann\Diff\Diff', $diffs);
@@ -117,23 +109,7 @@ A;
 
     public function testParseDiffForMulitpleFiles()
     {
-        $content = <<<A
-diff --git a/Test.txt b/Test.txt
-index abcdefg..abcdefh 100644
---- a/Test.txt
-+++ b/Test.txt
-@@ -1,3 +1,2 @@
- A
--B
-
-diff --git a/Test123.txt b/Test123.txt
-index abcdefg..abcdefh 100644
---- a/Test2.txt
-+++ b/Test2.txt
-@@ -1,2 +1,3 @@
- A
-+B
-A;
+        $content = 'abcdefg';
         $diffs = $this->parser->parse($content);
         $this->assertCount(2, $diffs);
 

@@ -36,7 +36,6 @@ class PPPaymentInstallment extends PPPayment
             $this->populateFromInstallment($payment);
         } else {
             $id = null;
-            $resource = null;
         }
     }
 
@@ -45,10 +44,10 @@ class PPPaymentInstallment extends PPPayment
         try {
             $payment = \Payplug\InstallmentPlan::retrieve($id);
         } catch (\Payplug\Exception $e) {
-            $data = array(
+            $data = [
                 'result' => false,
                 'response' => $e->__toString(),
-            );
+            ];
             return $data;
         }
         return $payment;
@@ -61,16 +60,16 @@ class PPPaymentInstallment extends PPPayment
 
     public function getPaymentList()
     {
-        $list = array();
+        $list = [];
         $index = 0;
         foreach ($this->resource->schedule as $schedule) {
             if (count($schedule->payment_ids) > 0) {
                 foreach ($schedule->payment_ids as $pay_id) {
-                    $list[$index] = array(
+                    $list[$index] = [
                         'pay_id' => $pay_id,
                         'date' => $schedule->date,
                         'amount' => $schedule->amount
-                    );
+                    ];
                     $index ++;
                 }
             }

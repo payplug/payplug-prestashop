@@ -26,7 +26,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-//        require_once(dirname(__FILE__) . './../../../../config/config.inc.php');
 
         /** Call init.php to initialize context */
         require_once(_PS_MODULE_DIR_ . '../init.php');
@@ -40,7 +39,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $payplug->initializeApi();
 
         $context = Context::getContext();
-        $cart = $context->cart;
 
         $id_payplug_card = Tools::getValue('pc', null);
 
@@ -57,36 +55,31 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             '_ajax' => 1
         ];
 
-        $payment_data = $payplug->preparePayment($options,$id_payplug_card);
+        $payment_data = $payplug->preparePayment($options, $id_payplug_card);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
-        $error_url = $context->link->getPageLink($page, true, $context->language->id, array('error' => 1, 'step' => 3));
+        $error_url = $context->link->getPageLink($page, true, $context->language->id, ['error' => 1, 'step' => 3]);
 
         // Invalid payment then return error
-        if  (($payment_data['result'] && (isset($payment_data['return_url']) && $payment_data['return_url'])))
-        {
+        if (($payment_data['result'] && (isset($payment_data['return_url']) && $payment_data['return_url']))) {
             Payplug::redirectForVersion($payment_data['return_url']);
         }
-        if  (($payment_data_16['result'] && (isset($payment_data_16['return_url']) && $payment_data_16['return_url']))) {
+        if (($payment_data_16['result'] && (isset($payment_data_16['return_url']) && $payment_data_16['return_url']))) {
             Payplug::redirectForVersion($payment_data_16['return_url']);
-        }
-        elseif (!$payment_data['result']) {
-            if(isset($payment_data['response']) && $payment_data['response']) {
-                $payplug->setPaymentErrorsCookie(array($payment_data['response']));
+        } elseif (!$payment_data['result']) {
+            if (isset($payment_data['response']) && $payment_data['response']) {
+                $payplug->setPaymentErrorsCookie([$payment_data['response']]);
+            }
+            Payplug::redirectForVersion($error_url);
+        } elseif (!$payment_data_16['result']) {
+            if (isset($payment_data_16['response']) && $payment_data_16['response']) {
+                $payplug->setPaymentErrorsCookie([$payment_data_16['response']]);
             }
             Payplug::redirectForVersion($error_url);
         }
 
-        elseif(!$payment_data_16['result']) {
-            if(isset($payment_data_16['response']) && $payment_data_16['response']) {
-                $payplug->setPaymentErrorsCookie(array($payment_data_16['response']));
-            }
-            Payplug::redirectForVersion($error_url);
-        }
-
-        if ((isset($payment_data['response'])) || (isset($payment_data_16['response'])))
-        {
+        if ((isset($payment_data['response'])) || (isset($payment_data_16['response']))) {
             die($payment_data['response']);
         }
     }

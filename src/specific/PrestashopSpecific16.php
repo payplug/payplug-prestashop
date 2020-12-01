@@ -48,9 +48,9 @@ class PrestashopSpecific16
         $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
         $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
 
-        Media::addJsDef(array(
-            'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', array(), true),
-        ));
+        Media::addJsDef([
+            'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', [], true),
+        ]);
         $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
     }
 
@@ -58,23 +58,22 @@ class PrestashopSpecific16
     {
         $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
 
-        $this->contextSpecific->smarty->assign(array(
+        $this->contextSpecific->smarty->assign([
             'payplug_icon_url' => $payplug_icon_url
-        ));
+        ]);
     }
 
     public function displayPaymentOption($payment_options, $cart)
     {
-        $paymentOptions = array();
+        $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
         $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
-        $oney = $this->oney;
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
         $current_lang = $current_lang[0];
-        if (in_array($current_lang, array('it', 'en'))) {
+        if (in_array($current_lang, ['it', 'en'], true)) {
             $img_lang = $current_lang;
         } else {
             $img_lang = 'default';
@@ -85,7 +84,7 @@ class PrestashopSpecific16
             // get the available carrier
 
             $package_list = $cart->getPackageList();
-            $carrier_ids = array();
+            $carrier_ids = [];
             foreach ($package_list as $address) {
                 foreach ($address as $package) {
                     $carrier_ids = array_merge($carrier_ids, $package['carrier_list']);
@@ -125,34 +124,28 @@ class PrestashopSpecific16
             }
 
             try {
-                $this->contextSpecific->smarty->assign(array(
+                $this->contextSpecific->smarty->assign([
                     'payplug_module_dir' => _PS_MODULE_DIR_,
                     'payplug_oney' => true,
                     'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
                     'payplug_oney_loading_msg' => $this->payplug->l('Loading')
-                ));
+                ]);
             } catch (\Exception $e) {
-                var_dump($e); exit;
+                var_dump($e);
+                exit;
             }
         }
 
         $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer($cart->id_customer, true);
 
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
-        $i = 0;
 
-        foreach($payment_options as $payment_option) {
-
-            // Pour n'affiche qu'un template OneClick
-            // Sinon, si x CB d'enregistrées : affiche x temmplates avec x CB dans chaque
+        foreach ($payment_options as $payment_option) {
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
-
-                // Si OneClick activé + carte déjà enregistrée + boucle tombe sur "standard" = on sort de la boucle
-                // En gros le paymentOption d'affiché sera QUE le OneClick (qui comprends les choix CB enregistrée + payer autre carte)
                 if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
                     && ($payment_method == 'standard')) {
@@ -166,20 +159,24 @@ class PrestashopSpecific16
                      * oney.tpl (Oney optimisé)
                      * unified.tpl (Oney non optimisé)
                      */
-                    $paymentOptions[$payment_method.'-'.$extraClass] = array(
-                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass . ($error ? '-alt' : ''),
+                    $paymentOptions[$payment_method.'-'.$extraClass] = [
+                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
+                            ($error ? '-alt' : ''),
                         'label' => $payment_option['callToActionText'],
-                        'logo_url' => $payment_method == 'one_click' ? $payment_options['standard']['logo'] : $payment_option['logo'],
+                        'logo_url' => $payment_method == 'one_click' ?
+                            $payment_options['standard']['logo'] :
+                            $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
-                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' . $payment_option['tpl'],
-                    );
+                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
+                            $payment_option['tpl'],
+                    ];
                 }
 
                 if (isset($payment_option['payment_controller_url'])) {
-                    $this->contextSpecific->smarty->assign(array(
+                    $this->contextSpecific->smarty->assign([
                         'payplug_cards' => $payplug_cards,
                         'payment_controller_url' => $payment_option['payment_controller_url'],
-                    ));
+                    ]);
                 }
 
                 // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
@@ -201,10 +198,10 @@ class PrestashopSpecific16
 
     public function installTab()
     {
-        $translationsAdminPayPlugInstallment = array(
+        $translationsAdminPayPlugInstallment = [
             'en' => 'Installment Plans',
             'fr' => 'Paiements en plusieurs fois'
-        );
+        ];
 
         $flag = $this->payplug->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, 0);
 
@@ -215,5 +212,4 @@ class PrestashopSpecific16
     {
         return ($this->payplug->uninstallModuleTab('AdminPayPlugInstallment'));
     }
-
 }

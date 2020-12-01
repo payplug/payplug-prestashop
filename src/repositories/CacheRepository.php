@@ -114,7 +114,6 @@ class CacheRepository
             }
             
             return true;
-            
         }
     }
 
@@ -158,10 +157,10 @@ class CacheRepository
         if (!$this->query->build()) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
             $error_level = 'error';
-            $this->logger->addLog($error_message,$error_level);
+            $this->logger->addLog($error_message, $error_level);
             return false;
         }
         
-       return true;
+        return true;
     }
 }

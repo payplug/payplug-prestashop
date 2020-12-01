@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -41,7 +41,7 @@
                             <p>{$field.text|escape:'htmlall':'UTF-8'}</p>
                             {foreach $field.input as $input}
                                 <div class="oneyRequired_field -{$input.name|escape:'htmlall':'UTF-8'}">
-                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="oneyRequired_input{if $name==$input.name} -tocheck -error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
+                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="oneyRequired_input{if $name==$input.name} -tocheck -error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type|escape:'htmlall':'UTF-8'}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
                                 </div>
                             {/foreach}
                         </div>

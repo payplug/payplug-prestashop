@@ -6,7 +6,7 @@ namespace Payplug;
  **/
 class InstallmentPlan
 {
-	/**
+    /**
      * Retrieves an InstallmentPlan.
      *
      * @param   string          $installmentPlanId      the installment plan ID
@@ -21,7 +21,7 @@ class InstallmentPlan
         return Resource\InstallmentPlan::retrieve($installmentPlanId, $payplug);
     }
 
-	/**
+    /**
      * Aborts an InstallmentPlan.
      *
      * @param   string          $installmentPlanId      the installment plan ID
@@ -33,7 +33,7 @@ class InstallmentPlan
      */
     public static function abort($installmentPlanId, Payplug $payplug = null)
     {
-        $installmentPlan = Resource\InstallmentPlan::fromAttributes(array('id' => $installmentPlanId));
+        $installmentPlan = Resource\InstallmentPlan::fromAttributes(['id' => $installmentPlanId]);
         return $installmentPlan->abort($payplug);
     }
 
@@ -49,6 +49,6 @@ class InstallmentPlan
      */
     public static function create(array $data, Payplug $payplug = null)
     {
-    	return Resource\InstallmentPlan::create($data, $payplug);
+        return Resource\InstallmentPlan::create($data, $payplug);
     }
 };

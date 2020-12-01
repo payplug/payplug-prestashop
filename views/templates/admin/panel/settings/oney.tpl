@@ -21,7 +21,7 @@
 *}
 <div class="panel-row separate_margin_block">
     <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='Activate Payments Oney' mod='payplug'}</div>
+        <div class="payplugPanel_label">{l s='Activate Oney Payments' mod='payplug'}</div>
         <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.oney}</div>
     </div>
     <div class="payplugPanel">
@@ -47,7 +47,7 @@
                                                 name="payplug_oney_tos_url"
                                                 placeholder="ex : http://monsite.fr/mes-cgv"
                                                 {if $PAYPLUG_ONEY_TOS_URL}
-                                                    value="{$PAYPLUG_ONEY_TOS_URL}"
+                                                    value="{$PAYPLUG_ONEY_TOS_URL|escape:'htmlall':'UTF-8'}"
                                                 {/if}
                                         >
                                         <div class="payplugOneyTOS_error">{l s='Error : Please enter a valid URL.' mod='payplug'}</div>

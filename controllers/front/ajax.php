@@ -60,7 +60,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->plugin = $this->payplug->getPlugin();
         $this->toolsSpecific = $this->plugin->getTools();
 
-        if ($this->toolsSpecific->tool('getValue','_ajax') == 1) {
+        if ($this->toolsSpecific->tool('getValue', '_ajax') == 1) {
             $this->card = $this->plugin->getCard();
             $this->configurationSpecific = $this->plugin->getConfiguration();
             $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
@@ -69,17 +69,16 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
             $config = $this->configurationSpecific;
             $context = $this->contextSpecific->getContext(); // get the method
-            $product = $this->productSpecific;
             $tools = $this->toolsSpecific;
 
-            if ($tools->tool('getIsset','pc')) {
-                if ((int)$tools->tool('getValue','delete') == 1) {
+            if ($tools->tool('getIsset', 'pc')) {
+                if ((int)$tools->tool('getValue', 'delete') == 1) {
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $id_payplug_card = $tools->tool('getValue','pc');
+                    $id_payplug_card = $tools->tool('getValue', 'pc');
                     $valid_key = Payplug::setAPIKey();
                     $deleted = $this->card->deleteCard($id_customer, $id_payplug_card, $valid_key);
                     if ($deleted) {
@@ -88,24 +87,43 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
-            } elseif ($tools->tool('getIsset','getOneyCta')) {
-                die(json_encode(array(
+            } elseif ($tools->tool('getIsset', 'getOneyCta')) {
+                die(json_encode([
                     'result' => true,
                     'tpl' => $this->oney->getOneyCTA(),
-                )));
-            } elseif ($tools->tool('getIsset','isOneyElligible')) {
+                ]));
+            } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
-                if ($id_product = (int)$tools->tool('getValue','id_product')) {
-                    $group = $tools->tool('getValue','group');
+                if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
+                    $group = $tools->tool('getValue', 'group');
                     // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
                     if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
-                        $id_product_attribute = $group ? (int)Product::getIdProductAttributesByIdAttributes($id_product, $group) : 0;
+                        $id_product_attribute = $group ?
+                            (int)Product::getIdProductAttributesByIdAttributes($id_product, $group) :
+                            0
+                        ;
                     } else {
-                        $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+                        $id_product_attribute = $group ?
+                            (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) :
+                            0
+                        ;
                     }
-                    $quantity = (int)$tools->tool('getValue','qty', (int)$tools->tool('getValue','quantity_wanted', 1));
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
+                    $quantity = (int)$tools->tool(
+                        'getValue',
+                        'qty',
+                        (int)$tools->tool('getValue', 'quantity_wanted', 1)
+                    );
+                    $product_price = Product::getPriceStatic(
+                        (int)$id_product,
+                        $use_taxes,
+                        $id_product_attribute,
+                        6,
+                        null,
+                        false,
+                        true,
+                        $quantity
+                    );
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
                     $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
@@ -119,16 +137,28 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode($is_elligible));
-            } elseif ($tools->tool('getIsset','getOneyPriceAndPaymentOptions')) {
+            } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
-                if ($id_product = (int)$tools->tool('getValue','id_product')) {
-                    $group = $tools->tool('getValue','group');
-                    $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+                if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
+                    $group = $tools->tool('getValue', 'group');
+                    $id_product_attribute = $group ?
+                        (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) :
+                        0
+                    ;
                     // Some integration will not use qty data but quantity_wanted
-                    $quantity = (int)$tools->tool('getValue','qty');
-                    $quantity = $quantity ? $quantity : (int)$tools->tool('getValue','quantity_wanted', 1);
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6,null, false, true, $quantity);
+                    $quantity = (int)$tools->tool('getValue', 'qty');
+                    $quantity = $quantity ? $quantity : (int)$tools->tool('getValue', 'quantity_wanted', 1);
+                    $product_price = Product::getPriceStatic(
+                        (int)$id_product,
+                        $use_taxes,
+                        $id_product_attribute,
+                        6,
+                        null,
+                        false,
+                        true,
+                        $quantity
+                    );
                     $amount = $product_price * $quantity;
                     $cart = false;
                 } else {
@@ -138,7 +168,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount);
                 die(json_encode($payment_options));
-            } elseif ($tools->tool('getIsset','getPaymentErrors')) {
+            } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
                 $errors = $this->payplug->getPaymentErrorsCookie();
 
@@ -147,25 +177,33 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode(['result' => false]));
-            } elseif ($tools->tool('getIsset','savePaymentData')) {
-                $payment_data = $tools->tool('getValue','payment_data');
+            } elseif ($tools->tool('getIsset', 'savePaymentData')) {
+                $payment_data = $tools->tool('getValue', 'payment_data');
 
                 if (empty($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => [$this->payplug->l('Empty payment data')]
+                        'message' => [
+                            $this->payplug->l('Empty payment data')
+                        ]
                     ]));
                 } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => [$this->payplug->l('At least one of the fields is not correctly completed.')]
+                        'message' => [
+                            $this->payplug->l('At least one of the fields is not correctly completed.')
+                        ]
                     ]));
                 }
 
                 $result = $this->payplug->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
-                    'message' => [$result ? $this->payplug->l('Your information has been saved') : $this->payplug->l('An error occured. Please retry in few seconds.')]
+                    'message' => [
+                        $result ?
+                            $this->payplug->l('Your information has been saved') :
+                            $this->payplug->l('An error occurred. Please retry in few seconds.')
+                    ]
                 ]));
             }
         }

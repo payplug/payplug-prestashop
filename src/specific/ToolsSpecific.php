@@ -30,6 +30,8 @@ class ToolsSpecific implements ToolsInterface
 {
     public function tool($action, $param1 = null, $param2 = null)
     {
-        return Tools::$action($param1, $param2);
+        if (isset($action)) {
+            return Tools::$action($param1, $param2);
+        }
     }
 }

@@ -121,7 +121,9 @@ class OneyRepository
             }
         }
 
-        if ($this->validateSpecific->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+        if ($this->validateSpecific->validate('isLoadedObject', $cart)
+            && $cart->id_address_invoice
+            && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart);
         } else {
             $id_currency = $this->contextSpecific->getContext()->currency->id;
@@ -151,7 +153,9 @@ class OneyRepository
     {
         $tools = $this->toolsSpecific;
 
-        if ($this->validateSpecific->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+        if ($this->validateSpecific->validate('isLoadedObject', $cart)
+            && $cart->id_address_invoice
+            && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart, $amount, $country);
         } else {
             $id_currency = $this->contextSpecific->getContext()->currency->id;
@@ -165,38 +169,43 @@ class OneyRepository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->payplug->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->payplug->l('Oney is momentarily unavailable.')
         );
 
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $this->contextSpecific->getContext()->smarty->assign([
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => $tools->tool('displayPrice', $amount),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
             'payplug_oney_error' => $error
-        ));
+        ]);
 
         if ($oney_payment_options) {
-            $this->contextSpecific->getContext()->smarty->assign(array(
+            $this->contextSpecific->getContext()->smarty->assign([
                 'oney_payment_options' => $oney_payment_options,
-            ));
+            ]);
         }
 
         $limits = $this->getOneyPriceLimit();
         $min_amount = $this->payplug->convertAmount($limits['min'], true);
         $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. ';
+        $legal_text = 'Offre de financement avec apport obligatoire, 
+        réservée aux particuliers et valable pour tout achat de %s à %s. ';
         $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
         $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
+        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
+        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
-        $this->contextSpecific->getContext()->smarty->assign(array(
-            'legal_notice' => sprintf($this->payplug->l($legal_text), $tools->tool('displayPrice', $min_amount),
-                $tools->tool('displayPrice', $max_amount))
-        ));
+        $this->contextSpecific->getContext()->smarty->assign([
+            'legal_notice' => sprintf(
+                $this->payplug->l($legal_text),
+                $tools->tool('displayPrice', $min_amount),
+                $tools->tool('displayPrice', $max_amount)
+            )
+        ]);
     }
 
     /**
@@ -207,10 +216,12 @@ class OneyRepository
      */
     public function checkOneyRequiredFields($payment_data)
     {
-        $errors = array();
+        $tools = $this->toolsSpecific;
+        $validate = $this->validateSpecific;
+        $errors = [];
 
         if (!$payment_data) {
-            return array($this->payplug->l('Please fill in the required fields'));
+            return [$this->payplug->l('Please fill in the required fields')];
         }
 
         foreach ($payment_data as $key => $data) {
@@ -221,20 +232,26 @@ class OneyRepository
                 $field = $parsed[1];
             }
             switch ($field) {
-                case 'email' :
-                    if (strlen($data) > 100 && strpos($data, '+') !== false) {
-                        $text = $this->payplug->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
+                case 'email':
+                    if ($tools->tool('strlen', $data, 'UTF-8') > 100
+                        && $tools->tool('strpos', $data, '+') !== false) {
+                        $text = $this->payplug->l('Your email address is too long and the + character is not valid, 
+                        please change it to another address (max 100 characters).');
                         $errors[] = $text;
-                    } elseif (strlen($data) > 100) {
-                        $text = $this->payplug->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
+                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100) {
+                        $text = $this->payplug->l('Your email address is too long, 
+                        please change it to a shorter one (max 100 characters).');
                         $errors[] = $text;
                     } elseif (strpos($data, '+') !== false) {
-                        $text = $this->payplug->l('The + character is not valid. Please change your email address (100 characters max).');
+                        $text = $this->payplug->l('The + character is not valid. 
+                        Please change your email address (100 characters max).');
                         $errors[] = $text;
                     }
                     break;
-                case 'mobile_phone_number' :
-                    $id_address = $type == 'shipping' ? $this->contextSpecific->getContext()->cart->id_address_delivery : $this->contextSpecific->getContext()->cart->id_address_invoice;
+                case 'mobile_phone_number':
+                    $id_address = $type == 'shipping' ?
+                        $this->contextSpecific->getContext()->cart->id_address_delivery :
+                        $this->contextSpecific->getContext()->cart->id_address_invoice;
                     $address = $this->addressSpecific->getAddress($id_address);
                     $country = $this->countrySpecific->getCountry($address->id_country);
                     $valid = $this->payplug->isValidMobilePhoneNumber($data, $country->iso_code);
@@ -242,35 +259,45 @@ class OneyRepository
                         $errors[] = $this->payplug->l('Please enter your mobile phone number.');
                     }
                     break;
-                case 'first_name' :
-                    if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping firstname.') : $this->payplug->l('Please enter your billing firstname.');
+                case 'first_name':
+                    if (!$validate->validate('isPostCode', $data)) {
+                        $text = $type == 'shipping' ?
+                            $this->payplug->l('Please enter your shipping firstname.') :
+                            $this->payplug->l('Please enter your billing firstname.');
                         $errors[] = $text;
                     }
                     break;
-                case 'last_name' :
-                    if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping lastname.') : $this->payplug->l('Please enter your billing lastname.');
+                case 'last_name':
+                    if (!$validate->validate('isPostCode', $data)) {
+                        $text = $type == 'shipping' ?
+                            $this->payplug->l('Please enter your shipping lastname.') :
+                            $this->payplug->l('Please enter your billing lastname.');
                         $errors[] = $text;
                     }
                     break;
-                case 'address1' :
-                    if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping address.') : $this->payplug->l('Please enter your billing address.');
+                case 'address1':
+                    if (!$validate->validate('isPostCode', $data)) {
+                        $text = $type == 'shipping' ?
+                            $this->payplug->l('Please enter your shipping address.') :
+                            $this->payplug->l('Please enter your billing address.');
                         $errors[] = $text;
                     }
                     break;
-                case 'postcode' :
-                    if (!Validate::isPostCode($data)) {
-                        $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping postcode.') : $this->payplug->l('Please enter your billing postcode.');
+                case 'postcode':
+                    if (!$validate->validate('isPostCode', $data)) {
+                        $text = $type == 'shipping' ?
+                            $this->payplug->l('Please enter your shipping postcode.') :
+                            $this->payplug->l('Please enter your billing postcode.');
                         $errors[] = $text;
                     }
                     break;
-                case 'city' :
-                    if (!Validate::isCityName($data)) {
-                        $text = $type == 'shipping' ? $this->payplug->l('Please enter your shipping city.') : $this->payplug->l('Please enter your billing city.');
+                case 'city':
+                    if (!$validate->validate('isCityName', $data)) {
+                        $text = $type == 'shipping' ?
+                            $this->payplug->l('Please enter your shipping city.') :
+                            $this->payplug->l('Please enter your billing city.');
                         $errors[] = $text;
-                    } elseif (strlen($data) > 32) {
+                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 32) {
                         $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                             . $this->payplug->l('Please change it to another one or select another payment method.');
                         $errors[] = $text;
@@ -296,10 +323,12 @@ class OneyRepository
         $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
 
-        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. ';
+        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers 
+        et valable pour tout achat de %s à %s. ';
         $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
         $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
+        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
+        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
         $tos_url = $config->get('PAYPLUG_ONEY_TOS_URL');
@@ -307,11 +336,15 @@ class OneyRepository
             $tos_url = $tools->tool('getShopProtocol') . $tos_url;
         }
 
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $this->contextSpecific->getContext()->smarty->assign([
             'tos_active' => $config->get('PAYPLUG_ONEY_TOS'),
             'tos_url' => $tos_url,
-            'legal_notice' => sprintf($this->payplug->l($legal_text), $tools->tool('displayPrice',$min_amount), $tools->tool('displayPrice',$max_amount))
-        ));
+            'legal_notice' => sprintf(
+                $this->payplug->l($legal_text),
+                $tools->tool('displayPrice', $min_amount),
+                $tools->tool('displayPrice', $max_amount)
+            )
+        ]);
 
         return $this->payplug->display($this->payplug->constantFile, 'oney/popin.tpl');
     }
@@ -344,11 +377,15 @@ class OneyRepository
     public function displayOneyPaymentOptions()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->contextSpecific->getContext()->smarty->assign(array(
-                'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
+            $this->contextSpecific->getContext()->smarty->assign([
+                'payplug_module_dir' => str_replace(
+                    'payplug/payplug.php',
+                    '',
+                    $this->payplug->constantFile
+                ),
                 'payplug_oney_loading_msg' => $this->payplug->l('Loading'),
                 'oney_required_fields' => $this->displayOneyRequiredFields(),
-            ));
+            ]);
 
             return $this->payplug->display($this->payplug->constantFile, 'oney/payment/payment.tpl');
         }
@@ -406,8 +443,8 @@ class OneyRepository
      */
     public function getOneyCountry($iso_country)
     {
-        $overseas_iso = array('GP', 'MQ', 'GF', 'RE', 'YT');
-        if (in_array($iso_country, $overseas_iso)) {
+        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
+        if (in_array($iso_country, $overseas_iso, true)) {
             return 'FR';
         }
         return $iso_country;
@@ -421,12 +458,12 @@ class OneyRepository
      */
     public function getOneyCTA($env = null)
     {
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $this->contextSpecific->getContext()->smarty->assign([
             'this_path' => str_replace('payplug.php', '', $this->payplug->constantFile),
             'env' => $env,
             'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
             'payplug_oney_loading_msg' => $this->payplug->l('Loading')
-        ));
+        ]);
 
         return $this->payplug->display($this->payplug->constantFile, 'oney/cta.tpl');
     }
@@ -450,7 +487,10 @@ class OneyRepository
 
         return [
             'delivery_label' => $carrier->name,
-            'expected_delivery_date' => date('Y-m-d', strtotime('+' . \PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')),
+            'expected_delivery_date' => date(
+                'Y-m-d',
+                strtotime('+' . \PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')
+            ),
             'delivery_type' => \PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE
         ];
     }
@@ -468,14 +508,18 @@ class OneyRepository
 
         foreach ($products as $product) {
             $unit_price = $this->payplug->convertAmount($product['price_wt']);
-            $item = array(
+            $item = [
                 'merchant_item_id' => $product['id_product'],
-                'name' => (string)$product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : ''),
+                'name' => (string)$product['name'] . (isset($product['attributes']) ?
+                        ' - ' . $product['attributes'] :
+                        ''),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
-                'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ? $product['manufacturer_name']  : $this->configurationSpecific->get('PS_SHOP_NAME')
-            );
+                'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
+                    $product['manufacturer_name']  :
+                    $this->configurationSpecific->get('PS_SHOP_NAME')
+            ];
 
             $cart_context[] = array_merge($item, $delivery_context);
         }
@@ -493,7 +537,7 @@ class OneyRepository
     public function getOneyPaymentOptionsList($amount, $country = false)
     {
         // get Oney resource
-        $payment_list = array();
+        $payment_list = [];
         $amount = $this->payplug->convertAmount($amount);
 
         if (!$country) {
@@ -502,7 +546,7 @@ class OneyRepository
             $country = reset($iso_list);
         }
 
-        $country = strtoupper($country);
+        $country = $this->toolsSpecific->tool('strtoupper', $country);
 
         $oney_sims = $this->getOneySimulations($amount, $country, $this->payplug->available_oney_payments);
 
@@ -529,7 +573,9 @@ class OneyRepository
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
-        if ($this->validateSpecific->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+        if ($this->validateSpecific->validate('isLoadedObject', $cart)
+            && $cart->id_address_invoice
+            && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart, $amount, $country);
         } else {
             $id_currency = $this->contextSpecific->getContext()->currency->id;
@@ -541,14 +587,16 @@ class OneyRepository
             $oney_payment_options = $this->getOneyPaymentOptionsList($amount, $country);
         } else {
             $oney_payment_options = false;
-            $error = $is_elligible['error'] ? $is_elligible['error'] : $this->payplug->l('Oney is momentarily unavailable.');
+            $error = $is_elligible['error'] ?
+                $is_elligible['error'] :
+                $this->payplug->l('Oney is momentarily unavailable.');
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->payplug->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->payplug->l('Oney is momentarily unavailable.')
         );
 
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $this->contextSpecific->getContext()->smarty->assign([
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_amount' => [
                 'amount' => $amount,
@@ -556,23 +604,23 @@ class OneyRepository
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
             'payplug_oney_error' => $error
-        ));
+        ]);
 
         if ($oney_payment_options) {
-            $this->contextSpecific->getContext()->smarty->assign(array(
+            $this->contextSpecific->getContext()->smarty->assign([
                 'oney_payment_options' => $oney_payment_options,
-            ));
+            ]);
         }
 
         $popin_tpl = $this->displayOneyPopin();
         $payment_tpl = $this->displayOneyPaymentOptions();
 
-        return array(
+        return [
             'result' => $is_elligible['result'] && $oney_payment_options,
             'error' => $error,
             'popin' => $popin_tpl,
             'payment' => $payment_tpl,
-        );
+        ];
     }
 
     /**
@@ -584,6 +632,7 @@ class OneyRepository
     public function getOneyPriceLimit($id_currency = false)
     {
         $config = $this->configurationSpecific;
+        $tools = $this->toolsSpecific;
 
         if ($this->validateSpecific->validate('isLoadedObject', $id_currency)) {
             $currency = $id_currency;
@@ -597,18 +646,21 @@ class OneyRepository
             $currency = new \Currency($id_currency);
         }
 
-        $limits = array(
+        $limits = [
             'min' => false,
             'max' => false
-        );
+        ];
 
         if (!$this->validateSpecific->validate('isLoadedObject', $currency)) {
             return $limits;
         }
 
-        $iso_code = strtoupper($currency->iso_code);
+        $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
-        $oney_min_amounts = explode(',', strtoupper($config->get('PAYPLUG_ONEY_MIN_AMOUNTS')));
+        $oney_min_amounts = explode(
+            ',',
+            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MIN_AMOUNTS'))
+        );
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -617,7 +669,10 @@ class OneyRepository
             }
         }
 
-        $oney_max_amounts = explode(',', strtoupper($config->get('PAYPLUG_ONEY_MAX_AMOUNTS')));
+        $oney_max_amounts = explode(
+            ',',
+            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MAX_AMOUNTS'))
+        );
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
@@ -636,7 +691,17 @@ class OneyRepository
      */
     public function getOneyRequiredFields()
     {
-        $is_same = $this->contextSpecific->getContext()->cart->id_address_delivery == $this->contextSpecific->getContext()->cart->id_address_invoice;
+        $tools = $this->toolsSpecific;
+        $is_same = $this
+                ->contextSpecific
+                ->getContext()
+                ->cart
+                ->id_address_delivery
+            == $this
+                ->contextSpecific
+                ->getContext()
+                ->cart
+                ->id_address_invoice;
 
         $fields = [];
         $shipping_fields = [];
@@ -645,7 +710,9 @@ class OneyRepository
         $shipping_country = new \Country($shipping_address->id_country);
 
         // Validate email format
-        if (strlen($this->contextSpecific->getContext()->customer->email) > 100 && strpos($this->contextSpecific->getContext()->customer->email, '+') !== false) {
+        if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100
+            && $tools->tool('strpos', $this->contextSpecific->getContext()->customer->email, '+')
+            !== false) {
             $text = $this->payplug->l('Your email address is too long and the + character is not valid,') .
                 $this->payplug->l(' please change it to another address (max 100 characters).');
             $shipping_fields['email'] = [
@@ -658,8 +725,9 @@ class OneyRepository
                     ]
                 ],
             ];
-        } elseif (strlen($this->contextSpecific->getContext()->customer->email) > 100) {
-            $text = $this->payplug->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
+        } elseif ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100) {
+            $text = $this->payplug->l('Your email address is too long, please change it 
+            to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
                 'text' => $text,
                 'input' => [
@@ -671,7 +739,8 @@ class OneyRepository
                 ],
             ];
         } elseif (strpos($this->contextSpecific->getContext()->customer->email, '+') !== false) {
-            $text = $this->payplug->l('The + character is not valid. Please change your email address (100 characters max).');
+            $text = $this->payplug->l('The + character is not valid. 
+            Please change your email address (100 characters max).');
             $shipping_fields['email'] = [
                 'text' => $text,
                 'input' => [
@@ -685,8 +754,10 @@ class OneyRepository
         }
 
         // Validate phone number
-        $is_valid_mobile_phone_number = $this->payplug->isValidMobilePhoneNumber($shipping_address->phone_mobile,
-            $shipping_country->iso_code);
+        $is_valid_mobile_phone_number = $this->payplug->isValidMobilePhoneNumber(
+            $shipping_address->phone_mobile,
+            $shipping_country->iso_code
+        );
         if (!$is_valid_mobile_phone_number) {
             $shipping_fields['mobile_phone_number'] = [
                 'text' => $this->payplug->l('Please enter your mobile phone number.'),
@@ -701,7 +772,7 @@ class OneyRepository
         }
 
         // Validate address
-        if (strlen($shipping_address->city) > 32) {
+        if ($tools->tool('strlen', $shipping_address->city, 'UTF-8') > 32) {
             $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                 . $this->payplug->l('Please change it to another one or select another payment method.');
             $shipping_fields['city'] = [
@@ -747,8 +818,10 @@ class OneyRepository
             $billing_address = new \Address($this->contextSpecific->getContext()->cart->id_address_invoice);
             $billing_country = new \Country($billing_address->id_country);
 
-            $is_valid_mobile_phone_number = $this->payplug->isValidMobilePhoneNumber($billing_address->phone_mobile,
-                $billing_country->iso_code);
+            $is_valid_mobile_phone_number = $this->payplug->isValidMobilePhoneNumber(
+                $billing_address->phone_mobile,
+                $billing_country->iso_code
+            );
             if (!$is_valid_mobile_phone_number) {
                 $billing_fields['mobile_phone_number'] = [
                     'text' => $this->payplug->l('Please enter your mobile phone number.'),
@@ -762,7 +835,7 @@ class OneyRepository
                 ];
             }
 
-            if (strlen($billing_address->city) > 32) {
+            if ($tools->tool('strlen', $billing_address->city, 'UTF-8') > 32) {
                 $text = $this->payplug->l('Your city name is too long (max 32 characters). ')
                     . $this->payplug->l('Please change it to another one or select another payment method.');
                 $billing_fields['city'] = [
@@ -838,28 +911,29 @@ class OneyRepository
         }
 
         try {
-            $data = array(
+            $data = [
                 'amount' => $amount,
                 'country' => $this->getOneyCountry($country),
                 'operations' => $operation,
-            );
+            ];
 
             $simulations = \Payplug\OneySimulation::getSimulations($data);
 
-            if (isset($simulations['details']) && $simulations['details'] == 'Access to this feature is not available.') {
+            if (isset($simulations['details'])
+                && $simulations['details'] == 'Access to this feature is not available.') {
                 $this->payplug->updatePermissions();
             } elseif (isset($simulations['object']) && $simulations['object'] == 'error') {
-                return array(
+                return [
                     'result' => false,
                     'error' => $simulations['message']
-                );
+                ];
             } else {
                 if ($simulations) {
                     ksort($simulations);
-                    $to_cache = array(
+                    $to_cache = [
                         'result' => true,
                         'simulations' => $simulations
-                    );
+                    ];
 
                     // $cache_id = cache_key in db
                     // $to_cache = cache_value in db
@@ -869,19 +943,18 @@ class OneyRepository
                         $error_level = 'error';
                         $this->logger->addLog($error_message, $error_level);
                     }
-
                 }
             }
 
-            return array(
+            return [
                 'result' => true,
                 'simulations' => $simulations
-            );
+            ];
         } catch (Exception $exception) {
-            return array(
+            return [
                 'result' => false,
                 'error' => $exception->__toString()
-            );
+            ];
         }
     }
 
@@ -891,33 +964,38 @@ class OneyRepository
      * @param array $payment_data
      * @return bool
      */
-    public function hasOneyRequiredFields($payment_data = array())
+    public function hasOneyRequiredFields($payment_data = [])
     {
         if (!$payment_data) {
             return false;
         }
 
+        $tools = $this->toolsSpecific;
+
         // Check the shipping fields
         $shipping = $payment_data['shipping'];
 
         // Validate email format
-        if (strlen($shipping['email']) > 100 && strpos($shipping['email'], '+') !== false) {
+        if ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100
+            && $tools->tool('$shipping[\'email\']', '+') !== false) {
             return true;
-        } elseif (strlen($shipping['email']) > 100) {
+        } elseif ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100) {
             return true;
         } elseif (strpos($shipping['email'], '+') !== false) {
             return true;
         }
 
         // Validate phone number
-        $valid_shipping_mobile = $this->payplug->isValidMobilePhoneNumber($shipping['mobile_phone_number'],
-            $shipping['country']);
+        $valid_shipping_mobile = $this->payplug->isValidMobilePhoneNumber(
+            $shipping['mobile_phone_number'],
+            $shipping['country']
+        );
         if (!$valid_shipping_mobile) {
             return true;
         }
 
         // Validate address
-        if (strlen($shipping['city']) > 32) {
+        if ($tools->tool('strlen', $shipping['city'], 'UTF-8') > 32) {
             return true;
         }
 
@@ -925,13 +1003,16 @@ class OneyRepository
         $billing = $payment_data['billing'];
 
         // Validate phone number
-        $valid_billing_mobile = $this->payplug->isValidMobilePhoneNumber($billing['mobile_phone_number'], $billing['country']);
+        $valid_billing_mobile = $this->payplug->isValidMobilePhoneNumber(
+            $billing['mobile_phone_number'],
+            $billing['country']
+        );
         if (!$valid_billing_mobile) {
             return true;
         }
 
         // Validate address
-        if (strlen($billing['city']) > 32) {
+        if ($tools->tool('strlen', $billing['city'], 'UTF-8') > 32) {
             return true;
         }
 
@@ -952,9 +1033,9 @@ class OneyRepository
             return false;
         }
 
-        $this->contextSpecific->getContext()->smarty->assign(array(
+        $this->contextSpecific->getContext()->smarty->assign([
             'oney_required_fields' => $fields
-        ));
+        ]);
 
         return $this->payplug->display($this->payplug->constantFile, 'oney/required.tpl');
     }
@@ -1016,8 +1097,11 @@ class OneyRepository
         }
 
         // we use the Oney limit to get allowed currencies
-        $oney_min_amounts = strtoupper($this->configurationSpecific->get('PAYPLUG_ONEY_MIN_AMOUNTS'));
-        $iso_code = strtoupper($currency->iso_code);
+        $oney_min_amounts = $this->toolsSpecific->tool(
+            'strtoupper',
+            $this->configurationSpecific->get('PAYPLUG_ONEY_MIN_AMOUNTS')
+        );
+        $iso_code = $this->toolsSpecific->tool('strtoupper', $currency->iso_code);
 
         return strpos($oney_min_amounts, $iso_code) !== false;
     }
@@ -1035,22 +1119,22 @@ class OneyRepository
         // check if cart is valid
         $is_valid_cart = $this->isValidOneyCart($cart);
         if (!$is_valid_cart['result']) {
-            return array(
+            return [
                 'result' => false,
                 'error_type' => 'invalid_cart',
                 'error' => $is_valid_cart['error']
-            );
+            ];
         }
 
         // check if cart address is valid
         if ($country) {
             $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
             if (!$is_valid_addresses['result']) {
-                return array(
+                return [
                     'result' => false,
                     'error_type' => 'invalid_addresses',
                     'error' => $is_valid_addresses['error']
-                );
+                ];
             }
         }
 
@@ -1062,10 +1146,10 @@ class OneyRepository
             $converted_amount = $this->payplug->convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
-            return array('result' => false, 'error_type' => $error_type, 'error' => $is_valid_amount['error']);
+            return ['result' => false, 'error_type' => $error_type, 'error' => $is_valid_amount['error']];
         }
 
-        return array('result' => true, 'error' => false);
+        return ['result' => true, 'error' => false];
     }
 
     /**
@@ -1099,7 +1183,9 @@ class OneyRepository
         $flag = true;
 
         foreach ($oney_order_state as $key => $state) {
-            $flag = $flag && $this->payplug->createOrderState($key, $state, true) && $this->payplug->createOrderState($key, $state,false);
+            $flag = $flag
+                && $this->payplug->createOrderState($key, $state, true)
+                && $this->payplug->createOrderState($key, $state, false);
         }
         return $flag;
     }
@@ -1164,17 +1250,17 @@ class OneyRepository
             $min_amount = $this->payplug->convertAmount($limits['min'], true);
             $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-            return array(
+            return [
                 'result' => false,
                 'error' => sprintf(
                     $this->payplug->l('The total amount of your order should be between %s and %s to pay with Oney.'),
                     $this->toolsSpecific->tool('displayPrice', $min_amount),
                     $this->toolsSpecific->tool('displayPrice', $max_amount)
                 )
-            );
+            ];
         }
 
-        return array('result' => true, 'error' => false);
+        return ['result' => true, 'error' => false];
     }
 
     /**
@@ -1187,14 +1273,14 @@ class OneyRepository
     public function isValidOneyCarrier($cart)
     {
         if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
-            return array(
+            return [
                 'result' => false,
                 'error' => $this->payplug->l('The cart is unvalid'),
                 'error_type' => 'invalid_carrier',
-            );
+            ];
         }
 
-        $invalid_carrier_type = array('storepickup', 'networkpickup');
+        $invalid_carrier_type = ['storepickup', 'networkpickup'];
 
         // check if current carrier is available
         $payplug_carrier = new \PayPlugCarrier();
@@ -1202,14 +1288,15 @@ class OneyRepository
 
         if (!$payplug_carrier->delivery_type) {
             $carrier = new \Carrier($cart->id_carrier);
-            $error = $this->payplug->l('The carrier') . ' ' . $carrier->name . ' ' . $this->payplug->l('shipping is conflicting with this payment method. ');
+            $error = $this->payplug->l('The carrier') . ' ' . $carrier->name . ' ' .
+                $this->payplug->l('shipping is conflicting with this payment method. ');
             $error .= $this->payplug->l('Please change the shipping method chosen at the last step.');
-            return array(
+            return [
                 'result' => false,
                 'error' => sprintf($error),
                 'error_type' => 'invalid_carrier',
-            );
-        } elseif ((bool)in_array($payplug_carrier->delivery_type, $invalid_carrier_type)) {
+            ];
+        } elseif ((bool)in_array($payplug_carrier->delivery_type, $invalid_carrier_type, true)) {
             switch ($payplug_carrier->delivery_type) {
                 case 'networkpickup':
                     $delivery_type = $this->payplug->l('Network Pickup');
@@ -1220,18 +1307,18 @@ class OneyRepository
                     break;
             }
 
-
-            $error = $this->payplug->l('The ') . $delivery_type . $this->payplug->l(' shipping is conflicting with this payment method. ');
+            $error = $this->payplug->l('The ') . $delivery_type .
+                $this->payplug->l(' shipping is conflicting with this payment method. ');
             $error .= $this->payplug->l('Please change the shipping method chosen at the last step.');
 
-            return array(
+            return [
                 'result' => false,
                 'error' => $error,
                 'error_type' => 'invalid_carrier',
-            );
+            ];
         }
 
-        return array('result' => true, 'error' => false);
+        return ['result' => true, 'error' => false];
     }
 
     /**
@@ -1243,10 +1330,10 @@ class OneyRepository
     public function isValidOneyCart($cart)
     {
         if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
-            return array(
+            return [
                 'result' => false,
                 'error' => $this->payplug->l('The cart is unvalid')
-            );
+            ];
         }
 
         $nb_products = $this->contextSpecific->getContext()->cart->nbProducts();
@@ -1256,13 +1343,13 @@ class OneyRepository
 
         if ($nb_products >= $max) {
             $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
-            return array(
+            return [
                 'result' => false,
                 'error' => $this->payplug->l($error)
-            );
+            ];
         }
 
-        return array('result' => true, 'error' => false);
+        return ['result' => true, 'error' => false];
     }
 
     /**
@@ -1277,40 +1364,45 @@ class OneyRepository
         // check if the billing country and the shipping country are different then return false
         if ($shipping_iso != $billing_iso) {
             $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
-            return array(
+            return [
                 'result' => false,
                 'type' => 'different',
                 'error' => $this->payplug->l($error)
-            );
+            ];
         }
 
         // check if the shipping country are different then return false
-        $iso_code = strtoupper($shipping_iso);
-        $allow_countries = strtoupper($this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES'));
+        $iso_code = $this->toolsSpecific->tool('strtoupper', $shipping_iso);
+        $allow_countries = $this->toolsSpecific->tool(
+            'strtoupper',
+            $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+        );
         if (!$allow_countries) {
-            return array(
+            return [
                 'result' => false,
                 'type' => 'no_country',
                 'error' => $this->payplug->l('No countries are configured to use oney.')
-            );
+            ];
         }
 
         $iso_list = explode(',', $allow_countries);
-        if (!in_array($iso_code, $iso_list)) {
-            $list = array();
+        if (!in_array($iso_code, $iso_list, true)) {
+            $list = [];
             foreach ($iso_list as $iso) {
                 $id_country = \Country::getByIso($iso);
                 $list[] = \Country::getNameById($this->contextSpecific->getContext()->language->id, $id_country);
             }
-            return array(
+            return [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => sprintf($this->payplug->l('For a payment with Oney, delivery and billing addresses must be in %s'),
-                    implode(', ', $list))
-            );
+                'error' => sprintf(
+                    $this->payplug->l('For a payment with Oney, delivery and billing addresses must be in %s'),
+                    implode(', ', $list)
+                )
+            ];
         }
 
-        return array('result' => true, 'error' => false);
+        return ['result' => true, 'error' => false];
     }
 
     /**

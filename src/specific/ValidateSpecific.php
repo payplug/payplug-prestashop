@@ -30,7 +30,8 @@ class ValidateSpecific implements ValidateInterface
 {
     public function validate($action, $object)
     {
-        return Validate::$action($object);
+        if (isset($action)) {
+            return Validate::$action($object);
+        }
     }
-
 }

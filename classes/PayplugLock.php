@@ -53,23 +53,23 @@ class PayplugLock extends ObjectModel
     protected $identifier;
 
     /** @var array */
-    protected $fieldsRequired = array();
+    protected $fieldsRequired = [];
 
     /** @var array */
-    protected $fieldsValidate = array();
+    protected $fieldsValidate = [];
 
     /** @var array */
-    protected $fieldsValidateLang = array();
+    protected $fieldsValidateLang = [];
 
     /** @var array */
-    public static $definition = array(
+    public static $definition = [
         'table'   => 'payplug_lock',
         'primary' => 'id_payplug_lock',
         'multishop' => true,
-        'fields'  => array(
-            'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
-        )
-    );
+        'fields'  => [
+            'id_cart' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true],
+        ]
+    ];
 
     /**
      * get fields
@@ -80,7 +80,7 @@ class PayplugLock extends ObjectModel
     {
         parent::validateFields();
 
-        $fields = array();
+        $fields = [];
         $fields['id_cart'] = (int)($this->id_cart);
         $fields['date_add'] = pSQL($this->date_add);
         $fields['date_upd'] = pSQL($this->date_upd);
@@ -250,7 +250,7 @@ class PayplugLock extends ObjectModel
 
         // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
         try {
-        $res_lock = Db::getInstance()->execute($req_lock);
+            $res_lock = Db::getInstance()->execute($req_lock);
         } catch (Exception $e) {
             $res_lock = false;
         }

@@ -24,56 +24,56 @@
 class PayPlugPaymentOney extends PayplugPayment
 {
     /** @var array Addition payment tab definition */
-    private $additionnal_definition = array(
-        'payment_context' => array(
+    private $additionnal_definition = [
+        'payment_context' => [
             'type' => 'array',
-            'fields' => array(
-                'cart' => array(
+            'fields' => [
+                'cart' => [
                     'type' => 'iterable',
-                    'fields' => array(
-                        'brand' => array(
+                    'fields' => [
+                        'brand' => [
                             'type' => 'string',
                             'validate' => 'isCleanHtml',
                             'required' => true,
                             'size' => 100
-                        ),
-                        'expected_delivery_date' => array('type' => 'date', 'validate' => 'isDate', 'required' => true),
-                        'delivery_label' => array(
+                        ],
+                        'expected_delivery_date' => ['type' => 'date', 'validate' => 'isDate', 'required' => true],
+                        'delivery_label' => [
                             'type' => 'string',
                             'validate' => 'isCleanHtml',
                             'required' => true,
                             'size' => 100
-                        ),
-                        'delivery_type' => array(
+                        ],
+                        'delivery_type' => [
                             'type' => 'string',
                             'validate' => 'isName',
-                            'allowed' => array('storepickup', 'networkpickup', 'travelpickup', 'carrier', 'edelivery'),
+                            'allowed' => ['storepickup', 'networkpickup', 'travelpickup', 'carrier', 'edelivery'],
                             'required' => true
-                        ),
-                        'merchant_item_id' => array(
+                        ],
+                        'merchant_item_id' => [
                             'type' => 'int',
                             'validate' => 'isInt',
                             'required' => true,
                             'size' => 256
-                        ),
-                        'name' => array(
+                        ],
+                        'name' => [
                             'type' => 'string',
                             'validate' => 'isCleanHtml',
                             'required' => true,
                             'size' => 256
-                        ),
-                        'price' => array('type' => 'int', 'validate' => 'isInt', 'required' => true),
-                        'quantity' => array('type' => 'int', 'validate' => 'isInt', 'required' => true),
-                        'total_amount' => array('type' => 'int', 'validate' => 'isInt', 'required' => true),
-                    ),
-                ),
-            ),
+                        ],
+                        'price' => ['type' => 'int', 'validate' => 'isInt', 'required' => true],
+                        'quantity' => ['type' => 'int', 'validate' => 'isInt', 'required' => true],
+                        'total_amount' => ['type' => 'int', 'validate' => 'isInt', 'required' => true],
+                    ],
+                ],
+            ],
             'required' => true
-        ),
-        'authorized_amount' => array('type' => 'int', 'validate' => 'isInt', 'required' => true),
-        'payment_method' => array('type' => 'string', 'validate' => 'isCleanHtml', 'required' => true),
-        'force_3ds' => array('type' => 'bool', 'validate' => 'isBool', 'required' => false, 'default' => false),
-    );
+        ],
+        'authorized_amount' => ['type' => 'int', 'validate' => 'isInt', 'required' => true],
+        'payment_method' => ['type' => 'string', 'validate' => 'isCleanHtml', 'required' => true],
+        'force_3ds' => ['type' => 'bool', 'validate' => 'isBool', 'required' => false, 'default' => false],
+    ];
 
     /** @var string */
     protected $oney_type;
@@ -87,7 +87,7 @@ class PayPlugPaymentOney extends PayplugPayment
      * @param string $id_card
      * @return PayplugPayment
      */
-    public function __construct($id_card = null, $options = array(), Context $context = null)
+    public function __construct($id_card = null, $options = [], Context $context = null)
     {
         parent::__construct($id_card, $options, $context);
 
@@ -113,8 +113,13 @@ class PayPlugPaymentOney extends PayplugPayment
         $this->payment_tab['authorized_amount'] = $this->getCartAmount($this->payment_tab['currency']);
         $this->payment_tab['payment_context'] = $this->generateCartTab();
         $this->payment_tab['payment_method'] = $this->getPaymentMethodFromType();
-        $this->payment_tab['hosted_payment']['return_url'] = PayplugBackward::getModuleLink('payplug', 'validation',
-            array('ps' => 1, 'cartid' => (int)$this->cart->id), true);
+        $this->payment_tab['hosted_payment']['return_url'] =
+            PayplugBackward::getModuleLink(
+                'payplug',
+                'validation',
+                ['ps' => 1, 'cartid' => (int)$this->cart->id],
+                true
+            );
         $this->payment_tab['force_3ds'] = false;
         $this->payment_tab['auto_capture'] = true;
 
@@ -128,7 +133,7 @@ class PayPlugPaymentOney extends PayplugPayment
      */
     public function generateCartTab()
     {
-        $items = array();
+        $items = [];
         $summary = $this->cart->getSummaryDetails();
 
         // treat products from cart
@@ -179,13 +184,13 @@ class PayPlugPaymentOney extends PayplugPayment
     private function formatCartItem($product)
     {
         $unit_price = $this->module->convertAmount($product['price_wt']);
-        $item = array(
+        $item = [
             'merchant_item_id' => $product['id_product'],
             'name' => (string)$product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : ''),
             'price' => (int)$unit_price,
             'quantity' => (int)$product['cart_quantity'],
             'total_amount' => (string)$unit_price * $product['cart_quantity'],
-        );
+        ];
 
         // Set brand data
         $manufacturer = new Manufacturer($product['id_manufacturer']);
@@ -207,14 +212,14 @@ class PayPlugPaymentOney extends PayplugPayment
      */
     private function getDeliveryData($carrier)
     {
-        $delivery_data = array();
+        $delivery_data = [];
 
         if (!Validate::isLoadedObject($this->cart)) {
             // todo: log error
             return $delivery_data;
         }
 
-        if($this->cart->isVirtualCart()) {
+        if ($this->cart->isVirtualCart()) {
             $delivery_data['delivery_label'] = $this->module->getConfiguration('PS_SHOP_NAME');
             $delivery_data['expected_delivery_date'] = date('Y-m-d');
             $delivery_data['delivery_type'] = 'edelivery';
@@ -257,20 +262,20 @@ class PayPlugPaymentOney extends PayplugPayment
     private function hydrateFromAdditionalFields()
     {
         if ($this->oney_form) {
-            foreach($this->oney_form as $k => $field) {
-                $keys = explode('-',$k);
+            foreach ($this->oney_form as $k => $field) {
+                $keys = explode('-', $k);
                 $type = $keys[0];
                 $field_name = $keys[1];
 
                 if (strpos($field_name, 'phone') != false) {
-                    switch($type) {
-                        case 'billing' :
+                    switch ($type) {
+                        case 'billing':
                             $id_country = Country::getByIso($this->payment_tab['billing']['country']);
                             $country = new Country($id_country);
                             $field = $this->formatPhoneNumber($field, $country);
                             break;
-                        case 'same' :
-                        case 'shipping' :
+                        case 'same':
+                        case 'shipping':
                         default:
                             $id_country = Country::getByIso($this->payment_tab['shipping']['country']);
                             $country = new Country($id_country);
@@ -292,7 +297,8 @@ class PayPlugPaymentOney extends PayplugPayment
         }
     }
 
-    private function checkAddressFields(){
+    private function checkAddressFields()
+    {
         // check company name
         $this->payment_tab['billing']['company_name'] = $this->payment_tab['billing']['company_name'] ?
             $this->payment_tab['billing']['company_name'] :

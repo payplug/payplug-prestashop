@@ -33,7 +33,7 @@ class CardRepository
     private $configurationSpecific;
     private $payplug;
     private $query;
-    private $tools;
+    private $toolsSpecific;
 
     public function __construct($payplug)
     {
@@ -41,11 +41,12 @@ class CardRepository
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->payplug = $payplug;
         $this->query = new QueryRepository();
-        $this->tools = new ToolsSpecific();
+        $this->toolsSpecific = new ToolsSpecific();
         $this->setParams();
     }
 
-    private function setParams() {
+    private function setParams()
+    {
         $config = $this->configurationSpecific;
         $idCompany = $config->get('PAYPLUG_COMPANY_ID');
         $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
@@ -133,7 +134,7 @@ class CardRepository
             CURLOPT_SSL_VERIFYHOST,
             (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
         );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
+        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
         $error_curl = curl_errno($process);
 
         curl_close($process);
@@ -235,9 +236,9 @@ class CardRepository
             ->fields('pc.country')
             ->fields('pc.metadata')
             ->from(_DB_PREFIX_ .'payplug_card', 'pc')
-            ->where('pc.id_customer = ' . (int)$id_customer)
-            ->where('pc.id_company = ' . (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')))
-            ->where('pc.is_sandbox = ' . (int)$is_sandbox)
+            ->where('pc.id_customer = '.(int)$id_customer)
+            ->where('pc.id_company = '.(int)$config->get('PAYPLUG_COMPANY_ID'.($is_sandbox ? '_TEST' : '')))
+            ->where('pc.is_sandbox = '.(int)$is_sandbox)
         ;
 
         $res_payplug_card = $this->query->build();
@@ -247,7 +248,8 @@ class CardRepository
         } else {
             foreach ($res_payplug_card as $key => &$value) {
                 if ((int)$value['exp_year'] < (int)date('Y')
-                    || ((int)$value['exp_year'] == (int)date('Y') && (int)$value['exp_month'] < (int)date('m'))) {
+                    || ((int)$value['exp_year'] == (int)date('Y')
+                        && (int)$value['exp_month'] < (int)date('m'))) {
                     $value['expired'] = true;
                     if ($active_only) {
                         unset($res_payplug_card[$key]);
@@ -304,7 +306,10 @@ class CardRepository
         if ($payment->card->exp_month === null) {
             $card_expiry_date = $this->payplug->l('Unavailable');
         } else {
-            $card_expiry_date = date('m/y', strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year));
+            $card_expiry_date = date(
+                'm/y',
+                strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year)
+            );
         }
         return $card_expiry_date;
     }
@@ -343,12 +348,15 @@ class CardRepository
         $config = $this->configurationSpecific;
 
         $brand = $payment->card->brand;
-        if (strtolower($brand) != 'mastercard' && strtolower($brand) != 'visa') {
+        if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
+            && $this->toolsSpecific->tool('strtolower', $brand) != 'visa') {
             $brand = 'none';
         }
 
         $is_sandbox = 0;
-        $customer_id = isset($payment->metadata['ID Client']) ? (int)$payment->metadata['ID Client'] : $payment->metadata['Client'];
+        $customer_id = isset($payment->metadata['ID Client']) ?
+            (int)$payment->metadata['ID Client'] :
+            $payment->metadata['Client'];
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
 
         $company_id = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
@@ -425,7 +433,6 @@ class CardRepository
 
 //            $this->tools->tool('redirect',$_SERVER['HTTP_REFERER']); exit;
             return '<script type="text/javascript">document.location.reload(true);</script>';
-
         } catch (Exception $e) {
             //@todo: add log
             if ($e->getCode() == '404') { // resource cant be found
@@ -444,6 +451,7 @@ class CardRepository
     {
         $card = $this->cardEntity;
         $id = $this->cardEntity->getId();
+        $fields = [];
         if (isset($id)) {
             $fields['id_payplug_card'] = (int)($id);
         }
@@ -500,7 +508,7 @@ class CardRepository
             ->select()
             ->fields('*')
             ->from(_DB_PREFIX_.$this->cardEntity->getTable())
-            ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id) ) ? $customer->id : $customer ))
+            ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id)) ? $customer->id : $customer))
             ->where('`id_company` = ' . (int)$this->cardEntity->getIdCompany())
             ->where('`is_sandbox` = ' . (int)$this->cardEntity->isSandbox())
         ;
@@ -518,7 +526,10 @@ class CardRepository
             } else {
                 $card['expired'] = false;
             }
-            $card['expiry_date'] = date('m / y', mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year']));
+            $card['expiry_date'] = date(
+                'm / y',
+                mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
+            );
 
             unset($card['is_sandbox']);
             unset($card['id_card']);

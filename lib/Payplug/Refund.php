@@ -4,8 +4,9 @@ namespace Payplug;
 /**
  * The Refund DAO simplifies the access to most useful methods
  **/
-class Refund {
-	/**
+class Refund
+{
+    /**
      * Creates a refund on a payment.
      *
      * @param   string|Payment      $payment        the payment id or the payment object
@@ -17,7 +18,7 @@ class Refund {
      */
     public static function create($payment, array $data = null, Payplug $payplug = null)
     {
-    	return Resource\Refund::create($payment, $data, $payplug);
+        return Resource\Refund::create($payment, $data, $payplug);
     }
 
     /**
@@ -33,7 +34,7 @@ class Refund {
      */
     public static function retrieve($payment, $refundId, Payplug $payplug = null)
     {
-    	return Resource\Refund::retrieve($payment, $refundId, $payplug);
+        return Resource\Refund::retrieve($payment, $refundId, $payplug);
     }
 
     /**
@@ -49,6 +50,6 @@ class Refund {
      */
     public static function listRefunds($payment, Payplug $payplug = null)
     {
-    	return Resource\Refund::listRefunds($payment, $payplug);
+        return Resource\Refund::listRefunds($payment, $payplug);
     }
 }

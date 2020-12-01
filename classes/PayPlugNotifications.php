@@ -63,7 +63,7 @@ class PayPlugNotifications
         $this->key = microtime(true) * 10000;
         $this->flag = false;
         $this->except = null;
-        $this->resp = array();
+        $this->resp = [];
         $this->payplug = new Payplug();
         $this->plugin = $this->payplug->getPlugin();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
@@ -101,7 +101,9 @@ class PayPlugNotifications
 
         try {
             $resource = json_decode($body);
-            $this->api_key = (bool)$resource->is_live ? $this->payplug->getConfiguration('PAYPLUG_LIVE_API_KEY') : $this->payplug->getConfiguration('PAYPLUG_TEST_API_KEY');
+            $this->api_key = (bool)$resource->is_live ?
+                $this->payplug->getConfiguration('PAYPLUG_LIVE_API_KEY') :
+                $this->payplug->getConfiguration('PAYPLUG_TEST_API_KEY');
             $this->payplug->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
@@ -181,8 +183,7 @@ class PayPlugNotifications
 
         $this->setOrderStates();
 
-        if (
-            ((isset($this->payment->save_card) && (int)$this->payment->save_card == 1))
+        if (((isset($this->payment->save_card) && (int)$this->payment->save_card == 1))
             ||
             ((isset($this->payment->card->id) && $this->payment->card->id != '')
                 && ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment != ''))
@@ -252,7 +253,9 @@ class PayPlugNotifications
 
         if ($this->is_installment) {
             $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
-            $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
+            $sql = 'SELECT `id_cart` 
+                    FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` 
+                    WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
@@ -261,14 +264,18 @@ class PayPlugNotifications
                 $this->exitProcess($error_msg, 500);
             }
         } else {
-            $sql = 'SELECT `id_cart` FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` WHERE `id_payment` = "' . $this->resource->id . '"';
+            $sql = 'SELECT `id_cart` 
+                    FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` 
+                    WHERE `id_payment` = "' . $this->resource->id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
                 $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
                 $this->logger->addLog($error_msg, 'error');
-                //HOTFIX: MR331 We use custom http code to precisely log this case of desync between real payment notification and wrong ones.
+                // HOTFIX: MR331
+                // We use custom http code to precisely log this case of desync
+                // between real payment notification and wrong ones.
                 $response_code = ($this->is_oney ? 242 : 500);
                 $this->exitProcess($error_msg, $response_code);
             }
@@ -352,7 +359,9 @@ class PayPlugNotifications
             $current_state = (int)$order->getCurrentState();
         } catch (Exception $exception) {
             $this->logger->addLog(
-                'The current state cannot be loaded: ' . $exception->getMessage(), 'error');
+                'The current state cannot be loaded: ' . $exception->getMessage(),
+                'error'
+            );
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
 
@@ -360,7 +369,7 @@ class PayPlugNotifications
         if ($this->is_oney
             && isset($this->payment->failure)
             && $this->payment->failure !== null
-            && !in_array($current_state, array($this->order_states['cancelled'], $this->order_states['paid']))
+            && !in_array($current_state, [$this->order_states['cancelled'], $this->order_states['paid']], true)
         ) {
             $this->logger->addLog('The payment is refused by Oney.');
             $new_order_state = $this->order_states['cancelled'];
@@ -388,17 +397,17 @@ class PayPlugNotifications
                 $order->update();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                    'Order cannot be updated: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
-        } // if payment is deferred and expired
-        elseif (
-            $this->is_deferred
+        } elseif ($this->is_deferred
             && $current_state == $this->order_states['auth']
             && ($this->payment->authorization->expires_at - time()) <= 0
-        ) {
+        ) { // elseif payment is deferred and expired
             $this->logger->addLog('The payment authorization has expired.');
             $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
             $this->logger->addLog('Order new status will be \'Authorization expired\'.');
@@ -412,10 +421,13 @@ class PayPlugNotifications
                 $order_history->save();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                    'Order history cannot be saved: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->logger->addLog(
                     'Please check if order state ' . (int)$new_order_state . ' exists.',
-                    'error');
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
 
@@ -424,25 +436,28 @@ class PayPlugNotifications
                 $order->update();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                    'Order cannot be updated: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
-        } // if payment is pending or awaiting a capture
-        elseif (in_array($current_state, array(
+        } elseif (in_array($current_state, [
                 $this->order_states['pending'],
                 $this->order_states['auth'],
                 $this->order_states['oney']
-            )) || !$order->valid) {
+            ], true) || !$order->valid) { // elseif payment is pending or awaiting a capture
             $this->logger->addLog('Order is currently pending.');
             $this->logger->addLog('Payment amount: ' . $this->payment->amount, 'debug');
 
             if ($this->payment->installment_plan_id !== null) {
                 $is_amount_correct = (bool)$this->payment->is_paid;
             } else {
-                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect($this->payment->amount / 100,
-                    $order);
+                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect(
+                    $this->payment->amount / 100,
+                    $order
+                );
             }
 
             $this->logger->addLog('Order ID: ' . (int)$order->id, 'debug');
@@ -486,10 +501,13 @@ class PayPlugNotifications
                         $order_history->save();
                     } catch (Exception $exception) {
                         $this->logger->addLog(
-                            'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                            'Order history cannot be saved: ' . $exception->getMessage(),
+                            'error'
+                        );
                         $this->logger->addLog(
                             'Please check if order state ' . (int)$new_order_state . ' exists.',
-                            'error');
+                            'error'
+                        );
                         $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
                     }
                     $this->exitProcess('The payment has failed and order has been cancelled.');
@@ -545,10 +563,13 @@ class PayPlugNotifications
                 $order_history->save();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order history cannot be saved: ' . $exception->getMessage(), 'error');
+                    'Order history cannot be saved: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->logger->addLog(
                     'Please check if order state ' . (int)$new_order_state . ' exists.',
-                    'error');
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
 
@@ -557,25 +578,27 @@ class PayPlugNotifications
                 $order->update();
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Order cannot be updated: ' . $exception->getMessage(), 'error');
+                    'Order cannot be updated: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
-        } // if payment is already paid
-        elseif ($current_state == $this->order_states['paid']) {
+        } elseif ($current_state == $this->order_states['paid']) {
+            // if payment is already paid
             $this->logger->addLog('Order is already paid.');
             $this->exitProcess('Order is already paid.');
-        } // if payment is already expired
-        elseif ($current_state == $this->order_states['exp']) {
+        } elseif ($current_state == $this->order_states['exp']) {
+            // if payment is already expired
             $this->logger->addLog('Order is already set as expired.');
             $this->exitProcess('Order is already set as expired.');
-        } // if payment is already cancelled
-        elseif ($current_state == $this->order_states['cancelled']) {
+        } elseif ($current_state == $this->order_states['cancelled']) {
+            // if payment is already cancelled
             $this->logger->addLog('Order is already set as cancelled.');
             $this->exitProcess('Order is already set as cancelled.');
-        } // else set error
-        else {
+        } else {
+            // else set error
             $this->logger->addLog(
                 'Current state: ' . (int)$current_state,
                 'debug'
@@ -648,9 +671,9 @@ class PayPlugNotifications
             $transaction_id = $this->payment->id;
         }
 
-        $extra_vars = array(
+        $extra_vars = [
             'transaction_id' => $transaction_id
-        );
+        ];
 
         $amount = $this->payplug->convertAmount($amount, true);
 
@@ -658,8 +681,10 @@ class PayPlugNotifications
         try {
             $customer = new Customer((int)$this->cart->id_customer);
         } catch (Exception $exception) {
-            $this->logger->addLog('Customer cannot be loaded: ' . $exception->getMessage(),
-                'error');
+            $this->logger->addLog(
+                'Customer cannot be loaded: ' . $exception->getMessage(),
+                'error'
+            );
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
         if (!Validate::isLoadedObject($customer)) {
@@ -673,15 +698,16 @@ class PayPlugNotifications
              */
         $secure_key = false;
         if (isset($customer->secure_key) && !empty($customer->secure_key)) {
-            if (
-                isset($this->cart->secure_key)
+            if (isset($this->cart->secure_key)
                 && !empty($this->cart->secure_key)
                 && $this->cart->secure_key !== $customer->secure_key
             ) {
                 $secure_key = $this->cart->secure_key;
                 $this->logger->addLog('Secure keys do not match.', 'error');
-                $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key,
-                    'error');
+                $this->logger->addLog(
+                    'Customer Secure Key: ' . $customer->secure_key,
+                    'error'
+                );
                 $this->logger->addLog('Cart Secure Key: ' . $this->cart->secure_key, 'error');
             } else {
                 $secure_key = $customer->secure_key;
@@ -691,12 +717,12 @@ class PayPlugNotifications
         $module_name = $this->payplug->displayName;
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
-                case 'oney_x3_with_fees' :
-                case 'oney_x3_without_fees' :
+                case 'oney_x3_with_fees':
+                case 'oney_x3_without_fees':
                     $module_name = $this->payplug->l('Oney 3x');
                     break;
-                case 'oney_x4_with_fees' :
-                case 'oney_x4_without_fees' :
+                case 'oney_x4_with_fees':
+                case 'oney_x4_without_fees':
                     $module_name = $this->payplug->l('Oney 4x');
                     break;
                 default:
@@ -709,7 +735,7 @@ class PayPlugNotifications
             $cart_amount = (float)$this->cart->getOrderTotal(true, Cart::BOTH);
 
             if ($amount != $cart_amount) {
-                $this->logger->addLog('Cart amount is different and may occured an error');
+                $this->logger->addLog('Cart amount is different and may occurred an error');
                 $this->logger->addLog('Cart amount:' . $cart_amount);
             }
 
@@ -747,7 +773,7 @@ class PayPlugNotifications
         if ($this->is_installment) {
             $this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $order);
         } else {
-            $data = array();
+            $data = [];
             $data['metadata'] = $this->payment->metadata;
             $data['metadata']['Order'] = $order->id;
             try {
@@ -755,7 +781,9 @@ class PayPlugNotifications
                 $this->payplug->patchPayment($this->api_key, $this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
-                    'Payment cannot be patched: ' . $exception->getMessage(), 'error');
+                    'Payment cannot be patched: ' . $exception->getMessage(),
+                    'error'
+                );
                 $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
             }
 
@@ -874,10 +902,14 @@ class PayPlugNotifications
                     $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                     $order_history->save();
                 } catch (Exception $exception) {
-                    $this->logger->addLog('Order history cannot be saved: ' . $exception->getMessage(),
-                        'error');
                     $this->logger->addLog(
-                        'Please check if order state ' . (int)$new_order_state . ' exists.', 'error');
+                        'Order history cannot be saved: ' . $exception->getMessage(),
+                        'error'
+                    );
+                    $this->logger->addLog(
+                        'Please check if order state ' . (int)$new_order_state . ' exists.',
+                        'error'
+                    );
                     $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
                 }
             } else {

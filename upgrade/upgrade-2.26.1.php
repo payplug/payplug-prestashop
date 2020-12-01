@@ -39,13 +39,13 @@ function upgrade_module_2_26_1($object)
     }
 
     // Update payplug lock table
-    $sql_requests = array(
+    $sql_requests = [
         'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
-    );
+    ];
 
     try {
         foreach ($sql_requests as $sql_request) {
-            $request = Db::getInstance()->execute($sql_request);
+            Db::getInstance()->execute($sql_request);
             /*
              * Exceptionally we don't want to block update after request execution
              * because the constraint may be duplicated for beta testers

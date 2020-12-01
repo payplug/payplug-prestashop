@@ -30,7 +30,8 @@ class ProductSpecific implements ProductInterface
 {
     public function product($method)
     {
-        return Product::$method;
+        if (isset($method)) {
+            return Product::$method;
+        }
     }
-
 }

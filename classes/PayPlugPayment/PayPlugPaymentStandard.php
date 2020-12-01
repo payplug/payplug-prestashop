@@ -29,18 +29,18 @@ class PayPlugPaymentStandard extends PayplugPayment
      * @param string $id_card
      * @return PayplugPayment
      */
-    public function __construct($id_card = null, $options = array())
+    public function __construct($id_card = null, $options = [])
     {
         parent::__construct($id_card, $options);
 
-        $this->definition_tab['amount'] = array('type' => 'int', 'validate' => 'isInt', 'required' => true);
-        $this->definition_tab['force_3ds'] = array(
+        $this->definition_tab['amount'] = ['type' => 'int', 'validate' => 'isInt', 'required' => true];
+        $this->definition_tab['force_3ds'] = [
             'type' => 'bool',
             'validate' => 'isBool',
             'required' => false,
             'default' => false
-        );
-        $this->definition_tab['allow_save_card'] = array('type' => 'bool', 'validate' => 'isBool', 'required' => true);
+        ];
+        $this->definition_tab['allow_save_card'] = ['type' => 'bool', 'validate' => 'isBool', 'required' => true];
         $this->type = 'standard';
 
         $this->generatePaymentTab();

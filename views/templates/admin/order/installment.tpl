@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2020 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2020 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -39,9 +39,9 @@
         <tbody>
         {foreach $payment_list_new as $k=>$payment}
             <tr class="pp_fixed_height">
-                <td data-e2e-payment-details-inst-{$k}="date">{$payment['date']|escape:'htmlall':'UTF-8'}</td>
-                <td data-e2e-payment-details-inst-{$k}="amount">{displayPrice price=$payment['amount']}</td>
-                <td data-e2e-payment-details-inst-{$k}="state" data-e2e-payment-details-inst-{$k}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}" class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
+                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="date">{$payment['date']|escape:'htmlall':'UTF-8'}</td>
+                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="amount">{displayPrice price=$payment['amount']}</td>
+                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="state" data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}" class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
                 {if isset($payment['id'])}
                     <td class="actions">
                         <button class="btn btn-default open_payment_information">

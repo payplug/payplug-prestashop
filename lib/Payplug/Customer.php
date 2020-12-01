@@ -6,39 +6,39 @@ namespace Payplug;
  **/
 class Customer
 {
-     /**
-     * Retrieve a customer.
-     *
-     * @param   string $customerId the payment ID
-     * @param   Payplug $payplug the client configuration
-     *
-     * @return  null|Resource\Customer the retrieved payment or null on error
-     *
-     * @throws  Exception\ConfigurationNotSetException
-     */
+    /**
+    * Retrieve a customer.
+    *
+    * @param   string $customerId the payment ID
+    * @param   Payplug $payplug the client configuration
+    *
+    * @return  null|Resource\Customer the retrieved payment or null on error
+    *
+    * @throws  Exception\ConfigurationNotSetException
+    */
     public static function retrieve($customerId, Payplug $payplug = null)
     {
-    	return Resource\Customer::retrieve($customerId, $payplug);
+        return Resource\Customer::retrieve($customerId, $payplug);
     }
 
-     /**
-     * Update a customer.
-     *
-     * @param   string $customerId the customer ID
-     * @param   array $data the data to update
-     * @param   Payplug $payplug  the client configuration
-     *
-     * @return  Resource\Customer the updated customer
-     *
-     * @throws  Exception\ConfigurationNotSetException
-     */
+    /**
+    * Update a customer.
+    *
+    * @param   string $customerId the customer ID
+    * @param   array $data the data to update
+    * @param   Payplug $payplug  the client configuration
+    *
+    * @return  Resource\Customer the updated customer
+    *
+    * @throws  Exception\ConfigurationNotSetException
+    */
     public static function update($customerId, $data, Payplug $payplug = null)
     {
-        $customer = Resource\Customer::fromAttributes(array('id' => $customerId));
-    	return $customer->update($data, $payplug);
+        $customer = Resource\Customer::fromAttributes(['id' => $customerId]);
+        return $customer->update($data, $payplug);
     }
 
-	/**
+    /**
      * Delete a customer.
      *
      * @param   string $customerId the customer ID
@@ -50,8 +50,8 @@ class Customer
      */
     public static function delete($customerId, Payplug $payplug = null)
     {
-        $customer = Resource\Customer::fromAttributes(array('id' => $customerId));
-    	return $customer->delete($payplug);
+        $customer = Resource\Customer::fromAttributes(['id' => $customerId]);
+        return $customer->delete($payplug);
     }
 
     /**
@@ -66,7 +66,7 @@ class Customer
      */
     public static function create(array $data, Payplug $payplug = null)
     {
-    	return Resource\Customer::create($data, $payplug);
+        return Resource\Customer::create($data, $payplug);
     }
 
     /**
@@ -75,7 +75,7 @@ class Customer
      * @param   int     $perPage  number of results per page
      * @param   int     $page     the page number
      * @param   Payplug $payplug  the client configuration
-     * 
+     *
      * @return  Resource\Customer[] the array of customers
      *
      * @throws  Exception\InvalidPaymentException
@@ -83,6 +83,6 @@ class Customer
      */
     public static function listCustomers($perPage = null, $page = null, Payplug $payplug = null)
     {
-    	return Resource\Customer::listCustomers($perPage, $page, $payplug);
+        return Resource\Customer::listCustomers($perPage, $page, $payplug);
     }
 };

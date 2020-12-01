@@ -42,7 +42,7 @@ function upgrade_module_2_0_7()
     //files
     //$suppr_files = true;
     //$suppr_dirs = true;
-    $old_files = array(
+    $old_files = [
         dirname(__FILE__).'/../classes/PayplugTools.php',
         dirname(__FILE__).'/../controllers/dispatcher.php',
         dirname(__FILE__).'/../controllers/FrontAjaxPayplug.php',
@@ -66,12 +66,12 @@ function upgrade_module_2_0_7()
         dirname(__FILE__).'/../views/templates/hook/payment_16.tpl',
         dirname(__FILE__).'/../installPayplug.php',
         dirname(__FILE__).'/../ipn.php'
-    );
+    ];
 
-    $old_dirs = array(
+    $old_dirs = [
         dirname(__FILE__).'/../css',
         dirname(__FILE__).'/../img',
-    );
+    ];
 
     foreach ($old_files as $file) {
         if (file_exists($file)) {

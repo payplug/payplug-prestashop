@@ -1,5 +1,6 @@
 <?php
 namespace Payplug\Resource;
+
 use Payplug;
 
 /**
@@ -42,7 +43,7 @@ class Refund extends APIResource implements IVerifiableAPIResource
 
         $httpClient = new Payplug\Core\HttpClient($payplug);
         $response = $httpClient->post(
-            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::REFUND_RESOURCE, null, array('PAYMENT_ID' => $payment)),
+            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::REFUND_RESOURCE, null, ['PAYMENT_ID' => $payment]),
             $data
         );
 
@@ -72,7 +73,9 @@ class Refund extends APIResource implements IVerifiableAPIResource
         $httpClient = new Payplug\Core\HttpClient($payplug);
         $response = $httpClient->get(
             Payplug\Core\APIRoutes::getRoute(
-                Payplug\Core\APIRoutes::REFUND_RESOURCE, $refundId, array('PAYMENT_ID' => $payment)
+                Payplug\Core\APIRoutes::REFUND_RESOURCE,
+                $refundId,
+                ['PAYMENT_ID' => $payment]
             )
         );
 
@@ -102,7 +105,7 @@ class Refund extends APIResource implements IVerifiableAPIResource
         $httpClient = new Payplug\Core\HttpClient($payplug);
 
         $response = $httpClient->get(
-            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::REFUND_RESOURCE, null, array('PAYMENT_ID' => $payment))
+            Payplug\Core\APIRoutes::getRoute(Payplug\Core\APIRoutes::REFUND_RESOURCE, null, ['PAYMENT_ID' => $payment])
         );
 
         if (!array_key_exists('data', $response['httpResponse']) || !is_array($response['httpResponse']['data'])) {
@@ -112,7 +115,7 @@ class Refund extends APIResource implements IVerifiableAPIResource
             );
         }
 
-        $refunds = array();
+        $refunds = [];
         foreach ($response['httpResponse']['data'] as &$refund) {
             $refunds[] = Refund::fromAttributes($refund);
         }
@@ -129,12 +132,11 @@ class Refund extends APIResource implements IVerifiableAPIResource
      *
      * @throws  Payplug\Exception\UndefinedAttributeException when the local resource is invalid.
      */
-    function getConsistentResource(Payplug\Payplug $payplug = null)
+    public function getConsistentResource(Payplug\Payplug $payplug = null)
     {
         if (!array_key_exists('id', $this->_attributes)) {
             throw new Payplug\Exception\UndefinedAttributeException('The id of the refund is not set.');
-        }
-        else if (!array_key_exists('payment_id', $this->_attributes)) {
+        } elseif (!array_key_exists('payment_id', $this->_attributes)) {
             throw new Payplug\Exception\UndefinedAttributeException('The payment_id of the refund is not set.');
         }
 

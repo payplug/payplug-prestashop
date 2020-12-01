@@ -69,9 +69,9 @@ class LoggerEntity
      * @var string $type
      */
     private $type;
- /**
-     * @var string $table
-     */
+    /**
+        * @var string $table
+        */
     private $table;
 
     /**
@@ -253,6 +253,4 @@ class LoggerEntity
         $this->table = $table;
         return $this;
     }
-
-
 }
