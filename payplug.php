@@ -755,9 +755,7 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->l(
-                            'Capture of this payment is authorized before %s. After this date, you will not be able to get paid.'
-                        ),
+                        $this->l('Capture of this payment is authorized before %s. After this date, you will not be able to get paid.'),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -1772,11 +1770,9 @@ class Payplug extends PaymentModule
             $req_order_state = new DbQuery();
             $req_order_state->select('DISTINCT osl.id_order_state');
             $req_order_state->from('order_state_lang', 'osl');
-            $req_order_state->where('osl.name LIKE \'' . pSQL($name['en'] . (
-                    $test_mode ?
-                        ' [TEST]'
-                        : ' [PayPlug]')
-                ) . '\' 
+            $req_order_state->where(
+                'osl.name LIKE \''
+                . pSQL($name['en'] . ($test_mode ?' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
@@ -2193,8 +2189,8 @@ class Payplug extends PaymentModule
         $req_payplug_card->from('payplug_card', 'pc');
         $req_payplug_card->where('pc.id_customer = ' . (int)$id_customer);
         $req_payplug_card->where('pc.id_company = ' . (int)Configuration::get(
-                'PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')
-            ));
+            'PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')
+        ));
         $req_payplug_card->where('pc.is_sandbox = ' . (int)$is_sandbox);
         $res_payplug_card = Db::getInstance()->executeS($req_payplug_card);
 
@@ -6149,12 +6145,8 @@ class Payplug extends PaymentModule
                 if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
                     $new_state = (int)Tools::getValue('id_state');
                     if (!$new_state) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . (
-                            $installment->is_live ?
-                                ''
-                                : '_TEST'
-                            )
-                        );
+                        $new_state_key = 'PAYPLUG_ORDER_STATE_REFUND' . ($installment->is_live ? '' : '_TEST');
+                        $new_state = (int)Configuration::get($new_state_key);
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
@@ -6172,12 +6164,8 @@ class Payplug extends PaymentModule
                 $payment = $this->retrievePayment($refund->payment_id);
                 $new_state = (int)Tools::getValue('id_state');
                 if (!$new_state && $payment->is_refunded) {
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . (
-                        $payment->is_live ?
-                            ''
-                            : '_TEST'
-                        )
-                    );
+                    $new_state_key = 'PAYPLUG_ORDER_STATE_REFUND' . ($payment->is_live ? '' : '_TEST');
+                    $new_state = (int)Configuration::get($new_state_key);
                 }
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
@@ -6460,7 +6448,6 @@ class Payplug extends PaymentModule
             $card_txt = $this->l('All the registered cards of your customer will be kept.');
         } else {
             $card_txt = $this->l('All the registered cards of your customer will be deleted.');
-
         }
         $this->confirmUninstall .= ' ' . $card_txt;
 
