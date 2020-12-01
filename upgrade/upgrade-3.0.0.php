@@ -31,16 +31,8 @@ function upgrade_module_3_0_0($object)
 {
     $flag = true;
 
-    // install payplug payment cart
-    $sql = '
-        ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
-        ADD COLUMN `date_upd` DATETIME NULL
-        AFTER `is_pending`';
-    $flag = $flag && Db::getInstance()->execute($sql);
-
     // install table `payplug_logger`
-    $sql = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
             `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `process` VARCHAR(255) NOT NULL,
             `content` TEXT NOT NULL,
