@@ -1771,11 +1771,11 @@ class Payplug extends PaymentModule
             $req_order_state->select('DISTINCT osl.id_order_state');
             $req_order_state->from('order_state_lang', 'osl');
             $req_order_state->where(
-                'osl.name LIKE \''
-                . pSQL($name['en'] . ($test_mode ?' [TEST]' : ' [PayPlug]')) . '\' 
+                'osl.name LIKE \'' . pSQL($name['en'] . ($test_mode ?' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
 				OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-				OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
+				OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
+            );
             $res_order_state = Db::getInstance()->getValue($req_order_state);
 
             if (!$res_order_state) {
