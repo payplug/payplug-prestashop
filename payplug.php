@@ -4200,8 +4200,7 @@ class Payplug extends PaymentModule
             }
 
             $conf = (int)Tools::getValue('conf');
-            if (($conf == 30 || $conf == 31)
-                && version_compare(_PS_VERSION_, '1.5', '>=')) {
+            if ($conf == 30 || $conf == 31) {
                 $show_popin = true;
 
                 $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
