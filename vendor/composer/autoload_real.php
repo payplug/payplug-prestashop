@@ -13,13 +13,16 @@ class ComposerAutoloaderInit6fe1e2be2c1f64472e8524add3e400eb
         }
     }
 
+    /**
+     * @return \Composer\Autoload\ClassLoader
+     */
     public static function getLoader()
     {
         if (null !== self::$loader) {
             return self::$loader;
         }
 
-        spl_autoload_register(array('ComposerAutoloaderInit6fe1e2be2c1f64472e8524add3e400eb', 'loadClassLoader'), true, true);
+        spl_autoload_register(array('ComposerAutoloaderInit6fe1e2be2c1f64472e8524add3e400eb', 'loadClassLoader'), true, false);
         self::$loader = $loader = new \Composer\Autoload\ClassLoader();
         spl_autoload_unregister(array('ComposerAutoloaderInit6fe1e2be2c1f64472e8524add3e400eb', 'loadClassLoader'));
 
@@ -45,7 +48,7 @@ class ComposerAutoloaderInit6fe1e2be2c1f64472e8524add3e400eb
             }
         }
 
-        $loader->register(true);
+        $loader->register(false);
 
         if ($useStaticLoader) {
             $includeFiles = Composer\Autoload\ComposerStaticInit6fe1e2be2c1f64472e8524add3e400eb::$files;

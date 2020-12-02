@@ -1,7 +1,8 @@
 {
     "name": "cyril/payplug",
     "require": {
-        "giggsey/libphonenumber-for-php": "^8.12"
+        "giggsey/libphonenumber-for-php": "^8.12",
+        "payplug/payplug-php": "3.*"
     },
     "require-dev": {
         "phpunit/phpunit": "9.*"
@@ -17,22 +18,10 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "rm -rf vendor/giggsey/libphonenumberlight",
-            "rm -rf vendor/giggsey/libphonenumber-for-php/src/carrier",
-            "rm -rf vendor/giggsey/libphonenumber-for-php/src/geocoding",
-            "rm -rf vendor/giggsey/libphonenumber-for-php/src/prefixmapper",
-            "mv vendor/giggsey/libphonenumber-for-php vendor/giggsey/libphonenumberlight",
-            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/namespace libphonenumber;/namespace libphonenumberlight;/g'",
-            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/use libphonenumber/use libphonenumberlight/g'"
+            "./composer.sh"
         ],
         "post-update-cmd": [
-            "rm -rf vendor/giggsey/libphonenumberlight",
-            "rm -rf vendor/giggsey/libphonenumber-for-php/src/carrier",
-            "rm -rf vendor/giggsey/libphonenumber-for-php/src/geocoding",
-            "rm -rf vendor/giggsey/libphonenumber-for-php/src/prefixmapper",
-            "mv vendor/giggsey/libphonenumber-for-php vendor/giggsey/libphonenumberlight",
-            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/namespace libphonenumber;/namespace libphonenumberlight;/g'",
-            "grep -rl 'libphonenumber' vendor/giggsey/libphonenumberlight/ | xargs sed -i 's/use libphonenumber/use libphonenumberlight/g'"
+            "./composer.sh"
         ]
     }
 }
