@@ -1,3 +1,3 @@
 <?php
 
-$truc = ['coucou', 'blabla'];
+$truc = array('coucou', 'blabla');
