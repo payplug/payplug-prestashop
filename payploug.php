@@ -1,0 +1,3 @@
+<?php
+
+$truc = ['coucou', 'blabla'];

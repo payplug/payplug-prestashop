@@ -3,3 +3,4 @@ config*.xml
 .DS_Store
 .idea
 vendor/
+.php_cs.cache

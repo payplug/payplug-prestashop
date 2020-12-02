@@ -1,5 +1,5 @@
 {
   "hooks": {
-    "pre-commit": "php vendor/bin/php-cs-fixer fix -vvv",
+    "pre-commit": "php vendor/bin/php-cs-fixer fix -vvv ./payploug.php",
   }
 }
