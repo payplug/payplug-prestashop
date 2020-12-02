@@ -116,7 +116,6 @@ if (Tools::getValue('_ajax') == 1) {
             die(json_encode(array(
                 'status' => 'error',
                 'data' => $payplug->l('Incorrect amount to refund')
-                //'data' => $this->getTranslator()->trans('Incorrect amount to refund', array(), 'Modules.Payplug.Admin')
             )));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));
@@ -138,7 +137,6 @@ if (Tools::getValue('_ajax') == 1) {
             die(json_encode(array(
                 'status' => 'error',
                 'data' => $payplug->l('Cannot refund that amount.')
-                //'data' => $this->getTranslator()->trans('Cannot refund that amount.', array(), 'Modules.Payplug.Admin')
             )));
         } else {
             $payment = $payplug->retrievePayment($pay_id);
@@ -179,7 +177,6 @@ if (Tools::getValue('_ajax') == 1) {
                 'status' => 'ok',
                 'data' => $data,
                 'message' => $payplug->l('Amount successfully refunded.'),
-                //'message' => $this->getTranslator()->trans('Amount successfully refunded.', array(), 'Modules.Payplug.Admin'),
                 'reload' => $reload
             )));
         }
