@@ -3,7 +3,6 @@ config*.xml
 .DS_Store
 .idea
 vendor/
-views/css/*.css
 views/css/*.map
 views/css/less/*.css
 views/css/less/*.map
