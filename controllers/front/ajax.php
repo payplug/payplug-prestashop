@@ -75,12 +75,25 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $group = Tools::getValue('group');
                     // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
                     if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
-                        $id_product_attribute = $group ? (int)Product::getIdProductAttributesByIdAttributes($id_product, $group) : 0;
+                        $id_product_attribute = $group ?
+                            (int)Product::getIdProductAttributesByIdAttributes($id_product, $group)
+                            : 0;
                     } else {
-                        $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+                        $id_product_attribute = $group ?
+                            (int)Product::getIdProductAttributeByIdAttributes($id_product, $group)
+                            : 0;
                     }
                     $quantity = (int)Tools::getValue('qty', 1);
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
+                    $product_price = Product::getPriceStatic(
+                        (int)$id_product,
+                        $use_taxes,
+                        $id_product_attribute,
+                        6,
+                        null,
+                        false,
+                        true,
+                        $quantity
+                    );
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
                     $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency);
@@ -99,10 +112,24 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 if ($id_product = (int)Tools::getValue('id_product')) {
                     $group = Tools::getValue('group');
-                    $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) : 0;
+                    $id_product_attribute = $group ?
+                        (int)Product::getIdProductAttributeByIdAttributes($id_product, $group)
+                        : 0;
                     // Some integration will not use qty data but quantity_wanted
-                    $quantity = (int)Tools::getValue('qty', (int)Tools::getValue('quantity_wanted', 1));
-                    $product_price = Product::getPriceStatic((int)$id_product, $use_taxes, $id_product_attribute, 6, null, false, true, $quantity);
+                    $quantity = (int)Tools::getValue(
+                        'qty',
+                        (int)Tools::getValue('quantity_wanted', 1)
+                    );
+                    $product_price = Product::getPriceStatic(
+                        (int)$id_product,
+                        $use_taxes,
+                        $id_product_attribute,
+                        6,
+                        null,
+                        false,
+                        true,
+                        $quantity
+                    );
                     $amount = $product_price * $quantity;
                     $cart = false;
                 } else {
@@ -139,7 +166,11 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $result = $payplug->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
-                    'message' => [$result ? $payplug->l('Your information has been saved') : $payplug->l('An error occured. Please retry in few seconds.')]
+                    'message' => [
+                        $result ?
+                        $payplug->l('Your information has been saved') :
+                        $payplug->l('An error occured. Please retry in few seconds.')
+                    ]
                 ]));
             }
         }

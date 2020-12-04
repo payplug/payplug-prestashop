@@ -103,8 +103,10 @@ class PayPlugCache extends ObjectModel
      */
     public function getCacheByKey($cache_key)
     {
-        $req_cache = 'SELECT `id_payplug_cache`  FROM `' . _DB_PREFIX_ . 'payplug_cache` WHERE `cache_key` = "' . (string)$cache_key . '"';
-        $id_payplug_cache = Db::getInstance()->getValue($req_cache);
+        $sql = 'SELECT `id_payplug_cache`  
+                FROM `' . _DB_PREFIX_ . 'payplug_cache` 
+                WHERE `cache_key` = "' . (string)$cache_key . '"';
+        $id_payplug_cache = Db::getInstance()->getValue($sql);
         return new PayPlugCache($id_payplug_cache);
     }
 

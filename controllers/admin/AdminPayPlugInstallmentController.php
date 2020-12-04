@@ -128,7 +128,11 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     {
         $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
-        Tools::redirectAdmin('index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.Tools::getAdminTokenLite('AdminOrders'));
+        Tools::redirectAdmin(
+            'index.php?tab=AdminOrders&id_order=' . $id_order
+            . '&vieworder&token='
+            . Tools::getAdminTokenLite('AdminOrders')
+        );
     }
 
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
