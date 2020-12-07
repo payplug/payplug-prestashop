@@ -27,4 +27,5 @@ interface CountryInterface
 {
     public function getByIso($idCurrency);
     public function getCountry($idCountry);
+    public function getNameById($param1, $param2);
 }
