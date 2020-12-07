@@ -29,6 +29,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
  */
 class PayPlugNotifications
 {
+    private $can_save_card = true;
     public $resource;
     public $flag;
     public $except;
@@ -148,6 +149,7 @@ class PayPlugNotifications
         if ($this->resource->installment_plan_id) {
             $this->logger->addLog('Installment ID: ' . $this->resource->installment_plan_id);
             $this->is_installment = true;
+            $this->can_save_card = false;
         }
 
         $this->logger->addLog('PAYMENT MODE');
@@ -183,10 +185,12 @@ class PayPlugNotifications
 
         $this->setOrderStates();
 
-        if (((isset($this->payment->save_card) && (int)$this->payment->save_card == 1))
-            ||
-            ((isset($this->payment->card->id) && $this->payment->card->id != '')
-                && ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment != ''))
+        if (($this->can_save_card)
+            &&
+            (((isset($this->payment->save_card) && (int)$this->payment->save_card == 1))
+                ||
+                ((isset($this->payment->card->id) && !empty($this->payment->card->id))
+                    && ((isset($this->payment->hosted_payment)) && !empty($this->payment->hosted_payment))))
         ) {
             $this->logger->addLog('[Save Card] Saving card...');
             $res_payplug_card = $this->plugin->getCard()->saveCard($this->payment);
