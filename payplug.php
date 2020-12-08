@@ -3440,6 +3440,11 @@ class Payplug extends PaymentModule
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+
+        if ($this->checkVersion('1.7.7.0')) {
+            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+        }
     }
     
     /**
