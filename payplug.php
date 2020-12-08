@@ -3715,6 +3715,7 @@ class Payplug extends PaymentModule
         $hooksToRegister = [
             'paymentReturn',
             'Header',
+            'displayHeader',
             'adminOrder',
             'actionOrderStatusUpdate',
             'customerAccount',
