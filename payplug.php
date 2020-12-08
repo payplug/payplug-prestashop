@@ -4054,11 +4054,9 @@ class Payplug extends PaymentModule
         ];
         $data_string = json_encode($data);
 
-
         $url = $this->plugin->getApiUrl() . $this->routes['login'];
         $curl_version = curl_version();
         $process = curl_init($url);
-
         curl_setopt(
             $process,
             CURLOPT_HTTPHEADER,
