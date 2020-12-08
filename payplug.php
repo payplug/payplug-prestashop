@@ -534,7 +534,7 @@ class Payplug extends PaymentModule
         if (Tools::isSubmit('submitAccount')) {
             /*
              * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
-             * Because special pwd with chars don't works
+             * Because pwd with special chars don't work
              */
             $password = $_POST['PAYPLUG_PASSWORD'];
             $email = Tools::getValue('PAYPLUG_EMAIL');
@@ -4275,7 +4275,7 @@ class Payplug extends PaymentModule
         if (Tools::isSubmit('submitAccount')) {
             /*
              * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
-             * Because special pwd with chars don't works
+             * Because pwd with special chars don't work
              */
             $password = $_POST['PAYPLUG_PASSWORD'];
             $email = Tools::getValue('PAYPLUG_EMAIL');
