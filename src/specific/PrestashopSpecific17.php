@@ -83,7 +83,7 @@ class PrestashopSpecific17
 
     public function hookActionAdminControllerSetMedia()
     {
-        $this->payplug->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
-        $this->payplug->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
     }
 }
