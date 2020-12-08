@@ -3430,13 +3430,20 @@ class Payplug extends PaymentModule
         $this->smarty->assign(['env' => 'product']);
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
-
-
+    
+    public function hookActionAdminControllerSetMedia($params)
+    {
+        if ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'hookActionAdminControllerSetMedia'))) {
+            $this->PrestashopSpecificObject->hookActionAdminControllerSetMedia();
+        }
+    }
+    
     /**
      * @param array $params
      * @return string
+     * @throws Exception
      * @see Module::hookHeader()
-     *
      */
     public function hookHeader($params)
     {
@@ -3731,6 +3738,7 @@ class Payplug extends PaymentModule
             'displayExpressCheckout',
             'actionClearCompileCache',
             'displayBeforeShoppingCartBlock',
+            'actionAdminControllerSetMedia',
         ];
 
         foreach ($hooksToRegister as $hookToRegister) {

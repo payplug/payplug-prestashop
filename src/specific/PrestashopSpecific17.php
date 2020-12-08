@@ -80,4 +80,10 @@ class PrestashopSpecific17
 
         return $paymentOptions;
     }
+
+    public function hookActionAdminControllerSetMedia()
+    {
+        $this->context->controller->addCSS($this->_path . 'views/css/admin_order.css');
+        $this->context->controller->addJS($this->_path . 'views/js/admin_order.js');
+    }
 }
