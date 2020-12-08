@@ -532,7 +532,11 @@ class Payplug extends PaymentModule
         }
 
         if (Tools::isSubmit('submitAccount')) {
-            $password = Tools::getValue('PAYPLUG_PASSWORD');
+            /*
+             * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+             * Because special pwd with chars don't works
+             */
+            $password = $_POST['PAYPLUG_PASSWORD'];
             $email = Tools::getValue('PAYPLUG_EMAIL');
             if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
@@ -4050,9 +4054,11 @@ class Payplug extends PaymentModule
         ];
         $data_string = json_encode($data);
 
+
         $url = $this->plugin->getApiUrl() . $this->routes['login'];
         $curl_version = curl_version();
         $process = curl_init($url);
+
         curl_setopt(
             $process,
             CURLOPT_HTTPHEADER,
@@ -4267,7 +4273,11 @@ class Payplug extends PaymentModule
         }
 
         if (Tools::isSubmit('submitAccount')) {
-            $password = Tools::getValue('PAYPLUG_PASSWORD');
+            /*
+             * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+             * Because special pwd with chars don't works
+             */
+            $password = $_POST['PAYPLUG_PASSWORD'];
             $email = Tools::getValue('PAYPLUG_EMAIL');
             if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
                 $this->validationErrors['username_password'] =
