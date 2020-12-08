@@ -3430,7 +3430,12 @@ class Payplug extends PaymentModule
         $this->smarty->assign(['env' => 'product']);
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
-    
+
+    /**
+     * @description To load admin_order (js and css) in order details in PS 1.7.7.0
+     *
+     * @param $params
+     */
     public function hookActionAdminControllerSetMedia($params)
     {
         if ((class_exists($this->PrestashopSpecificClass))
@@ -3722,7 +3727,6 @@ class Payplug extends PaymentModule
         $hooksToRegister = [
             'paymentReturn',
             'Header',
-            'displayHeader',
             'adminOrder',
             'actionOrderStatusUpdate',
             'customerAccount',
