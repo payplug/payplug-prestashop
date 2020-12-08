@@ -2997,6 +2997,9 @@ class Payplug extends PaymentModule
             return;
         }
 
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+
         $this->html = '';
         $order = new Order((int)$params['id_order']);
         if (!Validate::isLoadedObject($order)) {
@@ -3434,10 +3437,9 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminControllerSetMedia($params)
     {
-        if ((class_exists($this->PrestashopSpecificClass))
-            && (method_exists($this->PrestashopSpecificObject, 'hookActionAdminControllerSetMedia'))) {
-            $this->PrestashopSpecificObject->hookActionAdminControllerSetMedia();
-        }
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
     }
     
     /**
