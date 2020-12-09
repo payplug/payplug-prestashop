@@ -1389,9 +1389,13 @@ class OneyRepository
         if (!in_array($iso_code, $iso_list, true)) {
             $list = [];
             foreach ($iso_list as $iso) {
-                $id_country = \Country::getByIso($iso);
-                $list[] = \Country::getNameById($this->contextSpecific->getContext()->language->id, $id_country);
+                $id_country = $this->countrySpecific->getByIso($iso);
+                $list[] = $this->countrySpecific->getNameById(
+                    $this->contextSpecific->getContext()->language->id,
+                    $id_country
+                );
             }
+
             return [
                 'result' => false,
                 'type' => 'invalid',
