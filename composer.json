@@ -1,11 +1,23 @@
 {
-    "name": "cyril/payplug",
+    "name": "payplug/payplug-prestashop",
     "require": {
         "giggsey/libphonenumber-for-php": "^8.12",
         "payplug/payplug-php": "3.3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "9.*"
+    },
+    "archive": {
+        "exclude": [
+            "!vendor/*",
+            ".*",
+            "tests",
+            "view/css/less",
+            "controllers/tools",
+            "views/templates/front/tools",
+            "test.php",
+            "composer.*"
+        ]
     },
     "autoload": {
         "psr-4": {
