@@ -2997,8 +2997,12 @@ class Payplug extends PaymentModule
             return;
         }
 
-        // For PrestaShop < 1.7.7.0
-        // (in 1.7.7.0, the medias won't be loaded in Admin Order Detail page)
+        /*
+         * /!\ For PrestaShop < 1.7.7.0
+         * (in 1.7.7.0, the medias won't be loaded in Admin Order Detail page)
+         *
+         * For more clarity, the 'admin_order' medias are loaded here, in the 'hookAdminOrder'
+        */
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
 
@@ -3452,10 +3456,19 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminControllerSetMedia($params)
     {
+        /*
+         * PS 1.6, 1.7, 1.7.7.0 : In this hook, we load the admin medias
+         */
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
+        /*
+         * 1) 1.6, 1.7 : We have to not load these 'admin' and 'admin_order' medias in same time, otherwise,
+         * we will have a JS 'override error' in the module configuration page
+         *
+         * 2) 1.7.7.0 : It's only here that the media can be loaded in the Admin Order Details page
+         */
         if ($this->checkVersion('1.7.7.0')) {
             $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
             $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
