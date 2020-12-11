@@ -6,17 +6,19 @@ unit tests:
   image: composer:1.9
   stage: tests
   script:
-    - composer require --dev phpunit/phpunit ^9
+    - composer install
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
 
 build zip release:
-  image: ubuntu:16.04
+  image: composer:1.9
   stage: build
   before_script:
-    - apt-get -y -qq update
-    - apt-get -y -qq install git zip
+    - composer install --no-dev
+    - mkdir payplug
   script:
-    - git archive --format=zip --output=payplug_$CI_COMMIT_REF_NAME.zip --prefix=payplug/ HEAD
+    - shopt -s extglob
+    - mv !(payplug|composer.json) payplug
+    - composer archive --file payplug_$CI_COMMIT_REF_NAME --format zip
   artifacts:
     paths:
       - payplug_$CI_COMMIT_REF_NAME.zip
