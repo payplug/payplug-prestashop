@@ -37,4 +37,9 @@ class CountrySpecific implements CountryInterface
     {
         return new Country($idCountry);
     }
+
+    public function getNameById($param1, $param2)
+    {
+        return Country::getNameById($param1, $param2);
+    }
 }
