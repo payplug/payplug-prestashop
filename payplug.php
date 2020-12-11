@@ -2997,8 +2997,9 @@ class Payplug extends PaymentModule
             return;
         }
 
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+        // For PrestaShop < 1.7.7.0
+        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
+        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
 
         $this->html = '';
         $order = new Order((int)$params['id_order']);
@@ -3430,6 +3431,20 @@ class Payplug extends PaymentModule
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
+    public function setMedia($media)
+    {
+        if (!$media) {
+            return false;
+        }
+
+       if (is_file($media)) {
+           return $this->context->controller->addJS($media);
+       } elseif (is_file($media)) {
+           return $this->context->controller->addCSS($media);
+       }
+    }
+
+
     /**
      * @description To load admin_order (js and css) in order details in PS 1.7.7.0
      *
@@ -3437,13 +3452,13 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminControllerSetMedia($params)
     {
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
+        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         if ($this->checkVersion('1.7.7.0')) {
-            $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+            $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
+            $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
         }
     }
     
