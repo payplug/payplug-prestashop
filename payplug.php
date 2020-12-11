@@ -3434,17 +3434,16 @@ class Payplug extends PaymentModule
 
     public function setMedia($media)
     {
-        if (!$media) {
+        if (!$media || !is_file($media)) {
             return false;
         }
 
-       if (is_file($media)) {
+       if (strpos($media, 'css') === false) {
            return $this->context->controller->addJS($media);
-       } elseif (is_file($media)) {
+       } else {
            return $this->context->controller->addCSS($media);
        }
     }
-
 
     /**
      * @description To load admin_order (js and css) in order details in PS 1.7.7.0
