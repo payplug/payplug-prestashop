@@ -2998,6 +2998,7 @@ class Payplug extends PaymentModule
         }
 
         // For PrestaShop < 1.7.7.0
+        // (in 1.7.7.0, the medias won't be loaded in Admin Order Detail page)
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
         $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
 
