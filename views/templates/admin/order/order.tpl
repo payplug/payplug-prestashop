@@ -21,9 +21,9 @@
 *}
 
 <div class="panel panel-1-6 payplugOrder card mt-2 d-print-none" id="pppanel">
-    <div class="panel-heading card-header">
-        <i class="icon-money"></i> <h3 class="payplugOrder_title">{l s='Payplug payment details' mod='payplug'}</h3>
-    </div>
+    <h3 class="panel-heading card-header">
+        <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
+    </h3>
     <div class="card-body">
         <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
         {if $show_menu_installment}

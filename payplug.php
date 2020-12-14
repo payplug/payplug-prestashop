@@ -3454,9 +3454,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description To load admin_order (js and css) in order details in PS 1.7.7.0
-     *
-     * @param $params
+     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
      */
     public function hookActionAdminControllerSetMedia()
     {
