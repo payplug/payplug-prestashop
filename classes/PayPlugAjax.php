@@ -177,7 +177,10 @@ class PayPlugAjax
                 try {
                     $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 } catch (Exception $e) {
-                    throw new \Exception($e);
+                    die($tools->tool('jsonEncode', [
+                        'result' => false,
+                        'message' => $this->payplug->l('An error occurred. Please retry in few seconds.')
+                    ]));
                 }
 
                 die($tools->tool('jsonEncode', $payment_options));
