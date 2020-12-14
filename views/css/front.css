@@ -596,7 +596,7 @@
 }
 .oneyPopin_navigation li:hover button,
 .oneyPopin_navigation li.selected button {
-  color: #b2b2b2;
+  color: #777;
   font-weight: bold;
 }
 .oneyPopin_navigation li.selected {
