@@ -103,16 +103,17 @@
       flex-direction: column;
       width: 100%;
       position: relative;
-      max-width: 330px;
+      max-width: calc(~"50% - 30px");
       padding: 0 15px;
       margin: 0 0 15px;
 
       &.-same {
         margin: auto;
+        max-width: 100%;
       }
 
-      .oneyRequired_wrapper & {
-        max-width: calc(~"50% - 50px");
+      @media (@mobile) {
+        max-width: 100%;
       }
 
       .payplugPopin & {

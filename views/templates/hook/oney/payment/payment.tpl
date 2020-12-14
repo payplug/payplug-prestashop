@@ -34,7 +34,9 @@
             <div class="oneyOption_wrapper">
                 {include file="./options.tpl"}
             </div>
-            {$payplug_oney_required_field|escape:'htmlall':'UTF-8'}
+            {if isset($oney_required_fields)}
+                {include file="./../required.tpl" oney_required_fields=$oney_required_fields}
+            {/if}
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
             </div>
