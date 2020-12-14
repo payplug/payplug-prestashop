@@ -3321,10 +3321,6 @@ class Payplug extends PaymentModule
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
 
-
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
-
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
         return $this->html;
     }
@@ -3434,12 +3430,56 @@ class Payplug extends PaymentModule
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
+    /**
+     * @description To load JS and CSS medias
+     *
+     * @param array|string $medias
+     * @return bool
+     */
+    public function setMedia($medias = false)
+    {
+        if (!$medias) {
+            return false;
+        }
+
+        if (!is_array($medias)) {
+            $medias = [$medias];
+        }
+
+       foreach ($medias as $media) {
+           if (strpos($media, 'css') === false) {
+                $this->context->controller->addJS($media);
+           } else {
+               $this->context->controller->addCSS($media);
+           }
+       }
+       return true;
+    }
+
+    /**
+     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
+     */
+    public function hookActionAdminControllerSetMedia()
+    {
+        if ($this->context->controller->controller_name == 'AdminOrders') {
+            $this->setMedia([
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+            ]);
+        } else {
+            $this->setMedia([
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.admin-old.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.csscss',
+            ]);
+        }
+    }
 
     /**
      * @param array $params
      * @return string
+     * @throws Exception
      * @see Module::hookHeader()
-     *
      */
     public function hookHeader($params)
     {
@@ -3733,6 +3773,7 @@ class Payplug extends PaymentModule
             'displayExpressCheckout',
             'actionClearCompileCache',
             'displayBeforeShoppingCartBlock',
+            'actionAdminControllerSetMedia',
         ];
 
         foreach ($hooksToRegister as $hookToRegister) {

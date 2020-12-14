@@ -20,32 +20,31 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="panel panel-1-6 payplugOrder" id="pppanel">
-
-    <div class="panel-heading">
+<div class="panel panel-1-6 payplugOrder card mt-2 d-print-none" id="pppanel">
+    <h3 class="panel-heading card-header">
         <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
-    </div>
-    <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
-
-    {if $show_menu_installment}
-        {include file='./installment.tpl'}
-    {/if}
-
-    {if $display_single_payment}
-        {if $single_payment.can_be_captured && isset($single_payment.date)}
-            <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
+    </h3>
+    <div class="card-body">
+        <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
+        {if $show_menu_installment}
+            {include file='./installment.tpl'}
         {/if}
-        {include file='./details.tpl' payment=$single_payment}
-    {/if}
-    {if $display_refund}
-        <hr />
-        {include file='./refund.tpl'}
-    {elseif $show_menu_refunded}
-        <hr />
-        {include file='./refunded.tpl'}
-    {elseif $show_menu_update}
-        <hr />
-        {include file='./update.tpl'}
-    {/if}
 
+        {if $display_single_payment}
+            {if $single_payment.can_be_captured && isset($single_payment.date)}
+                <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
+            {/if}
+            {include file='./details.tpl' payment=$single_payment}
+        {/if}
+        {if $display_refund}
+            <hr />
+            {include file='./refund.tpl'}
+        {elseif $show_menu_refunded}
+            <hr />
+            {include file='./refunded.tpl'}
+        {elseif $show_menu_update}
+            <hr />
+            {include file='./update.tpl'}
+        {/if}
+    </div>
 </div>

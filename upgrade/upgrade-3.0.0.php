@@ -102,5 +102,8 @@ function upgrade_module_3_0_0($object)
         $flag = $flag && Configuration::updateValue('PAYPLUG_ORDER_STATE_PAID', $order_state);
     }
 
-    return true;
+    // plug module on the hook actionAdminControllerSetMedia
+    $flag = $flag && $object->registerHook('actionAdminControllerSetMedia');
+
+    return $flag;
 }
