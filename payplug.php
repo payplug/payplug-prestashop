@@ -3003,8 +3003,10 @@ class Payplug extends PaymentModule
          *
          * For more clarity, the 'admin_order' medias are loaded here, in the 'hookAdminOrder'
         */
-        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
-        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+        $this->setMedia([
+            __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+            __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+        ]);
 
         $this->html = '';
         $order = new Order((int)$params['id_order']);
@@ -3439,19 +3441,21 @@ class Payplug extends PaymentModule
     /**
      * @description To load JS and CSS medias
      *
-     * @param $media
+     * @param array|string $medias
      * @return bool
      */
-    public function setMedia($media)
+    public function setMedia($medias)
     {
-        if (!$media) {
+        if (!$medias) {
             return false;
         }
 
-       if (strpos($media, 'css') === false) {
-           return $this->context->controller->addJS($media);
-       } else {
-           return $this->context->controller->addCSS($media);
+       foreach ($medias as $media) {
+           if (strpos($media, 'css') === false) {
+               return $this->context->controller->addJS($media);
+           } else {
+               return $this->context->controller->addCSS($media);
+           }
        }
     }
 
@@ -3465,9 +3469,11 @@ class Payplug extends PaymentModule
         /*
          * PS 1.6, 1.7, 1.7.7.0 : In this hook, we load the admin medias
          */
-        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
-        $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->setMedia([
+            __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
+            __PS_BASE_URI__ . 'modules/payplug/views/css/admin.admin-old.css',
+            __PS_BASE_URI__ . 'modules/payplug/views/css/admin.csscss',
+        ]);
 
         /*
          * 1) 1.6, 1.7 : We have to not load these 'admin' and 'admin_order' medias in same time, otherwise,
@@ -3476,8 +3482,10 @@ class Payplug extends PaymentModule
          * 2) 1.7.7.0 : It's only here that the media can be loaded in the Admin Order Details page
          */
         if ($this->checkVersion('1.7.7.0')) {
-            $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css');
-            $this->setMedia(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js');
+            $this->setMedia([
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+            ]);
         }
     }
     
