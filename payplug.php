@@ -3444,7 +3444,7 @@ class Payplug extends PaymentModule
      */
     public function setMedia($media)
     {
-        if (!$media || !is_file($media)) {
+        if (!$media) {
             return false;
         }
 
