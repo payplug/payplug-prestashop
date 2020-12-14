@@ -3436,6 +3436,12 @@ class Payplug extends PaymentModule
         return $this->display(__FILE__, 'oney/cta.tpl');
     }
 
+    /**
+     * @description To load JS and CSS medias
+     *
+     * @param $media
+     * @return bool
+     */
     public function setMedia($media)
     {
         if (!$media || !is_file($media)) {
