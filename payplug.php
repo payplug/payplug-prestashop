@@ -216,7 +216,7 @@ class Payplug extends PaymentModule
             'invoice' => false,
             'color' => '#04b404',
             'name' => [
-                'en' => 'Payment authorised',
+                'en' => 'Payment authorized',
                 'fr' => 'Paiement autorisé',
                 'es' => 'Pago',
                 'it' => 'Pagamento',
