@@ -36,7 +36,7 @@ use PayPlug\src\specific\ToolsSpecific;
 use PayPlug\src\specific\ValidateSpecific;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
-class OneyRepository
+class OneyRepository extends Repository
 {
     private $addressSpecific;
     private $cache;
@@ -45,12 +45,13 @@ class OneyRepository
     private $configurationSpecific;
     private $contextSpecific;
     private $countrySpecific;
-    private $payplug;
+    protected $payplug;
     private $toolsSpecific;
     private $validateSpecific;
 
     public function __construct($payplug)
     {
+        parent::__construct();
         $this->payplug = $payplug;
         $this->addressSpecific = new AddressSpecific();
         $this->cache = new CacheRepository();
@@ -69,7 +70,7 @@ class OneyRepository
     public function assignOneyJSVar()
     {
         $js_var = [
-            'loading_msg' => $this->payplug->l('Loading'),
+            'loading_msg' => $this->l('Loading'),
             'can_use_oney' => $this->payplug->getConfiguration('PAYPLUG_ONEY'),
         ];
         return \Media::addJsDef($js_var);
@@ -1400,7 +1401,7 @@ class OneyRepository
                 'result' => false,
                 'type' => 'invalid',
                 'error' => sprintf(
-                    $this->payplug->l('For a payment with Oney, delivery and billing addresses must be in %s'),
+                    $this->l('For a payment with Oney, delivery and billing addresses must be in %s'),
                     implode(', ', $list)
                 )
             ];

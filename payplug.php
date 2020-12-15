@@ -3470,7 +3470,7 @@ class Payplug extends PaymentModule
             $this->setMedia([
                 __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
                 __PS_BASE_URI__ . 'modules/payplug/views/css/admin.admin-old.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.csscss',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
             ]);
         }
     }
