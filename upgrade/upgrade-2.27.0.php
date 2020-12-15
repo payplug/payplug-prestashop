@@ -35,7 +35,7 @@ function upgrade_module_2_27_0($object)
     $flag = true;
 
     // run the method who install Oney feature
-    $flag = $object->installOney();
+    $flag = $object->getPlugin()->getOney()->installOney();
 
     //adding new configurations
     if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
