@@ -34,7 +34,6 @@ class CacheRepository extends Repository
 
     public function __construct()
     {
-        parent::__construct();
         $this->cacheEntity = new CacheEntity();
         $this->query = new QueryRepository();
         $this->setStdParams();

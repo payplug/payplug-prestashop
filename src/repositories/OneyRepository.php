@@ -52,7 +52,6 @@ class OneyRepository extends Repository
 
     public function __construct($payplug)
     {
-        parent::__construct();
         $this->payplug = $payplug;
         $this->addressSpecific = new AddressSpecific();
         $this->cache = new CacheRepository();

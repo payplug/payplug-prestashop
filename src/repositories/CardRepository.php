@@ -38,7 +38,6 @@ class CardRepository extends Repository
 
     public function __construct($payplug)
     {
-        parent::__construct();
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->payplug = $payplug;

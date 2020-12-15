@@ -106,7 +106,6 @@ class QueryRepository extends Repository
 
     public function __construct()
     {
-        parent::__construct();
         $this->specific_class = new QuerySpecific();
     }
 

@@ -32,7 +32,6 @@ class LoggerRepository extends Repository
 
     public function __construct()
     {
-        parent::__construct();
         $this->loggerEntity = new loggerEntity();
         $this->query = new QueryRepository();
         $this->setStdParams();

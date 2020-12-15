@@ -31,11 +31,6 @@ class Repository
     protected $name;
     protected $payplug;
 
-    public function __construct()
-    {
-        $this->setName();
-    }
-
     public function setName()
     {
         $classname = explode('\\', get_class($this));
@@ -60,6 +55,7 @@ class Repository
 
     public function l($string)
     {
+        $this->setName();
         return TranslationSpecific::translate($this->payplug, $string, $this->name);
     }
 }
