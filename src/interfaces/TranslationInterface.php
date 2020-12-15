@@ -21,8 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlug\src\interfaces;
 
-class HookRepository extends \Payplug
+interface TranslationInterface
 {
+    public static function translate($module_class, $string, $repository_name);
 }
