@@ -2090,9 +2090,6 @@ class Payplug extends PaymentModule
 
         $faq_links = $this->getFAQLinks(Context::getContext()->language->iso_code);
 
-        //remove deleted carrier from PayPlugCarrier list
-        $this->removeDeletedCarriers();
-
         $amounts = $this->oney->getOneyPriceLimit();
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
@@ -4935,24 +4932,6 @@ class Payplug extends PaymentModule
                 'message' => $this->l('Amount successfully refunded.'),
                 'reload' => $reload
             ]));
-        }
-    }
-
-    /**
-     * Automatically remove a PayPlugCarrier corresponding to a "deleted" Prestashop Carrier
-     * We actually have to execute this action while loading the list of carriers because
-     * there is no hook in Prestashop for Carrier deletion
-     *
-     * @return void
-     */
-    public function removeDeletedCarriers()
-    {
-        $current_payplug_carriers = PayPlugCarrier::getAll();
-        foreach ($current_payplug_carriers as $carrier) {
-            $actual_carrier = new Carrier($carrier->id_carrier);
-            if ($actual_carrier->deleted == 1) {
-                $carrier->delete();
-            }
         }
     }
 
