@@ -33,8 +33,7 @@ class Repository
 
     public function setName()
     {
-        $classname = explode('\\', get_class($this));
-        $this->name = array_pop($classname);
+        $this->name = (new \ReflectionClass($this))->getShortName();
         return $this;
     }
 
