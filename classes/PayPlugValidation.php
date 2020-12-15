@@ -223,7 +223,7 @@ class PayPlugValidation
 
                 $is_authorized = false;
 
-                if (($payment->authorization !== null) && isset($payment->authorization['authorized_amount']) ){
+                if (($payment->authorization !== null) && isset($payment->authorization->authorized_amount)) {
                     $is_authorized = true;
                     if (!$this->isOney) {
                         $this->isDeferred = true;
