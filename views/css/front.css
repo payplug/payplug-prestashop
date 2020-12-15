@@ -701,11 +701,6 @@
   -o-transform: translate(-50%, -50%) rotate(-45deg);
   transform: translate(-50%, -50%) rotate(-45deg);
 }
-@media (max-width: 767px) {
-  .oneyPopin_close {
-    display: none;
-  }
-}
 .oneyPopin_error {
   margin: 0;
   font-size: 14px;
