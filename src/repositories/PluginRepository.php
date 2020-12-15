@@ -50,6 +50,7 @@ class PluginRepository extends Repository
 
     public function __construct($payplug = null)
     {
+        parent::__construct();
         $this->cache    = new CacheRepository();
         $this->card     = new CardRepository($payplug);
         $this->configuration = new ConfigurationSpecific();

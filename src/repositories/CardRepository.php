@@ -27,16 +27,18 @@ use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
 
-class CardRepository
+class CardRepository extends Repository
 {
     private $cardEntity;
     private $configurationSpecific;
-    private $payplug;
     private $query;
     private $toolsSpecific;
 
+    protected $payplug;
+
     public function __construct($payplug)
     {
+        parent::__construct();
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->payplug = $payplug;
@@ -284,7 +286,7 @@ class CardRepository
         if ($payment->card->brand != '') {
             $brand = $payment->card->brand;
         } else {
-            $brand = $this->payplug->l('Unavailable');
+            $brand = $this->l('Unavailable');
         }
         return $brand;
     }
@@ -304,7 +306,7 @@ class CardRepository
         }
 
         if ($payment->card->exp_month === null) {
-            $card_expiry_date = $this->payplug->l('Unavailable');
+            $card_expiry_date = $this->l('Unavailable');
         } else {
             $card_expiry_date = date(
                 'm/y',
@@ -331,7 +333,7 @@ class CardRepository
         if ($payment->card->last4 != '') {
             $card_mask = '**** **** **** ' . $payment->card->last4;
         } else {
-            $card_mask = $this->payplug->l('Unavailable');
+            $card_mask = $this->l('Unavailable');
         }
         return $card_mask;
     }

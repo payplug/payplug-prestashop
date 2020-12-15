@@ -25,13 +25,14 @@ namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\LoggerEntity;
 
-class LoggerRepository
+class LoggerRepository extends Repository
 {
     private $loggerEntity;
     private $query;
 
     public function __construct()
     {
+        parent::__construct();
         $this->loggerEntity = new loggerEntity();
         $this->query = new QueryRepository();
         $this->setStdParams();

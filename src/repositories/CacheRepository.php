@@ -26,7 +26,7 @@ namespace PayPlug\src\repositories;
 use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\exceptions\BadParameterException;
 
-class CacheRepository
+class CacheRepository extends Repository
 {
     public $cacheEntity;
     private $query;
@@ -34,6 +34,7 @@ class CacheRepository
 
     public function __construct()
     {
+        parent::__construct();
         $this->cacheEntity = new CacheEntity();
         $this->query = new QueryRepository();
         $this->setStdParams();
