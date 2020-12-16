@@ -813,15 +813,18 @@
   flex-direction: column;
   width: 100%;
   position: relative;
-  max-width: 330px;
+  max-width: calc(50% - 30px);
   padding: 0 15px;
   margin: 0 0 15px;
 }
 .oneyRequired_fieldset.-same {
   margin: auto;
+  max-width: 100%;
 }
-.oneyRequired_wrapper .oneyRequired_fieldset {
-  max-width: calc(50% - 50px);
+@media (max-width: 767px) {
+  .oneyRequired_fieldset {
+    max-width: 100%;
+  }
 }
 @media (max-width: 767px) {
   .payplugPopin .oneyRequired_fieldset {

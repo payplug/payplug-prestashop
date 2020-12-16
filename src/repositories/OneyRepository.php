@@ -385,7 +385,7 @@ class OneyRepository extends Repository
                     $this->payplug->constantFile
                 ),
                 'payplug_oney_loading_msg' => $this->l('Loading'),
-                'oney_required_fields' => $this->displayOneyRequiredFields(),
+                'oney_required_fields' => $this->getOneyRequiredFields(),
             ]);
 
             return $this->payplug->display($this->payplug->constantFile, 'oney/payment/payment.tpl');
