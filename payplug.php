@@ -304,11 +304,11 @@ class Payplug extends PaymentModule
     {
         $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->card     = $this->getPlugin()->getCard();
-        $this->logger   = $this->getPlugin()->getLogger();
-        $this->oney     = $this->getPlugin()->getOney();
-        $this->query    = $this->getPlugin()->getQuery();
-        $this->tools    = $this->getPlugin()->getTools();
+        $this->card = $this->getPlugin()->getCard();
+        $this->logger = $this->getPlugin()->getLogger();
+        $this->oney = $this->getPlugin()->getOney();
+        $this->query = $this->getPlugin()->getQuery();
+        $this->tools = $this->getPlugin()->getTools();
     }
 
     public function loadSpecificPrestaClasses()
@@ -2085,8 +2085,8 @@ class Payplug extends PaymentModule
 
         $login_infos = [];
 
-        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment&token='.
-            Tools::getAdminTokenLite('AdminPayPlugInstallment');
+        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment';
+        $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
         $faq_links = $this->getFAQLinks(Context::getContext()->language->iso_code);
 
@@ -2428,10 +2428,11 @@ class Payplug extends PaymentModule
             _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
                 'none' : 'logos_schemes_' . $this->img_lang) . '.png'
         );
-        $paymentOption['standard']['callToActionText'] = count($payplug_cards) > 0 ?
-            $this->l('Pay with a different card') :
-            $this->l('Pay with a credit card')
-        ;
+        if (count($payplug_cards) > 0) {
+            $paymentOption['standard']['callToActionText'] = $this->l('Pay with a different card');
+        } else {
+            $paymentOption['standard']['callToActionText'] = $this->l('Pay with a credit card');
+        }
         $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
             $this->name,
             'dispatcher',
@@ -3062,10 +3063,9 @@ class Payplug extends PaymentModule
                         } elseif ((int)$p->amount_refunded > 0) {
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_refundable_payment = ($p->amount - $p->amount_refunded);
-                            $amount_available += ($amount_refundable_payment >= 10 ?
-                                $amount_refundable_payment / 100 :
-                                0)
-                            ;
+                            if ($amount_refundable_payment >= 10) {
+                                $amount_available += $amount_refundable_payment / 100;
+                            }
                         } else {
                             $amount_available += ($p->amount >= 10 ? $p->amount / 100 : 0);
                         }
@@ -3156,6 +3156,33 @@ class Payplug extends PaymentModule
                     if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
                         $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
+                    }
+                }
+            }
+
+            // Update order state if is pending
+            $state_addons = $payment->is_live ? '' : '_TEST';
+            $paid_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $oney_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+            $cancelled_state = $this->getConfiguration('PS_OS_CANCELED');
+
+            if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
+                if (in_array($payment->payment_method['type'], ['oney_x3_with_fees', 'oney_x4_with_fees'])
+                    && $order->getCurrentState() == $oney_state
+                ) {
+                    $new_order_state = false;
+
+                    if ($payment->is_paid) {
+                        $new_order_state = $paid_state;
+                    } elseif (isset($payment->failure) && $payment->failure !== null) {
+                        $new_order_state = $cancelled_state;
+                    }
+
+                    if ($new_order_state) {
+                        $order_history = new OrderHistory();
+                        $order_history->id_order = $order->id;
+                        $order_history->changeIdOrderState($new_order_state, $order->id, true);
+                        $order_history->save();
                     }
                 }
             }
@@ -3443,14 +3470,14 @@ class Payplug extends PaymentModule
             $medias = [$medias];
         }
 
-       foreach ($medias as $media) {
-           if (strpos($media, 'css') === false) {
+        foreach ($medias as $media) {
+            if (strpos($media, 'css') === false) {
                 $this->context->controller->addJS($media);
-           } else {
-               $this->context->controller->addCSS($media);
-           }
-       }
-       return true;
+            } else {
+                $this->context->controller->addCSS($media);
+            }
+        }
+        return true;
     }
 
     /**
@@ -3792,7 +3819,7 @@ class Payplug extends PaymentModule
             $install['flag'] = $installHook16['flag'];
             $install['error'] = $installHook16['error'];
         }
-        $log->info('----------------> Install hooks: '.($install['flag'] ? 'ok' : 'nok').' <----------------');
+        $log->info('----------------> Install hooks: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install configuration. <----------------');
         if (!$this->createConfig() && $install['flag']) {
@@ -3951,13 +3978,13 @@ class Payplug extends PaymentModule
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
         if (preg_match(
-            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
+                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
                         iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|
                         palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|
                         up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-            $useragent
-        ) || preg_match(
-            '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
+                $useragent
+            ) || preg_match(
+                '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
             an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
                 br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
                 dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|
@@ -3974,8 +4001,8 @@ class Payplug extends PaymentModule
                 tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|
                 vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|
                 wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-            Tools::substr($useragent, 0, 4)
-        )) {
+                Tools::substr($useragent, 0, 4)
+            )) {
             return true;
         }
         return false;
@@ -4389,8 +4416,7 @@ class Payplug extends PaymentModule
         $id_card = isset($options['id_card']) ? $options['id_card'] : $default_options['id_card'];
         $is_installment = isset($options['is_installment']) ?
             $options['is_installment'] :
-            $default_options['is_installment']
-        ;
+            $default_options['is_installment'];
         $is_deferred = isset($options['is_deferred']) ? $options['is_deferred'] : $default_options['is_deferred'];
         $is_oney = isset($options['is_oney']) ? $options['is_oney'] : $default_options['is_oney'];
 
@@ -5180,8 +5206,8 @@ class Payplug extends PaymentModule
      */
     private function setLoggers()
     {
-        $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.$this->name.'/log/general-log.csv');
-        $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.$this->name.'/log/install-log.csv');
+        $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
+        $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
         $this->logger->setParams(['process' => 'payplug.php']);
 
