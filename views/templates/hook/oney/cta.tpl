@@ -21,7 +21,7 @@
 *}
 <div class="oneyCta_wrapper">
     <div class="oneyCta{if isset($env) && $env} -{$env|escape:'htmlall':'UTF-8'}{/if}">
-        <button type="button" class="oneyCta_button{if isset($payplug_oney_error) && $payplug_oney_error} -disabled{/if}" data-e2e-oney="cta">
+        <button type="button" class="oneyCta_button{if !isset($payplug_is_oney_elligible) || (isset($payplug_is_oney_elligible) && $payplug_is_oney_elligible neq 1)} -disabled{else}{/if}" data-e2e-oney="cta">
             <span>{l s='Or pay in' mod='payplug'}</span>
             <span class="oneyCta_logo oneyLogo -x3x4"></span>
             <span class="oneyCta_tooltip oneyLogo -tooltip"></span>
