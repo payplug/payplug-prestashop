@@ -2431,9 +2431,11 @@ class Payplug extends PaymentModule
             _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
                 'none' : 'logos_schemes_' . $this->img_lang) . '.png'
         );
-        $paymentOption['standard']['callToActionText'] = count($payplug_cards) > 0 ?
-            $this->l('Pay with a different card') :
-            $this->l('Pay with a credit card');
+        if (count($payplug_cards) > 0) {
+            $paymentOption['standard']['callToActionText'] = $this->l('Pay with a different card');
+        } else {
+            $paymentOption['standard']['callToActionText'] = $this->l('Pay with a credit card');
+        }
         $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
             $this->name,
             'dispatcher',
@@ -3064,9 +3066,9 @@ class Payplug extends PaymentModule
                         } elseif ((int)$p->amount_refunded > 0) {
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_refundable_payment = ($p->amount - $p->amount_refunded);
-                            $amount_available += ($amount_refundable_payment >= 10 ?
-                                $amount_refundable_payment / 100 :
-                                0);
+                            if ($amount_refundable_payment >= 10) {
+                                $amount_available += $amount_refundable_payment / 100;
+                            }
                         } else {
                             $amount_available += ($p->amount >= 10 ? $p->amount / 100 : 0);
                         }
