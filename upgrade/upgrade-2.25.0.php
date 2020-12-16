@@ -32,7 +32,14 @@ function upgrade_module_2_25_0()
         return true;
     }
 
-    truncateCSV(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
+    // Blank every CSV file if we don't have permission to "rm *"
+    $csv_files = _PS_MODULE_DIR_ . 'payplug/log/*.csv';
+    foreach (glob($csv_files) as $path) {
+        $file = fopen($path, "w");
+        ftruncate($file, 0);
+        fclose($file);
+    }
+
     Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
     return true;
 }

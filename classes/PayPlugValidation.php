@@ -221,15 +221,18 @@ class PayPlugValidation
                     }
                 }
 
-                if ($payment->authorization !== null && !$this->isOney) {
-                    $this->isDeferred = true;
-                }
+                $is_authorized = false;
 
-                $is_authorized = count($payment->authorization) > 0;
+                if (($payment->authorization !== null) && isset($payment->authorization->authorized_amount)) {
+                    $is_authorized = true;
+                    if (!$this->isOney) {
+                        $this->isDeferred = true;
+                    }
+                }
 
                 $amount = $payment->amount;
             } catch (Exception $e) {
-                $this->logger->addLog('Payment cannot be retrieved.', 'error');
+                $this->logger->addLog('Payment cannot be retrieved. Exception : '.$e->getMessage(), 'error');
                 if (!PayplugLock::deleteLockG2($cart->id)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {

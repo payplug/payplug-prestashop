@@ -138,12 +138,3 @@ class MyLogPHP
         self::log('DEBUG', $value, $tag, $line_n);
     }
 }
-
-function truncateCSV($glob)
-{
-    foreach (glob($glob) as $path) {
-        $file = fopen($path, "w");
-        ftruncate($file, 0);
-        fclose($file);
-    }
-}

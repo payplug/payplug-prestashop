@@ -39,7 +39,6 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->contextSpecific = $this->plugin->getContext();
 
         include_once($this->module->getLocalPath() . 'payplug.php');
-        include_once($this->module->getLocalPath() . 'lib/init.php');
     }
 
     /**

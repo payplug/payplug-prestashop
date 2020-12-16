@@ -33,7 +33,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         /** Call to payplug-php API */
         require_once(_PS_MODULE_DIR_ . '/payplug/classes/PayplugBackward.php');
         require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
-        require_once(_PS_MODULE_DIR_ . '/payplug/lib/init.php');
 
         $payplug = Module::getInstanceByName('payplug');
         $payplug->initializeApi();

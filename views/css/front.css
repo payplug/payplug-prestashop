@@ -596,7 +596,8 @@
 }
 .oneyPopin_navigation li:hover button,
 .oneyPopin_navigation li.selected button {
-  color: #b2b2b2;
+  font-weight: bold;
+  color: #777;
 }
 .oneyPopin_navigation li.selected {
   background: rgba(126, 189, 0, 0.15);
@@ -699,11 +700,6 @@
   -ms-transform: translate(-50%, -50%) rotate(-45deg);
   -o-transform: translate(-50%, -50%) rotate(-45deg);
   transform: translate(-50%, -50%) rotate(-45deg);
-}
-@media (max-width: 767px) {
-  .oneyPopin_close {
-    display: none;
-  }
 }
 .oneyPopin_error {
   margin: 0;

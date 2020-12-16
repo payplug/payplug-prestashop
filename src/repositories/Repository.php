@@ -23,17 +23,38 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\src\specific\TranslationSpecific;
+
 class Repository
 {
     private $entity;
+    protected $name;
+    protected $payplug;
+
+    public function setName()
+    {
+        $this->name = (new \ReflectionClass($this))->getShortName();
+        return $this;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
 
     public function setEntity($entity)
     {
         $this->entity = $entity;
-        return  $this;
+        return $this;
     }
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function l($string)
+    {
+        $this->setName();
+        return TranslationSpecific::translate($this->payplug, $string, $this->name);
     }
 }

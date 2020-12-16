@@ -1,3 +1,4 @@
+<?php
 /**
  * 2013 - 2020 PayPlug SAS
  *
@@ -14,11 +15,15 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2020 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-@import "less/include";
-@import "less/front";
+namespace PayPlug\src\interfaces;
+
+interface TranslationInterface
+{
+    public static function translate($module_class, $string, $repository_name);
+}
