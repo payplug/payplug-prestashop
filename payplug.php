@@ -4413,12 +4413,11 @@ class Payplug extends PaymentModule
             'is_oney' => false
         ];
 
-        $id_card = isset($options['id_card']) ? $options['id_card'] : $default_options['id_card'];
-        $is_installment = isset($options['is_installment']) ?
-            $options['is_installment'] :
-            $default_options['is_installment'];
-        $is_deferred = isset($options['is_deferred']) ? $options['is_deferred'] : $default_options['is_deferred'];
-        $is_oney = isset($options['is_oney']) ? $options['is_oney'] : $default_options['is_oney'];
+        foreach($default_options as $key => $value) {
+            if (!isset($options[$key])) {
+                $options[$key] = $value;
+            }
+        }
 
         $customer = new Customer((int)$cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
@@ -4441,15 +4440,15 @@ class Payplug extends PaymentModule
             'oney' => (int)Configuration::get('PAYPLUG_ONEY')
         ];
 
-        $is_one_click = $id_card != 'new_card' && $config['one_click'];
-        $is_installment = $is_installment && $config['installment'];
+        $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
+        $options['is_installment'] = $options['is_installment'] && $config['installment'];
 
         // defined which is current payment method
         if ($is_one_click) {
             $payment_method = 'oneclick';
-        } elseif ($is_oney) {
+        } elseif ($options['is_oney']) {
             $payment_method = 'oney';
-        } elseif ($is_installment) {
+        } elseif ($options['is_installment']) {
             $payment_method = 'installment';
         } else {
             $payment_method = 'standard';
@@ -4593,7 +4592,7 @@ class Payplug extends PaymentModule
         $force_3ds = false;
 
         //save card
-        $allow_save_card = $config['one_click'] && Cart::isGuestCartByCartId($cart->id) != 1 && $id_card == 'new_card';
+        $allow_save_card = $config['one_click'] && Cart::isGuestCartByCartId($cart->id) != 1 && $options['id_card'] == 'new_card';
 
         //
         $payment_tab = [
@@ -4610,14 +4609,14 @@ class Payplug extends PaymentModule
             'allow_save_card' => $allow_save_card
         ];
 
-        if (!$is_deferred && !$is_oney) {
+        if (!$options['is_deferred'] && !$options['is_oney']) {
             $payment_tab['amount'] = $amount;
         } else {
             $payment_tab['authorized_amount'] = $amount;
         }
 
         // check payment tab from current payment method
-        if ($is_installment) {
+        if ($options['is_installment']) {
             // remove useless field from payment table
             unset($payment_tab['force_3ds']);
             unset($payment_tab['allow_save_card']);
@@ -4630,7 +4629,7 @@ class Payplug extends PaymentModule
                 if ($i == 0) {
                     $schedule[$i]['date'] = 'TODAY';
                     $int_part = (int)($amount / $config['inst_mode']);
-                    if ($is_deferred) {
+                    if ($options['is_deferred']) {
                         $schedule[$i]['authorized_amount'] = (int)($int_part +
                             ($amount - ($int_part * $config['inst_mode'])));
                     } else {
@@ -4645,13 +4644,13 @@ class Payplug extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $id_card && $id_card != 'new_card' ?
-                $this->card->getCardId((int)$cart->id_customer, $id_card, $config['company'])
+            $payment_tab['payment_method'] = $options['id_card'] && $options['id_card'] != 'new_card' ?
+                $this->card->getCardId((int)$cart->id_customer, $options['id_card'], $config['company'])
                 : null;
         }
 
         // check payment tab from current payment method
-        if ($is_oney) {
+        if ($options['is_oney']) {
             // check if oney was elligible then return if not
             $is_elligible = $this->oney->isOneyElligible($this->context->cart, false, true);
 
@@ -4703,11 +4702,11 @@ class Payplug extends PaymentModule
 
                     // then recheck
                     if ($this->oney->hasOneyRequiredFields($payment_tab)) {
-                        $this->setPaymentErrorsCookie(['oney_required_field_' . $is_oney]);
+                        $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
                         return ['result' => false, 'response' => false];
                     }
                 } else {
-                    $this->setPaymentErrorsCookie(['oney_required_field_' . $is_oney]);
+                    $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
                     return ['result' => false, 'response' => false];
                 }
             }
@@ -4716,10 +4715,10 @@ class Payplug extends PaymentModule
 
             $payment_tab['force_3ds'] = false;
             $payment_tab['auto_capture'] = true;
-            $payment_tab['payment_method'] = 'oney_' . $is_oney;
+            $payment_tab['payment_method'] = 'oney_' . $options['is_oney'];
             $payment_tab['payment_context'] = $this->oney->getOneyPaymentContext();
 
-            $return_url_params = ['ps' => 1, 'cartid' => (int)$cart->id, 'isoney' => $is_oney];
+            $return_url_params = ['ps' => 1, 'cartid' => (int)$cart->id, 'isoney' => $options['is_oney']];
             $return_url = $this->context->link->getModuleLink(
                 $this->name,
                 'validation',
@@ -4731,7 +4730,7 @@ class Payplug extends PaymentModule
 
         // Create payment
         try {
-            if ($is_installment) {
+            if ($options['is_installment']) {
                 $payment = \Payplug\InstallmentPlan::create($payment_tab);
                 if ($payment->failure != null && !empty($payment->failure->message)) {
                     return [
@@ -4762,7 +4761,7 @@ class Payplug extends PaymentModule
         switch ($payment_method) {
             case 'oneclick':
                 $redirect = $payment->is_paid;
-                if (!$redirect && $is_deferred) {
+                if (!$redirect && $options['is_deferred']) {
                     $redirect = (bool)$payment->authorization->authorized_at;
                 }
                 $payment_return = [
