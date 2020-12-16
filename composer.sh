@@ -1,5 +1,7 @@
 #!/bin/sh
 
+source ~/.bash_profile
+
 ## Auto index
 find ./vendor -type d -exec cp index.php {} \\;
 

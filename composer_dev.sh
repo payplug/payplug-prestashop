@@ -1,5 +1,7 @@
 #!/bin/sh
 
+source ~/.bash_profile
+
 composer update;
 
 ## Lib Payplug
