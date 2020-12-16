@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
+use Payplug\Exception\ConfigurationNotSetException;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
@@ -192,7 +193,6 @@ class CardRepository extends Repository
      * Delete all cards for a given customer
      *
      * @param int $id_customer
-     * @param string $api_key
      * @return bool
      */
     public function deleteCards($id_customer)
@@ -293,6 +293,7 @@ class CardRepository extends Repository
     /**
      * @param $payment
      * @return Exception|false|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardExpiryDateByPayment($payment)
     {
@@ -318,6 +319,7 @@ class CardRepository extends Repository
     /**
      * @param $payment
      * @return Exception|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardMaskByPayment($payment)
     {
@@ -402,7 +404,9 @@ class CardRepository extends Repository
 
     /**
      * ## From classes/__PayPlugCard.php ##
+     * @param $idPayplugCard
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function delete($idPayplugCard)
     {
@@ -424,7 +428,7 @@ class CardRepository extends Repository
             // Delete from API
             \Payplug\Card::delete($idCard);
 
-            // Delete from out DB
+            // Delete from our DB
             $this->query
                 ->delete()
                 ->from(_DB_PREFIX_.$table)
@@ -537,4 +541,14 @@ class CardRepository extends Repository
         }
         return $cards;
     }
+
+    /**
+     * @description Return successflull deleted card, called in front/cards.php
+     * @return mixed
+     */
+    public function deleteCardMessage()
+    {
+        return $this->l('Card sucessfully deleted.');
+    }
+
 }

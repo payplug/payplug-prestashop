@@ -81,9 +81,9 @@ $_MODULE['<{payplug}prestashop>payplug_f7d543c9b824323b84ab11668002f207'] = 'aut
 $_MODULE['<{payplug}prestashop>payplug_9206b1b984fa6e5d49f9b0ad0df43806'] = 'autorisation expirée';
 $_MODULE['<{payplug}prestashop>payplug_f2e6b2f7f4a9bd95832eaaaeddd7a952'] = 'Oney en attente';
 $_MODULE['<{payplug}prestashop>payplug_81f3d2a447d9c5579b446ff048827de1'] = 'Abandonné';
+$_MODULE['<{payplug}prestashop>payplugajax_443388128bed099c5199f1220572f96d'] = 'Une erreur s\'est produite. Veuillez réessayer dans quelques secondes.';
 $_MODULE['<{payplug}prestashop>payplugajax_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Empty payment data';
 $_MODULE['<{payplug}prestashop>payplugajax_53e41386744dfc0c2665f7f5c84ab97f'] = 'Vos informations ont été sauvegardées';
-$_MODULE['<{payplug}prestashop>payplugajax_443388128bed099c5199f1220572f96d'] = 'Une erreur s\'est produite. Veuillez réessayer dans quelques secondes.';
 $_MODULE['<{payplug}prestashop>payplugnotifications_070045a43ffc0c954761e803bf7ec0f7'] = 'Le montant collecté par PayPlug est différent';
 $_MODULE['<{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87'] = 'du total de la commande';
 $_MODULE['<{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
@@ -382,3 +382,4 @@ $_MODULE['<{payplug}prestashop>oneyrepository_a9873968394cee55c8783a2dc0d95d67']
 $_MODULE['<{payplug}prestashop>oneyrepository_7eab6a6607c367867b134afc2df95e2e'] = 'Le paiement avec Oney n\'est pas disponible.';
 $_MODULE['<{payplug}prestashop>oneyrepository_dcf7ac2432ef9544c63cd151fe296995'] = 'Pour un paiement avec Oney, les adresses de livraison et de facturation doivent être en %s';
 $_MODULE['<{payplug}prestashop>cardrepository_453e6aa38d87b28ccae545967c53004f'] = 'Indisponible';
+$_MODULE['<{payplug}prestashop>cardrepository_0d2d5fa0cfffc8577f948d683a82079e'] = 'Carte supprimée avec succès.';
