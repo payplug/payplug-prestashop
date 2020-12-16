@@ -3010,6 +3010,7 @@ class Payplug extends PaymentModule
 
         $show_popin = false;
         $display_refund = false;
+        $refund_delay_oney = false;
         $show_menu_refunded = false;
         $show_menu_update = false;
         $show_menu_installment = false;
@@ -3160,18 +3161,22 @@ class Payplug extends PaymentModule
                 }
             }
 
+            // check if order is from oney payment
+            $oney_payment_method = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+            $is_oney = isset($payment->payment_method)
+                && isset($payment->payment_method['type'])
+                && in_array($payment->payment_method['type'], $oney_payment_method);
+
             // Update order state if is pending
             $state_addons = $payment->is_live ? '' : '_TEST';
             $paid_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
             $oney_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
             $cancelled_state = $this->getConfiguration('PS_OS_CANCELED');
 
-            if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
-                if (in_array($payment->payment_method['type'], ['oney_x3_with_fees', 'oney_x4_with_fees'])
-                    && $order->getCurrentState() == $oney_state
-                ) {
+            if ($is_oney) {
+                // update order state from payment status
+                if ($order->getCurrentState() == $oney_state) {
                     $new_order_state = false;
-
                     if ($payment->is_paid) {
                         $new_order_state = $paid_state;
                     } elseif (isset($payment->failure) && $payment->failure !== null) {
@@ -3216,8 +3221,13 @@ class Payplug extends PaymentModule
             } elseif ((int)$payment->is_refunded == 1) {
                 $show_menu_refunded = true;
                 $display_refund = false;
+            }  elseif(time() >= $payment->refundable_until) {
+                $display_refund = false;
             } else {
                 $display_refund = true;
+                if ($is_oney) {
+                    $refund_delay_oney = time() <= $payment->refundable_after;
+                }
             }
 
             $conf = (int)Tools::getValue('conf');
@@ -3327,6 +3337,7 @@ class Payplug extends PaymentModule
             'admin_ajax_url' => $admin_ajax_url,
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
+            'refund_delay_oney' => $refund_delay_oney,
             'show_menu_payment' => $show_menu_payment,
             'show_menu_refunded' => $show_menu_refunded,
             'show_menu_update' => $show_menu_update,
