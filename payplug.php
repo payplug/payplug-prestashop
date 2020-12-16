@@ -3392,7 +3392,6 @@ class Payplug extends PaymentModule
         $is_elligible = $this->oney->isOneyElligible($this->context->cart, false, true);
         $is_elligible = $is_elligible['result'];
 
-
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
