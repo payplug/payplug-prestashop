@@ -5819,7 +5819,7 @@ class Payplug extends PaymentModule
 
     /**
      * Install the required hooks
-     * @return bool[]
+     * @return array
      */
     protected function installHook()
     {
