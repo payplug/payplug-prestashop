@@ -726,7 +726,10 @@ class OneyRepository extends Repository
                     ]
                 ],
             ];
-        } elseif ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100) {
+        } elseif ($tools->tool(
+            'strlen',
+            $this->contextSpecific->getContext()->customer->email,
+            'UTF-8') > 100) {
             $text = $this->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
@@ -740,8 +743,8 @@ class OneyRepository extends Repository
                 ],
             ];
         } elseif (strpos($this->contextSpecific->getContext()->customer->email, '+') !== false) {
-            $text = $this->l('The + character is not valid. 
-            Please change your email address (100 characters max).');
+            $text = $this->l('The + character is not valid.') . ' ' .
+                $this->l('Please change your email address (100 characters max).');
             $shipping_fields['email'] = [
                 'text' => $text,
                 'input' => [
