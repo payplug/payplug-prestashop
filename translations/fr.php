@@ -384,3 +384,4 @@ $_MODULE['<{payplug}prestashop>oneyrepository_a9873968394cee55c8783a2dc0d95d67']
 $_MODULE['<{payplug}prestashop>oneyrepository_7eab6a6607c367867b134afc2df95e2e'] = 'Le paiement avec Oney n\'est pas disponible.';
 $_MODULE['<{payplug}prestashop>oneyrepository_dcf7ac2432ef9544c63cd151fe296995'] = 'Pour un paiement avec Oney, les adresses de livraison et de facturation doivent être en %s';
 $_MODULE['<{payplug}prestashop>cardrepository_453e6aa38d87b28ccae545967c53004f'] = 'Indisponible';
+$_MODULE['<{payplug}prestashop>cardrepository_0d2d5fa0cfffc8577f948d683a82079e'] = 'Carte supprimée avec succès.';

@@ -79,7 +79,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             'payplug_delete_card_url' => $payplug_delete_card_url
         ]);
 
-        $card_deleted_msg = $this->payplug->displayPaymentErrors([$this->payplug->l('Card sucessfully deleted.')]);
+        $card_deleted_msg = $this->payplug->displayPaymentErrors([$this->card->deleteCardMessage()]);
         Media::addJsDef(['card_deleted_msg' => $card_deleted_msg]);
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
