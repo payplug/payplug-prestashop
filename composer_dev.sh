@@ -2,7 +2,7 @@
 
 # source ~/.bash_profile
 
-composer update;
+composer install;
 
 ## Lib Payplug
 apiRoute=vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php;

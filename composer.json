@@ -38,7 +38,7 @@
         "post-update-cmd": [
             "./composer.sh"
         ],
-        "update-dev": [
+        "install-dev": [
             "./composer_dev.sh"
         ]
     }
