@@ -367,11 +367,12 @@ $_MODULE['<{payplug}prestashop>oneyrepository_7cf56dac6ba06e2f2afce009f6da06b3']
 $_MODULE['<{payplug}prestashop>oneyrepository_d14ca54db0343b2847cdfc14db5ac044'] = 'Please enter your billing city.';
 $_MODULE['<{payplug}prestashop>oneyrepository_0e7374c84fe9165359996cfbd2170263'] = 'Your city name is too long (max 32 characters). ';
 $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56'] = 'Please change it to another one or select another payment method.';
-$_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Paiement en %Payment in %sx';
+$_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Payment in %sx';
 $_MODULE['<{payplug}prestashop>oneyrepository_ff9df6bac3078402374e750e02d60715'] = 'Your email address is too long and the + character is not valid,';
-$_MODULE['<{payplug}prestashop>oneyrepository_7b5bf6aefa40695d2f2da3a883b9fe85'] = ' please change it to another address (max 100 characters).';
+$_MODULE['<{payplug}prestashop>oneyrepository_a65c018ceba95687ec307a32e4443381'] = 'please change it to another address (max 100 characters).';
 $_MODULE['<{payplug}prestashop>oneyrepository_a3f2e0151b5896634ed88e7db254671e'] = 'The + character is not valid.';
 $_MODULE['<{payplug}prestashop>oneyrepository_f49dfe70475057b2fd9c15a3839bff2c'] = 'Please change your email address (100 characters max).';
+$_MODULE['<{payplug}prestashop>oneyrepository_ab46a1167bda1c1229c641a1c61a455d'] = 'Your city name is too long (max 32 characters).';
 $_MODULE['<{payplug}prestashop>oneyrepository_22d545ded224c1e3f0f821e99f01ed09'] = 'The total amount of your order should be between %s and %s to pay with Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_0f3e17b27426f0c030c3a3a7f461cf7b'] = 'The cart is unvalid';
 $_MODULE['<{payplug}prestashop>oneyrepository_e181052b07a91a4cacd05dd1a2db223f'] = 'The carrier';
