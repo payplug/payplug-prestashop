@@ -42,9 +42,6 @@
                                 <div class="payplugTips_item -left" {if !$payplug_switch.oney_tos.checked || !$payplug_switch.oney_tos.active}style="display: none;"{/if}>
                                     <div class="payplugOneyTOS" >
                                         <p class="payplugOneyTOS_text">{l s='Please enter your General terms and conditions URL here: ' mod='payplug'}</p>
-                                        Veuillez renseigner les CGV relatives à Oney.
-                                        Ti preghiamo di inserire le CGV relative a Oney.
-
                                         <input  type="text"
                                                 class="payplugOneyTOS_input"
                                                 name="payplug_oney_tos_url"
