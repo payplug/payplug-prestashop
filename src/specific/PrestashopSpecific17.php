@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\specific;
 
+use Exception;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class PrestashopSpecific17
@@ -43,7 +44,7 @@ class PrestashopSpecific17
     public function displayPaymentOption($payment_options)
     {
         $paymentOptions = [];
-        foreach ($payment_options as $payment_option) {
+        foreach ($payment_options as $key => $payment_option) {
             $payment_method = $payment_option['name'];
             $paymentOption = new PaymentOption();
             if (isset($payment_option['expiry_date_card'])) {
@@ -58,10 +59,15 @@ class PrestashopSpecific17
 
             // load oney schedule on e page loading
             if ($payment_method == 'oney' && $payment_option['is_optimized']) {
-                $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
-                    $payment_option['amount'],
-                    $payment_option['iso_code']
-                );
+                try {
+                    $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
+                        $payment_option['amount'],
+                        $payment_option['iso_code']
+                    );
+                } catch (Exception $e) {
+                    $payment_schedule = false;
+                }
+
                 if ($payment_schedule) {
                     $schedules = $this->payplug->oney->displayOneySchedule(
                         $payment_schedule[$payment_option['type']],
