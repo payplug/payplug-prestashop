@@ -264,6 +264,7 @@ var $document, $window, payplug = {
             var {show} = payplug,
                 {identifier} = show.props;
             $document.on('switchSelected', '.' + identifier + ' input', show.change)
+                .on('click', 'button[name="cancel_deactivate"]', show.cancel)
                 .on('click', 'button[name="confirm_deactivate"]', show.deactivate);
         },
         change: function (event) {
@@ -322,6 +323,18 @@ var $document, $window, payplug = {
                     }
                 }
             });
+        },
+        cancel: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {show, tools} = payplug,
+                {switcher} = tools,
+                showIdentifier = show.props.identifier,
+                switcherIdentifier = switcher.props.identifier,
+                $switcher = $('.'+showIdentifier).find('.'+switcherIdentifier);
+
+            switcher.left($switcher, true);
         },
         deactivate: function (event) {
             event.preventDefault();
@@ -978,7 +991,7 @@ var $document, $window, payplug = {
                     $selected.trigger('switchSelected');
                 }
             },
-            left: function (target) {
+            left: function (target, withoutEvent) {
                 var {switcher} = payplug.tools,
                     {identifier} = switcher.props;
                 target.removeClass('-right');
