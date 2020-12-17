@@ -3451,10 +3451,10 @@ class Payplug extends PaymentModule
     /**
      * @description To load JS and CSS medias
      *
-     * @param bool $medias
+     * @param array $medias
      * @return bool
      */
-    public function setMedia($medias = false)
+    public function setMedia($medias)
     {
         if (!$medias) {
             return false;
