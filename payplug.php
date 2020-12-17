@@ -2684,7 +2684,7 @@ class Payplug extends PaymentModule
     /**
      * get cart installment
      *
-     * @param int $id_order
+     * @param $id_cart
      * @return bool
      */
     public function getPayplugInstallmentCart($id_cart)
@@ -3451,7 +3451,7 @@ class Payplug extends PaymentModule
     /**
      * @description To load JS and CSS medias
      *
-     * @param array|string $medias
+     * @param bool $medias
      * @return bool
      */
     public function setMedia($medias = false)
@@ -3566,6 +3566,7 @@ class Payplug extends PaymentModule
     /**
      * @param array $params
      * @return array
+     * @throws Exception
      * @see Module::hookPaymentOptions()
      *
      */
@@ -4384,9 +4385,10 @@ class Payplug extends PaymentModule
      * @description
      * prepare payment
      *
-     * @param object $cart
+     * @param $options
      * @param string $id_card
      * @return mixed
+     * @throws Exception
      */
     public function preparePayment($options, $id_card = null)
     {
@@ -4978,8 +4980,8 @@ class Payplug extends PaymentModule
     /**
      * Retrieve payment informations
      *
-     * @param string $pay_id
-     * @return PayplugInstallment
+     * @param $inst_id
+     * @return bool|\Payplug\Resource\InstallmentPlan|null
      */
     public function retrieveInstallment($inst_id)
     {
@@ -4995,7 +4997,7 @@ class Payplug extends PaymentModule
      * Retrieve payment informations
      *
      * @param string $pay_id
-     * @return PayplugPayment
+     * @return bool|\Payplug\Resource\Payment|null
      */
     public function retrievePayment($pay_id)
     {
@@ -5680,6 +5682,7 @@ class Payplug extends PaymentModule
     /**
      * @param array $params
      * @return string
+     * @throws Exception
      * @see Module::hookPayment()
      *
      */
@@ -5735,6 +5738,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $cart
+     * @return bool
      */
     public function assignPaymentOptions($cart)
     {
@@ -5815,7 +5819,7 @@ class Payplug extends PaymentModule
 
     /**
      * Install the required hooks
-     * @return bool
+     * @return bool[]
      */
     protected function installHook()
     {
@@ -5969,6 +5973,7 @@ class Payplug extends PaymentModule
 
     /**
      * Check Prestashop version for new feature
+     * @param string $min
      * @return bool
      */
     public function checkVersion($min = '1.6')
