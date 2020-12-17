@@ -44,7 +44,7 @@ class PrestashopSpecific17
     public function displayPaymentOption($payment_options)
     {
         $paymentOptions = [];
-        foreach ($payment_options as $key => $payment_option) {
+        foreach ($payment_options as $payment_option) {
             $payment_method = $payment_option['name'];
             $paymentOption = new PaymentOption();
             if (isset($payment_option['expiry_date_card'])) {
