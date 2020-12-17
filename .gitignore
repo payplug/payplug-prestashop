@@ -4,3 +4,5 @@ config*.xml
 .idea
 vendor/
 .php_cs.cache
+views/css/less/*.css
+*.map
