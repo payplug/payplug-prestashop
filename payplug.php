@@ -3451,7 +3451,7 @@ class Payplug extends PaymentModule
     /**
      * @description To load JS and CSS medias
      *
-     * @param array $medias
+     * @param array|string $medias
      * @return bool
      */
     public function setMedia($medias)
