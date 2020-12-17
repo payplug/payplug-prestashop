@@ -41,12 +41,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class Payplug extends PaymentModule
 {
-    const PAYPLUG_PROD_API_URL = 'https://api.payplug.com';
-    const PAYPLUG_PROD_SITE_URL = 'https://www.payplug.com';
-    const INST_MIN_AMOUNT = 4;
-
     private $card; // 3.0
-
 
     private $tools; // 3.0
 
@@ -115,7 +110,6 @@ class Payplug extends PaymentModule
 
     /** @var string */
     public $site_url;
-
 
     /** @var PayPlugConfiguration */
     public $configuration;
