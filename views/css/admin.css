@@ -79,6 +79,7 @@ p.payplugInterpanel {
   background: rgba(247, 160, 0, 0.15);
   border-color: #f7a000;
   color: rgba(196, 127, 0, 0.8);
+  width: max-content;
 }
 .payplugAlert.-warning:before {
   content: "";

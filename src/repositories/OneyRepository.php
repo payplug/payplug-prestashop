@@ -714,8 +714,8 @@ class OneyRepository extends Repository
         if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100
             && $tools->tool('strpos', $this->contextSpecific->getContext()->customer->email, '+')
             !== false) {
-            $text = $this->l('Your email address is too long and the + character is not valid,') .
-                $this->l(' please change it to another address (max 100 characters).');
+            $text = $this->l('Your email address is too long and the + character is not valid,') . ' '.
+                $this->l('please change it to another address (max 100 characters).');
             $shipping_fields['email'] = [
                 'text' => $text,
                 'input' => [
@@ -726,7 +726,10 @@ class OneyRepository extends Repository
                     ]
                 ],
             ];
-        } elseif ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100) {
+        } elseif ($tools->tool(
+            'strlen',
+            $this->contextSpecific->getContext()->customer->email,
+            'UTF-8') > 100) {
             $text = $this->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
@@ -740,8 +743,8 @@ class OneyRepository extends Repository
                 ],
             ];
         } elseif (strpos($this->contextSpecific->getContext()->customer->email, '+') !== false) {
-            $text = $this->l('The + character is not valid. 
-            Please change your email address (100 characters max).');
+            $text = $this->l('The + character is not valid.') . ' ' .
+                $this->l('Please change your email address (100 characters max).');
             $shipping_fields['email'] = [
                 'text' => $text,
                 'input' => [
@@ -774,8 +777,8 @@ class OneyRepository extends Repository
 
         // Validate address
         if ($tools->tool('strlen', $shipping_address->city, 'UTF-8') > 32) {
-            $text = $this->l('Your city name is too long (max 32 characters). ')
-                . $this->l('Please change it to another one or select another payment method.');
+            $text = $this->l('Your city name is too long (max 32 characters).') . ' ' .
+                $this->l('Please change it to another one or select another payment method.');
             $shipping_fields['city'] = [
                 'text' => $text,
                 'input' => [
