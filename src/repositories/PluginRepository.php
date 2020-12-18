@@ -38,6 +38,7 @@ class PluginRepository extends Repository
     private $logger;
     private $oney;
     private $plugin;
+    private $order_state;
 
     // Specific classes
     private $configuration;
@@ -62,6 +63,7 @@ class PluginRepository extends Repository
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
         $this->validate = new ValidateSpecific();
+        $this->order_state = new OrderStateRepository();
         $this->plugin
             ->setApiVersion('2019-08-06')
             ->setCache($this->cache)
@@ -75,6 +77,7 @@ class PluginRepository extends Repository
             ->setQuery($this->query)
             ->setTools($this->tools)
             ->setValidate($this->validate)
+            ->setOrderState($this->order_state)
         ;
         $this->setEntity($this->plugin);
     }

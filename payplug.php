@@ -49,6 +49,8 @@ class Payplug extends PaymentModule
 
     public $oney;
 
+    public $order_state;
+
     public $constantFile; // 3.0
 
     /** @var PluginEntity */
@@ -303,6 +305,7 @@ class Payplug extends PaymentModule
         $this->oney = $this->getPlugin()->getOney();
         $this->query = $this->getPlugin()->getQuery();
         $this->tools = $this->getPlugin()->getTools();
+        $this->order_state = $this->getPlugin()->getOrderState();
     }
 
     public function loadSpecificPrestaClasses()
@@ -1040,7 +1043,7 @@ class Payplug extends PaymentModule
 
 
         // check if oney tos is complete
-        $ney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
+        $check_oney_tos = $this->l('Please manage the “General terms and conditions” part for Oney');
         if ($is_payplug_connected && Configuration::get('PAYPLUG_ONEY')
             && empty(Configuration::get('PAYPLUG_ONEY_TOS_URL'))) {
             $this->check_configuration['other'][] = [
@@ -1159,7 +1162,7 @@ class Payplug extends PaymentModule
             }
         }
 
-        $this->removeUnusedPayPlugOrderStates();
+        $this->order_state->removeIdsUnusedByPayPlug();
     }
 
     /**
@@ -1291,7 +1294,7 @@ class Payplug extends PaymentModule
             $this->createOrderState($key, $state, false);
         }
 
-        $this->removeUnusedPayPlugOrderStates();
+        $this->order_state->removeIdsUnusedByPayPlug();
 
         $log->info('Order state creation ended.');
         return true;
@@ -6024,148 +6027,5 @@ class Payplug extends PaymentModule
         ]);
 
         return $this->oney->getOneyCTA('checkout');
-    }
-
-    public function getOrderStateIdByName($name)
-    {
-        $req = '
-            SELECT DISTINCT osl.id_order_state
-            FROM `'._DB_PREFIX_.'order_state_lang` osl 
-            WHERE osl.name = \''.pSQL($name).'\'';
-        return (int)Db::getInstance()->getValue($req);;
-    }
-
-    public function getOrderStateIdByKey($key)
-    {
-        return (int)Configuration::get($key);
-    }
-
-    public function getOrderStateIdByConfig($config)
-    {
-        if (!isset($config['template'])
-            || !isset($config['invoice'])
-            || !isset($config['send_email'])
-            || !isset($config['hidden'])
-            || !isset($config['logable'])
-            || !isset($config['delivery'])
-            || !isset($config['shipped'])
-            || !isset($config['paid'])
-            || !isset($config['pdf_invoice'])
-            || !isset($config['pdf_delivery'])
-        ) {
-                return false;
-        } else {
-            $req = '
-                SELECT os.id_order_state
-                FROM `'._DB_PREFIX_.'order_state` os 
-                LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
-                ON (osl.id_order_state = os.id_order_state AND osl.template = \''.pSQL($config['template']).'\'
-                WHERE os.invoice = '.(int)$config['invoice'].'
-                AND os.send_email = '.(int)$config['send_email'].'
-                AND os.hidden = '.(int)$config['hidden'].'
-                AND os.logable = '.(int)$config['logable'].'
-                AND os.delivery = '.(int)$config['delivery'].'
-                AND os.shipped = '.(int)$config['shipped'].'
-                AND os.paid = '.(int)$config['paid'].'
-                AND os.pdf_invoice = '.(int)$config['pdf_invoice'].'
-                AND os.pdf_delivery = '.(int)$config['pdf_delivery'].'
-			';
-            return (int)Db::getInstance()->getValue($req);
-        }
-    }
-
-    public function getOrderStateIdsByModuleName($module_name)
-    {
-        $ids = [];
-        $req = '
-            SELECT *
-            FROM `'._DB_PREFIX_.'order_state` os 
-            WHERE os.module_name = \''.pSQL($module_name).'\'
-        ';
-        $res = Db::getInstance()->executeS($req);
-
-        foreach ($res as $os) {
-            array_push($ids, (int)$os['id_order_state']);
-        }
-
-        return $ids;
-    }
-
-    public function getOrderState($config)
-    {
-        $id = 0;
-        $case = 0;
-        if (!isset($config['template'])
-            || !isset($config['invoice'])
-            || !isset($config['send_email'])
-            || !isset($config['hidden'])
-            || !isset($config['logable'])
-            || !isset($config['delivery'])
-            || !isset($config['shipped'])
-            || !isset($config['paid'])
-            || !isset($config['pdf_invoice'])
-            || !isset($config['pdf_delivery'])
-            || !isset($config['name'])
-            || !isset($config['key'])
-        ) {
-            return false;
-        } else {
-            while ((int)$id === 0) {
-                switch ($case) {
-                    case 0:
-                        $id = $this->getOrderStateIdByKey($config['key']);
-                        $case ++;
-                        break;
-                    case 1:
-                        $id = $this->getOrderStateIdByName($config['name']);
-                        $case ++;
-                        break;
-                    case 2:
-                        $id = $this->getOrderStateIdByConfig($config);
-                        $case ++;
-                        break;
-                    default:
-                        return false;
-                }
-            }
-
-            $os = new OrderState($id);
-            if (!Validate::isLoadedObject($os)) {
-                return false;
-            } else {
-                return $os;
-            }
-        }
-    }
-
-    public function removeUnusedPayPlugOrderStates()
-    {
-        $payplug_os_id_list = $this->getOrderStateIdsByModuleName('payplug');
-        $used_os_id_list = $this->getUsedPayPlugOrderStateIds();
-        foreach ($payplug_os_id_list as $payplug_os_id) {
-            if (!in_array($payplug_os_id, $used_os_id_list)) {
-                $os = new OrderState($payplug_os_id);
-                if (Validate::isLoadedObject($os)) {
-                    $os->delete();
-                }
-            }
-        }
-    }
-
-    public function getUsedPayPlugOrderStateIds()
-    {
-        $ids = [];
-        $req = '
-            SELECT c.value
-            FROM `'._DB_PREFIX_.'configuration` c 
-            WHERE c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'
-        ';
-        $res = Db::getInstance()->executeS($req);
-
-        foreach ($res as $os) {
-            array_push($ids, (int)$os['value']);
-        }
-
-        return $ids;
     }
 }
