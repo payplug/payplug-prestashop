@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\specific;
 
-use Exception;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class PrestashopSpecific17
@@ -64,7 +63,8 @@ class PrestashopSpecific17
                         $payment_option['amount'],
                         $payment_option['iso_code']
                     );
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
+                    // todo: set a permanent log
                     $payment_schedule = false;
                 }
 
