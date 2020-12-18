@@ -21,6 +21,8 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use Payplug\Exception\ConfigurationNotSetException;
+
 /**
  * Core file of PayPlug module
  */
@@ -400,7 +402,7 @@ class Payplug extends PaymentModule
      * @param $installment
      * @param $order
      * @return bool
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function addPayplugInstallment($installment, $order)
     {
@@ -664,7 +666,7 @@ class Payplug extends PaymentModule
     /**
      * @param $payment
      * @return array|Exception
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function buildPaymentDetails($payment)
     {
@@ -2600,7 +2602,7 @@ class Payplug extends PaymentModule
     /**
      * @param $payment
      * @return int
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     private function getPaymentStatusByPayment($payment)
     {
@@ -2731,7 +2733,7 @@ class Payplug extends PaymentModule
      * @param $installment
      * @return array|bool|false|mysqli_result|PDOStatement|resource|null
      * @throws PrestaShopDatabaseException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function getStoredInstallment($installment)
     {
@@ -2755,7 +2757,7 @@ class Payplug extends PaymentModule
      * @param $installment
      * @param $step
      * @return array|bool|object|null
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function getStoredInstallmentTransaction($installment, $step)
     {
@@ -2961,7 +2963,7 @@ class Payplug extends PaymentModule
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws \Payplug\Exception\ConfigurationException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      * @see Module::hookAdminOrder()
      */
     public function hookAdminOrder($params)
@@ -4003,7 +4005,7 @@ class Payplug extends PaymentModule
      * @param string $payment_id
      * @param string $type default payment
      * @return bool
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function isPaidPaymentMethod($payment_id, $type = 'payment')
     {
@@ -4120,7 +4122,7 @@ class Payplug extends PaymentModule
      * @param null $inst_id
      * @return string
      * @throws \Payplug\Exception\ConfigurationException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -4207,6 +4209,7 @@ class Payplug extends PaymentModule
      * @param String $pay_id
      * @param Array $data
      * @return Array
+     * @throws ConfigurationNotSetException
      */
     public function patchPayment($api_key, $pay_id, $data)
     {
@@ -5567,7 +5570,7 @@ class Payplug extends PaymentModule
     /**
      * @param $installment
      * @return bool
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      *
      */
     public function updatePayplugInstallment($installment)
