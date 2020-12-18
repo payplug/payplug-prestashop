@@ -32,7 +32,7 @@
 
         {if $display_single_payment}
             {if $single_payment.can_be_captured && isset($single_payment.date)}
-                <span class="pp_block">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
+                <span class="payplugAlert -warning">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
             {/if}
             {include file='./details.tpl' payment=$single_payment}
         {/if}

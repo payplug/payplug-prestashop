@@ -576,7 +576,7 @@ var $document,
                         payplugModule.oney.payment.form.open();
                     } else {
                         payplugModule.payment.send({
-                            id_card: null,
+                            id_card: 'new_card',
                             is_inst: null,
                             is_oney: payplugModule.oney.props.type,
                         });

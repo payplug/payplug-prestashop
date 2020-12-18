@@ -179,7 +179,7 @@ class PayPlugAjax
                 } catch (Exception $e) {
                     die($tools->tool('jsonEncode', [
                         'result' => false,
-                        'message' => $this->payplug->l('An error occurred. Please retry in few seconds.')
+                        'error' => $this->payplug->l('Oney is momentarily unavailable.')
                     ]));
                 }
 

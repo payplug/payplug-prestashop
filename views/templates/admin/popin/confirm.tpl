@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<p>{l s='Once the settings are saved, the Payplug module will be displayed:' mod='payplug'}</p>
+<p>{l s='The following settings will be saved:' mod='payplug'}</p>
 <ul>
     <li data-e2e-type="sandbox" data-e2e-state="{if $sandbox}on{else}off{/if}">
         {l s='Mode:' mod='payplug'}

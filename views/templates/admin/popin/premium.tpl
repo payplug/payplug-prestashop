@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<p>{l s='You cannot access this feature. For further information please contact our team : support@payplug.com' mod='payplug'}</p>
+<p>{l s='You don\'t have access to this feature. For more information, please contact us via our website : https://www.payplug.com/contact' mod='payplug'}</p>
 <div class="payplugPopup_footer -center">
     <button type="button" class="payplugButton -green -close">{l s='Ok' mod='payplug'}</button>
 </div>
