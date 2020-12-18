@@ -1666,33 +1666,11 @@ class Payplug extends PaymentModule
      */
     public function getAccount($api_key, $sandbox = true)
     {
-        $url = $this->plugin->getApiUrl() . $this->routes['account'];
-        $curl_version = curl_version();
-        $process = curl_init($url);
-        curl_setopt($process, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $api_key]);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
-        $answer = curl_exec($process);
-        $error_curl = curl_errno($process);
+        $response = \Payplug\Authentication::getAccount();
+        $json_answer = $response['httpResponse'];
+        if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
+            return $permissions;
 
-        curl_close($process);
-
-        if ($error_curl == 0) {
-            $json_answer = json_decode($answer);
-
-            if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
-                return $permissions;
-            } else {
-                return false;
-            }
         } else {
             return false;
         }
@@ -4123,48 +4101,10 @@ class Payplug extends PaymentModule
      */
     private function login($email, $password)
     {
-        $data = [
-            'email' => $email,
-            'password' => $password
-        ];
-        $data_string = json_encode($data);
-
-        $url = $this->plugin->getApiUrl() . $this->routes['login'];
-        $curl_version = curl_version();
-        $process = curl_init($url);
-        curl_setopt(
-            $process,
-            CURLOPT_HTTPHEADER,
-            [
-                'Content-Type:application/json',
-                'Content-Length: ' . Tools::strlen($data_string)
-            ]
-        );
-        curl_setopt($process, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($process, CURLOPT_POST, true);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
-        $answer = curl_exec($process);
-        $error_curl = curl_errno($process);
-
-        curl_close($process);
-
-        if ($error_curl == 0) {
-            $json_answer = json_decode($answer);
-
-            if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                return true;
-            } else {
-                return false;
-            }
+        $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+        $json_answer = $response['httpResponse'];
+        if ($this->setApiKeysbyJsonResponse($json_answer)) {
+            return true;
         } else {
             return false;
         }
@@ -4270,52 +4210,20 @@ class Payplug extends PaymentModule
      */
     public function patchPayment($api_key, $pay_id, $data)
     {
-        $data_string = json_encode($data);
-        $url = $this->plugin->getApiUrl() . $this->routes['patch'] . '/' . $pay_id;
-        $curl_version = curl_version();
-        $process = curl_init($url);
-        curl_setopt(
-            $process,
-            CURLOPT_HTTPHEADER,
-            [
-                'Authorization: Bearer ' . $api_key,
-                'Content-Type:application/json',
-                'Content-Length: ' . Tools::strlen($data_string)
-            ]
-        );
-        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($process, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
-        $answer = curl_exec($process);
-        $error_curl = curl_errno($process);
-        curl_close($process);
+        $payment = \Payplug\Resource\Payment::fromAttributes(array('id' => $pay_id));
+        $response = $payment->update($data);
+        $json_answer = $response['httpResponse'];
 
         $result = [
             'status' => false,
             'message' => null,
         ];
 
-        if ($error_curl == 0) {
-            $json_answer = json_decode($answer);
-
-            if (isset($json_answer->object) && $json_answer->object == 'error') {
-                $result['status'] = false;
-                $result['message'] = $json_answer->message;
-            } else {
-                $result['status'] = true;
-            }
-        } else {
+        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
             $result['status'] = false;
-            $result['message'] = $this->l('Error while executing cURL request.');
+            $result['message'] = $json_answer['message'];
+        } else {
+            $result['status'] = true;
         }
         return $result;
     }
@@ -5097,7 +5005,7 @@ class Payplug extends PaymentModule
      */
     private function setApiKeysbyJsonResponse($json_answer)
     {
-        if (isset($json_answer->object) && $json_answer->object == 'error') {
+        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
             return false;
         }
 
@@ -5105,12 +5013,12 @@ class Payplug extends PaymentModule
         $api_keys['test_key'] = '';
         $api_keys['live_key'] = '';
 
-        if (isset($json_answer->secret_keys)) {
-            if (isset($json_answer->secret_keys->test)) {
-                $api_keys['test_key'] = $json_answer->secret_keys->test;
+        if (isset($json_answer['secret_keys'])) {
+            if (isset($json_answer['secret_keys']['test'])) {
+                $api_keys['test_key'] = $json_answer['secret_keys']['test'];
             }
-            if (isset($json_answer->secret_keys->live)) {
-                $api_keys['live_key'] = $json_answer->secret_keys->live;
+            if (isset($json_answer['secret_keys']['live'])) {
+                $api_keys['live_key'] = $json_answer['secret_keys']['live'];
             }
         }
         Configuration::updateValue('PAYPLUG_TEST_API_KEY', $api_keys['test_key']);
@@ -5445,13 +5353,13 @@ class Payplug extends PaymentModule
      */
     private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
-        if ((isset($json_answer->object) && $json_answer->object == 'error')
+        if ((isset($json_answer['object']) && $json_answer['object'] == 'error')
             || empty($json_answer)
         ) {
             return false;
         }
 
-        $id = $json_answer->id;
+        $id = $json_answer['id'];
 
         $configuration = [
             'currencies' => Configuration::get('PAYPLUG_CURRENCIES'),
@@ -5461,49 +5369,62 @@ class Payplug extends PaymentModule
             'oney_max_amounts' => Configuration::get('PAYPLUG_ONEY_MAX_AMOUNTS'),
             'oney_min_amounts' => Configuration::get('PAYPLUG_ONEY_MIN_AMOUNTS'),
         ];
-        if (isset($json_answer->configuration)) {
-            if (isset($json_answer->configuration->currencies) && !empty($json_answer->configuration->currencies)) {
+
+        if (isset($json_answer['configuration'])) {
+
+            if (isset($json_answer['configuration']['currencies'])
+                && !empty($json_answer['configuration']['currencies'])) {
                 $configuration['currencies'] = [];
-                foreach ($json_answer->configuration->currencies as $value) {
+                foreach ($json_answer['configuration']['currencies'] as $value) {
                     $configuration['currencies'][] = $value;
                 }
             }
-            if (isset($json_answer->configuration->min_amounts) && !empty($json_answer->configuration->min_amounts)) {
+
+            if (isset($json_answer['configuration']['min_amounts'])
+                && !empty($json_answer['configuration']['min_amounts'])) {
                 $configuration['min_amounts'] = '';
-                foreach ($json_answer->configuration->min_amounts as $key => $value) {
+                foreach ($json_answer['configuration']['min_amounts'] as $key => $value) {
                     $configuration['min_amounts'] .= $key . ':' . $value . ';';
                 }
                 $configuration['min_amounts'] = Tools::substr($configuration['min_amounts'], 0, -1);
             }
-            if (isset($json_answer->configuration->max_amounts) && !empty($json_answer->configuration->max_amounts)) {
+
+            if (isset($json_answer['configuration']['max_amounts'])
+                && !empty($json_answer['configuration']['max_amounts'])) {
                 $configuration['max_amounts'] = '';
-                foreach ($json_answer->configuration->max_amounts as $key => $value) {
+                foreach ($json_answer['configuration']['max_amounts'] as $key => $value) {
                     $configuration['max_amounts'] .= $key . ':' . $value . ';';
                 }
                 $configuration['max_amounts'] = Tools::substr($configuration['max_amounts'], 0, -1);
             }
-            if (isset($json_answer->configuration->oney)) {
-                if (isset($json_answer->configuration->oney->allowed_countries)
-                    && !empty($json_answer->configuration->oney->allowed_countries)
-                    && sizeof($json_answer->configuration->oney->allowed_countries)) {
+
+            if (isset($json_answer['configuration']['oney'])) {
+                if (isset($json_answer['configuration']['oney']['allowed_countries'])
+                    && !empty($json_answer['configuration']['oney']['allowed_countries'])
+                    && sizeof($json_answer['configuration']['oney']['allowed_countries'])
+                ) {
                     $allowed = '';
-                    foreach ($json_answer->configuration->oney->allowed_countries as $country) {
+                    foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
                         $allowed .= $country . ',';
                     }
                     $configuration['oney_allowed_countries'] = Tools::substr($allowed, 0, -1);
                 }
-                if (isset($json_answer->configuration->oney->min_amounts)
-                    && !empty($json_answer->configuration->oney->min_amounts)) {
+
+                if (isset($json_answer['configuration']['oney']['min_amounts'])
+                    && !empty($json_answer['configuration']['oney']['min_amounts'])
+                ) {
                     $configuration['oney_min_amounts'] = '';
-                    foreach ($json_answer->configuration->oney->min_amounts as $key => $value) {
+                    foreach ($json_answer['configuration']['oney']['min_amounts'] as $key => $value) {
                         $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
                     }
                     $configuration['oney_min_amounts'] = Tools::substr($configuration['oney_min_amounts'], 0, -1);
                 }
-                if (isset($json_answer->configuration->oney->max_amounts)
-                    && !empty($json_answer->configuration->oney->max_amounts)) {
+
+                if (isset($json_answer['configuration']['oney']['max_amounts'])
+                    && !empty($json_answer['configuration']['oney']['max_amounts'])
+                ) {
                     $configuration['oney_max_amounts'] = '';
-                    foreach ($json_answer->configuration->oney->max_amounts as $key => $value) {
+                    foreach ($json_answer['configuration']['oney']['max_amounts'] as $key => $value) {
                         $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
                     }
                     $configuration['oney_max_amounts'] = Tools::substr($configuration['oney_max_amounts'], 0, -1);
@@ -5512,16 +5433,16 @@ class Payplug extends PaymentModule
         }
 
         $permissions = [
-            'use_live_mode' => $json_answer->permissions->use_live_mode,
-            'can_save_cards' => $json_answer->permissions->can_save_cards,
-            'can_create_installment_plan' => $json_answer->permissions->can_create_installment_plan,
-            'can_create_deferred_payment' => $json_answer->permissions->can_create_deferred_payment,
-            'can_use_oney' => $json_answer->permissions->can_use_oney,
+            'use_live_mode' => $json_answer['permissions']['use_live_mode'],
+            'can_save_cards' => $json_answer['permissions']['can_save_cards'],
+            'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
+            'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
+            'can_use_oney' => $json_answer['permissions']['can_use_oney'],
         ];
 
         // If sandbox mode active, no allowed countries sent
         // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
-        if (isset($json_answer->is_live) && !$json_answer->is_live) {
+        if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
