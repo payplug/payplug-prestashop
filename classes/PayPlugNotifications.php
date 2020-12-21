@@ -782,7 +782,7 @@ class PayPlugNotifications
             $data['metadata']['Order'] = $order->id;
             try {
                 $this->logger->addLog('Payment patched.', 'debug');
-                $this->payplug->patchPayment($this->api_key, $this->payment->id, $data);
+                $this->payplug->patchPayment($this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
                     'Payment cannot be patched: ' . $exception->getMessage(),

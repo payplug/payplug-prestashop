@@ -4213,21 +4213,21 @@ class Payplug extends PaymentModule
      */
     public function patchPayment($api_key, $pay_id, $data)
     {
-        $payment = \Payplug\Resource\Payment::fromAttributes(array('id' => $pay_id));
-        $response = $payment->update($data);
-        $json_answer = $response['httpResponse'];
-
         $result = [
-            'status' => false,
+            'status' => true,
             'message' => null,
         ];
 
-        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
-            $result['status'] = false;
-            $result['message'] = $json_answer['message'];
-        } else {
-            $result['status'] = true;
+        try {
+            $payment = \Payplug\Resource\Payment::fromAttributes(array('id' => $pay_id));
+            $payment->update($data);
+        } catch (Exception $e) {
+            $result = [
+                'status' => false,
+                'message' => $e['message']
+            ];
         }
+
         return $result;
     }
 

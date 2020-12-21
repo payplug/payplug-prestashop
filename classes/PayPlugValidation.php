@@ -464,7 +464,7 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-                $this->payplug->patchPayment($this->payplug->current_api_key, $payment->id, $data);
+                $this->payplug->patchPayment($payment->id, $data);
 
                 if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');
