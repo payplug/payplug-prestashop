@@ -2974,7 +2974,7 @@ class Payplug extends PaymentModule
      * @throws ConfigurationNotSetException
      * @see Module::hookAdminOrder()
      */
-    public function hookAdminOrder($params)
+    public function hookDisplayAdminOrderMain($params)
     {
         if (!$this->active) {
             return;
@@ -3340,6 +3340,20 @@ class Payplug extends PaymentModule
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
         return $this->html;
+    }
+
+    /**
+     * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     *
+     * @param $params
+     * @return string
+     * @throws ConfigurationNotSetException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \Payplug\Exception\ConfigurationException
+     */
+    public function hookAdminOrder($params) {
+        return $this->hookDisplayAdminOrderMain($params);
     }
 
     /**
@@ -3782,6 +3796,7 @@ class Payplug extends PaymentModule
             'paymentReturn',
             'Header',
             'adminOrder',
+            'displayAdminOrderMain',
             'actionOrderStatusUpdate',
             'customerAccount',
             'paymentOptions',
@@ -5781,6 +5796,7 @@ class Payplug extends PaymentModule
 
         $hooksToRegister = [
             'adminOrder',
+            'displayAdminOrderMain',
             'customerAccount',
             'header',
             'paymentReturn',
