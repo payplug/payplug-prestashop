@@ -4205,13 +4205,12 @@ class Payplug extends PaymentModule
     /**
      * Send cURL request to PayPlug to patch a given payment
      *
-     * @param String $api_key
      * @param String $pay_id
      * @param Array $data
      * @return Array
      * @throws ConfigurationNotSetException
      */
-    public function patchPayment($api_key, $pay_id, $data)
+    public function patchPayment($pay_id, $data)
     {
         $result = [
             'status' => true,
