@@ -387,7 +387,8 @@ var $document, $window, payplug = {
     login: {
         props: {
             identifier: 'payplugLogin',
-            query: null
+            query: null,
+            logged: false
         },
         init: function () {
             var {login} = payplug,
@@ -395,6 +396,10 @@ var $document, $window, payplug = {
             $document.on('click', '.' + identifier + '_login', login.login)
                 .on('click', '.' + identifier + '_logout', login.logout)
                 .on('click', 'button[name=password]', login.password);
+
+            if ($('.' + identifier).is('.-logged')) {
+                login.props.logged = true;
+            }
         },
         login: function (event) {
             event.preventDefault();
@@ -594,10 +599,13 @@ var $document, $window, payplug = {
             query: null,
         },
         init: function () {
-            var {settings} = payplug,
+            var {settings, login} = payplug,
                 {identifier} = settings.props;
             $document.on('switchSelected', '.' + identifier + ' input', settings.change);
-            $window.on('load', settings.load);
+
+            if (login.props.logged) {
+                $window.on('load', settings.load);
+            }
         },
         load: function (event) {
             event.preventDefault();

@@ -5027,6 +5027,13 @@ class Payplug extends PaymentModule
         Configuration::updateValue('PAYPLUG_TEST_API_KEY', $api_keys['test_key']);
         Configuration::updateValue('PAYPLUG_LIVE_API_KEY', $api_keys['live_key']);
 
+        $is_sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        if ($is_sandbox) {
+            $this->setSecretKey($api_keys['test_key']);
+        } else {
+            $this->setSecretKey($api_keys['live_key']);
+        }
+
         return true;
     }
 
