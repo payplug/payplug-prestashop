@@ -431,6 +431,11 @@ class QueryRepository extends Repository
         }
 
         $result = $this->specific_class->query($sql);
+
+        if (isset($param) && $param == 'unique_value') {
+            $result = reset($result[0]);
+        }
+
         $this->query = null;
         $sql = null;
         return $result;

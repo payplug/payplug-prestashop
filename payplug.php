@@ -51,6 +51,8 @@ class Payplug extends PaymentModule
 
     public $oney;
 
+    public $order_state;
+
     public $constantFile; // 3.0
 
     /** @var PluginEntity */
@@ -305,6 +307,7 @@ class Payplug extends PaymentModule
         $this->oney = $this->getPlugin()->getOney();
         $this->query = $this->getPlugin()->getQuery();
         $this->tools = $this->getPlugin()->getTools();
+        $this->order_state = $this->getPlugin()->getOrderState();
     }
 
     public function loadSpecificPrestaClasses()
@@ -1160,6 +1163,8 @@ class Payplug extends PaymentModule
                 $this->createOrderState($key, $state, true, true);
             }
         }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
     }
 
     /**
@@ -1271,6 +1276,7 @@ class Payplug extends PaymentModule
             $os = $order_state->id;
             $log->info('ID: ' . $os);
         }
+
         return Configuration::updateValue($key_config, $os);
     }
 
@@ -1289,6 +1295,8 @@ class Payplug extends PaymentModule
             $this->createOrderState($key, $state, true);
             $this->createOrderState($key, $state, false);
         }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
 
         $log->info('Order state creation ended.');
         return true;
@@ -3822,6 +3830,7 @@ class Payplug extends PaymentModule
             ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install order states. <----------------');
+
         if (!$this->createOrderStates() && $install['flag']) {
             $log->error('Install failed: order states.');
             $install['flag'] = false;
