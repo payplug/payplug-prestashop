@@ -443,6 +443,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined' && result.content) {
                         $('form.payplug').replaceWith(result.content);
+                        login.props.logged = true;
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
                         payplug.tools.popup.error(result.error);
@@ -460,7 +461,7 @@ var $document, $window, payplug = {
                 data = {
                     _ajax: 1,
                     submitDisconnect: 1,
-                }
+                };
 
             if (login.props.query != null) {
                 login.props.query.abort();
@@ -489,6 +490,7 @@ var $document, $window, payplug = {
                 },
                 success: function (result) {
                     $('form.payplug').replaceWith(result.content);
+                    login.props.logged = false;
                 }
             });
         },
@@ -602,16 +604,17 @@ var $document, $window, payplug = {
             var {settings, login} = payplug,
                 {identifier} = settings.props;
             $document.on('switchSelected', '.' + identifier + ' input', settings.change);
-
-            if (login.props.logged) {
-                $window.on('load', settings.load);
-            }
+            $window.on('load', settings.load);
         },
         load: function (event) {
             event.preventDefault();
             event.stopPropagation();
 
-            var {settings} = payplug;
+            var {settings, login} = payplug;
+
+            if (!login.props.logged) {
+                return false;
+            }
 
             if (settings.props.query != null) {
                 settings.props.query.abort();
