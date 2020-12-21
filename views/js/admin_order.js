@@ -32,13 +32,13 @@ var $document, $window, payplug = {
     },
     abort: {
         init: function(){
-            var abort = payplug.abort;
+            var {abort} = payplug;
             $document.on('click','input[name=submitPPAbort]', abort.call)
                 .on('click','button[name=confirmPayplugAbort]', abort.confirm);
         },
         call: function(event) {
             event.preventDefault();
-            var popup = payplug.popup;
+            var {popup} = payplug;
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
             var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
@@ -97,8 +97,8 @@ var $document, $window, payplug = {
             identifier: 'payplugPopup',
         },
         init: function () {
-            var popup = payplug.popup,
-                identifier = popup.props.identifier;
+            var {popup} = payplug,
+                {identifier} = popup.props;
 
             $document.on('click', '.' + identifier + '_close', popup.close)
                 .on('click', '.' + identifier + ' .payplugButton-close', popup.close)
@@ -110,9 +110,8 @@ var $document, $window, payplug = {
                 });
         },
         set: function (content) {
-            console.log('popup set');
-            var popup = payplug.popup,
-                identifier = popup.props.identifier;
+            var {popup} = payplug,
+                {identifier} = popup.props;
 
             if (!$('.' + identifier).length) {
                 popup.create();
@@ -121,9 +120,8 @@ var $document, $window, payplug = {
             popup.open();
         },
         open: function () {
-            console.log('popup open');
-            var popup = payplug.popup,
-                identifier = popup.props.identifier,
+            var {popup} = payplug,
+                {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
             $popup.addClass(identifier + '-open');
@@ -132,9 +130,8 @@ var $document, $window, payplug = {
             }, 0);
         },
         close: function () {
-            console.log('popup close');
-            var popup = payplug.popup,
-                identifier = popup.props.identifier,
+            var {popup} = payplug,
+                {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
             $popup.removeClass(identifier + '-show');
@@ -144,24 +141,21 @@ var $document, $window, payplug = {
             }, 500);
         },
         create: function () {
-            console.log('popup create');
-            var popup = payplug.popup,
-                identifier = popup.props.identifier,
+            var {popup} = payplug,
+                {identifier} = popup.props,
                 html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
             $('body').append(html);
         },
         remove: function () {
-            console.log('popup remove');
-            var popup = payplug.popup,
-                identifier = popup.props.identifier,
+            var {popup} = payplug,
+                {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
             $popup.remove();
         },
         hydrate: function (content) {
-            console.log('popup hydrate');
-            var popup = payplug.popup,
-                identifier = popup.props.identifier;
+            var {popup} = payplug,
+                {identifier} = popup.props;
             $('.' + identifier + '_content').html(content);
         }
     }
