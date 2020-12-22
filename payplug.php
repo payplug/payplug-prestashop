@@ -1432,7 +1432,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Display payment errors template
+     * Display payment errors messages template
      *
      * @param array $errors
      * @return mixed
@@ -1443,7 +1443,7 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $payment_messages = [];
+        $formated = [];
         $with_msg_button = false;
         foreach ($errors as $error) {
             if (strpos($error, 'oney_required_field') !== false) {
@@ -1453,13 +1453,13 @@ class Payplug extends PaymentModule
                     'oney_type' => str_replace('oney_required_field_', '', $error),
                     'oney_required_fields' => $fields,
                 ]);
-                $payment_messages[] = [
+                $formated[] = [
                     'type' => 'template',
                     'value' => 'oney/required.tpl'
                 ];
             } else {
                 $with_msg_button = true;
-                $payment_messages[] = [
+                $formated[] = [
                     'type' => 'string',
                     'value' => $error
                 ];
@@ -1467,7 +1467,36 @@ class Payplug extends PaymentModule
         }
 
         $this->smarty->assign([
-            'payment_messages' => $payment_messages,
+            'is_error_message' => true,
+            'messages' => $formated,
+            'with_msg_button' => $with_msg_button
+        ]);
+
+        return $this->display(__FILE__, '_partials/messages.tpl');
+    }
+
+    /**
+     * Display messages template
+     *
+     * @param array $messages
+     * @return bool|string
+     */
+    public function displayMessages($messages = [], $with_msg_button = false)
+    {
+        if (empty($messages)) {
+            return false;
+        }
+
+        $formated = [];
+        foreach ($messages as $message) {
+            $formated[] = [
+                'type' => 'string',
+                'value' => $message
+            ];
+        }
+
+        $this->smarty->assign([
+            'messages' => $formated,
             'with_msg_button' => $with_msg_button
         ]);
 
@@ -4490,7 +4519,10 @@ class Payplug extends PaymentModule
                 $billing_address->company :
                 $billing_address->firstname . ' ' . $billing_address->lastname,
             'email' => $customer->email,
-            'landline_phone_number' => $this->formatPhoneNumber($billing_address->phone, $billing_address->id_country),
+            'landline_phone_number' => $this->formatPhoneNumber(
+                $billing_address->phone,
+                $billing_address->id_country
+            ),
             'mobile_phone_number' => $this->formatPhoneNumber(
                 $billing_address->phone_mobile,
                 $billing_address->id_country
