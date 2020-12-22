@@ -106,8 +106,8 @@ class PayPlugValidation
         // Create lock
         $cart_lock = false;
         $datetime1 = date_create(date('Y-m-d H:i:s'));
+        $this->logger->addLog('Check lock');
         do {
-            $this->logger->addLog('Check if lock exist');
             $cart_lock = PayplugLock::check($cart->id);
             if (!$cart_lock) {
                 $datetime2 = date_create(date('Y-m-d H:i:s'));
