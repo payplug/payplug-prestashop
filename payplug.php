@@ -1676,6 +1676,7 @@ class Payplug extends PaymentModule
      */
     public function getAccount($api_key, $sandbox = true)
     {
+        $this->setSecretKey($api_key);
         $response = \Payplug\Authentication::getAccount();
         $json_answer = $response['httpResponse'];
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
