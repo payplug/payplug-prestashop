@@ -278,6 +278,8 @@ class PayPlugValidation
                     if ((isset($payment->hosted_payment)) && $payment->hosted_payment == '') {
                         $this->logger->addLog('[Save Card] $payment->hosted_payment is set but empty', 'debug');
                     }
+                } else {
+                    $this->logger->addLog('[Save Card] Card saved', 'debug');
                 }
             }
         }

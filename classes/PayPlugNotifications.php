@@ -221,6 +221,8 @@ class PayPlugNotifications
                 if ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment == '') {
                     $this->logger->addLog('[Save Card] $this->payment->hosted_payment is set but empty', 'debug');
                 }
+            } else {
+                $this->logger->addLog('[Save Card] Card saved', 'debug');
             }
         }
 
