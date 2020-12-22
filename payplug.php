@@ -4680,6 +4680,10 @@ class Payplug extends PaymentModule
             if ($options['is_installment']) {
                 $payment = \Payplug\InstallmentPlan::create($payment_tab);
                 if ($payment->failure != null && !empty($payment->failure->message)) {
+                    $this->setPaymentErrorsCookie([
+                        $this->l('The transaction was not completed and your card was not charged.')
+                    ]);
+
                     return [
                         'result' => false,
                         'response' => $payment->failure->message,
@@ -4689,6 +4693,10 @@ class Payplug extends PaymentModule
             } else {
                 $payment = \Payplug\Payment::create($payment_tab);
                 if ($payment->failure == true && !empty($payment->failure->message)) {
+                    $this->setPaymentErrorsCookie([
+                        $this->l('The transaction was not completed and your card was not charged.')
+                    ]);
+
                     return [
                         'result' => false,
                         'response' => $payment->failure->message,
@@ -4698,6 +4706,11 @@ class Payplug extends PaymentModule
             }
         } catch (Exception $e) {
             $messages = $this->catchErrorsFromApi($e->__toString());
+
+            $this->setPaymentErrorsCookie([
+                $this->l('The transaction was not completed and your card was not charged.')
+            ]);
+
             return [
                 'result' => false,
                 'payment_tab' => $payment_tab,
