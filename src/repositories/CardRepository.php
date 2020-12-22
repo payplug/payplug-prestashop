@@ -120,12 +120,19 @@ class CardRepository extends Repository
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
 
-        $this->query
-            ->delete()
-            ->from(_DB_PREFIX_.$this->cardEntity->getTable())
-            ->where(_DB_PREFIX_.$this->cardEntity->getTable().'.id_card = \'' . pSQL($id_card) . '\'')
-            ->build()
-        ;
+        $response = \Payplug\Card::delete($id_card);
+        $json_answer = $response['httpResponse'];
+
+        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+            return false;
+        } else {
+            $this->query
+                ->delete()
+                ->from(_DB_PREFIX_.$this->cardEntity->getTable())
+                ->where(_DB_PREFIX_.$this->cardEntity->getTable().'.id_card = \'' . pSQL($id_card) . '\'')
+                ->build()
+            ;
+        }
 
         return true;
     }
