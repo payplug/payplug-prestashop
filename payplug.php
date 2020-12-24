@@ -810,8 +810,8 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->l('Capture of this payment is authorized before %s. 
-                        After this date, you will not be able to get paid.'),
+                        $this->l('Capture of this payment is authorized before %s.').' '.
+                        $this->l('After this date, you will not be able to get paid.'),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -919,8 +919,8 @@ class Payplug extends PaymentModule
                     $error_key = md5('The transaction was not completed and your card was not charged.');
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
-                        $errors[$error_key] = $this->l('The transaction was not completed 
-                        and your card was not charged.');
+                        $errors[$error_key] =
+                            $this->l('The transaction was not completed and your card was not charged.');
                     }
             }
         }
@@ -5153,8 +5153,8 @@ class Payplug extends PaymentModule
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->l('In order to accept payments you need to configure your module 
-            by connecting your PayPlug account.');
+            $this->warning = $this->l('In order to accept payments you need to configure your module').' '.
+            $this->l('by connecting your PayPlug account.');
         }
 
         $this->payment_status = [
