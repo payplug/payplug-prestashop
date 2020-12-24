@@ -59,19 +59,11 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             if ($options['oney'] && $is_oney) {
                 $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
-
                 if (!$payment['result']) {
-                    if ($payment['response']) {
-                        $error_message = $payment['response'];
-                    } else {
-                        $error_message = $payplug->l('The transaction was not completed and your card was not charged.');
-                    }
-                    $payplug->setPaymentErrorsCookie([$error_message]);
+                    Tools::redirect($error_url);
+                } else {
+                    Tools::redirect($payment['return_url']);
                 }
-
-                $redirect_url = isset($payment['return_url']) ? $payment['return_url'] : $error_url;
-                Tools::redirect($redirect_url);
-
             } elseif (!$options['embedded'] && !$is_one_click) {
                 // if the payment is redirect and not a one click payment, prepare the payment and redirect
                 $payment_options = [
@@ -81,6 +73,9 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 ];
                 $payment = $payplug->preparePayment($payment_options);
                 if (!$payment['result']) {
+                    $payplug->setPaymentErrorsCookie([
+                        $payplug->l('The transaction was not completed and your card was not charged.')
+                    ]);
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);
