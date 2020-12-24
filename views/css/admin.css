@@ -155,6 +155,9 @@ label.payplugSwitch_label {
   align-items: center;
   cursor: pointer;
 }
+.-disabledlabel.payplugSwitch_label {
+  cursor: default;
+}
 .payplugSwitch_label.-left {
   color: #fff;
 }
