@@ -194,6 +194,7 @@ $_MODULE['<{payplug}prestashop>embedded_9d271e949d80d6dc284b801c533124fe'] = 'Le
 $_MODULE['<{payplug}prestashop>embedded_e5e6e92741ab5d10e8f0f0eb35b37c5f'] = 'Vos clients pourront effectuer des transactions directement depuis votre boutique.';
 $_MODULE['<{payplug}prestashop>embedded_f990e553cdc4c29c2efffba33e08a8c7'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>embedded_ebfb18fdefe0647011c75dbab1412ca1'] = 'Vos clients seront redirigés vers une page de paiement hébergée par PayPlug.';
+$_MODULE['<{payplug}prestashop>embedded_1f1d3da2e63ec19456e33fa811c81041'] = 'Personnaliser ma page de paiement.';
 $_MODULE['<{payplug}prestashop>deferred_40a84afbec2ddc1e86d0772888a68941'] = 'Différer le déclenchement du paiement';
 $_MODULE['<{payplug}prestashop>deferred_aac960a647e6cff88049b927f529ee2e'] = 'Finalisez le paiement ultérieurement, par exemple à l’expédition de la commande. Les montants sont bloqués sur une période de 7 jours maximum à compter de la date d’autorisation.';
 $_MODULE['<{payplug}prestashop>deferred_998b807d121a4daa046bc4ce983d34ea'] = 'En savoir plus.';
