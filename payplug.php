@@ -974,7 +974,7 @@ class Payplug extends PaymentModule
     public function checkAmountToRefund($amount)
     {
         $amount = str_replace(',', '.', $amount);
-        return is_numeric($amount) && ($amount >= 0.1);
+        return is_numeric($amount);
     }
 
     /**
@@ -4839,10 +4839,17 @@ class Payplug extends PaymentModule
 
     public function refundPayment()
     {
-        if (!$this->checkAmountToRefund(Tools::getValue('amount'))) {
+        $amount = Tools::getValue('amount');
+
+        if (!$this->checkAmountToRefund($amount)) {
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Incorrect amount to refund')
+            ]));
+        } elseif ($this->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            die(json_encode([
+                'status' => 'error',
+                'data' => $this->l('The amount to be refunded must be at least 0.10 €')
             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));
