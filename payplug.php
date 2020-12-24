@@ -4155,16 +4155,29 @@ class Payplug extends PaymentModule
      * @param string $email
      * @param string $password
      * @return bool
+     * @throws \Payplug\Exception\BadRequestException
      */
     private function login($email, $password)
     {
-        $response = \Payplug\Authentication::getKeysByLogin($email, $password);
-        $json_answer = $response['httpResponse'];
-        if ($this->setApiKeysbyJsonResponse($json_answer)) {
-            return true;
-        } else {
+        try {
+            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+
+            $json_answer = $response['httpResponse'];
+            if ($this->setApiKeysbyJsonResponse($json_answer)) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception $e) {
+            json_encode([
+                'content' => null,
+                'error' => $e->getMessage()
+            ]);
             return false;
         }
+
+
     }
 
     /**
