@@ -758,6 +758,7 @@ class Payplug extends PaymentModule
             'status_code' => $status_code,
             'status_class' => $status_class,
             'amount' => (int)$payment->amount / 100,
+            'refunded' => (int)$payment->amount_refunded / 100,
             'card_brand' => $pay_brand,
             'card_mask' => $this->card->getCardMaskByPayment($payment),
             'card_date' => $this->card->getCardExpiryDateByPayment($payment),
