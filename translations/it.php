@@ -154,6 +154,7 @@ $_MODULE['<{payplug}prestashop>refund_01ddb6831cdf22a0055a2a42a09482d6'] = 'Impo
 $_MODULE['<{payplug}prestashop>refund_554cd9e547629109b77e4c60ddd44da3'] = 'Totale da rimborsare';
 $_MODULE['<{payplug}prestashop>refund_de0585357d47ceb0dbbe92118bcf2a64'] = 'Cambia lo stato d\'ordine di Prestashop in \"Rimborsato\"';
 $_MODULE['<{payplug}prestashop>refund_76f0ed934de85cc7131910b32ede7714'] = 'Rimborsato';
+$_MODULE['<{payplug}prestashop>refund_3e220cc8128d7b270226d79b84ebce33'] = 'The refund will be possible 48h after the last payment or refund transaction.';
 $_MODULE['<{payplug}prestashop>installment_1717748ecd906b762e6011dde5f41884'] = 'Cette commande fait l’objet d’un paiement en plusieurs fois, d\'où le statut est';
 $_MODULE['<{payplug}prestashop>installment_e66ee8fbda58a23ade6612addd735eb7'] = 'Numéro d’échéancier';
 $_MODULE['<{payplug}prestashop>installment_44749712dbec183e983dcd78a7736c41'] = 'Date';
@@ -369,6 +370,7 @@ $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56']
 $_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Pagamento in %sx';
 $_MODULE['<{payplug}prestashop>oneyrepository_ff9df6bac3078402374e750e02d60715'] = 'Your email address is too long and the + character is not valid,';
 $_MODULE['<{payplug}prestashop>oneyrepository_a65c018ceba95687ec307a32e4443381'] = 'please change it to another address (max 100 characters).';
+$_MODULE['<{payplug}prestashop>oneyrepository_b2dc565d4ef46c220f2e88791fa9afe5'] = 'L\'adresse e-mail est trop longue. Merci d\'en entrer une qui ne dépasse pas 100 caractères';
 $_MODULE['<{payplug}prestashop>oneyrepository_a3f2e0151b5896634ed88e7db254671e'] = 'The + character is not valid.';
 $_MODULE['<{payplug}prestashop>oneyrepository_f49dfe70475057b2fd9c15a3839bff2c'] = 'Please change your email address (100 characters max).';
 $_MODULE['<{payplug}prestashop>oneyrepository_ab46a1167bda1c1229c641a1c61a455d'] = 'Le nom de la vill est trop long. (32 caractères maximum).';
