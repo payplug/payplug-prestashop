@@ -175,7 +175,6 @@ $(document).ready(function() {
         callRefund();
     });
 
-
     $('input[name=submitPPUpdate]').bind('click', function(e) {
         e.preventDefault();
         callUpdate();
@@ -184,6 +183,14 @@ $(document).ready(function() {
     $('input[name=submitPPCapture]').bind('click', function(e) {
         e.preventDefault();
         callCapture();
+    });
+
+    $('.open_payment_information').unbind('click').click(function(e) {
+        if ($(this).parent().parent().next('tr').is(':visible'))
+            $(this).parent().parent().next('tr').hide();
+        else
+            $(this).parent().parent().next('tr').show();
+        e.preventDefault();
     });
 
     payplug.init();
