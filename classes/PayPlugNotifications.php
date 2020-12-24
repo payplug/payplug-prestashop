@@ -221,6 +221,8 @@ class PayPlugNotifications
                 if ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment == '') {
                     $this->logger->addLog('[Save Card] $this->payment->hosted_payment is set but empty', 'debug');
                 }
+            } else {
+                $this->logger->addLog('[Save Card] Card saved', 'debug');
             }
         }
 
@@ -782,7 +784,7 @@ class PayPlugNotifications
             $data['metadata']['Order'] = $order->id;
             try {
                 $this->logger->addLog('Payment patched.', 'debug');
-                $this->payplug->patchPayment($this->api_key, $this->payment->id, $data);
+                $this->payplug->patchPayment($this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
                     'Payment cannot be patched: ' . $exception->getMessage(),

@@ -78,9 +78,6 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 ];
                 $payment = $payplug->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    $payplug->setPaymentErrorsCookie([
-                        $payplug->l('The transaction was not completed and your card was not charged.')
-                    ]);
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);

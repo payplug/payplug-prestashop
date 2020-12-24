@@ -19,16 +19,18 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugMsg_wrapper">
-    {foreach $payment_messages as $payment_message}
-        {if $payment_message.type == 'string'}
-            <p class="payplugMsg_error">{$payment_message.value|escape:'htmlall':'UTF-8'}</p>
-        {elseif $payment_message.type == 'template'}
-            {include file="../"|cat:$payment_message.value}
-        {/if}
-    {/foreach}
+{if isset($messages) && $messages}
+    <div class="payplugMsg_wrapper">
+        {foreach $messages as $message}
+            {if $message.type == 'string'}
+                <p{if isset($is_error_message) && $is_error_message} class="payplugMsg_error"{/if}>{$message.value|escape:'htmlall':'UTF-8'}</p>
+            {elseif $message.type == 'template'}
+                {include file="../"|cat:$message.value}
+            {/if}
+        {/foreach}
 
-    {if isset($with_msg_button) && $with_msg_button}
-        <button type="button" class="payplugMsg_button">{l s='Ok' mod='payplug'}</button>
-    {/if}
-</div>
+        {if isset($with_msg_button) && $with_msg_button}
+            <button type="button" class="payplugMsg_button">{l s='Ok' mod='payplug'}</button>
+        {/if}
+    </div>
+{/if}

@@ -387,7 +387,8 @@ var $document, $window, payplug = {
     login: {
         props: {
             identifier: 'payplugLogin',
-            query: null
+            query: null,
+            logged: false
         },
         init: function () {
             var {login} = payplug,
@@ -395,6 +396,10 @@ var $document, $window, payplug = {
             $document.on('click', '.' + identifier + '_login', login.login)
                 .on('click', '.' + identifier + '_logout', login.logout)
                 .on('click', 'button[name=password]', login.password);
+
+            if ($('.' + identifier).is('.-logged')) {
+                login.props.logged = true;
+            }
         },
         login: function (event) {
             event.preventDefault();
@@ -438,6 +443,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined' && result.content) {
                         $('form.payplug').replaceWith(result.content);
+                        login.props.logged = true;
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
                         payplug.tools.popup.error(result.error);
@@ -455,7 +461,7 @@ var $document, $window, payplug = {
                 data = {
                     _ajax: 1,
                     submitDisconnect: 1,
-                }
+                };
 
             if (login.props.query != null) {
                 login.props.query.abort();
@@ -484,6 +490,7 @@ var $document, $window, payplug = {
                 },
                 success: function (result) {
                     $('form.payplug').replaceWith(result.content);
+                    login.props.logged = false;
                 }
             });
         },
@@ -594,7 +601,7 @@ var $document, $window, payplug = {
             query: null,
         },
         init: function () {
-            var {settings} = payplug,
+            var {settings, login} = payplug,
                 {identifier} = settings.props;
             $document.on('switchSelected', '.' + identifier + ' input', settings.change);
             $window.on('load', settings.load);
@@ -603,7 +610,11 @@ var $document, $window, payplug = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {settings} = payplug;
+            var {settings, login} = payplug;
+
+            if (!login.props.logged) {
+                return false;
+            }
 
             if (settings.props.query != null) {
                 settings.props.query.abort();
