@@ -205,9 +205,8 @@ class PayPlugAjax
                     } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                         die($tools->tool('jsonEncode', [
                             'result' => false,
-                            'message' => $this->payplug->l(
-                                'At least one of the fields is not correctly completed.'
-                            )
+                            'message' => $this->payplug
+                                ->l('At least one of the fields is not correctly completed.')
                         ]));
                     }
                 } catch (Exception $e) {
