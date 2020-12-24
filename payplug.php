@@ -4683,6 +4683,7 @@ class Payplug extends PaymentModule
                 // check oney required fields
 
                 $payment_data = $this->getPaymentDataCookie();
+                
                 if (!$payment_data) {
                     $payment_data = Tools::getValue('oney_form');
                 }
@@ -5255,8 +5256,8 @@ class Payplug extends PaymentModule
     /**
      * @description Set payment errors in cookie
      *
+     * @param array $payplug_errors
      * @return mixed
-     * @throws Exception
      */
     public function setPaymentErrorsCookie($payplug_errors = [])
     {
