@@ -4169,9 +4169,6 @@ class Payplug extends PaymentModule
                 return false;
             }
 
-            $error = 'Error during login attempt';
-            throw new Exception($error);
-
         } catch (Exception $e) {
             json_encode([
                 'content' => null,
