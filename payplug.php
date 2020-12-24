@@ -5240,6 +5240,7 @@ class Payplug extends PaymentModule
      * Set payment data in cookie
      *
      * @return mixed
+     * @throws Exception
      */
     public function setPaymentDataCookie($payplug_data = [])
     {
@@ -5258,6 +5259,7 @@ class Payplug extends PaymentModule
      *
      * @param array $payplug_errors
      * @return mixed
+     * @throws Exception
      */
     public function setPaymentErrorsCookie($payplug_errors = [])
     {
