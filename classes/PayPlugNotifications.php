@@ -887,8 +887,19 @@ class PayPlugNotifications
         $is_totaly_refunded = $this->payment->is_refunded;
         if ($is_totaly_refunded) {
             $this->logger->addLog('TOTAL REFUND MODE');
+            $cart_id = '';
 
-            $cart_id = (int)$meta['Cart'];
+            if (isset($meta['Cart'])) {
+                $cart_id = (int)$meta['Cart'];
+                $this->logger->addLog('Cart ID : ' . $cart_id);
+            } elseif (isset($meta['Cart'])) {
+                $cart_id = (int)$meta['ID Cart'];
+                $this->logger->addLog('Cart ID : ' . $cart_id);
+            } else {
+                $this->logger->addLog('Can\'t be refunded, because there is an error during retrieving Cart ID.', 'error');
+                $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
+            }
+
             $id_order = (int)Order::getOrderByCartId($cart_id);
             $order = new Order($id_order);
             $this->logger->addLog('Order ID : ' . $id_order);
