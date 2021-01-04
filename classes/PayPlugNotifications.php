@@ -892,7 +892,7 @@ class PayPlugNotifications
             if (isset($meta['Cart'])) {
                 $cart_id = (int)$meta['Cart'];
                 $this->logger->addLog('Cart ID : ' . $cart_id);
-            } elseif (isset($meta['Cart'])) {
+            } elseif (isset($meta['ID Cart'])) {
                 $cart_id = (int)$meta['ID Cart'];
                 $this->logger->addLog('Cart ID : ' . $cart_id);
             } else {
