@@ -75,11 +75,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private $lock_key;
 
     /**
-     * @var string $type
-     */
-    private $type;
-
-    /**
      * @var bool $is_oney
      */
     private $is_oney;
