@@ -163,7 +163,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         try {
             $this->resource = \Payplug\Notification::treat($body);
-            $this->type = $this->resource->installment_plan_id != null ? 'installment' : 'payment';
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
