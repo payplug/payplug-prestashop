@@ -69,7 +69,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  content: "";
+  payplugcontent: "";
   background: rgba(0, 0, 0, 0.2);
   width: 100vw;
   height: 100vh;
@@ -772,7 +772,7 @@
   background: none;
   border: none;
   text-align: center;
-  color: #00ab7a;
+  color: #7ebd00;
   margin: 0 0 15px;
   cursor: pointer;
 }
@@ -797,7 +797,7 @@
 .oneyRequired_title {
   display: block;
   padding: 8px 0 16px;
-  color: #00ab7a;
+  color: #7ebd00;
   font-size: 14px;
   text-transform: uppercase;
 }
@@ -896,7 +896,7 @@
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
-  background: #00ab7a;
+  background: #7ebd00;
   width: 200px;
   height: 50px;
   color: #fff;
@@ -1015,4 +1015,3 @@
   font-weight: 400;
   width: 100%;
 }
-/*# sourceMappingURL=front.css.map */
