@@ -484,7 +484,7 @@ class PayPlugNotifications
                 }
             } elseif ($order_payments) {
                 foreach ($order_payments as $payment) {
-                    if ($payment['transaction_id'] == $this->payment->id) {
+                    if ($payment->transaction_id == $this->payment->id) {
                         $related = true;
                     }
                 }
