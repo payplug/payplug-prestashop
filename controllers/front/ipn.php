@@ -75,11 +75,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
     private $lock_key;
 
     /**
-     * @var string $type
-     */
-    private $type;
-
-    /**
      * @var bool $is_oney
      */
     private $is_oney;
@@ -163,7 +158,6 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 
         try {
             $this->resource = \Payplug\Notification::treat($body);
-            $this->type = $this->resource->installment_plan_id != null ? 'installment' : 'payment';
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
         }
@@ -909,7 +903,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         if ($is_totaly_refunded) {
             $this->logger->addLog('TOTAL REFUND MODE');
 
-            $cart_id = (int)$meta['Cart'];
+            $cart_id = (int)$meta['ID Cart'];
             $id_order = (int)Order::getOrderByCartId($cart_id);
             $order = new Order($id_order);
             $this->logger->addLog('Order ID : ' . $id_order);
