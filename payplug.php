@@ -142,7 +142,7 @@ class Payplug extends PaymentModule
             'invoice' => true,
             'color' => '#04b404',
             'name' => [
-                'en' => 'Payment successful',
+                'en' => 'Payment accepted',
                 'fr' => 'Paiement effectué',
                 'es' => 'Pago efectuado',
                 'it' => 'Pagamento effettuato',
