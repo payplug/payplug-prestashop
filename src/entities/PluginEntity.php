@@ -35,6 +35,7 @@ class PluginEntity
     private $logger;
     private $oney;
     private $order_state;
+    private $translate;
 
     // Specific classes
     private $configuration;
@@ -296,4 +297,23 @@ class PluginEntity
         $this->order_state = $order_state;
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getTranslate()
+    {
+        return $this->translate;
+    }
+
+    /**
+     * @param mixed $translate
+     * @return PluginEntity
+     */
+    public function setTranslate($translate)
+    {
+        $this->translate = $translate;
+        return $this;
+    }
+
 }
