@@ -35,7 +35,7 @@
                 </div>
                 <div class="payplugTips_item -right"{if $payplug_switch.embedded.checked}style="display: none;"{/if}>
                     {l s='The customers will be redirected to a PayPlug payment page to finalize the transaction.' mod='payplug'}
-                    <a class="payplugLink" href="{$faq_links.payment_page|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                    <a class="payplugLink" href="{$faq_links.payment_page|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Customize my payment page.' mod='payplug'}</a>
                 </div>
             </div>
         </div>

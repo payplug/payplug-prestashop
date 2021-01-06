@@ -221,6 +221,8 @@ class PayPlugNotifications
                 if ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment == '') {
                     $this->logger->addLog('[Save Card] $this->payment->hosted_payment is set but empty', 'debug');
                 }
+            } else {
+                $this->logger->addLog('[Save Card] Card saved', 'debug');
             }
         }
 
@@ -482,7 +484,7 @@ class PayPlugNotifications
                 }
             } elseif ($order_payments) {
                 foreach ($order_payments as $payment) {
-                    if ($payment['transaction_id'] == $this->payment->id) {
+                    if ($payment->transaction_id == $this->payment->id) {
                         $related = true;
                     }
                 }
@@ -782,7 +784,7 @@ class PayPlugNotifications
             $data['metadata']['Order'] = $order->id;
             try {
                 $this->logger->addLog('Payment patched.', 'debug');
-                $this->payplug->patchPayment($this->api_key, $this->payment->id, $data);
+                $this->payplug->patchPayment($this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
                     'Payment cannot be patched: ' . $exception->getMessage(),
@@ -885,8 +887,19 @@ class PayPlugNotifications
         $is_totaly_refunded = $this->payment->is_refunded;
         if ($is_totaly_refunded) {
             $this->logger->addLog('TOTAL REFUND MODE');
+            $cart_id = '';
 
-            $cart_id = (int)$meta['Cart'];
+            if (isset($meta['Cart'])) {
+                $cart_id = (int)$meta['Cart'];
+                $this->logger->addLog('Cart ID : ' . $cart_id);
+            } elseif (isset($meta['ID Cart'])) {
+                $cart_id = (int)$meta['ID Cart'];
+                $this->logger->addLog('Cart ID : ' . $cart_id);
+            } else {
+                $this->logger->addLog('Can\'t be refunded, because there is an error during retrieving Cart ID.', 'error');
+                $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
+            }
+
             $id_order = (int)Order::getOrderByCartId($cart_id);
             $order = new Order($id_order);
             $this->logger->addLog('Order ID : ' . $id_order);

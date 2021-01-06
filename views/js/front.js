@@ -148,7 +148,8 @@ var $document, $window, payplugModule = {
             });
 
             var {popin} = oney.cta;
-            prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
+            prestashop.on('updatedCart', popin.check)
+                .on('updatedProduct', popin.check);
         },
         load: function (with_schedule) {
             var {oney} = payplugModule,
@@ -332,9 +333,9 @@ var $document, $window, payplugModule = {
                 check: function () {
                     var {oney} = payplugModule,
                         {popin} = oney.cta,
-                        {identifier, open} = popin.props;
+                        {open} = popin.props;
 
-                    oney.props.loaded = $('.' + identifier).length > 0;
+                    oney.props.loaded = false;
 
                     if (open) {
                         popin.open();

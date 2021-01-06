@@ -34,6 +34,7 @@ class PluginEntity
     private $card;
     private $logger;
     private $oney;
+    private $order_state;
 
     // Specific classes
     private $configuration;
@@ -275,6 +276,24 @@ class PluginEntity
     public function setValidate($validate)
     {
         $this->validate = $validate;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrderState()
+    {
+        return $this->order_state;
+    }
+
+    /**
+     * @param mixed $order_state
+     * @return PluginEntity
+     */
+    public function setOrderState($order_state)
+    {
+        $this->order_state = $order_state;
         return $this;
     }
 }

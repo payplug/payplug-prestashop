@@ -105,5 +105,8 @@ function upgrade_module_3_0_0($object)
     // plug module on the hook actionAdminControllerSetMedia
     $flag = $flag && $object->registerHook('actionAdminControllerSetMedia');
 
+    // plug module on the hook displayAdminOrderMain
+    $flag = $flag && $object->registerHook('displayAdminOrderMain');
+
     return $flag;
 }

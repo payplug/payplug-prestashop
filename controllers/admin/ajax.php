@@ -115,10 +115,16 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
-        if (!$payplug->checkAmountToRefund(Tools::getValue('amount'))) {
+        $amount = Tools::getValue('amount');
+        if (!$payplug->checkAmountToRefund($amount)) {
             die(json_encode([
                 'status' => 'error',
                 'data' => $payplug->l('Incorrect amount to refund')
+            ]));
+        } elseif ($payplug->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            die(json_encode([
+                'status' => 'error',
+                'data' => $this->l('The amount to be refunded must be at least 0.10 €')
             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));

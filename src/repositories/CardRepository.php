@@ -119,38 +119,19 @@ class CardRepository extends Repository
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
-        $url = (new \Payplug())->getPlugin()->getApiUrl() . '/v1/cards/' . $id_card;
 
-        $curl_version = curl_version();
+        $response = \Payplug\Card::delete($id_card);
+        $json_answer = $response['httpResponse'];
 
-        $process = curl_init($url);
-        curl_setopt($process, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $api_key]);
-        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'DELETE');
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        // CURL const are in uppercase
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
-        $error_curl = curl_errno($process);
-
-        curl_close($process);
-
-        // if no error
-        if ($error_curl == 0) {
+        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+            return false;
+        } else {
             $this->query
                 ->delete()
                 ->from(_DB_PREFIX_.$this->cardEntity->getTable())
                 ->where(_DB_PREFIX_.$this->cardEntity->getTable().'.id_card = \'' . pSQL($id_card) . '\'')
                 ->build()
-                ;
-        } else {
-            return false;
+            ;
         }
 
         return true;
@@ -426,7 +407,7 @@ class CardRepository extends Repository
             $idCard = $this->query->build()[0]['id_card'];
 
             // Delete from API
-            \Payplug\Card::delete($idCard);
+            Card::delete($idCard);
 
             // Delete from our DB
             $this->query
