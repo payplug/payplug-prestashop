@@ -5,4 +5,5 @@ config*.xml
 vendor/
 .php_cs.cache
 views/css/less/*.css
+views/css/*.map
 *.map

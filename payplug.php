@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,10 +16,12 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
+use Payplug\Exception\ConfigurationNotSetException;
 
 /**
  * Core file of PayPlug module
@@ -48,6 +50,8 @@ class Payplug extends PaymentModule
     private $logger;
 
     public $oney;
+
+    public $order_state;
 
     public $constantFile; // 3.0
 
@@ -138,7 +142,7 @@ class Payplug extends PaymentModule
             'invoice' => true,
             'color' => '#04b404',
             'name' => [
-                'en' => 'Payment successful',
+                'en' => 'Payment accepted',
                 'fr' => 'Paiement effectué',
                 'es' => 'Pago efectuado',
                 'it' => 'Pagamento effettuato',
@@ -303,6 +307,7 @@ class Payplug extends PaymentModule
         $this->oney = $this->getPlugin()->getOney();
         $this->query = $this->getPlugin()->getQuery();
         $this->tools = $this->getPlugin()->getTools();
+        $this->order_state = $this->getPlugin()->getOrderState();
     }
 
     public function loadSpecificPrestaClasses()
@@ -400,7 +405,7 @@ class Payplug extends PaymentModule
      * @param $installment
      * @param $order
      * @return bool
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function addPayplugInstallment($installment, $order)
     {
@@ -664,7 +669,7 @@ class Payplug extends PaymentModule
     /**
      * @param $payment
      * @return array|Exception
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function buildPaymentDetails($payment)
     {
@@ -753,6 +758,7 @@ class Payplug extends PaymentModule
             'status_code' => $status_code,
             'status_class' => $status_class,
             'amount' => (int)$payment->amount / 100,
+            'refunded' => (int)$payment->amount_refunded / 100,
             'card_brand' => $pay_brand,
             'card_mask' => $this->card->getCardMaskByPayment($payment),
             'card_date' => $this->card->getCardExpiryDateByPayment($payment),
@@ -804,8 +810,8 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->l('Capture of this payment is authorized before %s. 
-                        After this date, you will not be able to get paid.'),
+                        $this->l('Capture of this payment is authorized before %s.').' '.
+                        $this->l('After this date, you will not be able to get paid.'),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -913,8 +919,8 @@ class Payplug extends PaymentModule
                     $error_key = md5('The transaction was not completed and your card was not charged.');
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
-                        $errors[$error_key] = $this->l('The transaction was not completed 
-                        and your card was not charged.');
+                        $errors[$error_key] =
+                            $this->l('The transaction was not completed and your card was not charged.');
                     }
             }
         }
@@ -969,7 +975,7 @@ class Payplug extends PaymentModule
     public function checkAmountToRefund($amount)
     {
         $amount = str_replace(',', '.', $amount);
-        return is_numeric($amount) && ($amount >= 0.1);
+        return is_numeric($amount);
     }
 
     /**
@@ -1158,6 +1164,8 @@ class Payplug extends PaymentModule
                 $this->createOrderState($key, $state, true, true);
             }
         }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
     }
 
     /**
@@ -1269,6 +1277,7 @@ class Payplug extends PaymentModule
             $os = $order_state->id;
             $log->info('ID: ' . $os);
         }
+
         return Configuration::updateValue($key_config, $os);
     }
 
@@ -1287,6 +1296,8 @@ class Payplug extends PaymentModule
             $this->createOrderState($key, $state, true);
             $this->createOrderState($key, $state, false);
         }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
 
         $log->info('Order state creation ended.');
         return true;
@@ -1422,7 +1433,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Display payment errors template
+     * Display payment errors messages template
      *
      * @param array $errors
      * @return mixed
@@ -1433,7 +1444,7 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $payment_messages = [];
+        $formated = [];
         $with_msg_button = false;
         foreach ($errors as $error) {
             if (strpos($error, 'oney_required_field') !== false) {
@@ -1443,13 +1454,13 @@ class Payplug extends PaymentModule
                     'oney_type' => str_replace('oney_required_field_', '', $error),
                     'oney_required_fields' => $fields,
                 ]);
-                $payment_messages[] = [
+                $formated[] = [
                     'type' => 'template',
                     'value' => 'oney/required.tpl'
                 ];
             } else {
                 $with_msg_button = true;
-                $payment_messages[] = [
+                $formated[] = [
                     'type' => 'string',
                     'value' => $error
                 ];
@@ -1457,7 +1468,36 @@ class Payplug extends PaymentModule
         }
 
         $this->smarty->assign([
-            'payment_messages' => $payment_messages,
+            'is_error_message' => true,
+            'messages' => $formated,
+            'with_msg_button' => $with_msg_button
+        ]);
+
+        return $this->display(__FILE__, '_partials/messages.tpl');
+    }
+
+    /**
+     * Display messages template
+     *
+     * @param array $messages
+     * @return bool|string
+     */
+    public function displayMessages($messages = [], $with_msg_button = false)
+    {
+        if (empty($messages)) {
+            return false;
+        }
+
+        $formated = [];
+        foreach ($messages as $message) {
+            $formated[] = [
+                'type' => 'string',
+                'value' => $message
+            ];
+        }
+
+        $this->smarty->assign([
+            'messages' => $formated,
             'with_msg_button' => $with_msg_button
         ]);
 
@@ -1666,33 +1706,12 @@ class Payplug extends PaymentModule
      */
     public function getAccount($api_key, $sandbox = true)
     {
-        $url = $this->plugin->getApiUrl() . $this->routes['account'];
-        $curl_version = curl_version();
-        $process = curl_init($url);
-        curl_setopt($process, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $api_key]);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem')); //work only wiht cURL 7.10+
-        $answer = curl_exec($process);
-        $error_curl = curl_errno($process);
+        $this->setSecretKey($api_key);
+        $response = \Payplug\Authentication::getAccount();
+        $json_answer = $response['httpResponse'];
+        if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
+            return $permissions;
 
-        curl_close($process);
-
-        if ($error_curl == 0) {
-            $json_answer = json_decode($answer);
-
-            if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
-                return $permissions;
-            } else {
-                return false;
-            }
         } else {
             return false;
         }
@@ -2622,7 +2641,7 @@ class Payplug extends PaymentModule
     /**
      * @param $payment
      * @return int
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     private function getPaymentStatusByPayment($payment)
     {
@@ -2753,7 +2772,7 @@ class Payplug extends PaymentModule
      * @param $installment
      * @return array|bool|false|mysqli_result|PDOStatement|resource|null
      * @throws PrestaShopDatabaseException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function getStoredInstallment($installment)
     {
@@ -2777,7 +2796,7 @@ class Payplug extends PaymentModule
      * @param $installment
      * @param $step
      * @return array|bool|object|null
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function getStoredInstallmentTransaction($installment, $step)
     {
@@ -2983,10 +3002,10 @@ class Payplug extends PaymentModule
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws \Payplug\Exception\ConfigurationException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      * @see Module::hookAdminOrder()
      */
-    public function hookAdminOrder($params)
+    public function hookDisplayAdminOrderMain($params)
     {
         if (!$this->active) {
             return;
@@ -3355,6 +3374,20 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     *
+     * @param $params
+     * @return string
+     * @throws ConfigurationNotSetException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \Payplug\Exception\ConfigurationException
+     */
+    public function hookAdminOrder($params) {
+        return $this->hookDisplayAdminOrderMain($params);
+    }
+
+    /**
      * @param $params
      * @return string|void
      */
@@ -3497,8 +3530,14 @@ class Payplug extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                /* TODO : admin.css ne devrait pas être inclus ici, il ne sert que pour récuperer le css de la popin.
+                 * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
+                 * des modifiers dans le js. Have fun!
+                 * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
+                 * soit chargé après admin.css.
+                 */
                 __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
             ]);
         } else {
@@ -3794,6 +3833,7 @@ class Payplug extends PaymentModule
             'paymentReturn',
             'Header',
             'adminOrder',
+            'displayAdminOrderMain',
             'actionOrderStatusUpdate',
             'customerAccount',
             'paymentOptions',
@@ -3842,6 +3882,7 @@ class Payplug extends PaymentModule
             ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install order states. <----------------');
+
         if (!$this->createOrderStates() && $install['flag']) {
             $log->error('Install failed: order states.');
             $install['flag'] = false;
@@ -4025,7 +4066,7 @@ class Payplug extends PaymentModule
      * @param string $payment_id
      * @param string $type default payment
      * @return bool
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function isPaidPaymentMethod($payment_id, $type = 'payment')
     {
@@ -4120,54 +4161,29 @@ class Payplug extends PaymentModule
      * @param string $email
      * @param string $password
      * @return bool
+     * @throws \Payplug\Exception\BadRequestException
      */
     private function login($email, $password)
     {
-        $data = [
-            'email' => $email,
-            'password' => $password
-        ];
-        $data_string = json_encode($data);
+        try {
+            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
 
-        $url = $this->plugin->getApiUrl() . $this->routes['login'];
-        $curl_version = curl_version();
-        $process = curl_init($url);
-        curl_setopt(
-            $process,
-            CURLOPT_HTTPHEADER,
-            [
-                'Content-Type:application/json',
-                'Content-Length: ' . Tools::strlen($data_string)
-            ]
-        );
-        curl_setopt($process, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($process, CURLOPT_POST, true);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
-        $answer = curl_exec($process);
-        $error_curl = curl_errno($process);
-
-        curl_close($process);
-
-        if ($error_curl == 0) {
-            $json_answer = json_decode($answer);
-
+            $json_answer = $response['httpResponse'];
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
                 return true;
             } else {
                 return false;
             }
-        } else {
+
+        } catch (Exception $e) {
+            json_encode([
+                'content' => null,
+                'error' => $e->getMessage()
+            ]);
             return false;
         }
+
+
     }
 
     /**
@@ -4180,7 +4196,7 @@ class Payplug extends PaymentModule
      * @param null $inst_id
      * @return string
      * @throws \Payplug\Exception\ConfigurationException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -4263,60 +4279,28 @@ class Payplug extends PaymentModule
     /**
      * Send cURL request to PayPlug to patch a given payment
      *
-     * @param String $api_key
      * @param String $pay_id
      * @param Array $data
      * @return Array
+     * @throws ConfigurationNotSetException
      */
-    public function patchPayment($api_key, $pay_id, $data)
+    public function patchPayment($pay_id, $data)
     {
-        $data_string = json_encode($data);
-        $url = $this->plugin->getApiUrl() . $this->routes['patch'] . '/' . $pay_id;
-        $curl_version = curl_version();
-        $process = curl_init($url);
-        curl_setopt(
-            $process,
-            CURLOPT_HTTPHEADER,
-            [
-                'Authorization: Bearer ' . $api_key,
-                'Content-Type:application/json',
-                'Content-Length: ' . Tools::strlen($data_string)
-            ]
-        );
-        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($process, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
-        $answer = curl_exec($process);
-        $error_curl = curl_errno($process);
-        curl_close($process);
-
         $result = [
-            'status' => false,
+            'status' => true,
             'message' => null,
         ];
 
-        if ($error_curl == 0) {
-            $json_answer = json_decode($answer);
-
-            if (isset($json_answer->object) && $json_answer->object == 'error') {
-                $result['status'] = false;
-                $result['message'] = $json_answer->message;
-            } else {
-                $result['status'] = true;
-            }
-        } else {
-            $result['status'] = false;
-            $result['message'] = $this->l('Error while executing cURL request.');
+        try {
+            $payment = \Payplug\Resource\Payment::fromAttributes(array('id' => $pay_id));
+            $payment->update($data);
+        } catch (Exception $e) {
+            $result = [
+                'status' => false,
+                'message' => $e['message']
+            ];
         }
+
         return $result;
     }
 
@@ -4555,7 +4539,10 @@ class Payplug extends PaymentModule
                 $billing_address->company :
                 $billing_address->firstname . ' ' . $billing_address->lastname,
             'email' => $customer->email,
-            'landline_phone_number' => $this->formatPhoneNumber($billing_address->phone, $billing_address->id_country),
+            'landline_phone_number' => $this->formatPhoneNumber(
+                $billing_address->phone,
+                $billing_address->id_country
+            ),
             'mobile_phone_number' => $this->formatPhoneNumber(
                 $billing_address->phone_mobile,
                 $billing_address->id_country
@@ -4702,6 +4689,7 @@ class Payplug extends PaymentModule
                 // check oney required fields
 
                 $payment_data = $this->getPaymentDataCookie();
+                
                 if (!$payment_data) {
                     $payment_data = Tools::getValue('oney_form');
                 }
@@ -4745,6 +4733,10 @@ class Payplug extends PaymentModule
             if ($options['is_installment']) {
                 $payment = \Payplug\InstallmentPlan::create($payment_tab);
                 if ($payment->failure != null && !empty($payment->failure->message)) {
+                    $this->setPaymentErrorsCookie([
+                        $this->l('The transaction was not completed and your card was not charged.')
+                    ]);
+
                     return [
                         'result' => false,
                         'response' => $payment->failure->message,
@@ -4754,6 +4746,10 @@ class Payplug extends PaymentModule
             } else {
                 $payment = \Payplug\Payment::create($payment_tab);
                 if ($payment->failure == true && !empty($payment->failure->message)) {
+                    $this->setPaymentErrorsCookie([
+                        $this->l('The transaction was not completed and your card was not charged.')
+                    ]);
+
                     return [
                         'result' => false,
                         'response' => $payment->failure->message,
@@ -4763,6 +4759,11 @@ class Payplug extends PaymentModule
             }
         } catch (Exception $e) {
             $messages = $this->catchErrorsFromApi($e->__toString());
+
+            $this->setPaymentErrorsCookie([
+                $this->l('The transaction was not completed and your card was not charged.')
+            ]);
+
             return [
                 'result' => false,
                 'payment_tab' => $payment_tab,
@@ -4859,10 +4860,17 @@ class Payplug extends PaymentModule
 
     public function refundPayment()
     {
-        if (!$this->checkAmountToRefund(Tools::getValue('amount'))) {
+        $amount = Tools::getValue('amount');
+
+        if (!$this->checkAmountToRefund($amount)) {
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Incorrect amount to refund')
+            ]));
+        } elseif ($this->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            die(json_encode([
+                'status' => 'error',
+                'data' => $this->l('The amount to be refunded must be at least 0.10 €')
             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));
@@ -5097,7 +5105,7 @@ class Payplug extends PaymentModule
      */
     private function setApiKeysbyJsonResponse($json_answer)
     {
-        if (isset($json_answer->object) && $json_answer->object == 'error') {
+        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
             return false;
         }
 
@@ -5105,16 +5113,23 @@ class Payplug extends PaymentModule
         $api_keys['test_key'] = '';
         $api_keys['live_key'] = '';
 
-        if (isset($json_answer->secret_keys)) {
-            if (isset($json_answer->secret_keys->test)) {
-                $api_keys['test_key'] = $json_answer->secret_keys->test;
+        if (isset($json_answer['secret_keys'])) {
+            if (isset($json_answer['secret_keys']['test'])) {
+                $api_keys['test_key'] = $json_answer['secret_keys']['test'];
             }
-            if (isset($json_answer->secret_keys->live)) {
-                $api_keys['live_key'] = $json_answer->secret_keys->live;
+            if (isset($json_answer['secret_keys']['live'])) {
+                $api_keys['live_key'] = $json_answer['secret_keys']['live'];
             }
         }
         Configuration::updateValue('PAYPLUG_TEST_API_KEY', $api_keys['test_key']);
         Configuration::updateValue('PAYPLUG_LIVE_API_KEY', $api_keys['live_key']);
+
+        $is_sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        if ($is_sandbox) {
+            $this->setSecretKey($api_keys['test_key']);
+        } else {
+            $this->setSecretKey($api_keys['live_key']);
+        }
 
         return true;
     }
@@ -5144,8 +5159,8 @@ class Payplug extends PaymentModule
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->l('In order to accept payments you need to configure your module 
-            by connecting your PayPlug account.');
+            $this->warning = $this->l('In order to accept payments you need to configure your module').' '.
+            $this->l('by connecting your PayPlug account.');
         }
 
         $this->payment_status = [
@@ -5231,6 +5246,7 @@ class Payplug extends PaymentModule
      * Set payment data in cookie
      *
      * @return mixed
+     * @throws Exception
      */
     public function setPaymentDataCookie($payplug_data = [])
     {
@@ -5247,6 +5263,7 @@ class Payplug extends PaymentModule
     /**
      * @description Set payment errors in cookie
      *
+     * @param array $payplug_errors
      * @return mixed
      * @throws Exception
      */
@@ -5445,13 +5462,13 @@ class Payplug extends PaymentModule
      */
     private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
-        if ((isset($json_answer->object) && $json_answer->object == 'error')
+        if ((isset($json_answer['object']) && $json_answer['object'] == 'error')
             || empty($json_answer)
         ) {
             return false;
         }
 
-        $id = $json_answer->id;
+        $id = $json_answer['id'];
 
         $configuration = [
             'currencies' => Configuration::get('PAYPLUG_CURRENCIES'),
@@ -5461,49 +5478,62 @@ class Payplug extends PaymentModule
             'oney_max_amounts' => Configuration::get('PAYPLUG_ONEY_MAX_AMOUNTS'),
             'oney_min_amounts' => Configuration::get('PAYPLUG_ONEY_MIN_AMOUNTS'),
         ];
-        if (isset($json_answer->configuration)) {
-            if (isset($json_answer->configuration->currencies) && !empty($json_answer->configuration->currencies)) {
+
+        if (isset($json_answer['configuration'])) {
+
+            if (isset($json_answer['configuration']['currencies'])
+                && !empty($json_answer['configuration']['currencies'])) {
                 $configuration['currencies'] = [];
-                foreach ($json_answer->configuration->currencies as $value) {
+                foreach ($json_answer['configuration']['currencies'] as $value) {
                     $configuration['currencies'][] = $value;
                 }
             }
-            if (isset($json_answer->configuration->min_amounts) && !empty($json_answer->configuration->min_amounts)) {
+
+            if (isset($json_answer['configuration']['min_amounts'])
+                && !empty($json_answer['configuration']['min_amounts'])) {
                 $configuration['min_amounts'] = '';
-                foreach ($json_answer->configuration->min_amounts as $key => $value) {
+                foreach ($json_answer['configuration']['min_amounts'] as $key => $value) {
                     $configuration['min_amounts'] .= $key . ':' . $value . ';';
                 }
                 $configuration['min_amounts'] = Tools::substr($configuration['min_amounts'], 0, -1);
             }
-            if (isset($json_answer->configuration->max_amounts) && !empty($json_answer->configuration->max_amounts)) {
+
+            if (isset($json_answer['configuration']['max_amounts'])
+                && !empty($json_answer['configuration']['max_amounts'])) {
                 $configuration['max_amounts'] = '';
-                foreach ($json_answer->configuration->max_amounts as $key => $value) {
+                foreach ($json_answer['configuration']['max_amounts'] as $key => $value) {
                     $configuration['max_amounts'] .= $key . ':' . $value . ';';
                 }
                 $configuration['max_amounts'] = Tools::substr($configuration['max_amounts'], 0, -1);
             }
-            if (isset($json_answer->configuration->oney)) {
-                if (isset($json_answer->configuration->oney->allowed_countries)
-                    && !empty($json_answer->configuration->oney->allowed_countries)
-                    && sizeof($json_answer->configuration->oney->allowed_countries)) {
+
+            if (isset($json_answer['configuration']['oney'])) {
+                if (isset($json_answer['configuration']['oney']['allowed_countries'])
+                    && !empty($json_answer['configuration']['oney']['allowed_countries'])
+                    && sizeof($json_answer['configuration']['oney']['allowed_countries'])
+                ) {
                     $allowed = '';
-                    foreach ($json_answer->configuration->oney->allowed_countries as $country) {
+                    foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
                         $allowed .= $country . ',';
                     }
                     $configuration['oney_allowed_countries'] = Tools::substr($allowed, 0, -1);
                 }
-                if (isset($json_answer->configuration->oney->min_amounts)
-                    && !empty($json_answer->configuration->oney->min_amounts)) {
+
+                if (isset($json_answer['configuration']['oney']['min_amounts'])
+                    && !empty($json_answer['configuration']['oney']['min_amounts'])
+                ) {
                     $configuration['oney_min_amounts'] = '';
-                    foreach ($json_answer->configuration->oney->min_amounts as $key => $value) {
+                    foreach ($json_answer['configuration']['oney']['min_amounts'] as $key => $value) {
                         $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
                     }
                     $configuration['oney_min_amounts'] = Tools::substr($configuration['oney_min_amounts'], 0, -1);
                 }
-                if (isset($json_answer->configuration->oney->max_amounts)
-                    && !empty($json_answer->configuration->oney->max_amounts)) {
+
+                if (isset($json_answer['configuration']['oney']['max_amounts'])
+                    && !empty($json_answer['configuration']['oney']['max_amounts'])
+                ) {
                     $configuration['oney_max_amounts'] = '';
-                    foreach ($json_answer->configuration->oney->max_amounts as $key => $value) {
+                    foreach ($json_answer['configuration']['oney']['max_amounts'] as $key => $value) {
                         $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
                     }
                     $configuration['oney_max_amounts'] = Tools::substr($configuration['oney_max_amounts'], 0, -1);
@@ -5512,16 +5542,16 @@ class Payplug extends PaymentModule
         }
 
         $permissions = [
-            'use_live_mode' => $json_answer->permissions->use_live_mode,
-            'can_save_cards' => $json_answer->permissions->can_save_cards,
-            'can_create_installment_plan' => $json_answer->permissions->can_create_installment_plan,
-            'can_create_deferred_payment' => $json_answer->permissions->can_create_deferred_payment,
-            'can_use_oney' => $json_answer->permissions->can_use_oney,
+            'use_live_mode' => $json_answer['permissions']['use_live_mode'],
+            'can_save_cards' => $json_answer['permissions']['can_save_cards'],
+            'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
+            'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
+            'can_use_oney' => $json_answer['permissions']['can_use_oney'],
         ];
 
         // If sandbox mode active, no allowed countries sent
         // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
-        if (isset($json_answer->is_live) && !$json_answer->is_live) {
+        if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
@@ -5646,7 +5676,7 @@ class Payplug extends PaymentModule
     /**
      * @param $installment
      * @return bool
-     * @throws \Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationNotSetException
      *
      */
     public function updatePayplugInstallment($installment)
@@ -5842,6 +5872,7 @@ class Payplug extends PaymentModule
 
         $hooksToRegister = [
             'adminOrder',
+            'displayAdminOrderMain',
             'customerAccount',
             'header',
             'paymentReturn',

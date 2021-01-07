@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2019 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -35,6 +35,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $plugin;
     private $productSpecific;
     private $toolsSpecific;
+    private $translate;
 
     /**
      * @description
@@ -65,6 +66,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
             $this->oney = $this->plugin->getOney();
             $this->productSpecific = $this->plugin->getProduct();
+            $this->translate = $this->plugin->getTranslate();
 
             $config = $this->configurationSpecific;
             $context = $this->contextSpecific->getContext(); // get the method
@@ -171,7 +173,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 } catch (Exception $e) {
                     die($tools->tool('jsonEncode', [
                         'result' => false,
-                        'error' => $this->payplug->l('Oney is momentarily unavailable.')
+                        'error' => $this->translate->translate(5) //('Oney is momentarily unavailable.')
                     ]));
                 }
 
@@ -192,14 +194,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     die(json_encode([
                         'result' => false,
                         'message' => [
-                            $this->payplug->l('Empty payment data')
+                            $this->translate->translate(1) // 'Empty payment data'
                         ]
                     ]));
                 } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
                         'message' => [
-                            $this->payplug->l('At least one of the fields is not correctly completed.')
+                            $this->translate->translate(2) // 'At least one of the fields is not correctly completed.'
                         ]
                     ]));
                 }
@@ -209,8 +211,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => $result,
                     'message' => [
                         $result ?
-                            $this->payplug->l('Your information has been saved') :
-                            $this->payplug->l('An error occurred. Please retry in few seconds.')
+                            $this->translate->translate(3) : //('Your information has been saved') :
+                            $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
                 ]));
             }

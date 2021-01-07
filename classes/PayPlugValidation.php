@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -106,8 +106,8 @@ class PayPlugValidation
         // Create lock
         $cart_lock = false;
         $datetime1 = date_create(date('Y-m-d H:i:s'));
+        $this->logger->addLog('Check lock');
         do {
-            $this->logger->addLog('Check if lock exist');
             $cart_lock = PayplugLock::check($cart->id);
             if (!$cart_lock) {
                 $datetime2 = date_create(date('Y-m-d H:i:s'));
@@ -278,6 +278,8 @@ class PayPlugValidation
                     if ((isset($payment->hosted_payment)) && $payment->hosted_payment == '') {
                         $this->logger->addLog('[Save Card] $payment->hosted_payment is set but empty', 'debug');
                     }
+                } else {
+                    $this->logger->addLog('[Save Card] Card saved', 'debug');
                 }
             }
         }
@@ -464,7 +466,7 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-                $this->payplug->patchPayment($this->payplug->current_api_key, $payment->id, $data);
+                $this->payplug->patchPayment($payment->id, $data);
 
                 if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');

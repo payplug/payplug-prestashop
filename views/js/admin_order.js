@@ -1,5 +1,5 @@
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -166,7 +166,6 @@ $(document).ready(function() {
         callRefund();
     });
 
-
     $('input[name=submitPPUpdate]').bind('click', function(e) {
         e.preventDefault();
         callUpdate();
@@ -175,6 +174,14 @@ $(document).ready(function() {
     $('input[name=submitPPCapture]').bind('click', function(e) {
         e.preventDefault();
         callCapture();
+    });
+
+    $('.open_payment_information').unbind('click').click(function(e) {
+        if ($(this).parent().parent().next('tr').is(':visible'))
+            $(this).parent().parent().next('tr').hide();
+        else
+            $(this).parent().parent().next('tr').show();
+        e.preventDefault();
     });
 
     payplug.init();

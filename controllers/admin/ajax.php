@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -115,10 +115,16 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
-        if (!$payplug->checkAmountToRefund(Tools::getValue('amount'))) {
+        $amount = Tools::getValue('amount');
+        if (!$payplug->checkAmountToRefund($amount)) {
             die(json_encode([
                 'status' => 'error',
                 'data' => $payplug->l('Incorrect amount to refund')
+            ]));
+        } elseif ($payplug->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            die(json_encode([
+                'status' => 'error',
+                'data' => $this->l('The amount to be refunded must be at least 0.10 €')
             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));

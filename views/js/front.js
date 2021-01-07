@@ -1,5 +1,5 @@
 /**
- * 2013 - 2019 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2019 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -337,7 +337,7 @@ var $document, $window, payplugModule = {
                         identifier = popin.props.identifier,
                         open = popin.props.open;
 
-                    oney.props.loaded = $('.' + identifier).length > 0;
+                    oney.props.loaded = false;
 
                     if (open) {
                         popin.open();

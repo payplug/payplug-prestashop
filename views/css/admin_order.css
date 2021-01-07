@@ -1,5 +1,5 @@
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -47,15 +47,17 @@
 }
 
 #pppanel input[type="submit"].green-button {
-    background: #00ab7a;
-    color: #ffffff;
-    border: none;
-    /*margin: 15px 0 20px 0;*/
-    text-transform: uppercase;
-    font-weight: bold;
-    margin: 0 0 0 60px;
-    width: 150px;
-    height: 27px;
+	background: #00ab7a;
+	color: #ffffff;
+	border: none;
+	/*margin: 15px 0 20px 0;*/
+	text-transform: uppercase;
+	font-weight: bold;
+	margin: 0 0 0 60px;
+	padding: 0;
+	width: 150px;
+	height: 27px;
+	line-height: 27px;
 }
 
 #pppanel input[type="submit"].green-button.abort-button.btn[disabled] {

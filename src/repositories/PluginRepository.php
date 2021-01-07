@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -38,6 +38,8 @@ class PluginRepository extends Repository
     private $logger;
     private $oney;
     private $plugin;
+    private $order_state;
+    private $translate;
 
     // Specific classes
     private $configuration;
@@ -61,7 +63,9 @@ class PluginRepository extends Repository
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
+        $this->translate = new TranslationsRepository($payplug);
         $this->validate = new ValidateSpecific();
+        $this->order_state = new OrderStateRepository();
         $this->plugin
             ->setApiVersion('2019-08-06')
             ->setCache($this->cache)
@@ -74,7 +78,9 @@ class PluginRepository extends Repository
             ->setOney($this->oney)
             ->setQuery($this->query)
             ->setTools($this->tools)
+            ->setTranslate($this->translate)
             ->setValidate($this->validate)
+            ->setOrderState($this->order_state)
         ;
         $this->setEntity($this->plugin);
     }

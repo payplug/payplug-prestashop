@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -33,13 +33,13 @@ final class GetDateUpdTest extends TestCase
     protected function setUp(): void
     {
         $this->cache = new CacheEntity();
-        $this->cache->setDateUpd('2020-12-31 23:59:42');
+        $this->cache->setDateUpd('2021-12-31 23:59:42');
     }
 
     public function testReturnDateUpd(): void
     {
         $this->assertSame(
-            '2020-12-31 23:59:42',
+            '2021-12-31 23:59:42',
             $this->cache->getDateUpd()
         );
     }
