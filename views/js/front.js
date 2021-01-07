@@ -281,8 +281,9 @@ var $document, $window, payplugModule = {
                     if (typeof content == 'undefined' || !content) {
                         return false;
                     }
+
                     var oney = payplugModule.oney,
-                        popin = payplugModule.oney.popin,
+                        popin = oney.cta.popin,
                         identifier = popin.props.identifier,
                         open = popin.props.open;
 
@@ -321,8 +322,7 @@ var $document, $window, payplugModule = {
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var popin = payplugModule.oney.cta.popin,
-                        identifier = popin.props.identifier;
+                    var popin = payplugModule.oney.cta.popin;
 
                     var is_open = $('-open').length > 0;
                     if (is_open) {
@@ -333,8 +333,7 @@ var $document, $window, payplugModule = {
                 },
                 check: function () {
                     var oney = payplugModule.oney,
-                        popin = payplugModule.oney.popin,
-                        identifier = popin.props.identifier,
+                        popin = oney.cta.popin,
                         open = popin.props.open;
 
                     oney.props.loaded = false;
