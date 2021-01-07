@@ -250,7 +250,6 @@ var $document, $window, payplug = {
                 success: function (result) {
                     $('.' + identifier).replaceWith(result.content);
                     payplug.tools.loader.hide($('.' + identifier));
-                    var {oney} = payplug;
                 }
             });
         },

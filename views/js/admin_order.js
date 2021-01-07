@@ -38,7 +38,6 @@ var $document, $window, payplug = {
         },
         call: function(event) {
             event.preventDefault();
-            var {abort} = payplug;
             var {popup} = payplug;
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
@@ -65,8 +64,6 @@ var $document, $window, payplug = {
         },
         confirm: function(event){
             event.preventDefault();
-            var {abort} = payplug;
-            var {popup} = payplug;
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
             var id_order = $('input:hidden[name=id_order]').val();
@@ -113,7 +110,6 @@ var $document, $window, payplug = {
                 });
         },
         set: function (content) {
-            console.log('popup set');
             var {popup} = payplug,
                 {identifier} = popup.props;
 
@@ -124,7 +120,6 @@ var $document, $window, payplug = {
             popup.open();
         },
         open: function () {
-            console.log('popup open');
             var {popup} = payplug,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
@@ -135,7 +130,6 @@ var $document, $window, payplug = {
             }, 0);
         },
         close: function () {
-            console.log('popup close');
             var {popup} = payplug,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
@@ -147,14 +141,12 @@ var $document, $window, payplug = {
             }, 500);
         },
         create: function () {
-            console.log('popup create');
             var {popup} = payplug,
                 {identifier} = popup.props,
                 html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
             $('body').append(html);
         },
         remove: function () {
-            console.log('popup remove');
             var {popup} = payplug,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
@@ -162,7 +154,6 @@ var $document, $window, payplug = {
             $popup.remove();
         },
         hydrate: function (content) {
-            console.log('popup hydrate');
             var {popup} = payplug,
                 {identifier} = popup.props;
             $('.' + identifier + '_content').html(content);
