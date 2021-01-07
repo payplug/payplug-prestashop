@@ -2199,7 +2199,8 @@ class Payplug extends PaymentModule
         } else {
             foreach ($res_payplug_card as $key => &$value) {
                 if ((int)$value['exp_year'] < (int)date('Y')
-                    || ((int)$value['exp_year'] == (int)date('Y')
+                    || (
+                        (int)$value['exp_year'] == (int)date('Y')
                         && (int)$value['exp_month'] < (int)date('m')
                     )) {
                     $value['expired'] = true;
@@ -2587,7 +2588,7 @@ class Payplug extends PaymentModule
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->smarty->assign(array(
@@ -2861,7 +2862,7 @@ class Payplug extends PaymentModule
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->smarty->assign(array(
@@ -4047,7 +4048,7 @@ class Payplug extends PaymentModule
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_refundable_payment = ($p->amount - $p->amount_refunded);
                             $amount_available += (
-                            $amount_refundable_payment >= 10 ?
+                                $amount_refundable_payment >= 10 ?
                                 $amount_refundable_payment / 100
                                 : 0
                             );
@@ -5431,8 +5432,7 @@ class Payplug extends PaymentModule
      */
     private function login($email, $password)
     {
-        $data = array
-        (
+        $data = array(
             'email' => $email,
             'password' => $password
         );
@@ -6580,7 +6580,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '2.31.0';
+        $this->version = '2.31.1';
         $this->api_version = '2019-08-06';
     }
 
@@ -6639,7 +6639,6 @@ class Payplug extends PaymentModule
      */
     public function storeInstallment($installment_id, $id_cart)
     {
-
         if ($pay_id = $this->getPaymentByCart($id_cart)) {
             $this->deletePayment($pay_id, $id_cart);
         }
@@ -7065,7 +7064,6 @@ class Payplug extends PaymentModule
 
     public function updateOrderState($payment)
     {
-
         if (!Validate::isLoadedObject($payment)) {
             return false;
         }

@@ -490,7 +490,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
                 }
             } elseif ($order_payments) {
                 foreach ($order_payments as $payment) {
-                    if ($payment['transaction_id'] == $this->payment->id) {
+                    if ($payment->transaction_id == $this->payment->id) {
                         $related = true;
                     }
                 }
@@ -903,7 +903,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
         if ($is_totaly_refunded) {
             $this->logger->addLog('TOTAL REFUND MODE');
 
-            $cart_id = (int)$meta['Cart'];
+            $cart_id = (int)$meta['ID Cart'];
             $id_order = (int)Order::getOrderByCartId($cart_id);
             $order = new Order($id_order);
             $this->logger->addLog('Order ID : ' . $id_order);
