@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{payplug}prestashop>payplug_8247b8e98846f96a3dc86c86107d194e'] = 'La solution de paiement en ligne alliant simplicité et accompagnement de premier ordre pour booster vos ventes.';
+$_MODULE['<{payplug}prestashop>payplug_8247b8e98846f96a3dc86c86107d194e'] = 'La soluzione di pagamento online che ti assiste con facilità e ti aiuta ad aumentare le vendite.';
 $_MODULE['<{payplug}prestashop>payplug_f157d7333585b8ce4db9722f383d3bcb'] = 'Impossibile interropere il pagamento frazionato.';
 $_MODULE['<{payplug}prestashop>payplug_6339057c04eafb3954cf17cd06847efc'] = 'Aggiornamento non riuscito';
 $_MODULE['<{payplug}prestashop>payplug_8186e25dabeca93837acfc5664c7fd00'] = 'L\'indirizzo mail e/o la password sono errati.';
@@ -252,7 +252,7 @@ $_MODULE['<{payplug}prestashop>connected_42ae25231906c83927831e0ef7c317ac'] = 'D
 $_MODULE['<{payplug}prestashop>disconnected_ce8ae9da5b7cd6c3df2929543a9af92d'] = 'Email';
 $_MODULE['<{payplug}prestashop>disconnected_8b5dd64ab8d0b8158906796b53a200e2'] = 'Indirizzo E-mail';
 $_MODULE['<{payplug}prestashop>disconnected_bbc1a783fdde5e4cf38810fe1ec75e82'] = 'L\'indirizzo E-mail non é valido';
-$_MODULE['<{payplug}prestashop>disconnected_dc647eb65e6711e155375218212b3964'] = 'Mot de passe';
+$_MODULE['<{payplug}prestashop>disconnected_dc647eb65e6711e155375218212b3964'] = 'Password';
 $_MODULE['<{payplug}prestashop>disconnected_36d190267368ff7f3f58eacef82be025'] = 'La password deve essere di almeno 8 caratteri';
 $_MODULE['<{payplug}prestashop>disconnected_01a569ddc6cf67ddec2a683f0a5f5956'] = 'Hai dimenticato la password?';
 $_MODULE['<{payplug}prestashop>disconnected_5a70fa9bcb546858a137c11468967f5e'] = 'Accedi al tuo conto';
@@ -274,7 +274,7 @@ $_MODULE['<{payplug}prestashop>activate_c0e1a495d527370f5ab1ea42061d9786'] = 'At
 $_MODULE['<{payplug}prestashop>pwd_d698469a293eb8d935d4e9496c53caed'] = 'Si prega di inserire la password del tuo conto PayPlug';
 $_MODULE['<{payplug}prestashop>pwd_ea4788705e6873b424c65e91c2846b19'] = 'Cancella';
 $_MODULE['<{payplug}prestashop>pwd_a60852f204ed8028c1c58808b746d115'] = 'Ok';
-$_MODULE['<{payplug}prestashop>confirm_67495109b39d61d78694e052142b51bc'] = 'Les paramètres suivant seront enregistrés :';
+$_MODULE['<{payplug}prestashop>confirm_67495109b39d61d78694e052142b51bc'] = 'Il modulo di Payplug sarà visualizzato:';
 $_MODULE['<{payplug}prestashop>confirm_1ee1c44c2dc81681f961235604247b81'] = 'Modalità';
 $_MODULE['<{payplug}prestashop>confirm_033bd94b1168d7e4f0d644c3c95e35bf'] = 'TEST';
 $_MODULE['<{payplug}prestashop>confirm_f35d25277cc50c27cf7b5d69181dd381'] = 'LIVE';
