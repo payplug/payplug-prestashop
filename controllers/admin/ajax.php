@@ -166,7 +166,7 @@ if (Tools::getValue('_ajax') == 1) {
             if ((int)Tools::getValue('id_state') != 0 || $payment->is_refunded == 1) {
                 $order = new Order((int)$id_order);
                 if (Validate::isLoadedObject($order)) {
-                    $current_state = (int)$order->getCurrentState();
+                    $current_state = (int)$payplug->getCurrentOrderState($order->id);
                     $logger->addLog('notice', 'Current order state: ' . $current_state);
                     if ($current_state != 0 && $current_state != $new_state) {
                         $history = new OrderHistory();

@@ -4931,7 +4931,7 @@ class Payplug extends PaymentModule
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        $current_state = (int)$order->getCurrentState();
+                        $current_state = (int)$this->getCurrentOrderState($order->id);
                         $this->logger->addLog('notice', 'Current order state: ' . $current_state);
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
@@ -4957,7 +4957,7 @@ class Payplug extends PaymentModule
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        $current_state = (int)$order->getCurrentState();
+                        $current_state = (int)$this->getCurrentOrderState($order->id);
                         $this->logger->addLog('notice', 'Current order state: ' . $current_state);
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
@@ -6057,5 +6057,21 @@ class Payplug extends PaymentModule
         ]);
 
         return $this->oney->getOneyCTA('checkout');
+    }
+
+    /**
+     * @description Get the current Order State Id for a given Order ID
+     *
+     * @param bool $id_order
+     * @return integer|false
+     */
+    public function getCurrentOrderState($id_order = false)
+    {
+        if (!$id_order) {
+            return false;
+        }
+
+        $sql = 'SELECT `current_state` FROM `'._DB_PREFIX_.'orders` WHERE `id_order` = ' . (int)$id_order;
+        return Db::getInstance()->getValue($sql);
     }
 }

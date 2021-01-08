@@ -909,7 +909,7 @@ class PayPlugNotifications
             }
 
             $new_order_state = $this->order_states['refund'];
-            $current_state = $order->getCurrentState();
+            $current_state = $this->getCurrentOrderState($order->id);
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
