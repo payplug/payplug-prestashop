@@ -531,5 +531,4 @@ class CardRepository extends Repository
     {
         return $this->l('Card sucessfully deleted.');
     }
-
 }

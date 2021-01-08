@@ -1711,7 +1711,6 @@ class Payplug extends PaymentModule
         $json_answer = $response['httpResponse'];
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
-
         } else {
             return false;
         }
@@ -3114,7 +3113,8 @@ class Payplug extends PaymentModule
             $show_menu_installment = true;
             $inst_status = $installment->is_active ?
                 $this->l('ongoing') :
-                ($installment->is_fully_paid ?
+                (
+                    $installment->is_fully_paid ?
                     $this->l('paid') :
                     $this->l('suspended')
                 );
@@ -3234,7 +3234,7 @@ class Payplug extends PaymentModule
             } elseif ((int)$payment->is_refunded == 1) {
                 $show_menu_refunded = true;
                 $display_refund = false;
-            }  elseif(time() >= $payment->refundable_until) {
+            } elseif (time() >= $payment->refundable_until) {
                 $display_refund = false;
             } else {
                 $display_refund = true;
@@ -3383,7 +3383,8 @@ class Payplug extends PaymentModule
      * @throws PrestaShopException
      * @throws \Payplug\Exception\ConfigurationException
      */
-    public function hookAdminOrder($params) {
+    public function hookAdminOrder($params)
+    {
         return $this->hookDisplayAdminOrderMain($params);
     }
 
@@ -4030,12 +4031,12 @@ class Payplug extends PaymentModule
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
         if (preg_match(
-                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
+            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
                         iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|
                         palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|
                         up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-                $useragent
-            ) || preg_match(
+            $useragent
+        ) || preg_match(
                 '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
             an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
                 br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
@@ -4174,7 +4175,6 @@ class Payplug extends PaymentModule
             } else {
                 return false;
             }
-
         } catch (Exception $e) {
             json_encode([
                 'content' => null,
@@ -4182,8 +4182,6 @@ class Payplug extends PaymentModule
             ]);
             return false;
         }
-
-
     }
 
     /**
@@ -4292,7 +4290,7 @@ class Payplug extends PaymentModule
         ];
 
         try {
-            $payment = \Payplug\Resource\Payment::fromAttributes(array('id' => $pay_id));
+            $payment = \Payplug\Resource\Payment::fromAttributes(['id' => $pay_id]);
             $payment->update($data);
         } catch (Exception $e) {
             $result = [
@@ -4409,7 +4407,7 @@ class Payplug extends PaymentModule
             'is_oney' => false
         ];
 
-        foreach($default_options as $key => $value) {
+        foreach ($default_options as $key => $value) {
             if (!isset($options[$key])) {
                 $options[$key] = $value;
             }
@@ -5480,7 +5478,6 @@ class Payplug extends PaymentModule
         ];
 
         if (isset($json_answer['configuration'])) {
-
             if (isset($json_answer['configuration']['currencies'])
                 && !empty($json_answer['configuration']['currencies'])) {
                 $configuration['currencies'] = [];
