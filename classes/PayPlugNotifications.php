@@ -896,7 +896,10 @@ class PayPlugNotifications
                 $cart_id = (int)$meta['ID Cart'];
                 $this->logger->addLog('Cart ID : ' . $cart_id);
             } else {
-                $this->logger->addLog('Can\'t be refunded, because there is an error during retrieving Cart ID.', 'error');
+                $this->logger->addLog(
+                    'Can\'t be refunded, because there is an error during retrieving Cart ID.',
+                    'error'
+                );
                 $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
             }
 

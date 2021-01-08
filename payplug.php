@@ -617,7 +617,7 @@ class Payplug extends PaymentModule
             die(json_encode($return));
         }
         if (Tools::getValue('has_live_key')) {
-            die(json_encode(['result' => $this->has_live_key()]));
+            die(json_encode(['result' => $this->hasLiveKey()]));
         }
         if ((int)Tools::getValue('refund') == 1) {
             $this->refundPayment();
@@ -2893,7 +2893,7 @@ class Payplug extends PaymentModule
     /**
      * @return bool
      */
-    public function has_live_key()
+    public function hasLiveKey()
     {
         return (bool)Configuration::get('PAYPLUG_LIVE_API_KEY');
     }
@@ -4589,7 +4589,10 @@ class Payplug extends PaymentModule
         $force_3ds = false;
 
         //save card
-        $allow_save_card = $config['one_click'] && Cart::isGuestCartByCartId($cart->id) != 1 && $options['id_card'] == 'new_card';
+        $allow_save_card =
+            $config['one_click']
+            && Cart::isGuestCartByCartId($cart->id) != 1
+            && $options['id_card'] == 'new_card';
 
         //
         $payment_tab = [
@@ -5727,6 +5730,7 @@ class Payplug extends PaymentModule
      * @throws Exception
      * @see Module::hookPayment()
      *
+     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
      */
     public function hookPayment($params)
     {

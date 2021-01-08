@@ -34,6 +34,5 @@ function upgrade_module_2_24_1()
 
     require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
     require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-    truncateCSV(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
     return PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 0);
 }

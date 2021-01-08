@@ -88,7 +88,7 @@ if (Tools::getValue('_ajax') == 1) {
         $payplug->submitPopinPwd($_POST['pwd']);
     }
     if (Tools::getValue('has_live_key')) {
-        die(Tools::jsonEncode(['result' => $payplug->has_live_key()]));
+        die(Tools::jsonEncode(['result' => $payplug->hasLiveKey()]));
     }
     if (Tools::getValue('submit') == 'submitPopin_confirm') {
         die(json_encode(['content' => 'confirm_ok']));
@@ -124,7 +124,7 @@ if (Tools::getValue('_ajax') == 1) {
         } elseif ($payplug->checkAmountToRefund($amount) && ($amount < 0.10)) {
             die(json_encode([
                 'status' => 'error',
-                'data' => $this->l('The amount to be refunded must be at least 0.10 €')
+                'data' => $payplug->l('The amount to be refunded must be at least 0.10 €')
             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));
