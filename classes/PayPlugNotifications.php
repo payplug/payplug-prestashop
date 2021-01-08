@@ -912,10 +912,11 @@ class PayPlugNotifications
             }
 
             $new_order_state = $this->order_states['refund'];
-            $current_state = $order->getCurrentState();
+            $current_state = $this->payplug->getCurrentOrderState($order->id);
+            $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
-                $this->logger->addLog('Changing status to \'refunded\'');
+                $this->logger->addLog('Changing status to \'refunded\': ' . $new_order_state);
                 $order_history = new OrderHistory();
                 $order_history->id_order = $id_order;
                 try {
