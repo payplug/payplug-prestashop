@@ -363,7 +363,7 @@ class OneyRepository extends Repository
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $this->toolsSpecific->tool('displayPrice',$amount),
+                'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ]
         ];
         $this->contextSpecific->getContext()->smarty->assign($vars);
@@ -729,7 +729,8 @@ class OneyRepository extends Repository
         } elseif ($tools->tool(
             'strlen',
             $this->contextSpecific->getContext()->customer->email,
-            'UTF-8') > 100) {
+            'UTF-8'
+        ) > 100) {
             $text = $this->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [

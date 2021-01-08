@@ -112,6 +112,7 @@ class CardRepository extends Repository
      * @param int $id_payplug_card
      * @param string $api_key
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function deleteCard($id_customer, $id_payplug_card, $api_key)
     {
@@ -407,7 +408,7 @@ class CardRepository extends Repository
             $idCard = $this->query->build()[0]['id_card'];
 
             // Delete from API
-            Card::delete($idCard);
+            \Payplug\Card::delete($idCard);
 
             // Delete from our DB
             $this->query
@@ -531,5 +532,4 @@ class CardRepository extends Repository
     {
         return $this->l('Card sucessfully deleted.');
     }
-
 }

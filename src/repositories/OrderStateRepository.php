@@ -73,7 +73,11 @@ class OrderStateRepository extends Repository
                 ->select()
                 ->fields('os.id_order_state')
                 ->from(_DB_PREFIX_.'order_state', 'os')
-                ->leftJoin(_DB_PREFIX_.'order_state_lang', 'osl', 'osl.id_order_state = os.id_order_state AND osl.template = \''.pSQL($definition['template']).'\'')
+                ->leftJoin(
+                    _DB_PREFIX_.'order_state_lang',
+                    'osl',
+                    'osl.id_order_state = os.id_order_state AND osl.template = \''.pSQL($definition['template']).'\''
+                )
                 ->where('os.invoice = '.(int)$definition['invoice'])
                 ->where('os.send_email = '.(int)$definition['send_email'])
                 ->where('os.hidden = '.(int)$definition['hidden'])

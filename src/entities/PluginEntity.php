@@ -315,5 +315,4 @@ class PluginEntity
         $this->translate = $translate;
         return $this;
     }
-
 }
