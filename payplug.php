@@ -355,6 +355,7 @@ class Payplug extends PaymentModule
             ]));
         } else {
             $installment = $this->retrieveInstallment($inst_id);
+
             if ($installment->is_live == 1) {
                 $new_state = (int)Configuration::get('PS_OS_CANCELED');
             } else {
@@ -362,9 +363,10 @@ class Payplug extends PaymentModule
             }
 
             $order = new Order((int)$id_order);
+
             if (Validate::isLoadedObject($order)) {
                 $current_state = (int)$order->getCurrentState();
-                if ($current_state != 0 && $current_state != $new_state) {
+                if ($current_state != 0 && $current_state !== $new_state) {
                     $history = new OrderHistory();
                     $history->id_order = (int)$order->id;
                     $history->changeIdOrderState($new_state, (int)$order->id);
