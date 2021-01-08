@@ -3,7 +3,7 @@
 # source ~/.bash_profile
 
 ## Auto index
-find ./vendor -type d -exec cp index.php {} \\;
+find ./vendor -type d -exec cp index.php {} \;
 
 ## Lib Phone Number
 rm -rf vendor/giggsey/libphonenumberlight;
