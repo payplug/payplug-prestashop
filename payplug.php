@@ -4689,7 +4689,7 @@ class Payplug extends PaymentModule
                 // check oney required fields
 
                 $payment_data = $this->getPaymentDataCookie();
-                
+
                 if (!$payment_data) {
                     $payment_data = Tools::getValue('oney_form');
                 }
@@ -4860,14 +4860,17 @@ class Payplug extends PaymentModule
 
     public function refundPayment()
     {
+        $this->logger->addLog('notice', '[Payplug] Start refund');
         $amount = Tools::getValue('amount');
 
         if (!$this->checkAmountToRefund($amount)) {
+            $this->logger->addLog('notice', 'Incorrect amount to refund');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Incorrect amount to refund')
             ]));
         } elseif ($this->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            $this->logger->addLog('notice', 'The amount to be refunded must be at least 0.10 €');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('The amount to be refunded must be at least 0.10 €')
@@ -4889,6 +4892,7 @@ class Payplug extends PaymentModule
         $pay_mode = Tools::getValue('pay_mode');
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
+            $this->logger->addLog('notice', 'Cannot refund that amount.');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Cannot refund that amount.')
@@ -4928,11 +4932,13 @@ class Payplug extends PaymentModule
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
                         $current_state = (int)$order->getCurrentState();
+                        $this->logger->addLog('notice', 'Current order state: ' . $current_state);
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
+                            $this->logger->addLog('notice', 'Change order state to ' . $new_state);
                         }
                     }
                     $reload = true;
@@ -4952,11 +4958,13 @@ class Payplug extends PaymentModule
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
                         $current_state = (int)$order->getCurrentState();
+                        $this->logger->addLog('notice', 'Current order state: ' . $current_state);
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
+                            $this->logger->addLog('notice', 'Change order state to ' . $new_state);
                         }
                     }
                     $reload = true;

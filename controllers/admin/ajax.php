@@ -115,6 +115,7 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
+        $logger->addLog('notice', '[Ajax] Start refund');
         $amount = Tools::getValue('amount');
         if (!$payplug->checkAmountToRefund($amount)) {
             die(json_encode([
@@ -143,6 +144,7 @@ if (Tools::getValue('_ajax') == 1) {
         $pay_mode = Tools::getValue('pay_mode');
         $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
+            $logger->addLog('notice', 'Cannot refund that amount.');
             die(json_encode([
                 'status' => 'error',
                 'data' => $payplug->l('Cannot refund that amount.')
@@ -165,11 +167,13 @@ if (Tools::getValue('_ajax') == 1) {
                 $order = new Order((int)$id_order);
                 if (Validate::isLoadedObject($order)) {
                     $current_state = (int)$order->getCurrentState();
+                    $logger->addLog('notice', 'Current order state: ' . $current_state);
                     if ($current_state != 0 && $current_state != $new_state) {
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
                         $history->changeIdOrderState($new_state, (int)$order->id);
                         $history->addWithemail();
+                        $logger->addLog('notice', 'Change order state to ' . $new_state);
                     }
                 }
                 $reload = true;
@@ -182,6 +186,7 @@ if (Tools::getValue('_ajax') == 1) {
                 $amount_refunded_payplug,
                 $amount_available
             );
+            $logger->addLog('notice', 'Amount successfully refunded.');
             die(json_encode([
                 'status' => 'ok',
                 'data' => $data,
