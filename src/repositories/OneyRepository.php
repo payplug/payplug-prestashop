@@ -1392,6 +1392,11 @@ class OneyRepository extends Repository
 
         $iso_list = explode(',', $allow_countries);
         if (!in_array($iso_code, $iso_list, true)) {
+            /*
+             * We first used Prestashop country list but translation was not ok so we had to write countries
+             * directly in the code. Maybe later it will be ok and dynamic.
+             */
+            /*
             $list = [];
             foreach ($iso_list as $iso) {
                 $id_country = $this->countrySpecific->getByIso($iso);
@@ -1400,14 +1405,16 @@ class OneyRepository extends Repository
                     $id_country
                 );
             }
+            */
+            $str_list = $this->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana');
+            if (in_array('IT', $iso_list)) {
+                $str_list = $this->l('Italy');
+            }
 
             return [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => sprintf(
-                    $this->l('For a payment with Oney, delivery and billing addresses must be in %s'),
-                    implode(', ', $list)
-                )
+                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in ') . $str_list
             ];
         }
 
