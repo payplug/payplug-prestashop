@@ -3827,6 +3827,7 @@ class Payplug extends PaymentModule
             $log->error('Install failed: parent::install().');
             $install['flag'] = false;
             $install['error'] = 'parent::install()';
+            return false;
         } else {
             $log->info('Install success: parent::install().');
         }
