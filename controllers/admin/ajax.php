@@ -150,8 +150,9 @@ if (Tools::getValue('_ajax') == 1) {
                 ' - $amount : '.$amount.
                 ' - $metadata : '.json_encode($metadata).
                 ' - $pay_mode : '.$pay_mode.
-                ' - $inst_id : '.$inst_id
-            , 'debug');
+                ' - $inst_id : '.$inst_id,
+                'debug'
+            );
             die(json_encode([
                 'status' => 'error',
                 'data' => $payplug->l('Cannot refund that amount.')
@@ -173,7 +174,7 @@ if (Tools::getValue('_ajax') == 1) {
             if ((int)Tools::getValue('id_state') != 0 || $payment->is_refunded == 1) {
                 $order = new Order((int)$id_order);
                 if (Validate::isLoadedObject($order)) {
-                    if(!$payplug->createLockFromCartId($order->id_cart)) {
+                    if (!$payplug->createLockFromCartId($order->id_cart)) {
                         die(json_encode([
                             'status' => 'error',
                             'data' => $this->l('An error has occurred')
