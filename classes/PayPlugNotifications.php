@@ -895,6 +895,12 @@ class PayPlugNotifications
             } elseif (isset($meta['ID Cart'])) {
                 $cart_id = (int)$meta['ID Cart'];
                 $this->logger->addLog('Cart ID : ' . $cart_id);
+                $this->cart = new Cart($cart_id);
+
+                if (!Validate::isLoadedObject($this->cart)) {
+                    $this->logger->addLog('Cart cannot be loaded.', 'error');
+                    $this->exitProcess('Cart cannot be loaded.', 500);
+                }
             } else {
                 $this->logger->addLog(
                     'Can\'t be refunded, because there is an error during retrieving Cart ID.',
@@ -911,6 +917,17 @@ class PayPlugNotifications
                 $this->exitProcess('Order cannot be loaded.', 500);
             }
 
+            // Set lock Lock the process with id_cart from order object
+            do {
+                $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+                if (!$cart_lock) {
+                    PayplugLock::check($this->cart->id);
+                } else {
+                    $this->logger->addLog('Lock created');
+                    $this->lock_key = $this->cart->id;
+                }
+            } while (!$cart_lock);
+
             $new_order_state = $this->order_states['refund'];
             $current_state = $this->payplug->getCurrentOrderState($order->id);
             $this->logger->addLog('Current state: ' . $current_state);
@@ -922,6 +939,7 @@ class PayPlugNotifications
                 try {
                     $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                     $order_history->save();
+                    $this->exitProcess('Order state has been updated.');
                 } catch (Exception $exception) {
                     $this->logger->addLog(
                         'Order history cannot be saved: ' . $exception->getMessage(),
@@ -939,6 +957,7 @@ class PayPlugNotifications
             }
         } else {
             $this->logger->addLog('PARTIAL REFUND');
+            $this->exitProcess('PARTIAL REFUND');
         }
     }
 
