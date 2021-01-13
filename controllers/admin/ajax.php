@@ -173,16 +173,12 @@ if (Tools::getValue('_ajax') == 1) {
             if ((int)Tools::getValue('id_state') != 0 || $payment->is_refunded == 1) {
                 $order = new Order((int)$id_order);
                 if (Validate::isLoadedObject($order)) {
-                    // Set lock Lock the process with id_cart from order object
-                    $this->logger->addLog('Lock creation', 'notice');
-                    do {
-                        $cart_lock = PayplugLock::createLockG2($order->id_cart, 'payplug');
-                        if (!$cart_lock) {
-                            PayplugLock::check($order->id_cart);
-                        } else {
-                            $this->logger->addLog('Lock created', 'notice');
-                        }
-                    } while (!$cart_lock);
+                    if(!$payplug->createLockFromCartId($order->id_cart)) {
+                        die(json_encode([
+                            'status' => 'error',
+                            'data' => $this->l('An error has occurred')
+                        ]));
+                    }
 
                     $current_state = (int)$payplug->getCurrentOrderState($order->id);
                     $logger->addLog('Current order state: ' . $current_state, 'notice');
@@ -195,9 +191,9 @@ if (Tools::getValue('_ajax') == 1) {
                     }
 
                     if (!PayplugLock::deleteLockG2($order->id_cart)) {
-                        $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        $logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
-                        $this->logger->addLog('Lock deleted.', 'notice');
+                        $logger->addLog('Lock deleted.', 'notice');
                     }
                 }
                 $reload = true;
