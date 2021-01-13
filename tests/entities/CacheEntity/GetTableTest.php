@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class GetTableTest extends TestCase
 {
     protected $cache;
@@ -46,8 +51,8 @@ final class GetTableTest extends TestCase
 
     public function testTableIsAString(): void
     {
-        $this->assertIsString(
-            $this->cache->getTable()
+        $this->assertTrue(
+            is_string($this->cache->getTable())
         );
     }
 }

@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class GetCacheValueTest extends TestCase
 {
     protected $cache;
@@ -46,8 +51,8 @@ final class GetCacheValueTest extends TestCase
 
     public function testCacheValueIsAString(): void
     {
-        $this->assertIsString(
-            $this->cache->getCacheValue()
+        $this->assertTrue(
+            is_string($this->cache->getCacheValue())
         );
     }
 }

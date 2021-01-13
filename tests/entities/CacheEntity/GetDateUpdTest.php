@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class GetDateUpdTest extends TestCase
 {
     protected $cache;
@@ -46,15 +51,15 @@ final class GetDateUpdTest extends TestCase
 
     public function testDateUpdIsAString(): void
     {
-        $this->assertIsString(
-            $this->cache->getDateUpd()
+        $this->assertTrue(
+            is_string($this->cache->getDateUpd())
         );
     }
 
     public function testDateUpdHaveAValidDatetimeFormat(): void
     {
-        $this->assertMatchesRegularExpression(
-            '/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/',
+        $this->assertRegExp(
+            '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
             $this->cache->getDateUpd()
         );
     }
