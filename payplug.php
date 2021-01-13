@@ -4996,6 +4996,8 @@ class Payplug extends PaymentModule
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+                        } else {
+                            $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                         }
 
                         if (!PayplugLock::deleteLockG2($order->id_cart)) {
