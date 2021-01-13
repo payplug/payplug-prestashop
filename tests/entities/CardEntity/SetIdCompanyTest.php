@@ -27,6 +27,11 @@ use PayPlug\src\entities\CardEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group card
+ * @group card_entity
+ */
 final class SetIdCompanyTest extends TestCase
 {
     protected $card;
@@ -54,6 +59,12 @@ final class SetIdCompanyTest extends TestCase
         );
     }
 
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
     public function testThrowExceptionWhenNotAnInt(): void
     {
         $this->expectException(BadParameterException::class);
