@@ -25,4 +25,906 @@ namespace PayPlug\src\repositories;
 
 class HookRepository extends \Payplug
 {
+    /**
+     * Automatically update PayPlugCarrier after someone update a Prestashop Carrier
+     *
+     * @param array $params List of parameters used when the hook was triggered
+     * @return void
+     */
+    public function hookActionCarrierUpdate($params)
+    {
+        $updated_carrier = $params['carrier'];
+        $payplug_carrier = PayPlugCarrier::getPayPlugCarrierByIdCarrier((int)$params['id_carrier']);
+
+        // if the payplug carrier don't exists, set default value
+        if (!Validate::isLoadedObject($payplug_carrier)) {
+            $payplug_carrier->delay = '1';
+            $payplug_carrier->delivery_type = 'carrier';
+        }
+
+        $payplug_carrier->id_carrier = (int)$updated_carrier->id;
+        $payplug_carrier->save();
+    }
+
+    /**
+     * @param $customer
+     * @return false|string
+     */
+    public function hookActionDeleteGDPRCustomer($customer)
+    {
+        if (!$this->card->deleteCards((int)$customer['id'])) {
+            return json_encode($this->l('PayPlug : Unable to delete customer saved cards.'));
+        }
+        return json_encode(true);
+    }
+
+    /**
+     * @param $customer
+     * @return false|string
+     * @throws PrestaShopDatabaseException
+     */
+    public function hookActionExportGDPRData($customer)
+    {
+        if (!$cards = $this->gdprCardExport((int)$customer['id'])) {
+            return json_encode($this->l('PayPlug : Unable to export customer saved cards.'));
+        } else {
+            return json_encode($cards);
+        }
+    }
+
+    /**
+     * Automatically add and populate a PayPlugCarrier after someone add a Prestashop Carrier
+     *
+     * @param array $params List of parameters used when the hook was triggered
+     * @return void
+     */
+    public function hookActionObjectCarrierAddAfter($params)
+    {
+        $new_carrier = $params['object'];
+        $new_pp_carrier = new PayPlugCarrier();
+        $new_pp_carrier->populateFromCarrier($new_carrier);
+        $new_pp_carrier->save();
+    }
+
+    /**
+     * @param $params
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public function hookActionOrderStatusUpdate($params)
+    {
+        $active = false;
+        $order = new Order((int)$params['id_order']);
+        $active = Module::isEnabled($this->name);
+        if (!$active
+            || !$order->payment == $this->displayName
+            || !$this->isReferredPaymentsActive()
+            || !$this->isReferredAutoActive()
+            || $params['newOrderStatus']->id != Configuration::get('PAYPLUG_DEFERRED_STATE')
+        ) {
+            return;
+        } else {
+            $cart = new Cart((int)$order->id_cart);
+            $payment_method = $this->getPaymentMethodByCart($cart);
+            if ($payment_method['type'] == 'installment') {
+                $installment = new PPPaymentInstallment($payment_method['id']);
+                $payment = $installment->getFirstPayment();
+            } else {
+                $payment = new PPPayment($payment_method['id']);
+            }
+            if (!$payment->isPaid()) {
+                $payment->capture();
+                $payment->refresh();
+                if ($payment->resource->card->id !== null) {
+                    $this->card->saveCard($payment->resource);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationNotSetException
+     * @see Module::hookAdminOrder()
+     */
+    public function hookDisplayAdminOrderMain($params)
+    {
+        if (!$this->active) {
+            return;
+        }
+
+        $this->html = '';
+        $order = new Order((int)$params['id_order']);
+        if (!Validate::isLoadedObject($order)) {
+            return false;
+        }
+
+        if ($order->module != $this->name) {
+            return false;
+        }
+
+        $show_popin = false;
+        $display_refund = false;
+        $refund_delay_oney = false;
+        $show_menu_refunded = false;
+        $show_menu_update = false;
+        $show_menu_installment = false;
+        $show_menu_payment = false;
+        $pay_error = '';
+        $amount_refunded_payplug = 0;
+        $amount_available = 0;
+
+        $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
+        $amount_refunded_presta = $this->getTotalRefunded($order->id);
+
+        if ($inst_id = $this->getPayplugInstallmentCart($order->id_cart)) {
+            $payment_list = [];
+            if (!$inst_id || empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
+                if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
+                    $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        return false;
+                    }
+                } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
+                    $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        return false;
+                    }
+                }
+            }
+
+            $pay_mode = $installment->is_live ? $this->l('LIVE') : $this->l('TEST');
+            $payments = $order->getOrderPaymentCollection();
+            $pps = [];
+            if (count($payments) > 0) {
+                foreach ($payments as $payment) {
+                    $pps[] = $payment->transaction_id;
+                }
+            }
+
+            $payment_list_new = [];
+            foreach ($installment->schedule as $schedule) {
+                if ($schedule->payment_ids != null) {
+                    foreach ($schedule->payment_ids as $pay_id) {
+                        $p = $this->retrievePayment($pay_id);
+                        $payment_list_new[] = $this->buildPaymentDetails($p);
+                        if ((int)$p->is_paid == 0) {
+                            $amount_refunded_payplug += 0;
+                            $amount_available += 0;
+                        } elseif ((int)$p->is_refunded == 1) {
+                            $amount_refunded_payplug += ($p->amount_refunded) / 100;
+                            $amount_available += ($p->amount - $p->amount_refunded) / 100;
+                        } elseif ((int)$p->amount_refunded > 0) {
+                            $amount_refunded_payplug += ($p->amount_refunded) / 100;
+                            $amount_refundable_payment = ($p->amount - $p->amount_refunded);
+                            if ($amount_refundable_payment >= 10) {
+                                $amount_available += $amount_refundable_payment / 100;
+                            }
+                        } else {
+                            $amount_available += ($p->amount >= 10 ? $p->amount / 100 : 0);
+                        }
+
+                        if ($amount_available > 0) {
+                            $display_refund = true;
+                        }
+
+                        if ($p->amount_refunded > 0) {
+                            $show_menu_refunded = true;
+                        }
+                    }
+                } else {
+                    $payment_list_new[] = [
+                        'id' => null,
+                        'status' => $installment->is_active ? $this->payment_status[6] : $this->payment_status[7],
+                        'status_class' => $installment->is_active ? 'pp_success' : 'pp_error',
+                        'status_code' => 'incoming',
+                        'amount' => (int)$schedule->amount / 100,
+                        'card_brand' => null,
+                        'card_mask' => null,
+                        'tds' => null,
+                        'card_date' => null,
+                        'mode' => null,
+                        'authorization' => null,
+                        'date' => date('d/m/Y', strtotime($schedule->date)),
+                    ];
+                }
+            }
+
+            $id_currency = (int)Currency::getIdByIsoCode($installment->currency);
+            $show_menu_installment = true;
+            $inst_status = $installment->is_active ?
+                $this->l('ongoing') :
+                (
+                $installment->is_fully_paid ?
+                    $this->l('paid') :
+                    $this->l('suspended')
+                );
+            $inst_status_code = $installment->is_active ?
+                'ongoing' :
+                ($installment->is_fully_paid ? 'paid' : 'suspended');
+            $inst_aborted = !$installment->is_active;
+            $ppInstallment = new PPPaymentInstallment($installment->id);
+            $instPaymentOne = $ppInstallment->getFirstPayment();
+            $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
+            $inst_paid = $installment->is_fully_paid;
+            $this->context->smarty->assign([
+                'inst_id' => $inst_id,
+                'inst_status' => $inst_status,
+                'inst_status_code' => $inst_status_code,
+                'inst_aborted' => $inst_aborted,
+                'inst_paid' => $inst_paid,
+                'payment_list' => $payment_list,
+                'payment_list_new' => $payment_list_new,
+                'inst_can_be_aborted' => $inst_can_be_aborted,
+            ]);
+
+            $sandbox = ((int)$installment->is_live == 1 ? false : true);
+            $state_addons = ($sandbox ? '_TEST' : '');
+            $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
+
+            $this->updatePayplugInstallment($installment);
+        } else {
+            if (!$pay_id = $this->isTransactionPending($order->id_cart)) {
+                $pay_id = $this->getPayplugOrderPayment($order->id);
+
+                if (!$pay_id) {
+                    $payments = $order->getOrderPaymentCollection();
+                    if (count($payments->getResults()) > 1 || !$payments->getFirst()) {
+                        return false;
+                    } else {
+                        $pay_id = $payments->getFirst()->transaction_id;
+                    }
+                }
+            }
+
+            $sandbox = (bool)Configuration::get('PAYPLUG_SANDBOX_MODE');
+
+            if (!$pay_id || empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                if ($sandbox) {
+                    $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                    if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                        $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                        return false;
+                    }
+                } else {
+                    $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+                    if (empty($pay_id) || !$payment = $this->retrievePayment($pay_id)) {
+                        $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+                        return false;
+                    }
+                }
+            }
+
+            // check if order is from oney payment
+            $oney_payment_method = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+            $is_oney = isset($payment->payment_method)
+                && isset($payment->payment_method['type'])
+                && in_array($payment->payment_method['type'], $oney_payment_method);
+
+            // Update order state if is pending
+            $state_addons = $payment->is_live ? '' : '_TEST';
+            $paid_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $oney_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+            $cancelled_state = $this->getConfiguration('PS_OS_CANCELED');
+
+            if ($is_oney) {
+                // update order state from payment status
+                if ($order->getCurrentState() == $oney_state) {
+                    $new_order_state = false;
+                    if ($payment->is_paid) {
+                        $new_order_state = $paid_state;
+                    } elseif (isset($payment->failure) && $payment->failure !== null) {
+                        $new_order_state = $cancelled_state;
+                    }
+
+                    if ($new_order_state) {
+                        $order_history = new OrderHistory();
+                        $order_history->id_order = $order->id;
+                        $order_history->changeIdOrderState($new_order_state, $order->id, true);
+                        $order_history->save();
+                    }
+                }
+            }
+
+            $single_payment = $this->buildPaymentDetails($payment);
+            $amount_refunded_payplug = ($payment->amount_refunded) / 100;
+            $amount_available_payment = ($payment->amount - $payment->amount_refunded);
+            $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
+            $id_currency = (int)Currency::getIdByIsoCode($payment->currency);
+            $state_addons = (!$payment->is_live ? '_TEST' : '');
+
+            $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
+            $id_pending_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
+
+            $current_state = (int)$order->getCurrentState();
+
+            if ((int)$payment->is_paid == 0) {
+                if (isset($payment->failure) && isset($payment->failure->message)) {
+                    $pay_error = '(' . $payment->failure->message . ')';
+                } else {
+                    $pay_error = '';
+                }
+                $display_refund = false;
+                if ($current_state != 0 && $current_state == $id_pending_order_state) {
+                    $show_menu_update = true;
+                }
+            } elseif ((((int)$payment->amount_refunded > 0)
+                    || $amount_refunded_presta > 0)
+                && (int)$payment->is_refunded != 1) {
+                $display_refund = true;
+            } elseif ((int)$payment->is_refunded == 1) {
+                $show_menu_refunded = true;
+                $display_refund = false;
+            } elseif (time() >= $payment->refundable_until) {
+                $display_refund = false;
+            } else {
+                $display_refund = true;
+                if ($is_oney) {
+                    $refund_delay_oney = time() <= $payment->refundable_after;
+                }
+            }
+
+            $conf = (int)Tools::getValue('conf');
+            if ($conf == 30 || $conf == 31) {
+                $show_popin = true;
+
+                $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
+
+                $this->html .= '<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>';
+            }
+
+            $pay_status = (int)$payment->is_paid == 1 ? $this->l('PAID') : $this->l('NOT PAID');
+            if ((int)$payment->is_refunded == 1) {
+                $pay_status = $this->l('REFUNDED');
+            } elseif ((int)$payment->amount_refunded > 0) {
+                $pay_status = $this->l('PARTIALLY REFUNDED');
+            }
+            $pay_amount = (int)$payment->amount / 100;
+            $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
+            if ($payment->card->brand != '') {
+                $pay_brand = $payment->card->brand;
+            } else {
+                $pay_brand = $this->l('Unavailable in test mode');
+            }
+            if ($payment->card->country != '') {
+                $pay_brand .= ' ' . $this->l('Card') . ' (' . $payment->card->country . ')';
+            }
+            if ($payment->card->last4 != '') {
+                $pay_card_mask = '**** **** **** ' . $payment->card->last4;
+            } else {
+                $pay_card_mask = $this->l('Unavailable in test mode');
+            }
+
+            // Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            if ($payment->is_3ds !== null) {
+                $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
+                $this->context->smarty->assign(['pay_tds' => $pay_tds]);
+            }
+
+            $pay_mode = $payment->is_live ? $this->l('LIVE') : $this->l('TEST');
+
+            if ($payment->card->exp_month === null) {
+                $pay_card_date = $this->l('Unavailable in test mode');
+            } else {
+                $pay_card_date = date(
+                    'm/y',
+                    strtotime('01.' . $payment->card->exp_month . '.' . $payment->card->exp_year)
+                );
+            }
+
+            $show_menu_payment = true;
+
+            $this->context->smarty->assign([
+                'pay_id' => $pay_id,
+                'pay_status' => $pay_status,
+                'pay_amount' => $pay_amount,
+                'pay_date' => $pay_date,
+                'pay_brand' => $pay_brand,
+                'pay_card_mask' => $pay_card_mask,
+                'pay_card_date' => $pay_card_date,
+                'pay_error' => $pay_error,
+            ]);
+
+            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            if ($payment->is_3ds !== null) {
+                $pay_tds = $payment->is_3ds ? $this->l('YES') : $this->l('NO');
+                $this->context->smarty->assign(['pay_tds' => $pay_tds]);
+            }
+        }
+
+        $currency = new Currency($id_currency);
+        if (!Validate::isLoadedObject($currency)) {
+            return false;
+        }
+
+        $amount_suggested = (min($amount_refunded_presta, $amount_available) - $amount_refunded_payplug);
+        $amount_suggested = number_format((float)$amount_suggested, 2);
+        if ($amount_suggested < 0) {
+            $amount_suggested = 0;
+        }
+
+        if ($display_refund) {
+            $this->context->smarty->assign([
+                'order' => $order,
+                'amount_refunded_payplug' => $amount_refunded_payplug,
+                'amount_available' => $amount_available,
+                'amount_refunded_presta' => $amount_refunded_presta,
+                'currency' => $currency,
+                'amount_suggested' => $amount_suggested,
+                'id_new_order_state' => $id_new_order_state,
+            ]);
+        } elseif ($show_menu_refunded) {
+            $this->context->smarty->assign([
+                'amount_refunded_payplug' => $amount_refunded_payplug,
+                'currency' => $currency,
+            ]);
+        } elseif ($show_menu_update) {
+            $this->context->smarty->assign([
+                'admin_ajax_url' => $admin_ajax_url,
+                'order' => $order,
+            ]);
+        }
+
+        $display_single_payment = $show_menu_payment;
+        $this->context->smarty->assign([
+            'logo_url' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
+            'admin_ajax_url' => $admin_ajax_url,
+            'display_single_payment' => $display_single_payment,
+            'display_refund' => $display_refund,
+            'refund_delay_oney' => $refund_delay_oney,
+            'show_menu_payment' => $show_menu_payment,
+            'show_menu_refunded' => $show_menu_refunded,
+            'show_menu_update' => $show_menu_update,
+            'show_menu_installment' => $show_menu_installment,
+            'pay_mode' => $pay_mode,
+            'order' => $order,
+        ]);
+
+        if ($display_single_payment) {
+            $this->context->smarty->assign([
+                'single_payment' => $single_payment,
+            ]);
+        }
+
+        if ($show_popin && $display_refund) {
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+        }
+
+        $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
+        return $this->html;
+    }
+
+    /**
+     * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     *
+     * @param $params
+     * @return string
+     * @throws ConfigurationNotSetException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \Payplug\Exception\ConfigurationException
+     */
+    public function hookAdminOrder($params)
+    {
+        return $this->hookDisplayAdminOrderMain($params);
+    }
+
+    /**
+     * @param $params
+     * @return string|void
+     */
+    public function hookCustomerAccount($params)
+    {
+        if (!$this->isAllowed()) {
+            return false;
+        }
+
+        $payplug_cards_url = $this->context->link->getModuleLink(
+            $this->name,
+            'cards',
+            ['process' => 'cardlist'],
+            true
+        );
+
+        if ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'hookCustomerAccount'))) {
+            $this->PrestashopSpecificObject->hookCustomerAccount();
+        }
+
+        $this->smarty->assign([
+            'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
+            'payplug_cards_url' => $payplug_cards_url
+        ]);
+
+        return $this->display(__FILE__, 'customer/my_account.tpl');
+    }
+
+    /**
+     * @param $params
+     * @return string|void
+     */
+    public function hookDisplayExpressCheckout($param)
+    {
+        if (!$this->oney->isOneyAllowed()) {
+            return false;
+        }
+
+        $is_elligible = $this->oney->isOneyElligible($this->context->cart, false, true);
+        $is_elligible = $is_elligible['result'];
+
+        $this->smarty->assign([
+            'env' => 'checkout',
+            'payplug_is_oney_elligible' => $is_elligible,
+        ]);
+        return $this->display(__FILE__, 'oney/cta.tpl');
+    }
+
+    public function hookDisplayProductPriceBlock($param)
+    {
+        if ((!$this->getConfiguration('PAYPLUG_ONEY'))
+            || (!$this->oney->isOneyAllowed())
+            || (Dispatcher::getInstance()->getController() == 'category')
+            || (Dispatcher::getInstance()->getController() == 'index')
+        ) {
+            return false;
+        }
+
+        $action = Tools::getValue('action');
+        if ($action == 'quickview') {
+            return false;
+        }
+        if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
+            return;
+        }
+
+        if ($action == 'refresh') {
+            $use_taxes = (bool)Configuration::get('PS_TAX');
+
+            $id_product = (int)Tools::getValue('id_product');
+            $group = Tools::getValue('group');
+            // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
+            if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
+                $id_product_attribute = $group ? (int)Product::getIdProductAttributesByIdAttributes(
+                    $id_product,
+                    $group
+                ) : 0;
+            } else {
+                $id_product_attribute = $group ? (int)Product::getIdProductAttributeByIdAttributes(
+                    $id_product,
+                    $group
+                ) : 0;
+            }
+            $quantity = (int)Tools::getValue('qty', (int)Tools::getValue('quantity_wanted', 1));
+
+            $product_price = Product::getPriceStatic(
+                (int)$id_product,
+                $use_taxes,
+                $id_product_attribute,
+                6,
+                null,
+                false,
+                true,
+                $quantity
+            );
+            $amount = $product_price * $quantity;
+            $is_elligible = $this->oney->isValidOneyAmount($amount, $this->context->currency->id);
+            $is_elligible = $is_elligible['result'];
+
+            $this->smarty->assign([
+                'payplug_is_oney_elligible' => $is_elligible,
+            ]);
+            $this->smarty->assign(['popin' => true]);
+        }
+        $this->smarty->assign(['env' => 'product']);
+        return $this->display(__FILE__, 'oney/cta.tpl');
+    }
+
+    /**
+     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
+     */
+    public function hookActionAdminControllerSetMedia()
+    {
+        if ($this->context->controller->controller_name == 'AdminOrders') {
+            $this->setMedia([
+                /* TODO : admin.css ne devrait pas être inclus ici, il ne sert que pour récuperer le css de la popin.
+                 * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
+                 * des modifiers dans le js. Have fun!
+                 * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
+                 * soit chargé après admin.css.
+                 */
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+            ]);
+        } else {
+            $this->setMedia([
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+            ]);
+        }
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     * @throws Exception
+     * @see Module::hookHeader()
+     */
+    public function hookHeader($params)
+    {
+        if (!$this->isAllowed()) {
+            return false;
+        }
+
+        if (Tools::getValue('error')) {
+            Media::addJsDef(['payment_errors' => true]);
+        }
+        if ((class_exists($this->PrestashopSpecificClass))
+            && (method_exists($this->PrestashopSpecificObject, 'hookHeader'))) {
+            $this->PrestashopSpecificObject->hookHeader();
+        }
+
+        if ((int)Tools::getValue('lightbox') == 1) {
+            $cart = $params['cart'];
+            if (!Validate::isLoadedObject($cart)) {
+                return;
+            }
+
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+
+            $payment_options = [
+                'id_card' => Tools::getValue('pc', 'new_card'),
+                'is_installment' => (bool)Tools::getValue('inst'),
+                'is_deferred' => (bool)Tools::getValue('def'),
+            ];
+
+            $payment = $this->preparePayment($payment_options, 'new_card');
+
+            if ($payment['result']) {
+                // If payment is paid then redirect
+                if ($payment['redirect']) {
+                    Tools::redirect($payment['return_url']);
+                } else {
+                    // else show the popin
+                    $this->context->smarty->assign([
+                        'payment_url' => $payment['return_url'],
+                        'api_url' => $this->plugin->getApiUrl(),
+                    ]);
+                    return $this->display(__FILE__, 'checkout/embedded.tpl');
+                }
+            } else {
+                $this->setPaymentErrorsCookie([
+                    $this->l('The transaction was not completed and your card was not charged.')
+                ]);
+                $error_url = 'index.php?controller=order&step=3&error=1';
+                Tools::redirect($error_url);
+            }
+        }
+
+        if (Configuration::get('PAYPLUG_ONEY')) {
+            Media::addJsDef([
+                'payplug_oney' => true,
+                'payplug_oney_loading_msg' => $this->l('Loading')
+            ]);
+        }
+
+        $payplug_ajax_url = $this->context->link->getModuleLink($this->name, 'ajax', [], true);
+        Media::addJsDef([
+            'payplug_ajax_url' => $payplug_ajax_url,
+        ]);
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     * @throws Exception
+     * @see Module::hookPaymentOptions()
+     *
+     */
+    public function hookPaymentOptions($params)
+    {
+        if (!$this->isAllowed()) {
+            return false;
+        }
+
+        $cart = $params['cart'];
+        if (!Validate::isLoadedObject($cart)) {
+            return false;
+        }
+
+        $this->context->smarty->assign([
+            'api_url' => $this->plugin->getApiUrl(),
+        ]);
+
+        $payment_options = $this->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
+
+        return $this->PrestashopSpecificObject->displayPaymentOption($payment_options); // Transforme tableau en object
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     * @see Module::hookPaymentReturn()
+     *
+     */
+    public function hookPaymentReturn($params)
+    {
+        if (!$this->isAllowed()) {
+            return false;
+        }
+
+        $order_id = Tools::getValue('id_order');
+        $order = new Order($order_id);
+        // Check order state to display appropriate message
+        $state = null;
+        if (isset($order->current_state)
+            && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PENDING')
+        ) {
+            $state = 'pending';
+        } elseif (isset($order->current_state)
+            && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PAID')
+        ) {
+            $state = 'paid';
+        } elseif (isset($order->current_state)
+            && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST')
+        ) {
+            $state = 'pending_test';
+        } elseif (isset($order->current_state)
+            && $order->current_state == Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST')
+        ) {
+            $state = 'paid_test';
+        }
+
+        $this->smarty->assign('state', $state);
+        // Get order information for display
+        $total_paid = number_format($order->total_paid, 2, ',', '');
+        $context = ['totalPaid' => $total_paid];
+        if (isset($order->reference)) {
+            $context['reference'] = $order->reference;
+        }
+        $this->smarty->assign($context);
+        return $this->display(__FILE__, 'checkout/order-confirmation.tpl');
+    }
+
+    public function hookRegisterGDPRConsent()
+    {
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public function hookActionAdminPerformanceControllerAfter($params)
+    {
+        return $this
+            ->getPlugin()
+            ->getCache()
+            ->flushCache();
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public function hookActionClearCompileCache($params)
+    {
+        return $this
+            ->getPlugin()
+            ->getCache()
+            ->flushCache();
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     * @throws Exception
+     * @see Module::hookPayment()
+     *
+     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
+     */
+    public function hookPayment($params)
+    {
+        if (!$this->isAllowed()) {
+            return false;
+        }
+
+        $use_taxes = $this->getConfiguration('PS_TAX');
+        $base_total_tax_inc = $params['cart']->getOrderTotal(true);
+        $base_total_tax_exc = $params['cart']->getOrderTotal(false);
+
+        if ($use_taxes) {
+            $price2display = $base_total_tax_inc;
+        } else {
+            $price2display = $base_total_tax_exc;
+        }
+
+        $cart = $params['cart'];
+
+        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+            $this->oney->assignOneyPaymentOptions($cart);
+        }
+
+        $payment_options = $this->getPaymentOptions($cart);
+
+        // Transforme tableau en TPL
+        $paymentOptions = $this->PrestashopSpecificObject->displayPaymentOption(
+            $payment_options,
+            $cart
+        );
+
+        foreach ($paymentOptions as $paymentOption) {
+            $find = 'oney';
+            if (strstr($paymentOption['tpl'], $find)) {
+                $this->oneyLogoUrl = $paymentOption['logo_url'];
+            }
+        }
+
+        $this->smarty->assign([
+            'payplug_payment_options' => $paymentOptions,
+            'spinner_url' => PayplugBackward::getHttpHost(true) .
+                __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
+            'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', [], true),
+            'api_url' => $this->plugin->getApiUrl(),
+            'price2display' => $price2display,
+            'this_path' => $this->_path,
+        ]);
+
+        return $this->display(__FILE__, 'checkout/payment/display.tpl');
+    }
+
+    /**
+     * Install the required hooks
+     * @return array
+     */
+    protected function installHook()
+    {
+        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+
+        $hooksToRegister = [
+            'adminOrder',
+            'displayAdminOrderMain',
+            'customerAccount',
+            'header',
+            'paymentReturn',
+            'actionAdminPerformanceControllerAfter',
+            'moduleRoutes'
+        ];
+
+        $install = [
+            'flag' => true,
+            'error' => false
+        ];
+
+        foreach ($hooksToRegister as $hookToRegister) {
+            $install['flag'] = true;
+            $log->info('Try to install Hook ' . $hookToRegister . '.');
+            if (!$this->registerHook($hookToRegister)) {
+                $log->error('Install failed: Hook ' . $hookToRegister . '.');
+                $install['flag'] = false;
+                $install['error'] = $hookToRegister;
+                return $install;
+            } else {
+                $log->info('Install success: Hook ' . $hookToRegister . '.');
+                $install['flag'] = true;
+            }
+        }
+        return $install;
+    }
+
+    public function installOneyHook($hook)
+    {
+        $this->registerHook($hook);
+        $this->context->controller->warnings[] = $this->l($hook);
+    }
+
 }
