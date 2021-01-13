@@ -27,16 +27,29 @@ use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\entities\QueryEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group plugin
+ * @group plugin_entity
+ */
 final class GetQueryTest extends TestCase
 {
-    public function test_return_a_query_entity(): void
+    protected $plugin;
+    protected $query;
+
+    protected function setUp(): void
     {
-        $plugin = new PluginEntity();
-        $query = new QueryEntity();
-        $plugin->setQuery($query);
+        $this->plugin = new PluginEntity();
+        $this->query = new QueryEntity();
+
+        $this->plugin->setQuery($this->query);
+    }
+
+    public function testReturnAQueryEntity(): void
+    {
         $this->assertInstanceOf(
             QueryEntity::class,
-            $plugin->getQuery()
+            $this->plugin->getQuery()
         );
     }
 }

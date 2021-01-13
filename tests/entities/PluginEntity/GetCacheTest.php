@@ -27,16 +27,29 @@ use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group plugin
+ * @group plugin_entity
+ */
 final class GetCacheTest extends TestCase
 {
-    public function test_return_a_cache_entity(): void
+    protected $plugin;
+    protected $cache;
+
+    protected function setUp(): void
     {
-        $plugin = new PluginEntity();
-        $cache = new CacheEntity();
-        $plugin->setCache($cache);
+        $this->plugin = new PluginEntity();
+        $this->cache = new CacheEntity();
+
+        $this->plugin->setCache($this->cache);
+    }
+
+    public function testReturnACacheEntity(): void
+    {
         $this->assertInstanceOf(
             CacheEntity::class,
-            $plugin->getCache()
+            $this->plugin->getCache()
         );
     }
 }

@@ -27,16 +27,29 @@ use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group plugin
+ * @group plugin_entity
+ */
 final class GetLoggerTest extends TestCase
 {
-    public function test_return_a_logger_entity(): void
+    protected $plugin;
+    protected $logger;
+
+    protected function setUp(): void
     {
-        $plugin = new PluginEntity();
-        $logger = new LoggerEntity();
-        $plugin->setLogger($logger);
+        $this->plugin = new PluginEntity();
+        $this->logger = new LoggerEntity();
+
+        $this->plugin->setLogger($this->logger);
+    }
+
+    public function testReturnALoggerEntity(): void
+    {
         $this->assertInstanceOf(
             LoggerEntity::class,
-            $plugin->getLogger()
+            $this->plugin->getLogger()
         );
     }
 }
