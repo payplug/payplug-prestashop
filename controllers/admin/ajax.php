@@ -58,7 +58,7 @@ if (Tools::getValue('_ajax') == 1) {
         die(true);
     }
     if ((int)Tools::getValue('popin') == 1) {
-        $logger->addLog('notice', 'Popin OK');
+        $logger->addLog('Popin OK', 'notice');
         $args = null;
         if (Tools::getValue('type') == 'confirm') {
             $sandbox = (int)Tools::getValue('sandbox');
@@ -115,7 +115,7 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
-        $logger->addLog('notice', '[Ajax] Start refund');
+        $logger->addLog('[Ajax] Start refund', 'notice');
         $amount = Tools::getValue('amount');
         if (!$payplug->checkAmountToRefund($amount)) {
             die(json_encode([
@@ -144,7 +144,7 @@ if (Tools::getValue('_ajax') == 1) {
         $pay_mode = Tools::getValue('pay_mode');
         $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
-            $logger->addLog('notice', 'Cannot refund that amount.');
+            $logger->addLog('Cannot refund that amount.', 'notice');
             die(json_encode([
                 'status' => 'error',
                 'data' => $payplug->l('Cannot refund that amount.')
@@ -166,14 +166,31 @@ if (Tools::getValue('_ajax') == 1) {
             if ((int)Tools::getValue('id_state') != 0 || $payment->is_refunded == 1) {
                 $order = new Order((int)$id_order);
                 if (Validate::isLoadedObject($order)) {
+                    // Set lock Lock the process with id_cart from order object
+                    $this->logger->addLog('Lock creation', 'notice');
+                    do {
+                        $cart_lock = PayplugLock::createLockG2($order->id_cart, 'payplug');
+                        if (!$cart_lock) {
+                            PayplugLock::check($order->id_cart);
+                        } else {
+                            $this->logger->addLog('Lock created', 'notice');
+                        }
+                    } while (!$cart_lock);
+
                     $current_state = (int)$payplug->getCurrentOrderState($order->id);
-                    $logger->addLog('notice', 'Current order state: ' . $current_state);
+                    $logger->addLog('Current order state: ' . $current_state, 'notice');
                     if ($current_state != 0 && $current_state != $new_state) {
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
                         $history->changeIdOrderState($new_state, (int)$order->id);
                         $history->addWithemail();
-                        $logger->addLog('notice', 'Change order state to ' . $new_state);
+                        $logger->addLog('Change order state to ' . $new_state, 'notice');
+                    }
+
+                    if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                        $this->logger->addLog('Lock cannot be deleted.', 'error');
+                    } else {
+                        $this->logger->addLog('Lock deleted.', 'notice');
                     }
                 }
                 $reload = true;
@@ -186,7 +203,7 @@ if (Tools::getValue('_ajax') == 1) {
                 $amount_refunded_payplug,
                 $amount_available
             );
-            $logger->addLog('notice', 'Amount successfully refunded.');
+            $logger->addLog('Amount successfully refunded.', 'notice');
             die(json_encode([
                 'status' => 'ok',
                 'data' => $data,
