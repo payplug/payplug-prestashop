@@ -145,6 +145,13 @@ if (Tools::getValue('_ajax') == 1) {
         $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
             $logger->addLog('Cannot refund that amount.', 'notice');
+            $logger->addLog(
+                '$pay_id : '.$pay_id.
+                ' - $amount : '.$amount.
+                ' - $metadata : '.json_encode($metadata).
+                ' - $pay_mode : '.$pay_mode.
+                ' - $inst_id : '.$inst_id
+            , 'debug');
             die(json_encode([
                 'status' => 'error',
                 'data' => $payplug->l('Cannot refund that amount.')
