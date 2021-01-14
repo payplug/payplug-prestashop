@@ -241,7 +241,7 @@ class HookRepository extends \Payplug
             $inst_status = $installment->is_active ?
                 $this->l('ongoing') :
                 (
-                $installment->is_fully_paid ?
+                    $installment->is_fully_paid ?
                     $this->l('paid') :
                     $this->l('suspended')
                 );
@@ -926,5 +926,4 @@ class HookRepository extends \Payplug
         $this->registerHook($hook);
         $this->context->controller->warnings[] = $this->l($hook);
     }
-
 }

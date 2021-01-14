@@ -38,6 +38,4 @@ class PPPaymentInstallment extends PPPayment
             $id = null;
         }
     }
-
-
 }

@@ -452,5 +452,4 @@ class AdminRepository extends Repository
 
         return $this->html;
     }
-
 }

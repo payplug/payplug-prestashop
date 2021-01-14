@@ -248,5 +248,4 @@ class OrderRepository extends Repository
 
         return $this->oney->getOneyCTA('checkout');
     }
-
 }
