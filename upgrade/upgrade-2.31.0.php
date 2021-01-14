@@ -41,7 +41,7 @@ function upgrade_module_2_31_0($object)
     $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
-    $states = array(
+    $states = [
         'auth_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
         'auth_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),
         'exp_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'),
@@ -58,7 +58,7 @@ function upgrade_module_2_31_0($object)
         'error_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
         'oney_pending' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
         'oney_pending_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),
-    );
+    ];
 
     foreach ($states as $state) {
         if ($state != null) {
