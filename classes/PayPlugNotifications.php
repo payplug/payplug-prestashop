@@ -308,7 +308,6 @@ class PayPlugNotifications
         $this->setContextFromCartID($this->cart->id);
 
         // Set lock in db then set $this->lock_key
-        $cart_lock = false;
         do {
             $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {

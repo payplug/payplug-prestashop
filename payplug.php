@@ -6127,29 +6127,23 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        // Set lock Lock the process with id_cart from order object
         $this->logger->addLog('Lock creation', 'notice');
 
-        // set a starting point to lock creation
-        $datetime1 = date_create(date('Y-m-d H:i:s'));
+        $creation_date = new DateTime('now');
+        $duration = '10S';
+        $lifetime = new DateInterval('PT' . $duration);
+        $end_of_life = $creation_date->add($lifetime);
+
         do {
-            // try to create the lock
             $cart_lock = PayplugLock::createLockG2($id_cart, 'payplug');
 
-            if (!$cart_lock) { // If the lock can't be created
-
-                // Get the current time and check the time betwon now and the starting point above
-                $datetime2 = date_create(date('Y-m-d H:i:s'));
-                $interval = date_diff($datetime1, $datetime2);
-                $diff = explode('+', $interval->format('%R%s'));
-
-                // If the diff is more than 10s, return the process as error
-                if ($diff[1] >= 10) {
+            if (!$cart_lock) {
+                $time = new DateTime('now');
+                if ($time > $end_of_life) {
                     $this->logger->addLog(
-                        'Try to create lock during ' . $diff[1] . ' sec, but can\'t proceed',
+                        'Try to create lock during ' . $duration . ' sec, but can\'t proceed',
                         'error'
                     );
-
                     return false;
                 }
             } else {
