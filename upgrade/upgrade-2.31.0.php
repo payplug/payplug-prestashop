@@ -21,6 +21,8 @@
  * International Registered Trademark & Property of PayPlug SAS
  */
 
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -36,9 +38,10 @@ function upgrade_module_2_31_0($object)
         define('_PS_OS_PENDING_', 0);
     }
 
+    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
-    $states = [
+    $states = array(
         'auth_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
         'auth_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),
         'exp_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'),
@@ -46,16 +49,16 @@ function upgrade_module_2_31_0($object)
         'inst_pg_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'),
         'inst_pg_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG_TEST'),
         'pending_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') != _PS_OS_PENDING_ ?
-            (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') :
-            null,
+            (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING')
+            : null,
         'pending_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
         'error_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') != _PS_OS_ERROR_ ?
-            (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') :
-            null,
+            (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR')
+            : null,
         'error_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
         'oney_pending' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
         'oney_pending_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),
-    ];
+    );
 
     foreach ($states as $state) {
         if ($state != null) {
@@ -83,6 +86,7 @@ function upgrade_module_2_31_0($object)
     $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
 
     if (!$res_payplug_order_payment) {
+        $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
         $flag = false;
     }
 
@@ -105,13 +109,15 @@ function upgrade_module_2_31_0($object)
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
+                $log->error('Can\'t truncate payplug_lock');
             }
             if ($flag) {
-                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
-                ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
-                $res_alter = Db::getInstance()->execute($req_alter);
+                $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
+                        ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
+                $res_alter = Db::getInstance()->execute($sql);
                 if (!$res_alter) {
                     $flag = false;
+                    $log->error('Can\'t alter table payplug_lock');
                 }
             }
             if ($flag) {
@@ -125,10 +131,12 @@ function upgrade_module_2_31_0($object)
                     }
                 } else {
                     $flag = false;
+                    $log->error('Wrong table describe payplug_lock');
                 }
             }
         }
     } catch (Exception $e) {
+        $log->error('Exception: ' . $e->getMessage());
         $flag = false;
     }
 

@@ -21,12 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-header("Location: ../../../../");
-exit;
+function upgrade_module_2_27_20($object)
+{
+    return Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
+}
