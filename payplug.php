@@ -807,7 +807,7 @@ class Payplug extends PaymentModule
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->l('Capture of this payment is authorized before %s.').' '.
+                        $this->l('Capture of this payment is authorized before %s.') . ' ' .
                         $this->l('After this date, you will not be able to get paid.'),
                         $expiration
                     );
@@ -4851,17 +4851,17 @@ class Payplug extends PaymentModule
 
     public function refundPayment()
     {
-        $this->logger->addLog('notice', '[Payplug] Start refund');
+        $this->logger->addLog('[Payplug] Start refund', 'notice');
         $amount = Tools::getValue('amount');
 
         if (!$this->checkAmountToRefund($amount)) {
-            $this->logger->addLog('notice', 'Incorrect amount to refund');
+            $this->logger->addLog('Incorrect amount to refund', 'notice');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Incorrect amount to refund')
             ]));
         } elseif ($this->checkAmountToRefund($amount) && ($amount < 0.10)) {
-            $this->logger->addLog('notice', 'The amount to be refunded must be at least 0.10 €');
+            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('The amount to be refunded must be at least 0.10 €')
@@ -4883,7 +4883,16 @@ class Payplug extends PaymentModule
         $pay_mode = Tools::getValue('pay_mode');
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
-            $this->logger->addLog('notice', 'Cannot refund that amount.');
+            $this->logger->addLog('Cannot refund that amount.', 'notice');
+            $this->logger->addLog(
+                '$pay_id : ' . $pay_id .
+                ' - $amount : ' . $amount .
+                ' - $metadata : ' . json_encode($metadata) . /* or implode() ? */
+                ' - $pay_mode : ' . $pay_mode .
+                ' - $inst_id : ' . $inst_id,
+                'debug'
+            );
+
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Cannot refund that amount.')
@@ -4922,14 +4931,27 @@ class Payplug extends PaymentModule
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
+                        if (!$this->createLockFromCartId($order->id_cart)) {
+                            die(json_encode([
+                                'status' => 'error',
+                                'data' => $this->l('An error has occurred')
+                            ]));
+                        }
+
                         $current_state = (int)$this->getCurrentOrderState($order->id);
-                        $this->logger->addLog('notice', 'Current order state: ' . $current_state);
+                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
-                            $this->logger->addLog('notice', 'Change order state to ' . $new_state);
+                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+                        }
+
+                        if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'notice');
                         }
                     }
                     $reload = true;
@@ -4948,14 +4970,29 @@ class Payplug extends PaymentModule
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
+                        if (!$this->createLockFromCartId($order->id_cart)) {
+                            die(json_encode([
+                                'status' => 'error',
+                                'data' => $this->l('An error has occurred')
+                            ]));
+                        }
+
                         $current_state = (int)$this->getCurrentOrderState($order->id);
-                        $this->logger->addLog('notice', 'Current order state: ' . $current_state);
+                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
-                            $this->logger->addLog('notice', 'Change order state to ' . $new_state);
+                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+                        } else {
+                            $this->logger->addLog('Order status is already \'refunded\'', 'notice');
+                        }
+
+                        if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('Lock deleted.', 'notice');
                         }
                     }
                     $reload = true;
@@ -5158,8 +5195,8 @@ class Payplug extends PaymentModule
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->l('In order to accept payments you need to configure your module').' '.
-            $this->l('by connecting your PayPlug account.');
+            $this->warning = $this->l('In order to accept payments you need to configure your module') . ' ' .
+                $this->l('by connecting your PayPlug account.');
         }
 
         $this->payment_status = [
@@ -6060,7 +6097,46 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $sql = 'SELECT `current_state` FROM `'._DB_PREFIX_.'orders` WHERE `id_order` = ' . (int)$id_order;
+        $sql = 'SELECT `current_state` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . (int)$id_order;
         return Db::getInstance()->getValue($sql);
+    }
+
+
+    /**
+     * @description Create a lock from a Cart ID
+     * @param bool $id_cart
+     * @return bool
+     */
+    public function createLockFromCartId($id_cart = false)
+    {
+        if (!$id_cart) {
+            return false;
+        }
+
+        $this->logger->addLog('Lock creation', 'notice');
+
+        $creation_date = new DateTime('now');
+        $duration = '10S';
+        $lifetime = new DateInterval('PT' . $duration);
+        $end_of_life = $creation_date->add($lifetime);
+
+        do {
+            $cart_lock = PayplugLock::createLockG2($id_cart, 'payplug');
+
+            if (!$cart_lock) {
+                $time = new DateTime('now');
+                if ($time > $end_of_life) {
+                    $this->logger->addLog(
+                        'Try to create lock during ' . $duration . ' sec, but can\'t proceed',
+                        'error'
+                    );
+                    return false;
+                }
+            } else {
+                $this->logger->addLog('Lock created', 'notice');
+            }
+        } while (!$cart_lock);
+
+        return true;
     }
 }
