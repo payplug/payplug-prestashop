@@ -27,6 +27,11 @@ use PayPlug\src\entities\CardEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group card
+ * @group card_entity
+ */
 final class SetIdCardTest extends TestCase
 {
     protected $card;
@@ -54,12 +59,24 @@ final class SetIdCardTest extends TestCase
         );
     }
 
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
     public function testThrowExceptionWhenNotAString(): void
     {
         $this->expectException(BadParameterException::class);
         $this->card->setIdCard(42);
     }
 
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
     public function testThrowExceptionWhenNotWellFormatted(): void
     {
         $this->expectException(BadParameterException::class);

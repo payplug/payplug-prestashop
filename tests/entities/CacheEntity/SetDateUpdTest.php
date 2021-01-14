@@ -27,6 +27,11 @@ use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class SetDateUpdTest extends TestCase
 {
     protected $cache;
@@ -54,12 +59,24 @@ final class SetDateUpdTest extends TestCase
         );
     }
 
+    /**
+     * @group entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
+     * @group exception
+     */
     public function testThrowExceptionWhenNotAString(): void
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setDateUpd(42);
     }
 
+    /**
+     * @group entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
+     * @group exception
+     */
     public function testThrowExceptionWhenNotWellFormatted(): void
     {
         $this->expectException(BadParameterException::class);
