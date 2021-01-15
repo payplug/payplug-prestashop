@@ -107,9 +107,9 @@ function upgrade_module_2_31_0($object)
                 $flag = false;
             }
             if ($flag) {
-                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
-                ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
-                $res_alter = Db::getInstance()->execute($req_alter);
+                $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
+                    ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
+                $res_alter = Db::getInstance()->execute($sql);
                 if (!$res_alter) {
                     $flag = false;
                 }
