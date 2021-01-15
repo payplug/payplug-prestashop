@@ -35,13 +35,13 @@ final class GetDateAddTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setDateAdd('2021-12-31 23:59:42');
     }
 
-    public function testReturnDateAdd(): void
+    public function testReturnDateAdd()
     {
         $this->assertSame(
             '2021-12-31 23:59:42',
@@ -49,14 +49,14 @@ final class GetDateAddTest extends TestCase
         );
     }
 
-    public function testDateAddIsAString(): void
+    public function testDateAddIsAString()
     {
         $this->assertTrue(
             is_string($this->cache->getDateAdd())
         );
     }
 
-    public function testDateAddHaveAValidDatetimeFormat(): void
+    public function testDateAddHaveAValidDatetimeFormat()
     {
         $this->assertRegExp(
             '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',

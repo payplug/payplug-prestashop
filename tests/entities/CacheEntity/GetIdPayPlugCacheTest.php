@@ -35,13 +35,13 @@ final class GetIdPayPlugCacheTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setIdPayPlugCache('test_id');
     }
 
-    public function testReturnCacheId(): void
+    public function testReturnCacheId()
     {
         $this->assertSame(
             'test_id',
@@ -49,7 +49,7 @@ final class GetIdPayPlugCacheTest extends TestCase
         );
     }
 
-    public function testCacheIdIsAString(): void
+    public function testCacheIdIsAString()
     {
         $this->assertTrue(
             is_string($this->cache->getIdPayPlugCache())

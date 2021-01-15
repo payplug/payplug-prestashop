@@ -36,13 +36,13 @@ final class SetCacheValueTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setCacheValue('test_value');
     }
 
-    public function testUpdateCacheValue(): void
+    public function testUpdateCacheValue()
     {
         $this->cache->setCacheValue('another_value');
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetCacheValueTest extends TestCase
         );
     }
 
-    public function testReturnCacheEntity(): void
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,
@@ -65,7 +65,7 @@ final class SetCacheValueTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString(): void
+    public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setCacheValue(42);

@@ -37,7 +37,7 @@ final class GetCacheTest extends TestCase
     protected $plugin;
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->plugin = new PluginEntity();
         $this->cache = new CacheEntity();
@@ -45,7 +45,7 @@ final class GetCacheTest extends TestCase
         $this->plugin->setCache($this->cache);
     }
 
-    public function testReturnACacheEntity(): void
+    public function testReturnACacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,

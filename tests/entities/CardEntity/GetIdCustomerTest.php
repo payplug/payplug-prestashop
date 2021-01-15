@@ -35,13 +35,13 @@ final class GetIdCustomerTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
         $this->card->setIdCustomer(42);
     }
 
-    public function testReturnIdCustomer(): void
+    public function testReturnIdCustomer()
     {
         $this->assertSame(
             42,
@@ -49,7 +49,7 @@ final class GetIdCustomerTest extends TestCase
         );
     }
 
-    public function testIdCustomerIsAnInt(): void
+    public function testIdCustomerIsAnInt()
     {
         $this->assertTrue(
             is_int($this->card->getIdCustomer())

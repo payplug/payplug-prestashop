@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SetQueryTest extends TestCase
 {
-    public function test_update_the_query_entity(): void
+    public function test_update_the_query_entity()
     {
         $plugin = new PluginEntity();
         $query = new QueryEntity();

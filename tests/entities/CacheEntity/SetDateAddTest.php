@@ -36,13 +36,13 @@ final class SetDateAddTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setDateAdd('2021-12-31 23:59:42');
     }
 
-    public function testUpdateDateAdd(): void
+    public function testUpdateDateAdd()
     {
         $this->cache->setDateAdd('1920-12-31 23:59:42');
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetDateAddTest extends TestCase
         );
     }
 
-    public function testReturnCacheEntity(): void
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,
@@ -65,7 +65,7 @@ final class SetDateAddTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString(): void
+    public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setDateAdd(42);
@@ -77,7 +77,7 @@ final class SetDateAddTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotWellFormatted(): void
+    public function testThrowExceptionWhenNotWellFormatted()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setDateAdd('1er Janvier 1970');

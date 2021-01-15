@@ -36,7 +36,7 @@ final class GetDefinitionTest extends TestCase
     protected $cache;
     protected $definition;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->definition = [
@@ -47,7 +47,7 @@ final class GetDefinitionTest extends TestCase
         $this->cache->setDefinition($this->definition);
     }
 
-    public function testReturnDefinition(): void
+    public function testReturnDefinition()
     {
         $this->assertSame(
             $this->definition,
@@ -55,7 +55,7 @@ final class GetDefinitionTest extends TestCase
         );
     }
 
-    public function testDefinitionIsAnArray(): void
+    public function testDefinitionIsAnArray()
     {
         $this->assertTrue(
             is_array($this->cache->getDefinition())

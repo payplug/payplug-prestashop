@@ -35,13 +35,13 @@ final class GetIdCardTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
         $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     }
 
-    public function testReturnIdCard(): void
+    public function testReturnIdCard()
     {
         $this->assertSame(
             'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -49,14 +49,14 @@ final class GetIdCardTest extends TestCase
         );
     }
 
-    public function testIdCardIsAString(): void
+    public function testIdCardIsAString()
     {
         $this->assertTrue(
             is_string($this->card->getIdCard())
         );
     }
 
-    public function testIdCardHaveAValidFormat(): void
+    public function testIdCardHaveAValidFormat()
     {
         $this->assertRegExp(
             '/card_[a-z0-9]{32}/',

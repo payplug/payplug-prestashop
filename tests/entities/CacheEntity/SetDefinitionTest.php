@@ -38,7 +38,7 @@ final class SetDefinitionTest extends TestCase
     protected $definition;
     protected $definition_alt;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->definition = [
@@ -54,7 +54,7 @@ final class SetDefinitionTest extends TestCase
         $this->cache->setDefinition($this->definition);
     }
 
-    public function testUpdateDefinition(): void
+    public function testUpdateDefinition()
     {
         $this->cache->setDefinition($this->definition_alt);
         $this->assertSame(
@@ -63,7 +63,7 @@ final class SetDefinitionTest extends TestCase
         );
     }
 
-    public function testReturnCacheEntity(): void
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,
@@ -77,7 +77,7 @@ final class SetDefinitionTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAnArray(): void
+    public function testThrowExceptionWhenNotAnArray()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setDefinition(42);

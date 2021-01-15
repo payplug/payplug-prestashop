@@ -36,13 +36,13 @@ final class GetApiVersionTest extends TestCase
 {
     protected $plugin;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->plugin = new PluginEntity();
         $this->plugin->setApiVersion('2021-01-01');
     }
 
-    public function testReturnAnApiVersion(): void
+    public function testReturnAnApiVersion()
     {
         $this->assertSame(
             '2021-01-01',
@@ -50,14 +50,14 @@ final class GetApiVersionTest extends TestCase
         );
     }
 
-    public function testApiVersionIsAString(): void
+    public function testApiVersionIsAString()
     {
         $this->assertTrue(
             is_string($this->plugin->getApiVersion())
         );
     }
 
-    public function testApiVersionHaveAValidFormat(): void
+    public function testApiVersionHaveAValidFormat()
     {
         $this->assertRegExp(
             '/^\d{4}-\d{2}-\d{2}$/',

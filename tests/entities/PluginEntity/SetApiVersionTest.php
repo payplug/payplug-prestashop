@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SetApiVersionTest extends TestCase
 {
-    public function test_update_the_api_version(): void
+    public function test_update_the_api_version()
     {
         $plugin = new PluginEntity();
         $plugin->setApiVersion('test_version');

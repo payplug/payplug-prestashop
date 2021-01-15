@@ -36,13 +36,13 @@ final class SetIdCustomerTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
         $this->card->setIdCustomer(42);
     }
 
-    public function testUpdateIdCustomer(): void
+    public function testUpdateIdCustomer()
     {
         $this->card->setIdCustomer(777);
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetIdCustomerTest extends TestCase
         );
     }
 
-    public function testReturnCardEntity(): void
+    public function testReturnCardEntity()
     {
         $this->assertInstanceOf(
             CardEntity::class,
@@ -65,7 +65,7 @@ final class SetIdCustomerTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAnInt(): void
+    public function testThrowExceptionWhenNotAnInt()
     {
         $this->expectException(BadParameterException::class);
         $this->card->setIdCustomer('test');

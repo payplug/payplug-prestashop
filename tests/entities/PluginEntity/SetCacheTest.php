@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SetCacheTest extends TestCase
 {
-    public function test_update_the_cache_entity(): void
+    public function test_update_the_cache_entity()
     {
         $plugin = new PluginEntity();
         $cache = new CacheEntity();

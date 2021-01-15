@@ -35,13 +35,13 @@ final class GetTableTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setTable('test_table');
     }
 
-    public function testReturnTable(): void
+    public function testReturnTable()
     {
         $this->assertSame(
             'test_table',
@@ -49,7 +49,7 @@ final class GetTableTest extends TestCase
         );
     }
 
-    public function testTableIsAString(): void
+    public function testTableIsAString()
     {
         $this->assertTrue(
             is_string($this->cache->getTable())

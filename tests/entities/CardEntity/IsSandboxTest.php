@@ -35,13 +35,13 @@ final class IsSandboxTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
         $this->card->setIsSandbox(true);
     }
 
-    public function testReturnIsSandbox(): void
+    public function testReturnIsSandbox()
     {
         $this->assertSame(
             true,
@@ -49,7 +49,7 @@ final class IsSandboxTest extends TestCase
         );
     }
 
-    public function testSandboxIsABool(): void
+    public function testSandboxIsABool()
     {
         $this->assertTrue(
             is_bool($this->card->isSandbox())

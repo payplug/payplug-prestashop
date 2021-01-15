@@ -36,13 +36,13 @@ final class SetIsSandboxTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
         $this->card->setIsSandbox(true);
     }
 
-    public function testUpdateIsSandbox(): void
+    public function testUpdateIsSandbox()
     {
         $this->card->setIsSandbox(false);
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetIsSandboxTest extends TestCase
         );
     }
 
-    public function testReturnCardEntity(): void
+    public function testReturnCardEntity()
     {
         $this->assertInstanceOf(
             CardEntity::class,
@@ -65,7 +65,7 @@ final class SetIsSandboxTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotABool(): void
+    public function testThrowExceptionWhenNotABool()
     {
         $this->expectException(BadParameterException::class);
         $this->card->setIsSandbox('test');

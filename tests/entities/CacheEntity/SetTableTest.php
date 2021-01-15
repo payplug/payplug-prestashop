@@ -36,13 +36,13 @@ final class SetTableTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setTable('test_table');
     }
 
-    public function testUpdateTable(): void
+    public function testUpdateTable()
     {
         $this->cache->setTable('another_table');
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetTableTest extends TestCase
         );
     }
 
-    public function testReturnCacheEntity(): void
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,
@@ -65,7 +65,7 @@ final class SetTableTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString(): void
+    public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setTable(42);

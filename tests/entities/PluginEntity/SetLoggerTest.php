@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SetLoggerTest extends TestCase
 {
-    public function test_update_the_logger_entity(): void
+    public function test_update_the_logger_entity()
     {
         $plugin = new PluginEntity();
         $logger = new LoggerEntity();

@@ -37,7 +37,7 @@ final class GetLoggerTest extends TestCase
     protected $plugin;
     protected $logger;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->plugin = new PluginEntity();
         $this->logger = new LoggerEntity();
@@ -45,7 +45,7 @@ final class GetLoggerTest extends TestCase
         $this->plugin->setLogger($this->logger);
     }
 
-    public function testReturnALoggerEntity(): void
+    public function testReturnALoggerEntity()
     {
         $this->assertInstanceOf(
             LoggerEntity::class,

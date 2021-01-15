@@ -36,13 +36,13 @@ final class SetCacheKeyTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setCacheKey('test_key');
     }
 
-    public function testUpdateCacheKey(): void
+    public function testUpdateCacheKey()
     {
         $this->cache->setCacheKey('another_key');
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetCacheKeyTest extends TestCase
         );
     }
 
-    public function testReturnCacheEntity(): void
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,
@@ -65,7 +65,7 @@ final class SetCacheKeyTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testTrowExceptionWhenNotAString(): void
+    public function testTrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setCacheKey(42);

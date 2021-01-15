@@ -35,13 +35,13 @@ final class GetCacheValueTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setCacheValue('test_value');
     }
 
-    public function testReturnCacheValue(): void
+    public function testReturnCacheValue()
     {
         $this->assertSame(
             'test_value',
@@ -49,7 +49,7 @@ final class GetCacheValueTest extends TestCase
         );
     }
 
-    public function testCacheValueIsAString(): void
+    public function testCacheValueIsAString()
     {
         $this->assertTrue(
             is_string($this->cache->getCacheValue())
