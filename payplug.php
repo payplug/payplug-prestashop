@@ -279,7 +279,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.7.7.0', 'max' => '1.8.0.0'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.0.0';
+        $this->version = '4.0.0';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
