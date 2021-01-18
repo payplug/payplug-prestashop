@@ -30,67 +30,74 @@ use PHPUnit\Framework\TestCase;
  */
 final class IsValidOneyCountryTest extends TestCase
 {
-
-    /*
-    public function isValidOneyCountry($shipping_iso, $billing_iso)
-    {
-        // check if the billing country and the shipping country are different then return false
-        if ($shipping_iso != $billing_iso) {
-            $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
-            return [
-                'result' => false,
-                'type' => 'different',
-                'error' => $this->l($error)
-            ];
-        }
-
-        // check if the shipping country are different then return false
-        $iso_code = $this->toolsSpecific->tool('strtoupper', $shipping_iso);
-        $allow_countries = $this->toolsSpecific->tool(
-            'strtoupper',
-            $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-        );
-
-        if (!$allow_countries) {
-            return [
-                'result' => false,
-                'type' => 'no_country',
-                'error' => $this->l('No countries are configured to use oney.')
-            ];
-        }
-
-        $iso_list = explode(',', $allow_countries);
-        if (!in_array($iso_code, $iso_list, true)) {
-            $str_list = $this->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana');
-            if (in_array('IT', $iso_list)) {
-                $str_list = $this->l('Italy');
-            }
-
-            return [
-                'result' => false,
-                'type' => 'invalid',
-                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in ') . $str_list
-            ];
-        }
-
-        return ['result' => true, 'error' => false];
-    }
-     */
+    protected $isoCode;
+    protected $allowCountries;
 
     public function setUp()
-    {}
+    {
+        $this->isoCode = 'FR';
+        $this->allowCountries = 'GF,GP,YT,MQ,RE,FR';
+    }
 
     public function testShippingAndBillingIsoAreDifferent()
     {
         $this->assertNotEquals('shipping_iso', 'billing_iso');
     }
 
+    public function testIsoCode()
+    {
+        $this->assertSame(
+            'FR',
+            $this->isoCode
+        );
+    }
+
+    public function testIsoCodeIsAString()
+    {
+        $this->assertTrue(
+            is_string($this->isoCode)
+        );
+    }
+
     public function testIsIsoCodeWellFormated()
     {
         $iso_code = 'fr';
         $this->assertSame(
-            'FR',
+            $this->isoCode,
             strtoupper($iso_code)
+        );
+    }
+
+    public function testIsAllowCountriesWellFormated()
+    {
+        $allow_countries = 'gf,gp,yt,mq,re,fr';
+        $this->assertSame(
+            $this->allowCountries,
+            strtoupper($allow_countries)
+        );
+    }
+
+    public function testAllowCountries()
+    {
+        $allow_countries = 'GF,GP,YT,MQ,RE,FR';
+        $this->assertSame(
+            'GF,GP,YT,MQ,RE,FR',
+            $this->allowCountries
+        );
+    }
+
+    public function testAllowCountriesIsAString()
+    {
+        $this->assertTrue(
+            is_string($this->allowCountries)
+        );
+    }
+
+    public function testIsoCodeIsInAllowCountries()
+    {
+        $iso_list = explode(',', $this->allowCountries);
+        $this->assertTrue(
+            in_array($this->isoCode, $iso_list, true)
         );
     }
 }
