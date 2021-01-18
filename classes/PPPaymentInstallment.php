@@ -41,6 +41,10 @@ class PPPaymentInstallment extends PPPayment
 
     public function retrieve($id)
     {
+        if (!$id) {
+            return false;
+        }
+
         try {
             $payment = \Payplug\InstallmentPlan::retrieve($id);
         } catch (\Payplug\Exception $e) {

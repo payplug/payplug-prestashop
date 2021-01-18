@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group card
+ * @group card_entity
+ */
 final class IsSandboxTest extends TestCase
 {
     protected $card;
@@ -46,8 +51,8 @@ final class IsSandboxTest extends TestCase
 
     public function testSandboxIsABool(): void
     {
-        $this->assertIsBool(
-            $this->card->isSandbox()
+        $this->assertTrue(
+            is_bool($this->card->isSandbox())
         );
     }
 }

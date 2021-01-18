@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group card
+ * @group card_entity
+ */
 final class GetIdCardTest extends TestCase
 {
     protected $card;
@@ -46,14 +51,14 @@ final class GetIdCardTest extends TestCase
 
     public function testIdCardIsAString(): void
     {
-        $this->assertIsString(
-            $this->card->getIdCard()
+        $this->assertTrue(
+            is_string($this->card->getIdCard())
         );
     }
 
     public function testIdCardHaveAValidFormat(): void
     {
-        $this->assertMatchesRegularExpression(
+        $this->assertRegExp(
             '/card_[a-z0-9]{32}/',
             $this->card->getIdCard()
         );

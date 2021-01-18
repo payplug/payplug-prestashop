@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group card
+ * @group card_entity
+ */
 final class GetIdCompanyTest extends TestCase
 {
     protected $card;
@@ -46,8 +51,8 @@ final class GetIdCompanyTest extends TestCase
 
     public function testIdCompanyIsAnInt(): void
     {
-        $this->assertIsInt(
-            $this->card->getIdCompany()
+        $this->assertTrue(
+            is_int($this->card->getIdCompany())
         );
     }
 }
