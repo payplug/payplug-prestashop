@@ -1,0 +1,77 @@
+/* Oney cta */
+.oneyCta {
+  position: relative;
+  z-index: 3;
+  display: inline-block;
+
+  &_button {
+    .Poppins();
+    .transition(~"color @{dur}");
+    display: flex;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    text-transform: uppercase;
+    color: #2F2930;
+    cursor: pointer;
+    font-size: 11px;
+
+    &:hover {
+      color: #colorMap[oney];
+    }
+
+    &:focus {
+      outline: 0;
+    }
+
+    @media (@mobile) {
+      position: relative;
+      height: 32px;
+    }
+
+    &.-disabled {
+      color: #colorMap[grey];
+
+      &:hover {
+        color: #colorMap[grey];
+      }
+    }
+
+    span {
+      font: inherit;
+      white-space: nowrap;
+    }
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  &_logo {
+    width: 106px;
+    height: 25px;
+    background-size: 110%;
+    margin: 0 0 0 .25em;
+  }
+
+  &_tooltip {
+    width: 14px;
+    height: 14px;
+  }
+
+  &_field {
+    height: 46px;
+    background: rgba(128, 188, 0, 0.1);
+    text-align: right;
+    padding: 0 8px !important;
+
+    @media (@mobile) {
+      height: auto;
+      background: transparent;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -29,7 +29,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_27_1($object)
 {
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
     // run the method who install Oney feature
@@ -37,25 +36,22 @@ function upgrade_module_2_27_1($object)
 
     //adding new configurations
     if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
     // Update payplug lock table
-    $sql_requests = array(
+    $sql_requests = [
         'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
-    );
+    ];
 
     try {
         foreach ($sql_requests as $sql_request) {
             $request = Db::getInstance()->execute($sql_request);
             if (!$request) {
-                $log->error('Fail to execute request: ' . $request);
                 $flag = false;
             }
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to execute requests');
         $flag = false;
     }
 

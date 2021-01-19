@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -29,19 +29,21 @@ require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
 
 function upgrade_module_2_17_0($object)
 {
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     $flag = true;
 
     if (!Configuration::updateValue('PAYPLUG_INST', null)
         || !Configuration::updateValue('PAYPLUG_INST_MODE', 3)
         || !Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
     ) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
     if (!$object->createOrderStates()) {
-        $log->error('Fail to create new order states');
         $flag = false;
     }
 
@@ -57,11 +59,9 @@ function upgrade_module_2_17_0($object)
     try {
         $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
         if (!$res_payplug_installment_cart) {
-            $log->error('Fail to add table installment_cart');
             $flag = false;
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to add new table');
         $flag = false;
     }
 

@@ -1,0 +1,42 @@
+/* Payplug button */
+.payplugButton {
+  .border(#cccccc);
+  .borderRadius(.25em);
+  .transition;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+  text-align: center;
+  padding: .4em .5em;
+  text-transform: uppercase;
+  font-size: 12px;
+  outline: none;
+  min-width: 6.5em;
+
+  &.-payment {
+    min-width: 11em;
+    height: 3em;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  &.-green {
+    border-color: #colorMap[payplug];
+    background: #colorMap[payplug];
+    color: #fff;
+
+    &:hover {
+      border-color: darken(#colorMap[payplug], 5%);
+      background: darken(#colorMap[payplug], 5%);
+      color: #fff;
+    }
+  }
+  &.-disabled {
+    &,
+    &:hover {
+      border-color: #colorMap[grey];
+      background: #colorMap[grey];
+      color: #fff;
+      cursor: default;
+    }
+  }
+}

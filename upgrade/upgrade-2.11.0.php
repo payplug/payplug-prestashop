@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -27,6 +27,11 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_11_0()
 {
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+    
     //sql
     $req_payplug_payment_cart = '
         ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`

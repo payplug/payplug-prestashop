@@ -1,5 +1,5 @@
 {*
-* 2019 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,16 +15,19 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="oneyCta_wrapper">
-    <div class="oneyCta{if isset($env) && $env} oneyCta-{$env|escape:'htmlall':'UTF-8'}{/if}">
-        <button type="button" class="oneyCta_button{if isset($payplug_oney_error) && $payplug_oney_error} oneyCta_button-disabled{/if}">
+    <div class="oneyCta{if isset($env) && $env} -{$env|escape:'htmlall':'UTF-8'}{/if}">
+        <button type="button" class="oneyCta_button
+            {if !isset($payplug_is_oney_elligible)
+                || (isset($payplug_is_oney_elligible) && $payplug_is_oney_elligible neq 1)} -disabled{/if}"
+                data-e2e-oney="cta">
             <span>{l s='Or pay in' mod='payplug'}</span>
-            <span class="oneyCta_logo oneyLogo oneyLogo-x3x4"></span>
-            <span class="oneyCta_tooltip oneyLogo oneyLogo-tooltip"></span>
+            <span class="oneyCta_logo oneyLogo -x3x4"></span>
+            <span class="oneyCta_tooltip oneyLogo -tooltip"></span>
         </button>
         {if isset($popin) && $popin}
             {include file="./popin.tpl"}

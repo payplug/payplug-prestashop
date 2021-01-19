@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -25,11 +25,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-
 function upgrade_module_2_19_0($object)
 {
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     $flag = true;
 
     //Configurations may not exist if upgrade is from an old enough version
@@ -56,18 +58,15 @@ function upgrade_module_2_19_0($object)
     try {
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
         if (!$res_payplug_installment) {
-            $log->error('Fail to add table payplug_installment');
             $flag = false;
         }
     } catch (PrestaShopDatabaseException $e) {
-        $log->error('Fail to add new table');
         $flag = false;
     }
 
     $object->uninstallTab();
     $object->uninstallModuleTab('AdminPayplug');
     if (!$object->installTab()) {
-        $log->error('Fail to add installment tab.');
         $flag = false;
     }
 

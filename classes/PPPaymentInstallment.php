@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -24,6 +24,8 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 
 class PPPaymentInstallment extends PPPayment
 {
@@ -34,7 +36,6 @@ class PPPaymentInstallment extends PPPayment
             $this->populateFromInstallment($payment);
         } else {
             $id = null;
-            $resource = null;
         }
     }
 
@@ -47,10 +48,10 @@ class PPPaymentInstallment extends PPPayment
         try {
             $payment = \Payplug\InstallmentPlan::retrieve($id);
         } catch (\Payplug\Exception $e) {
-            $data = array(
+            $data = [
                 'result' => false,
                 'response' => $e->__toString(),
-            );
+            ];
             return $data;
         }
         return $payment;
@@ -63,16 +64,16 @@ class PPPaymentInstallment extends PPPayment
 
     public function getPaymentList()
     {
-        $list = array();
+        $list = [];
         $index = 0;
         foreach ($this->resource->schedule as $schedule) {
             if (count($schedule->payment_ids) > 0) {
                 foreach ($schedule->payment_ids as $pay_id) {
-                    $list[$index] = array(
+                    $list[$index] = [
                         'pay_id' => $pay_id,
                         'date' => $schedule->date,
                         'amount' => $schedule->amount
-                    );
+                    ];
                     $index ++;
                 }
             }

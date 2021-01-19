@@ -1,5 +1,5 @@
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -54,8 +54,10 @@
     text-transform: uppercase;
     font-weight: bold;
     margin: 0 0 0 60px;
+    padding: 0;
     width: 150px;
     height: 27px;
+    line-height: 27px;
 }
 
 #pppanel input[type="submit"].green-button.abort-button.btn[disabled] {
@@ -460,11 +462,6 @@ span.ppclose {
     padding: 25px 0 0 10px;
 }
 
-#pppanel .oney_delay {
-    clear: both;
-    padding: 8px 0 0;
-}
-
 
 .payplugPopup {
     -webkit-transform: translate(-50%, -50%);
@@ -624,7 +621,7 @@ span.ppclose {
     justify-content: space-between;
 }
 
-.payplugPopup_footer-center {
+.payplugPopup_footer.-center {
     justify-content: center;
 }
 
@@ -683,10 +680,15 @@ span.ppclose {
     margin: 10px 0 0;
 }
 
-
 .payplugOrder {
-     display: flex;
-     flex-wrap: wrap;
-     width: 100%;
-     flex-direction: column;
- }
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    flex-direction: column;
+}
+.payplugOrder_delay {
+    float: left;
+    margin: 20px 0 0;
+    line-height: 27px;
+    padding: 0 0 0 16px;
+}

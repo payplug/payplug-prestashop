@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,12 +16,10 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -29,14 +27,18 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_31_0($object)
 {
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     if (!defined('_PS_OS_PENDING_')) {
         define('_PS_OS_PENDING_', 0);
     }
 
-    $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     $flag = true;
 
-    $states = array(
+    $states = [
         'auth_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
         'auth_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),
         'exp_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'),
@@ -53,7 +55,7 @@ function upgrade_module_2_31_0($object)
         'error_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
         'oney_pending' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
         'oney_pending_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),
-    );
+    ];
 
     foreach ($states as $state) {
         if ($state != null) {
@@ -81,7 +83,6 @@ function upgrade_module_2_31_0($object)
     $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
 
     if (!$res_payplug_order_payment) {
-        $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
         $flag = false;
     }
 
@@ -104,7 +105,6 @@ function upgrade_module_2_31_0($object)
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
-                $log->error('Can\'t truncate payplug_lock');
             }
             if ($flag) {
                 $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
@@ -112,7 +112,6 @@ function upgrade_module_2_31_0($object)
                 $res_alter = Db::getInstance()->execute($sql);
                 if (!$res_alter) {
                     $flag = false;
-                    $log->error('Can\'t alter table payplug_lock');
                 }
             }
             if ($flag) {
@@ -126,12 +125,10 @@ function upgrade_module_2_31_0($object)
                     }
                 } else {
                     $flag = false;
-                    $log->error('Wrong table describe payplug_lock');
                 }
             }
         }
     } catch (Exception $e) {
-        $log->error('Exception: ' . $e->getMessage());
         $flag = false;
     }
 

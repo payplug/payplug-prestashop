@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -28,21 +28,21 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
 
-            <div class="payplugTips payplugTips-{$payplug_switch.installment.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item payplugTips_item-left"{if !$payplug_switch.installment.checked}style="display: none;"{/if}>
-                    <p class="payplugAlert payplugAlert-warning"><span>{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</span></p>
+            <div class="payplugTips -{$payplug_switch.installment.name|escape:'htmlall':'UTF-8'}">
+                <div class="payplugTips_item -left"{if !$payplug_switch.installment.checked}style="display: none;"{/if}>
+                    <p class="payplugAlert -warning"><span>{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</span></p>
                     <p>
                         {l s='You can consult all your past and pending installment payments in' mod='payplug'}
-                        <a class="payplugLink" href="{$installments_panel_url|escape:'htmlall':'UTF-8'}"> {l s='a dedicated menu' mod='payplug'}</a>
+                        <a class="payplugLink" href="{$installments_panel_url|escape:'htmlall':'UTF-8'}" data-e2e-link="installment"> {l s='a dedicated menu' mod='payplug'}</a>
                         {l s='made accessible from the navigation bar, and in the details of each order within the' mod='payplug'}
                         <i> {l s='Payment with PayPlug' mod='payplug'}</i> {l s='bloc.' mod='payplug'}
                     </p>
                     <p>
                         {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}
-                        <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                        <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                     </p>
 
                     <div class="payplugInstallment_fieldset payplugPanel">
@@ -76,16 +76,16 @@
                     <div class="payplugInstallment_fieldset payplugPanel">
                         <div class="payplugPanel_label">{l s='Receive:' mod='payplug'}</div>
                         <div class="payplugPanel_content">
-                            <p class="payplugInstallment_schedule payplugInstallment_schedule-x2{if $PAYPLUG_INST_MODE == 2} payplugInstallment_schedule-select{/if}">
+                            <p class="payplugInstallment_schedule -x2{if $PAYPLUG_INST_MODE == 2} -select{/if}">
                                 50% {l s='of order amount on the first day' mod='payplug'},<br>
                                 50% {l s='of order amount after 30 days' mod='payplug'}.
                             </p>
-                            <p class="payplugInstallment_schedule payplugInstallment_schedule-x3{if $PAYPLUG_INST_MODE == 3} payplugInstallment_schedule-select{/if}">
+                            <p class="payplugInstallment_schedule -x3{if $PAYPLUG_INST_MODE == 3} -select{/if}">
                                 34% {l s='of order amount on the first day' mod='payplug'},<br>
                                 33% {l s='of order amount after 30 days' mod='payplug'},<br>
                                 33% {l s='of order amount after 60 days' mod='payplug'}.
                             </p>
-                            <p class="payplugInstallment_schedule payplugInstallment_schedule-x4{if $PAYPLUG_INST_MODE == 4} payplugInstallment_schedule-select{/if}">
+                            <p class="payplugInstallment_schedule -x4{if $PAYPLUG_INST_MODE == 4} -select{/if}">
                                 25% {l s='of order amount on the first day' mod='payplug'},<br>
                                 25% {l s='of order amount after 30 days' mod='payplug'},<br>
                                 25% {l s='of order amount after 60 days' mod='payplug'},<br>

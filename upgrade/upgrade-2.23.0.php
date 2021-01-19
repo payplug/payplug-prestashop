@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -25,11 +25,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-
 function upgrade_module_2_23_0($object)
 {
-    $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     $flag = true;
 
     //adding new configurations
@@ -40,19 +42,16 @@ function upgrade_module_2_23_0($object)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP', 0)
         || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP_TEST', 0)) {
-        $log->error('Fail to add new configuration');
         $flag = false;
     }
 
     //hooking
     if (!$object->registerHook('actionOrderStatusUpdate')) {
-        $log->error('Fail to hook');
         $flag = false;
     }
 
     //add order-state for deferred payment
     if (!$object->createOrderStates()) {
-        $log->error('Fail to add order state');
         $flag = false;
     }
 

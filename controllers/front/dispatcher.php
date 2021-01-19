@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -26,14 +26,15 @@
  */
 class PayplugDispatcherModuleFrontController extends ModuleFrontController
 {
-
     /**
      * @description
      * Method that is executed after init() and checkAccess().
      * Used to process user input.
      *
-     * return void
+     * @return bool|void
+     * @throws Exception
      */
+
     public function postProcess()
     {
         if ($method = Tools::getValue('method')) {
@@ -46,6 +47,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $oney_type = Tools::getValue('oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
 
+
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
                 return false;
@@ -54,6 +56,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $options = $payplug->getAvailableOptions($cart);
 
             $error_url = 'index.php?controller=order&step=3&error=1';
+
             if ($options['oney'] && $is_oney) {
                 $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
                 if (!$payment['result']) {
@@ -83,6 +86,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     . ($is_installment ? '&inst=1' : '')
                     . ($is_one_click ? '&pc=' . $id_card : '')
                     . '&def=' . (int)Tools::getValue('def');
+
                 Tools::redirect($return_url);
             }
         }

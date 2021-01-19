@@ -14,3 +14,5 @@
 - Fix failure message getter (SIM-468)
 - Fix installment retrieve $inst_id (SIM-468)
 
+## 3.0.0
+

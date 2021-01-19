@@ -1,5 +1,5 @@
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -35,7 +35,7 @@ var $document, $window, payplugModule = {
         init: function () {
             // Styling
             var $options = $('input[data-module-name="payplug"]');
-            $options.parents('.payment-option').addClass('payplug-payment-option')
+            $options.parents('.payment-option').addClass('payplugPaymentOption')
 
             this.checkErrors();
 
@@ -61,9 +61,9 @@ var $document, $window, payplugModule = {
                         payplugModule.popup.set(data.template);
 
                         // Select Oney Option
-                        var $form = $('.' + payplugModule.oney.form.props.identifier);
-                        if ($form.length) {
-                            var oney_type = $form.data('oney_type'),
+                        var $required = $('.' + payplugModule.oney.required.props.identifier);
+                        if ($required.length) {
+                            var oney_type = $required.data('oney_type'),
                                 paymentOption = $('input[value="' + oney_type + '"]')
                                     .parent('form')
                                     .find('button[type=submit]')
@@ -77,15 +77,24 @@ var $document, $window, payplugModule = {
         },
     },
     card: {
+        props: {
+            identifier: 'payplugCard',
+            query: null,
+        },
         init: function () {
-            $document.on('click', 'a.ppdeletecard', payplugModule.card.delete);
+            var card = payplugModule.card,
+                identifier = card.props.identifier;
+            $document.on('click', '.' + identifier + '_delete', payplugModule.card.delete);
         },
         delete: function (event) {
             event.preventDefault();
+            event.stopPropagation();
 
             var $elem = $(this),
                 id_card = $elem.data('id_card'),
-                url = $(this).attr('href') + '&pc=' + id_card;
+                url = $(this).attr('href') + '&pc=' + id_card,
+                card = payplugModule.card,
+                identifier = card.props.identifier;
 
             $.ajax({
                 type: 'POST',
@@ -103,9 +112,8 @@ var $document, $window, payplugModule = {
                 },
                 success: function (result) {
                     if (result) {
-                        $('#id_payplug_card_' + id_card).remove();
-                        $('#module-payplug-cards div.message').show();
-                        $('#module-payplug-controllers-front-cards div.message').show();
+                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                        payplugModule.popup.set(card_deleted_msg);
                     }
                 }
             });
@@ -133,7 +141,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney;
 
             this.cta.init();
-            this.form.init();
+            this.required.init();
 
             $window.on('load', function () {
                 oney.load();
@@ -142,13 +150,13 @@ var $document, $window, payplugModule = {
             var popin = oney.cta.popin;
             prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
         },
-        load: function (full) {
+        load: function (with_schedule) {
             var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
                 };
 
-            if (full) {
+            if (with_schedule) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
             } else {
                 data['isOneyElligible'] = 1;
@@ -182,7 +190,11 @@ var $document, $window, payplugModule = {
                     if (data.result) {
                         if (typeof data.popin != 'undefined' && data.popin && oney.cta.props.loaded) {
                             oney.cta.popin.hydrate(data.popin);
-                            oney.cta.enable();
+                            if (typeof data.error != 'undefined' && data.error) {
+                                oney.cta.disable();
+                            } else {
+                                oney.cta.enable();
+                            }
                         }
                     } else if (oney.cta.props.loaded) {
                         if (typeof data.popin != 'undefined') {
@@ -225,14 +237,14 @@ var $document, $window, payplugModule = {
             enable: function () {
                 var popin = payplugModule.oney.cta.popin.props.identifier,
                     cta = payplugModule.oney.cta.props.identifier;
-                $('.' + cta + '_button').removeClass(cta + '_button-disabled');
-                $('.' + popin).removeClass(popin + '-error');
+                $('.' + cta + '_button').removeClass('-disabled');
+                $('.' + popin).removeClass('-error');
             },
             disable: function () {
                 var popin = payplugModule.oney.cta.popin.props.identifier,
                     cta = payplugModule.oney.cta.props.identifier;
-                $('.' + cta + '_button').addClass(cta + '_button-disabled');
-                $('.' + popin).addClass(popin + '-error');
+                $('.' + cta + '_button').addClass('-disabled');
+                $('.' + popin).addClass('-error');
             },
             popin: {
                 props: {
@@ -241,14 +253,15 @@ var $document, $window, payplugModule = {
                     loaded: false,
                 },
                 init: function () {
-                    var cta = payplugModule.oney.cta,
+                    var oney = payplugModule.oney,
+                        cta = oney.cta,
                         popin = cta.popin;
 
                     $document.on('click', '.' + popin.props.identifier + '_close', popin.hide)
                         .on('click', '.' + popin.props.identifier + '_navigation button', popin.select)
                         .on('click', function (event) {
                             var $clicked = $(event.target);
-                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('.' + cta.props.identifier + '-open')) {
+                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('.-open')) {
                                 popin.close();
                             }
                         });
@@ -262,18 +275,19 @@ var $document, $window, payplugModule = {
                         $('.' + cta.props.identifier).append('<span class="' + popin.props.identifier + '" />');
                     }
                     oney.loader.set('.' + popin.props.identifier);
-                    $('.' + popin.props.identifier).addClass(popin.props.identifier + '-loading');
+                    $('.' + popin.props.identifier).addClass('-loading');
                 },
                 hydrate: function (content) {
                     if (typeof content == 'undefined' || !content) {
                         return false;
                     }
+
                     var oney = payplugModule.oney,
                         popin = oney.cta.popin,
                         identifier = popin.props.identifier,
                         open = popin.props.open;
 
-                    $('.' + identifier).replaceWith(content).removeClass(identifier + '-loading');
+                    $('.' + identifier).replaceWith(content).removeClass('-loading');
                     oney.props.loaded = true;
 
                     var $button = $('.' + identifier + '_navigation button').eq(0);
@@ -302,16 +316,15 @@ var $document, $window, payplugModule = {
                     $('.' + identifier + '_navigation button[data-type=' + option + ']').parent('li').addClass('selected');
 
                     // option
-                    $('.' + identifier + '_option').removeClass(identifier + '_option-show');
-                    $('.' + identifier + '_option[data-type=' + option + ']').addClass(identifier + '_option-show');
+                    $('.' + identifier + '_option').removeClass('-show');
+                    $('.' + identifier + '_option[data-type=' + option + ']').addClass('-show');
                 },
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var popin = payplugModule.oney.cta.popin,
-                        identifier = popin.props.identifier;
+                    var popin = payplugModule.oney.cta.popin;
 
-                    var is_open = $('.' + identifier + '-open').length > 0;
+                    var is_open = $('-open').length > 0;
                     if (is_open) {
                         popin.close();
                     } else {
@@ -321,11 +334,9 @@ var $document, $window, payplugModule = {
                 check: function () {
                     var oney = payplugModule.oney,
                         popin = oney.cta.popin,
-                        identifier = popin.props.identifier,
                         open = popin.props.open;
 
-
-                    oney.props.loaded = $('.' + identifier).length > 0;
+                    oney.props.loaded = false;
 
                     if (open) {
                         popin.open();
@@ -340,11 +351,11 @@ var $document, $window, payplugModule = {
                         oney.load(true);
                     }
 
-                    $('.' + cta.props.identifier).addClass(cta.props.identifier + '-open');
-                    $('.' + popin.props.identifier).addClass(popin.props.identifier + '-open');
+                    $('.' + cta.props.identifier).addClass('-open');
+                    $('.' + popin.props.identifier).addClass('-open');
 
                     setTimeout(function () {
-                        $('.' + popin.props.identifier).addClass(popin.props.identifier + '-show');
+                        $('.' + popin.props.identifier).addClass('-show');
                         popin.props.open = true;
                     }, 0);
                 },
@@ -353,11 +364,11 @@ var $document, $window, payplugModule = {
                         cta = oney.cta,
                         popin = cta.popin;
 
-                    $('.' + popin.props.identifier).removeClass(popin.props.identifier + '-show');
-                    $('.' + popin.props.identifier).removeClass(popin.props.identifier + '-open');
+                    $('.' + popin.props.identifier).removeClass('-show');
+                    $('.' + popin.props.identifier).removeClass('-open');
 
                     setTimeout(function () {
-                        $('.' + cta.props.identifier).removeClass(cta.props.identifier + '-open');
+                        $('.' + cta.props.identifier).removeClass('-open');
                         popin.props.open = false;
                     }, 0);
                 },
@@ -373,21 +384,23 @@ var $document, $window, payplugModule = {
                 },
             }
         },
-        form: {
+        required: {
             props: {
-                identifier: 'oneyForm'
+                identifier: 'oneyRequired'
             },
             init: function () {
-                var form = this,
-                    identifier = form.props.identifier;
+                var required = this,
+                    identifier = required.props.identifier;
                 $document
-                    .on('click', '.' + identifier + '_close', form.close)
-                    .on('submit', '.' + identifier, form.submit)
-                    .on('keyup focusout', '.' + identifier + ' input', form.check);
+                    .on('click', '.' + identifier + '_close', required.close)
+                    .on('submit', '.' + identifier, required.submit)
+                    .on('keyup focusout', '.' + identifier + ' input', required.check);
             },
             check: function () {
-                var is_valid = true,
-                    $fields = $('.oneyForm_input');
+                var required = this,
+                    identifier = required.props.identifier,
+                    is_valid = true,
+                    $fields = $('.' + identifier + '_input');
 
                 $fields.each(function () {
                     var $input = $(this),
@@ -422,48 +435,42 @@ var $document, $window, payplugModule = {
                     }
 
                     if (valid_input) {
-                        $input.removeClass('oneyForm_input-error');
+                        $input.removeClass('-error');
                     } else {
-                        $input.addClass('oneyForm_input-error');
+                        $input.addClass('-error');
                     }
 
                     is_valid = is_valid && valid_input;
                 });
-
-                if (is_valid) {
-                    $('.oneyPayment_button').removeClass('oneyPayment_button-disabled').addClass('oneyPayment_button-validate');
-                } else {
-                    $('.oneyPayment_button').addClass('oneyPayment_button-disabled').removeClass('oneyPayment_button-validate');
-                }
             },
             close: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                payplugModule.oney.form.reset();
+                payplugModule.oney.required.reset();
                 payplugModule.popup.close();
             },
             reset: function () {
-                var form = this,
-                    identifier = form.props.identifier;
+                var required = this,
+                    identifier = required.props.identifier;
                 $('.' + identifier).find('input').each(function () {
                     var $field = $(this);
                     $field.val('');
 
-                    if ($field.is('.' + identifier + '_input-tocheck')) {
-                        $field.addClass(identifier + '_input-error');
+                    if ($field.is('.-tocheck')) {
+                        $field.addClass('-error');
                     }
                 });
             },
             save: function (payment_data) {
-                var form = this,
-                    identifier = form.props.identifier,
+                var required = this,
+                    identifier = required.props.identifier,
                     data = {
                         _ajax: 1,
                         savePaymentData: 1,
                         payment_data: payment_data
                     };
 
-                $('.' + identifier + '_message').removeClass(identifier + '_message-success').removeClass(identifier + '_message-error');
+                $('.' + identifier + '_message').removeClass('-success').removeClass('-error');
 
                 $.ajax({
                     url: payplug_ajax_url + '?rand=' + new Date().getTime(),
@@ -475,9 +482,9 @@ var $document, $window, payplugModule = {
                     data: data,
                     success: function (data) {
                         if (data.result) {
-                            $('.' + identifier + '_validation').addClass(identifier + '_validation-show');
+                            $('.' + identifier + '_validation').addClass('-show');
                             window.setTimeout(function () {
-                                $('.' + identifier + '_validation').addClass(identifier + '_validation-appear');
+                                $('.' + identifier + '_validation').addClass('-appear');
                             });
                             window.setTimeout(function () {
                                 payplugModule.popup.close();
@@ -488,7 +495,7 @@ var $document, $window, payplugModule = {
                                 if (error !== 'indexOf')
                                     errors += $('<p />').html(data.message[error]).text() + "\n";
 
-                            $('.' + identifier + '_message').addClass(identifier + '_message-error').html(errors);
+                            $('.' + identifier + '_message').addClass('-error').html(errors);
                         }
                     }
                 });
@@ -498,8 +505,8 @@ var $document, $window, payplugModule = {
                 event.stopPropagation();
 
                 var payment_data = {},
-                    $form = $('.oneyForm'),
-                    $fields = $form.find('input');
+                    $required = $('.oneyRequired'),
+                    $fields = $required.find('input');
 
                 $fields.each(function () {
                     var $el = $(this), name = $el.attr('name'), value = null;
@@ -515,7 +522,7 @@ var $document, $window, payplugModule = {
                     }
                 });
 
-                return payplugModule.oney.form.save(payment_data);
+                return payplugModule.oney.required.save(payment_data);
             },
         },
     },
@@ -530,7 +537,7 @@ var $document, $window, payplugModule = {
             $document.on('click', '.' + props.identifier + '_close', popup.close)
                 .on('click', function (event) {
                     var $clicked = $(event.target);
-                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('.' + props.identifier + '-open')) {
+                    if ($clicked.is('.' + props.identifier) && $('.' + props.identifier).is('.-open')) {
                         popup.close();
                     }
                 });
@@ -550,18 +557,18 @@ var $document, $window, payplugModule = {
         open: function () {
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
-            popin.addClass(props.identifier + '-open');
+            popin.addClass('-open');
             window.setTimeout(function () {
-                popin.addClass(props.identifier + '-show');
+                popin.addClass('-show');
             }, 0);
         },
         close: function () {
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
 
-            popin.removeClass(props.identifier + '-show');
+            popin.removeClass('-show');
             window.setTimeout(function () {
-                popin.removeClass(props.identifier + '-open');
+                popin.removeClass('-open');
             }, 500);
         },
         create: function () {

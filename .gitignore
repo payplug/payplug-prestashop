@@ -1,4 +1,9 @@
 log/*.csv
 config*.xml
 .DS_Store
-.idea/
+.idea
+vendor/
+.php_cs.cache
+views/css/less/*.css
+views/css/*.map
+*.map

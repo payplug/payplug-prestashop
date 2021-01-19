@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,39 +16,70 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
-require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
-require_once(_PS_MODULE_DIR_ . '/payplug/lib/init.php');
+class PayplugPaymentModuleFrontController extends ModuleFrontController
+{
+    public function postProcess()
+    {
+        require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
-$payplug = Module::getInstanceByName('payplug');
-\Payplug\Payplug::init([
-    'secretKey' => $payplug->current_api_key,
-    'apiVersion' => $payplug->api_version
-]);
+        /** Call init.php to initialize context */
+        require_once(_PS_MODULE_DIR_ . '../init.php');
 
-\Payplug\Core\HttpClient::addDefaultUserAgentProduct(
-    'PayPlug-Prestashop',
-    $payplug->version,
-    'Prestashop/' . _PS_VERSION_
-);
+        /** Call to payplug-php API */
+        require_once(_PS_MODULE_DIR_ . '/payplug/classes/PayplugBackward.php');
+        require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
 
-$context = Context::getContext();
-$cookie = $context->cookie;
+        $payplug = Module::getInstanceByName('payplug');
+        $payplug->initializeApi();
 
-$result_currency = array();
-$cart = $context->cart;
-$is_deferred = (int)Tools::getValue('def');
+        $context = Context::getContext();
 
-$payment_url = $payplug->preparePayment($cart->id, 'new_card', false, $is_deferred);
+        $id_payplug_card = Tools::getValue('pc', null);
 
-if (!is_array($payment_url)) {
-    Tools::redirect($payment_url);
-} else {
-    Tools::redirect('index.php?controller=order&step=3&error=1');
+        $type = Tools::getValue('type', null);
+        $io = Tools::getValue('io', null);
+        $is_oney = null;
+        if ((isset($type)) && ($type == 'oney')) {
+            if (isset($io)) {
+                $is_oney = 'x'.$io.'_with_fees';
+            }
+        }
+        $options = [
+            'is_oney' => $is_oney,
+            '_ajax' => 1
+        ];
+
+        $payment_data = $payplug->preparePayment($options, $id_payplug_card);
+        $payment_data_16 = Tools::jsonDecode($payment_data, true);
+
+        $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
+        $error_url = $context->link->getPageLink($page, true, $context->language->id, ['error' => 1, 'step' => 3]);
+
+        // Invalid payment then return error
+        if (($payment_data['result'] && (isset($payment_data['return_url']) && $payment_data['return_url']))) {
+            Payplug::redirectForVersion($payment_data['return_url']);
+        }
+        if (($payment_data_16['result'] && (isset($payment_data_16['return_url']) && $payment_data_16['return_url']))) {
+            Payplug::redirectForVersion($payment_data_16['return_url']);
+        } elseif (!$payment_data['result']) {
+            if (isset($payment_data['response']) && $payment_data['response']) {
+                $payplug->setPaymentErrorsCookie([$payment_data['response']]);
+            }
+            Payplug::redirectForVersion($error_url);
+        } elseif (!$payment_data_16['result']) {
+            if (isset($payment_data_16['response']) && $payment_data_16['response']) {
+                $payplug->setPaymentErrorsCookie([$payment_data_16['response']]);
+            }
+            Payplug::redirectForVersion($error_url);
+        }
+
+        if ((isset($payment_data['response'])) || (isset($payment_data_16['response']))) {
+            die($payment_data['response']);
+        }
+    }
 }
