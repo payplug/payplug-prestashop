@@ -55,7 +55,7 @@ final class IsValidOneyAmountTest extends TestCase
         );
     }
 
-    public function testLimitsIsArray()
+    public function testLimitsIsAnArray()
     {
         $this->assertTrue(
             is_array($this->limits)

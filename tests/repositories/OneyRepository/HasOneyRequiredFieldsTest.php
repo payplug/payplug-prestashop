@@ -84,14 +84,14 @@ final class HasOneyRequiredFieldsTest extends TestCase
         ];
     }
 
-    public function testPaymentDataIsArray()
+    public function testPaymentDataIsAnArray()
     {
         $this->assertTrue(
             is_array($this->payment_data)
         );
     }
 
-    public function testShippingIsArray()
+    public function testShippingIsAnArray()
     {
         $this->assertTrue(
             is_array($this->payment_data['shipping'])
