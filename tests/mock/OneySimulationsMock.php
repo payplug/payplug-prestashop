@@ -29,41 +29,41 @@ class OneySimulationsMock
     public static function getOneySimulations()
     {
         $simulations = [
-            "x3_with_fees" => [
-                "installments" => [
+            'x3_with_fees' => [
+                'installments' => [
                     [
-                        "date" => "2021-02-19T01:00:00.000Z",
-                        "amount" => 8042,
+                        'date' => '2021-02-19T01:00:00.000Z',
+                        'amount' => 8042,
                     ],
                     [
-                        "date" => "2021-03-19T01:00:00.000Z",
-                        "amount" => 8041,
+                        'date' => '2021-03-19T01:00:00.000Z',
+                        'amount' => 8041,
                     ],
                 ],
-                "total_cost" => 350,
-                "nominal_annual_percentage_rate" => 17.76,
-                "effective_annual_percentage_rate" => 19.27,
-                "down_payment_amount" => 8392,
+                'total_cost' => 350,
+                'nominal_annual_percentage_rate' => 17.76,
+                'effective_annual_percentage_rate' => 19.27,
+                'down_payment_amount' => 8392,
             ],
-            "x4_with_fees" => [
-                "installments" => [
+            'x4_with_fees' => [
+                'installments' => [
                     [
-                        "date" => "2021-02-19T01:00:00.000Z",
-                        "amount" => 6031,
+                        'date' => '2021-02-19T01:00:00.000Z',
+                        'amount' => 6031,
                     ],
                     [
-                        "date" => "2021-03-19T01:00:00.000Z",
-                        "amount" => 6031,
+                        'date' => '2021-03-19T01:00:00.000Z',
+                        'amount' => 6031,
                     ],
                     [
-                        "date" => "2021-04-19T00:00:00.000Z",
-                        "amount" => 6032,
+                        'date' => '2021-04-19T00:00:00.000Z',
+                        'amount' => 6032,
                     ],
                 ],
-                "total_cost" => 531,
-                "nominal_annual_percentage_rate" => 18.05,
-                "effective_annual_percentage_rate" => 19.62,
-                "down_payment_amount" => 6562,
+                'total_cost' => 531,
+                'nominal_annual_percentage_rate' => 18.05,
+                'effective_annual_percentage_rate' => 19.62,
+                'down_payment_amount' => 6562,
             ],
         ];
 
@@ -73,7 +73,7 @@ class OneySimulationsMock
     public static function getOneySimulationsNotAvailable()
     {
         $simulations = [
-            "details" => 'Access to this feature is not available.'
+            'details' => 'Access to this feature is not available.'
         ];
 
         return $simulations;
@@ -82,7 +82,7 @@ class OneySimulationsMock
     public static function getOneySimulationsIsError()
     {
         $simulations = [
-            "details" => 'Access to this feature is not available.'
+            'object' => 'error.'
         ];
 
         return $simulations;
