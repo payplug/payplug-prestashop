@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  * @group oney
  * @group oney_repository
  */
-final class IsValidOneyAmountTest extends TestCase
+final class HasOneyRequiredFieldsTest extends TestCase
 {
     protected $payment_data;
 
@@ -83,59 +83,135 @@ final class IsValidOneyAmountTest extends TestCase
             "authorized_amount" => 10277,
         ];
     }
-}
 
-//public function hasOneyRequiredFields($payment_data = [])
-//{
-//    if (!$payment_data) {
-//        return false;
-//    }
-//
-//    $tools = $this->toolsSpecific;
-//
-//    // Check the shipping fields
-//    $shipping = $payment_data['shipping'];
-//
-//    // Validate email format
-//    if ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100
-//        && $tools->tool('$shipping[\'email\']', '+') !== false) {
-//        return true;
-//    } elseif ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100) {
-//        return true;
-//    } elseif (strpos($shipping['email'], '+') !== false) {
-//        return true;
-//    }
-//
-//    // Validate phone number
-//    $valid_shipping_mobile = $this->payplug->isValidMobilePhoneNumber(
-//        $shipping['mobile_phone_number'],
-//        $shipping['country']
-//    );
-//    if (!$valid_shipping_mobile) {
-//        return true;
-//    }
-//
-//    // Validate address
-//    if ($tools->tool('strlen', $shipping['city'], 'UTF-8') > 32) {
-//        return true;
-//    }
-//
-//    // Check the billing fields
-//    $billing = $payment_data['billing'];
-//
-//    // Validate phone number
-//    $valid_billing_mobile = $this->payplug->isValidMobilePhoneNumber(
-//        $billing['mobile_phone_number'],
-//        $billing['country']
-//    );
-//    if (!$valid_billing_mobile) {
-//        return true;
-//    }
-//
-//    // Validate address
-//    if ($tools->tool('strlen', $billing['city'], 'UTF-8') > 32) {
-//        return true;
-//    }
-//
-//    return false;
-//}
+    public function testPaymentDataIsArray()
+    {
+        $this->assertTrue(
+            is_array($this->payment_data)
+        );
+    }
+
+    public function testShippingIsArray()
+    {
+        $this->assertTrue(
+            is_array($this->payment_data['shipping'])
+        );
+    }
+
+    public function testShippingEmail()
+    {
+        $this->assertSame(
+            'customer@payplug.com',
+            $this->payment_data['shipping']['email']
+        );
+    }
+
+    public function testShippingEmailAString()
+    {
+        $this->assertTrue(
+            is_string($this->payment_data['shipping']['email'])
+        );
+    }
+
+    public function testShippingEmailHaveAValidEmailFormat()
+    {
+        $this->assertRegExp(
+            '/^([\w\.\-_]+)?\w+@[\w-_]+(\.\w+){1,}$/',
+            $this->payment_data['shipping']['email']
+        );
+    }
+
+    public function testShippingEmailIsShortEnough()
+    {
+        $condition = strlen($this->payment_data['shipping']['email']) < 100;
+        $this->assertTrue($condition);
+    }
+
+    public function testShippingCity()
+    {
+        $this->assertSame(
+            'Paris',
+            $this->payment_data['shipping']['city']
+        );
+    }
+
+    public function testShippingCityAString()
+    {
+        $this->assertTrue(
+            is_string($this->payment_data['shipping']['city'])
+        );
+    }
+
+    public function testShippingCityIsShortEnough()
+    {
+        $condition = strlen($this->payment_data['shipping']['city']) < 32;
+        $this->assertTrue($condition);
+    }
+
+    public function testShippingMobilePhone()
+    {
+        $this->assertSame(
+            '+33623456789',
+            $this->payment_data['shipping']['mobile_phone_number']
+        );
+    }
+
+    public function testShippingMobilePhoneAString()
+    {
+        $this->assertTrue(
+            is_string($this->payment_data['shipping']['mobile_phone_number'])
+        );
+    }
+
+    public function testShippingMobilePhoneHaveAValidPhoneFormat()
+    {
+        $this->assertRegExp(
+            '/^(?:0|\+?33)?([6-7]\d{5,12})$/',
+            $this->payment_data['shipping']['mobile_phone_number']
+        );
+    }
+
+    public function testBillingCity()
+    {
+        $this->assertSame(
+            'Paris',
+            $this->payment_data['billing']['city']
+        );
+    }
+
+    public function testBillingCityAString()
+    {
+        $this->assertTrue(
+            is_string($this->payment_data['billing']['city'])
+        );
+    }
+
+    public function testBillingCityIsShortEnough()
+    {
+        $condition = strlen($this->payment_data['billing']['city']) < 32;
+        $this->assertTrue($condition);
+    }
+
+    public function testBillingMobilePhone()
+    {
+        $this->assertSame(
+            '+33623456789',
+            $this->payment_data['billing']['mobile_phone_number']
+        );
+    }
+
+    public function testBillingMobilePhoneAString()
+    {
+        $this->assertTrue(
+            is_string($this->payment_data['billing']['mobile_phone_number'])
+        );
+    }
+
+    public function testBillingMobilePhoneHaveAValidPhoneFormat()
+    {
+        $this->assertRegExp(
+            '/^(?:0|\+?33)?([6-7]\d{5,12})$/',
+            $this->payment_data['billing']['mobile_phone_number']
+        );
+    }
+}
