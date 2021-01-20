@@ -82,7 +82,7 @@ class OneySimulationsMock
     public static function getOneySimulationsIsError()
     {
         $simulations = [
-            'object' => 'error.'
+            'object' => 'error'
         ];
 
         return $simulations;
