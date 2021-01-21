@@ -5421,8 +5421,6 @@ class Payplug extends PaymentModule
     {
         $cart = new Cart($id_cart);
         $hash = hash('sha256', json_encode($cart));
-        dump($hash);
-        exit;
 
         if ($inst_id = $this->getInstallmentByCart($id_cart)) {
             $this->deleteInstallment($inst_id, $id_cart);
@@ -5437,17 +5435,18 @@ class Payplug extends PaymentModule
         if (!$res_payment_cart_exists) {
             //insert
             $req_payment_cart = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment_cart (id_payment, id_cart) 
-                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$id_cart . ')';
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment_cart (id_payment, id_cart, cart_hash) 
+                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$id_cart . ', ' . pSQL($hash) . ')';
             $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
             if (!$res_payment_cart) {
                 return false;
             }
-        } else {
+        } elseif ($res_payment_cart_exists['cart_hash'] != $hash) {
             //update
             $req_payment_cart = '
                 UPDATE ' . _DB_PREFIX_ . 'payplug_payment_cart ppc  
-                SET ppc.id_payment = \'' . pSQL($pay_id) . '\'
+                SET ppc.id_payment = \'' . pSQL($pay_id) . '\',
+                    ppc.cart_hash = \'' . pSQL($hash) . '\'
                 WHERE ppc.id_cart = ' . (int)$id_cart;
             $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
             if (!$res_payment_cart) {
