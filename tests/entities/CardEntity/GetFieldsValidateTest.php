@@ -31,41 +31,41 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class GetFieldsRequiredCardTest extends TestCase
+final class GetFieldsValidateTest extends TestCase
 {
     protected $card;
-    protected $fieldsRequired;
+    protected $fieldsValidate;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->fieldsRequired = [
+        $this->fieldsValidate = [
             'key1' => 'value1',
             'key2' => 'value2',
             'key3' => 3,
         ];
-        $this->card->setFieldsRequired($this->fieldsRequired);
+        $this->card->setFieldsSize($this->fieldsValidate);
     }
 
-    public function testReturnFieldsRequired()
+    public function testReturnFieldsSize()
     {
         $this->assertSame(
-            $this->fieldsRequired,
-            $this->card->getFieldsRequired()
+            $this->fieldsValidate,
+            $this->card->getFieldsSize()
         );
     }
 
-    public function testFieldsRequiredIsArray()
+    public function testFieldsSizeIsArray()
     {
         $this->assertTrue(
-            is_array($this->card->getFieldsRequired())
+            is_array($this->card->getFieldsSize())
         );
     }
 
-    public function testFieldsRequiredIsNotEmpty()
+    public function testFieldsSizeIsNotEmpty()
     {
         $this->assertFalse(
-            empty($this->card->getFieldsRequired())
+            empty($this->card->getFieldsSize())
         );
     }
 }
