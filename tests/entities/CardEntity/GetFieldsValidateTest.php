@@ -44,28 +44,28 @@ final class GetFieldsValidateTest extends TestCase
             'key2' => 'value2',
             'key3' => 3,
         ];
-        $this->card->setFieldsSize($this->fieldsValidate);
+        $this->card->setFieldsValidate($this->fieldsValidate);
     }
 
-    public function testReturnFieldsSize()
+    public function testReturnFieldsValidate()
     {
         $this->assertSame(
             $this->fieldsValidate,
-            $this->card->getFieldsSize()
+            $this->card->getFieldsValidate()
         );
     }
 
-    public function testFieldsSizeIsArray()
+    public function testFieldsValidateIsArray()
     {
         $this->assertTrue(
-            is_array($this->card->getFieldsSize())
+            is_array($this->card->getFieldsValidate())
         );
     }
 
-    public function testFieldsSizeIsNotEmpty()
+    public function testFieldsValidateIsNotEmpty()
     {
         $this->assertFalse(
-            empty($this->card->getFieldsSize())
+            empty($this->card->getFieldsValidate())
         );
     }
 }
