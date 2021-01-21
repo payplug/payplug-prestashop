@@ -31,28 +31,35 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class GetIdCustomerTest extends TestCase
+final class GetAllowedBrandCardTest extends TestCase
 {
     protected $card;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIdCustomer(42);
+        $this->card->setAllowedBrand(['brand']);
     }
 
-    public function testReturnIdCustomer()
+    public function testReturnAllowedBrand()
     {
         $this->assertSame(
-            42,
-            $this->card->getIdCustomer()
+            ['brand'],
+            $this->card->getAllowedBrand()
         );
     }
 
-    public function testIdCustomerIsAnInt()
+    public function testAllowedBrandIsArray()
     {
         $this->assertTrue(
-            is_int($this->card->getIdCustomer())
+            is_array($this->card->getAllowedBrand())
+        );
+    }
+
+    public function testAllowedBrandIsNotEmpty()
+    {
+        $this->assertFalse(
+            empty($this->card->getAllowedBrand())
         );
     }
 }

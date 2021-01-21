@@ -31,28 +31,36 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class IsSandboxTest extends TestCase
+final class GetIdCardCardTest extends TestCase
 {
     protected $card;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIsSandbox(true);
+        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     }
 
-    public function testReturnIsSandbox()
+    public function testReturnIdCard()
     {
         $this->assertSame(
-            true,
-            $this->card->isSandbox()
+            'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            $this->card->getIdCard()
         );
     }
 
-    public function testSandboxIsABool()
+    public function testIdCardIsAString()
     {
         $this->assertTrue(
-            is_bool($this->card->isSandbox())
+            is_string($this->card->getIdCard())
+        );
+    }
+
+    public function testIdCardHaveAValidFormat()
+    {
+        $this->assertRegExp(
+            '/card_[a-z0-9]{32}/',
+            $this->card->getIdCard()
         );
     }
 }

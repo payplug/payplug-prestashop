@@ -31,28 +31,28 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class GetIdCompanyTest extends TestCase
+final class IsSandboxCardTest extends TestCase
 {
     protected $card;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIdCompany(42);
+        $this->card->setIsSandbox(true);
     }
 
-    public function testReturnIdCompany()
+    public function testReturnIsSandbox()
     {
         $this->assertSame(
-            42,
-            $this->card->getIdCompany()
+            true,
+            $this->card->isSandbox()
         );
     }
 
-    public function testIdCompanyIsAnInt()
+    public function testSandboxIsABool()
     {
         $this->assertTrue(
-            is_int($this->card->getIdCompany())
+            is_bool($this->card->isSandbox())
         );
     }
 }

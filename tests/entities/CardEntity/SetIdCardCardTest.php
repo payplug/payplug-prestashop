@@ -32,22 +32,22 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class SetIdCompanyTest extends TestCase
+final class SetIdCardCardTest extends TestCase
 {
     protected $card;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIdCompany(42);
+        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     }
 
-    public function testUpdateIdCompany()
+    public function testUpdateIdCard()
     {
-        $this->card->setIdCompany(777);
+        $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12');
         $this->assertSame(
-            777,
-            $this->card->getIdCompany()
+            'card_azertyuiop1234567890qsdfghjklm12',
+            $this->card->getIdCard()
         );
     }
 
@@ -55,7 +55,7 @@ final class SetIdCompanyTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setIdCompany(777)
+            $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12')
         );
     }
 
@@ -65,9 +65,21 @@ final class SetIdCompanyTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAnInt()
+    public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setIdCompany('test');
+        $this->card->setIdCard(42);
+    }
+
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotWellFormatted()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->card->setIdCard('Kart_AZERT&é"');
     }
 }

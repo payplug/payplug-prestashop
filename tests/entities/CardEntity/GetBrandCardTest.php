@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class GetBrandTest extends TestCase
+final class GetBrandCardTest extends TestCase
 {
     protected $card;
 

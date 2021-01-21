@@ -39,15 +39,15 @@ final class SetIdCardTest extends TestCase
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        $this->card->setId(42);
     }
 
-    public function testUpdateIdCard()
+    public function testUpdateId()
     {
-        $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12');
+        $this->card->setId(777);
         $this->assertSame(
-            'card_azertyuiop1234567890qsdfghjklm12',
-            $this->card->getIdCard()
+            777,
+            $this->card->getId()
         );
     }
 
@@ -55,7 +55,7 @@ final class SetIdCardTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12')
+            $this->card->setId(777)
         );
     }
 
@@ -65,21 +65,9 @@ final class SetIdCardTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAnInt()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setIdCard(42);
-    }
-
-    /**
-     * @group entity_exception
-     * @group card_exception
-     * @group card_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->card->setIdCard('Kart_AZERT&é"');
+        $this->card->setId('test');
     }
 }

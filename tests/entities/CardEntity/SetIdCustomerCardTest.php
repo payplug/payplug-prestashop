@@ -24,6 +24,7 @@
 declare(strict_types=1);
 
 use PayPlug\src\entities\CardEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,28 +32,42 @@ use PHPUnit\Framework\TestCase;
  * @group card
  * @group card_entity
  */
-final class GetCountryTest extends TestCase
+final class SetIdCustomerCardTest extends TestCase
 {
     protected $card;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setCountry('ISO');
+        $this->card->setIdCustomer(42);
     }
 
-    public function testReturnCountry()
+    public function testUpdateIdCustomer()
     {
+        $this->card->setIdCustomer(777);
         $this->assertSame(
-            'ISO',
-            $this->card->getCountry()
+            777,
+            $this->card->getIdCustomer()
         );
     }
 
-    public function testCountryIsAnInt()
+    public function testReturnCardEntity()
     {
-        $this->assertTrue(
-            is_string($this->card->getCountry())
+        $this->assertInstanceOf(
+            CardEntity::class,
+            $this->card->setIdCustomer(777)
         );
+    }
+
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotAnInt()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->card->setIdCustomer('test');
     }
 }
