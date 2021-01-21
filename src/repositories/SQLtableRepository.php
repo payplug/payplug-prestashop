@@ -88,6 +88,7 @@ class SQLtableRepository extends \Payplug
             ->fields('`id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_payment` VARCHAR(255) NOT NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`cart_hash` VARCHAR(64) NOT NULL')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
             ->engine(_MYSQL_ENGINE_)

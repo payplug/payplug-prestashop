@@ -279,7 +279,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.7.7.0', 'max' => '1.8.0.0'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.0.0';
+        $this->version = '3.0.2';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -5419,6 +5419,11 @@ class Payplug extends PaymentModule
      */
     private function storePayment($pay_id, $id_cart)
     {
+        $cart = new Cart($id_cart);
+        $hash = hash('sha256', json_encode($cart));
+        dump($hash);
+        exit;
+
         if ($inst_id = $this->getInstallmentByCart($id_cart)) {
             $this->deleteInstallment($inst_id, $id_cart);
         }
