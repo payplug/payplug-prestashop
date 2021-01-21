@@ -34,32 +34,31 @@ use PHPUnit\Framework\TestCase;
 final class GetDefinitionCardTest extends TestCase
 {
     protected $card;
+    protected $brands;
 
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setDefinition(['prop']);
+        $this->card= new CardEntity();
+        $this->brands = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->card->setDefinition($this->brands);
     }
 
     public function testReturnDefinition()
     {
         $this->assertSame(
-            ['prop'],
+            $this->brands,
             $this->card->getDefinition()
         );
     }
 
-    public function testDefinitionIsArray()
+    public function testDefinitionIsAnArray()
     {
         $this->assertTrue(
             is_array($this->card->getDefinition())
-        );
-    }
-
-    public function testDefinitionIsNotEmpty()
-    {
-        $this->assertFalse(
-            empty($this->card->getDefinition())
         );
     }
 }

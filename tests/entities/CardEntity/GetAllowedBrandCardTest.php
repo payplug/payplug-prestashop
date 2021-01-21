@@ -34,17 +34,23 @@ use PHPUnit\Framework\TestCase;
 final class GetAllowedBrandCardTest extends TestCase
 {
     protected $card;
+    protected $allowedBrands;
 
     protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setAllowedBrand(['brand']);
+        $this->allowedBrands = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->card->setAllowedBrand($this->allowedBrands);
     }
 
     public function testReturnAllowedBrand()
     {
         $this->assertSame(
-            ['brand'],
+            $this->allowedBrands,
             $this->card->getAllowedBrand()
         );
     }
