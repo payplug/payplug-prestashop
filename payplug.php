@@ -6580,7 +6580,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '1.8');
         $this->tab = 'payments_gateways';
-        $this->version = '3.0.7';
+        $this->version = '2.31.1';
         $this->api_version = '2019-08-06';
     }
 
