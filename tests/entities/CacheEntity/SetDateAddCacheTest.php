@@ -32,7 +32,7 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class SetDateAddTest extends TestCase
+final class SetDateAddCacheTest extends TestCase
 {
     protected $cache;
 

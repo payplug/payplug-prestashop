@@ -24,7 +24,6 @@
 declare(strict_types=1);
 
 use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,42 +31,34 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class SetCacheValueTest extends TestCase
+final class GetDefinitionCacheTest extends TestCase
 {
     protected $cache;
+    protected $definition;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->cache->setCacheValue('test_value');
+        $this->definition = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->cache->setDefinition($this->definition);
     }
 
-    public function testUpdateCacheValue()
+    public function testReturnDefinition()
     {
-        $this->cache->setCacheValue('another_value');
         $this->assertSame(
-            'another_value',
-            $this->cache->getCacheValue()
+            $this->definition,
+            $this->cache->getDefinition()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testDefinitionIsAnArray()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setCacheValue('another_key')
+        $this->assertTrue(
+            is_array($this->cache->getDefinition())
         );
-    }
-
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotAString()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setCacheValue(42);
     }
 }

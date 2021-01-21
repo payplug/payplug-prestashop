@@ -24,7 +24,6 @@
 declare(strict_types=1);
 
 use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,42 +31,36 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class SetCacheKeyTest extends TestCase
+final class GetDateUpdCacheTest extends TestCase
 {
     protected $cache;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->cache->setCacheKey('test_key');
+        $this->cache->setDateUpd('2021-12-31 23:59:42');
     }
 
-    public function testUpdateCacheKey()
+    public function testReturnDateUpd()
     {
-        $this->cache->setCacheKey('another_key');
         $this->assertSame(
-            'another_key',
-            $this->cache->getCacheKey()
+            '2021-12-31 23:59:42',
+            $this->cache->getDateUpd()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testDateUpdIsAString()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setCacheKey('another_key')
+        $this->assertTrue(
+            is_string($this->cache->getDateUpd())
         );
     }
 
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testTrowExceptionWhenNotAString()
+    public function testDateUpdHaveAValidDatetimeFormat()
     {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setCacheKey(42);
+        $this->assertRegExp(
+            '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
+            $this->cache->getDateUpd()
+        );
     }
 }

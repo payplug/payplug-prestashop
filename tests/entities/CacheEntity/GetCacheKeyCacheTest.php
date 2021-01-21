@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class GetCacheKeyTest extends TestCase
+final class GetCacheKeyCacheTest extends TestCase
 {
     protected $cache;
 

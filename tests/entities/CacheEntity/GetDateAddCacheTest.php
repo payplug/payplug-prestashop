@@ -31,28 +31,36 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class GetCacheValueTest extends TestCase
+final class GetDateAddCacheTest extends TestCase
 {
     protected $cache;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->cache->setCacheValue('test_value');
+        $this->cache->setDateAdd('2021-12-31 23:59:42');
     }
 
-    public function testReturnCacheValue()
+    public function testReturnDateAdd()
     {
         $this->assertSame(
-            'test_value',
-            $this->cache->getCacheValue()
+            '2021-12-31 23:59:42',
+            $this->cache->getDateAdd()
         );
     }
 
-    public function testCacheValueIsAString()
+    public function testDateAddIsAString()
     {
         $this->assertTrue(
-            is_string($this->cache->getCacheValue())
+            is_string($this->cache->getDateAdd())
+        );
+    }
+
+    public function testDateAddHaveAValidDatetimeFormat()
+    {
+        $this->assertRegExp(
+            '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
+            $this->cache->getDateAdd()
         );
     }
 }

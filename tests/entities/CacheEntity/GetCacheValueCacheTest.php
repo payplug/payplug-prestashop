@@ -31,28 +31,28 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class GetTableTest extends TestCase
+final class GetCacheValueCacheTest extends TestCase
 {
     protected $cache;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->cache->setTable('test_table');
+        $this->cache->setCacheValue('test_value');
     }
 
-    public function testReturnTable()
+    public function testReturnCacheValue()
     {
         $this->assertSame(
-            'test_table',
-            $this->cache->getTable()
+            'test_value',
+            $this->cache->getCacheValue()
         );
     }
 
-    public function testTableIsAString()
+    public function testCacheValueIsAString()
     {
         $this->assertTrue(
-            is_string($this->cache->getTable())
+            is_string($this->cache->getCacheValue())
         );
     }
 }

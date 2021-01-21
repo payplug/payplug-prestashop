@@ -24,6 +24,7 @@
 declare(strict_types=1);
 
 use PayPlug\src\entities\CacheEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,28 +32,53 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class GetIdPayPlugCacheTest extends TestCase
+final class SetDateUpdCacheTest extends TestCase
 {
     protected $cache;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->cache->setIdPayPlugCache('test_id');
+        $this->cache->setDateUpd('2021-12-31 23:59:42');
     }
 
-    public function testReturnCacheId()
+    public function testUpdateDateUpd()
     {
         $this->assertSame(
-            'test_id',
-            $this->cache->getIdPayPlugCache()
+            '2021-12-31 23:59:42',
+            $this->cache->getDateUpd()
         );
     }
 
-    public function testCacheIdIsAString()
+    public function testReturnCacheEntity()
     {
-        $this->assertTrue(
-            is_string($this->cache->getIdPayPlugCache())
+        $this->assertInstanceOf(
+            CacheEntity::class,
+            $this->cache->setDateUpd('1920-12-31 23:59:42')
         );
+    }
+
+    /**
+     * @group entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotAString()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->cache->setDateUpd(42);
+    }
+
+    /**
+     * @group entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotWellFormatted()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->cache->setDateUpd('1er Janvier 1970');
     }
 }

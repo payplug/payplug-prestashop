@@ -32,34 +32,22 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class SetDefinitionTest extends TestCase
+final class SetCacheKeyCacheTest extends TestCase
 {
     protected $cache;
-    protected $definition;
-    protected $definition_alt;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->definition = [
-            'key1' => 'value1',
-            'key2' => 'value2',
-            'key3' => 3,
-        ];
-        $this->definition_alt = [
-            'keyA' => 'valueA',
-            'keyB' => 'valueB',
-            'keyC' => 8,
-        ];
-        $this->cache->setDefinition($this->definition);
+        $this->cache->setCacheKey('test_key');
     }
 
-    public function testUpdateDefinition()
+    public function testUpdateCacheKey()
     {
-        $this->cache->setDefinition($this->definition_alt);
+        $this->cache->setCacheKey('another_key');
         $this->assertSame(
-            $this->definition_alt,
-            $this->cache->getDefinition()
+            'another_key',
+            $this->cache->getCacheKey()
         );
     }
 
@@ -67,7 +55,7 @@ final class SetDefinitionTest extends TestCase
     {
         $this->assertInstanceOf(
             CacheEntity::class,
-            $this->cache->setDefinition($this->definition_alt)
+            $this->cache->setCacheKey('another_key')
         );
     }
 
@@ -77,9 +65,9 @@ final class SetDefinitionTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAnArray()
+    public function testTrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->cache->setDefinition(42);
+        $this->cache->setCacheKey(42);
     }
 }
