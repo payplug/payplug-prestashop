@@ -1064,6 +1064,9 @@ class Payplug extends PaymentModule
     private function checkCurrency($cart)
     {
         $currency_order = new Currency((int)($cart->id_currency));
+        if ($currency_order->iso_code !== 'EUR') {
+            exit;
+        }
         $currencies_module = $this->getCurrency((int)$cart->id_currency);
         if (is_array($currencies_module)) {
             foreach ($currencies_module as $currency_module) {
