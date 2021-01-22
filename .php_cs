@@ -2,6 +2,7 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->exclude('test/')
+    ->exclude('tests/')
     ->exclude('translations/')
     //->exclude('src/')
     ->exclude('vendor/')
