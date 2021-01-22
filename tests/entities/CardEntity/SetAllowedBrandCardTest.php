@@ -70,4 +70,16 @@ final class SetAllowedBrandCardTest extends TestCase
             $this->card->setAllowedBrand($this->allowedBranbAlt)
         );
     }
+
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotAnArray()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->card->setAllowedBrand('wrong_parameter');
+    }
 }
