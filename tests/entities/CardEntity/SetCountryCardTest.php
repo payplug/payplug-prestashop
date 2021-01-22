@@ -58,4 +58,16 @@ final class SetCountryCardTest extends TestCase
             $this->card->setCountry('country_name')
         );
     }
+
+    /**
+     * @group entity_exception
+     * @group card_exception
+     * @group card_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotAnArray()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->card->setCountry(42);
+    }
 }
