@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class GetDateAddTest extends TestCase
 {
     protected $cache;
@@ -33,28 +38,28 @@ final class GetDateAddTest extends TestCase
     protected function setUp(): void
     {
         $this->cache = new CacheEntity();
-        $this->cache->setDateAdd('2020-12-31 23:59:42');
+        $this->cache->setDateAdd('2021-12-31 23:59:42');
     }
 
     public function testReturnDateAdd(): void
     {
         $this->assertSame(
-            '2020-12-31 23:59:42',
+            '2021-12-31 23:59:42',
             $this->cache->getDateAdd()
         );
     }
 
     public function testDateAddIsAString(): void
     {
-        $this->assertIsString(
-            $this->cache->getDateAdd()
+        $this->assertTrue(
+            is_string($this->cache->getDateAdd())
         );
     }
 
     public function testDateAddHaveAValidDatetimeFormat(): void
     {
-        $this->assertMatchesRegularExpression(
-            '/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/',
+        $this->assertRegExp(
+            '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
             $this->cache->getDateAdd()
         );
     }

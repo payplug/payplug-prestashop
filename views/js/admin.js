@@ -1,5 +1,5 @@
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -250,7 +250,6 @@ var $document, $window, payplug = {
                 success: function (result) {
                     $('.' + identifier).replaceWith(result.content);
                     payplug.tools.loader.hide($('.' + identifier));
-                    var {oney} = payplug;
                 }
             });
         },
@@ -264,6 +263,7 @@ var $document, $window, payplug = {
             var {show} = payplug,
                 {identifier} = show.props;
             $document.on('switchSelected', '.' + identifier + ' input', show.change)
+                .on('click', 'button[name="cancel_deactivate"]', show.cancel)
                 .on('click', 'button[name="confirm_deactivate"]', show.deactivate);
         },
         change: function (event) {
@@ -323,6 +323,18 @@ var $document, $window, payplug = {
                 }
             });
         },
+        cancel: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var {show, tools} = payplug,
+                {switcher} = tools,
+                showIdentifier = show.props.identifier,
+                switcherIdentifier = switcher.props.identifier,
+                $switcher = $('.'+showIdentifier).find('.'+switcherIdentifier);
+
+            switcher.left($switcher, true);
+        },
         deactivate: function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -374,7 +386,8 @@ var $document, $window, payplug = {
     login: {
         props: {
             identifier: 'payplugLogin',
-            query: null
+            query: null,
+            logged: false
         },
         init: function () {
             var {login} = payplug,
@@ -444,6 +457,7 @@ var $document, $window, payplug = {
                 success: function (result) {
                     if (typeof result.content != 'undefined' && result.content) {
                         $('form.payplug').replaceWith(result.content);
+                        login.props.logged = true;
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
                         payplug.tools.popup.error(result.error);
@@ -461,7 +475,7 @@ var $document, $window, payplug = {
                 data = {
                     _ajax: 1,
                     submitDisconnect: 1,
-                }
+                };
 
             if (login.props.query != null) {
                 login.props.query.abort();
@@ -490,6 +504,7 @@ var $document, $window, payplug = {
                 },
                 success: function (result) {
                     $('form.payplug').replaceWith(result.content);
+                    login.props.logged = false;
                 }
             });
         },
@@ -600,7 +615,7 @@ var $document, $window, payplug = {
             query: null,
         },
         init: function () {
-            var {settings} = payplug,
+            var {settings, login} = payplug,
                 {identifier} = settings.props;
             $document.on('switchSelected', '.' + identifier + ' input', settings.change);
             $window.on('load', settings.load);
@@ -609,7 +624,11 @@ var $document, $window, payplug = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {settings} = payplug;
+            var {settings, login} = payplug;
+
+            if (!login.props.logged) {
+                return false;
+            }
 
             if (settings.props.query != null) {
                 settings.props.query.abort();
@@ -997,7 +1016,7 @@ var $document, $window, payplug = {
                     $selected.trigger('switchSelected');
                 }
             },
-            left: function (target) {
+            left: function (target, withoutEvent) {
                 var {switcher} = payplug.tools,
                     {identifier} = switcher.props;
                 target.removeClass('-right');

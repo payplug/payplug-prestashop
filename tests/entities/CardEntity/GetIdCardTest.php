@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -26,6 +26,11 @@ declare(strict_types=1);
 use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group card
+ * @group card_entity
+ */
 final class GetIdCardTest extends TestCase
 {
     protected $card;
@@ -46,14 +51,14 @@ final class GetIdCardTest extends TestCase
 
     public function testIdCardIsAString(): void
     {
-        $this->assertIsString(
-            $this->card->getIdCard()
+        $this->assertTrue(
+            is_string($this->card->getIdCard())
         );
     }
 
     public function testIdCardHaveAValidFormat(): void
     {
-        $this->assertMatchesRegularExpression(
+        $this->assertRegExp(
             '/card_[a-z0-9]{32}/',
             $this->card->getIdCard()
         );

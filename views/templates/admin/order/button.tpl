@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,11 +15,19 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<input class="btn green-button button" type="submit" name="{$submitName|escape:'htmlall':'UTF-8'}" value="{$submitValue|escape:'htmlall':'UTF-8'}"{if isset($e2e_action) && $e2e_action} data-e2e-type="button" data-e2e-action="{$e2e_action|escape:'htmlall':'UTF-8'}"{/if} />
-<p class="hide ppaction pperror"></p>
-<p class="hide ppaction ppsuccess"></p>
-<img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
+<input class="btn green-button button{if isset($button_disable) && $button_disable} disabled{/if}"
+       type="submit"
+       name="{$submitName|escape:'htmlall':'UTF-8'}"
+       value="{$submitValue|escape:'htmlall':'UTF-8'}"
+       {if isset($e2e_action) && $e2e_action} data-e2e-type="button" data-e2e-action="{$e2e_action|escape:'htmlall':'UTF-8'}"{/if}
+       {if isset($button_disable) && $button_disable} disabled{/if} />
+
+{if !isset($button_disable) || !$button_disable}
+    <p class="hide ppaction pperror"></p>
+    <p class="hide ppaction ppsuccess"></p>
+    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
+{/if}

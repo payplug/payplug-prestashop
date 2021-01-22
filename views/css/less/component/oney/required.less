@@ -59,7 +59,7 @@
       background: none;
       border: none;
       text-align: center;
-      color: #colorMap[payplug];
+      color: #colorMap[oney];
       margin: 0 0 15px;
       cursor: pointer;
 
@@ -69,7 +69,7 @@
 
       &.-button {
         .borderRadius(2px);
-        background: #colorMap[payplug];
+        background: #colorMap[oney];
         width: auto;
         height: 32px;
         padding: 0 16px;
@@ -85,7 +85,7 @@
     &_title {
       display: block;
       padding: 8px 0 16px;
-      color: #colorMap[payplug];
+      color: #colorMap[oney];
       font-size: 14px;
       text-transform: uppercase;
     }
@@ -103,16 +103,17 @@
       flex-direction: column;
       width: 100%;
       position: relative;
-      max-width: 330px;
+      max-width: calc(~"50% - 30px");
       padding: 0 15px;
       margin: 0 0 15px;
 
       &.-same {
         margin: auto;
+        max-width: 100%;
       }
 
-      .oneyRequired_wrapper & {
-        max-width: calc(~"50% - 50px");
+      @media (@mobile) {
+        max-width: 100%;
       }
 
       .payplugPopin & {
@@ -203,7 +204,7 @@
 
     &_submit {
       .borderRadius(2px);
-      background: #colorMap[payplug];
+      background: #colorMap[oney];
       width: 200px;
       height: 50px;
       color: #fff;
@@ -252,12 +253,12 @@
         font-size: 15px;
 
         &:first-child {
-          color: #colorMap[payplug];
+          color: #colorMap[oney];
           font-size: 12px;
           margin: 0 0 15px;
 
           &:before {
-            .border(#colorMap[payplug], bl, 4px);
+            .border(#colorMap[oney], bl, 4px);
             .rotate(-45deg);
             display: block;
             width: 30px;

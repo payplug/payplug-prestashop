@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -34,7 +34,9 @@
             <div class="oneyOption_wrapper">
                 {include file="./options.tpl"}
             </div>
-            {$payplug_oney_required_field|escape:'htmlall':'UTF-8'}
+            {if isset($oney_required_fields)}
+                {include file="./../required.tpl" oney_required_fields=$oney_required_fields}
+            {/if}
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
             </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,25 +16,37 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
 declare(strict_types=1);
 
+use PayPlug\src\entities\CardEntity;
 use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group plugin
+ * @group plugin_entity
+ */
 final class GetApiVersionTest extends TestCase
 {
-    public function test_return_an_api_version(): void
+    protected $plugin;
+
+    protected function setUp(): void
     {
-        $plugin = new PluginEntity();
-        $plugin->setApiVersion('test_version');
+        $this->plugin = new PluginEntity();
+        $this->plugin->setApiVersion('test_version');
+    }
+
+    public function testReturnAnApiVersion(): void
+    {
         $this->assertSame(
             'test_version',
-            $plugin->getApiVersion()
+            $this->plugin->getApiVersion()
         );
     }
 }

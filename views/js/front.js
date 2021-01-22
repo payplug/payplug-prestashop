@@ -1,5 +1,5 @@
 /**
- * 2013 - 2019 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2019 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -82,8 +82,8 @@ var $document, $window, payplugModule = {
             query: null,
         },
         init: function () {
-            var {card} = payplugModule,
-                {identifier} = card.props;
+            var card = payplugModule.card,
+                identifier = card.props.identifier;
             $document.on('click', '.' + identifier + '_delete', payplugModule.card.delete);
         },
         delete: function (event) {
@@ -93,8 +93,8 @@ var $document, $window, payplugModule = {
             var $elem = $(this),
                 id_card = $elem.data('id_card'),
                 url = $(this).attr('href') + '&pc=' + id_card,
-                {card} = payplugModule,
-                {identifier} = card.props;
+                card = payplugModule.card,
+                identifier = card.props.identifier;
 
             $.ajax({
                 type: 'POST',
@@ -138,7 +138,7 @@ var $document, $window, payplugModule = {
             if (typeof payplug_oney == 'undefined' || !payplug_oney) {
                 return;
             }
-            var {oney} = payplugModule;
+            var oney = payplugModule.oney;
 
             this.cta.init();
             this.required.init();
@@ -147,11 +147,11 @@ var $document, $window, payplugModule = {
                 oney.load();
             });
 
-            var {popin} = oney.cta;
+            var popin = oney.cta.popin;
             prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
         },
         load: function (with_schedule) {
-            var {oney} = payplugModule,
+            var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
                 };
@@ -253,8 +253,9 @@ var $document, $window, payplugModule = {
                     loaded: false,
                 },
                 init: function () {
-                    var {cta} = payplugModule.oney,
-                        {popin} = cta;
+                    var oney = payplugModule.oney,
+                        cta = oney.cta,
+                        popin = cta.popin;
 
                     $document.on('click', '.' + popin.props.identifier + '_close', popin.hide)
                         .on('click', '.' + popin.props.identifier + '_navigation button', popin.select)
@@ -280,9 +281,11 @@ var $document, $window, payplugModule = {
                     if (typeof content == 'undefined' || !content) {
                         return false;
                     }
-                    var {oney} = payplugModule,
-                        {popin} = oney.cta,
-                        {identifier, open} = popin.props;
+
+                    var oney = payplugModule.oney,
+                        popin = oney.cta.popin,
+                        identifier = popin.props.identifier,
+                        open = popin.props.open;
 
                     $('.' + identifier).replaceWith(content).removeClass('-loading');
                     oney.props.loaded = true;
@@ -319,8 +322,7 @@ var $document, $window, payplugModule = {
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var popin = payplugModule.oney.cta.popin,
-                        identifier = popin.props.identifier;
+                    var popin = payplugModule.oney.cta.popin;
 
                     var is_open = $('-open').length > 0;
                     if (is_open) {
@@ -330,20 +332,20 @@ var $document, $window, payplugModule = {
                     }
                 },
                 check: function () {
-                    var {oney} = payplugModule,
-                        {popin} = oney.cta,
-                        {identifier, open} = popin.props;
+                    var oney = payplugModule.oney,
+                        popin = oney.cta.popin,
+                        open = popin.props.open;
 
-                    oney.props.loaded = $('.' + identifier).length > 0;
+                    oney.props.loaded = false;
 
                     if (open) {
                         popin.open();
                     }
                 },
                 open: function () {
-                    var {oney} = payplugModule,
-                        {cta} = oney,
-                        {popin} = cta;
+                    var oney = payplugModule.oney,
+                        cta = oney.cta,
+                        popin = cta.popin;
 
                     if (!oney.props.loaded) {
                         oney.load(true);
@@ -358,9 +360,9 @@ var $document, $window, payplugModule = {
                     }, 0);
                 },
                 close: function () {
-                    var {oney} = payplugModule,
-                        {cta} = oney,
-                        {popin} = cta;
+                    var oney = payplugModule.oney,
+                        cta = oney.cta,
+                        popin = cta.popin;
 
                     $('.' + popin.props.identifier).removeClass('-show');
                     $('.' + popin.props.identifier).removeClass('-open');

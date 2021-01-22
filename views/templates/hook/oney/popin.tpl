@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -35,20 +35,20 @@
         </ul>
 
         {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
-            <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
+        <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
 			    {include file="./payment/detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
-        {/foreach}
+    {/foreach}
 
         {*  Phrase 'Accept CGV' *}
         {if $tos_active && $tos_url}
-            <span class="oneyPopin_legal">
+        <span class="oneyPopin_legal">
                 {l s='By placing an order, you accept our ' mod='payplug'}
                 <a href="{$tos_url|escape:'htmlall':'UTF-8'}" target="_blank">
                     <u>{l s='TOS' mod='payplug'}</u>.
                 </a>
             </span>
-        {/if}
+    {/if}
 
         <span class="oneyPopin_legal">{$legal_notice|escape:'htmlall':'UTF-8'}</span>
     {else}

@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,13 +15,13 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
 <p>{l s='Payplug will no longer be displayed as a payment option to your customers.' mod='payplug'}</p>
 <div class="payplugPopup_footer">
-    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton -close" name="cancel_deactivate">{l s='Cancel' mod='payplug'}</button>
     <button type="button" class="payplugButton -green" name="confirm_deactivate">{l s='SAVE SETTINGS' mod='payplug'}</button>
 </div>

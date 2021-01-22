@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2019 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2019 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -41,6 +41,10 @@ class PPPaymentInstallment extends PPPayment
 
     public function retrieve($id)
     {
+        if (!$id) {
+            return false;
+        }
+
         try {
             $payment = \Payplug\InstallmentPlan::retrieve($id);
         } catch (\Payplug\Exception $e) {

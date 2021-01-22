@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -36,7 +36,7 @@
         <li data-e2e-state_code="{$payment.status_code|escape:'htmlall':'UTF-8'}">
             <span class="pp_col1">{l s='Status' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="status">
-                <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">{$payment.status|escape:'htmlall':'UTF-8'}</span>
+                <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">{$payment.status|escape:'htmlall':'UTF-8'}{if isset($payment.refunded) and ($payment.refunded gt 0) and (($payment.status_code eq 'refunded') or ($payment.status_code eq 'partially_refunded'))}: {displayPrice price=$payment.refunded}{/if}</span>
                 <span>{if isset($payment.status_message)}{$payment.status_message|escape:'htmlall':'UTF-8'}{/if}</span>
                 <span>{if isset($payment.error)} {$payment.error|escape:'htmlall':'UTF-8'}{/if}</span>
             </span>

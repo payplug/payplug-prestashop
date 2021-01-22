@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -34,6 +34,5 @@ function upgrade_module_2_24_1()
 
     require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
     require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.class.php');
-    truncateCSV(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
     return PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 0);
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -39,7 +39,6 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->contextSpecific = $this->plugin->getContext();
 
         include_once($this->module->getLocalPath() . 'payplug.php');
-        include_once($this->module->getLocalPath() . 'lib/init.php');
     }
 
     /**
@@ -80,7 +79,9 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             'payplug_delete_card_url' => $payplug_delete_card_url
         ]);
 
-        $card_deleted_msg = $this->payplug->displayPaymentErrors([$this->payplug->l('Card sucessfully deleted.')]);
+        $msg = $this->card->deleteCardMessage();
+        $card_deleted_msg = $this->payplug->displayMessages([$msg], true);
+
         Media::addJsDef(['card_deleted_msg' => $card_deleted_msg]);
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {

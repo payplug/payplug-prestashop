@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2020 PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -32,7 +32,14 @@ function upgrade_module_2_25_0()
         return true;
     }
 
-    truncateCSV(_PS_MODULE_DIR_ . 'payplug/log/*.csv');
+    // Blank every CSV file if we don't have permission to "rm *"
+    $csv_files = _PS_MODULE_DIR_ . 'payplug/log/*.csv';
+    foreach (glob($csv_files) as $path) {
+        $file = fopen($path, "w");
+        ftruncate($file, 0);
+        fclose($file);
+    }
+
     Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
     return true;
 }

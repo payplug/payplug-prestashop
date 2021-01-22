@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -58,10 +58,16 @@ class PrestashopSpecific17
 
             // load oney schedule on e page loading
             if ($payment_method == 'oney' && $payment_option['is_optimized']) {
-                $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
-                    $payment_option['amount'],
-                    $payment_option['iso_code']
-                );
+                try {
+                    $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
+                        $payment_option['amount'],
+                        $payment_option['iso_code']
+                    );
+                } catch (\Exception $e) {
+                    // todo: set a permanent log
+                    $payment_schedule = false;
+                }
+
                 if ($payment_schedule) {
                     $schedules = $this->payplug->oney->displayOneySchedule(
                         $payment_schedule[$payment_option['type']],

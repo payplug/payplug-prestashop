@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,24 +16,26 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
 namespace PayPlug\src\repositories;
 
+use Payplug\Exception\ConfigurationNotSetException;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
 
-class CardRepository
+class CardRepository extends Repository
 {
     private $cardEntity;
     private $configurationSpecific;
-    private $payplug;
     private $query;
     private $toolsSpecific;
+
+    protected $payplug;
 
     public function __construct($payplug)
     {
@@ -110,6 +112,7 @@ class CardRepository
      * @param int $id_payplug_card
      * @param string $api_key
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function deleteCard($id_customer, $id_payplug_card, $api_key)
     {
@@ -117,38 +120,19 @@ class CardRepository
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
-        $url = (new \Payplug())->getPlugin()->getApiUrl() . '/v1/cards/' . $id_card;
 
-        $curl_version = curl_version();
+        $response = \Payplug\Card::delete($id_card);
+        $json_answer = $response['httpResponse'];
 
-        $process = curl_init($url);
-        curl_setopt($process, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $api_key]);
-        curl_setopt($process, CURLOPT_CUSTOMREQUEST, 'DELETE');
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($process, CURLINFO_HEADER_OUT, true);
-        // CURL const are in uppercase
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, true);
-        # >= 7.26 to 7.28.1 add a notice message for value 1 will be remove
-        curl_setopt(
-            $process,
-            CURLOPT_SSL_VERIFYHOST,
-            (version_compare($curl_version['version'], '7.21', '<') ? true : 2)
-        );
-        curl_setopt($process, CURLOPT_CAINFO, realpath(dirname(__FILE__) . '/cacert.pem'));
-        $error_curl = curl_errno($process);
-
-        curl_close($process);
-
-        // if no error
-        if ($error_curl == 0) {
+        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+            return false;
+        } else {
             $this->query
                 ->delete()
                 ->from(_DB_PREFIX_.$this->cardEntity->getTable())
                 ->where(_DB_PREFIX_.$this->cardEntity->getTable().'.id_card = \'' . pSQL($id_card) . '\'')
                 ->build()
-                ;
-        } else {
-            return false;
+            ;
         }
 
         return true;
@@ -191,7 +175,6 @@ class CardRepository
      * Delete all cards for a given customer
      *
      * @param int $id_customer
-     * @param string $api_key
      * @return bool
      */
     public function deleteCards($id_customer)
@@ -284,7 +267,7 @@ class CardRepository
         if ($payment->card->brand != '') {
             $brand = $payment->card->brand;
         } else {
-            $brand = $this->payplug->l('Unavailable');
+            $brand = $this->l('Unavailable');
         }
         return $brand;
     }
@@ -292,6 +275,7 @@ class CardRepository
     /**
      * @param $payment
      * @return Exception|false|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardExpiryDateByPayment($payment)
     {
@@ -304,7 +288,7 @@ class CardRepository
         }
 
         if ($payment->card->exp_month === null) {
-            $card_expiry_date = $this->payplug->l('Unavailable');
+            $card_expiry_date = $this->l('Unavailable');
         } else {
             $card_expiry_date = date(
                 'm/y',
@@ -317,6 +301,7 @@ class CardRepository
     /**
      * @param $payment
      * @return Exception|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardMaskByPayment($payment)
     {
@@ -331,7 +316,7 @@ class CardRepository
         if ($payment->card->last4 != '') {
             $card_mask = '**** **** **** ' . $payment->card->last4;
         } else {
-            $card_mask = $this->payplug->l('Unavailable');
+            $card_mask = $this->l('Unavailable');
         }
         return $card_mask;
     }
@@ -401,7 +386,9 @@ class CardRepository
 
     /**
      * ## From classes/__PayPlugCard.php ##
+     * @param $idPayplugCard
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function delete($idPayplugCard)
     {
@@ -423,7 +410,7 @@ class CardRepository
             // Delete from API
             \Payplug\Card::delete($idCard);
 
-            // Delete from out DB
+            // Delete from our DB
             $this->query
                 ->delete()
                 ->from(_DB_PREFIX_.$table)
@@ -535,5 +522,14 @@ class CardRepository
             unset($card['id_card']);
         }
         return $cards;
+    }
+
+    /**
+     * @description Return successflull deleted card, called in front/cards.php
+     * @return mixed
+     */
+    public function deleteCardMessage()
+    {
+        return $this->l('Card sucessfully deleted.');
     }
 }

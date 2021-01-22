@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -27,6 +27,11 @@ use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class SetCacheValueTest extends TestCase
 {
     protected $cache;
@@ -54,6 +59,12 @@ final class SetCacheValueTest extends TestCase
         );
     }
 
+    /**
+     * @group entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
+     * @group exception
+     */
     public function testThrowExceptionWhenNotAString(): void
     {
         $this->expectException(BadParameterException::class);

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -29,6 +29,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
  */
 class PayPlugNotifications
 {
+    private $can_save_card = true;
     public $resource;
     public $flag;
     public $except;
@@ -148,6 +149,7 @@ class PayPlugNotifications
         if ($this->resource->installment_plan_id) {
             $this->logger->addLog('Installment ID: ' . $this->resource->installment_plan_id);
             $this->is_installment = true;
+            $this->can_save_card = false;
         }
 
         $this->logger->addLog('PAYMENT MODE');
@@ -183,10 +185,12 @@ class PayPlugNotifications
 
         $this->setOrderStates();
 
-        if (((isset($this->payment->save_card) && (int)$this->payment->save_card == 1))
-            ||
-            ((isset($this->payment->card->id) && $this->payment->card->id != '')
-                && ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment != ''))
+        if (($this->can_save_card)
+            &&
+            (((isset($this->payment->save_card) && (int)$this->payment->save_card == 1))
+                ||
+                ((isset($this->payment->card->id) && !empty($this->payment->card->id))
+                    && ((isset($this->payment->hosted_payment)) && !empty($this->payment->hosted_payment))))
         ) {
             $this->logger->addLog('[Save Card] Saving card...');
             $res_payplug_card = $this->plugin->getCard()->saveCard($this->payment);
@@ -217,6 +221,8 @@ class PayPlugNotifications
                 if ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment == '') {
                     $this->logger->addLog('[Save Card] $this->payment->hosted_payment is set but empty', 'debug');
                 }
+            } else {
+                $this->logger->addLog('[Save Card] Card saved', 'debug');
             }
         }
 
@@ -302,7 +308,6 @@ class PayPlugNotifications
         $this->setContextFromCartID($this->cart->id);
 
         // Set lock in db then set $this->lock_key
-        $cart_lock = false;
         do {
             $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
@@ -478,7 +483,7 @@ class PayPlugNotifications
                 }
             } elseif ($order_payments) {
                 foreach ($order_payments as $payment) {
-                    if ($payment['transaction_id'] == $this->payment->id) {
+                    if ($payment->transaction_id == $this->payment->id) {
                         $related = true;
                     }
                 }
@@ -778,7 +783,7 @@ class PayPlugNotifications
             $data['metadata']['Order'] = $order->id;
             try {
                 $this->logger->addLog('Payment patched.', 'debug');
-                $this->payplug->patchPayment($this->api_key, $this->payment->id, $data);
+                $this->payplug->patchPayment($this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
                     'Payment cannot be patched: ' . $exception->getMessage(),
@@ -881,8 +886,29 @@ class PayPlugNotifications
         $is_totaly_refunded = $this->payment->is_refunded;
         if ($is_totaly_refunded) {
             $this->logger->addLog('TOTAL REFUND MODE');
+            $cart_id = '';
 
-            $cart_id = (int)$meta['Cart'];
+            if (isset($meta['Cart'])) {
+                $cart_id = (int)$meta['Cart'];
+                $this->logger->addLog('Cart ID : ' . $cart_id);
+            } elseif (isset($meta['ID Cart'])) {
+                $cart_id = (int)$meta['ID Cart'];
+                $this->logger->addLog('Cart ID : ' . $cart_id);
+                $this->cart = new Cart($cart_id);
+
+                if (!Validate::isLoadedObject($this->cart)) {
+                    $this->logger->addLog('Cart cannot be loaded.', 'error');
+                    $this->logger->addLog('$cart_id : '.$cart_id, 'debug');
+                    $this->exitProcess('Cart cannot be loaded.', 500);
+                }
+            } else {
+                $this->logger->addLog(
+                    'Can\'t be refunded, because there is an error during retrieving Cart ID.',
+                    'error'
+                );
+                $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
+            }
+
             $id_order = (int)Order::getOrderByCartId($cart_id);
             $order = new Order($id_order);
             $this->logger->addLog('Order ID : ' . $id_order);
@@ -891,16 +917,29 @@ class PayPlugNotifications
                 $this->exitProcess('Order cannot be loaded.', 500);
             }
 
+            // Set lock Lock the process with id_cart from order object
+            do {
+                $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+                if (!$cart_lock) {
+                    PayplugLock::check($this->cart->id);
+                } else {
+                    $this->logger->addLog('Lock created');
+                    $this->lock_key = $this->cart->id;
+                }
+            } while (!$cart_lock);
+
             $new_order_state = $this->order_states['refund'];
-            $current_state = $order->getCurrentState();
+            $current_state = $this->payplug->getCurrentOrderState($order->id);
+            $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
-                $this->logger->addLog('Changing status to \'refunded\'');
+                $this->logger->addLog('Changing status to \'refunded\': ' . $new_order_state);
                 $order_history = new OrderHistory();
                 $order_history->id_order = $id_order;
                 try {
                     $order_history->changeIdOrderState((int)$new_order_state, $id_order);
                     $order_history->save();
+                    $this->exitProcess('Order state has been updated.');
                 } catch (Exception $exception) {
                     $this->logger->addLog(
                         'Order history cannot be saved: ' . $exception->getMessage(),
@@ -918,6 +957,7 @@ class PayPlugNotifications
             }
         } else {
             $this->logger->addLog('PARTIAL REFUND');
+            $this->exitProcess('PARTIAL REFUND');
         }
     }
 

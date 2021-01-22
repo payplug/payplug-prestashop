@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2020 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2020 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -106,8 +106,8 @@ class PayPlugValidation
         // Create lock
         $cart_lock = false;
         $datetime1 = date_create(date('Y-m-d H:i:s'));
+        $this->logger->addLog('Check lock');
         do {
-            $this->logger->addLog('Check if lock exist');
             $cart_lock = PayplugLock::check($cart->id);
             if (!$cart_lock) {
                 $datetime2 = date_create(date('Y-m-d H:i:s'));
@@ -221,15 +221,18 @@ class PayPlugValidation
                     }
                 }
 
-                if ($payment->authorization !== null && !$this->isOney) {
-                    $this->isDeferred = true;
-                }
+                $is_authorized = false;
 
-                $is_authorized = count($payment->authorization) > 0;
+                if (($payment->authorization !== null) && isset($payment->authorization->authorized_amount)) {
+                    $is_authorized = true;
+                    if (!$this->isOney) {
+                        $this->isDeferred = true;
+                    }
+                }
 
                 $amount = $payment->amount;
             } catch (Exception $e) {
-                $this->logger->addLog('Payment cannot be retrieved.', 'error');
+                $this->logger->addLog('Payment cannot be retrieved. Exception : '.$e->getMessage(), 'error');
                 if (!PayplugLock::deleteLockG2($cart->id)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
@@ -275,6 +278,8 @@ class PayPlugValidation
                     if ((isset($payment->hosted_payment)) && $payment->hosted_payment == '') {
                         $this->logger->addLog('[Save Card] $payment->hosted_payment is set but empty', 'debug');
                     }
+                } else {
+                    $this->logger->addLog('[Save Card] Card saved', 'debug');
                 }
             }
         }
@@ -461,7 +466,7 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-                $this->payplug->patchPayment($this->payplug->current_api_key, $payment->id, $data);
+                $this->payplug->patchPayment($payment->id, $data);
 
                 if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');
