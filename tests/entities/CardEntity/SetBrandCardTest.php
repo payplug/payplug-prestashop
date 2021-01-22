@@ -58,6 +58,7 @@ final class SetBrandCardTest extends TestCase
             $this->card->setBrand('brand_name')
         );
     }
+
     /**
      * @group entity_exception
      * @group card_exception
