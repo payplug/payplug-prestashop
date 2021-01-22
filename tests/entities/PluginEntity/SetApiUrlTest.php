@@ -32,22 +32,22 @@ use PHPUnit\Framework\TestCase;
  * @group plugin
  * @group plugin_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetApiUrlTest extends TestCase
 {
     protected $plugin;
 
     protected function setUp()
     {
         $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->plugin->setApiUrl('https://api-qa.payplug.com');
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateApiUrl()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->plugin->setApiUrl('https://api.payplug.com');
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            'https://api.payplug.com',
+            $this->plugin->getApiUrl()
         );
     }
 
@@ -55,7 +55,7 @@ final class SetApiVersionTest extends TestCase
     {
         $this->assertInstanceOf(
             PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            $this->plugin->setApiUrl('https://api.payplug.com')
         );
     }
 
@@ -68,7 +68,7 @@ final class SetApiVersionTest extends TestCase
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
+        $this->plugin->setApiUrl(42);
     }
 
     /**
@@ -80,6 +80,6 @@ final class SetApiVersionTest extends TestCase
     public function testThrowExceptionWhenNotWellFormatted()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->plugin->setApiUrl('api.payplug.com');
     }
 }
