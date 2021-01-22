@@ -65,7 +65,7 @@ final class SetBrandCardTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAnArray()
+    public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
         $this->card->setBrand(42);
