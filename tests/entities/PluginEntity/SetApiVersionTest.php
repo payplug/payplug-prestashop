@@ -31,9 +31,9 @@ final class SetApiVersionTest extends TestCase
     public function test_update_the_api_version()
     {
         $plugin = new PluginEntity();
-        $plugin->setApiVersion('test_version');
+        $plugin->setApiVersion('2021-01-01');
         $this->assertSame(
-            'test_version',
+            '2021-01-01',
             $plugin->getApiVersion()
         );
     }
