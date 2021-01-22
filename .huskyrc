@@ -3,3 +3,4 @@
     "pre-commit": "php vendor/bin/php-cs-fixer fix -vvv  && vendor/phpunit/phpunit/phpunit tests -v"
   }
 }
+
