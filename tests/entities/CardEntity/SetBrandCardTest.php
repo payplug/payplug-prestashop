@@ -67,6 +67,6 @@ final class SetBrandCardTest extends TestCase
     public function testThrowExceptionWhenNotAnArray()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setAllowedBrand(42);
+        $this->card->setBrand(42);
     }
 }
