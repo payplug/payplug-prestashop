@@ -31,28 +31,28 @@ use PHPUnit\Framework\TestCase;
  * @group logger
  * @group logger_entity
  */
-final class GetLimitDateLoggerTest extends TestCase
+final class GetProcessLoggerTest extends TestCase
 {
     protected $logger;
 
     protected function setUp()
     {
         $this->logger = new LoggerEntity();
-        $this->logger->setLimitDate('limit_date');
+        $this->logger->setProcess('process');
     }
 
-    public function testReturntLimitDate()
+    public function testReturnProcess()
     {
         $this->assertSame(
-            'limit_date',
-            $this->logger->getLimitDate()
+            'process',
+            $this->logger->getProcess()
         );
     }
 
-    public function testtLimitDateIsAnInt()
+    public function testProcessIsAString()
     {
         $this->assertTrue(
-            is_string($this->logger->getLimitDate())
+            is_string($this->logger->getProcess())
         );
     }
 }
