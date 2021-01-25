@@ -416,29 +416,6 @@ button.payplugLink:hover {
   display: none;
   color: #e56876;
 }
-.payplugOneyTOS {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-}
-p.payplugOneyTOS_text {
-  margin: 0 8px 0 0;
-  line-height: 31px;
-}
-.payplugOneyTOS_input {
-  margin: initial;
-  display: inline-block;
-  width: 250px;
-}
-.payplugOneyTOS_error {
-  width: 100%;
-  display: none;
-  color: #dd2525;
-  padding: 0 0 0 10px;
-}
-.payplugOneyTOS_error.-show {
-  display: block;
-}
 /* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
