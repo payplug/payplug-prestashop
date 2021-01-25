@@ -2253,12 +2253,15 @@ class Payplug extends PaymentModule
      * @param int $cart_id
      * @return int OR bool
      */
-    public function getPaymentByCart($cart_id)
+    public function getPaymentByCart($cart_id, $hash = null)
     {
         $req_payment_cart = new DbQuery();
         $req_payment_cart->select('ppc.id_payment');
         $req_payment_cart->from('payplug_payment_cart', 'ppc');
         $req_payment_cart->where('ppc.id_cart = ' . (int)$cart_id);
+        if ($hash != null) {
+            $req_payment_cart->where('ppc.cart_hash = \'' . pSQL($hash) . '\'');
+        }
         $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
 
         if (!$res_payment_cart) {
@@ -4719,6 +4722,55 @@ class Payplug extends PaymentModule
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
+        //Hash Control
+        $hash = hash('sha256', json_encode($cart));
+        $req_payment_cart_exists = new DbQuery();
+        $req_payment_cart_exists->select('*');
+        $req_payment_cart_exists->from('payplug_payment_cart', 'ppc');
+        $req_payment_cart_exists->where('ppc.id_cart = ' . (int)$cart->id);
+        $res_payment_cart_exists = Db::getInstance()->getRow($req_payment_cart_exists);
+        if ($res_payment_cart_exists['cart_hash'] === $hash) {
+            $payment = \Payplug\Payment::retrieve($res_payment_cart_exists['id_payment']);
+            if ($payment->failure === null) {
+                $this->storePayment($payment->id, (int)$cart->id);
+                switch ($payment_method) {
+                    case 'oneclick':
+                        $redirect = $payment->is_paid;
+                        if (!$redirect && $options['is_deferred']) {
+                            $redirect = (bool)$payment->authorization->authorized_at;
+                        }
+                        $payment_return = [
+                            'result' => true,
+                            'embedded' => true,
+                            'redirect' => $redirect, // force `true` we are in 3DS 1
+                            'return_url' => $redirect ?
+                                $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
+                        ];
+                        break;
+                    case 'oney':
+                        $payment_return = [
+                            'result' => 'new_card',
+                            'embedded' => false,
+                            'redirect' => true,
+                            'return_url' => $payment->hosted_payment->payment_url,
+                        ];
+                        break;
+                    case 'standard':
+                    case 'installment':
+                    default:
+                        $payment_return = [
+                            'result' => 'new_card',
+                            'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
+                            'redirect' => $this->isMobiledevice(),
+                            'return_url' => $payment->hosted_payment->payment_url,
+                        ];
+                        break;
+                }
+                return $payment_return;
+            }
+        }
+        //End Hash Control
+
         // Create payment
         try {
             if ($options['is_installment']) {
@@ -4746,7 +4798,7 @@ class Payplug extends PaymentModule
                         'response' => $payment->failure->message,
                     ];
                 }
-                $this->storePayment($payment->id, (int)$cart->id);
+                $this->storePayment($payment->id, (int)$cart->id, true);
             }
         } catch (Exception $e) {
             $messages = $this->catchErrorsFromApi($e->__toString());
@@ -4761,7 +4813,6 @@ class Payplug extends PaymentModule
                 'response' => count($messages) > 1 ? $messages : reset($messages),
             ];
         }
-
         switch ($payment_method) {
             case 'oneclick':
                 $redirect = $payment->is_paid;
@@ -5417,7 +5468,7 @@ class Payplug extends PaymentModule
      * @param int $id_cart
      * @return bool
      */
-    private function storePayment($pay_id, $id_cart)
+    private function storePayment($pay_id, $id_cart, $force = false)
     {
         $cart = new Cart($id_cart);
         $hash = hash('sha256', json_encode($cart));
@@ -5436,12 +5487,12 @@ class Payplug extends PaymentModule
             //insert
             $req_payment_cart = '
                 INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment_cart (id_payment, id_cart, cart_hash) 
-                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$id_cart . ', ' . pSQL($hash) . ')';
+                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$id_cart . ', \'' . pSQL($hash) . '\')';
             $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
             if (!$res_payment_cart) {
                 return false;
             }
-        } elseif ($res_payment_cart_exists['cart_hash'] != $hash) {
+        } elseif ($res_payment_cart_exists['cart_hash'] != $hash || $force) {
             //update
             $req_payment_cart = '
                 UPDATE ' . _DB_PREFIX_ . 'payplug_payment_cart ppc  

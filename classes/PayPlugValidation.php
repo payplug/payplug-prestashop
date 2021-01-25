@@ -92,7 +92,6 @@ class PayPlugValidation
         $this->logger->addLog('Cart ID : ' . (int)$cart_id);
 
         $cart = new Cart((int)$cart_id);
-
         // Check if valid cart
         if (!Validate::isLoadedObject($cart)) {
             $this->logger->addLog('Cart cannot be loaded.', 'error');
@@ -127,8 +126,9 @@ class PayPlugValidation
             }
         } while (!$cart_lock);
 
+        $hash = hash('sha256', json_encode($cart));
         $amount = 0;
-        if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
+        if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id, $hash)) {
             if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Payment is not stored or is already consumed.');
                 $id_order = Order::getOrderByCartId($cart->id);
