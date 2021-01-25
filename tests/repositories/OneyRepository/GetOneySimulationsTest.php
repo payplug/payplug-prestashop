@@ -22,17 +22,23 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use Payplug\Exception\HttpException;
+use PayPlug\src\repositories\CacheRepository;
+use PayPlug\tests\mock\MockHelper;
+use PayPlug\src\repositories\LoggerRepository;
 use PayPlug\tests\mock\OneySimulationsMock;
+use PayPlug\src\repositories\OneyRepository;
 use PHPUnit\Framework\TestCase;
+use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
- * @group repository
- * @group oney
- * @group oney_repository
+ * @group test
  */
 final class GetOneySimulationsTest extends TestCase
 {
-    protected $cacheId;
+    use MockeryPHPUnitIntegration;
+
+    protected $cacheMock;
     protected $amount;
     protected $isoCode;
     protected $operations;
@@ -40,128 +46,56 @@ final class GetOneySimulationsTest extends TestCase
 
     public function setUp()
     {
-        $this->amount = 20678;
-        $this->isoCode = 'FR';
-        $this->operations = ['x3_with_fees', 'x4_with_fees'];
-        $this->cacheId = 'Payplug::OneySimulations_' .
-            (int)$this->amount . '_' .
-            (string)$this->isoCode . '_' .
-            (string)implode('_', $this->operations) . '_' .
-            'live';
-        $this->data = [
-            'amount' => $this->amount,
-            'country' => $this->isoCode,
-            'operations' => $this->operations,
-        ];
-    }
+        $this->cacheMock = MockHelper::createMockFactory(
+            'Payplug\src\repositories\CacheRepository',
+            'CacheRepository'
+        )
+            ->shouldReceive('setCache')
+            ->andReturn(true);
 
-    public function testAmount()
-    {
-        $this->assertSame(
-            20678,
-            $this->amount
+        $this->confSpecificMock = MockHelper::createMockFactory(
+            'Payplug\src\specific\ConfigurationSpecific',
+            'ConfigurationSpecific'
+        )
+            ->shouldReceive('get')
+            ->with('PAYPLUG_SANDBOX_MODE')
+            ->andReturn(false);
+
+        $this->myLogPhpMock = MockHelper::createMockFactory(
+            'Payplug\classes\MyLogPHP',
+            'MyLogPHP'
         );
+
+        $this->loggerMock = MockHelper::createMockFactory(
+            'PayPlug\src\repositories\LoggerRepository',
+            'LoggerRepository'
+        )
+            ->shouldReceive('setParams')
+            ->andReturn(true);
+
     }
 
-    public function testAmountIsInt()
+    public function testGetOneySimulationsWithoutCacheValid()
     {
-        $this->assertTrue(
-            is_int($this->amount)
-        );
-    }
+        $operation = 'x3_with_fees';
 
-    public function testIsoCode()
-    {
-        $this->assertSame(
-            'FR',
-            $this->isoCode
-        );
-    }
+        // Get a array of oney simulation fake values
+        $simulationsCallBack = OneySimulationsMock::getOneySimulations()[$operation];
 
-    public function testIsoCodeIsAString()
-    {
-        $this->assertTrue(
-            is_string($this->isoCode)
-        );
-    }
+        // 1 - Mock getCacheByKey in order to NOT use cache
 
-    public function testOperations()
-    {
-        $this->assertSame(
-            ['x3_with_fees', 'x4_with_fees'],
-            $this->operations
-        );
-    }
+        // 2 - Mock payplug-php getSimulations callback with a valid result
 
-    public function testOperationsIsAnArray()
-    {
-        $this->assertTrue(
-            is_array($this->operations)
-        );
-    }
+        // 3 - Initiate OneyRepository class
+        $oney_repo = new OneyRepository('');
 
-    public function testCacheId()
-    {
-        $this->assertSame(
-            'Payplug::OneySimulations_20678_FR_x3_with_fees_x4_with_fees_live',
-            $this->cacheId
-        );
-    }
-
-    public function testCacheIdIsAString()
-    {
-        $this->assertTrue(
-            is_string($this->cacheId)
-        );
-    }
-
-    public function testCacheIdHasValidatedFormat()
-    {
-        $this->assertRegExp(
-            '/Payplug::OneySimulations_\d{5,6}_[A-Z]{2}_(x\d{1}_with_fees|x\d{1}_with_fees_x\d{1}_with_fees)_live/',
-            $this->cacheId
-        );
-    }
-
-    public function testDataIsAnArray()
-    {
-        $this->assertTrue(
-            is_array($this->data)
-        );
-    }
-
-    public function testSimulationsIsAnArray()
-    {
-        $simulations = OneySimulationsMock::getOneySimulations();
-        $this->assertTrue(
-            is_array($simulations)
-        );
-    }
-
-    public function testSimulationsCountEqualsToOperationsCount()
-    {
-        $simulations = OneySimulationsMock::getOneySimulations();
+        // Check assert
         $this->assertEquals(
-            count($simulations),
-            count($this->operations)
-        );
-    }
-
-    public function testSimulationsIsNotAvailable()
-    {
-        $simulations = OneySimulationsMock::getOneySimulationsNotAvailable();
-        $this->assertSame(
-            'Access to this feature is not available.',
-            $simulations['details']
-        );
-    }
-
-    public function testSimulationsIsError()
-    {
-        $simulations = OneySimulationsMock::getOneySimulationsIsError();
-        $this->assertSame(
-            'error',
-            $simulations['object']
+            $oney_repo->getOneySimulations(500, 'FR', [$operation]),
+             [
+                'result' => true,
+                'simulations' => $simulationsCallBack
+             ]
         );
     }
 }

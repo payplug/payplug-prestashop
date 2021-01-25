@@ -37,6 +37,14 @@ class LoggerRepository extends Repository
         $this->setStdParams();
     }
 
+    public static function loggerRepositoryFactory() {
+        return new LoggerRepository();
+    }
+
+    public static function getPriceInCentsFromProduct($id_product) {
+        return 12;
+    }
+
     /**
      * @description Hydrate standard entities
      */

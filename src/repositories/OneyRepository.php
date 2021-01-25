@@ -54,13 +54,13 @@ class OneyRepository extends Repository
     {
         $this->payplug = $payplug;
         $this->addressSpecific = new AddressSpecific();
-        $this->cache = new CacheRepository();
-        $this->configurationSpecific = new ConfigurationSpecific();
+        $this->cache = CacheRepository::cacheRepositoryFactory();
+        $this->configurationSpecific = ConfigurationSpecific::configurationSpecificFactory();
         $this->countrySpecific = new CountrySpecific();
-        $this->logger = new LoggerRepository();
-        $this->toolsSpecific = new ToolsSpecific();
+        $this->logger = LoggerRepository::loggerRepositoryFactory();
+        $this->toolsSpecific = ToolsSpecific::toolsSpecificFactory();
         $this->validateSpecific = new ValidateSpecific();
-        $this->log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
+        $this->log = \Payplug\classes\MyLogPHP::myLogPHPFactory('payplug/log/install-log.csv');
         $this->contextSpecific = new ContextSpecific();
     }
 
@@ -912,6 +912,7 @@ class OneyRepository extends Repository
         $cache_from_bdd = $this->cache->getCacheByKey($cache_id);
 
         if ($cache_from_bdd) {
+            //var_dump(json_decode($cache_from_bdd[0]['cache_value']));
             return $tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
         }
 
@@ -955,7 +956,7 @@ class OneyRepository extends Repository
                 'result' => true,
                 'simulations' => $simulations
             ];
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             return [
                 'result' => false,
                 'error' => $exception->__toString()
