@@ -40,7 +40,6 @@ final class GetApiUrlTest extends TestCase
     {
         $this->plugin = new PluginEntity();
         $this->plugin->setApiUrl('https://api-qa.payplug.com');
-        $test = array();
     }
 
     public function testReturnAnApiUrl()
