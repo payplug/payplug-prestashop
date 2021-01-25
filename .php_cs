@@ -3,9 +3,7 @@
 $finder = PhpCsFixer\Finder::create()
     ->exclude('test/')
     ->exclude('translations/')
-    //->exclude('src/')
     ->exclude('vendor/')
-    //->notPath('payplug.php')
     ->in(__DIR__)
 ;
 
