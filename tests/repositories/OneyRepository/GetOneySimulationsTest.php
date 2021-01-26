@@ -22,146 +22,28 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use Payplug\Exception\HttpException;
+use PayPlug\src\repositories\CacheRepository;
+use PayPlug\tests\mock\MockHelper;
+use PayPlug\src\repositories\LoggerRepository;
 use PayPlug\tests\mock\OneySimulationsMock;
+use PayPlug\src\repositories\OneyRepository;
 use PHPUnit\Framework\TestCase;
+use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
- * @group repository
- * @group oney
- * @group oney_repository
+ * @group test
  */
 final class GetOneySimulationsTest extends TestCase
 {
-    protected $cacheId;
-    protected $amount;
-    protected $isoCode;
-    protected $operations;
-    protected $data;
+    use MockeryPHPUnitIntegration;
 
-    public function setUp()
-    {
-        $this->amount = 20678;
-        $this->isoCode = 'FR';
-        $this->operations = ['x3_with_fees', 'x4_with_fees'];
-        $this->cacheId = 'Payplug::OneySimulations_' .
-            (int)$this->amount . '_' .
-            (string)$this->isoCode . '_' .
-            (string)implode('_', $this->operations) . '_' .
-            'live';
-        $this->data = [
-            'amount' => $this->amount,
-            'country' => $this->isoCode,
-            'operations' => $this->operations,
-        ];
-    }
+    public function testOneyRepositoryWorks() {
+        $cacheMock = Mockery::mock('alias:PayPlug\src\repositories\CacheRepository');
+        $cacheMock
+            ->shouldReceive('cacheRepositoryFactory')
+            ->andReturn($cacheMock);
 
-    public function testAmount()
-    {
-        $this->assertSame(
-            20678,
-            $this->amount
-        );
-    }
-
-    public function testAmountIsInt()
-    {
-        $this->assertTrue(
-            is_int($this->amount)
-        );
-    }
-
-    public function testIsoCode()
-    {
-        $this->assertSame(
-            'FR',
-            $this->isoCode
-        );
-    }
-
-    public function testIsoCodeIsAString()
-    {
-        $this->assertTrue(
-            is_string($this->isoCode)
-        );
-    }
-
-    public function testOperations()
-    {
-        $this->assertSame(
-            ['x3_with_fees', 'x4_with_fees'],
-            $this->operations
-        );
-    }
-
-    public function testOperationsIsAnArray()
-    {
-        $this->assertTrue(
-            is_array($this->operations)
-        );
-    }
-
-    public function testCacheId()
-    {
-        $this->assertSame(
-            'Payplug::OneySimulations_20678_FR_x3_with_fees_x4_with_fees_live',
-            $this->cacheId
-        );
-    }
-
-    public function testCacheIdIsAString()
-    {
-        $this->assertTrue(
-            is_string($this->cacheId)
-        );
-    }
-
-    public function testCacheIdHasValidatedFormat()
-    {
-        $this->assertRegExp(
-            '/Payplug::OneySimulations_\d{5,6}_[A-Z]{2}_(x\d{1}_with_fees|x\d{1}_with_fees_x\d{1}_with_fees)_live/',
-            $this->cacheId
-        );
-    }
-
-    public function testDataIsAnArray()
-    {
-        $this->assertTrue(
-            is_array($this->data)
-        );
-    }
-
-    public function testSimulationsIsAnArray()
-    {
-        $simulations = OneySimulationsMock::getOneySimulations();
-        $this->assertTrue(
-            is_array($simulations)
-        );
-    }
-
-    public function testSimulationsCountEqualsToOperationsCount()
-    {
-        $simulations = OneySimulationsMock::getOneySimulations();
-        $this->assertEquals(
-            count($simulations),
-            count($this->operations)
-        );
-    }
-
-    public function testSimulationsIsNotAvailable()
-    {
-        $simulations = OneySimulationsMock::getOneySimulationsNotAvailable();
-        $this->assertSame(
-            'Access to this feature is not available.',
-            $simulations['details']
-        );
-    }
-
-    public function testSimulationsIsError()
-    {
-        $simulations = OneySimulationsMock::getOneySimulationsIsError();
-        $this->assertSame(
-            'error',
-            $simulations['object']
-        );
+        new OneyRepository('');
     }
 }
