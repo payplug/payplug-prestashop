@@ -294,7 +294,7 @@ class CardEntity
     public function setAllowedBrand($allowed_brand)
     {
         if (!is_array($allowed_brand)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid allowed brand, param $allowed_brand must be an array'));
         } else {
             $this->allowed_brand = $allowed_brand;
             return $this;
