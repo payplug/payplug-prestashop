@@ -299,9 +299,9 @@ class PluginEntity
     {
         if (!is_object($product)) {
             throw (
-            new BadParameterException(
-                'Invalid Product object, param $card must be a ProductSpecific'
-            )
+                new BadParameterException(
+                    'Invalid Product object, param $card must be a ProductSpecific'
+                )
             );
         } else {
             $this->product = $product;

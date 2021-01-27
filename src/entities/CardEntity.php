@@ -206,7 +206,7 @@ class CardEntity
     public function setLast4($last4)
     {
         if (!is_string($last4)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid last4, param $last4 must be a string'));
         } else {
             $this->last4 = $last4;
             return $this;
@@ -274,7 +274,7 @@ class CardEntity
         if (!is_string($brand)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->brand= $brand;
+            $this->brand = $brand;
             return $this;
         }
     }
@@ -296,7 +296,7 @@ class CardEntity
         if (!is_array($allowed_brand)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->allowed_brand= $allowed_brand;
+            $this->allowed_brand = $allowed_brand;
             return $this;
         }
     }
@@ -318,7 +318,7 @@ class CardEntity
         if (!is_string($country)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->country= $country;
+            $this->country = $country;
             return $this;
         }
     }
@@ -340,7 +340,7 @@ class CardEntity
         if (!is_string($metadata)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->metadata= $metadata;
+            $this->metadata = $metadata;
             return $this;
         }
     }
@@ -380,7 +380,7 @@ class CardEntity
         if (!is_array($definition)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->definition= $definition;
+            $this->definition = $definition;
             return $this;
         }
     }
@@ -402,7 +402,7 @@ class CardEntity
         if (!is_array($fieldsRequired)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->fieldsRequired= $fieldsRequired;
+            $this->fieldsRequired = $fieldsRequired;
             return $this;
         }
     }
@@ -424,7 +424,7 @@ class CardEntity
         if (!is_array($fieldsSize)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->fieldsSize= $fieldsSize;
+            $this->fieldsSize = $fieldsSize;
             return $this;
         }
     }
@@ -446,7 +446,7 @@ class CardEntity
         if (!is_array($fieldsValidate)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->fieldsValidate= $fieldsValidate;
+            $this->fieldsValidate = $fieldsValidate;
             return $this;
         }
     }
@@ -468,7 +468,7 @@ class CardEntity
         if (!is_string($table)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->table= $table;
+            $this->table = $table;
             return $this;
         }
     }
@@ -490,7 +490,7 @@ class CardEntity
         if (!is_string($identifier)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->identifier= $identifier;
+            $this->identifier = $identifier;
             return $this;
         }
     }

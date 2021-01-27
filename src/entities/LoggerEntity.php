@@ -115,7 +115,7 @@ class LoggerEntity
         if (!is_string($content)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->content= $content;
+            $this->content = $content;
             return $this;
         }
     }
@@ -211,7 +211,7 @@ class LoggerEntity
         if (!is_int($limit_number)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->limit_number= $limit_number;
+            $this->limit_number = $limit_number;
             return $this;
         }
     }
@@ -233,7 +233,7 @@ class LoggerEntity
         if (!is_string($limitDate)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->limitDate= $limitDate;
+            $this->limitDate = $limitDate;
             return $this;
         }
     }
@@ -255,7 +255,7 @@ class LoggerEntity
         if (!is_string($id)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->id= $id;
+            $this->id = $id;
             return $this;
         }
     }
@@ -277,7 +277,7 @@ class LoggerEntity
         if (!is_string($type)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->type= $type;
+            $this->type = $type;
             return $this;
         }
     }
