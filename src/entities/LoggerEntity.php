@@ -91,9 +91,9 @@ class LoggerEntity
     public function setProcess($process)
     {
         if (!is_string($process)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid setProcess, param $process must be a string'));
         } else {
-            $this->process= $process;
+            $this->process = $process;
             return $this;
         }
     }
@@ -113,7 +113,7 @@ class LoggerEntity
     public function setContent($content)
     {
         if (!is_string($content)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid content, param $content must be a string'));
         } else {
             $this->content = $content;
             return $this;
