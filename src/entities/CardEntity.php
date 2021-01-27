@@ -402,7 +402,7 @@ class CardEntity
         if (!is_array($fieldsRequired)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->fieldsRequired= $fieldsRequired;
+            $this->fieldsRequired = $fieldsRequired;
             return $this;
         }
     }
