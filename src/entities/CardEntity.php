@@ -400,7 +400,7 @@ class CardEntity
     public function setFieldsRequired($fieldsRequired)
     {
         if (!is_array($fieldsRequired)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid fieldsRequired (in setFieldsRequired), param $setFieldsRequired must be an array'));
         } else {
             $this->fieldsRequired = $fieldsRequired;
             return $this;
