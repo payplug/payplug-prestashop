@@ -466,7 +466,7 @@ class CardEntity
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid table, param $table must be a string'));
         } else {
             $this->table = $table;
             return $this;
