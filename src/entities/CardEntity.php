@@ -338,7 +338,7 @@ class CardEntity
     public function setMetadata($metadata)
     {
         if (!is_string($metadata)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid metadata, param $metadata must be a string'));
         } else {
             $this->metadata = $metadata;
             return $this;
