@@ -211,7 +211,7 @@ class LoggerEntity
         if (!is_int($limit_number)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->limit_number= $limit_number;
+            $this->limit_number = $limit_number;
             return $this;
         }
     }
