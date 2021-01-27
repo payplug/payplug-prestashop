@@ -272,7 +272,7 @@ class CardEntity
     public function setBrand($brand)
     {
         if (!is_string($brand)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid brand, param $brand must be a string'));
         } else {
             $this->brand = $brand;
             return $this;
