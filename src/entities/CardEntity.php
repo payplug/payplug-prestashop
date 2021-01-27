@@ -422,7 +422,7 @@ class CardEntity
     public function setFieldsSize($fieldsSize)
     {
         if (!is_array($fieldsSize)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid fieldsSize, param $fieldsSize must be an array'));
         } else {
             $this->fieldsSize = $fieldsSize;
             return $this;
