@@ -113,7 +113,7 @@ class LoggerEntity
     public function setContent($content)
     {
         if (!is_string($content)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid content, param $content must be a string'));
         } else {
             $this->content = $content;
             return $this;
