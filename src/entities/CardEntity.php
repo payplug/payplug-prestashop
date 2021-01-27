@@ -424,7 +424,7 @@ class CardEntity
         if (!is_array($fieldsSize)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->fieldsSize= $fieldsSize;
+            $this->fieldsSize = $fieldsSize;
             return $this;
         }
     }
