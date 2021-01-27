@@ -279,7 +279,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.0.0';
+        $this->version = '3.1.0';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -3425,7 +3425,9 @@ class Payplug extends PaymentModule
             return false;
         }
 
-        $is_elligible = $this->oney->isOneyElligible($this->context->cart, false, true);
+        $use_taxes = (bool)Configuration::get('PS_TAX');
+        $amount = $this->context->cart->getOrderTotal($use_taxes);
+        $is_elligible = $this->oney->isValidOneyAmount($amount);
         $is_elligible = $is_elligible['result'];
 
         $this->smarty->assign([
