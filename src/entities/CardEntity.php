@@ -296,7 +296,7 @@ class CardEntity
         if (!is_array($allowed_brand)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->allowed_brand= $allowed_brand;
+            $this->allowed_brand = $allowed_brand;
             return $this;
         }
     }
