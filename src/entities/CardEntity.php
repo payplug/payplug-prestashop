@@ -380,7 +380,7 @@ class CardEntity
         if (!is_array($definition)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->definition= $definition;
+            $this->definition = $definition;
             return $this;
         }
     }
