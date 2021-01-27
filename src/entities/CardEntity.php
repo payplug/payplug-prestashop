@@ -340,7 +340,7 @@ class CardEntity
         if (!is_string($metadata)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->metadata= $metadata;
+            $this->metadata = $metadata;
             return $this;
         }
     }
