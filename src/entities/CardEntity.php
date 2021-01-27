@@ -316,7 +316,7 @@ class CardEntity
     public function setCountry($country)
     {
         if (!is_string($country)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid country, param $country must be a string'));
         } else {
             $this->country = $country;
             return $this;
