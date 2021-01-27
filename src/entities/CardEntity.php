@@ -468,7 +468,7 @@ class CardEntity
         if (!is_string($table)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->table= $table;
+            $this->table = $table;
             return $this;
         }
     }
