@@ -91,7 +91,7 @@ class LoggerEntity
     public function setProcess($process)
     {
         if (!is_string($process)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid setProcess, param $process must be a string'));
         } else {
             $this->process = $process;
             return $this;
