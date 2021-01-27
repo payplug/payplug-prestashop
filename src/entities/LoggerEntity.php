@@ -233,7 +233,7 @@ class LoggerEntity
         if (!is_string($limitDate)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->limitDate= $limitDate;
+            $this->limitDate = $limitDate;
             return $this;
         }
     }
