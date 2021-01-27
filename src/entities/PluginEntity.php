@@ -301,7 +301,7 @@ class PluginEntity
             throw (
                 new BadParameterException(
                     'Invalid Product object, param $card must be a ProductSpecific'
-            )
+                )
             );
         } else {
             $this->product = $product;
