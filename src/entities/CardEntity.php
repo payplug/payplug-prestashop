@@ -228,7 +228,7 @@ class CardEntity
     public function setExpMonth($exp_month)
     {
         if (!is_string($exp_month)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid expiry month, param $exp_month must be a string'));
         } else {
             $this->exp_month = $exp_month;
             return $this;
