@@ -117,9 +117,9 @@ class PluginEntity
     {
         if (!is_object($card)) {
             throw (
-            new BadParameterException(
-                'Invalid Card object, param $card must be a CardRepository'
-            )
+                new BadParameterException(
+                    'Invalid Card object, param $card must be a CardRepository'
+                )
             );
         } else {
             $this->card = $card;
@@ -143,9 +143,9 @@ class PluginEntity
     {
         if (!is_object($logger)) {
             throw (
-            new BadParameterException(
-                'Invalid Logger object, param $card must be a LoggerRepository'
-            )
+                new BadParameterException(
+                    'Invalid Logger object, param $card must be a LoggerRepository'
+                )
             );
         } else {
             $this->logger = $logger;
@@ -169,9 +169,9 @@ class PluginEntity
     {
         if (!is_object($oney)) {
             throw (
-            new BadParameterException(
-                'Invalid Oney object, param $card must be a OneyRepository'
-            )
+                new BadParameterException(
+                    'Invalid Oney object, param $card must be a OneyRepository'
+                )
             );
         } else {
             $this->oney = $oney;
@@ -195,9 +195,9 @@ class PluginEntity
     {
         if (!is_object($cache)) {
             throw (
-            new BadParameterException(
-                'Invalid Cache object, param $card must be a CacheRepository'
-            )
+                new BadParameterException(
+                    'Invalid Cache object, param $card must be a CacheRepository'
+                )
             );
         } else {
             $this->cache = $cache;
@@ -221,9 +221,9 @@ class PluginEntity
     {
         if (!is_object($configuration)) {
             throw (
-            new BadParameterException(
-                'Invalid Configuration object, param $card must be a ConfigurationSpecific'
-            )
+                new BadParameterException(
+                    'Invalid Configuration object, param $card must be a ConfigurationSpecific'
+                )
             );
         } else {
             $this->configuration = $configuration;
@@ -247,9 +247,9 @@ class PluginEntity
     {
         if (!is_object($context)) {
             throw (
-            new BadParameterException(
-                'Invalid Context object, param $card must be a ContextSpecific'
-            )
+                new BadParameterException(
+                    'Invalid Context object, param $card must be a ContextSpecific'
+                )
             );
         } else {
             $this->context = $context;
@@ -273,9 +273,9 @@ class PluginEntity
     {
         if (!is_object($country)) {
             throw (
-            new BadParameterException(
-                'Invalid Country object, param $card must be a ContextSpecific'
-            )
+                new BadParameterException(
+                    'Invalid Country object, param $card must be a ContextSpecific'
+                )
             );
         } else {
             $this->country = $country;
@@ -351,9 +351,9 @@ class PluginEntity
     {
         if (!is_object($query)) {
             throw (
-            new BadParameterException(
-                'Invalid Query object, param $card must be a QueryRepository'
-            )
+                new BadParameterException(
+                    'Invalid Query object, param $card must be a QueryRepository'
+                )
             );
         } else {
             $this->query = $query;
@@ -377,9 +377,9 @@ class PluginEntity
     {
         if (!is_object($validate)) {
             throw (
-            new BadParameterException(
-                'Invalid Validate object, param $card must be a ValidateSpecific'
-            )
+                new BadParameterException(
+                    'Invalid Validate object, param $card must be a ValidateSpecific'
+                )
             );
         } else {
             $this->validate = $validate;
@@ -401,8 +401,16 @@ class PluginEntity
      */
     public function setOrderState($order_state)
     {
-        $this->order_state = $order_state;
-        return $this;
+        if (!is_object($order_state)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Validate object, param $order_state must be an OrderState'
+                )
+            );
+        } else {
+            $this->order_state = $order_state;
+            return $this;
+        }
     }
 
     /**
@@ -419,7 +427,15 @@ class PluginEntity
      */
     public function setTranslate($translate)
     {
-        $this->translate = $translate;
-        return $this;
+        if (!is_object($translate)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Validate object, param $translate must be a Translate'
+                )
+            );
+        } else {
+            $this->translate = $translate;
+            return $this;
+        }
     }
 }
