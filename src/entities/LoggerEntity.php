@@ -209,7 +209,7 @@ class LoggerEntity
     public function setLimitNumber($limit_number)
     {
         if (!is_int($limit_number)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid limit number, param $limit_number must be an integer'));
         } else {
             $this->limit_number = $limit_number;
             return $this;
@@ -231,7 +231,7 @@ class LoggerEntity
     public function setLimitDate($limitDate)
     {
         if (!is_string($limitDate)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid limit_date, param $limit_number must be an integer'));
         } else {
             $this->limitDate = $limitDate;
             return $this;
@@ -253,7 +253,7 @@ class LoggerEntity
     public function setId($id)
     {
         if (!is_string($id)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid id, param $id must be an string'));
         } else {
             $this->id = $id;
             return $this;
@@ -275,7 +275,7 @@ class LoggerEntity
     public function setType($type)
     {
         if (!is_string($type)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid type, param $type must be a string'));
         } else {
             $this->type = $type;
             return $this;
@@ -297,7 +297,7 @@ class LoggerEntity
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid table, param $table must be a string'));
         } else {
             $this->table= $table;
             return $this;
