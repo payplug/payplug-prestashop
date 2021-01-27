@@ -206,7 +206,7 @@ class CardEntity
     public function setLast4($last4)
     {
         if (!is_string($last4)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid last4, param $last4 must be a string'));
         } else {
             $this->last4 = $last4;
             return $this;
