@@ -255,7 +255,7 @@ class LoggerEntity
         if (!is_string($id)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->id= $id;
+            $this->id = $id;
             return $this;
         }
     }
