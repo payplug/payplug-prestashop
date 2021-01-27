@@ -250,7 +250,7 @@ class CardEntity
     public function setExpYear($exp_year)
     {
         if (!is_string($exp_year)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid expiry year, param $exp_year must be a string'));
         } else {
             $this->exp_year = $exp_year;
             return $this;
