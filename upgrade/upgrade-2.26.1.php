@@ -40,6 +40,7 @@ function upgrade_module_2_26_1($object)
 
     // Update payplug lock table
     $sql_requests = [
+        'TRUNCATE TABLE `'._DB_PREFIX_.'payplug_lock`',
         'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
     ];
 
