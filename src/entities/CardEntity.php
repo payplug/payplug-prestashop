@@ -444,7 +444,7 @@ class CardEntity
     public function setFieldsValidate($fieldsValidate)
     {
         if (!is_array($fieldsValidate)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw (new BadParameterException('Invalid fields validate, param $fieldsValidate must be an array'));
         } else {
             $this->fieldsValidate = $fieldsValidate;
             return $this;
