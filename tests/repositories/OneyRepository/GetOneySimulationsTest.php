@@ -46,30 +46,18 @@ final class GetOneySimulationsTest extends TestCase
 
     public function setUp()
     {
-        $this->cacheMock = MockHelper::createMockFactory(
-            'Payplug\src\repositories\CacheRepository',
-            'CacheRepository'
-        )
+        $this->cacheMock = Mockery::mock('Payplug\src\repositories\CacheRepository')
             ->shouldReceive('setCache')
             ->andReturn(true);
 
-        $this->confSpecificMock = MockHelper::createMockFactory(
-            'Payplug\src\specific\ConfigurationSpecific',
-            'ConfigurationSpecific'
-        )
+        $this->confSpecificMock = Mockery::mock('Payplug\src\specific\ConfigurationSpecific')
             ->shouldReceive('get')
             ->with('PAYPLUG_SANDBOX_MODE')
             ->andReturn(false);
 
-        $this->myLogPhpMock = MockHelper::createMockFactory(
-            'Payplug\classes\MyLogPHP',
-            'MyLogPHP'
-        );
+        $this->myLogPhpMock = Mockery::mock('Payplug\classes\MyLogPHP');
 
-        $this->loggerMock = MockHelper::createMockFactory(
-            'PayPlug\src\repositories\LoggerRepository',
-            'LoggerRepository'
-        )
+        $this->loggerMock = Mockery::mock('alias:PayPlug\src\repositories\LoggerRepository')
             ->shouldReceive('setParams')
             ->andReturn(true);
 
@@ -77,6 +65,7 @@ final class GetOneySimulationsTest extends TestCase
 
     public function testGetOneySimulationsWithoutCacheValid()
     {
+
         $operation = 'x3_with_fees';
 
         // Get a array of oney simulation fake values
