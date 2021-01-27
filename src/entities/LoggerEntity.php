@@ -93,7 +93,7 @@ class LoggerEntity
         if (!is_string($process)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->process= $process;
+            $this->process = $process;
             return $this;
         }
     }
