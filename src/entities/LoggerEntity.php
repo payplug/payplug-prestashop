@@ -187,7 +187,7 @@ class LoggerEntity
     public function setDefinition($definition)
     {
         if (!is_array($definition)) {
-            throw (new BadParameterException('Invalid id, param $definition must be an array'));
+            throw (new BadParameterException('Invalid definition, param $definition must be an array'));
         } else {
             $this->definition = $definition;
             return $this;
