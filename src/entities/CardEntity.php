@@ -490,7 +490,7 @@ class CardEntity
         if (!is_string($identifier)) {
             throw (new BadParameterException('Invalid id, param $id must be an integer'));
         } else {
-            $this->identifier= $identifier;
+            $this->identifier = $identifier;
             return $this;
         }
     }
