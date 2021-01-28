@@ -87,6 +87,7 @@ $_MODULE['<{payplug}prestashop>payplug_f7d543c9b824323b84ab11668002f207'] = 'Aut
 $_MODULE['<{payplug}prestashop>payplug_9206b1b984fa6e5d49f9b0ad0df43806'] = 'Autorizzazione scaduta';
 $_MODULE['<{payplug}prestashop>payplug_f2e6b2f7f4a9bd95832eaaaeddd7a952'] = 'Oney in attesa';
 $_MODULE['<{payplug}prestashop>payplug_81f3d2a447d9c5579b446ff048827de1'] = 'Abbandonato';
+$_MODULE['<{payplug}prestashop>payplug_f5146f3861c487374c38fb5ec78cda73'] = 'Au moins un champ n\'est pas completé correctement.';
 $_MODULE['<{payplug}prestashop>messages_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Carte registrate';
 $_MODULE['<{payplug}prestashop>my_account_9a5b5b8ce74c1f2f1cecbfd517fe1128'] = 'La tua versione Prestashop non é compatibile';
