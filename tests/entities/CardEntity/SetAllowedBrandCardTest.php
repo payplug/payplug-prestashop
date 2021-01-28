@@ -23,63 +23,63 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\CardEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group card
+ * @group card_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetAllowedBrandCardTest extends TestCase
 {
-    protected $plugin;
+    protected $card;
+    protected $allowedBranb;
+    protected $allowedBranbAlt;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->card = new CardEntity();
+        $this->allowedBranb = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->allowedBranbAlt = [
+            'keyA' => 'valueA',
+            'keyB' => 'valueB',
+            'keyC' => 8,
+        ];
+        $this->card->setAllowedBrand($this->allowedBranb);
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateAllowedBrand()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->card->setAllowedBrand($this->allowedBranbAlt);
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            $this->allowedBranbAlt,
+            $this->card->getAllowedBrand()
         );
     }
 
-    public function testReturnLoggerEntity()
+    public function testReturnCardEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            CardEntity::class,
+            $this->card->setAllowedBrand($this->allowedBranbAlt)
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group card_exception
+     * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAnArray()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
-    }
-
-    /**
-     * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->card->setAllowedBrand('wrong_parameter');
     }
 }

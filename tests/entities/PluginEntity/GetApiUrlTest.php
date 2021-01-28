@@ -23,51 +23,45 @@
 
 
 
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\entities\CardEntity;
+use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group cache
- * @group cache_entity
+ * @group plugin
+ * @group plugin_entity
  */
-final class SetIdPayPlugCacheTest extends TestCase
+final class GetApiUrlTest extends TestCase
 {
-    protected $cache;
+    protected $plugin;
 
     protected function setUp()
     {
-        $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->plugin = new PluginEntity();
+        $this->plugin->setApiUrl('https://api-qa.payplug.com');
     }
 
-    public function testUpdateCacheId()
+    public function testReturnAnApiUrl()
     {
-        $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
-            'another_id',
-            $this->cache->getIdPayplugCache()
+            'https://api-qa.payplug.com',
+            $this->plugin->getApiUrl()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testApiUrlIsAString()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setIdPayplugCache('another_id')
+        $this->assertTrue(
+            is_string($this->plugin->getApiUrl())
         );
     }
 
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotAString()
+    public function testApiUrlHaveAValidFormat()
     {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setIdPayplugCache(42);
+        $this->assertRegExp(
+            '/http(s?):\/\/api(-\w+)?.payplug.(com|test)/',
+            $this->plugin->getApiUrl()
+        );
     }
 }

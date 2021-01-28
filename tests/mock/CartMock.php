@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * 2013 - 2021 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+namespace PayPlug\tests\mock;
+
+class CartMock
+{
+    public static function getCart()
+    {
+        $cart = new \stdClass();
+        $cart->id = 1;
+        $cart->id_address_delivery = 2;
+        $cart->id_address_invoice = 3;
+        $cart->id_customer = 1;
+        $cart->date_add = '2021-01-01 00:00:00';
+        $cart->date_upd = '2021-01-01 00:00:00';
+        return $cart;
+    }
+
+    public static function getProducts()
+    {
+        $products = [
+            [
+                'id_product' => 1,
+                'cart_quantity' => 1,
+                'name' => 'Pull imprimé colibri',
+                'manufacturer_name' => 'Studio Design',
+                'price_wt' => 34.464,
+                'attributes' => 'Size : S',
+            ],
+            [
+                'id_product' => 2,
+                'cart_quantity' => 2,
+                'name' => 'T-shirt imprimé colibri',
+                'manufacturer_name' => 'Studio Design',
+                'price_wt' => 22.944,
+                'attributes' => 'Size : S- Color : White',
+            ],
+            [
+                'id_product' => 3,
+                'cart_quantity' => 3,
+                'name' => 'Mug The adventure begins',
+                'manufacturer_name' => 'Studio Design',
+                'price_wt' => 14.28,
+            ],
+            [
+                'id_product' => 4,
+                'cart_quantity' => 4,
+                'name' => 'Coussin ours brun',
+                'manufacturer_name' => 'Studio Design',
+                'price_wt' => 22.68,
+                'attributes' => 'Color : White',
+            ]
+        ];
+
+        return $products;
+    }
+}

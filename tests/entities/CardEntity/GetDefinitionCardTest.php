@@ -24,44 +24,41 @@
 
 
 use PayPlug\src\entities\CardEntity;
-use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group card
+ * @group card_entity
  */
-final class GetApiVersionTest extends TestCase
+final class GetDefinitionCardTest extends TestCase
 {
-    protected $plugin;
+    protected $card;
+    protected $brands;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->card= new CardEntity();
+        $this->brands = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->card->setDefinition($this->brands);
     }
 
-    public function testReturnAnApiVersion()
+    public function testReturnDefinition()
     {
         $this->assertSame(
-            '2021-01-01',
-            $this->plugin->getApiVersion()
+            $this->brands,
+            $this->card->getDefinition()
         );
     }
 
-    public function testApiVersionIsAString()
+    public function testDefinitionIsAnArray()
     {
         $this->assertTrue(
-            is_string($this->plugin->getApiVersion())
-        );
-    }
-
-    public function testApiVersionHaveAValidFormat()
-    {
-        $this->assertRegExp(
-            '/^\d{4}-\d{2}-\d{2}$/',
-            $this->plugin->getApiVersion()
+            is_array($this->card->getDefinition())
         );
     }
 }

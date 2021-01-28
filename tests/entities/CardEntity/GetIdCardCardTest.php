@@ -23,51 +23,44 @@
 
 
 
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group cache
- * @group cache_entity
+ * @group card
+ * @group card_entity
  */
-final class SetIdPayPlugCacheTest extends TestCase
+final class GetIdCardCardTest extends TestCase
 {
-    protected $cache;
+    protected $card;
 
     protected function setUp()
     {
-        $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->card = new CardEntity();
+        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     }
 
-    public function testUpdateCacheId()
+    public function testReturnIdCard()
     {
-        $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
-            'another_id',
-            $this->cache->getIdPayplugCache()
+            'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            $this->card->getIdCard()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testIdCardIsAString()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setIdPayplugCache('another_id')
+        $this->assertTrue(
+            is_string($this->card->getIdCard())
         );
     }
 
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotAString()
+    public function testIdCardHaveAValidFormat()
     {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setIdPayplugCache(42);
+        $this->assertRegExp(
+            '/card_[a-z0-9]{32}/',
+            $this->card->getIdCard()
+        );
     }
 }

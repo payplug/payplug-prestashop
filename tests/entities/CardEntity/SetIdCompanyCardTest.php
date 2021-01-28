@@ -23,63 +23,51 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\CardEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group card
+ * @group card_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetIdCompanyCardTest extends TestCase
 {
-    protected $plugin;
+    protected $card;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->card = new CardEntity();
+        $this->card->setIdCompany(42);
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateIdCompany()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->card->setIdCompany(777);
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            777,
+            $this->card->getIdCompany()
         );
     }
 
-    public function testReturnLoggerEntity()
+    public function testReturnCardEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            CardEntity::class,
+            $this->card->setIdCompany(777)
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group card_exception
+     * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAnInt()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
-    }
-
-    /**
-     * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->card->setIdCompany('test');
     }
 }

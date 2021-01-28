@@ -24,7 +24,6 @@
 
 
 use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,42 +31,28 @@ use PHPUnit\Framework\TestCase;
  * @group cache
  * @group cache_entity
  */
-final class SetIdPayPlugCacheTest extends TestCase
+final class GetCacheKeyCacheTest extends TestCase
 {
     protected $cache;
 
     protected function setUp()
     {
         $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->cache->setCacheKey('test_key');
     }
 
-    public function testUpdateCacheId()
+    public function testReturnCacheKey()
     {
-        $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
-            'another_id',
-            $this->cache->getIdPayplugCache()
+            'test_key',
+            $this->cache->getCacheKey()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testCacheKeyIsAString()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setIdPayplugCache('another_id')
+        $this->assertTrue(
+            is_string($this->cache->getCacheKey())
         );
-    }
-
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotAString()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setIdPayplugCache(42);
     }
 }

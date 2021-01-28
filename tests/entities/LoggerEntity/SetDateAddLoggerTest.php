@@ -23,63 +23,63 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group logger
+ * @group logger_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetDateAddLoggerTest extends TestCase
 {
-    protected $plugin;
+    protected $logger;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->logger = new LoggerEntity();
+        $this->logger->setDateAdd('2021-12-31 23:59:42');
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateDateAdd()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->logger->setDateAdd('1920-12-31 23:59:42');
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            '1920-12-31 23:59:42',
+            $this->logger->getDateAdd()
         );
     }
 
     public function testReturnLoggerEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            LoggerEntity::class,
+            $this->logger->setDateAdd('1920-12-31 23:59:42')
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group logger_exception
+     * @group logger_entity_exception
      * @group exception
      */
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
+        $this->logger->setDateAdd(42);
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group logger_exception
+     * @group logger_entity_exception
      * @group exception
      */
     public function testThrowExceptionWhenNotWellFormatted()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->logger->setDateAdd('1er Janvier 1970');
     }
 }

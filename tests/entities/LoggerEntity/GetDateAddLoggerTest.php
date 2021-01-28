@@ -23,51 +23,44 @@
 
 
 
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\entities\LoggerEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group cache
- * @group cache_entity
+ * @group logger
+ * @group logger_entity
  */
-final class SetIdPayPlugCacheTest extends TestCase
+final class GetDateAddLoggerTest extends TestCase
 {
-    protected $cache;
+    protected $logger;
 
     protected function setUp()
     {
-        $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->logger = new LoggerEntity();
+        $this->logger->setDateAdd('2021-12-31 23:59:42');
     }
 
-    public function testUpdateCacheId()
+    public function testReturnDateAdd()
     {
-        $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
-            'another_id',
-            $this->cache->getIdPayplugCache()
+            '2021-12-31 23:59:42',
+            $this->logger->getDateAdd()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testDateAddIsAString()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setIdPayplugCache('another_id')
+        $this->assertTrue(
+            is_string($this->logger->getDateAdd())
         );
     }
 
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotAString()
+    public function testDateAddHaveAValidDatetimeFormat()
     {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setIdPayplugCache(42);
+        $this->assertRegExp(
+            '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
+            $this->logger->getDateAdd()
+        );
     }
 }

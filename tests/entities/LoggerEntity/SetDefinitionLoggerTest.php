@@ -23,63 +23,63 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group logger
+ * @group logger_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetDefinitionLoggerTest extends TestCase
 {
-    protected $plugin;
+    protected $logger;
+    protected $definition;
+    protected $definition_alt;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->logger = new LoggerEntity();
+        $this->definition = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->definition_alt = [
+            'keyA' => 'valueA',
+            'keyB' => 'valueB',
+            'keyC' => 8,
+        ];
+        $this->logger->setDefinition($this->definition);
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateDefinition()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->logger->setDefinition($this->definition_alt);
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            $this->definition_alt,
+            $this->logger->getDefinition()
         );
     }
 
     public function testReturnLoggerEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            LoggerEntity::class,
+            $this->logger->setDefinition($this->definition_alt)
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group logger_exception
+     * @group logger_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAnArray()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
-    }
-
-    /**
-     * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->logger->setDefinition(42);
     }
 }

@@ -23,63 +23,51 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\CardEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group card
+ * @group card_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetCountryCardTest extends TestCase
 {
-    protected $plugin;
+    protected $card;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->card = new CardEntity();
+        $this->card->setCountry('country_name');
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateCountry()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->card->setCountry('new_country_name');
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            'new_country_name',
+            $this->card->getCountry()
         );
     }
 
-    public function testReturnLoggerEntity()
+    public function testReturnCardEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            CardEntity::class,
+            $this->card->setCountry('country_name')
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group card_exception
+     * @group card_entity_exception
      * @group exception
      */
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
-    }
-
-    /**
-     * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->card->setCountry(42);
     }
 }
