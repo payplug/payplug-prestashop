@@ -35,5 +35,11 @@ function upgrade_module_3_2_0($object)
         }
     }
 
+    if (Configuration::get('PAYPLUG_ONEY_TOS_URL')) {
+        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')) {
+            $flag = false;
+        }
+    }
+
     return $flag;
 }
