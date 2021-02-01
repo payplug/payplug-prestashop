@@ -21,6 +21,7 @@
  */
 
 @import "less/include";
+@import "less/component/payplug/admin/alert";
 @import "less/component/payplug/admin/popup";
 @import "less/component/payplug/button";
 
@@ -80,7 +81,6 @@
 #pppanel form {
   position: relative;
   overflow: hidden;
-  min-height: 62px;
 }
 
 #pppanel img.loader {
@@ -296,6 +296,11 @@ span.ppclose {
 
 #pppanel .form-group {
   overflow: hidden;
+  margin-bottom: 0;
+
+  & + .form-group {
+    margin-top: 1rem;
+  }
 }
 
 #pppanel.panel-1-6 .form-group input,

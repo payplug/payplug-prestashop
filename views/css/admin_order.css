@@ -35,6 +35,49 @@
     opacity: 1;
   }
 }
+/* Payplug Admin Alert */
+.payplugAlert {
+  border-left: 3px solid transparent;
+  display: flex;
+  background: #fff;
+  color: #000000;
+  padding: 10px 20px;
+  position: relative;
+  line-height: 19px;
+}
+.payplugAlert.-success {
+  background: rgba(0, 171, 122, 0.15);
+  border-color: #00ab7a;
+}
+.payplugAlert.-success a,
+.payplugAlert.-success a:hover,
+.payplugAlert.-success a:active,
+.payplugAlert.-success a:visited,
+.payplugAlert.-success a:focus {
+  color: #00ab7a;
+}
+.payplugAlert.-warning {
+  background: rgba(247, 160, 0, 0.15);
+  border-color: #f7a000;
+  color: rgba(196, 127, 0, 0.8);
+  width: max-content;
+}
+.payplugAlert.-warning:before {
+  content: "";
+  display: block;
+  background: 50% url(../img/admin/icon-lock.png) no-repeat;
+  background-size: contain;
+  width: 11px;
+  height: 15px;
+  margin: 0 8px 0 -8px;
+}
+.payplugAlert.-warning a,
+.payplugAlert.-warning a:hover,
+.payplugAlert.-warning a:active,
+.payplugAlert.-warning a:visited,
+.payplugAlert.-warning a:focus {
+  color: #f7a000;
+}
 /* Payplug Admin Popup */
 .payplugPopup {
   -webkit-transform: translate(-50%, -50%);
@@ -281,7 +324,6 @@
 #pppanel form {
   position: relative;
   overflow: hidden;
-  min-height: 62px;
 }
 #pppanel img.loader {
   display: none;
@@ -463,6 +505,10 @@ span.ppclose {
 }
 #pppanel .form-group {
   overflow: hidden;
+  margin-bottom: 0;
+}
+#pppanel .form-group + .form-group {
+  margin-top: 1rem;
 }
 #pppanel.panel-1-6 .form-group input,
 #pppanel.panel-1-6 .form-group label {

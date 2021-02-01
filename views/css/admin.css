@@ -63,6 +63,7 @@ p.payplugInterpanel {
   color: #000000;
   padding: 10px 20px;
   position: relative;
+  line-height: 19px;
 }
 .payplugAlert.-success {
   background: rgba(0, 171, 122, 0.15);

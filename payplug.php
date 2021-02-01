@@ -2083,7 +2083,6 @@ class Payplug extends PaymentModule
         }
 
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
@@ -3536,7 +3535,6 @@ class Payplug extends PaymentModule
                  * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
                  * soit chargé après admin.css.
                  */
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
             ]);
