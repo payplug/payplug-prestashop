@@ -1,5 +1,5 @@
 {
   "hooks": {
-    "pre-commit": "echo "heelo"
+    "pre-commit": "php vendor/bin/php-cs-fixer fix -vvv"
   }
 }
