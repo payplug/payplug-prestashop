@@ -45,8 +45,8 @@ class PrestashopSpecific16
 
     public function hookHeader()
     {
-        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
-        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
+        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6_3.1.0.css');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6_3.1.0.js');
 
         Media::addJsDef([
             'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', [], true),
