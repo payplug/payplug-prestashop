@@ -2082,9 +2082,9 @@ class Payplug extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_3.1.0.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old_3.1.0.css');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_3.1.0.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old-v3.1.0.css');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -2872,8 +2872,8 @@ class Payplug extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_3.1.0.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin_3.1.0.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -3362,7 +3362,7 @@ class Payplug extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin_3.1.0.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.1.0.js');
         }
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
@@ -3536,14 +3536,14 @@ class Payplug extends PaymentModule
                  * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
                  * soit chargé après admin.css.
                  */
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_3.1.0.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order_3.1.0.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_3.1.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.1.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.1.0.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_3.1.0.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_3.1.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css',
             ]);
         }
     }
@@ -3574,7 +3574,7 @@ class Payplug extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded_3.1.0.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.1.0.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
