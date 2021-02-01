@@ -4701,7 +4701,10 @@ class Payplug extends PaymentModule
                     // then recheck
                     if ($this->oney->hasOneyRequiredFields($payment_tab)) {
                         $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
-                        return ['result' => false, 'response' => false];
+                        return [
+                            'result' => false,
+                            'response' => $this->l('At least one of the fields is not correctly completed.')
+                        ];
                     }
                 } else {
                     $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
