@@ -1060,7 +1060,7 @@ var $document, $window, payplug = {
                     .on('click', function (event) {
                         var $clicked = $(event.target);
                         if ($clicked.is('.' + identifier) && $('.' + identifier).is('.-open')) {
-                            popup.close();
+                            $('.' + identifier + '_close').trigger('click');
                         }
                     });
             },
@@ -1085,10 +1085,14 @@ var $document, $window, payplug = {
                     $popup.addClass('-show');
                 }, 0);
             },
-            close: function () {
+            close: function (event) {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
+
+                if($(event.target).is('.' + identifier + '_close') && $popup.find('.payplugButton.-close')) {
+                    $popup.find('.payplugButton.-close').trigger('click');
+                }
 
                 $popup.removeClass('-show');
                 window.setTimeout(function () {
