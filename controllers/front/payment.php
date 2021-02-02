@@ -54,7 +54,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             '_ajax' => 1
         ];
 
-        $payment_data = $payplug->preparePayment($options, $id_payplug_card);
+        $payment_data = $payplug->preparePayment($options);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
