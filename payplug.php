@@ -3533,7 +3533,6 @@ class Payplug extends PaymentModule
                  * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
                  * des modifiers dans le js. Have fun!
                  * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
-                 * soit chargé après admin.css.
                 __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
             ]);
