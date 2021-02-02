@@ -3574,7 +3574,7 @@ class Payplug extends PaymentModule
                 'is_deferred' => (bool)Tools::getValue('def'),
             ];
 
-            $payment = $this->preparePayment($payment_options, 'new_card');
+            $payment = $this->preparePayment($payment_options);
 
             if ($payment['result']) {
                 // If payment is paid then redirect
@@ -4373,11 +4373,10 @@ class Payplug extends PaymentModule
      * prepare payment
      *
      * @param $options
-     * @param string $id_card
      * @return mixed
      * @throws Exception
      */
-    public function preparePayment($options, $id_card = null)
+    public function preparePayment($options)
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
