@@ -3530,7 +3530,6 @@ class Payplug extends PaymentModule
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
                 /* TODO : admin.css ne devrait pas être inclus ici, il ne sert que pour récuperer le css de la popin.
-                 * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
                  * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
                 __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
