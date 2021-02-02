@@ -258,7 +258,6 @@ class PayPlugNotifications
         $this->logger->addLog('Payment details:');
 
         if ($this->is_installment) {
-            $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
             $sql = 'SELECT `id_cart` 
                     FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` 
                     WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';

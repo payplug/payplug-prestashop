@@ -909,7 +909,8 @@ class Payplug extends PaymentModule
             return $errors;
         }
 
-        foreach ($response['details'] as $key => $value) {
+        $keys = array_keys($response['details']);
+        foreach ($keys as $key) {
             // add specific error message
             switch ($key) {
                 default:
@@ -3574,7 +3575,7 @@ class Payplug extends PaymentModule
                 'is_deferred' => (bool)Tools::getValue('def'),
             ];
 
-            $payment = $this->preparePayment($payment_options, 'new_card');
+            $payment = $this->preparePayment($payment_options);
 
             if ($payment['result']) {
                 // If payment is paid then redirect
@@ -4373,11 +4374,10 @@ class Payplug extends PaymentModule
      * prepare payment
      *
      * @param $options
-     * @param string $id_card
      * @return mixed
      * @throws Exception
      */
-    public function preparePayment($options, $id_card = null)
+    public function preparePayment($options)
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
@@ -5669,8 +5669,7 @@ class Payplug extends PaymentModule
             foreach ($res_all_cards as $card) {
                 $id_customer = $card['id_customer'];
                 $id_payplug_card = $card['id_payplug_card'];
-                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card, $api_key)) {
+                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
                     return false;
                 }
             }
