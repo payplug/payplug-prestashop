@@ -2083,7 +2083,6 @@ class Payplug extends PaymentModule
         }
 
         $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old-v3.1.0.css');
         $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
@@ -3530,13 +3529,6 @@ class Payplug extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                /* TODO : admin.css ne devrait pas être inclus ici, il ne sert que pour récuperer le css de la popin.
-                 * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
-                 * des modifiers dans le js. Have fun!
-                 * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
-                 * soit chargé après admin.css.
-                 */
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.1.0.css',
                 __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.1.0.js',
             ]);
