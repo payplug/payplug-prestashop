@@ -5669,8 +5669,7 @@ class Payplug extends PaymentModule
             foreach ($res_all_cards as $card) {
                 $id_customer = $card['id_customer'];
                 $id_payplug_card = $card['id_payplug_card'];
-                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card, $api_key)) {
+                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
                     return false;
                 }
             }
