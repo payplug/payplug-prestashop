@@ -909,7 +909,8 @@ class Payplug extends PaymentModule
             return $errors;
         }
 
-        foreach ($response['details'] as $key => $value) {
+        $keys = array_keys($response['details']);
+        foreach ($keys as $key) {
             // add specific error message
             switch ($key) {
                 default:
