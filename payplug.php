@@ -909,7 +909,8 @@ class Payplug extends PaymentModule
             return $errors;
         }
 
-        foreach ($response['details'] as $key => $value) {
+        $keys = array_keys($response['details']);
+        foreach ($keys as $key) {
             // add specific error message
             switch ($key) {
                 default:
@@ -2082,9 +2083,8 @@ class Payplug extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -2872,8 +2872,8 @@ class Payplug extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -3362,7 +3362,7 @@ class Payplug extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.1.0.js');
         }
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
@@ -3530,20 +3530,13 @@ class Payplug extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                /* TODO : admin.css ne devrait pas être inclus ici, il ne sert que pour récuperer le css de la popin.
-                 * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
-                 * des modifiers dans le js. Have fun!
-                 * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
-                 * soit chargé après admin.css.
-                 */
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.1.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.1.0.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css',
             ]);
         }
     }
@@ -3574,7 +3567,7 @@ class Payplug extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.1.0.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
@@ -3582,7 +3575,7 @@ class Payplug extends PaymentModule
                 'is_deferred' => (bool)Tools::getValue('def'),
             ];
 
-            $payment = $this->preparePayment($payment_options, 'new_card');
+            $payment = $this->preparePayment($payment_options);
 
             if ($payment['result']) {
                 // If payment is paid then redirect
@@ -4381,11 +4374,10 @@ class Payplug extends PaymentModule
      * prepare payment
      *
      * @param $options
-     * @param string $id_card
      * @return mixed
      * @throws Exception
      */
-    public function preparePayment($options, $id_card = null)
+    public function preparePayment($options)
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
@@ -4701,7 +4693,10 @@ class Payplug extends PaymentModule
                     // then recheck
                     if ($this->oney->hasOneyRequiredFields($payment_tab)) {
                         $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
-                        return ['result' => false, 'response' => false];
+                        return [
+                            'result' => false,
+                            'response' => $this->l('At least one of the fields is not correctly completed.')
+                        ];
                     }
                 } else {
                     $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
@@ -5674,8 +5669,7 @@ class Payplug extends PaymentModule
             foreach ($res_all_cards as $card) {
                 $id_customer = $card['id_customer'];
                 $id_payplug_card = $card['id_payplug_card'];
-                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card, $api_key)) {
+                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
                     return false;
                 }
             }
