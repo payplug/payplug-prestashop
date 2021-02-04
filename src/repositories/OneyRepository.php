@@ -234,7 +234,10 @@ class OneyRepository extends Repository
             }
             switch ($field) {
                 case 'email':
-                    if ($tools->tool('strlen', $data, 'UTF-8') > 100
+                    if (empty($data)) {
+                        $text = $this->l('The email address is empty.');
+                        $errors[] = $text;
+                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100
                         && $tools->tool('strpos', $data, '+') !== false) {
                         $text = $this->l('Your email address is too long and the + character is not valid, 
                         please change it to another address (max 100 characters).');
