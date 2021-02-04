@@ -5194,6 +5194,8 @@ class Payplug extends PaymentModule
         $this->current_api_key = $this->getCurrentApiKey();
         $this->email = Configuration::get('PAYPLUG_EMAIL');
         $available_img_lang = [
+            'fr',
+            'gb',
             'en',
             'it'
         ];
