@@ -844,15 +844,18 @@ class Payplug extends PaymentModule
 
     public function capturePayment()
     {
+        $this->logger->addLog('[Payplug] Start capture', 'notice');
         $pay_id = Tools::getValue('pay_id');
         $id_order = Tools::getValue('id_order');
         $payment = new PPPayment($pay_id);
         $capture = $payment->capture();
         $payment->refresh();
         if ($payment->resource->card->id !== null) {
+            $this->logger->addLog('Save the payment card', 'notice');
             $this->card->saveCard($payment->resource);
         }
         if ($capture['code'] >= 300) {
+            $this->logger->addLog('Cannot capture this payment', 'notice');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Cannot capture this payment.'),
@@ -864,6 +867,13 @@ class Payplug extends PaymentModule
 
             $order = new Order((int)$id_order);
             if (Validate::isLoadedObject($order)) {
+                if (!$this->createLockFromCartId($order->id_cart)) {
+                    die(json_encode([
+                        'status' => 'error',
+                        'data' => $this->l('An error has occurred')
+                    ]));
+                }
+
                 $order->setInvoice(true);
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
@@ -871,6 +881,12 @@ class Payplug extends PaymentModule
                     $history->id_order = (int)$order->id;
                     $history->changeIdOrderState($new_state, (int)$order->id);
                     $history->addWithemail();
+                }
+
+                if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $this->logger->addLog('Lock deleted.', 'notice');
                 }
             }
 
@@ -5194,6 +5210,8 @@ class Payplug extends PaymentModule
         $this->current_api_key = $this->getCurrentApiKey();
         $this->email = Configuration::get('PAYPLUG_EMAIL');
         $available_img_lang = [
+            'fr',
+            'gb',
             'en',
             'it'
         ];
