@@ -83,7 +83,7 @@ class PayPlugAjax
                         'is_oney' => $is_oney,
                         '_ajax' => 1
                     ];
-                    $payment = $this->payplug->preparePayment($options, $tools->tool('getValue', 'pc'));
+                    $payment = $this->payplug->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
                 } else {
                     $cookie = $context->cookie;

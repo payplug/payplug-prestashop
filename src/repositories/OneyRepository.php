@@ -1202,7 +1202,7 @@ class OneyRepository extends Repository
      */
     public function installOneyCarriers()
     {
-        $carriers = \PayPlugCarrier::getCarriers($this->contextSpecific->getContext()->language->id, true);
+        $carriers = \PayPlugCarrier::getCarriers(true);
         $flag = true;
         foreach ($carriers as $carrier) {
             $flag = $flag && $carrier->save();

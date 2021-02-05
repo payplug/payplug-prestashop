@@ -844,15 +844,18 @@ class Payplug extends PaymentModule
 
     public function capturePayment()
     {
+        $this->logger->addLog('[Payplug] Start capture', 'notice');
         $pay_id = Tools::getValue('pay_id');
         $id_order = Tools::getValue('id_order');
         $payment = new PPPayment($pay_id);
         $capture = $payment->capture();
         $payment->refresh();
         if ($payment->resource->card->id !== null) {
+            $this->logger->addLog('Save the payment card', 'notice');
             $this->card->saveCard($payment->resource);
         }
         if ($capture['code'] >= 300) {
+            $this->logger->addLog('Cannot capture this payment', 'notice');
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->l('Cannot capture this payment.'),
@@ -864,6 +867,13 @@ class Payplug extends PaymentModule
 
             $order = new Order((int)$id_order);
             if (Validate::isLoadedObject($order)) {
+                if (!$this->createLockFromCartId($order->id_cart)) {
+                    die(json_encode([
+                        'status' => 'error',
+                        'data' => $this->l('An error has occurred')
+                    ]));
+                }
+
                 $order->setInvoice(true);
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
@@ -871,6 +881,12 @@ class Payplug extends PaymentModule
                     $history->id_order = (int)$order->id;
                     $history->changeIdOrderState($new_state, (int)$order->id);
                     $history->addWithemail();
+                }
+
+                if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $this->logger->addLog('Lock deleted.', 'notice');
                 }
             }
 
@@ -909,7 +925,8 @@ class Payplug extends PaymentModule
             return $errors;
         }
 
-        foreach ($response['details'] as $key => $value) {
+        $keys = array_keys($response['details']);
+        foreach ($keys as $key) {
             // add specific error message
             switch ($key) {
                 default:
@@ -2082,9 +2099,8 @@ class Payplug extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-old.css');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -2872,8 +2888,8 @@ class Payplug extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -3110,7 +3126,7 @@ class Payplug extends PaymentModule
             $inst_status = $installment->is_active ?
                 $this->l('ongoing') :
                 (
-                    $installment->is_fully_paid ?
+                $installment->is_fully_paid ?
                     $this->l('paid') :
                     $this->l('suspended')
                 );
@@ -3362,7 +3378,7 @@ class Payplug extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.1.0.js');
         }
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
@@ -3530,20 +3546,13 @@ class Payplug extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                /* TODO : admin.css ne devrait pas être inclus ici, il ne sert que pour récuperer le css de la popin.
-                 * Il faut creer un admin_order.less avec les bons components mais aussi changer tout le namming
-                 * des modifiers dans le js. Have fun!
-                 * Pour eviter les conflits du a une multiple inclusion du component, on s'assure que admin_order.css
-                 * soit chargé après admin.css.
-                 */
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.1.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.1.0.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css',
             ]);
         }
     }
@@ -3574,7 +3583,7 @@ class Payplug extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.1.0.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
@@ -3582,7 +3591,7 @@ class Payplug extends PaymentModule
                 'is_deferred' => (bool)Tools::getValue('def'),
             ];
 
-            $payment = $this->preparePayment($payment_options, 'new_card');
+            $payment = $this->preparePayment($payment_options);
 
             if ($payment['result']) {
                 // If payment is paid then redirect
@@ -4031,13 +4040,13 @@ class Payplug extends PaymentModule
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
         if (preg_match(
-            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
+                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
                         iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|
                         palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|
                         up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-            $useragent
-        ) || preg_match(
-            '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
+                $useragent
+            ) || preg_match(
+                '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
             an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
                 br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
                 dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|
@@ -4054,8 +4063,8 @@ class Payplug extends PaymentModule
                 tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|
                 vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|
                 wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-            Tools::substr($useragent, 0, 4)
-        )) {
+                Tools::substr($useragent, 0, 4)
+            )) {
             return true;
         }
         return false;
@@ -4381,11 +4390,10 @@ class Payplug extends PaymentModule
      * prepare payment
      *
      * @param $options
-     * @param string $id_card
      * @return mixed
      * @throws Exception
      */
-    public function preparePayment($options, $id_card = null)
+    public function preparePayment($options)
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
@@ -4701,7 +4709,10 @@ class Payplug extends PaymentModule
                     // then recheck
                     if ($this->oney->hasOneyRequiredFields($payment_tab)) {
                         $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
-                        return ['result' => false, 'response' => false];
+                        return [
+                            'result' => false,
+                            'response' => $this->l('At least one of the fields is not correctly completed.')
+                        ];
                     }
                 } else {
                     $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
@@ -5198,7 +5209,14 @@ class Payplug extends PaymentModule
 
         $this->current_api_key = $this->getCurrentApiKey();
         $this->email = Configuration::get('PAYPLUG_EMAIL');
-        $this->img_lang = $this->context->language->iso_code === 'it' ? 'it' : 'default';
+        $available_img_lang = [
+            'fr',
+            'gb',
+            'en',
+            'it'
+        ];
+        $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
+            ? $this->context->language->iso_code : 'default';
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
@@ -5669,8 +5687,7 @@ class Payplug extends PaymentModule
             foreach ($res_all_cards as $card) {
                 $id_customer = $card['id_customer'];
                 $id_payplug_card = $card['id_payplug_card'];
-                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card, $api_key)) {
+                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
                     return false;
                 }
             }
