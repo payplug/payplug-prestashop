@@ -34,4 +34,9 @@ class ToolsSpecific implements ToolsInterface
             return Tools::$action($param1, $param2);
         }
     }
+
+    public static function factory()
+    {
+        return new ToolsSpecific();
+    }
 }

@@ -53,14 +53,14 @@ class OneyRepository extends Repository
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
-        $this->addressSpecific = new AddressSpecific();
-        $this->cache = new CacheRepository();
-        $this->configurationSpecific = new ConfigurationSpecific();
-        $this->countrySpecific = new CountrySpecific();
-        $this->logger = new LoggerRepository();
-        $this->toolsSpecific = new ToolsSpecific();
+        $this->addressSpecific = AddressSpecific::factory();
+        $this->cache = CacheRepository::factory();
+        $this->configurationSpecific = ConfigurationSpecific::factory();
+        $this->countrySpecific = CountrySpecific::factory();
+        $this->logger = LoggerRepository::factory();
+        $this->toolsSpecific = ToolsSpecific::factory();
         $this->validateSpecific = new ValidateSpecific();
-        $this->log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
+        $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
         $this->contextSpecific = new ContextSpecific();
     }
 

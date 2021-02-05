@@ -28,6 +28,11 @@ use Country;
 
 class CountrySpecific implements CountryInterface
 {
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function getByIso($idCurrency)
     {
         return Country::getByIso($idCurrency);

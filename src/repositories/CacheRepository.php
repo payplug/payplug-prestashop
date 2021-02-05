@@ -40,6 +40,10 @@ class CacheRepository extends Repository
         $this->setLogger();
     }
 
+    public static function prout(){
+ return 'bout';
+    }
+
     /**
      * @description Hydrate entities standard parameters
      *
@@ -97,9 +101,9 @@ class CacheRepository extends Repository
 
         if (!$cache) {
             $this->cacheEntity->setDateAdd($this->logger->udate('Y-m-d H:i:s'));
-            
+
             $cache = $this->cacheEntity;
-            
+
             $this->query
                 ->insert()
                 ->into(_DB_PREFIX_ .$this->cacheEntity->getTable())
@@ -112,7 +116,7 @@ class CacheRepository extends Repository
             if (!$this->query->build()) {
                 return false;
             }
-            
+
             return true;
         }
     }
@@ -160,7 +164,7 @@ class CacheRepository extends Repository
             $this->logger->addLog($error_message, $error_level);
             return false;
         }
-        
+
         return true;
     }
 }

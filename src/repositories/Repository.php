@@ -31,6 +31,11 @@ class Repository
     protected $name;
     protected $payplug;
 
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function setName()
     {
         $this->name = (new \ReflectionClass($this))->getShortName();
