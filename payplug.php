@@ -868,6 +868,7 @@ class Payplug extends PaymentModule
             $order = new Order((int)$id_order);
             if (Validate::isLoadedObject($order)) {
                 if (!$this->createLockFromCartId($order->id_cart)) {
+                    $this->logger->addLog('An error occured on lock creation', 'notice');
                     die(json_encode([
                         'status' => 'error',
                         'data' => $this->l('An error has occurred')
@@ -876,9 +877,11 @@ class Payplug extends PaymentModule
 
                 $order->setInvoice(true);
                 $current_state = (int)$order->getCurrentState();
+                $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                 if ($current_state != 0 && $current_state != $new_state) {
                     $history = new OrderHistory();
                     $history->id_order = (int)$order->id;
+                    $this->logger->addLog('New order state: ' . $new_state, 'notice');
                     $history->changeIdOrderState($new_state, (int)$order->id);
                     $history->addWithemail();
                 }
@@ -1259,6 +1262,12 @@ class Payplug extends PaymentModule
         }
 
         if (!$os || $force) {
+            // before creating a new order state, we should check if a previous state correspond to our needs
+            $previous_order_state_id = $this->findOrderState($state['name'], $sandbox);
+           if ($previous_order_state_id) {
+                return Configuration::updateValue($key_config, $previous_order_state_id);
+            }
+
             $log->info('Creating new order state.');
             $order_state = new OrderState();
             $order_state->logable = $state['logable'];
