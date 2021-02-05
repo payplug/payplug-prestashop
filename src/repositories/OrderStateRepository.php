@@ -127,12 +127,31 @@ class OrderStateRepository extends Repository
         return $ids;
     }
 
+    public function IsUsedByOrders($module_name)
+    {
+        $ids = [];
+        $res = $this->query
+            ->select()
+            ->fields('o.id_order_state')
+            ->from(_DB_PREFIX_.'orders', 'o')
+            ->where('o.module = \''.pSQL($module_name).'\'')
+            ->groupBy('o.id_order_state')
+            ->build();
+
+        foreach ($res as $os) {
+            array_push($ids, (int)$os['id_order_state']);
+        }
+
+        return $ids;
+    }
+
     public function removeIdsUnusedByPayPlug()
     {
         $payplug_os_id_list = $this->getIdsByModuleName('payplug');
+        $used_order_os_id_list = $this->IsUsedByOrders('payplug');
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
-            if (!in_array($payplug_os_id, $used_os_id_list)) {
+            if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
                 $os = new OrderStateEntity($payplug_os_id);
                 $os->delete();
             }
