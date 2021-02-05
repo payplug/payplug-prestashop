@@ -1259,6 +1259,12 @@ class Payplug extends PaymentModule
         }
 
         if (!$os || $force) {
+            // before creating a new order state, we should check if a previous state correspond to our needs
+            $previous_order_state_id = $this->findOrderState($state['name'], $sandbox);
+           if ($previous_order_state_id) {
+                return Configuration::updateValue($key_config, $previous_order_state_id);
+            }
+
             $log->info('Creating new order state.');
             $order_state = new OrderState();
             $order_state->logable = $state['logable'];
