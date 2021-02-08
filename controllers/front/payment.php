@@ -39,8 +39,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
         $context = Context::getContext();
 
-        $id_payplug_card = Tools::getValue('pc', 'new_card');
-
         $type = Tools::getValue('type', null);
         $io = Tools::getValue('io', null);
         $is_oney = null;
@@ -50,7 +48,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             }
         }
         $options = [
-            'id_card' => $id_payplug_card,
             'is_oney' => $is_oney,
             '_ajax' => 1
         ];
