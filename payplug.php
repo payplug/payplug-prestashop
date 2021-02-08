@@ -5685,9 +5685,6 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
-        $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-
         $req_all_cards = new DbQuery();
         $req_all_cards->select('pc.*');
         $req_all_cards->from('payplug_card', 'pc');

@@ -127,7 +127,7 @@ class OrderStateRepository extends Repository
         return $ids;
     }
 
-    public function IsUsedByOrders($module_name)
+    public function isUsedByOrders($module_name)
     {
         $ids = [];
         $res = $this->query
@@ -148,7 +148,7 @@ class OrderStateRepository extends Repository
     public function removeIdsUnusedByPayPlug()
     {
         $payplug_os_id_list = $this->getIdsByModuleName('payplug');
-        $used_order_os_id_list = $this->IsUsedByOrders('payplug');
+        $used_order_os_id_list = $this->isUsedByOrders('payplug');
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {

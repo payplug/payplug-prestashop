@@ -179,9 +179,6 @@ class CardRepository extends Repository
      */
     public function deleteCards($id_customer)
     {
-        $config = $this->configurationSpecific;
-        $test_api_key = $config->get('PAYPLUG_TEST_API_KEY');
-        $live_api_key = $config->get('PAYPLUG_LIVE_API_KEY');
         $cardsToDelete = $this->getCardsByCustomer($id_customer, false);
         if (isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
             foreach ($cardsToDelete as $card) {
