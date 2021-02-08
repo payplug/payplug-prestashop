@@ -3945,7 +3945,8 @@ class Payplug extends PaymentModule
         $this->uninstall();
         $install['error'] = (isset($install['error'])) ? 'Élément en cause : ' . $install['error'] : '';
         $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé 
-        en raison d\'une erreur. Les modifications apportées ont bien été annulées. ' . $install['error']);
+        en raison d\'une erreur. Les modifications apportées ont bien été annulées.');
+        $this->context->controller->errors[] = $install['error'];
         return false;
     }
 
