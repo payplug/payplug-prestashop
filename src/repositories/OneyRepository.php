@@ -250,6 +250,9 @@ class OneyRepository extends Repository
                         $text = $this->l('The + character is not valid. 
                         Please change your email address (100 characters max).');
                         $errors[] = $text;
+                    } elseif(!$this->validateSpecific->validate('isEmail', $data)) {
+                        $text = $this->l('Invalid address email.');
+                        $errors[] = $text;
                     }
                     break;
                 case 'mobile_phone_number':
