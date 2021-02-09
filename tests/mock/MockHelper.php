@@ -28,9 +28,7 @@ use \Mockery;
 
 class MockHelper extends Mockery
 {
-    public static function createMockFactory(
-        $classPathname
-    ) {
+    public static function createMockFactory($classPathname) {
         $mock = \Mockery::mock('alias:'. $classPathname);
         $mock->shouldReceive('factory')
             ->andReturnSelf();
@@ -56,4 +54,40 @@ class MockHelper extends Mockery
             });
     }
 
+    public static function createToolsMock($classPathname) {
+        $tools = self::createMockFactory($classPathname)
+            ->shouldReceive('tool')
+            ->andReturnUsing(function ($action, $value, $params2) {
+                switch ($action) {
+                    case 'jsonDecode':
+                        return json_decode($value, $params2);
+                    case 'strlen':
+                        return strlen($value);
+                    case 'strpos':
+                        return strpos($value, $params2);
+                    default:
+                        break;
+                }
+
+                return false;
+            });
+        return $tools;
+    }
+
+    public static function createTranslateMock($classPathname) {
+        $translate = self::createMockFactory($classPathname)
+            ->shouldReceive('translate')
+            ->andReturnUsing(function ($module_class, $string, $repository_name) {
+                return $string;
+            });
+        return $translate;
+    }
+
+    public static function createConfigMock($classPathname) {
+        $context = ContextMock::get();
+        $config = self::createMockFactory($classPathname)
+            ->shouldReceive('getContext')
+            ->andReturn($context);
+        return $config;
+    }
 }
