@@ -1264,7 +1264,7 @@ class Payplug extends PaymentModule
         if (!$os || $force) {
             // before creating a new order state, we should check if a previous state correspond to our needs
             $previous_order_state_id = $this->findOrderState($state['name'], $sandbox);
-           if ($previous_order_state_id) {
+            if ($previous_order_state_id) {
                 return Configuration::updateValue($key_config, $previous_order_state_id);
             }
 
@@ -3945,7 +3945,8 @@ class Payplug extends PaymentModule
         $this->uninstall();
         $install['error'] = (isset($install['error'])) ? 'Élément en cause : ' . $install['error'] : '';
         $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé 
-        en raison d\'une erreur. Les modifications apportées ont bien été annulées. ' . $install['error']);
+        en raison d\'une erreur. Les modifications apportées ont bien été annulées.');
+        $this->context->controller->errors[] = $install['error'];
         return false;
     }
 
@@ -5684,9 +5685,6 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
-        $test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-
         $req_all_cards = new DbQuery();
         $req_all_cards->select('pc.*');
         $req_all_cards->from('payplug_card', 'pc');

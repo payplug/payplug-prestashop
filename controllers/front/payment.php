@@ -39,8 +39,6 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
         $context = Context::getContext();
 
-        $id_payplug_card = Tools::getValue('pc', null);
-
         $type = Tools::getValue('type', null);
         $io = Tools::getValue('io', null);
         $is_oney = null;
