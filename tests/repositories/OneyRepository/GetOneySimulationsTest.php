@@ -45,6 +45,7 @@ final class GetOneySimulationsTest extends TestCase
     protected $logger;
     protected $myLogPhp;
     protected $tools;
+    protected $oney;
 
     protected $repo;
 
@@ -64,6 +65,7 @@ final class GetOneySimulationsTest extends TestCase
         $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
         $this->tools = MockHelper::createMockFactory('Payplug\src\specific\ToolsSpecific');
+        $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
 
         $this->cache->shouldReceive('setCache')
             ->andReturn(true);
@@ -96,8 +98,7 @@ final class GetOneySimulationsTest extends TestCase
             ->shouldReceive('getCacheByKey')
             ->andReturn(false);
 
-        $this->oneyMock = MockHelper::createMockFactory('Payplug\OneySimulation')
-            ->shouldReceive('getSimulations')
+        $this->oney->shouldReceive('getSimulations')
             ->andReturn($simulations);
 
         $this->assertEquals(
@@ -130,5 +131,38 @@ final class GetOneySimulationsTest extends TestCase
                 'simulations' => $simulations
              ]
         );
+    }
+
+
+    public function testGetOneySimulationsWithoutCacheThrowException()
+    {
+        // Mock cache storing
+        $arrayCache = [];
+        $this->cache
+            ->shouldReceive('getCacheByKey')
+            ->andReturn(null);
+        MockHelper::createSetCacheMock($this->cache, $arrayCache);
+
+        // Mock Logger storing
+        $arrayLogger = [];
+        MockHelper::createAddLogMock($this->logger, $arrayLogger);
+
+        // Mock payplug-php getSimulations callback with an exception
+        $this->oney->shouldReceive('getSimulations')
+            ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403);
+
+        $oney_repo = new OneyRepository('');
+
+        $this->assertSame(
+            $oney_repo->getOneySimulations(500, 'FR', ['x3_with_fees']),
+            [
+                'result' => false,
+                'error' => 'Payplug\Exception\HttpException: [0]: Forbidden method; HTTP Response: 403'
+            ]
+        );
+
+        // Check logger and cache
+        $this->assertSame(count($arrayLogger), 0);
+        $this->assertSame(count($arrayCache), 0);
     }
 }
