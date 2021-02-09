@@ -24,24 +24,23 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\CacheEntity;
+use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\exceptions\BadParameterException;
 
 class CacheRepository extends Repository
 {
     public $cacheEntity;
     private $query;
+    private $config;
     private $logger;
 
     public function __construct()
     {
         $this->cacheEntity = new CacheEntity();
-        $this->query = new QueryRepository();
+        $this->query = QueryRepository::factory();
+        $this->config = ConfigurationSpecific::factory();
         $this->setStdParams();
         $this->setLogger();
-    }
-
-    public static function prout(){
- return 'bout';
     }
 
     /**
@@ -54,27 +53,27 @@ class CacheRepository extends Repository
         $this->cacheEntity
             ->setTable('payplug_cache')
             ->setDefinition([
-            'table' => $this->cacheEntity->getTable(),
-            'primary' => 'id_'.$this->cacheEntity->getTable(),
-            'fields' => [
-                /*
-                 * Different types,
-                 * according to modules/gamification/tests/mocks/ObjectModel.php :
-                 * TYPE_INT = 1;
-                 * TYPE_BOOL = 2;
-                 * TYPE_STRING = 3;
-                 * TYPE_FLOAT = 4;
-                 * TYPE_DATE = 5;
-                 * TYPE_HTML = 6;
-                 * TYPE_NOTHING = 7;
-                 * TYPE_SQL = 8;
-                 */
-                'cache_key'     => ['type' => 3, 'validate' => 'isString', 'required' => true],
-                'cache_value'   => ['type' => 3, 'validate' => 'isString', 'required' => true],
-                'date_add'      => ['type' => 5, 'validate' => 'isDate'],
-                'date_upd'      => ['type' => 5, 'validate' => 'isDate'],
-            ]
-        ]);
+                'table' => $this->cacheEntity->getTable(),
+                'primary' => 'id_' . $this->cacheEntity->getTable(),
+                'fields' => [
+                    /*
+                     * Different types,
+                     * according to modules/gamification/tests/mocks/ObjectModel.php :
+                     * TYPE_INT = 1;
+                     * TYPE_BOOL = 2;
+                     * TYPE_STRING = 3;
+                     * TYPE_FLOAT = 4;
+                     * TYPE_DATE = 5;
+                     * TYPE_HTML = 6;
+                     * TYPE_NOTHING = 7;
+                     * TYPE_SQL = 8;
+                     */
+                    'cache_key' => ['type' => 3, 'validate' => 'isString', 'required' => true],
+                    'cache_value' => ['type' => 3, 'validate' => 'isString', 'required' => true],
+                    'date_add' => ['type' => 5, 'validate' => 'isDate'],
+                    'date_upd' => ['type' => 5, 'validate' => 'isDate'],
+                ]
+            ]);
     }
 
     /**
@@ -106,12 +105,11 @@ class CacheRepository extends Repository
 
             $this->query
                 ->insert()
-                ->into(_DB_PREFIX_ .$this->cacheEntity->getTable())
-                ->fields('cache_key')   ->values(pSQL($cache_key))
-                ->fields('cache_value') ->values(json_encode($cache_value))
-                ->fields('date_add')    ->values(pSQL($cache->getDateAdd()))
-                ->fields('date_upd')    ->values(pSQL($cache->getDateAdd()))
-            ;
+                ->into(_DB_PREFIX_ . $this->cacheEntity->getTable())
+                ->fields('cache_key')->values(pSQL($cache_key))
+                ->fields('cache_value')->values(json_encode($cache_value))
+                ->fields('date_add')->values(pSQL($cache->getDateAdd()))
+                ->fields('date_upd')->values(pSQL($cache->getDateAdd()));
 
             if (!$this->query->build()) {
                 return false;
@@ -119,6 +117,49 @@ class CacheRepository extends Repository
 
             return true;
         }
+    }
+
+    /**
+     * @description Get Cache ID
+     *
+     * @param int $amount
+     * @param string $country
+     * @param array $operation contain x3|4_with_fees or x3|4_without_fees
+     * @return array
+     */
+    public function setCacheKey($amount, $country, $operations)
+    {
+        if (!is_int($amount)) {
+            return [
+                'result' => false,
+                'message' => 'Amount is not an int'
+            ];
+        }
+
+        if (!is_string($country)) {
+            return [
+                'result' => false,
+                'message' => 'Country is not a string'
+            ];
+        }
+
+        if (!is_array($operations)) {
+            return [
+                'result' => false,
+                'message' => 'Operations is not an array'
+            ];
+        }
+
+        $cache_id = 'Payplug::OneySimulations_' .
+            (int)$amount . '_' .
+            (string)$country . '_' .
+            (string)implode('_', $operations) . '_' .
+            ($this->config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
+
+        return [
+            'result' => $cache_id,
+            'message' => 'success'
+        ];
     }
 
     /**
@@ -132,9 +173,8 @@ class CacheRepository extends Repository
         $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_.$this->cacheEntity->getTable())
-            ->where('`cache_key` = \'' . (string)$cache_key . '\'')
-        ;
+            ->from(_DB_PREFIX_ . $this->cacheEntity->getTable())
+            ->where('`cache_key` = \'' . (string)$cache_key . '\'');
 
         $cache = $this->query->build();
 
@@ -155,8 +195,7 @@ class CacheRepository extends Repository
     {
         $this->query
             ->truncate()
-            ->table(_DB_PREFIX_ .$this->cacheEntity->getTable())
-        ;
+            ->table(_DB_PREFIX_ . $this->cacheEntity->getTable());
 
         if (!$this->query->build()) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';

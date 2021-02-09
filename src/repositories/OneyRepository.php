@@ -901,15 +901,18 @@ class OneyRepository extends Repository
         $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
 
-        $cache_id = 'Payplug::OneySimulations_' .
-            (int)$amount . '_' .
-            (string)$country . '_' .
-            (string)implode('_', $operation) . '_' .
-            ($config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
+        $cache_key = $this->cache->setCacheKey($amount, $country, $operation);
+
+        if(!$cache_key['result']) {
+            return [
+                'result' => false,
+                'error' => $cache_key['message']
+            ];
+        }
 
         // Checks if the current simulation is already saved in the database
         // If not, we do a simulation for Oney, and we will store it to the DB
-        $cache_from_bdd = $this->cache->getCacheByKey($cache_id);
+        $cache_from_bdd = $this->cache->getCacheByKey($cache_key['result']);
 
         if ($cache_from_bdd) {
             return $tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
@@ -942,7 +945,7 @@ class OneyRepository extends Repository
 
                     // $cache_id = cache_key in db
                     // $to_cache = cache_value in db
-                    if (!$this->cache->setCache($cache_id, $to_cache)) {
+                    if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
                         $this->logger->setParams(['process' => '[Oney Repository] setCache']);
                         $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                         $error_level = 'error';
