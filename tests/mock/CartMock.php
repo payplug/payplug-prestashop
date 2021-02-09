@@ -26,7 +26,7 @@ namespace PayPlug\tests\mock;
 
 class CartMock
 {
-    public static function getCart()
+    public static function get()
     {
         $cart = new \stdClass();
         $cart->id = 1;
