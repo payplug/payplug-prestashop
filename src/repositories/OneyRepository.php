@@ -221,7 +221,7 @@ class OneyRepository extends Repository
         $validate = $this->validateSpecific;
         $errors = [];
 
-        if (!$payment_data) {
+        if (!$payment_data || !is_array($payment_data)) {
             return [$this->l('Please fill in the required fields')];
         }
 
