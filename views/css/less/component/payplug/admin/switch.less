@@ -1,0 +1,128 @@
+/* Payplug Admin Switch */
+.payplugSwitch {
+  .borderRadius(.25em);
+  .boxShadow(rgba(0, 0, 0, .15) 0 1px 4px 1px inset);
+  background: rgba(0, 0, 0, .1);
+  display: flex;
+  position: relative;
+  width: 160px;
+  height: 26px;
+  flex: 0 0 160px;
+
+  &_label {
+    label& {
+      .transition(color @dur);
+      position: relative;
+      display: flex;
+      width: 50%;
+      height: 100%;
+      z-index: 1;
+      font-weight: 400;
+      text-transform: uppercase;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+
+      .-disabled & {
+        cursor: default;
+      }
+    }
+
+    &.-left {
+      color: #fff;
+    }
+  }
+
+  &:before {
+    .borderRadius(.25em);
+    .transition(left @dur);
+    //.boxShadow(rgba(0,0,0,.15) 0 1px 4px 1px inset);
+    .border(darken(#colorMap[payplug], 5%));
+    border-bottom-width: 2px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    background: #colorMap[payplug];
+    width: 50%;
+    height: 100%;
+  }
+
+  &.-right {
+    .payplugSwitch_label {
+      &.-left {
+        color: inherit;
+      }
+
+      &.-right {
+        color: #fff;
+      }
+    }
+
+    &:before {
+      left: 50%;
+    }
+  }
+
+  &.-disabled {
+    &:before {
+      border-color: darken(#colorMap[stroke], 5%);
+      background: #colorMap[stroke];
+    }
+  }
+
+  &.-small {
+    .borderRadius(10px);
+    .transition(background @dur/1.5);
+    .boxShadow();
+    display: inline-block;
+    background: transparent;
+    width: 45px;
+    flex: 0 0 45px;
+    height: 20px;
+    margin: 0 8px 0 0;
+    cursor: pointer;
+    background: #colorMap[payplug];
+
+    label {
+      display: none;
+    }
+
+    & + label {
+      margin: 0;
+    }
+
+    &:before {
+      .borderRadius();
+      .transform(translateY(-50%));
+      .transition(left @dur);
+      border: none;
+      position: absolute;
+      top: 50%;
+      left: calc(100% - 18px);
+      content: "";
+      background: #fff;
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+
+    &.-right {
+      background: #colorMap[grey];
+
+      &:before {
+        left: 2px;
+      }
+    }
+
+    &.-disabled {
+      cursor: default;
+      background: fade(#colorMap[grey], 50%);
+    }
+  }
+
+  input {
+    display: none;
+  }
+}

@@ -1,0 +1,35 @@
+/* Payplug message */
+.payplugMsg {
+  &_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &_error {
+    color: #colorMap[error];
+    text-align: center;
+    @media (@mobile) {
+      // todo: we should use a modifier
+      .payplugPopin & {
+        width: calc(100vw - 30px);
+        max-width: 100%;
+      }
+    }
+  }
+
+  &_button {
+    .borderRadius(2px);
+    background: #colorMap[payplug];
+    width: auto;
+    height: 32px;
+    padding: 0 16px;
+    color: #fff;
+    border: none;
+    font-size: 15px;
+    outline: none;
+    margin: 5px 0 0;
+    cursor: pointer;
+  }
+}

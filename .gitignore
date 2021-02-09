@@ -1,4 +1,14 @@
 log/*.csv
 config*.xml
 .DS_Store
-.idea/
+.idea
+vendor/
+views/css/*.map
+views/css/less/*.css
+views/css/less/*.map
+views/css/less/*/*.css
+views/css/less/*/*.map
+views/css/less/*/*/*.css
+views/css/less/*/*/*.map
+views/css/less/*/*/*/*.css
+views/css/less/*/*/*/*.map

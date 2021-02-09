@@ -27,63 +27,93 @@
  */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
+    private $card;
+    private $configurationSpecific;
+    private $contextSpecific;
+    private $oney;
+    private $payplug;
+    private $plugin;
+    private $productSpecific;
+    private $toolsSpecific;
+    private $translate;
+
     /**
      * @description
      * Method that is executed after init() and checkAccess().
      * Used to process user input.
      *
      * return void
+     * @throws Exception
      */
     public function postProcess()
     {
-        require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
-        require_once(_PS_MODULE_DIR_ . '../init.php');
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $ajax = new PayPlugAjax();
+            $ajax->run();
+            exit;
+        }
+
+        require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
         include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
 
-        if (Tools::getValue('_ajax') == 1) {
-            $payplug = new Payplug();
-            $context = Context::getContext();
+        $this->payplug = new \Payplug();
+        $this->plugin = $this->payplug->getPlugin();
+        $this->toolsSpecific = $this->plugin->getTools();
 
-            if (Tools::getIsset('pc')) {
-                if ((int)Tools::getValue('pay') == 1) {
-                    $payment = $payplug->preparePayment(['id_card' => Tools::getValue('pc')]);
-                    die($payment);
-                } elseif ((int)Tools::getValue('delete') == 1) {
+        if ($this->toolsSpecific->tool('getValue', '_ajax') == 1) {
+            $this->card = $this->plugin->getCard();
+            $this->configurationSpecific = $this->plugin->getConfiguration();
+            $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
+            $this->oney = $this->plugin->getOney();
+            $this->productSpecific = $this->plugin->getProduct();
+            $this->translate = $this->plugin->getTranslate();
+
+            $config = $this->configurationSpecific;
+            $context = $this->contextSpecific->getContext(); // get the method
+            $tools = $this->toolsSpecific;
+
+            if ($tools->tool('getIsset', 'pc')) {
+                if ((int)$tools->tool('getValue', 'delete') == 1) {
                     $cookie = $context->cookie;
                     $id_customer = (int)$cookie->id_customer;
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $id_payplug_card = Tools::getValue('pc');
-                    $valid_key = Payplug::setAPIKey();
-                    $deleted = $payplug->deleteCard($id_customer, $id_payplug_card, $valid_key);
+                    $id_payplug_card = $tools->tool('getValue', 'pc');
+                    $deleted = $this->card->deleteCard($id_customer, $id_payplug_card);
                     if ($deleted) {
                         die(true);
                     } else {
                         die(false);
                     }
                 }
-            } elseif (Tools::getIsset('getOneyCta')) {
-                die(json_encode(array(
+            } elseif ($tools->tool('getIsset', 'getOneyCta')) {
+                die(json_encode([
                     'result' => true,
-                    'tpl' => $payplug->getOneyCTA(),
-                )));
-            } elseif (Tools::getIsset('isOneyElligible')) {
-                $use_taxes = (bool)Configuration::get('PS_TAX');
+                    'tpl' => $this->oney->getOneyCTA(),
+                ]));
+            } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
+                $use_taxes = (bool)$config->get('PS_TAX');
 
-                if ($id_product = (int)Tools::getValue('id_product')) {
-                    $group = Tools::getValue('group');
+                if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
+                    $group = $tools->tool('getValue', 'group');
                     // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
                     if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
                         $id_product_attribute = $group ?
-                            (int)Product::getIdProductAttributesByIdAttributes($id_product, $group)
-                            : 0;
+                            (int)Product::getIdProductAttributesByIdAttributes($id_product, $group) :
+                            0
+                        ;
                     } else {
                         $id_product_attribute = $group ?
-                            (int)Product::getIdProductAttributeByIdAttributes($id_product, $group)
-                            : 0;
+                            (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) :
+                            0
+                        ;
                     }
-                    $quantity = (int)Tools::getValue('qty', 1);
+                    $quantity = (int)$tools->tool(
+                        'getValue',
+                        'qty',
+                        (int)$tools->tool('getValue', 'quantity_wanted', 1)
+                    );
                     $product_price = Product::getPriceStatic(
                         (int)$id_product,
                         $use_taxes,
@@ -96,30 +126,29 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     );
                     $amount = $product_price * $quantity;
                     $id_currency = $context->currency->id;
-                    $is_elligible = $payplug->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $delivery_address = new Address($context->cart->id_address_delivery);
                     $delivery_country = new Country($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
                     $cart = $context->cart;
-                    $is_elligible = $payplug->isOneyElligible($cart, $amount, $iso_code);
+                    $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
                 }
 
                 die(json_encode($is_elligible));
-            } elseif (Tools::getIsset('getOneyPriceAndPaymentOptions')) {
-                $use_taxes = (bool)Configuration::get('PS_TAX');
+            } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
+                $use_taxes = (bool)$config->get('PS_TAX');
 
-                if ($id_product = (int)Tools::getValue('id_product')) {
-                    $group = Tools::getValue('group');
+                if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
+                    $group = $tools->tool('getValue', 'group');
                     $id_product_attribute = $group ?
-                        (int)Product::getIdProductAttributeByIdAttributes($id_product, $group)
-                        : 0;
+                        (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) :
+                        0
+                    ;
                     // Some integration will not use qty data but quantity_wanted
-                    $quantity = (int)Tools::getValue(
-                        'qty',
-                        (int)Tools::getValue('quantity_wanted', 1)
-                    );
+                    $quantity = (int)$tools->tool('getValue', 'qty');
+                    $quantity = $quantity ? $quantity : (int)$tools->tool('getValue', 'quantity_wanted', 1);
                     $product_price = Product::getPriceStatic(
                         (int)$id_product,
                         $use_taxes,
@@ -137,39 +166,52 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $cart = $context->cart;
                 }
 
-                $payment_options = $payplug->getOneyPriceAndPaymentOptions($cart, $amount);
+
+                try {
+                    $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount);
+                } catch (Exception $e) {
+                    die($tools->tool('jsonEncode', [
+                        'result' => false,
+                        'error' => $this->translate->translate(5) //('Oney is momentarily unavailable.')
+                    ]));
+                }
+
                 die(json_encode($payment_options));
-            } elseif (Tools::getIsset('getPaymentErrors')) {
+            } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
-                $errors = $payplug->getPaymentErrorsCookie();
+                $errors = $this->payplug->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die(json_encode(['result' => true, 'template' => $payplug->displayPaymentErrors($errors)]));
+                    die(json_encode(['result' => true, 'template' => $this->payplug->displayPaymentErrors($errors)]));
                 }
 
                 die(json_encode(['result' => false]));
-            } elseif (Tools::getIsset('savePaymentData')) {
-                $payment_data = Tools::getValue('payment_data');
+            } elseif ($tools->tool('getIsset', 'savePaymentData')) {
+                $payment_data = $tools->tool('getValue', 'payment_data');
 
                 if (empty($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => [$payplug->l('Empty payment data')]
+                        'message' => [
+                            $this->translate->translate(1) // 'Empty payment data'
+                        ]
                     ]));
-                } elseif ($payplug->checkOneyRequiredFields($payment_data)) {
+                } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                     die(json_encode([
                         'result' => false,
-                        'message' => [$payplug->l('At least one of the fields is not correctly completed.')]
+                        'message' => [
+                            $this->translate->translate(2) // 'At least one of the fields is not correctly completed.'
+                        ]
                     ]));
                 }
 
-                $result = $payplug->setPaymentDataCookie($payment_data);
+                $result = $this->payplug->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
                     'message' => [
                         $result ?
-                        $payplug->l('Your information has been saved') :
-                        $payplug->l('An error occured. Please retry in few seconds.')
+                            $this->translate->translate(3) : //('Your information has been saved') :
+                            $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
                 ]));
             }

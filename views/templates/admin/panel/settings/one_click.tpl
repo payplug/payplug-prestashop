@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -28,7 +28,7 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Allow customers to save their credit card information for later purchases' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
         </div>
     </div>

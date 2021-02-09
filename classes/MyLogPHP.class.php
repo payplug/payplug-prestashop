@@ -14,6 +14,8 @@
  * @link       http://github.com/llagerlof/MyLogPHP
  */
 
+namespace PayPlug\classes;
+
 class MyLogPHP
 {
     /**
@@ -80,7 +82,7 @@ class MyLogPHP
         }
         $file = $debugBacktrace[1]['file'];
         $value = preg_replace('/\s+/', ' ', trim($value));
-        $entry = array($datetime,$errorlevel,$tag,$value,$line,$file);
+        $entry = [$datetime, $errorlevel, $tag, $value, $line, $file];
         fputcsv($fd, $entry, $this->SEPARATOR);
         fclose($fd);
     }
@@ -134,14 +136,5 @@ class MyLogPHP
     public function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
         self::log('DEBUG', $value, $tag, $line_n);
-    }
-}
-
-function truncateCSV($glob)
-{
-    foreach (glob($glob) as $path) {
-        $file = fopen($path, "w");
-        ftruncate($file, 0);
-        fclose($file);
     }
 }

@@ -26,6 +26,7 @@
  * PayPlugCarrier : This class associate delivery type and delivery time to existing Carrier
  * It's necessary for Oney
  */
+
 class PayPlugCarrier extends ObjectModel
 {
     /** @const int Default delivery delay value in days for new carrier */
@@ -52,21 +53,21 @@ class PayPlugCarrier extends ObjectModel
     /** @var string Carrier name */
     public $name;
 
-    public static $definition = array(
+    public static $definition = [
         'table' => 'payplug_carrier',
         'primary' => 'id_payplug_carrier',
-        'fields' => array(
-            'id_carrier' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'delay' => array('type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true, 'size' => 3),
-            'delivery_type' => array(
+        'fields' => [
+            'id_carrier' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
+            'delay' => ['type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true, 'size' => 3],
+            'delivery_type' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isCleanHtml',
                 'size' => 100
-            ),
-            'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-        )
-    );
+            ],
+            'date_add' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
+            'date_upd' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
+        ]
+    ];
 
     /**
      * @description
@@ -113,9 +114,9 @@ class PayPlugCarrier extends ObjectModel
      */
     public static function getAll()
     {
-        $carriers = array();
+        $carriers = [];
         $req_payplug_carriers = '
-            SELECT pc.`id_payplug_carrier`, c.`name` 
+            SELECT pc.`id_payplug_carrier`, c.`name`
             FROM `'._DB_PREFIX_.self::$definition['table'].'` pc
             LEFT JOIN `'._DB_PREFIX_.'carrier` c ON (c.id_carrier = pc.id_carrier)
             ORDER BY pc.`id_payplug_carrier` ASC';

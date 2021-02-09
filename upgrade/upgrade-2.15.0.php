@@ -26,6 +26,11 @@ if (!defined('_PS_VERSION_')) {
 }
 function upgrade_module_2_3_0($object)
 {
+    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     return ($object->registerHook('registerGDPRConsent') &&
         $object->registerHook('actionDeleteGDPRCustomer') &&
         $object->registerHook('actionExportGDPRData'));

@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -24,7 +24,7 @@
 
     {if $connected && !$verified}
         <div class="panel-row">
-            <p class="payplugAlert payplugAlert-warning">
+            <p class="payplugAlert -warning">
                 <span>
                     {l s='You are able to perform only TEST transactions.' mod='payplug'} {l s='Please activate your account to perform LIVE transactions.' mod='payplug'}
                     <a href="{$faq_links.activation|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod='payplug'}</a>
@@ -48,6 +48,6 @@
     </div>
 
     <div class="panel-footer">
-        <button type="submit" name="submitSettings" class="payplugButton payplugButton-green{if !$connected} payplugButton-disabled{/if}">{l s='Update settings' mod='payplug'}</button>
+        <button type="submit" name="submitSettings" class="payplugButton -green{if !$connected} -disabled{/if}">{l s='Update settings' mod='payplug'}</button>
     </div>
 </div>

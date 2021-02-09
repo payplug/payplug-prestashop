@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2019 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -28,10 +28,10 @@
         <div class="payplugPanel_content">
             <p>
                 {l s='Finalize payment later, when order has been shipped for instance. The funds will be blocked for a period of 7 days maximum once the payment has been authorized.' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.deferred|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information.' mod='payplug'}</a>
+                <a class="payplugLink" href="{$faq_links.deferred|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='More information.' mod='payplug'}</a>
             </p>
-            <div class="payplugTips payplugTips-{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item payplugTips_item-left" {if !$payplug_switch.deferred.checked}style="display: none;"{/if}>
+            <div class="payplugTips -{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
+                <div class="payplugTips_item -left" {if !$payplug_switch.deferred.checked}style="display: none;"{/if}>
                     <div class="payplugDeferred">
                         <label for="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}">
                             <input type="checkbox" name="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" value="1" id="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" {if $payplug_switch.deferred_auto.checked}checked="checked"{/if}>
