@@ -22,74 +22,112 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use Payplug\Exception\HttpException;
-use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
-use PayPlug\src\repositories\LoggerRepository;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group unit
  * @group repository
  * @group oney
  * @group oney_repository
+ *
+ * @runTestsInSeparateProcesses
  */
 final class GetOneySimulationsTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected $cacheMock;
-    protected $amount;
-    protected $isoCode;
-    protected $operations;
-    protected $data;
+    protected $cache;
+    protected $config;
+    protected $logger;
+    protected $myLogPhp;
+    protected $tools;
+
+    protected $repo;
+
+    protected $amount = [
+        'lower' => 99,
+        'upper' => 3001,
+        'default' => 500
+    ];
+    protected $iso = 'FR';
+
+    protected $operation = 'x3_with_fees';
 
     public function setUp()
     {
-        $this->cacheMock = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository')
-            ->shouldReceive('setCache')
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
+        $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
+        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        $this->tools = MockHelper::createMockFactory('Payplug\src\specific\ToolsSpecific');
+
+        $this->cache->shouldReceive('setCache')
             ->andReturn(true);
 
-        $this->confSpecificMock = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific')
-            ->shouldReceive('get')
+        $this->cache->shouldReceive('setCacheKey')
+            ->andReturnUsing(function ($amount, $country, $operations) {
+                $cache_id = 'Payplug::OneySimulations_' .
+                    (int)$amount . '_' .
+                    (string)$country . '_' .
+                    (string)implode('_', $operations) . '_' .
+                    ($this->config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
+                return ['result' => $cache_id];
+            });
+
+        $this->config->shouldReceive('get')
             ->with('PAYPLUG_SANDBOX_MODE')
             ->andReturn(false);
 
-        $this->myLogPhpMock = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-
-        $this->loggerMock = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository')
-            ->shouldReceive('setParams')
+        $this->logger->shouldReceive('setParams')
             ->andReturn(true);
+
+        $this->repo = new OneyRepository('');
     }
 
     public function testGetOneySimulationsWithoutCacheValid()
     {
-        $operation = 'x3_with_fees';
+        $simulations = OneySimulationsMock::get()[$this->operation];
 
-        // Get a array of oney simulation fake values
-        $simulationsCallBack = OneySimulationsMock::getOneySimulations()[$operation];
-
-        // 1 - Mock getCacheByKey in order to NOT use cache
-        $this->cacheMock
+        $this->cache
             ->shouldReceive('getCacheByKey')
             ->andReturn(false);
 
-        // 2 - Mock payplug-php getSimulations callback with a valid result
-        $this->oneyMock = Mockery::mock('alias:Payplug\OneySimulation')
+        $this->oneyMock = MockHelper::createMockFactory('Payplug\OneySimulation')
             ->shouldReceive('getSimulations')
-            ->andReturn($simulationsCallBack);
+            ->andReturn($simulations);
 
-        // 3 - Initiate OneyRepository class
-        $oney_repo = new OneyRepository('');
-
-        // Check assert
         $this->assertEquals(
-            $oney_repo->getOneySimulations(500, 'FR', [$operation]),
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
+            [
+                'result' => true,
+                'simulations' => $simulations
+            ]
+        );
+    }
+
+    public function testGetOneySimulationsWithCacheValid()
+    {
+        $cache = OneySimulationsMock::getFromCache();
+        $simulations = OneySimulationsMock::get();
+
+        $this->cache
+            ->shouldReceive('getCacheByKey')
+            ->andReturn($cache);
+
+        $this->tools->shouldReceive('tool')
+            ->andReturnUsing(function ($action, $value, $params2) {
+                return json_decode($value, $params2);
+            });
+
+        $this->assertEquals(
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
              [
                 'result' => true,
-                'simulations' => $simulationsCallBack
+                'simulations' => $simulations
              ]
         );
     }
