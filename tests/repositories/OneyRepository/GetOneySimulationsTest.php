@@ -22,6 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
@@ -55,8 +56,11 @@ final class GetOneySimulationsTest extends TestCase
         'default' => 500
     ];
     protected $iso = 'FR';
-
     protected $operation = 'x3_with_fees';
+    protected $operations = ['x3_with_fees','x4_with_fees'];
+
+    protected $arrayCache;
+    protected $arrayLogger;
 
     public function setUp()
     {
@@ -66,9 +70,6 @@ final class GetOneySimulationsTest extends TestCase
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
         $this->tools = MockHelper::createMockFactory('Payplug\src\specific\ToolsSpecific');
         $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
-
-        $this->cache->shouldReceive('setCache')
-            ->andReturn(true);
 
         $this->cache->shouldReceive('setCacheKey')
             ->andReturnUsing(function ($amount, $country, $operations) {
@@ -88,10 +89,17 @@ final class GetOneySimulationsTest extends TestCase
             ->andReturn(true);
 
         $this->repo = new OneyRepository('');
+
+        $this->arrayCache = [];
+        $this->arrayLogger = [];
+
+        MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
     }
 
     public function testGetOneySimulationsWithoutCacheValid()
     {
+        MockHelper::createSetCacheMock($this->cache, $this->arrayCache);
+
         $simulations = OneySimulationsMock::get()[$this->operation];
 
         $this->cache
@@ -101,17 +109,24 @@ final class GetOneySimulationsTest extends TestCase
         $this->oney->shouldReceive('getSimulations')
             ->andReturn($simulations);
 
-        $this->assertEquals(
-            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
-            [
-                'result' => true,
-                'simulations' => $simulations
-            ]
-        );
+        foreach($this->operations as $operation) {
+            $this->assertEquals(
+                $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$operation]),
+                [
+                    'result' => true,
+                    'simulations' => $simulations
+                ]
+            );
+        }
+
+        $this->assertSame(count($this->arrayCache), count($this->operations));
+        $this->assertSame(count($this->arrayLogger), 0);
     }
 
     public function testGetOneySimulationsWithCacheValid()
     {
+        MockHelper::createSetCacheMock($this->cache, $this->arrayCache);
+
         $cache = OneySimulationsMock::getFromCache();
         $simulations = OneySimulationsMock::get();
 
@@ -131,38 +146,57 @@ final class GetOneySimulationsTest extends TestCase
                 'simulations' => $simulations
              ]
         );
+
+        $this->assertSame(count($this->arrayLogger), 0);
+        $this->assertSame(count($this->arrayCache), 0);
     }
 
-
-    public function testGetOneySimulationsWithoutCacheThrowException()
+    public function testGetOneySimulationsThrowException()
     {
-        // Mock cache storing
-        $arrayCache = [];
+        MockHelper::createSetCacheMock($this->cache, $this->arrayCache);
+
         $this->cache
             ->shouldReceive('getCacheByKey')
             ->andReturn(null);
-        MockHelper::createSetCacheMock($this->cache, $arrayCache);
 
-        // Mock Logger storing
-        $arrayLogger = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLogger);
-
-        // Mock payplug-php getSimulations callback with an exception
         $this->oney->shouldReceive('getSimulations')
             ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403);
 
-        $oney_repo = new OneyRepository('');
-
         $this->assertSame(
-            $oney_repo->getOneySimulations(500, 'FR', ['x3_with_fees']),
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
             [
                 'result' => false,
                 'error' => 'Payplug\Exception\HttpException: [0]: Forbidden method; HTTP Response: 403'
             ]
         );
 
-        // Check logger and cache
-        $this->assertSame(count($arrayLogger), 0);
-        $this->assertSame(count($arrayCache), 0);
+        $this->assertSame(count($this->arrayLogger), 1);
+        $this->assertSame(count($this->arrayCache), 0);
+    }
+
+    public function testGetOneySimulationsCantSetCache()
+    {
+
+        $simulations = OneySimulationsMock::get()[$this->operation];
+
+        $this->cache
+            ->shouldReceive('getCacheByKey')
+            ->andReturn(false);
+
+        $this->oney->shouldReceive('getSimulations')
+            ->andReturn($simulations);
+
+        $this->cache->shouldReceive('setCache')
+            ->andReturn(false);
+
+        $this->assertEquals(
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
+            [
+                'result' => true,
+                'simulations' => $simulations
+            ]
+        );
+
+        $this->assertSame(count($this->arrayLogger), 1);
     }
 }

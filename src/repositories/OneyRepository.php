@@ -898,7 +898,6 @@ class OneyRepository extends Repository
      */
     public function getOneySimulations($amount, $country, $operation)
     {
-        $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
 
         $cache_key = $this->cache->setCacheKey($amount, $country, $operation);
@@ -958,7 +957,10 @@ class OneyRepository extends Repository
                 'result' => true,
                 'simulations' => $simulations
             ];
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
+            $this->logger->setParams(['process' => '[Oney Repository] OneySimulation::getSimulations']);
+            $this->logger->addLog($exception->__toString(), 'error');
+
             return [
                 'result' => false,
                 'error' => $exception->__toString()
