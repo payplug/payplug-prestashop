@@ -26,7 +26,7 @@ namespace PayPlug\tests\mock;
 
 class CustomerMock
 {
-    public static function getCustomer()
+    public static function get()
     {
         $customer = new \stdClass();
         $customer->id = 1;
