@@ -733,10 +733,10 @@ class OneyRepository extends Repository
                 ],
             ];
         } elseif ($tools->tool(
-                'strlen',
-                $this->contextSpecific->getContext()->customer->email,
-                'UTF-8'
-            ) > 100) {
+            'strlen',
+            $this->contextSpecific->getContext()->customer->email,
+            'UTF-8'
+        ) > 100) {
             $text = $this->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
@@ -1353,7 +1353,8 @@ class OneyRepository extends Repository
         $max = 1000;
 
         if ($nb_products >= $max) {
-            $error = $this->l('The payment with Oney is not available because you have more than 1000 items in your cart.');
+            $error = $this->l('The payment with Oney is not available 
+                because you have more than 1000 items in your cart.');
             return [
                 'result' => false,
                 'error' => $this->l($error)
