@@ -24,12 +24,13 @@
 
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\mock\OneySimulationsMock;
+use PayPlug\tests\mock\ContextMock;
 use PayPlug\src\repositories\OneyRepository;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group test
  * @group unit
  * @group repository
  * @group oney
@@ -50,15 +51,6 @@ final class CheckOneyRequiredFieldsTest extends TestCase
 
     protected $repo;
 
-    protected $amount = [
-        'lower' => 99,
-        'upper' => 3001,
-        'default' => 500
-    ];
-    protected $iso = 'FR';
-    protected $operation = 'x3_with_fees';
-    protected $operations = ['x3_with_fees','x4_with_fees'];
-
     protected $arrayCache;
     protected $arrayLogger;
 
@@ -71,29 +63,23 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         $this->tools = MockHelper::createMockFactory('Payplug\src\specific\ToolsSpecific');
         $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
 
-        $this->cache->shouldReceive('setCacheKey')
-            ->andReturnUsing(function ($amount, $country, $operations) {
-                $cache_id = 'Payplug::OneySimulations_' .
-                    (int)$amount . '_' .
-                    (string)$country . '_' .
-                    (string)implode('_', $operations) . '_' .
-                    ($this->config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
-                return ['result' => $cache_id];
-            });
-
-        $this->config->shouldReceive('get')
-            ->with('PAYPLUG_SANDBOX_MODE')
-            ->andReturn(false);
-
-        $this->logger->shouldReceive('setParams')
-            ->andReturn(true);
-
         $this->repo = new OneyRepository('');
 
         $this->arrayCache = [];
         $this->arrayLogger = [];
 
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
+
+        // $context = ContextMock::get();
+    }
+
+    public function testIfPaymentDataIsEmpty()
+    {
+        $paymentData = null;
+        $this->assertSame(
+            ['Please fill in the required fields'],
+            $this->repo->checkOneyRequiredFields($paymentData)
+        );
     }
 
     public function checkOneyRequiredFields($payment_data)
