@@ -4393,9 +4393,6 @@ class Payplug extends PaymentModule
             ];
         }
 
-        dump($this->context);
-        die();
-
         $cart = $this->context->cart;
 
         $default_options = [
