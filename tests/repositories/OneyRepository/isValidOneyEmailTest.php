@@ -28,7 +28,6 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
- * @group test
  * @group unit
  * @group repository
  * @group oney
