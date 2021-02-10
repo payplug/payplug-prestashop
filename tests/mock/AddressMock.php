@@ -26,7 +26,7 @@ namespace PayPlug\tests\mock;
 
 class AddressMock
 {
-    public static function getAddress()
+    public static function get()
     {
         $address = new \stdClass();
         $address->id_customer = 1;
@@ -50,7 +50,7 @@ class AddressMock
 
     public static function getDeliveryAddress()
     {
-        $deliveryAddress = new \stdClass();
+        $deliveryAddress = self::get();
         $deliveryAddress->alias = 'Adresse de livraison';
         $deliveryAddress->id = 2;
         return $deliveryAddress;
@@ -58,7 +58,7 @@ class AddressMock
 
     public static function getInvoiceAddress()
     {
-        $invoiceAddress = new \stdClass();
+        $invoiceAddress = self::get();
         $invoiceAddress->alias = 'Adresse de facturation';
         $invoiceAddress->id = 3;
         return $invoiceAddress;

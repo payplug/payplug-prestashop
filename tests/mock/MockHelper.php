@@ -83,11 +83,24 @@ class MockHelper extends Mockery
         return $translate;
     }
 
-    public static function createConfigMock($classPathname) {
-        $context = ContextMock::get();
-        $config = self::createMockFactory($classPathname)
+    public static function createValidateMock($classPathname) {
+        $validate = self::createMockFactory($classPathname)
+            ->shouldReceive('validate')
+            ->andReturn(true);
+        return $validate;
+    }
+
+    public static function createContextMock($classPathname) {
+        $context = self::createMockFactory($classPathname)
             ->shouldReceive('getContext')
-            ->andReturn($context);
-        return $config;
+            ->andReturn(ContextMock::get());
+        return $context;
+    }
+
+    public static function createAddressMock($classPathname) {
+        $address = self::createMockFactory($classPathname)
+            ->shouldReceive('getAddress')
+            ->andReturn(AddressMock::get());
+        return $address;
     }
 }
