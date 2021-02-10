@@ -22,7 +22,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
@@ -93,6 +92,7 @@ final class GetOneySimulationsTest extends TestCase
         $this->arrayCache = [];
         $this->arrayLogger = [];
 
+        MockHelper::createToolsMock($this->tools);
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
     }
 
@@ -134,11 +134,6 @@ final class GetOneySimulationsTest extends TestCase
             ->shouldReceive('getCacheByKey')
             ->andReturn($cache);
 
-        $this->tools->shouldReceive('tool')
-            ->andReturnUsing(function ($action, $value, $params2) {
-                return json_decode($value, $params2);
-            });
-
         $this->assertEquals(
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
              [
@@ -176,7 +171,6 @@ final class GetOneySimulationsTest extends TestCase
 
     public function testGetOneySimulationsCantSetCache()
     {
-
         $simulations = OneySimulationsMock::get()[$this->operation];
 
         $this->cache
