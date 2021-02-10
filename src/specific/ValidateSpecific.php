@@ -28,6 +28,11 @@ use \Validate;
 
 class ValidateSpecific implements ValidateInterface
 {
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function validate($action, $object)
     {
         if (isset($action)) {

@@ -53,15 +53,18 @@ class OneyRepository extends Repository
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
-        $this->addressSpecific = AddressSpecific::factory();
+
         $this->cache = CacheRepository::factory();
-        $this->configurationSpecific = ConfigurationSpecific::factory();
-        $this->countrySpecific = CountrySpecific::factory();
         $this->logger = LoggerRepository::factory();
+
+        $this->addressSpecific = AddressSpecific::factory();
+        $this->configurationSpecific = ConfigurationSpecific::factory();
+        $this->contextSpecific = ContextSpecific::factory();
+        $this->countrySpecific = CountrySpecific::factory();
         $this->toolsSpecific = ToolsSpecific::factory();
-        $this->validateSpecific = new ValidateSpecific();
+        $this->validateSpecific = ValidateSpecific::factory();
+
         $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
-        $this->contextSpecific = new ContextSpecific();
     }
 
     /**
@@ -234,19 +237,9 @@ class OneyRepository extends Repository
             }
             switch ($field) {
                 case 'email':
-                    if ($tools->tool('strlen', $data, 'UTF-8') > 100
-                        && $tools->tool('strpos', $data, '+') !== false) {
-                        $text = $this->l('Your email address is too long and the + character is not valid, 
-                        please change it to another address (max 100 characters).');
-                        $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100) {
-                        $text = $this->l('Your email address is too long, 
-                        please change it to a shorter one (max 100 characters).');
-                        $errors[] = $text;
-                    } elseif (strpos($data, '+') !== false) {
-                        $text = $this->l('The + character is not valid. 
-                        Please change your email address (100 characters max).');
-                        $errors[] = $text;
+                    $is_valid_email = $this->isValidOneyEmail($data);
+                    if (!$is_valid_email['result']) {
+                        $errors[] = $is_valid_email['message'];
                     }
                     break;
                 case 'mobile_phone_number':
@@ -1424,6 +1417,37 @@ class OneyRepository extends Repository
         }
 
         return ['result' => true, 'error' => false];
+    }
+
+    /**
+     * @description Check given email is valid to use Oney payment
+     * @param $email
+     * @return array
+     */
+    public function isValidOneyEmail($email) {
+        $tools = $this->toolsSpecific;
+        $validate = $this->validateSpecific;
+        $error = false;
+
+        if(!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
+            $error = $this->l('Your email address is not a valid email');
+        }
+        elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
+            && $tools->tool('strpos', $email, '+') !== false) {
+            $error = $this->l('Your email address is too long and the + character is not valid, 
+                        please change it to another address (max 100 characters).');
+        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
+            $error = $this->l('Your email address is too long, 
+                        please change it to a shorter one (max 100 characters).');
+        } elseif (strpos($email, '+') !== false) {
+            $error = $this->l('The + character is not valid. 
+                        Please change your email address (100 characters max).');
+        }
+
+        return [
+            'result' => $error ? false : true,
+            'message' => $error,
+        ];
     }
 
     /**

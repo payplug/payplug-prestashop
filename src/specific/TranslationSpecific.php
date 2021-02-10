@@ -28,6 +28,11 @@ use \Translate;
 
 class TranslationSpecific implements TranslationInterface
 {
+    public static function factory()
+    {
+        return new self();
+    }
+
     public static function translate($module_class, $string, $repository_name)
     {
         return Translate::getModuleTranslation($module_class, $string, $repository_name);

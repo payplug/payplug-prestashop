@@ -28,15 +28,15 @@ use Tools;
 
 class ToolsSpecific implements ToolsInterface
 {
+    public static function factory()
+    {
+        return new ToolsSpecific();
+    }
+
     public function tool($action, $param1 = null, $param2 = null)
     {
         if (isset($action)) {
             return Tools::$action($param1, $param2);
         }
-    }
-
-    public static function factory()
-    {
-        return new ToolsSpecific();
     }
 }
