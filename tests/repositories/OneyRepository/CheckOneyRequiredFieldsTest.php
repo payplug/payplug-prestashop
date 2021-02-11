@@ -22,15 +22,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\mock\AddresstMock;
 use PayPlug\tests\mock\ContextMock;
+use PayPlug\tests\mock\PaymentTabMock;
+use PayPlug\tests\mock\CountryMock;
 use PayPlug\src\repositories\OneyRepository;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
- * @group test
  * @group unit
  * @group repository
  * @group oney
@@ -42,44 +43,103 @@ final class CheckOneyRequiredFieldsTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected $cache;
+    // Default setup
     protected $config;
-    protected $logger;
     protected $myLogPhp;
+
+
+    // Method setup
+    protected $cache;
+    protected $logger;
+
+    protected $address;
+    protected $context;
+    protected $country;
     protected $tools;
-    protected $oney;
+    protected $translate;
 
+    protected $libphonenumber;
+
+
+    // Method Params
     protected $repo;
-
     protected $arrayCache;
     protected $arrayLogger;
+    protected $tab;
 
     public function setUp()
     {
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        // Default setup for Oney Repository using
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-        $this->tools = MockHelper::createMockFactory('Payplug\src\specific\ToolsSpecific');
-        $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
 
-        $this->repo = new OneyRepository('');
-
-        $this->arrayCache = [];
-        $this->arrayLogger = [];
-
-        MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
-
-        // $context = ContextMock::get();
+        // Method setup
+//        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+//        $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
+//
+//        $this->address = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
+//        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
+//
+//        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
+//
+//        $this->country = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
+//        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
+//        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+//        $this->libphonenumber = Mockery::mock('alias:libphonenumberlight\PhoneNumberUtil');
+//        $this->libphonenumber->shouldReceive('getInstance')
+//            ->andReturnSelf();
+//
+//        $this->repo = new OneyRepository('');
+//
+//        $this->arrayCache = [];
+//        $this->arrayLogger = [];
+//
+//        $paymentTab = PaymentTabMock::getStandard();
+//        $this->tab = $paymentTab['shipping'];
     }
 
-    public function testIfPaymentDataIsEmpty()
+    public function MethodWithEmptyParams()
     {
         $paymentData = null;
+        $response = $this->repo->checkOneyRequiredFields($paymentData);
         $this->assertSame(
             ['Please fill in the required fields'],
-            $this->repo->checkOneyRequiredFields($paymentData)
+            $response
         );
+    }
+
+    public function MethodWithInvalidParams()
+    {
+        $paymentData = 'wrong params';
+        $response = $this->repo->checkOneyRequiredFields($paymentData);
+        $this->assertSame(
+            ['Please fill in the required fields'],
+            $response
+        );
+    }
+
+    public function WithValidPaymentData()
+    {
+        $response = $this->repo->checkOneyRequiredFields($this->tab);
+        $this->assertTrue(
+            empty($response)
+        );
+    }
+
+    public function testWithWrongMobilePhoneNumber()
+    {
+        $response = $this->repo->checkOneyRequiredFields(['shipping-mobile_phone_number' => $this->tab['mobile_phone_number']]);
+
+        echo "\n" . 'Debug: ';
+//        var_dump(get_class_methods($this->context));
+//        var_dump($response);
+
+//        $this->country->shouldReceive('getCountry')
+//            ->andReturn(CountryMock::get());
+//
+//        $this->libphonenumber->shouldReceive('getNumberType')
+//            ->andReturn(true);
+
     }
 
     public function checkOneyRequiredFields($payment_data)
@@ -110,7 +170,7 @@ final class CheckOneyRequiredFieldsTest extends TestCase
                         $text = $this->l('Your email address is too long, 
                         please change it to a shorter one (max 100 characters).');
                         $errors[] = $text;
-                    } elseif (strpos($data, '+') !== false) {
+                    } elseif ($tools->tool('strpos', $data, '+') !== false) {
                         $text = $this->l('The + character is not valid. 
                         Please change your email address (100 characters max).');
                         $errors[] = $text;

@@ -58,6 +58,7 @@ final class setCacheKeyTest extends TestCase
 
     public function testCacheIdHasValidatedFormat()
     {
+        //todo : finalize this test
 //        $cacheId = $this->repo->setCacheKey(500, 'FR', ['x3_with_fees'])['result'];
 //        $this->assertRegExp(
 //            '/Payplug::OneySimulations_\d{5,6}_[A-Z]{2}_(x\d{1}_with_fees|x\d{1}_with_fees_x\d{1}_with_fees)_live/',
