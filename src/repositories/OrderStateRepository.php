@@ -135,7 +135,7 @@ class OrderStateRepository extends Repository
             ->fields('o.current_state')
             ->from(_DB_PREFIX_.'orders', 'o')
             ->where('o.module = \''.pSQL($module_name).'\'')
-            ->groupBy('o.id_order_state')
+            ->groupBy('o.current_state')
             ->build();
 
         foreach ($res as $os) {
