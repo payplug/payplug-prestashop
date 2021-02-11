@@ -36,8 +36,8 @@ class PrestashopSpecific17
 
     public function hookHeader()
     {
-        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front-v3.1.0.css');
-        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front-v3.1.0.js');
+        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front-v3.1.1.css');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front-v3.1.1.js');
     }
 
     public function displayPaymentOption($payment_options)
