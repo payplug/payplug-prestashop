@@ -2,7 +2,7 @@ stages:
   - tests
   - build
 
-#unit tests:
+unit tests:
   image: composer:1.9
   stage: tests
   script:
