@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\MyLogPHP;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -31,9 +29,21 @@ function upgrade_module_3_2_0($object)
 {
     $flag = true;
 
+    if (Configuration::get('PAYPLUG_ONEY_TOS')) {
+        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS')) {
+            $flag = false;
+        }
+    }
+
+    if (Configuration::get('PAYPLUG_ONEY_TOS_URL')) {
+        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')) {
+            $flag = false;
+        }
+    }
+
     // add cart_hash field in payplug_payment_cart
-    $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_payment_cart` 
-            ADD `cart_hash` VARCHAR(64) NOT NULL 
+    $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_payment_cart`
+            ADD `cart_hash` VARCHAR(64) NOT NULL
             AFTER `id_cart`';
 
     $flag = $flag && Db::getInstance()->execute($sql);
