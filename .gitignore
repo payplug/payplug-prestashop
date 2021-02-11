@@ -3,7 +3,12 @@ config*.xml
 .DS_Store
 .idea
 vendor/
-.php_cs.cache
-views/css/less/*.css
 views/css/*.map
-*.map
+views/css/less/*.css
+views/css/less/*.map
+views/css/less/*/*.css
+views/css/less/*/*.map
+views/css/less/*/*/*.css
+views/css/less/*/*/*.map
+views/css/less/*/*/*/*.css
+views/css/less/*/*/*/*.map

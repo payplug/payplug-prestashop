@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -24,7 +24,7 @@
     <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
-    <input class="btn green-button" type="submit" name="submitPPUpdate" value="{l s='Update' mod='payplug'}" >
+    <input class="payplugButton -green" type="submit" name="submitPPUpdate" value="{l s='Update' mod='payplug'}" >
     <p class="hide pperror"></p>
     <p class="hide ppsuccess"></p>
     <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />

@@ -394,11 +394,26 @@ var $document, $window, payplug = {
                 {identifier} = login.props;
             $document.on('click', '.' + identifier + '_login', login.login)
                 .on('click', '.' + identifier + '_logout', login.logout)
-                .on('click', 'button[name=password]', login.password);
+                .on('click', 'button[name=password]', login.password)
+                .on('keyup', 'input[name=PAYPLUG_PASSWORD]', login.submit);
+        },
+        submit: function (event) {
+            var {login} = payplug,
+                {identifier} = login.props;
 
-            if ($('.' + identifier).is('.-logged')) {
-                login.props.logged = true;
+            if (typeof event.keyCode == 'undefined') {
+                var {tools} = payplug,
+                    email = $('input[name=PAYPLUG_EMAIL]').val(),
+                    pwd = $('input[name=PAYPLUG_PASSWORD]').val();
+
+                if(!tools.validate.isEmail(email) || !pwd.length) {
+                    return;
+                }
+            } else if (parseInt(event.keyCode) != 13) {
+                return;
             }
+
+            $('.' + identifier + '_login').trigger('click');
         },
         login: function (event) {
             event.preventDefault();
@@ -818,7 +833,7 @@ var $document, $window, payplug = {
             $document.on('change', 'input[name=PAYPLUG_INST_MODE]', installment.select)
                 .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check);
         },
-        select: function (event){
+        select: function (event) {
             event.preventDefault();
             event.stopPropagation();
 
@@ -1045,7 +1060,7 @@ var $document, $window, payplug = {
                     .on('click', function (event) {
                         var $clicked = $(event.target);
                         if ($clicked.is('.' + identifier) && $('.' + identifier).is('.-open')) {
-                            popup.close();
+                            $('.' + identifier + '_close').trigger('click');
                         }
                     });
             },
@@ -1070,10 +1085,14 @@ var $document, $window, payplug = {
                     $popup.addClass('-show');
                 }, 0);
             },
-            close: function () {
+            close: function (event) {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
+
+                if($(event.target).is('.' + identifier + '_close') && $popup.find('.payplugButton.-close')) {
+                    $popup.find('.payplugButton.-close').trigger('click');
+                }
 
                 $popup.removeClass('-show');
                 window.setTimeout(function () {
@@ -1108,6 +1127,16 @@ var $document, $window, payplug = {
                     '</div>' +
                     '</div>';
                 popup.set($error, 'error');
+            }
+        },
+        validate: {
+            isEmail: function(email){
+                if(typeof email == 'undefined' || !email) {
+                    return false;
+                }
+
+                var regex = /^[a-z\p{L}0-9!#$%&'*+\/=?^`{}|~_-]+[.a-z\p{L}0-9!#$%&'*+\/=?^`{}|~_-]*@[a-z\p{L}0-9]+[._a-z\p{L}0-9-]*\.[a-z\p{L}0-9]+$/i;
+                return regex.test(email);
             }
         }
     },

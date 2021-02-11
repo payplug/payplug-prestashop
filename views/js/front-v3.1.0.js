@@ -397,7 +397,7 @@ var $document, $window, payplugModule = {
                     .on('keyup focusout', '.' + identifier + ' input', required.check);
             },
             check: function () {
-                var required = this,
+                var required = payplugModule.oney.required,
                     identifier = required.props.identifier,
                     is_valid = true,
                     $fields = $('.' + identifier + '_input');
@@ -411,9 +411,9 @@ var $document, $window, payplugModule = {
                     switch (type) {
                         case 'email' :
                             var at = value.indexOf('@', 1),
-                                point = value.indexOf('.', at + 1),
+                                dot = value.indexOf('.', at + 1),
                                 plus = value.indexOf('+', 1),
-                                is_email = at > 0 && point > 0 && plus < 0;
+                                is_email = at > 0 && dot > 0 && plus < 0;
                             valid_input = valid_input && is_email;
                             break;
                         case 'mobile_phone_number' :
@@ -517,9 +517,7 @@ var $document, $window, payplugModule = {
                     } else {
                         value = $el.val()
                     }
-                    if (value) {
-                        payment_data[name] = value;
-                    }
+                    payment_data[name] = value;
                 });
 
                 return payplugModule.oney.required.save(payment_data);

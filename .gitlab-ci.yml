@@ -19,7 +19,7 @@ build zip release:
     - shopt -s extglob
     - mv !(payplug|composer.json) payplug
     - composer archive --file payplug_$CI_COMMIT_REF_NAME --format zip
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php 
+    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
     - composer archive --file payplug_qa_$CI_COMMIT_REF_NAME --format zip
   artifacts:
     paths:

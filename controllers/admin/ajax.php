@@ -23,12 +23,8 @@
 
 class PayplugAjaxModuleAdminController extends ModuleAdminController
 {
-    /**
-     * @see FrontController::initContent()
-     */
 }
 
-//require_once(dirname(__FILE__).'/../../../../config/config.inc.php');
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 require_once(_PS_MODULE_DIR_.'../init.php');
 include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
@@ -177,7 +173,7 @@ if (Tools::getValue('_ajax') == 1) {
                     if (!$payplug->createLockFromCartId($order->id_cart)) {
                         die(json_encode([
                             'status' => 'error',
-                            'data' => $this->l('An error has occurred')
+                            'data' => $payplug->l('An error has occurred')
                         ]));
                     }
 

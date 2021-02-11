@@ -130,7 +130,7 @@ var $document,
                             if (options['is_inst']) {
                                 $errorWrapper = $('.payplugPayment_error.-installment');
                             } else if (options['is_oney']) {
-                                $errorWrapper = $('.payplugPayment_error.-oney');
+                                $errorWrapper = $('.payplugPayment_error.-oney-oney3x');
                             } else if (options['id_card'] != 'new_card') {
                                 $errorWrapper = $('.payplugPayment_error.-one_click');
                             } else {
@@ -761,9 +761,14 @@ var $document,
                                     }, 5000);
                                 } else {
                                     var errors = '';
-                                    for (var error in data.message)
-                                        if (error !== 'indexOf')
-                                            errors += $('<p />').html(data.message[error]).text() + "\n";
+
+                                    if (typeof data.message == 'string') {
+                                        errors = data.message;
+                                    } else {
+                                        for (var error in data.message)
+                                            if (error !== 'indexOf')
+                                                errors += $('<p />').html(data.message[error]).text() + "\n";
+                                    }
 
                                     $('.oneyRequired_message').addClass('-error').html(errors);
                                 }

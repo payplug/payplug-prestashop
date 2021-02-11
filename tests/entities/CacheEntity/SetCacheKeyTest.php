@@ -27,6 +27,11 @@ use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group cache
+ * @group cache_entity
+ */
 final class SetCacheKeyTest extends TestCase
 {
     protected $cache;
@@ -54,7 +59,13 @@ final class SetCacheKeyTest extends TestCase
         );
     }
 
-    public function testThrowExceptionWhenNotAString(): void
+    /**
+     * @group entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
+     * @group exception
+     */
+    public function testTrowExceptionWhenNotAString(): void
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setCacheKey(42);

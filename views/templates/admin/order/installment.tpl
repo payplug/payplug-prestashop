@@ -1,5 +1,5 @@
 {*
-* 2020 PayPlug
+* 2021 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2020 PayPlug SAS
+*  @copyright 2021 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -63,12 +63,12 @@
     </table>
     {if !$inst_paid}
         {if $inst_aborted}
-            <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
+            <input class="payplugButton -disabled" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
         {elseif $inst_can_be_aborted}
             <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
             <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
             <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
-            <input class="btn green-button" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
+            <input class="payplugButton -green" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
         {/if}
         <br class="clear" />
     {/if}

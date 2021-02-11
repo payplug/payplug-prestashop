@@ -63,6 +63,7 @@ p.payplugInterpanel {
   color: #000000;
   padding: 10px 20px;
   position: relative;
+  line-height: 19px;
 }
 .payplugAlert.-success {
   background: rgba(0, 171, 122, 0.15);
@@ -155,7 +156,7 @@ label.payplugSwitch_label {
   align-items: center;
   cursor: pointer;
 }
-.-disabledlabel.payplugSwitch_label {
+.-disabled label.payplugSwitch_label {
   cursor: default;
 }
 .payplugSwitch_label.-left {
@@ -657,7 +658,7 @@ p.payplugOneyTOS_text {
   cursor: pointer;
   margin: 0;
   text-align: center;
-  padding: 0.4em 0.5em;
+  padding: 0.4em 1em;
   text-transform: uppercase;
   font-size: 12px;
   outline: none;
@@ -686,4 +687,4 @@ p.payplugOneyTOS_text {
   color: #fff;
   cursor: default;
 }
-/*# sourceMappingURL=admin.css.map */
+/*# sourceMappingURL=admin-v3.1.0.css.map */

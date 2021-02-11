@@ -39,13 +39,7 @@ function upgrade_module_2_26_0($object)
     }
 
     // run the method who install Oney feature
-    $flag = $object->installOney(); // (new PayPlug\src\repositories\SQLtableRepository())->installOney() ???
-
-    if (version_compare(_PS_VERSION_, '1.5', '<')) {
-        if (!PayplugBackward::updateConfiguration('PAYPLUG_VERSION_1_4', '2.26.0')) {
-            $flag = false;
-        }
-    }
+    $flag = $object->getPlugin()->getOney()->installOney();
 
     //adding new configurations
     if (!PayplugBackward::updateConfiguration('PAYPLUG_ONEY_OPTIMIZED', 0)) {

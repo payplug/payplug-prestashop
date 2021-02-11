@@ -114,7 +114,7 @@ class CardRepository extends Repository
      * @return bool
      * @throws ConfigurationNotSetException
      */
-    public function deleteCard($id_customer, $id_payplug_card, $api_key)
+    public function deleteCard($id_customer, $id_payplug_card)
     {
         $config = $this->configurationSpecific;
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
@@ -179,14 +179,10 @@ class CardRepository extends Repository
      */
     public function deleteCards($id_customer)
     {
-        $config = $this->configurationSpecific;
-        $test_api_key = $config->get('PAYPLUG_TEST_API_KEY');
-        $live_api_key = $config->get('PAYPLUG_LIVE_API_KEY');
         $cardsToDelete = $this->getCardsByCustomer($id_customer, false);
         if (isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
             foreach ($cardsToDelete as $card) {
-                $api_key = $card['is_sandbox'] == 1 ? $test_api_key : $live_api_key;
-                if (!$this->deleteCard($id_customer, $card['id_payplug_card'], $api_key)) {
+                if (!$this->deleteCard($id_customer, $card['id_payplug_card'])) {
                     return false;
                 }
             }
