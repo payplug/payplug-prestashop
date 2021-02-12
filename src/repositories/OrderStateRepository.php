@@ -139,7 +139,7 @@ class OrderStateRepository extends Repository
             ->build();
 
         foreach ($res as $os) {
-            array_push($ids, (int)$os['id_order_state']);
+            array_push($ids, (int)$os['current_state']);
         }
 
         return $ids;
