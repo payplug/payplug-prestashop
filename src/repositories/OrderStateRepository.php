@@ -140,7 +140,7 @@ class OrderStateRepository extends Repository
 
         foreach ($res as $os) {
             if ($os) {
-                array_push($ids, (int)$os['id_order_state']);
+                array_push($ids, (int)$os['current_state']);
             }
         }
 
