@@ -37,6 +37,7 @@ class PayPlugAjax
     private $payplug;
     private $plugin;
     private $toolsSpecific;
+    private $translate;
 
     public function __construct()
     {
@@ -46,6 +47,7 @@ class PayPlugAjax
         $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
         $this->oney = $this->plugin->getOney();
         $this->toolsSpecific = $this->plugin->getTools();
+        $this->translate = $this->plugin->getTranslate();
     }
 
     /**
@@ -81,7 +83,7 @@ class PayPlugAjax
                         'is_oney' => $is_oney,
                         '_ajax' => 1
                     ];
-                    $payment = $this->payplug->preparePayment($options, $tools->tool('getValue', 'pc'));
+                    $payment = $this->payplug->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
                 } else {
                     $cookie = $context->cookie;
@@ -179,7 +181,7 @@ class PayPlugAjax
                 } catch (Exception $e) {
                     die($tools->tool('jsonEncode', [
                         'result' => false,
-                        'error' => $this->payplug->l('Oney is momentarily unavailable.')
+                        'error' => $this->translate->translate(5) //('Oney is momentarily unavailable.')
                     ]));
                 }
 
@@ -200,13 +202,12 @@ class PayPlugAjax
                     if (empty($payment_data)) {
                         die($tools->tool('jsonEncode', [
                             'result' => false,
-                            'message' => $this->payplug->l('Empty payment data')
+                            'message' => $this->translate->translate(1) //('Empty payment data')
                         ]));
                     } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
                         die($tools->tool('jsonEncode', [
                             'result' => false,
-                            'message' => $this->payplug
-                                ->l('At least one of the fields is not correctly completed.')
+                            'message' => $this->translate->translate(2)
                         ]));
                     }
                 } catch (Exception $e) {
@@ -218,8 +219,8 @@ class PayPlugAjax
                 die($tools->tool('jsonEncode', [
                     'result' => $result,
                     'message' => $result ?
-                        $this->payplug->l('Your information has been saved') :
-                        $this->payplug->l('An error occurred. Please retry in few seconds.')
+                        $this->translate->translate(3) : //('Your information has been saved')
+                        $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                 ]));
             }
         }

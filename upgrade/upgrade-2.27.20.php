@@ -21,13 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_20($object)
+function upgrade_module_2_27_20()
 {
     return Configuration::updateValue('PAYPLUG_COMPANY_ID_TEST', '');
 }

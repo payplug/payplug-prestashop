@@ -60,7 +60,7 @@ class OneyRepository extends Repository
         $this->logger = new LoggerRepository();
         $this->toolsSpecific = new ToolsSpecific();
         $this->validateSpecific = new ValidateSpecific();
-        $this->log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
+        $this->log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $this->contextSpecific = new ContextSpecific();
     }
 
@@ -170,7 +170,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->contextSpecific->getContext()->smarty->assign([
@@ -234,7 +234,10 @@ class OneyRepository extends Repository
             }
             switch ($field) {
                 case 'email':
-                    if ($tools->tool('strlen', $data, 'UTF-8') > 100
+                    if (empty($data)) {
+                        $text = $this->l('The email address is empty.');
+                        $errors[] = $text;
+                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100
                         && $tools->tool('strpos', $data, '+') !== false) {
                         $text = $this->l('Your email address is too long and the + character is not valid, 
                         please change it to another address (max 100 characters).');
@@ -246,6 +249,9 @@ class OneyRepository extends Repository
                     } elseif (strpos($data, '+') !== false) {
                         $text = $this->l('The + character is not valid. 
                         Please change your email address (100 characters max).');
+                        $errors[] = $text;
+                    } elseif (!$this->validateSpecific->validate('isEmail', $data)) {
+                        $text = $this->l('Invalid address email.');
                         $errors[] = $text;
                     }
                     break;
@@ -511,7 +517,7 @@ class OneyRepository extends Repository
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
-                    $product['manufacturer_name']  :
+                    $product['manufacturer_name'] :
                     $this->configurationSpecific->get('PS_SHOP_NAME')
             ];
 
@@ -587,7 +593,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->contextSpecific->getContext()->smarty->assign([
@@ -707,7 +713,7 @@ class OneyRepository extends Repository
         if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100
             && $tools->tool('strpos', $this->contextSpecific->getContext()->customer->email, '+')
             !== false) {
-            $text = $this->l('Your email address is too long and the + character is not valid,') . ' '.
+            $text = $this->l('Your email address is too long and the + character is not valid,') . ' ' .
                 $this->l('please change it to another address (max 100 characters).');
             $shipping_fields['email'] = [
                 'text' => $text,
@@ -1193,7 +1199,7 @@ class OneyRepository extends Repository
      */
     public function installOneyCarriers()
     {
-        $carriers = \PayPlugCarrier::getCarriers($this->contextSpecific->getContext()->language->id, true);
+        $carriers = \PayPlugCarrier::getCarriers(true);
         $flag = true;
         foreach ($carriers as $carrier) {
             $flag = $flag && $carrier->save();
@@ -1338,7 +1344,8 @@ class OneyRepository extends Repository
         $max = 1000;
 
         if ($nb_products >= $max) {
-            $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
+            $error = $this->l('The payment with Oney is not available 
+                because you have more than 1000 items in your cart.');
             return [
                 'result' => false,
                 'error' => $this->l($error)

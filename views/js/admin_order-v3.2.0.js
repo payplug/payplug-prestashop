@@ -101,10 +101,10 @@ var $document, $window, payplug = {
                 {identifier} = popup.props;
 
             $document.on('click', '.' + identifier + '_close', popup.close)
-                .on('click', '.' + identifier + ' .payplugButton-close', popup.close)
+                .on('click', '.' + identifier + ' .-close', popup.close)
                 .on('click', function (event) {
                     var $clicked = $(event.target);
-                    if ($clicked.is('.' + identifier) && $('.' + identifier).is('.' + identifier + '-open')) {
+                    if ($clicked.is('.' + identifier) && $('.' + identifier).is('.-open')) {
                         popup.close();
                     }
                 });
@@ -124,9 +124,9 @@ var $document, $window, payplug = {
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
-            $popup.addClass(identifier + '-open');
+            $popup.addClass('-open');
             window.setTimeout(function () {
-                $popup.addClass(identifier + '-show');
+                $popup.addClass('-show');
             }, 0);
         },
         close: function () {
@@ -134,9 +134,9 @@ var $document, $window, payplug = {
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
-            $popup.removeClass(identifier + '-show');
+            $popup.removeClass('-show');
             window.setTimeout(function () {
-                $popup.removeClass(identifier + '-open');
+                $popup.removeClass('-open');
                 popup.remove();
             }, 500);
         },

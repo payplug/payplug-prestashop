@@ -25,22 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_0_0($object)
+function upgrade_module_3_1_0()
 {
-    $flag = true;
-
-    // check order state paid & update if different than prestashop state
-    $order_state = (int)Configuration::get('PS_OS_PAYMENT');
-    $payplug_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
-    if ($order_state != $payplug_order_state) {
-        $flag = $flag && Configuration::updateValue('PAYPLUG_ORDER_STATE_PAID', $order_state);
-    }
-
-    // plug module on the hook actionAdminControllerSetMedia
-    $flag = $flag && $object->registerHook('actionAdminControllerSetMedia');
-
-    // plug module on the hook displayAdminOrderMain
-    $flag = $flag && $object->registerHook('displayAdminOrderMain');
-
-    return $flag;
+    return true;
 }

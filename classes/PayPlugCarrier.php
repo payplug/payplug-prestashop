@@ -73,11 +73,10 @@ class PayPlugCarrier extends ObjectModel
      * @description
      * Get Carriers from Prestashop who are not "deleted" for a given language
      *
-     * @param int $id_lang ID of a language
      * @param boolean $is_active
      * @return array of PayPlugCarrier
      */
-    public static function getCarriers($id_lang, $is_active = true)
+    public static function getCarriers($is_active = true)
     {
         $sql = 'SELECT pc.`id_payplug_carrier`, c.`name`, c.`id_carrier`
                 FROM `'._DB_PREFIX_.'carrier` c
