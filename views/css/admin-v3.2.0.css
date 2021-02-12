@@ -63,6 +63,7 @@ p.payplugInterpanel {
   color: #000000;
   padding: 10px 20px;
   position: relative;
+  line-height: 19px;
 }
 .payplugAlert.-success {
   background: rgba(0, 171, 122, 0.15);
@@ -155,7 +156,7 @@ label.payplugSwitch_label {
   align-items: center;
   cursor: pointer;
 }
-.-disabledlabel.payplugSwitch_label {
+.-disabled label.payplugSwitch_label {
   cursor: default;
 }
 .payplugSwitch_label.-left {
@@ -416,29 +417,6 @@ button.payplugLink:hover {
   display: none;
   color: #e56876;
 }
-.payplugOneyTOS {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-}
-p.payplugOneyTOS_text {
-  margin: 0 8px 0 0;
-  line-height: 31px;
-}
-.payplugOneyTOS_input {
-  margin: initial;
-  display: inline-block;
-  width: 250px;
-}
-.payplugOneyTOS_error {
-  width: 100%;
-  display: none;
-  color: #dd2525;
-  padding: 0 0 0 10px;
-}
-.payplugOneyTOS_error.-show {
-  display: block;
-}
 /* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
@@ -657,7 +635,7 @@ p.payplugOneyTOS_text {
   cursor: pointer;
   margin: 0;
   text-align: center;
-  padding: 0.4em 0.5em;
+  padding: 0.4em 1em;
   text-transform: uppercase;
   font-size: 12px;
   outline: none;
@@ -686,4 +664,4 @@ p.payplugOneyTOS_text {
   color: #fff;
   cursor: default;
 }
-/*# sourceMappingURL=admin.css.map */
+/*# sourceMappingURL=admin-v3.2.0.css.map */

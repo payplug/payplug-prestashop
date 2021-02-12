@@ -21,18 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 function upgrade_module_2_27_1($object)
 {
+    if (version_compare(_PS_VERSION_, '1.7', '<')) {
+        return true;
+    }
+
     $flag = true;
 
     // run the method who install Oney feature
-    $flag = $object->installOney();
+    $flag = $object->getPlugin()->getOney()->installOney();
 
     //adding new configurations
     if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
@@ -41,6 +43,7 @@ function upgrade_module_2_27_1($object)
 
     // Update payplug lock table
     $sql_requests = [
+        'TRUNCATE TABLE `'._DB_PREFIX_.'payplug_lock`',
         'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
     ];
 

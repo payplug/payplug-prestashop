@@ -173,7 +173,7 @@ if (Tools::getValue('_ajax') == 1) {
                     if (!$payplug->createLockFromCartId($order->id_cart)) {
                         die(json_encode([
                             'status' => 'error',
-                            'data' => $this->l('An error has occurred')
+                            'data' => $payplug->l('An error has occurred')
                         ]));
                     }
 

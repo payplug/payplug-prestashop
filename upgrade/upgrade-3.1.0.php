@@ -21,15 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\MyLogPHP;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_0_0($object)
+function upgrade_module_3_1_0()
 {
-    $flag = true;
-
-    return $flag;
+    return true;
 }

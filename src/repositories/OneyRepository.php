@@ -325,14 +325,7 @@ class OneyRepository extends Repository
         546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
         $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 
-        $tos_url = $config->get('PAYPLUG_ONEY_TOS_URL');
-        if (strpos($tos_url, 'http://') === false && strpos($tos_url, 'https://') === false && $tos_url) {
-            $tos_url = $tools->tool('getShopProtocol') . $tos_url;
-        }
-
         $this->contextSpecific->getContext()->smarty->assign([
-            'tos_active' => $config->get('PAYPLUG_ONEY_TOS'),
-            'tos_url' => $tos_url,
             'legal_notice' => sprintf(
                 $this->l($legal_text),
                 $tools->tool('displayPrice', $min_amount),
@@ -511,7 +504,7 @@ class OneyRepository extends Repository
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
-                    $product['manufacturer_name']  :
+                    $product['manufacturer_name'] :
                     $this->configurationSpecific->get('PS_SHOP_NAME')
             ];
 
@@ -707,7 +700,7 @@ class OneyRepository extends Repository
         if ($tools->tool('strlen', $this->contextSpecific->getContext()->customer->email, 'UTF-8') > 100
             && $tools->tool('strpos', $this->contextSpecific->getContext()->customer->email, '+')
             !== false) {
-            $text = $this->l('Your email address is too long and the + character is not valid,') . ' '.
+            $text = $this->l('Your email address is too long and the + character is not valid,') . ' ' .
                 $this->l('please change it to another address (max 100 characters).');
             $shipping_fields['email'] = [
                 'text' => $text,
@@ -1069,9 +1062,7 @@ class OneyRepository extends Repository
         if (!$config->updateValue('PAYPLUG_ONEY', 0) ||
             !$config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
             !$config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
-            !$config->updateValue('PAYPLUG_ONEY_TOS', 0) ||
-            !$config->updateValue('PAYPLUG_ONEY_TOS_URL', '')
+            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
         ) {
             $this->log->error('Installation failed: Oney config');
             $flag = false;
@@ -1200,7 +1191,7 @@ class OneyRepository extends Repository
      */
     public function installOneyCarriers()
     {
-        $carriers = \PayPlugCarrier::getCarriers($this->contextSpecific->getContext()->language->id, true);
+        $carriers = \PayPlugCarrier::getCarriers(true);
         $flag = true;
         foreach ($carriers as $carrier) {
             $flag = $flag && $carrier->save();
@@ -1345,7 +1336,8 @@ class OneyRepository extends Repository
         $max = 1000;
 
         if ($nb_products >= $max) {
-            $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
+            $error = $this->l('The payment with Oney is not available 
+                because you have more than 1000 items in your cart.');
             return [
                 'result' => false,
                 'error' => $this->l($error)
@@ -1470,8 +1462,6 @@ class OneyRepository extends Repository
         return ($config->deleteByName('PAYPLUG_ONEY')
             && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_TOS')
-            && $config->deleteByName('PAYPLUG_ONEY_TOS_URL'));
+            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
     }
 }

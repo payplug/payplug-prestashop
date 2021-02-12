@@ -32,8 +32,12 @@ class TranslationsRepository extends Repository
         $this->payplug = $payplug;
     }
 
-    public function translate(int $id)
+    public function translate($id)
     {
+        if (!is_int($id)) {
+            return false;
+        }
+
         $translation = [
             // controllers/front/ajax.php
             1 => $this->l('Empty payment data'),
