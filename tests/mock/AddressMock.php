@@ -30,6 +30,7 @@ class AddressMock
     {
         $address = new \stdClass();
         $address->id_customer = 1;
+        $address->id_country = 1;
         $address->country = 'France';
         $address->alias = 'Adresse';
         $address->company = 'Payplug';

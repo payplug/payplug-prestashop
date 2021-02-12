@@ -24,7 +24,6 @@
 
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\AddresstMock;
-use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\PaymentTabMock;
 use PayPlug\tests\mock\CountryMock;
 use PayPlug\src\repositories\OneyRepository;
@@ -32,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -57,14 +57,12 @@ final class CheckOneyRequiredFieldsTest extends TestCase
     protected $country;
     protected $tools;
     protected $translate;
+    protected $validate;
 
-    protected $libphonenumber;
-
+    protected $payplug;
 
     // Method Params
     protected $repo;
-    protected $arrayCache;
-    protected $arrayLogger;
     protected $tab;
 
     public function setUp()
@@ -74,31 +72,22 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
 
         // Method setup
-//        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-//        $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
-//
-//        $this->address = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
-//        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-//
-//        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
-//
-//        $this->country = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
-//        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-//        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-//        $this->libphonenumber = Mockery::mock('alias:libphonenumberlight\PhoneNumberUtil');
-//        $this->libphonenumber->shouldReceive('getInstance')
-//            ->andReturnSelf();
-//
-//        $this->repo = new OneyRepository('');
-//
-//        $this->arrayCache = [];
-//        $this->arrayLogger = [];
-//
-//        $paymentTab = PaymentTabMock::getStandard();
-//        $this->tab = $paymentTab['shipping'];
+        $this->address = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
+        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
+        $this->country = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
+        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
+        $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
+
+        $this->payplug = Mockery::mock('payplug');
+        $this->repo = new OneyRepository($this->payplug);
+
+        // Method Params
+        $paymentTab = PaymentTabMock::getStandard();
+        $this->tab = $paymentTab['shipping'];
     }
 
-    public function MethodWithEmptyParams()
+    public function testMethodWithEmptyParams()
     {
         $paymentData = null;
         $response = $this->repo->checkOneyRequiredFields($paymentData);
@@ -108,7 +97,7 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         );
     }
 
-    public function MethodWithInvalidParams()
+    public function testMethodWithInvalidParams()
     {
         $paymentData = 'wrong params';
         $response = $this->repo->checkOneyRequiredFields($paymentData);
@@ -118,7 +107,7 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         );
     }
 
-    public function WithValidPaymentData()
+    public function testWithValidPaymentData()
     {
         $response = $this->repo->checkOneyRequiredFields($this->tab);
         $this->assertTrue(
@@ -126,114 +115,225 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         );
     }
 
-    public function testWithWrongMobilePhoneNumber()
+    public function testWithValidMobilePhoneNumber()
     {
-        $response = $this->repo->checkOneyRequiredFields(['shipping-mobile_phone_number' => $this->tab['mobile_phone_number']]);
+        $this->country->shouldReceive('getCountry')
+            ->andReturn(CountryMock::get());
 
-        echo "\n" . 'Debug: ';
-//        var_dump(get_class_methods($this->context));
-//        var_dump($response);
+        $this->payplug->shouldReceive('isValidMobilePhoneNumber')
+            ->andReturn(true);
 
-//        $this->country->shouldReceive('getCountry')
-//            ->andReturn(CountryMock::get());
-//
-//        $this->libphonenumber->shouldReceive('getNumberType')
-//            ->andReturn(true);
+        $phone_number = ['shipping-mobile_phone_number' => $this->tab['mobile_phone_number']];
+        $response = $this->repo->checkOneyRequiredFields($phone_number);
 
+        $this->assertSame(
+            [],
+            $response
+        );
     }
 
-    public function checkOneyRequiredFields($payment_data)
+    public function testWithInalidMobilePhoneNumber()
     {
-        $tools = $this->toolsSpecific;
-        $validate = $this->validateSpecific;
-        $errors = [];
+        $this->country->shouldReceive('getCountry')
+            ->andReturn(CountryMock::get());
 
-        if (!$payment_data) {
-            return [$this->l('Please fill in the required fields')];
-        }
+        $this->payplug->shouldReceive('isValidMobilePhoneNumber')
+            ->andReturn(false);
 
-        foreach ($payment_data as $key => $data) {
-            $parsed = explode('-', $key);
-            $type = $parsed[0];
-            $field = '';
-            if (isset($parsed[1])) {
-                $field = $parsed[1];
-            }
-            switch ($field) {
-                case 'email':
-                    if ($tools->tool('strlen', $data, 'UTF-8') > 100
-                        && $tools->tool('strpos', $data, '+') !== false) {
-                        $text = $this->l('Your email address is too long and the + character is not valid, 
-                        please change it to another address (max 100 characters).');
-                        $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100) {
-                        $text = $this->l('Your email address is too long, 
-                        please change it to a shorter one (max 100 characters).');
-                        $errors[] = $text;
-                    } elseif ($tools->tool('strpos', $data, '+') !== false) {
-                        $text = $this->l('The + character is not valid. 
-                        Please change your email address (100 characters max).');
-                        $errors[] = $text;
-                    }
-                    break;
-                case 'mobile_phone_number':
-                    $id_address = $type == 'shipping' ?
-                        $this->contextSpecific->getContext()->cart->id_address_delivery :
-                        $this->contextSpecific->getContext()->cart->id_address_invoice;
-                    $address = $this->addressSpecific->getAddress($id_address);
-                    $country = $this->countrySpecific->getCountry($address->id_country);
-                    $valid = $this->payplug->isValidMobilePhoneNumber($data, $country->iso_code);
-                    if (!$valid) {
-                        $errors[] = $this->l('Please enter your mobile phone number.');
-                    }
-                    break;
-                case 'first_name':
-                    if (!$validate->validate('isPostCode', $data)) {
-                        $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping firstname.') :
-                            $this->l('Please enter your billing firstname.');
-                        $errors[] = $text;
-                    }
-                    break;
-                case 'last_name':
-                    if (!$validate->validate('isPostCode', $data)) {
-                        $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping lastname.') :
-                            $this->l('Please enter your billing lastname.');
-                        $errors[] = $text;
-                    }
-                    break;
-                case 'address1':
-                    if (!$validate->validate('isPostCode', $data)) {
-                        $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping address.') :
-                            $this->l('Please enter your billing address.');
-                        $errors[] = $text;
-                    }
-                    break;
-                case 'postcode':
-                    if (!$validate->validate('isPostCode', $data)) {
-                        $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping postcode.') :
-                            $this->l('Please enter your billing postcode.');
-                        $errors[] = $text;
-                    }
-                    break;
-                case 'city':
-                    if (!$validate->validate('isCityName', $data)) {
-                        $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping city.') :
-                            $this->l('Please enter your billing city.');
-                        $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 32) {
-                        $text = $this->l('Your city name is too long (max 32 characters). ')
-                            . $this->l('Please change it to another one or select another payment method.');
-                        $errors[] = $text;
-                    }
-                    break;
-            }
-        }
+        $phone_number = ['shipping-mobile_phone_number' => $this->tab['mobile_phone_number']];
+        $response = $this->repo->checkOneyRequiredFields($phone_number);
 
-        return $errors;
+        $this->assertSame(
+            ['Please enter your mobile phone number.'],
+            $response
+        );
+    }
+
+    public function testWithValidFirstName()
+    {
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['shipping-first_name' => $this->tab['first_name']])
+        );
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['billing-first_name' => $this->tab['first_name']])
+        );
+    }
+
+    public function testWithInvalidFirstName()
+    {
+        $this->validate
+            ->andReturnUsing(function ($action, $data) {
+                if ($action == 'isName') {
+                    return false;
+                }
+                return true;
+            });
+
+        $this->assertSame(
+            ['Please enter your shipping firstname.'],
+            $this->repo->checkOneyRequiredFields(['shipping-first_name' => $this->tab['first_name']])
+        );
+        $this->assertSame(
+            ['Please enter your billing firstname.'],
+            $this->repo->checkOneyRequiredFields(['billing-first_name' => $this->tab['first_name']])
+        );
+    }
+
+    public function testWithValidLastName()
+    {
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['shipping-last_name' => $this->tab['last_name']])
+        );
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['billing-last_name' => $this->tab['last_name']])
+        );
+    }
+
+    public function testWithInvalidLastName()
+    {
+        $this->validate
+            ->andReturnUsing(function ($action, $data) {
+                if ($action == 'isName') {
+                    return false;
+                }
+                return true;
+            });
+
+        $this->assertSame(
+            ['Please enter your shipping lastname.'],
+            $this->repo->checkOneyRequiredFields(['shipping-last_name' => $this->tab['last_name']])
+        );
+        $this->assertSame(
+            ['Please enter your billing lastname.'],
+            $this->repo->checkOneyRequiredFields(['billing-last_name' => $this->tab['last_name']])
+        );
+    }
+
+    public function testWithValidAddress()
+    {
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['shipping-address1' => $this->tab['address1']])
+        );
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['billing-address1' => $this->tab['address1']])
+        );
+    }
+
+    public function testWithInvalidAddress()
+    {
+        $this->validate
+            ->andReturnUsing(function ($action, $data) {
+                if ($action == 'isAddress') {
+                    return false;
+                }
+                return true;
+            });
+
+        $this->assertSame(
+            ['Please enter your shipping address.'],
+            $this->repo->checkOneyRequiredFields(['shipping-address1' => $this->tab['address1']])
+        );
+        $this->assertSame(
+            ['Please enter your billing address.'],
+            $this->repo->checkOneyRequiredFields(['billing-address1' => $this->tab['address1']])
+        );
+    }
+
+    public function testWithValidPostcode()
+    {
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['shipping-postcode' => $this->tab['postcode']])
+        );
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['billing-postcode' => $this->tab['postcode']])
+        );
+    }
+
+    public function testWithInvalidPostcode()
+    {
+        $this->validate
+            ->andReturnUsing(function ($action, $data) {
+                if ($action == 'isPostCode') {
+                    return false;
+                }
+                return true;
+            });
+
+        $this->assertSame(
+            ['Please enter your shipping postcode.'],
+            $this->repo->checkOneyRequiredFields(['shipping-postcode' => $this->tab['postcode']])
+        );
+        $this->assertSame(
+            ['Please enter your billing postcode.'],
+            $this->repo->checkOneyRequiredFields(['billing-postcode' => $this->tab['postcode']])
+        );
+    }
+
+    public function testWithValidCity()
+    {
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['shipping-city' => $this->tab['city']])
+        );
+        $this->assertSame(
+            [],
+            $this->repo->checkOneyRequiredFields(['billing-city' => $this->tab['city']])
+        );
+    }
+
+    public function testWithInvalidCity()
+    {
+        $this->validate
+            ->andReturnUsing(function ($action, $data) {
+                if ($action == 'isCityName') {
+                    return false;
+                }
+                return true;
+            });
+
+        $this->assertSame(
+            ['Please enter your shipping city.'],
+            $this->repo->checkOneyRequiredFields(['shipping-city' => $this->tab['city']])
+        );
+        $this->assertSame(
+            ['Please enter your billing city.'],
+            $this->repo->checkOneyRequiredFields(['billing-city' => $this->tab['city']])
+        );
+    }
+
+    public function testWithTooLongCity()
+    {
+        $this->tools
+            ->andReturnUsing(function ($action, $value, $params2) {
+                switch ($action) {
+                    case 'jsonDecode':
+                        return json_decode($value, $params2);
+                    case 'strpos':
+                        return strpos($value, $params2);
+                    case 'strlen':
+                        return 33;
+                    default:
+                        break;
+                }
+
+                return false;
+            });
+
+        $this->assertSame(
+            ['Your city name is too long (max 32 characters). Please change it to another one or select another payment method.'],
+            $this->repo->checkOneyRequiredFields(['shipping-city' => $this->tab['city']])
+        );
+        $this->assertSame(
+            ['Your city name is too long (max 32 characters). Please change it to another one or select another payment method.'],
+            $this->repo->checkOneyRequiredFields(['billing-city' => $this->tab['city']])
+        );
     }
 }

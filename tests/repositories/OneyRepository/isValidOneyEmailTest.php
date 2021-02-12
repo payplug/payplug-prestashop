@@ -49,8 +49,8 @@ final class isValidOneyEmailTest extends TestCase
     protected $translate;
 
     // Method Params
-    protected $repo;
     protected $email;
+    protected $repo;
 
     public function setUp()
     {
@@ -65,7 +65,6 @@ final class isValidOneyEmailTest extends TestCase
 
         // Method Params
         $this->email = 'mock@payplug.com';
-
         $this->repo = new OneyRepository('');
     }
 

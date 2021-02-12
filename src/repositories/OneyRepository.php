@@ -254,7 +254,7 @@ class OneyRepository extends Repository
                     }
                     break;
                 case 'first_name':
-                    if (!$validate->validate('isPostCode', $data)) {
+                    if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
                             $this->l('Please enter your shipping firstname.') :
                             $this->l('Please enter your billing firstname.');
@@ -262,7 +262,7 @@ class OneyRepository extends Repository
                     }
                     break;
                 case 'last_name':
-                    if (!$validate->validate('isPostCode', $data)) {
+                    if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
                             $this->l('Please enter your shipping lastname.') :
                             $this->l('Please enter your billing lastname.');
@@ -270,7 +270,7 @@ class OneyRepository extends Repository
                     }
                     break;
                 case 'address1':
-                    if (!$validate->validate('isPostCode', $data)) {
+                    if (!$validate->validate('isAddress', $data)) {
                         $text = $type == 'shipping' ?
                             $this->l('Please enter your shipping address.') :
                             $this->l('Please enter your billing address.');

@@ -4139,6 +4139,7 @@ class Payplug extends PaymentModule
             $parsed = $phone_util->parse($phone_number, $iso_code);
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, [1, 2], true));
+            return true;
         } catch (Exception $e) {
             // @todo : Add Log
             return false;
