@@ -11,7 +11,7 @@ versionning_assets() {
       echo `basename ${file}`
       mv ${file} ${file%%.*}'-v'$version'.'$extension
       git grep -rl `basename ${file}` . ':!upgrade/*.php' ':!assets_revision.sh'
-      git grep -rl `basename ${file}` . ':!upgrade/*.php' ':!assets_revision.sh' | xargs sed -i -e s/'`basename ${file}`'/'`basename ${file%%.*}`'-v'$version'.'$extension'/g';
+      git grep -rl `basename ${file}` . ':!upgrade/*.php' ':!assets_revision.sh' | xargs sed -i -e 's/'`basename ${file}`'/'`basename ${file%%.*}`'-v'$version'.'$extension'/g';
   done
 }
 
