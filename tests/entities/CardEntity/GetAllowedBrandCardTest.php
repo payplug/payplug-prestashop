@@ -23,51 +23,49 @@
 
 
 
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group cache
- * @group cache_entity
+ * @group card
+ * @group card_entity
  */
-final class SetIdPayPlugCacheTest extends TestCase
+final class GetAllowedBrandCardTest extends TestCase
 {
-    protected $cache;
+    protected $card;
+    protected $allowedBrands;
 
     protected function setUp()
     {
-        $this->cache = new CacheEntity();
-        $this->cache->setIdPayplugCache('test_id');
+        $this->card = new CardEntity();
+        $this->allowedBrands = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 3,
+        ];
+        $this->card->setAllowedBrand($this->allowedBrands);
     }
 
-    public function testUpdateCacheId()
+    public function testReturnAllowedBrand()
     {
-        $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
-            'another_id',
-            $this->cache->getIdPayplugCache()
+            $this->allowedBrands,
+            $this->card->getAllowedBrand()
         );
     }
 
-    public function testReturnCacheEntity()
+    public function testAllowedBrandIsArray()
     {
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $this->cache->setIdPayplugCache('another_id')
+        $this->assertTrue(
+            is_array($this->card->getAllowedBrand())
         );
     }
 
-    /**
-     * @group entity_exception
-     * @group cache_exception
-     * @group cache_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotAString()
+    public function testAllowedBrandIsNotEmpty()
     {
-        $this->expectException(BadParameterException::class);
-        $this->cache->setIdPayplugCache(42);
+        $this->assertFalse(
+            empty($this->card->getAllowedBrand())
+        );
     }
 }

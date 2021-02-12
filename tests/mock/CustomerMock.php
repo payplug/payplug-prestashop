@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -21,38 +22,19 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\tests\mock;
 
-
-use PayPlug\src\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
-
-/**
- * @group entity
- * @group card
- * @group card_entity
- */
-final class GetIdCardTest extends TestCase
+class CustomerMock
 {
-    protected $card;
-
-    protected function setUp()
+    public static function getCustomer()
     {
-        $this->card = new CardEntity();
-        $this->card->setId(42);
-    }
-
-    public function testReturnId()
-    {
-        $this->assertSame(
-            42,
-            $this->card->getId()
-        );
-    }
-
-    public function testIdIsAnInt()
-    {
-        $this->assertTrue(
-            is_int($this->card->getId())
-        );
+        $customer = new \stdClass();
+        $customer->id = 1;
+        $customer->lastname = 'Lorem';
+        $customer->firstname = 'Ipsum';
+        $customer->email = 'customer@payplug.com';
+        $customer->date_add = '2020-12-21 12:03:52';
+        $customer->date_upd = '2021-01-11 11:24:31';
+        return $customer;
     }
 }

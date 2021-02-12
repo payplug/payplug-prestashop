@@ -24,44 +24,35 @@
 
 
 use PayPlug\src\entities\CardEntity;
-use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group card
+ * @group card_entity
  */
-final class GetApiVersionTest extends TestCase
+final class GetLast4CardTest extends TestCase
 {
-    protected $plugin;
+    protected $card;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->card = new CardEntity();
+        $this->card->setLast4('4242');
     }
 
-    public function testReturnAnApiVersion()
+    public function testReturnLast4()
     {
         $this->assertSame(
-            '2021-01-01',
-            $this->plugin->getApiVersion()
+            '4242',
+            $this->card->getLast4()
         );
     }
 
-    public function testApiVersionIsAString()
+    public function testLast4IsAnInt()
     {
         $this->assertTrue(
-            is_string($this->plugin->getApiVersion())
-        );
-    }
-
-    public function testApiVersionHaveAValidFormat()
-    {
-        $this->assertRegExp(
-            '/^\d{4}-\d{2}-\d{2}$/',
-            $this->plugin->getApiVersion()
+            is_string($this->card->getLast4())
         );
     }
 }

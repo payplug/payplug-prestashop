@@ -23,63 +23,51 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group cache
+ * @group cache_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetCacheKeyCacheTest extends TestCase
 {
-    protected $plugin;
+    protected $cache;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->cache = new CacheEntity();
+        $this->cache->setCacheKey('test_key');
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateCacheKey()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->cache->setCacheKey('another_key');
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            'another_key',
+            $this->cache->getCacheKey()
         );
     }
 
-    public function testReturnLoggerEntity()
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            CacheEntity::class,
+            $this->cache->setCacheKey('another_key')
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group cache_exception
+     * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testTrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
-    }
-
-    /**
-     * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->cache->setCacheKey(42);
     }
 }

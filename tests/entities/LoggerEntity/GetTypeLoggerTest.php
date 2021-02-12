@@ -23,45 +23,36 @@
 
 
 
-use PayPlug\src\entities\CardEntity;
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\LoggerEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group logger
+ * @group logger_entity
  */
-final class GetApiVersionTest extends TestCase
+final class GetTypeLoggerTest extends TestCase
 {
-    protected $plugin;
+    protected $logger;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->logger = new LoggerEntity();
+        $this->logger->setType('type');
     }
 
-    public function testReturnAnApiVersion()
+    public function testReturnType()
     {
         $this->assertSame(
-            '2021-01-01',
-            $this->plugin->getApiVersion()
+            'type',
+            $this->logger->getType()
         );
     }
 
-    public function testApiVersionIsAString()
+    public function testTypeIsAString()
     {
         $this->assertTrue(
-            is_string($this->plugin->getApiVersion())
-        );
-    }
-
-    public function testApiVersionHaveAValidFormat()
-    {
-        $this->assertRegExp(
-            '/^\d{4}-\d{2}-\d{2}$/',
-            $this->plugin->getApiVersion()
+            is_string($this->logger->getType())
         );
     }
 }

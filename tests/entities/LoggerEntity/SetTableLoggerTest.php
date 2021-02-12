@@ -23,63 +23,51 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
- * @group plugin
- * @group plugin_entity
+ * @group logger
+ * @group logger_entity
  */
-final class SetApiVersionTest extends TestCase
+final class SetTableLoggerTest extends TestCase
 {
-    protected $plugin;
+    protected $logger;
 
     protected function setUp()
     {
-        $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('2021-01-01');
+        $this->logger = new LoggerEntity();
+        $this->logger->setTable('test_table');
     }
 
-    public function testUpdateApiVersion()
+    public function testUpdateTable()
     {
-        $this->plugin->setApiVersion('1920-12-31');
+        $this->logger->setTable('another_table');
         $this->assertSame(
-            '1920-12-31',
-            $this->plugin->getApiVersion()
+            'another_table',
+            $this->logger->getTable()
         );
     }
 
     public function testReturnLoggerEntity()
     {
         $this->assertInstanceOf(
-            PluginEntity::class,
-            $this->plugin->setApiVersion('1920-12-31')
+            LoggerEntity::class,
+            $this->logger->setTable('another_table')
         );
     }
 
     /**
      * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
+     * @group logger_exception
+     * @group logger_entity_exception
      * @group exception
      */
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('wrong_api_version');
-    }
-
-    /**
-     * @group entity_exception
-     * @group plugin_exception
-     * @group plugin_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted()
-    {
-        $this->expectException(BadParameterException::class);
-        $this->plugin->setApiVersion('1er Janvier 1970');
+        $this->logger->setTable(42);
     }
 }

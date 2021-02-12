@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+
 
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\exceptions\BadParameterException;
@@ -36,26 +36,26 @@ final class SetIdCardTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        $this->card->setId(42);
     }
 
-    public function testUpdateIdCard(): void
+    public function testUpdateId()
     {
-        $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12');
+        $this->card->setId(777);
         $this->assertSame(
-            'card_azertyuiop1234567890qsdfghjklm12',
-            $this->card->getIdCard()
+            777,
+            $this->card->getId()
         );
     }
 
-    public function testReturnCardEntity(): void
+    public function testReturnCardEntity()
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12')
+            $this->card->setId(777)
         );
     }
 
@@ -65,21 +65,9 @@ final class SetIdCardTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString(): void
+    public function testThrowExceptionWhenNotAnInt()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setIdCard(42);
-    }
-
-    /**
-     * @group entity_exception
-     * @group card_exception
-     * @group card_entity_exception
-     * @group exception
-     */
-    public function testThrowExceptionWhenNotWellFormatted(): void
-    {
-        $this->expectException(BadParameterException::class);
-        $this->card->setIdCard('Kart_AZERT&é"');
+        $this->card->setId('test');
     }
 }
