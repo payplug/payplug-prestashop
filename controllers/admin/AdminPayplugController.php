@@ -104,8 +104,8 @@ class AdminPayplugController extends ModuleAdminController
             ]);
         }
 
-        $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin-v3.2.0.js');
-        $payplug->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin-v3.2.0.css');
+        $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin-v3.1.1.js');
+        $payplug->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin-v3.1.1.css');
 
         $admin_ajax_url = $payplug->getAdminAjaxUrl();
 
