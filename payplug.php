@@ -5594,12 +5594,6 @@ class Payplug extends PaymentModule
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
         ];
 
-        // If sandbox mode active, no allowed countries sent
-        // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
-        if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
-            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
-        }
-
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
