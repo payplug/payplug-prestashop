@@ -39,6 +39,11 @@ class QuerySpecific implements QueryInterface
         }
     }
 
+    public static function factory()
+    {
+        return new QuerySpecific();
+    }
+
     /**
      * @description Called from src/repositories/QueryRepository.php
      * @param $SQLRequest

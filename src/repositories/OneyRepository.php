@@ -404,12 +404,16 @@ class OneyRepository extends Repository
         if (!in_array($operation, $this->methods)) {
             return false;
         }
-
-        $type = explode('_', $operation);
-
         if (!is_array($resource)) {
             return false;
         }
+
+        if ($total_amount && !is_int($total_amount)) {
+            return false;
+        }
+
+        $type = explode('_', $operation);
+
         $resource['split'] = (int)str_replace('x', '', $type[0]);
         $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
 
@@ -436,7 +440,7 @@ class OneyRepository extends Repository
             'amount' => $total_amount,
             'value' => $tools->tool('displayPrice', $total_amount),
         ];
-        dump($resource);
+
         return $resource;
     }
 

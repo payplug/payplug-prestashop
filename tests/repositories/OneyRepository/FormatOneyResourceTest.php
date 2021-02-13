@@ -47,6 +47,7 @@ final class FormatOneyResourceTest extends TestCase
     protected $myLogPhp;
 
     // Method setup
+    protected $translate;
 
     // Method Params
     protected $payplug;
@@ -64,25 +65,28 @@ final class FormatOneyResourceTest extends TestCase
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
 
+        // Method setup
+        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
+
         // Method Params
         $this->payplug = Mockery::mock('payplug');
         $this->payplug
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent) {
                 if ($cent) {
-                    return (int)$amount * 100;
+                    return round($amount / 100, 2);
                 }
-                return (float)$amount / 100;
+                return (int)$amount * 100;
             });
 
         $this->repo = new OneyRepository($this->payplug);
 
-        $this->operation = reset($this->repo->methods);
+        $this->operation = 'x3_with_fees';
         $this->resource = OneySimulationsMock::get()[$this->operation];
     }
 
-    public function testLorem(){}
-    public function atestWithInvalidMethod()
+    public function testWithInvalidMethod()
     {
         $method = 'wrong method';
         $this->assertSame(
@@ -91,7 +95,7 @@ final class FormatOneyResourceTest extends TestCase
         );
     }
 
-    public function atestWithInvalidResource()
+    public function testWithInvalidResource()
     {
         $resource = 'wrong resource';
         $this->assertSame(
@@ -100,49 +104,111 @@ final class FormatOneyResourceTest extends TestCase
         );
     }
 
-    public function atestGetValidSplitValueFromMethod()
+    public function testGetValidSplit()
     {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = 3;
+        $this->assertSame(
+            $expected_value,
+            $response['split']
+        );
     }
 
-    public function formatOneyResource($operation, $resource, $total_amount = false)
+    public function testGetValidTitle()
     {
-        $tools = $this->toolsSpecific;
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = 'Payment in 3x';
+        $this->assertSame(
+            $expected_value,
+            $response['title']
+        );
+    }
 
-        if (!in_array($operation, $this->methods)) {
-            return false;
-        }
-
-        $type = explode('_', $operation);
-
-        if (!is_array($resource)) {
-            return false;
-        }
-        $resource['split'] = (int)str_replace('x', '', $type[0]);
-        $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
-
-        // format price
-        $total_cost = $this->payplug->convertAmount($resource['total_cost'], true);
-        $resource['total_cost'] = [
-            'amount' => $total_cost,
-            'value' => $tools->tool('displayPrice', $total_cost),
+    public function testGetValidTotalCost()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = [
+            'amount'=> (float)3.5,
+            'value'=> '3,50 €'
         ];
-        $down_payment_amount = $this->payplug->convertAmount($resource['down_payment_amount'], true);
-        $resource['down_payment_amount'] = [
-            'amount' => $down_payment_amount,
-            'value' => $tools->tool('displayPrice', $down_payment_amount),
-        ];
-        foreach ($resource['installments'] as &$installment) {
-            $amount = $this->payplug->convertAmount($installment['amount'], true);
-            $installment['amount'] = $amount;
-            $installment['value'] = $tools->tool('displayPrice', $amount);
-        }
+        $this->assertSame(
+            $expected_value,
+            $response['total_cost']
+        );
+    }
 
-        $total_amount = $this->payplug->convertAmount($total_amount, true);
-        $total_amount += $total_cost;
-        $resource['total_amount'] = [
-            'amount' => $total_amount,
-            'value' => $tools->tool('displayPrice', $total_amount),
+    public function testGetValidDownPaymentAmount()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = [
+            'amount' => (float)83.92,
+            'value' => '83,92 €'
         ];
-        return $resource;
+        $this->assertSame(
+            $expected_value,
+            $response['down_payment_amount']
+        );
+    }
+
+    public function testGetValidInstallments()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+
+        // check installments count
+        $this->assertSame(
+            2,
+            count($response['installments'])
+        );
+
+        $this->assertSame(
+            [
+                'date' => '2021-02-19T01:00:00.000Z',
+                'amount' => (float)80.42,
+                'value' => '80,42 €'
+            ],
+            $response['installments'][0]
+        );
+        $this->assertSame(
+            [
+                'date' => '2021-03-19T01:00:00.000Z',
+                'amount' => (float)80.41,
+                'value' => '80,41 €'
+            ],
+            $response['installments'][1]
+        );
+    }
+
+    public function testWithInvalidAmount()
+    {
+        $this->assertSame(
+            false,
+            $this->repo->formatOneyResource($this->operation, $this->resource, 'wrong params')
+        );
+    }
+
+    public function testGetValidTotalAmountWithEmptyValue()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = [
+            'amount' => (float)3.5,
+            'value' => '3,50 €'
+        ];
+        $this->assertSame(
+            $expected_value,
+            $response['total_amount']
+        );
+    }
+
+    public function testGetValidTotalAmount()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, 100);
+        $expected_value = [
+            'amount' => (float)4.5,
+            'value' => '4,50 €'
+        ];
+        $this->assertSame(
+            $expected_value,
+            $response['total_amount']
+        );
     }
 }

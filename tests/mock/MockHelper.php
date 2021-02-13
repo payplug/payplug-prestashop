@@ -57,7 +57,7 @@ class MockHelper extends Mockery
     public static function createToolsMock($classPathname) {
         $tools = self::createMockFactory($classPathname)
             ->shouldReceive('tool')
-            ->andReturnUsing(function ($action, $value, $params2) {
+            ->andReturnUsing(function ($action, $value, $params2 = false) {
                 switch ($action) {
                     case 'jsonDecode':
                         return json_decode($value, $params2);
@@ -65,6 +65,9 @@ class MockHelper extends Mockery
                         return strlen($value);
                     case 'strpos':
                         return strpos($value, $params2);
+                    case 'displayPrice':
+                        $value = number_format($value, 2) . ' €';
+                        return str_replace('.',',',$value);
                     default:
                         break;
                 }
