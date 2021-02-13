@@ -70,7 +70,6 @@ final class GetOneySimulationsTest extends TestCase
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
 
-
         // Method setup
         $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
         $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
