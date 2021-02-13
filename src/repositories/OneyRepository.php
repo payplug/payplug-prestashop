@@ -52,9 +52,9 @@ class OneyRepository extends Repository
 
 
     public $methods = [
-            'x3_with_fees',
-            'x4_with_fees',
-        ];
+        'x3_with_fees',
+        'x4_with_fees',
+    ];
 
     public function __construct($payplug)
     {
@@ -184,7 +184,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->contextSpecific->getContext()->smarty->assign([
@@ -453,6 +453,9 @@ class OneyRepository extends Repository
      */
     public function getOneyCountry($iso_country)
     {
+        if (!$iso_country || !is_string($iso_country)) {
+            return false;
+        }
         $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
         if (in_array($iso_country, $overseas_iso, true)) {
             return 'FR';
@@ -603,7 +606,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->contextSpecific->getContext()->smarty->assign([
@@ -736,10 +739,10 @@ class OneyRepository extends Repository
                 ],
             ];
         } elseif ($tools->tool(
-            'strlen',
-            $this->contextSpecific->getContext()->customer->email,
-            'UTF-8'
-        ) > 100) {
+                'strlen',
+                $this->contextSpecific->getContext()->customer->email,
+                'UTF-8'
+            ) > 100) {
             $text = $this->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [
@@ -910,7 +913,7 @@ class OneyRepository extends Repository
         $tools = $this->toolsSpecific;
         $cache_key = $this->cache->setCacheKey($amount, $country, $operation);
 
-        if(!$cache_key['result']) {
+        if (!$cache_key['result']) {
             return [
                 'result' => false,
                 'error' => $cache_key['message']
@@ -1438,15 +1441,15 @@ class OneyRepository extends Repository
      * @param $email
      * @return array
      */
-    public function isValidOneyEmail($email) {
+    public function isValidOneyEmail($email)
+    {
         $tools = $this->toolsSpecific;
         $validate = $this->validateSpecific;
         $error = false;
 
-        if(!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
+        if (!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
             $error = $this->l('Your email address is not a valid email');
-        }
-        elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
+        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
             && $tools->tool('strpos', $email, '+') !== false) {
             $error = $this->l('Your email address is too long and the + character is not valid, 
                         please change it to another address (max 100 characters).');
