@@ -47,6 +47,11 @@ class CardRepository extends Repository
         $this->setParams();
     }
 
+    public static function factory()
+    {
+        return new CardRepository();
+    }
+
     private function setParams()
     {
         $config = $this->configurationSpecific;

@@ -43,6 +43,11 @@ class CacheRepository extends Repository
         $this->setLogger();
     }
 
+    public static function factory()
+    {
+        return new CacheRepository();
+    }
+
     /**
      * @description Hydrate entities standard parameters
      *

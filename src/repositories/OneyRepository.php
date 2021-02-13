@@ -50,6 +50,12 @@ class OneyRepository extends Repository
 
     protected $payplug;
 
+
+    public $methods = [
+            'x3_with_fees',
+            'x4_with_fees',
+        ];
+
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
@@ -65,6 +71,11 @@ class OneyRepository extends Repository
         $this->validateSpecific = ValidateSpecific::factory();
 
         $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
+    }
+
+    public static function factory()
+    {
+        return new OneyRepository();
     }
 
     /**
@@ -386,12 +397,19 @@ class OneyRepository extends Repository
      * @param bool $total_amount
      * @return array
      */
-    public function formatOneyResource($method, $resource, $total_amount = false)
+    public function formatOneyResource($operation, $resource, $total_amount = false)
     {
         $tools = $this->toolsSpecific;
 
-        $type = explode('_', $method);
+        if (!in_array($operation, $this->methods)) {
+            return false;
+        }
 
+        $type = explode('_', $operation);
+
+        if (!is_array($resource)) {
+            return false;
+        }
         $resource['split'] = (int)str_replace('x', '', $type[0]);
         $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
 
@@ -418,6 +436,7 @@ class OneyRepository extends Repository
             'amount' => $total_amount,
             'value' => $tools->tool('displayPrice', $total_amount),
         ];
+        dump($resource);
         return $resource;
     }
 
@@ -535,7 +554,7 @@ class OneyRepository extends Repository
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->payplug->available_oney_payments);
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->methods);
 
         if (!$oney_sims['result']) {
             return $payment_list;
@@ -885,7 +904,6 @@ class OneyRepository extends Repository
     public function getOneySimulations($amount, $country, $operation)
     {
         $tools = $this->toolsSpecific;
-
         $cache_key = $this->cache->setCacheKey($amount, $country, $operation);
 
         if(!$cache_key['result']) {

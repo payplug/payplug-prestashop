@@ -31,7 +31,6 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -47,7 +46,6 @@ final class CheckOneyRequiredFieldsTest extends TestCase
     protected $config;
     protected $myLogPhp;
 
-
     // Method setup
     protected $cache;
     protected $logger;
@@ -59,15 +57,16 @@ final class CheckOneyRequiredFieldsTest extends TestCase
     protected $translate;
     protected $validate;
 
-    protected $payplug;
-
     // Method Params
+    protected $payplug;
     protected $repo;
     protected $tab;
 
     public function setUp()
     {
         // Default setup for Oney Repository using
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
 
@@ -79,10 +78,10 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
 
+        // Method Params
         $this->payplug = Mockery::mock('payplug');
         $this->repo = new OneyRepository($this->payplug);
 
-        // Method Params
         $paymentTab = PaymentTabMock::getStandard();
         $this->tab = $paymentTab['shipping'];
     }

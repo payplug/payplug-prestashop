@@ -28,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -35,11 +36,13 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class isValidOneyEmailTest extends TestCase
+final class IsValidOneyEmailTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     // Default setup
+    protected $cache;
+    protected $logger;
     protected $config;
     protected $myLogPhp;
 
@@ -55,6 +58,8 @@ final class isValidOneyEmailTest extends TestCase
     public function setUp()
     {
         // Default setup for Oney Repository using
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
 

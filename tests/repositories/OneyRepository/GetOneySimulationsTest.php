@@ -29,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group uni
  * @group unit
  * @group repository
  * @group oney
@@ -63,12 +64,16 @@ final class GetOneySimulationsTest extends TestCase
 
     public function setUp()
     {
+        // Default setup for Oney Repository using
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-        $this->tools = MockHelper::createMockFactory('Payplug\src\specific\ToolsSpecific');
+
+
+        // Method setup
         $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
+        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
 
         $this->cache->shouldReceive('setCacheKey')
             ->andReturnUsing(function ($amount, $country, $operations) {
@@ -92,7 +97,6 @@ final class GetOneySimulationsTest extends TestCase
         $this->arrayCache = [];
         $this->arrayLogger = [];
 
-        MockHelper::createToolsMock($this->tools);
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
     }
 
