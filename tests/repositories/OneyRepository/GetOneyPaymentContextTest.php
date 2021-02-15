@@ -30,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -37,7 +38,7 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyDeliveryContextTest extends TestCase
+final class GetOneyPaymentContextTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
@@ -63,60 +64,91 @@ final class GetOneyDeliveryContextTest extends TestCase
         // Method setup
         $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
         $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
+        $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
+
+        $this->carrier->shouldReceive([
+            'get' => CarrierMock::get(),
+            'getDefaultDelay' => 0,
+            'getDefaultDeliveryType' => 'storepickup'
+        ]);
+
+        $this->config->shouldReceive('get')
+            ->with('PS_SHOP_NAME')
+            ->andReturn('Payplug');
 
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 
         // Method Params
         $this->payplug = Mockery::mock('payplug');
+        $this->payplug
+            ->shouldReceive('convertAmount')
+            ->andReturnUsing(function ($amount, $cent = false) {
+                if ($cent) {
+                    return round($amount / 100, 2);
+                }
+                return (int)$amount * 100;
+            });
+
         $this->repo = new OneyRepository($this->payplug);
-    }
-
-    public function testGetContextFromVirtual()
-    {
-        $this->cart->shouldReceive('get')
-            ->andReturn(CartMock::get());
-        $this->cart->shouldReceive('isVirtualCart')
-            ->andReturn(true);
-
-        $this->config->shouldReceive('get')
-            ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug');
-
-        $this->assertSame(
-            [
-                'delivery_label' => 'Payplug',
-                'expected_delivery_date' => date('Y-m-d'),
-                'delivery_type' => 'edelivery',
-            ],
-            $this->repo->getOneyDeliveryContext()
-        );
     }
 
     public function testGetContext()
     {
-        $this->cart->shouldReceive('get')
-            ->andReturn(CartMock::get());
-        $this->cart->shouldReceive('isVirtualCart')
-            ->andReturn(false);
-
-        $this->carrier->shouldReceive('get')
-            ->andReturn(CarrierMock::get());
-        $this->carrier->shouldReceive('getDefaultDelay')
-            ->andReturn(0);
-        $this->carrier->shouldReceive('getDefaultDeliveryType')
-            ->andReturn('storepickup');
-
-        $this->config->shouldReceive('get')
-            ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug');
+        $this->cart->shouldReceive([
+            'get' => CartMock::get(),
+            'getProducts' => [CartMock::getProducts()[0]],
+            'isVirtualCart' => false
+        ]);
 
         $this->assertSame(
             [
-                'delivery_label' => 'Carrier name',
-                'expected_delivery_date' => date('Y-m-d'),
-                'delivery_type' => 'storepickup',
+                'cart' => [
+                    [
+                        'merchant_item_id' => 1,
+                        'name' => 'Pull imprimé colibri - Size : S',
+                        'price' => 3400,
+                        'quantity' => 1,
+                        'total_amount' => 3400,
+                        'brand' => 'Studio Design',
+                        'delivery_label' => 'Carrier name',
+                        'expected_delivery_date' => '2021-02-15',
+                        'delivery_type' => 'storepickup',
+                    ]
+                ]
             ],
-            $this->repo->getOneyDeliveryContext()
+            $this->repo->getOneyPaymentContext()
+        );
+    }
+
+    public function testGetContextWithNoProducts()
+    {
+        $this->cart->shouldReceive([
+            'get' => CartMock::get(),
+            'getProducts' => [],
+            'isVirtualCart' => false
+        ]);
+
+        $this->assertSame(
+            [
+                'cart' => []
+            ],
+            $this->repo->getOneyPaymentContext()
+        );
+    }
+
+    public function testGetContextWithWrongCart()
+    {
+        $this->cart->shouldReceive([
+            'get' => null,
+            'getProducts' => [],
+            'isVirtualCart' => false
+        ]);
+        $this->validate->andReturn(false); // force Validate::isEmail = false
+        $this->assertSame(
+            [
+                'cart' => []
+            ],
+            $this->repo->getOneyPaymentContext()
         );
     }
 }

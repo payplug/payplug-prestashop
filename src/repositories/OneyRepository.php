@@ -495,7 +495,7 @@ class OneyRepository extends Repository
     public function getOneyDeliveryContext()
     {
         $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
-        if ($this->cartSpecific->isVirtualCart($cart->id)) {
+        if ($this->cartSpecific->isVirtualCart($cart)) {
             return [
                 'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date('Y-m-d'),
@@ -523,7 +523,12 @@ class OneyRepository extends Repository
     public function getOneyPaymentContext()
     {
         $cart_context = [];
-        $products = $this->contextSpecific->getContext()->cart->getProducts();
+        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+        if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
+            return ['cart' => $cart_context];
+        }
+
+        $products = $this->cartSpecific->getProducts($cart);
         $delivery_context = $this->getOneyDeliveryContext();
 
         foreach ($products as $product) {
