@@ -29,6 +29,8 @@ use Payplug\Exception\HttpException;
 use Payplug\Exception\UnexpectedAPIResponseException;
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\CartSpecific;
+use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
@@ -42,6 +44,8 @@ class OneyRepository extends Repository
     private $cache;
     private $log;
     private $logger;
+    private $cartSpecific;
+    private $carrierSpecific;
     private $configurationSpecific;
     private $contextSpecific;
     private $countrySpecific;
@@ -64,6 +68,8 @@ class OneyRepository extends Repository
         $this->logger = LoggerRepository::factory();
 
         $this->addressSpecific = AddressSpecific::factory();
+        $this->cartSpecific = CartSpecific::factory();
+        $this->carrierSpecific = CarrierSpecific::factory();
         $this->configurationSpecific = ConfigurationSpecific::factory();
         $this->contextSpecific = ContextSpecific::factory();
         $this->countrySpecific = CountrySpecific::factory();
@@ -488,7 +494,8 @@ class OneyRepository extends Repository
      */
     public function getOneyDeliveryContext()
     {
-        if ($this->contextSpecific->getContext()->cart->isVirtualCart()) {
+        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+        if ($this->cartSpecific->isVirtualCart($cart->id)) {
             return [
                 'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date('Y-m-d'),
@@ -496,15 +503,15 @@ class OneyRepository extends Repository
             ];
         }
 
-        $carrier = new \Carrier($this->contextSpecific->getContext()->cart->id_carrier);
+        $carrier = $this->carrierSpecific->get($cart->id_carrier);
 
         return [
             'delivery_label' => $carrier->name,
             'expected_delivery_date' => date(
                 'Y-m-d',
-                strtotime('+' . \PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')
+                strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
             ),
-            'delivery_type' => \PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE
+            'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
         ];
     }
 
