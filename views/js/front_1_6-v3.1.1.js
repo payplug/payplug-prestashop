@@ -116,6 +116,11 @@ var $document,
                         if (data.result) {
                             // redirect to success url
                             if (data.embedded && !data.redirect) {
+                                // If Internet Explorer, redirect instead
+                                if(!!window.MSInputMethodContext && !!document.documentMode){
+                                    window.location.href = data.return_url;
+                                    return false;
+                                }
                                 var is_one_click = id_cart != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
