@@ -65,6 +65,8 @@ class MockHelper extends Mockery
                         return strlen($value);
                     case 'strpos':
                         return strpos($value, $params2);
+                    case 'strtoupper':
+                        return strtoupper($value);
                     case 'displayPrice':
                         $value = number_format($value, 2) . ' €';
                         return str_replace('.',',',$value);

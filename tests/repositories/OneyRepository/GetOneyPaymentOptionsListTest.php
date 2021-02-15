@@ -26,10 +26,12 @@ use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\mock\OneySimulationsMock;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -37,7 +39,7 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyPaymentContextTest extends TestCase
+final class GetOneyPaymentOptionsListTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
@@ -51,6 +53,8 @@ final class GetOneyPaymentContextTest extends TestCase
     protected $cart;
     protected $carrier;
     protected $context;
+    protected $partial;
+    protected $tools;
 
     public function setUp()
     {
@@ -63,6 +67,7 @@ final class GetOneyPaymentContextTest extends TestCase
         // Method setup
         $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
         $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
+        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
 
         $this->carrier->shouldReceive([
@@ -72,8 +77,8 @@ final class GetOneyPaymentContextTest extends TestCase
         ]);
 
         $this->config->shouldReceive('get')
-            ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug');
+            ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            ->andReturn(['FR']);
 
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 
@@ -88,66 +93,49 @@ final class GetOneyPaymentContextTest extends TestCase
                 return (int)$amount * 100;
             });
 
+        $this->partial = Mockery::mock('Payplug\src\repositories\OneyRepository')->makePartial();
+        $this->partial->shouldReceive('getOneySimulations')
+            ->andReturn(OneySimulationsMock::get());
+
         $this->repo = new OneyRepository($this->payplug);
+
     }
 
-    public function testGetContext()
+    public function testGetOptionsList()
     {
-        $this->cart->shouldReceive([
-            'get' => CartMock::get(),
-            'getProducts' => [CartMock::getProducts()[0]],
-            'isVirtualCart' => false
-        ]);
-
-        $this->assertSame(
-            [
-                'cart' => [
-                    [
-                        'merchant_item_id' => 1,
-                        'name' => 'Pull imprimé colibri - Size : S',
-                        'price' => 3400,
-                        'quantity' => 1,
-                        'total_amount' => 3400,
-                        'brand' => 'Studio Design',
-                        'delivery_label' => 'Carrier name',
-                        'expected_delivery_date' => '2021-02-15',
-                        'delivery_type' => 'storepickup',
-                    ]
-                ]
-            ],
-            $this->repo->getOneyPaymentContext()
-        );
+        $amount = 15000;
+        $country = 'FR';
+        $response = $this->repo->getOneyPaymentOptionsList($amount,$country);
+        echo "\n" . 'Debug: ';
+        var_dump($response);
     }
 
-    public function testGetContextWithNoProducts()
+    public function getOneyPaymentOptionsList($amount, $country = false)
     {
-        $this->cart->shouldReceive([
-            'get' => CartMock::get(),
-            'getProducts' => [],
-            'isVirtualCart' => false
-        ]);
+        // get Oney resource
+        $payment_list = [];
+        $amount = $this->payplug->convertAmount($amount);
 
-        $this->assertSame(
-            [
-                'cart' => []
-            ],
-            $this->repo->getOneyPaymentContext()
-        );
-    }
+        if (!$country) {
+            $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
+            $iso_list = explode(',', $iso_code_list);
+            $country = reset($iso_list);
+        }
 
-    public function testGetContextWithWrongCart()
-    {
-        $this->cart->shouldReceive([
-            'get' => null,
-            'getProducts' => [],
-            'isVirtualCart' => false
-        ]);
-        $this->validate->andReturn(false); // force Validate::isEmail = false
-        $this->assertSame(
-            [
-                'cart' => []
-            ],
-            $this->repo->getOneyPaymentContext()
-        );
+        $country = $this->toolsSpecific->tool('strtoupper', $country);
+
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->methods);
+
+        if (!$oney_sims['result']) {
+            return $payment_list;
+        }
+
+        foreach ($oney_sims['simulations'] as $method => $oney_sim) {
+            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
+                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
+            }
+        }
+
+        return $payment_list;
     }
 }
