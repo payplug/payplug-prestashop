@@ -125,7 +125,7 @@ class CacheRepository extends Repository
     }
 
     /**
-     * @description Get Cache ID
+     * @description Set Cache
      *
      * @param int $amount
      * @param string $country
