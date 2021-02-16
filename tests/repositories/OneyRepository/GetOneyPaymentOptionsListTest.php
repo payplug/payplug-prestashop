@@ -23,10 +23,9 @@
  */
 
 use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
+use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
@@ -53,8 +52,12 @@ final class GetOneyPaymentOptionsListTest extends TestCase
     protected $cart;
     protected $carrier;
     protected $context;
-    protected $partial;
+    protected $oneyEntity;
     protected $tools;
+    protected $translate;
+    protected $validate;
+
+    protected $list;
 
     public function setUp()
     {
@@ -68,6 +71,7 @@ final class GetOneyPaymentOptionsListTest extends TestCase
         $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
         $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
         $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
 
         $this->carrier->shouldReceive([
@@ -78,7 +82,7 @@ final class GetOneyPaymentOptionsListTest extends TestCase
 
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            ->andReturn(['FR']);
+            ->andReturn('FR');
 
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 
@@ -93,21 +97,91 @@ final class GetOneyPaymentOptionsListTest extends TestCase
                 return (int)$amount * 100;
             });
 
-        $this->partial = Mockery::mock('Payplug\src\repositories\OneyRepository')->makePartial();
-        $this->partial->shouldReceive('getOneySimulations')
-            ->andReturn(OneySimulationsMock::get());
+        $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
+        $this->repo->setFactories();
+        $this->repo->setPayplug($this->payplug);
 
-        $this->repo = new OneyRepository($this->payplug);
+        $this->repo
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive([
+                'getOneySimulations' => [
+                    'result' => true,
+                    'simulations' => OneySimulationsMock::get()
+                ],
+                'getMethods' => [
+                    'x3_with_fees',
+                ]
+            ]);
 
+        $this->list = [
+            'x3_with_fees' => [
+                'installments' => [
+                    [
+                        'date' => '2021-02-19T01:00:00.000Z',
+                        'amount' => (float)80.42,
+                        'value' => '80,42 €',
+                    ],
+                    [
+                        'date' => '2021-03-19T01:00:00.000Z',
+                        'amount' => (float)80.41,
+                        'value' => '80,41 €',
+                    ]
+                ],
+                'total_cost' => [
+                    'amount' => (float)3.5,
+                    'value' => '3,50 €',
+                ],
+                'nominal_annual_percentage_rate' => (float)17.76,
+                'effective_annual_percentage_rate' => (float)19.27,
+                'down_payment_amount' => [
+                    'amount' => (float)83.92,
+                    'value' => '83,92 €',
+                ],
+                'split' => 3,
+                'title' => 'Payment in 3x',
+                'total_amount' => [
+                    'amount' => (float)15003.5,
+                    'value' => '15,003,50 €',
+                ]
+            ],
+            'x4_with_fees' => false,
+        ];
     }
 
-    public function testGetOptionsList()
+    public function testGetList()
     {
         $amount = 15000;
         $country = 'FR';
-        $response = $this->repo->getOneyPaymentOptionsList($amount,$country);
-        echo "\n" . 'Debug: ';
-        var_dump($response);
+        $response = $this->repo->getOneyPaymentOptionsList($amount, $country);
+
+        $this->assertSame(
+            $this->list,
+            $response
+        );
+    }
+
+    public function testGetListWithWrongAmount()
+    {
+        $country = 'FR';
+        $this->assertSame(
+            [],
+            $this->repo->getOneyPaymentOptionsList(0, $country)
+        );
+        $this->assertSame(
+            [],
+            $this->repo->getOneyPaymentOptionsList('wrong params', $country)
+        );
+    }
+
+    public function testGetListWithNullCountry()
+    {
+        $amount = 15000;
+        $response = $this->repo->getOneyPaymentOptionsList($amount, false);
+
+        $this->assertSame(
+            $this->list,
+            $response
+        );
     }
 
     public function getOneyPaymentOptionsList($amount, $country = false)

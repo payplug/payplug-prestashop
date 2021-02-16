@@ -27,11 +27,6 @@ class TranslationsRepository extends Repository
 {
     protected $payplug;
 
-    public function __construct($payplug)
-    {
-        $this->payplug = $payplug;
-    }
-
     public static function factory()
     {
         return new TranslationsRepository();

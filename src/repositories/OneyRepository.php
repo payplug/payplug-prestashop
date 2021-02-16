@@ -55,18 +55,19 @@ class OneyRepository extends Repository
 
     private $oneyEntity;
 
-    protected $payplug;
-
-
     private $methods = [
         'x3_with_fees',
         'x4_with_fees',
     ];
 
-    public function __construct($payplug)
+    public function __construct()
     {
-        $this->payplug = $payplug;
+        $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
+        $this->setFactories();
+        $this->setMethods();
+    }
 
+    protected function setFactories(){
         $this->cache = CacheRepository::factory();
         $this->logger = LoggerRepository::factory();
 
@@ -79,11 +80,7 @@ class OneyRepository extends Repository
         $this->toolsSpecific = ToolsSpecific::factory();
         $this->validateSpecific = ValidateSpecific::factory();
 
-
-
-        $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
-
-        $this->setOneyEntity();
+        $this->oneyEntity = new OneyEntity();
     }
 
     public static function factory()
@@ -416,7 +413,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->oneyEntity->getMethods()) || !$operation) {
+        if (!in_array($operation, $this->getMethods()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -564,25 +561,33 @@ class OneyRepository extends Repository
     /**
      * @description Get Oney payment options
      *
-     * @param $amount
+     * @param int $amount
      * @param bool $country
      * @return array
      */
-    public function getOneyPaymentOptionsList($amount, $country = false)
+    public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
         // get Oney resource
         $payment_list = [];
+        if(!is_int($amount) || !$amount) {
+            return $payment_list;
+        }
+
         $amount = $this->payplug->convertAmount($amount);
 
         if (!$country) {
             $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
+            if (!$iso_code_list) {
+                return $payment_list;
+            }
+            var_dump($iso_code_list);
             $iso_list = explode(',', $iso_code_list);
             $country = reset($iso_list);
         }
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getMethods());
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->getMethods());
 
         if (!$oney_sims['result']) {
             return $payment_list;
@@ -1511,9 +1516,12 @@ class OneyRepository extends Repository
             && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
     }
 
-    protected function setOneyEntity()
+    protected function setMethods()
     {
-        $this->oneyEntity = new OneyEntity();
         $this->oneyEntity->setMethods($this->methods);
+    }
+    protected function getMethods()
+    {
+        $this->oneyEntity->getMethods();
     }
 }
