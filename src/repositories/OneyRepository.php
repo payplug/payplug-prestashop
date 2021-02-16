@@ -27,6 +27,7 @@ use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\UnexpectedAPIResponseException;
+use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CartSpecific;
@@ -52,10 +53,12 @@ class OneyRepository extends Repository
     private $toolsSpecific;
     private $validateSpecific;
 
+    private $oneyEntity;
+
     protected $payplug;
 
 
-    public $methods = [
+    private $methods = [
         'x3_with_fees',
         'x4_with_fees',
     ];
@@ -76,7 +79,11 @@ class OneyRepository extends Repository
         $this->toolsSpecific = ToolsSpecific::factory();
         $this->validateSpecific = ValidateSpecific::factory();
 
+
+
         $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
+
+        $this->setOneyEntity();
     }
 
     public static function factory()
@@ -409,7 +416,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->methods) || !$operation) {
+        if (!in_array($operation, $this->oneyEntity->getMethods()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -575,7 +582,7 @@ class OneyRepository extends Repository
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->methods);
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getMethods());
 
         if (!$oney_sims['result']) {
             return $payment_list;
@@ -1502,5 +1509,11 @@ class OneyRepository extends Repository
             && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
             && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
+    }
+
+    protected function setOneyEntity()
+    {
+        $this->oneyEntity = new OneyEntity();
+        $this->oneyEntity->setMethods($this->methods);
     }
 }

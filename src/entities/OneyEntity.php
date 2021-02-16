@@ -23,6 +23,33 @@
 
 namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
+
 class OneyEntity
 {
+    /**
+     * @var array $methods
+     */
+    private $methods;
+
+    /**
+     * @return array
+     */
+    public function getMethods(){
+        return $this->methods;
+    }
+
+    /**
+     * @param $methods
+     * @return $this
+     * @throws BadParameterException
+     */
+    public function setMethods($methods){
+        if(!is_array($methods)) {
+            throw (new BadParameterException('Invalid fields validate, param $methods must be an array'));
+        } else {
+            $this->methods = $methods;
+            return $this;
+        }
+    }
 }
