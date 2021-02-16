@@ -110,7 +110,7 @@ final class GetOneyPaymentContextTest extends TestCase
                         'total_amount' => 3400,
                         'brand' => 'Studio Design',
                         'delivery_label' => 'Carrier name',
-                        'expected_delivery_date' => '2021-02-15',
+                        'expected_delivery_date' => date('Y-m-d'),
                         'delivery_type' => 'storepickup',
                     ]
                 ]
