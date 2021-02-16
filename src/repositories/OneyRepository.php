@@ -991,7 +991,7 @@ class OneyRepository extends Repository
             ];
         } catch (\Exception $exception) {
             $this->logger->setParams(['process' => '[Oney Repository] OneySimulation::getSimulations']);
-            $this->logger->addLog($exception->__toString(), 'error');
+            $this->logger->addLog($exception->getMessage(), 'error');
 
             return [
                 'result' => false,
