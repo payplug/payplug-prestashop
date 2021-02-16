@@ -314,6 +314,8 @@ class OneyRepository extends Repository
                         $errors[] = $text;
                     }
                     break;
+                default:
+                    break;
             }
         }
 
