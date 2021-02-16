@@ -131,7 +131,7 @@ final class CheckOneyRequiredFieldsTest extends TestCase
         );
     }
 
-    public function testWithInalidMobilePhoneNumber()
+    public function testWithInvalidMobilePhoneNumber()
     {
         $this->country->shouldReceive('getCountry')
             ->andReturn(CountryMock::get());
