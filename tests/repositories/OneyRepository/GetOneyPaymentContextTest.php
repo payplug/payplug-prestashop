@@ -88,7 +88,8 @@ final class GetOneyPaymentContextTest extends TestCase
                 return (int)$amount * 100;
             });
 
-        $this->repo = new OneyRepository($this->payplug);
+        $this->repo = new OneyRepository();
+        $this->repo->setPayplug($this->payplug);
     }
 
     public function testGetContext()

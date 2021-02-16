@@ -91,7 +91,7 @@ final class GetOneySimulationsTest extends TestCase
         $this->logger->shouldReceive('setParams')
             ->andReturn(true);
 
-        $this->repo = new OneyRepository('');
+        $this->repo = new OneyRepository();
 
         $this->arrayCache = [];
         $this->arrayLogger = [];

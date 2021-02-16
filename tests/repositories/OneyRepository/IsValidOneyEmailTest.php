@@ -69,7 +69,7 @@ final class IsValidOneyEmailTest extends TestCase
 
         // Method Params
         $this->email = 'mock@payplug.com';
-        $this->repo = new OneyRepository('');
+        $this->repo = new OneyRepository();
     }
 
     public function testWithValidEmail()

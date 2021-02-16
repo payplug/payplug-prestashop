@@ -73,14 +73,24 @@ final class FormatOneyResourceTest extends TestCase
         $this->payplug = Mockery::mock('payplug');
         $this->payplug
             ->shouldReceive('convertAmount')
-            ->andReturnUsing(function ($amount, $cent) {
+            ->andReturnUsing(function ($amount, $cent = false) {
                 if ($cent) {
                     return round($amount / 100, 2);
                 }
                 return (int)$amount * 100;
             });
 
-        $this->repo = new OneyRepository($this->payplug);
+        $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
+        $this->repo->setFactories();
+        $this->repo->setPayplug($this->payplug);
+
+        $this->repo
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive([
+                'getMethods' => [
+                    'x3_with_fees',
+                ]
+            ]);
 
         $this->operation = 'x3_with_fees';
         $this->resource = OneySimulationsMock::get()[$this->operation];

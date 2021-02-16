@@ -55,7 +55,8 @@ final class GetOneyCountryTest extends TestCase
 
         // Method Params
         $this->payplug = Mockery::mock('payplug');
-        $this->repo = new OneyRepository($this->payplug);
+        $this->repo = new OneyRepository();
+        $this->repo->setPayplug($this->payplug);
     }
 
     public function testWithEmptyIsoCode()

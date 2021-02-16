@@ -580,7 +580,7 @@ class OneyRepository extends Repository
             if (!$iso_code_list) {
                 return $payment_list;
             }
-            var_dump($iso_code_list);
+
             $iso_list = explode(',', $iso_code_list);
             $country = reset($iso_list);
         }
