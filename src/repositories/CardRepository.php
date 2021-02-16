@@ -46,9 +46,9 @@ class CardRepository extends Repository
         $this->setParams();
     }
 
-    public static function factory($payplug)
+    public static function factory()
     {
-        return new CardRepository($payplug);
+        return new CardRepository();
     }
 
     private function setParams()
