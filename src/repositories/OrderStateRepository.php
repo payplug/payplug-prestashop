@@ -132,14 +132,16 @@ class OrderStateRepository extends Repository
         $ids = [];
         $res = $this->query
             ->select()
-            ->fields('o.id_order_state')
+            ->fields('o.current_state')
             ->from(_DB_PREFIX_.'orders', 'o')
             ->where('o.module = \''.pSQL($module_name).'\'')
-            ->groupBy('o.id_order_state')
+            ->groupBy('o.current_state')
             ->build();
 
         foreach ($res as $os) {
-            array_push($ids, (int)$os['id_order_state']);
+            if ($os) {
+                array_push($ids, (int)$os['current_state']);
+            }
         }
 
         return $ids;
