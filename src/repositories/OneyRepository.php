@@ -405,14 +405,14 @@ class OneyRepository extends Repository
      * @param bool $total_amount
      * @return array
      */
-    public function formatOneyResource($operation, $resource, $total_amount = false)
+    public function formatOneyResource($operation = false, $resource = [], $total_amount = false)
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->methods)) {
+        if (!in_array($operation, $this->methods) || !$operation) {
             return false;
         }
-        if (!is_array($resource)) {
+        if (!is_array($resource) || empty($resource)) {
             return false;
         }
 
