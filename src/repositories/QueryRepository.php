@@ -109,6 +109,12 @@ class QueryRepository extends Repository
         $this->specific_class = new QuerySpecific();
     }
 
+    public static function factory()
+    {
+        return new QueryRepository();
+    }
+
+
     public function select()
     {
         $this->query['type'] = 'SELECT';

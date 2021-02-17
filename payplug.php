@@ -40,9 +40,9 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class Payplug extends PaymentModule
 {
-    private $card; // 3.0
+    private $card;
 
-    private $tools; // 3.0
+    private $tools;
 
     private $logger;
 
@@ -50,16 +50,18 @@ class Payplug extends PaymentModule
 
     public $order_state;
 
-    public $constantFile; // 3.0
+    public $constantFile;
+
+    protected $payment;
 
     /** @var PluginEntity */
-    protected $plugin; // 3.0
+    protected $plugin;
 
-    protected $query; // 3.0
+    protected $query;
 
-    protected $PrestashopSpecificClass; // 3.0
+    protected $PrestashopSpecificClass;
 
-    protected $PrestashopSpecificObject; // 3.0
+    protected $PrestashopSpecificObject;
 
     /**
      * @var To inject logo_url in oney payment template
@@ -299,12 +301,13 @@ class Payplug extends PaymentModule
     {
         $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->card = $this->getPlugin()->getCard();
-        $this->logger = $this->getPlugin()->getLogger();
-        $this->oney = $this->getPlugin()->getOney();
-        $this->query = $this->getPlugin()->getQuery();
-        $this->tools = $this->getPlugin()->getTools();
-        $this->order_state = $this->getPlugin()->getOrderState();
+        $this->card         = $this->getPlugin()->getCard();
+        $this->logger       = $this->getPlugin()->getLogger();
+        $this->oney         = $this->getPlugin()->getOney();
+        $this->payment      = $this->getPlugin()->getPayment();
+        $this->query        = $this->getPlugin()->getQuery();
+        $this->tools        = $this->getPlugin()->getTools();
+        $this->order_state  = $this->getPlugin()->getOrderState();
     }
 
     public function loadSpecificPrestaClasses()
@@ -4728,7 +4731,7 @@ class Payplug extends PaymentModule
         }
 
         //Hash Control
-        $hash = hash('sha256', json_encode($cart));
+        $hash = hash('sha256', $payment_method.json_encode($cart));
         $req_payment_cart_exists = new DbQuery();
         $req_payment_cart_exists->select('*');
         $req_payment_cart_exists->from('payplug_payment_cart', 'ppc');
@@ -4737,7 +4740,7 @@ class Payplug extends PaymentModule
         if ($res_payment_cart_exists['cart_hash'] === $hash) {
             $payment = \Payplug\Payment::retrieve($res_payment_cart_exists['id_payment']);
             if ($payment->failure === null) {
-                $this->storePayment($payment->id, (int)$cart->id);
+                $this->payment->storePayment($payment->id, (int)$cart->id, $hash);
                 switch ($payment_method) {
                     case 'oneclick':
                         $redirect = $payment->is_paid;
@@ -4790,7 +4793,7 @@ class Payplug extends PaymentModule
                         'response' => $payment->failure->message,
                     ];
                 }
-                $this->storeInstallment($payment->id, (int)$cart->id);
+                $this->payment->storePayment($payment->id, (int)$cart->id, $hash, true);
             } else {
                 $payment = \Payplug\Payment::create($payment_tab);
                 if ($payment->failure == true && !empty($payment->failure->message)) {
@@ -4803,7 +4806,7 @@ class Payplug extends PaymentModule
                         'response' => $payment->failure->message,
                     ];
                 }
-                $this->storePayment($payment->id, (int)$cart->id, true);
+                $this->payment->storePayment($payment->id, (int)$cart->id, $hash, true);
             }
         } catch (Exception $e) {
             $messages = $this->catchErrorsFromApi($e->__toString());
@@ -5464,53 +5467,6 @@ class Payplug extends PaymentModule
                 WHERE pic.id_cart = ' . (int)$id_cart;
             $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
             if (!$res_installment_cart) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @description Register payment for later use
-     *
-     * @param string $pay_id
-     * @param int $id_cart
-     * @return bool
-     */
-    private function storePayment($pay_id, $id_cart, $force = false)
-    {
-        $cart = new Cart($id_cart);
-        $hash = hash('sha256', json_encode($cart));
-
-        if ($inst_id = $this->getInstallmentByCart($id_cart)) {
-            $this->deleteInstallment($inst_id, $id_cart);
-        }
-
-        $req_payment_cart_exists = new DbQuery();
-        $req_payment_cart_exists->select('*');
-        $req_payment_cart_exists->from('payplug_payment_cart', 'ppc');
-        $req_payment_cart_exists->where('ppc.id_cart = ' . (int)$id_cart);
-        $res_payment_cart_exists = Db::getInstance()->getRow($req_payment_cart_exists);
-
-        if (!$res_payment_cart_exists) {
-            //insert
-            $req_payment_cart = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment_cart (id_payment, id_cart, cart_hash) 
-                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$id_cart . ', \'' . pSQL($hash) . '\')';
-            $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
-            if (!$res_payment_cart) {
-                return false;
-            }
-        } elseif ($res_payment_cart_exists['cart_hash'] != $hash || $force) {
-            //update
-            $req_payment_cart = '
-                UPDATE ' . _DB_PREFIX_ . 'payplug_payment_cart ppc  
-                SET ppc.id_payment = \'' . pSQL($pay_id) . '\',
-                    ppc.cart_hash = \'' . pSQL($hash) . '\'
-                WHERE ppc.id_cart = ' . (int)$id_cart;
-            $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
-            if (!$res_payment_cart) {
                 return false;
             }
         }
