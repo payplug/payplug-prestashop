@@ -38,9 +38,4 @@ class OrderStateEntity
     {
         $this->specific_class->delete();
     }
-
-    public function softDelete()
-    {
-        $this->specific_class->softDelete();
-    }
 }
