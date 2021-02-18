@@ -28,16 +28,21 @@ use \OrderState;
 
 class OrderStateSpecific implements OrderStateInterface
 {
-    private $ps_order_state;
+    private $orderState;
 
     public function __construct($id = null)
     {
-        $this->ps_order_state = new OrderState($id);
+        return $this->orderState = new OrderState($id);
+    }
+
+    public function softDelete()
+    {
+        return $this->orderState->softDelete();
     }
 
     public function delete()
     {
-        $os = $this->ps_order_state;
-        return $os->delete();
+        return $this->orderState->delete();
     }
+
 }
