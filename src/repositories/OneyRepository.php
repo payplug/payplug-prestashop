@@ -330,17 +330,15 @@ class OneyRepository extends Repository
         $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
 
-        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers 
-        et valable pour tout achat de %s à %s. ';
-        $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
-        $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
-        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
-        $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
-
         $this->contextSpecific->getContext()->smarty->assign([
             'legal_notice' => sprintf(
-                $this->l($legal_text),
+                $this->l('Offre de financement avec apport obligatoire, réservée aux particuliers 
+                    et valable pour tout achat de %s à %s.
+                    Sous réserve d\'acceptation par Oney Bank. 
+                    Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. 
+                    Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
+                    546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr 
+                    Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr'),
                 $tools->tool('displayPrice', $min_amount),
                 $tools->tool('displayPrice', $max_amount)
             )
