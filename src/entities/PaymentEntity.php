@@ -21,38 +21,35 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
 
-use PayPlug\src\entities\CacheEntity;
-use PHPUnit\Framework\TestCase;
-
-/**
- * @group entity
- * @group cache
- * @group cache_entity
- */
-final class GetIdPayPlugCacheCacheTest extends TestCase
+class PaymentEntity
 {
-    protected $cache;
+    /**
+     * @var object $apiPayment
+     */
+    private $apiPayment;
 
-    protected function setUp()
-    {
-        $this->cache = new CacheEntity();
-        $this->cache->setIdPayPlugCache('test_id');
+    /**
+     * @return object
+     */
+    public function getApiPayment(){
+        return $this->apiPayment;
     }
 
-    public function testReturnCacheId()
-    {
-        $this->assertSame(
-            'test_id',
-            $this->cache->getIdPayPlugCache()
-        );
-    }
-
-    public function testCacheIdIsAString()
-    {
-        $this->assertTrue(
-            is_string($this->cache->getIdPayPlugCache())
-        );
+    /**
+     * @param $apiPayment
+     * @return $this
+     * @throws BadParameterException
+     */
+    public function setApiPayment($apiPayment){
+        if(!is_object($apiPayment)) {
+            throw (new BadParameterException('Invalid fields validate, param $apiPayment must be an object'));
+        } else {
+            $this->apiPayment = $apiPayment;
+            return $this;
+        }
     }
 }

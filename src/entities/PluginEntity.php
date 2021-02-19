@@ -37,6 +37,7 @@ class PluginEntity
     private $logger;
     private $oney;
     private $order_state;
+    private $payment;
     private $translate;
 
     // Specific classes
@@ -411,6 +412,24 @@ class PluginEntity
             $this->order_state = $order_state;
             return $this;
         }
+    }
+
+    /**
+     * @return object
+     */
+    public function getPayment()
+    {
+        return $this->payment;
+    }
+
+    /**
+     * @param object $payment
+     * @return PluginEntity
+     */
+    public function setPayment($payment)
+    {
+        $this->payment = $payment;
+        return $this;
     }
 
     /**

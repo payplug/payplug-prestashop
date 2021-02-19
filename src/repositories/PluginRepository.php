@@ -39,6 +39,7 @@ class PluginRepository extends Repository
     private $oney;
     private $plugin;
     private $order_state;
+    private $payment;
     private $translate;
 
     // Specific classes
@@ -61,6 +62,7 @@ class PluginRepository extends Repository
         $this->logger   = new LoggerRepository();
         $this->oney     = new OneyRepository();
         $this->oney->setPayplug($payplug);
+        $this->payment  = new PaymentRepository();
         $this->plugin   = new PluginEntity();
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
@@ -77,6 +79,7 @@ class PluginRepository extends Repository
             ->setContext($this->context)
             ->setCountry($this->country)
             ->setLogger($this->logger)
+            ->setPayment($this->payment)
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setQuery($this->query)

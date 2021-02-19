@@ -40,9 +40,9 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class Payplug extends PaymentModule
 {
-    private $card; // 3.0
+    private $card;
 
-    private $tools; // 3.0
+    private $tools;
 
     private $logger;
 
@@ -50,16 +50,20 @@ class Payplug extends PaymentModule
 
     public $order_state;
 
-    public $constantFile; // 3.0
+    public $constantFile;
+
+    private $payment; // PaymentRepository
+
+    private $paymentDetails;
 
     /** @var PluginEntity */
-    protected $plugin; // 3.0
+    protected $plugin;
 
-    protected $query; // 3.0
+    protected $query;
 
-    protected $PrestashopSpecificClass; // 3.0
+    protected $PrestashopSpecificClass;
 
-    protected $PrestashopSpecificObject; // 3.0
+    protected $PrestashopSpecificObject;
 
     /**
      * @var To inject logo_url in oney payment template
@@ -299,12 +303,13 @@ class Payplug extends PaymentModule
     {
         $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
 
-        $this->card = $this->getPlugin()->getCard();
-        $this->logger = $this->getPlugin()->getLogger();
-        $this->oney = $this->getPlugin()->getOney();
-        $this->query = $this->getPlugin()->getQuery();
-        $this->tools = $this->getPlugin()->getTools();
-        $this->order_state = $this->getPlugin()->getOrderState();
+        $this->card         = $this->getPlugin()->getCard();
+        $this->logger       = $this->getPlugin()->getLogger();
+        $this->oney         = $this->getPlugin()->getOney();
+        $this->payment      = $this->getPlugin()->getPayment();
+        $this->query        = $this->getPlugin()->getQuery();
+        $this->tools        = $this->getPlugin()->getTools();
+        $this->order_state  = $this->getPlugin()->getOrderState();
     }
 
     public function loadSpecificPrestaClasses()
@@ -2093,8 +2098,8 @@ class Payplug extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -2258,12 +2263,15 @@ class Payplug extends PaymentModule
      * @param int $cart_id
      * @return int OR bool
      */
-    public function getPaymentByCart($cart_id)
+    public function getPaymentByCart($cart_id, $hash = null)
     {
         $req_payment_cart = new DbQuery();
         $req_payment_cart->select('ppc.id_payment');
         $req_payment_cart->from('payplug_payment_cart', 'ppc');
         $req_payment_cart->where('ppc.id_cart = ' . (int)$cart_id);
+        if ($hash != null) {
+            $req_payment_cart->where('ppc.cart_hash = \'' . pSQL($hash) . '\'');
+        }
         $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
 
         if (!$res_payment_cart) {
@@ -2874,8 +2882,8 @@ class Payplug extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -3364,7 +3372,7 @@ class Payplug extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.1.0.js');
         }
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
@@ -3532,13 +3540,13 @@ class Payplug extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.1.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.1.0.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.0.css',
             ]);
         }
     }
@@ -3569,7 +3577,7 @@ class Payplug extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.1.0.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
@@ -4687,7 +4695,6 @@ class Payplug extends PaymentModule
                     $payment_data = Tools::getValue('oney_form');
                 }
 
-                //
                 if ($payment_data) {
                     // hydrate with payment data
                     $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
@@ -4724,84 +4731,142 @@ class Payplug extends PaymentModule
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
-        // Create payment
-        try {
-            if ($options['is_installment']) {
-                $payment = \Payplug\InstallmentPlan::create($payment_tab);
-                if ($payment->failure != null && !empty($payment->failure->message)) {
-                    $this->setPaymentErrorsCookie([
-                        $this->l('The transaction was not completed and your card was not charged.')
-                    ]);
+        // Prepare details to create / retrieve payment
+        $this->paymentDetails = [
+            'paymentMethod' => $payment_method,
+            'paymentTab'    => $payment_tab,
+            'paymentId'     => null,
+            'paymentReturn' => null,
+//            'isPaid'        => $payment->is_paid,
+            'isDeferred'    => $options['is_deferred'],
+            'embeddedMode'  => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
+            'isMobileDevice'=> $this->isMobiledevice(),
+            'returnUrl'     => null,
+            'cart'          => $cart,
+            'cartHash'      => null,
+            'forceHash'     => true
+        ];
 
-                    return [
-                        'result' => false,
-                        'response' => $payment->failure->message,
-                    ];
+        // Create payment if inexistent
+        if (!$this->payment->checkPaymentCart($cart->id)) {
+            try {
+                $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
+                $this->paymentDetails = $this->payment->insertPaymentCart($this->paymentDetails);
+                if (!$this->paymentDetails) {
+                    return false;
                 }
-                $this->storeInstallment($payment->id, (int)$cart->id);
-            } else {
-                $payment = \Payplug\Payment::create($payment_tab);
-                if ($payment->failure == true && !empty($payment->failure->message)) {
-                    $this->setPaymentErrorsCookie([
-                        $this->l('The transaction was not completed and your card was not charged.')
-                    ]);
+//                die('STOP POUR LE MOMENT:: TOUT EST OK! :: NOUVEAU PAIEMENT CRÉÉ ET STORÉ');
+                return $this->payment->getPaymentReturn($this->paymentDetails);
+            } catch (Exception $e) {
+                $messages = $this->catchErrorsFromApi($e->__toString());
 
-                    return [
-                        'result' => false,
-                        'response' => $payment->failure->message,
-                    ];
-                }
-                $this->storePayment($payment->id, (int)$cart->id);
+                $this->setPaymentErrorsCookie([
+                    $this->l('The transaction was not completed and your card was not charged.')
+                ]);
+
+                return [
+                    'result' => false,
+                    'payment_tab' => $payment_tab,
+                    'response' => count($messages) > 1 ? $messages : reset($messages),
+                ];
             }
-        } catch (Exception $e) {
-            $messages = $this->catchErrorsFromApi($e->__toString());
-
-            $this->setPaymentErrorsCookie([
-                $this->l('The transaction was not completed and your card was not charged.')
-            ]);
-
-            return [
-                'result' => false,
-                'payment_tab' => $payment_tab,
-                'response' => count($messages) > 1 ? $messages : reset($messages),
-            ];
+        } elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
+            // If payment already exists, and timeout > 1 min : Create a new payment
+            $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
+            $this->paymentDetails = $this->payment->updatePaymentCart($this->paymentDetails);
+            $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
+//            die('STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC HASH REGÉNÉRÉ CAR TIMEOUT > 1MIN');
+            if (!$this->paymentDetails) {
+                return false;
+            }
+            return $this->payment->getPaymentReturn($this->paymentDetails);
+        } elseif ($this->payment->checkTimeoutPayment($cart->id)) {
+            $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
+//            die('STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC MEME HASH CAR TIMEOUT < 1MIN');
+            return $this->payment->getPaymentReturn($this->paymentDetails);
         }
 
-        switch ($payment_method) {
-            case 'oneclick':
-                $redirect = $payment->is_paid;
-                if (!$redirect && $options['is_deferred']) {
-                    $redirect = (bool)$payment->authorization->authorized_at;
-                }
-                $payment_return = [
-                    'result' => true,
-                    'embedded' => true,
-                    'redirect' => $redirect, // force `true` we are in 3DS 1
-                    'return_url' => $redirect ?
-                        $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
-                ];
-                break;
-            case 'oney':
-                $payment_return = [
-                    'result' => 'new_card',
-                    'embedded' => false,
-                    'redirect' => true,
-                    'return_url' => $payment->hosted_payment->payment_url,
-                ];
-                break;
-            case 'standard':
-            case 'installment':
-            default:
-                $payment_return = [
-                    'result' => 'new_card',
-                    'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
-                    'redirect' => $this->isMobiledevice(),
-                    'return_url' => $payment->hosted_payment->payment_url,
-                ];
-                break;
-        }
 
-        return $payment_return;
+        //Hash Control
+//
+//        if ($res_payment_cart_exists['cart_hash'] === $hash) {
+//            $payment = \Payplug\Payment::retrieve($res_payment_cart_exists['id_payment']);
+//            if ($payment->failure === null) {
+//                $this->payment->createPayment($payment->id, (int)$cart->id, $hash);
+//                switch ($payment_method) {
+//                    case 'oneclick':
+//                        $redirect = $payment->is_paid;
+//                        if (!$redirect && $options['is_deferred']) {
+//                            $redirect = (bool)$payment->authorization->authorized_at;
+//                        }
+//                        $payment_return = [
+//                            'result' => true,
+//                            'embedded' => true,
+//                            'redirect' => $redirect, // force `true` we are in 3DS 1
+//                            'return_url' => $redirect ?
+//                                $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
+//                        ];
+//                        break;
+//                    case 'oney':
+//                        $payment_return = [
+//                            'result' => 'new_card',
+//                            'embedded' => false,
+//                            'redirect' => true,
+//                            'return_url' => $payment->hosted_payment->payment_url,
+//                        ];
+//                        break;
+//                    case 'standard':
+//                    case 'installment':
+//                    default:
+//                        $payment_return = [
+//                            'result' => 'new_card',
+//                            'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
+//                            'redirect' => $this->isMobiledevice(),
+//                            'return_url' => $payment->hosted_payment->payment_url,
+//                        ];
+//                        break;
+//                }
+//                return $payment_return;
+//            }
+//        }
+        //End Hash Control
+
+
+//        switch ($payment_method) {
+//            case 'oneclick':
+//                $redirect = $payment->is_paid;
+//                if (!$redirect && $options['is_deferred']) {
+//                    $redirect = (bool)$payment->authorization->authorized_at;
+//                }
+//                $payment_return = [
+//                    'result' => true,
+//                    'embedded' => true,
+//                    'redirect' => $redirect, // force `true` we are in 3DS 1
+//                    'return_url' => $redirect ?
+//                        $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
+//                ];
+//                break;
+//            case 'oney':
+//                $payment_return = [
+//                    'result' => 'new_card',
+//                    'embedded' => false,
+//                    'redirect' => true,
+//                    'return_url' => $payment->hosted_payment->payment_url,
+//                ];
+//                break;
+//            case 'standard':
+//            case 'installment':
+//            default:
+//                $payment_return = [
+//                    'result' => 'new_card',
+//                    'embedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE') && !$this->isMobiledevice(),
+//                    'redirect' => $this->isMobiledevice(),
+//                    'return_url' => $payment->hosted_payment->payment_url,
+//                ];
+//                break;
+//        }
+
+//        return $payment_return;
     }
 
     /**
@@ -5421,49 +5486,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Register payment for later use
-     *
-     * @param string $pay_id
-     * @param int $id_cart
-     * @return bool
-     */
-    private function storePayment($pay_id, $id_cart)
-    {
-        if ($inst_id = $this->getInstallmentByCart($id_cart)) {
-            $this->deleteInstallment($inst_id, $id_cart);
-        }
-
-        $req_payment_cart_exists = new DbQuery();
-        $req_payment_cart_exists->select('*');
-        $req_payment_cart_exists->from('payplug_payment_cart', 'ppc');
-        $req_payment_cart_exists->where('ppc.id_cart = ' . (int)$id_cart);
-        $res_payment_cart_exists = Db::getInstance()->getRow($req_payment_cart_exists);
-
-        if (!$res_payment_cart_exists) {
-            //insert
-            $req_payment_cart = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment_cart (id_payment, id_cart) 
-                VALUES (\'' . pSQL($pay_id) . '\', ' . (int)$id_cart . ')';
-            $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
-            if (!$res_payment_cart) {
-                return false;
-            }
-        } else {
-            //update
-            $req_payment_cart = '
-                UPDATE ' . _DB_PREFIX_ . 'payplug_payment_cart ppc  
-                SET ppc.id_payment = \'' . pSQL($pay_id) . '\'
-                WHERE ppc.id_cart = ' . (int)$id_cart;
-            $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
-            if (!$res_payment_cart) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * @description submit password
      *
      * @param string $pwd
@@ -5593,6 +5615,12 @@ class Payplug extends PaymentModule
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
         ];
+
+        // If sandbox mode active, no allowed countries sent
+        // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
+        if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
+            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
+        }
 
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
