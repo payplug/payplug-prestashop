@@ -45,6 +45,7 @@ class OneyRepository extends Repository
     private $cache;
     private $log;
     private $logger;
+    private $operations;
     private $cartSpecific;
     private $carrierSpecific;
     private $configurationSpecific;
@@ -52,7 +53,6 @@ class OneyRepository extends Repository
     private $countrySpecific;
     private $toolsSpecific;
     private $validateSpecific;
-
     private $oneyEntity;
 
     public function __construct()
@@ -73,19 +73,27 @@ class OneyRepository extends Repository
         $this->countrySpecific = CountrySpecific::factory();
         $this->toolsSpecific = ToolsSpecific::factory();
         $this->validateSpecific = ValidateSpecific::factory();
-
         $this->oneyEntity = new OneyEntity();
 
         $this->oneyEntity->setOperations([
             'x3_with_fees',
             'x4_with_fees',
         ]);
+
+        $this->operations = $this->oneyEntity->getOperations();
     }
 
     public static function factory()
     {
         return new OneyRepository();
     }
+
+    public function getOperations()
+    {
+        return $this->operations;
+    }
+
+
 
     /**
      * @description Assign Oney javascript variable
@@ -410,7 +418,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
+        if (!in_array($operation, $this->operations) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -584,7 +592,7 @@ class OneyRepository extends Repository
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->operations);
 
         if (!$oney_sims['result']) {
             return $payment_list;
