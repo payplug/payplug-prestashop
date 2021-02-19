@@ -21,7 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
