@@ -21,20 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\interfaces;
 
-use Address;
-use PayPlug\src\interfaces\AddressInterface;
-
-class AddressSpecific implements AddressInterface
+interface CartInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
-    public function getAddress($idAddress)
-    {
-        return new Address($idAddress);
-    }
+    public function get($idCart);
 }

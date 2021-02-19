@@ -24,7 +24,7 @@
 
 namespace PayPlug\tests\mock;
 
-class CartMock
+class CarrierMock
 {
     public static function factory()
     {
@@ -35,10 +35,7 @@ class CartMock
     {
         $cart = new \stdClass();
         $cart->id = 1;
-        $cart->id_carrier = 1;
-        $cart->id_address_delivery = 2;
-        $cart->id_address_invoice = 3;
-        $cart->id_customer = 1;
+        $cart->name = 'Carrier name';
         $cart->date_add = '2021-01-01 00:00:00';
         $cart->date_upd = '2021-01-01 00:00:00';
         return $cart;

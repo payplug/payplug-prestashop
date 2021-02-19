@@ -23,18 +23,37 @@
 
 namespace PayPlug\src\specific;
 
-use Address;
-use PayPlug\src\interfaces\AddressInterface;
+use PayPlug\src\interfaces\CarrierInterface;
+use Carrier;
 
-class AddressSpecific implements AddressInterface
+class CarrierSpecific implements CarrierInterface
 {
+    /** @var int Default delivery delay value in days for new carrier */
+    public $default_delay = 0;
+
+    /** @var string Default delivery type value for new carrier */
+    public $default_delivery_type = 'storepickup';
+
     public static function factory()
     {
         return new self();
     }
 
-    public function getAddress($idAddress)
+    public function get($id_carrier = false)
     {
-        return new Address($idAddress);
+        if (!is_int($id_carrier)) {
+            $id_carrier = false;
+        }
+        return new Carrier($id_carrier);
+    }
+
+    public function getDefaultDelay()
+    {
+        return $this->carrier_default_delay;
+    }
+
+    public function getDefaultDeliveryType()
+    {
+        return $this->default_delivery_type;
     }
 }

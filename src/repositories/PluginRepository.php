@@ -53,17 +53,20 @@ class PluginRepository extends Repository
     public function __construct($payplug = null)
     {
         $this->cache    = new CacheRepository();
-        $this->card     = new CardRepository($payplug);
+        $this->card     = new CardRepository();
+        $this->card->setPayplug($payplug);
         $this->configuration = new ConfigurationSpecific();
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();
-        $this->oney     = new OneyRepository($payplug);
+        $this->oney     = new OneyRepository();
+        $this->oney->setPayplug($payplug);
         $this->plugin   = new PluginEntity();
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
-        $this->translate = new TranslationsRepository($payplug);
+        $this->translate = new TranslationsRepository();
+        $this->translate->setPayplug($payplug);
         $this->validate = new ValidateSpecific();
         $this->order_state = new OrderStateRepository();
         $this->plugin

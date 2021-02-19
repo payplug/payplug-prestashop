@@ -37,6 +37,11 @@ class OrderStateRepository extends Repository
         $this->configuration = new ConfigurationEntity();
     }
 
+    public static function factory()
+    {
+        return new OrderStateRepository();
+    }
+
     public function getIdByName($name)
     {
         $this->query

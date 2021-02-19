@@ -31,6 +31,11 @@ class Repository
     protected $name;
     protected $payplug;
 
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function setName()
     {
         $this->name = (new \ReflectionClass($this))->getShortName();
@@ -50,6 +55,14 @@ class Repository
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function setPayplug($payplug){
+        $this->payplug = $payplug;
+        return $this;
+    }
+    public function getPayplug(){
+        return $this->payplug;
     }
 
     public function l($string)

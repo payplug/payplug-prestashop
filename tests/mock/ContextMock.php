@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -21,20 +22,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\tests\mock;
 
-use Address;
-use PayPlug\src\interfaces\AddressInterface;
-
-class AddressSpecific implements AddressInterface
+class ContextMock
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
-    public function getAddress($idAddress)
-    {
-        return new Address($idAddress);
+    public static function get(){
+        $context = new \stdClass();
+        $context->cart = CartMock::get();
+        $context->customer = CustomerMock::get();
+        return $context;
     }
 }

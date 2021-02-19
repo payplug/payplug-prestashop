@@ -26,7 +26,7 @@ namespace PayPlug\tests\mock;
 
 class OneySimulationsMock
 {
-    public static function getOneySimulations()
+    public static function get()
     {
         $simulations = [
             'x3_with_fees' => [
@@ -70,7 +70,7 @@ class OneySimulationsMock
         return $simulations;
     }
 
-    public static function getOneySimulationsNotAvailable()
+    public static function getNotAvailable()
     {
         $simulations = [
             'details' => 'Access to this feature is not available.'
@@ -79,12 +79,26 @@ class OneySimulationsMock
         return $simulations;
     }
 
-    public static function getOneySimulationsIsError()
+    public static function getIsError()
     {
         $simulations = [
             'object' => 'error'
         ];
 
         return $simulations;
+    }
+
+    public static function getFromCache(){
+        $cache_value = [
+            'result' => true,
+            'simulations' => self::get()
+        ];
+        $cache = [
+            'cache_key' => 'cache_key',
+            'cache_value' => json_encode($cache_value),
+            'date_add' => '2021-01-01 00:00:00',
+            'date_upd' => '2021-01-01 00:00:00',
+        ];
+        return [$cache];
     }
 }

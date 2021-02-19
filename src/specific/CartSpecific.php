@@ -23,18 +23,36 @@
 
 namespace PayPlug\src\specific;
 
-use Address;
-use PayPlug\src\interfaces\AddressInterface;
+use PayPlug\src\interfaces\CartInterface;
+use Cart;
 
-class AddressSpecific implements AddressInterface
+class CartSpecific implements CartInterface
 {
     public static function factory()
     {
         return new self();
     }
 
-    public function getAddress($idAddress)
+    public function get($id_cart = false)
     {
-        return new Address($idAddress);
+        if (!is_int($id_cart)) {
+            $id_cart = false;
+        }
+        return new Cart($id_cart);
+    }
+
+    public function isVirtualCart($cart)
+    {
+        if (!is_object($cart)) {
+            return false;
+        }
+        return $cart->isVirtualCart();
+    }
+
+    public function getProducts($cart) {
+        if (!is_object($cart)) {
+            return false;
+        }
+        return $cart->getProducts();
     }
 }

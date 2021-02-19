@@ -37,6 +37,11 @@ class LoggerRepository extends Repository
         $this->setStdParams();
     }
 
+    public static function factory()
+    {
+        return new LoggerRepository();
+    }
+
     /**
      * @description Hydrate standard entities
      */

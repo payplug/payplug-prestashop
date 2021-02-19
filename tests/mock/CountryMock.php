@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -21,20 +22,27 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\tests\mock;
 
-use Address;
-use PayPlug\src\interfaces\AddressInterface;
-
-class AddressSpecific implements AddressInterface
+class CountryMock
 {
-    public static function factory()
-    {
-        return new self();
-    }
+    public static function get(){
+        $country = new \stdClass();
 
-    public function getAddress($idAddress)
-    {
-        return new Address($idAddress);
+        $country->id = 1;
+        $country->id_zone = 1;
+        $country->id_currency = 1;
+        $country->iso_code = "FR";
+        $country->call_prefix = "33";
+        $country->name = [
+            1 => "France",
+            2 => "France",
+            3 => "France",
+            4 => "France",
+        ];
+        $country->active = 1;
+        $country->id_lang = null;
+
+        return $country;
     }
 }
