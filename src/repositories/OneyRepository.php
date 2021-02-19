@@ -55,16 +55,13 @@ class OneyRepository extends Repository
 
     private $oneyEntity;
 
-    private $methods;
-
     public function __construct()
     {
         $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
-        $this->setFactories();
-        $this->setMethods();
+        $this->setParams();
     }
 
-    protected function setFactories(){
+    protected function setParams(){
         $this->cache = CacheRepository::factory();
         $this->logger = LoggerRepository::factory();
 
@@ -78,6 +75,11 @@ class OneyRepository extends Repository
         $this->validateSpecific = ValidateSpecific::factory();
 
         $this->oneyEntity = new OneyEntity();
+
+        $this->oneyEntity->setOperations([
+            'x3_with_fees',
+            'x4_with_fees',
+        ]);
     }
 
     public static function factory()
@@ -408,7 +410,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->getMethods()) || !$operation) {
+        if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -582,7 +584,7 @@ class OneyRepository extends Repository
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->getMethods());
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
 
         if (!$oney_sims['result']) {
             return $payment_list;
@@ -1509,17 +1511,5 @@ class OneyRepository extends Repository
             && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
             && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
-    }
-
-    protected function setMethods()
-    {
-        $this->oneyEntity->setMethods([
-            'x3_with_fees',
-            'x4_with_fees',
-        ]);
-    }
-    protected function getMethods()
-    {
-        $this->oneyEntity->getMethods();
     }
 }

@@ -97,7 +97,7 @@ final class GetOneyPaymentOptionsListTest extends TestCase
             });
 
         $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
-        $this->repo->setFactories();
+        $this->repo->setParams();
         $this->repo->setPayplug($this->payplug);
 
         $this->repo
