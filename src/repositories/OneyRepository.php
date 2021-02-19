@@ -61,7 +61,8 @@ class OneyRepository extends Repository
         $this->setParams();
     }
 
-    protected function setParams(){
+    protected function setParams()
+    {
         $this->cache = CacheRepository::factory();
         $this->logger = LoggerRepository::factory();
 
@@ -75,12 +76,10 @@ class OneyRepository extends Repository
         $this->validateSpecific = ValidateSpecific::factory();
         $this->oneyEntity = new OneyEntity();
 
-        $this->oneyEntity->setOperations([
+        $this->setOperations([
             'x3_with_fees',
             'x4_with_fees',
         ]);
-
-        $this->operations = $this->oneyEntity->getOperations();
     }
 
     public static function factory()
@@ -88,12 +87,16 @@ class OneyRepository extends Repository
         return new OneyRepository();
     }
 
+    public function setOperations($operations)
+    {
+        $this->oneyEntity->setOperations($operations);
+        return $this->operations = $this->oneyEntity->getOperations();
+    }
+
     public function getOperations()
     {
         return $this->operations;
     }
-
-
 
     /**
      * @description Assign Oney javascript variable
@@ -418,7 +421,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->operations) || !$operation) {
+        if (!in_array($operation, $this->getOperations()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -574,7 +577,7 @@ class OneyRepository extends Repository
     {
         // get Oney resource
         $payment_list = [];
-        if(!is_int($amount) || !$amount) {
+        if (!is_int($amount) || !$amount) {
             return $payment_list;
         }
 
@@ -592,7 +595,7 @@ class OneyRepository extends Repository
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->operations);
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->getOperations());
 
         if (!$oney_sims['result']) {
             return $payment_list;

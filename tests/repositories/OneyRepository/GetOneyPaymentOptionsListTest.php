@@ -30,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -106,6 +107,9 @@ final class GetOneyPaymentOptionsListTest extends TestCase
                 'getOneySimulations' => [
                     'result' => true,
                     'simulations' => OneySimulationsMock::get()
+                ],
+                'setOperations' => [
+                    true,
                 ],
                 'getOperations' => [
                     'x3_with_fees',
