@@ -56,7 +56,6 @@ class OneyRepository extends Repository
     private $oneyEntity;
 
     private $methods;
-    ];
 
     public function __construct()
     {
