@@ -107,7 +107,7 @@ final class GetOneyPaymentOptionsListTest extends TestCase
                     'result' => true,
                     'simulations' => OneySimulationsMock::get()
                 ],
-                'getMethods' => [
+                'getOperations' => [
                     'x3_with_fees',
                 ]
             ]);
@@ -181,34 +181,5 @@ final class GetOneyPaymentOptionsListTest extends TestCase
             $this->list,
             $response
         );
-    }
-
-    public function getOneyPaymentOptionsList($amount, $country = false)
-    {
-        // get Oney resource
-        $payment_list = [];
-        $amount = $this->payplug->convertAmount($amount);
-
-        if (!$country) {
-            $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
-            $iso_list = explode(',', $iso_code_list);
-            $country = reset($iso_list);
-        }
-
-        $country = $this->toolsSpecific->tool('strtoupper', $country);
-
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->methods);
-
-        if (!$oney_sims['result']) {
-            return $payment_list;
-        }
-
-        foreach ($oney_sims['simulations'] as $method => $oney_sim) {
-            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
-            }
-        }
-
-        return $payment_list;
     }
 }
