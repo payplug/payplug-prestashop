@@ -57,7 +57,6 @@ class OneyRepository extends Repository
 
     private $methods = [
         'x3_with_fees',
-        'x4_with_fees',
     ];
 
     public function __construct()
