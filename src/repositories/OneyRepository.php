@@ -1513,7 +1513,10 @@ class OneyRepository extends Repository
 
     protected function setMethods()
     {
-        $this->oneyEntity->setMethods($this->methods);
+        $this->oneyEntity->setMethods([
+            'x3_with_fees',
+            'x4_with_fees',
+        ]);
     }
     protected function getMethods()
     {
