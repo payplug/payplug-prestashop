@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+
 
 use PayPlug\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
@@ -35,32 +35,24 @@ final class GetIdCardTest extends TestCase
 {
     protected $card;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->card = new CardEntity();
-        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        $this->card->setId(42);
     }
 
-    public function testReturnIdCard(): void
+    public function testReturnId()
     {
         $this->assertSame(
-            'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-            $this->card->getIdCard()
+            42,
+            $this->card->getId()
         );
     }
 
-    public function testIdCardIsAString(): void
+    public function testIdIsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getIdCard())
-        );
-    }
-
-    public function testIdCardHaveAValidFormat(): void
-    {
-        $this->assertRegExp(
-            '/card_[a-z0-9]{32}/',
-            $this->card->getIdCard()
+            is_int($this->card->getId())
         );
     }
 }

@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+
 
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\entities\PluginEntity;
@@ -36,16 +36,31 @@ final class GetApiVersionTest extends TestCase
 {
     protected $plugin;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->plugin = new PluginEntity();
-        $this->plugin->setApiVersion('test_version');
+        $this->plugin->setApiVersion('2021-01-01');
     }
 
-    public function testReturnAnApiVersion(): void
+    public function testReturnAnApiVersion()
     {
         $this->assertSame(
-            'test_version',
+            '2021-01-01',
+            $this->plugin->getApiVersion()
+        );
+    }
+
+    public function testApiVersionIsAString()
+    {
+        $this->assertTrue(
+            is_string($this->plugin->getApiVersion())
+        );
+    }
+
+    public function testApiVersionHaveAValidFormat()
+    {
+        $this->assertRegExp(
+            '/^\d{4}-\d{2}-\d{2}$/',
             $this->plugin->getApiVersion()
         );
     }

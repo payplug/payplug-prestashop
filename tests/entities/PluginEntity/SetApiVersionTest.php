@@ -21,20 +21,65 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+
 
 use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group entity
+ * @group plugin
+ * @group plugin_entity
+ */
 final class SetApiVersionTest extends TestCase
 {
-    public function test_update_the_api_version(): void
+    protected $plugin;
+
+    protected function setUp()
     {
-        $plugin = new PluginEntity();
-        $plugin->setApiVersion('test_version');
+        $this->plugin = new PluginEntity();
+        $this->plugin->setApiVersion('2021-01-01');
+    }
+
+    public function testUpdateApiVersion()
+    {
+        $this->plugin->setApiVersion('1920-12-31');
         $this->assertSame(
-            'test_version',
-            $plugin->getApiVersion()
+            '1920-12-31',
+            $this->plugin->getApiVersion()
         );
+    }
+
+    public function testReturnLoggerEntity()
+    {
+        $this->assertInstanceOf(
+            PluginEntity::class,
+            $this->plugin->setApiVersion('1920-12-31')
+        );
+    }
+
+    /**
+     * @group entity_exception
+     * @group plugin_exception
+     * @group plugin_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotAString()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->plugin->setApiVersion('wrong_api_version');
+    }
+
+    /**
+     * @group entity_exception
+     * @group plugin_exception
+     * @group plugin_entity_exception
+     * @group exception
+     */
+    public function testThrowExceptionWhenNotWellFormatted()
+    {
+        $this->expectException(BadParameterException::class);
+        $this->plugin->setApiVersion('1er Janvier 1970');
     }
 }

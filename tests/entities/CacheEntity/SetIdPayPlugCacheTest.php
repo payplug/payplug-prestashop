@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+
 
 use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\exceptions\BadParameterException;
@@ -36,13 +36,13 @@ final class SetIdPayPlugCacheTest extends TestCase
 {
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setIdPayplugCache('test_id');
     }
 
-    public function testUpdateCacheId(): void
+    public function testUpdateCacheId()
     {
         $this->cache->setIdPayplugCache('another_id');
         $this->assertSame(
@@ -51,7 +51,7 @@ final class SetIdPayPlugCacheTest extends TestCase
         );
     }
 
-    public function testReturnCacheEntity(): void
+    public function testReturnCacheEntity()
     {
         $this->assertInstanceOf(
             CacheEntity::class,
@@ -65,7 +65,7 @@ final class SetIdPayPlugCacheTest extends TestCase
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString(): void
+    public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
         $this->cache->setIdPayplugCache(42);
