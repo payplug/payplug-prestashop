@@ -28,6 +28,11 @@ use Context;
 
 class ContextSpecific implements ContextInterface
 {
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function getContext()
     {
         return Context::getContext();

@@ -25,8 +25,5 @@ namespace PayPlug\src\interfaces;
 
 interface CartInterface
 {
-    public static function factory();
     public function get($idCart);
-    public function isVirtualCart($cart);
-    public function getProducts($cart);
 }

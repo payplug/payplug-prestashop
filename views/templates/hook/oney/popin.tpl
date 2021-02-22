@@ -40,16 +40,6 @@
             </span>
     {/foreach}
 
-        {*  Phrase 'Accept CGV' *}
-        {if $tos_active && $tos_url}
-        <span class="oneyPopin_legal">
-                {l s='By placing an order, you accept our ' mod='payplug'}
-                <a href="{$tos_url|escape:'htmlall':'UTF-8'}" target="_blank">
-                    <u>{l s='TOS' mod='payplug'}</u>.
-                </a>
-            </span>
-    {/if}
-
         <span class="oneyPopin_legal">{$legal_notice|escape:'htmlall':'UTF-8'}</span>
     {else}
         <p class="oneyPopin_error">{l s='Oney is momentarily unavailable.' mod='payplug'}</p>

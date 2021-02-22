@@ -21,22 +21,35 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+namespace PayPlug\src\entities;
 
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\entities\PluginEntity;
-use PHPUnit\Framework\TestCase;
+use PayPlug\src\exceptions\BadParameterException;
 
-final class SetCacheTest extends TestCase
+class PaymentEntity
 {
-    public function test_update_the_cache_entity(): void
-    {
-        $plugin = new PluginEntity();
-        $cache = new CacheEntity();
-        $plugin->setCache($cache);
-        $this->assertInstanceOf(
-            CacheEntity::class,
-            $plugin->getCache()
-        );
+    /**
+     * @var object $apiPayment
+     */
+    private $apiPayment;
+
+    /**
+     * @return object
+     */
+    public function getApiPayment(){
+        return $this->apiPayment;
+    }
+
+    /**
+     * @param $apiPayment
+     * @return $this
+     * @throws BadParameterException
+     */
+    public function setApiPayment($apiPayment){
+        if(!is_object($apiPayment)) {
+            throw (new BadParameterException('Invalid fields validate, param $apiPayment must be an object'));
+        } else {
+            $this->apiPayment = $apiPayment;
+            return $this;
+        }
     }
 }

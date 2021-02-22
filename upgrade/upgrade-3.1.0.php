@@ -1,3 +1,4 @@
+<?php
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -20,10 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-$(document).ready(function() {
-    if(typeof payplug_errors != 'undefined' && payplug_errors) {
-        return false;
-    }
-    var url = $('#payplug_form_js').data('payment-url');
-    Payplug.showPayment(url);
-});
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+function upgrade_module_3_1_0()
+{
+    return true;
+}

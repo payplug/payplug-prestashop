@@ -21,38 +21,39 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+namespace PayPlug\src\specific;
 
-use PayPlug\src\entities\CacheEntity;
-use PHPUnit\Framework\TestCase;
+use PayPlug\src\interfaces\CarrierInterface;
+use Carrier;
 
-/**
- * @group entity
- * @group cache
- * @group cache_entity
- */
-final class GetCacheValueTest extends TestCase
+class CarrierSpecific implements CarrierInterface
 {
-    protected $cache;
+    /** @var int Default delivery delay value in days for new carrier */
+    public $default_delay = 0;
 
-    protected function setUp(): void
+    /** @var string Default delivery type value for new carrier */
+    public $default_delivery_type = 'storepickup';
+
+    public static function factory()
     {
-        $this->cache = new CacheEntity();
-        $this->cache->setCacheValue('test_value');
+        return new self();
     }
 
-    public function testReturnCacheValue(): void
+    public function get($id_carrier = false)
     {
-        $this->assertSame(
-            'test_value',
-            $this->cache->getCacheValue()
-        );
+        if (!is_int($id_carrier)) {
+            $id_carrier = false;
+        }
+        return new Carrier($id_carrier);
     }
 
-    public function testCacheValueIsAString(): void
+    public function getDefaultDelay()
     {
-        $this->assertTrue(
-            is_string($this->cache->getCacheValue())
-        );
+        return $this->carrier_default_delay;
+    }
+
+    public function getDefaultDeliveryType()
+    {
+        return $this->default_delivery_type;
     }
 }

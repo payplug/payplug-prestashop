@@ -1,4 +1,3 @@
-<?php
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -21,12 +20,18 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
+$(document).ready(function() {
+    if(typeof payplug_errors != 'undefined' && payplug_errors) {
+        return false;
+    }
 
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+    var url = $('#payplug_form_js').data('payment-url');
 
-header("Location: ../../../../");
-exit;
+    // (PrestaShop 1.7 only) : If Internet Explorer, redirect instead
+    if(!!window.MSInputMethodContext && !!document.documentMode){
+        window.location.href = url;
+        return false;
+    }
+
+    Payplug.showPayment(url);
+});

@@ -21,38 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-declare(strict_types=1);
+namespace PayPlug\src\interfaces;
 
-use PayPlug\src\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
-
-/**
- * @group entity
- * @group card
- * @group card_entity
- */
-final class GetIdCustomerTest extends TestCase
+interface CarrierInterface
 {
-    protected $card;
-
-    protected function setUp(): void
-    {
-        $this->card = new CardEntity();
-        $this->card->setIdCustomer(42);
-    }
-
-    public function testReturnIdCustomer(): void
-    {
-        $this->assertSame(
-            42,
-            $this->card->getIdCustomer()
-        );
-    }
-
-    public function testIdCustomerIsAnInt(): void
-    {
-        $this->assertTrue(
-            is_int($this->card->getIdCustomer())
-        );
-    }
+    public function get($idCarrier);
 }

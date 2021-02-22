@@ -12,3 +12,4 @@ views/css/less/*/*/*.css
 views/css/less/*/*/*.map
 views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
+tests/

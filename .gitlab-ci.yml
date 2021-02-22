@@ -7,13 +7,16 @@ unit tests:
   stage: tests
   script:
     - composer install
-    - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
+#    - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
+#    - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
 build zip release:
   image: composer:1.9
   stage: build
   before_script:
     - composer install --no-dev
+    - ./assets_revision.sh
+    - git status
     - mkdir payplug
   script:
     - shopt -s extglob

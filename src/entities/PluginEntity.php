@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
+
 class PluginEntity
 {
     // Vars
@@ -48,7 +50,7 @@ class PluginEntity
     private $validate;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getApiUrl()
     {
@@ -56,17 +58,26 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $api_url
+     * @param string $api_url
      * @return PluginEntity
      */
     public function setApiUrl($api_url)
     {
-        $this->api_url = $api_url;
+        if (!is_string($api_url) || !preg_match('/http(s?):\/\/api(-\w+)?.payplug.(com|test)/', $api_url)) {
+            throw (
+            new BadParameterException(
+                'Invalid url format, param $api_url must be a a valid api url format'
+            )
+            );
+        } else {
+            $this->api_url = $api_url;
+            return $this;
+        }
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getApiVersion()
     {
@@ -74,17 +85,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $api_version
+     * @param string $api_version
      * @return PluginEntity
      */
     public function setApiVersion($api_version)
     {
-        $this->api_version = $api_version;
-        return $this;
+        if (!is_string($api_version) || !preg_match('/(\d{4})-(\d{2})-(\d{2})/', $api_version)) {
+            throw (
+            new BadParameterException(
+                'Invalid url format, param $api_url must be a a valid api url format'
+            )
+            );
+        } else {
+            $this->api_version = $api_version;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getCard()
     {
@@ -92,17 +111,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $card
+     * @param object $card
      * @return PluginEntity
      */
     public function setCard($card)
     {
-        $this->card = $card;
-        return $this;
+        if (!is_object($card)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Card object, param $card must be a CardRepository'
+                )
+            );
+        } else {
+            $this->card = $card;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getLogger()
     {
@@ -110,17 +137,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $logger
+     * @param object $logger
      * @return PluginEntity
      */
     public function setLogger($logger)
     {
-        $this->logger = $logger;
-        return $this;
+        if (!is_object($logger)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Logger object, param $card must be a LoggerRepository'
+                )
+            );
+        } else {
+            $this->logger = $logger;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getOney()
     {
@@ -128,17 +163,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $oney
+     * @param object $oney
      * @return PluginEntity
      */
     public function setOney($oney)
     {
-        $this->oney = $oney;
-        return $this;
+        if (!is_object($oney)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Oney object, param $card must be a OneyRepository'
+                )
+            );
+        } else {
+            $this->oney = $oney;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getCache()
     {
@@ -146,17 +189,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $cache
+     * @param object $cache
      * @return PluginEntity
      */
     public function setCache($cache)
     {
-        $this->cache = $cache;
-        return $this;
+        if (!is_object($cache)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Cache object, param $card must be a CacheRepository'
+                )
+            );
+        } else {
+            $this->cache = $cache;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getConfiguration()
     {
@@ -164,17 +215,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $configuration
+     * @param object $configuration
      * @return PluginEntity
      */
     public function setConfiguration($configuration)
     {
-        $this->configuration = $configuration;
-        return $this;
+        if (!is_object($configuration)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Configuration object, param $card must be a ConfigurationSpecific'
+                )
+            );
+        } else {
+            $this->configuration = $configuration;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getContext()
     {
@@ -182,17 +241,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $context
+     * @param object $context
      * @return PluginEntity
      */
     public function setContext($context)
     {
-        $this->context = $context;
-        return $this;
+        if (!is_object($context)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Context object, param $card must be a ContextSpecific'
+                )
+            );
+        } else {
+            $this->context = $context;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getCountry()
     {
@@ -200,17 +267,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $country
+     * @param object $country
      * @return PluginEntity
      */
     public function setCountry($country)
     {
-        $this->country = $country;
-        return $this;
+        if (!is_object($country)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Country object, param $card must be a ContextSpecific'
+                )
+            );
+        } else {
+            $this->country = $country;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getProduct()
     {
@@ -218,17 +293,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $product
+     * @param object $product
      * @return PluginEntity
      */
     public function setProduct($product)
     {
-        $this->product = $product;
-        return $this;
+        if (!is_object($product)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Product object, param $card must be a ProductSpecific'
+                )
+            );
+        } else {
+            $this->product = $product;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getTools()
     {
@@ -236,17 +319,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $tools
+     * @param object $tools
      * @return PluginEntity
      */
     public function setTools($tools)
     {
-        $this->tools = $tools;
-        return $this;
+        if (!is_object($tools)) {
+            throw (
+            new BadParameterException(
+                'Invalid Tools object, param $card must be a ToolsSpecific'
+            )
+            );
+        } else {
+            $this->tools = $tools;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getQuery()
     {
@@ -254,17 +345,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $query
+     * @param object $query
      * @return PluginEntity
      */
     public function setQuery($query)
     {
-        $this->query = $query;
-        return $this;
+        if (!is_object($query)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Query object, param $card must be a QueryRepository'
+                )
+            );
+        } else {
+            $this->query = $query;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getValidate()
     {
@@ -272,17 +371,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $validate
+     * @param object $validate
      * @return PluginEntity
      */
     public function setValidate($validate)
     {
-        $this->validate = $validate;
-        return $this;
+        if (!is_object($validate)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Validate object, param $card must be a ValidateSpecific'
+                )
+            );
+        } else {
+            $this->validate = $validate;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getOrderState()
     {
@@ -290,17 +397,25 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $order_state
+     * @param object $order_state
      * @return PluginEntity
      */
     public function setOrderState($order_state)
     {
-        $this->order_state = $order_state;
-        return $this;
+        if (!is_object($order_state)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Validate object, param $order_state must be an OrderState'
+                )
+            );
+        } else {
+            $this->order_state = $order_state;
+            return $this;
+        }
     }
 
     /**
-     * @return mixed
+     * @return object
      */
     public function getPayment()
     {
@@ -308,7 +423,7 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $payment
+     * @param object $payment
      * @return PluginEntity
      */
     public function setPayment($payment)
@@ -326,12 +441,20 @@ class PluginEntity
     }
 
     /**
-     * @param mixed $translate
+     * @param object $translate
      * @return PluginEntity
      */
     public function setTranslate($translate)
     {
-        $this->translate = $translate;
-        return $this;
+        if (!is_object($translate)) {
+            throw (
+                new BadParameterException(
+                    'Invalid Validate object, param $translate must be a Translate'
+                )
+            );
+        } else {
+            $this->translate = $translate;
+            return $this;
+        }
     }
 }

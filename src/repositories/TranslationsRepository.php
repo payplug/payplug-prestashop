@@ -27,9 +27,9 @@ class TranslationsRepository extends Repository
 {
     protected $payplug;
 
-    public function __construct($payplug)
+    public static function factory()
     {
-        $this->payplug = $payplug;
+        return new TranslationsRepository();
     }
 
     public function translate($id)

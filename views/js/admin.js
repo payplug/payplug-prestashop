@@ -792,6 +792,31 @@ var $document, $window, payplug = {
 
             $('input[name=' + switcher + ']').trigger('switchSelected');
         },
+        urlCheck: function () {
+            const url = ($(this).val());
+            const pattern = new RegExp('^(https?:\\/\\/)?' +
+                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+                '((\\d{1,3}\\.){3}\\d{1,3}))' +
+                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+                '(\\?[;&a-z\\d%_.~+=-]*)?' +
+                '(\\#[-a-z\\d_]*)?$', 'i');
+            const matches = url.match(pattern);
+            if (matches == null) {
+                if (!$('.payplugOneyTOS_error').hasClass('-show')) {
+                    $('.payplugOneyTOS_error').addClass('-show');
+                }
+                $("button[name=submitSettings]").prop("disabled", true);
+                $("button[name=submitSettings]").addClass('-disabled');
+            }
+            if ((matches !== null) || (url.length == 0)) {
+                if ($('.payplugOneyTOS_error').hasClass('-show')) {
+                    $('.payplugOneyTOS_error').removeClass('-show');
+                }
+                $("button[name=submitSettings]").prop("disabled", false);
+                $("button[name=submitSettings]").removeClass('-disabled');
+
+            }
+        },
     },
     installment: {
         props: {

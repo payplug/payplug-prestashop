@@ -171,6 +171,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount);
                 } catch (Exception $e) {
                     die($tools->tool('jsonEncode', [
+                        'exception' => $e->getMessage(),
                         'result' => false,
                         'error' => $this->translate->translate(5) //('Oney is momentarily unavailable.')
                     ]));
