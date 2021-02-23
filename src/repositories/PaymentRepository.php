@@ -196,7 +196,7 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].$paymentDetails['paymentId'].json_encode($paymentDetails['cart'])
+            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart'])
         );
 
         $this->query
@@ -261,7 +261,7 @@ class PaymentRepository extends Repository
     {
         $paymentDate = date('Y-m-d H:i:s');
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].$paymentDetails['paymentId'].json_encode($cart = $paymentDetails['cart']));
+            $paymentDetails['paymentMethod'].json_encode($cart = $paymentDetails['cart']));
 
         $table = _DB_PREFIX_ .'payplug_payment';
 
@@ -303,22 +303,30 @@ class PaymentRepository extends Repository
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].$paymentStored['id_payment'].json_encode($paymentDetails['cart']));
+            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart']));
 
-        // Si le hash est strictement identique avec même mode de paiement : on est OK
+        /*
+         * Si le hash est strictement identique avec même mode de paiement : on est OK
+         */
         if ($paymentStored['cart_hash'] === $cartHash && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return $paymentDetails;
-        // Si le hash est différent
-        // OU
-        // Si le hach est identique mais un autre moyen de paiement a été sélectionné entre temps : On met à jour le paiement avec le nouveau pay_id / inst_id
-        } elseif (($paymentStored['cart_hash'] !== $cartHash) ||
-            (($paymentStored['cart_hash'] === $cartHash)
-                && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))) {
+        /*
+         * Si le hash et mode de paiement différents
+         * OU
+         * Si le hach est identique mais un autre moyen de paiement a été sélectionné entre temps
+         * OU
+         * Si le hash est différent avec le même mode de paiement
+         * => On met à jour le paiement avec le nouveau pay_id / inst_id
+         */
+        } elseif (
+            (($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))
+            ||
+            (($paymentStored['cart_hash'] === $cartHash) && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))
+            ||
+            ($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])
+        ) {
             $paymentDetails = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($paymentDetails);
-        // Si le hash est différent avec le même mode de paiement : Cela créera un double paiement, donc on n'en créé pas de nouveau;
-        } elseif (($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
-            return $paymentDetails;
         }
     }
 
