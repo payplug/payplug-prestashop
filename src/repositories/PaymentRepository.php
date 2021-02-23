@@ -196,7 +196,7 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart'])
+            $paymentDetails['paymentId'].json_encode($paymentDetails['cart'])
         );
 
         $this->query
@@ -261,7 +261,7 @@ class PaymentRepository extends Repository
     {
         $paymentDate = date('Y-m-d H:i:s');
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($cart = $paymentDetails['cart']));
+            $paymentDetails['paymentId'].json_encode($cart = $paymentDetails['cart']));
 
         $table = _DB_PREFIX_ .'payplug_payment';
 
@@ -300,10 +300,10 @@ class PaymentRepository extends Repository
             return false;
         }
 
-        $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart']));
-
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+
+        $cartHash = hash('sha256',
+            $paymentStored['id_payment'].json_encode($paymentDetails['cart']));
 
         if ($paymentStored['cart_hash'] === $cartHash) {
             return $paymentDetails;
