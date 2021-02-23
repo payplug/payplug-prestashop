@@ -4737,25 +4737,26 @@ class Payplug extends PaymentModule
             'paymentTab'    => $payment_tab,
             'paymentId'     => null,
             'paymentReturn' => null,
-//            'isPaid'        => $payment->is_paid,
+            'paymentDate'   => null,
+            'isPaid'        => null,
             'isDeferred'    => $options['is_deferred'],
-            'embeddedMode'  => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
+            'isEmbedded'    => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
             'isMobileDevice'=> $this->isMobiledevice(),
-            'returnUrl'     => null,
             'cart'          => $cart,
+            'cartId'        => $payment_tab['metadata']['ID Cart'],
             'cartHash'      => null,
             'forceHash'     => true
         ];
 
         // Create payment if inexistent
-        if (!$this->payment->checkPaymentCart($cart->id)) {
+        if (!$this->payment->checkPaymentTable($cart->id)) {
             try {
                 $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
-                $this->paymentDetails = $this->payment->insertPaymentCart($this->paymentDetails);
+                $this->paymentDetails = $this->payment->insertPaymentTable($this->paymentDetails);
                 if (!$this->paymentDetails) {
                     return false;
                 }
-//                die('STOP POUR LE MOMENT:: TOUT EST OK! :: NOUVEAU PAIEMENT CRÉÉ ET STORÉ');
+//                die('CAS 1 => STOP POUR LE MOMENT:: TOUT EST OK! :: NOUVEAU PAIEMENT CRÉÉ ET STORÉ');
                 return $this->payment->getPaymentReturn($this->paymentDetails);
             } catch (Exception $e) {
                 $messages = $this->catchErrorsFromApi($e->__toString());
@@ -4770,19 +4771,21 @@ class Payplug extends PaymentModule
                     'response' => count($messages) > 1 ? $messages : reset($messages),
                 ];
             }
-        } elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
+        }
+        elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
             // If payment already exists, and timeout > 1 min : Create a new payment
             $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
-            $this->paymentDetails = $this->payment->updatePaymentCart($this->paymentDetails);
+            $this->paymentDetails = $this->payment->updatePaymentTable($this->paymentDetails);
             $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
-//            die('STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC HASH REGÉNÉRÉ CAR TIMEOUT > 1MIN');
+//            die('CAS 2 => STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC HASH REGÉNÉRÉ CAR TIMEOUT > 1MIN');
             if (!$this->paymentDetails) {
                 return false;
             }
             return $this->payment->getPaymentReturn($this->paymentDetails);
-        } elseif ($this->payment->checkTimeoutPayment($cart->id)) {
+        }
+        elseif ($this->payment->checkTimeoutPayment($cart->id)) {
             $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
-//            die('STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC MEME HASH CAR TIMEOUT < 1MIN');
+//            die('CAS 3 => STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC MEME HASH CAR TIMEOUT < 1MIN');
             return $this->payment->getPaymentReturn($this->paymentDetails);
         }
 

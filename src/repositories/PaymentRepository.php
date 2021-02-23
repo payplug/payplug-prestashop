@@ -103,8 +103,8 @@ class PaymentRepository extends Repository
                     return $this->displayErrorPayment();
                 }
 
-                if (!$paymentDetails['returnUrl'] && isset($this->apiPayment->hosted_payment->payment_url)) {
-                    $paymentDetails['returnUrl'] = $this->apiPayment->hosted_payment->payment_url;
+                if (!$paymentDetails['paymentReturn'] && isset($this->apiPayment->hosted_payment->payment_url)) {
+                    $paymentDetails['paymentReturn'] = $this->apiPayment->hosted_payment->payment_url;
                 } else {
                     $this->logger->addLog('[createPayment] hosted_payment->payment_url is null / not set', 'error');
                     return $this->displayErrorPayment();
@@ -136,11 +136,11 @@ class PaymentRepository extends Repository
             return false;
         }
 
-        $dateStored = $this->checkPaymentCart($idCart)['date_upd'];
+        $dateStored = $this->checkPaymentTable($idCart)['date_upd'];
 
         $date = new \DateTime($dateStored);
         $date2 = new \DateTime('now');
-        
+
         if ($date->diff($date2)->y !== 0 ||
             $date->diff($date2)->d !== 0 ||
             $date->diff($date2)->h !== 0 ||
@@ -180,38 +180,38 @@ class PaymentRepository extends Repository
     }
 
     /**
-     * @description Insert cart, pay id and hash in Payplug Payment Cart table
-     * @param array $paymentDetails
-     * @return array
+     * @description Insert payment with all details in table
      */
-    public function insertPaymentCart($paymentDetails)
+    public function insertPaymentTable($paymentDetails)
     {
         if (!isset($paymentDetails)) {
-            $this->logger->addLog('[insertPaymentCart] The parameter $paymentDetails is null', 'error');
+            $this->logger->addLog('[insertPaymentTable] The parameter $paymentDetails is null', 'error');
             return false;
         }
 
         if (!is_array($paymentDetails)) {
-            $this->logger->addLog('[insertPaymentCart] The parameter $paymentDetails is not an array', 'error');
+            $this->logger->addLog('[insertPaymentTable] The parameter $paymentDetails is not an array', 'error');
             return false;
         }
 
-        $idPayment = $paymentDetails['paymentId'];
-        $idCart = $paymentDetails['paymentTab']['metadata']['ID Cart'];
-        $paymentMethod = $paymentDetails['paymentMethod'];
-        $cart = $paymentDetails['cart'];
-
-        $cartHash = hash('sha256', $paymentMethod.json_encode($cart));
+        $paymentDate = date('Y-m-d H:i:s');
+        $cartHash = hash('sha256',
+            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart'])
+        );
 
         $this->query
             ->insert()
-            ->into(_DB_PREFIX_ . 'payplug_payment_cart')
-            ->fields('id_payment')  ->values(pSQL($idPayment))
-            ->fields('id_cart')     ->values(pSQL($idCart))
-            ->fields('cart_hash')   ->values(pSQL($cartHash))
-            ->fields('date_upd')    ->values(pSQL(date('Y-m-d H:i:s')))
+            ->into(_DB_PREFIX_ . 'payplug_payment')
+            ->fields('id_payment')      ->values(pSQL($paymentDetails['paymentId']))
+            ->fields('payment_method')  ->values(pSQL($paymentDetails['paymentMethod']))
+            ->fields('payment_return')  ->values(pSQL($paymentDetails['paymentReturn']))
+            ->fields('id_cart')         ->values(pSQL($paymentDetails['cartId']))
+            ->fields('cart_hash')       ->values(pSQL($cartHash))
+            ->fields('is_deferred')     ->values(pSQL($paymentDetails['isDeferred']))
+            ->fields('is_embedded')     ->values(pSQL($paymentDetails['isEmbedded']))
+            ->fields('is_mobile_device')->values(pSQL($paymentDetails['isMobileDevice']))
+            ->fields('date_upd')        ->values(pSQL($paymentDate))
         ;
-
         if (!$this->query->build()) {
             $this->logger->addLog('[insertPaymentCart] Unable to flush DB (build method)', 'error');
             return false;
@@ -225,22 +225,22 @@ class PaymentRepository extends Repository
      * @param integer $idCart
      * @return bool|array
      */
-    public function checkPaymentCart($idCart)
+    public function checkPaymentTable($idCart)
     {
         if (!$idCart) {
-            $this->logger->addLog('[checkPaymentCart] the $idCart parameter is null', 'error');
+            $this->logger->addLog('[checkPaymentTable] the $idCart parameter is null', 'error');
             return false;
         }
 
         if (!is_int($idCart)) {
-            $this->logger->addLog('[checkPaymentCart] the $idCart parameter is not an integer', 'error');
+            $this->logger->addLog('[checkPaymentTable] the $idCart parameter is not an integer', 'error');
             return false;
         }
 
         $reqCheck = $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_ .'payplug_payment_cart')
+            ->from(_DB_PREFIX_ .'payplug_payment')
             ->where('id_cart = ' . (int)$idCart);
 
         $resCheck = $reqCheck->build();
@@ -257,28 +257,31 @@ class PaymentRepository extends Repository
      * @param array $paymentDetails
      * @return array
      */
-    public function updatePaymentCart($paymentDetails)
+    public function updatePaymentTable($paymentDetails)
     {
-        $idPayment = $paymentDetails['paymentId'];
-        $idCart = $paymentDetails['paymentTab']['metadata']['ID Cart'];
-        $paymentMethod = $paymentDetails['paymentMethod'];
-        $cart = $paymentDetails['cart'];
+        $paymentDate = date('Y-m-d H:i:s');
+        $cartHash = hash('sha256',
+            $paymentDetails['paymentMethod'].json_encode($cart = $paymentDetails['cart']));
 
-        $cartHash = hash('sha256', $paymentMethod.json_encode($cart));
-
-        $table = _DB_PREFIX_ .'payplug_payment_cart';
+        $table = _DB_PREFIX_ .'payplug_payment';
 
         $this->query
             ->update()
             ->table($table)
-            ->set($table.'.id_payment =  \''.pSQL($idPayment).'\'')
-            ->set($table.'.cart_hash =  \''.pSQL($cartHash).'\'')
-            ->set($table.'.date_upd =  \''.pSQL(date('Y-m-d H:i:s')).'\'')
-            ->where($table.'.id_cart = '.(int)$idCart)
+            ->set($table.'.id_payment =         \''.pSQL($paymentDetails['paymentId']).'\'')
+            ->set($table.'.payment_method =     \''.pSQL($paymentDetails['paymentMethod']).'\'')
+            ->set($table.'.payment_return =     \''.pSQL($paymentDetails['paymentReturn']).'\'')
+            ->set($table.'.cart_hash =          \''.pSQL($cartHash).'\'')
+            ->set($table.'.is_deferred =        \''.pSQL($paymentDetails['isDeferred']).'\'')
+            ->set($table.'.is_embedded =        \''.pSQL($paymentDetails['isEmbedded']).'\'')
+            ->set($table.'.is_mobile_device =   \''.pSQL($paymentDetails['isMobileDevice']).'\'')
+            ->set($table.'.is_paid =            \''.pSQL($paymentDetails['isPaid']).'\'')
+            ->set($table.'.date_upd =           \''.pSQL($paymentDate).'\'')
+            ->where($table.'.id_cart =          '.(int)$paymentDetails['cartId'])
         ;
 
         if (!$this->query->build()) {
-            $this->logger->addLog('[updatePaymentCart] Unable to fetch the query on DB');
+            $this->logger->addLog('[updatePaymentTable] Unable to fetch the query on DB');
             return false;
         }
 
@@ -297,44 +300,60 @@ class PaymentRepository extends Repository
             return false;
         }
 
-        $idCart = $paymentDetails['paymentTab']['metadata']['ID Cart'];
-        $paymentMethod = $paymentDetails['paymentMethod'];
-        $cart = $paymentDetails['cart'];
+        $cartHash = hash('sha256',
+            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart']));
 
-        $cartHash = hash('sha256', $paymentMethod.json_encode($cart));
+        $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
-        $cartStored = $this->checkPaymentCart($idCart);
-
-            // Check if valid in API
-            if ($paymentMethod == 'standard') {
-                $apiPayment = \Payplug\Payment::retrieve($cartStored['id_payment']);
-            } elseif ($paymentMethod == 'installment') {
-                $apiPayment = \Payplug\InstallmentPlan::retrieve($cartStored['id_payment']);
-            }
-            if ($apiPayment) {
-                $this->paymentEntity->setApiPayment($apiPayment);
-                $this->apiPayment = $this->paymentEntity->getApiPayment();
-
-                if (!$paymentDetails['paymentId']) {
-                    $paymentDetails['paymentId'] = $this->apiPayment->id;
-                }
-
-                if (!$paymentDetails['returnUrl']) {
-                    $paymentDetails['returnUrl'] = $this->apiPayment->hosted_payment->payment_url;
-                }
-            }
-
-        if ($cartStored['cart_hash'] === $cartHash) {
+        if ($paymentStored['cart_hash'] === $cartHash) {
             return $paymentDetails;
+            // Check if valid in API
+//            if ($paymentDetails['paymentMethod'] == 'standard') {
+//                $apiPayment = \Payplug\Payment::retrieve($cartStored['id_payment']);
+//            } elseif ($paymentDetails['paymentMethod'] == 'installment') {
+//                $apiPayment = \Payplug\InstallmentPlan::retrieve($cartStored['id_payment']);
+//            }
+//            if ($apiPayment) {
+//                $this->paymentEntity->setApiPayment($apiPayment);
+//                $this->apiPayment = $this->paymentEntity->getApiPayment();
+//
+//                if (!$paymentDetails['paymentId']) {
+//                    $paymentDetails['paymentId'] = $this->apiPayment->id;
+//                }
+//var_dump('1');
+//                if ((!$cartStored['payment_return'] || empty($cartStored['payment_return'])) && $paymentDetails['paymentReturn']) {
+//                    var_dump('2');
+//                    //$paymentDetails['returnUrl'] = $this->apiPayment->hosted_payment->payment_url;
+//                    $table = _DB_PREFIX_ .'payplug_payment';
+//                    $this->query
+//                        ->update()
+//                        ->table($table)
+//                        ->set($table.'.payment_return = \''.pSQL($paymentDetails['paymentReturn']).'\'')
+//                        ->where($table.'.id_cart = '.(int)$idCart)
+//                    ;
+//
+//                    if (!$this->query->build()) {
+//                        $this->logger->addLog('[updatePaymentTable] Unable to fetch the query on DB');
+//                        return false;
+//                    }
+//                }
+//            }
+//            return $paymentDetails;
         } else {
-            return $this->updatePaymentCart($paymentDetails);
+            $paymentDetails = $this->createPayment($paymentDetails);
+            
+            return $this->updatePaymentTable($paymentDetails);
         }
     }
 
     public function getPaymentReturn($paymentDetails)
     {
-        $paymentMethod = $paymentDetails['paymentMethod'];
-        switch ($paymentMethod) {
+        if (!$paymentDetails['paymentReturn']) {
+            $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+            $paymentDetails['paymentReturn'] = $paymentStored['payment_return'];
+        }
+
+        switch ($paymentDetails['paymentMethod']) {
 //                    case 'oneclick':
 //                        $redirect = $payment->is_paid;
 //                        if (!$redirect && $options['is_deferred']) {
@@ -361,9 +380,9 @@ class PaymentRepository extends Repository
                     default:
                         $paymentReturn = [
                             'result' => 'new_card',
-                            'embedded' => $paymentDetails['embeddedMode'] && !$paymentDetails['isMobileDevice'],
+                            'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
                             'redirect' => $paymentDetails['isMobileDevice'],
-                            'return_url' => $paymentDetails['returnUrl']
+                            'return_url' => $paymentDetails['paymentReturn']
                         ];
                         break;
                 }
