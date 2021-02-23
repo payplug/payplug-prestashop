@@ -4783,8 +4783,7 @@ class Payplug extends PaymentModule
             }
             return $this->payment->getPaymentReturn($this->paymentDetails);
         }
-        elseif ($this->payment->checkTimeoutPayment($cart->id)) {
-            $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
+        elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
 //            die('CAS 3 => STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC MEME HASH CAR TIMEOUT < 1MIN');
             return $this->payment->getPaymentReturn($this->paymentDetails);
         }

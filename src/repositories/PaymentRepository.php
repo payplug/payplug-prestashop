@@ -196,7 +196,7 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
         $cartHash = hash('sha256',
-            $paymentDetails['paymentId'].json_encode($paymentDetails['cart'])
+            $paymentDetails['paymentMethod'].$paymentDetails['paymentId'].json_encode($paymentDetails['cart'])
         );
 
         $this->query
@@ -261,7 +261,7 @@ class PaymentRepository extends Repository
     {
         $paymentDate = date('Y-m-d H:i:s');
         $cartHash = hash('sha256',
-            $paymentDetails['paymentId'].json_encode($cart = $paymentDetails['cart']));
+            $paymentDetails['paymentMethod'].$paymentDetails['paymentId'].json_encode($cart = $paymentDetails['cart']));
 
         $table = _DB_PREFIX_ .'payplug_payment';
 
@@ -303,46 +303,22 @@ class PaymentRepository extends Repository
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
         $cartHash = hash('sha256',
-            $paymentStored['id_payment'].json_encode($paymentDetails['cart']));
+            $paymentDetails['paymentMethod'].$paymentStored['id_payment'].json_encode($paymentDetails['cart']));
 
-        if ($paymentStored['cart_hash'] === $cartHash) {
+        // Si le hash est strictement identique avec même mode de paiement : on est OK
+        if ($paymentStored['cart_hash'] === $cartHash && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return $paymentDetails;
-            // Check if valid in API
-//            if ($paymentDetails['paymentMethod'] == 'standard') {
-//                $apiPayment = \Payplug\Payment::retrieve($cartStored['id_payment']);
-//            } elseif ($paymentDetails['paymentMethod'] == 'installment') {
-//                $apiPayment = \Payplug\InstallmentPlan::retrieve($cartStored['id_payment']);
-//            }
-//            if ($apiPayment) {
-//                $this->paymentEntity->setApiPayment($apiPayment);
-//                $this->apiPayment = $this->paymentEntity->getApiPayment();
-//
-//                if (!$paymentDetails['paymentId']) {
-//                    $paymentDetails['paymentId'] = $this->apiPayment->id;
-//                }
-//var_dump('1');
-//                if ((!$cartStored['payment_return'] || empty($cartStored['payment_return'])) && $paymentDetails['paymentReturn']) {
-//                    var_dump('2');
-//                    //$paymentDetails['returnUrl'] = $this->apiPayment->hosted_payment->payment_url;
-//                    $table = _DB_PREFIX_ .'payplug_payment';
-//                    $this->query
-//                        ->update()
-//                        ->table($table)
-//                        ->set($table.'.payment_return = \''.pSQL($paymentDetails['paymentReturn']).'\'')
-//                        ->where($table.'.id_cart = '.(int)$idCart)
-//                    ;
-//
-//                    if (!$this->query->build()) {
-//                        $this->logger->addLog('[updatePaymentTable] Unable to fetch the query on DB');
-//                        return false;
-//                    }
-//                }
-//            }
-//            return $paymentDetails;
-        } else {
+        // Si le hash est différent
+        // OU
+        // Si le hach est identique mais un autre moyen de paiement a été sélectionné entre temps : On met à jour le paiement avec le nouveau pay_id / inst_id
+        } elseif (($paymentStored['cart_hash'] !== $cartHash) ||
+            (($paymentStored['cart_hash'] === $cartHash)
+                && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))) {
             $paymentDetails = $this->createPayment($paymentDetails);
-            
             return $this->updatePaymentTable($paymentDetails);
+        // Si le hash est différent avec le même mode de paiement : Cela créera un double paiement, donc on n'en créé pas de nouveau;
+        } elseif (($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+            return $paymentDetails;
         }
     }
 
