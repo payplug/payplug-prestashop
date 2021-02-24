@@ -22,6 +22,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\src\entities\OneyEntity;
+use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\CarrierSpecific;
+use PayPlug\src\specific\CartSpecific;
+use PayPlug\src\specific\ContextSpecific;
+use PayPlug\src\specific\CountrySpecific;
+use PayPlug\src\specific\ToolsSpecific;
+use PayPlug\src\specific\ValidateSpecific;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
@@ -91,7 +99,20 @@ final class GetOneySimulationsTest extends TestCase
         $this->logger->shouldReceive('setParams')
             ->andReturn(true);
 
-        $this->repo = new OneyRepository();
+        $this->repo = new OneyRepository(
+            $this->cache,
+            $this->logger,
+            new AddressSpecific(),
+            new CartSpecific(),
+            new CarrierSpecific(),
+            $this->config,
+            new ContextSpecific(),
+            new CountrySpecific(),
+            new ToolsSpecific(),
+            new ValidateSpecific(),
+            new OneyEntity(),
+            $this->myLogPhp
+        );
 
         $this->arrayCache = [];
         $this->arrayLogger = [];

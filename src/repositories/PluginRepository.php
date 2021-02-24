@@ -60,7 +60,6 @@ class PluginRepository extends Repository
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();
         $this->oney     = new OneyRepository();
-        $this->oney->setPayplug($payplug);
         $this->plugin   = new PluginEntity();
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();

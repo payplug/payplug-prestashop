@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\repositories;
 
+use Payplug;
+use PayPlug\classes\MyLogPHP;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
@@ -45,7 +47,6 @@ class OneyRepository extends Repository
     private $cache;
     private $log;
     private $logger;
-    private $operations;
     private $cartSpecific;
     private $carrierSpecific;
     private $configurationSpecific;
@@ -54,29 +55,42 @@ class OneyRepository extends Repository
     private $toolsSpecific;
     private $validateSpecific;
     private $oneyEntity;
+    protected $payplug;
 
-    public function __construct()
+    public function __construct(CacheRepository $cache,
+                                LoggerRepository $logger,
+                                AddressSpecific $addressSpecific,
+                                CartSpecific $cartSpecific,
+                                CarrierSpecific $carrierSpecific,
+                                ConfigurationSpecific $configurationSpecific,
+                                ContextSpecific $contextSpecific,
+                                CountrySpecific $countrySpecific,
+                                ToolsSpecific $toolsSpecific,
+                                ValidateSpecific $validateSpecific,
+                                OneyEntity $oneyEntity,
+                                MyLogPHP $myLogPHP,
+                                Payplug $payplug)
     {
-        $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
+        $this->cache = $cache;
+        $this->logger = $logger;
+        $this->addressSpecific = $addressSpecific;
+        $this->cartSpecific = $cartSpecific;
+        $this->carrierSpecific = $carrierSpecific;
+        $this->configurationSpecific = $configurationSpecific;
+        $this->contextSpecific = $contextSpecific;
+        $this->countrySpecific = $countrySpecific;
+        $this->toolsSpecific = $toolsSpecific;
+        $this->validateSpecific = $validateSpecific;
+        $this->oneyEntity = $oneyEntity;
+        $this->log = $myLogPHP;
+        $this->payplug = $payplug;
+
         $this->setParams();
     }
 
     protected function setParams()
     {
-        $this->cache = CacheRepository::factory();
-        $this->logger = LoggerRepository::factory();
-
-        $this->addressSpecific = AddressSpecific::factory();
-        $this->cartSpecific = CartSpecific::factory();
-        $this->carrierSpecific = CarrierSpecific::factory();
-        $this->configurationSpecific = ConfigurationSpecific::factory();
-        $this->contextSpecific = ContextSpecific::factory();
-        $this->countrySpecific = CountrySpecific::factory();
-        $this->toolsSpecific = ToolsSpecific::factory();
-        $this->validateSpecific = ValidateSpecific::factory();
-        $this->oneyEntity = new OneyEntity();
-
-        $this->setOperations([
+        $this->oneyEntity->setOperations([
             'x3_with_fees',
             'x4_with_fees',
         ]);
@@ -86,17 +100,17 @@ class OneyRepository extends Repository
     {
         return new OneyRepository();
     }
-
-    public function setOperations($operations)
-    {
-        $this->oneyEntity->setOperations($operations);
-        return $this->operations = $this->oneyEntity->getOperations();
-    }
-
-    public function getOperations()
-    {
-        return $this->operations;
-    }
+//
+//    public function setOperations($operations)
+//    {
+//        $this->oneyEntity->setOperations($operations);
+//        return $this->operations = $this->oneyEntity->getOperations();
+//    }
+//
+//    public function getOperations()
+//    {
+//        return $this->operations;
+//    }
 
     /**
      * @description Assign Oney javascript variable
@@ -412,7 +426,7 @@ class OneyRepository extends Repository
     /**
      * @description Format Oney simulation from resource
      *
-     * @param string $method
+     * @param bool $operation
      * @param array $resource
      * @param bool $total_amount
      * @return array
@@ -421,7 +435,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->getOperations()) || !$operation) {
+        if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -595,7 +609,7 @@ class OneyRepository extends Repository
 
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->getOperations());
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
 
         if (!$oney_sims['result']) {
             return $payment_list;

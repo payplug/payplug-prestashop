@@ -22,7 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
+use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\ContextSpecific;
+use PayPlug\src\specific\CountrySpecific;
 use PayPlug\tests\mock\CarrierMock;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
@@ -96,22 +100,27 @@ final class GetOneyPaymentOptionsListTest extends TestCase
                 return (int)$amount * 100;
             });
 
-        $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
-        $this->repo->setParams();
-        $this->repo->setPayplug($this->payplug);
-
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->cache,
+            $this->logger,
+            new AddressSpecific(),
+            $this->cart,
+            $this->carrier,
+            $this->config,
+            new ContextSpecific(),
+            new CountrySpecific(),
+            $this->tools,
+            $this->validate,
+            new OneyEntity(),
+            $this->myLogPhp,
+            $this->payplug
+        ])->makePartial();
         $this->repo
             ->shouldAllowMockingProtectedMethods()
             ->shouldReceive([
                 'getOneySimulations' => [
                     'result' => true,
                     'simulations' => OneySimulationsMock::get()
-                ],
-                'setOperations' => [
-                    true,
-                ],
-                'getOperations' => [
-                    'x3_with_fees',
                 ]
             ]);
 

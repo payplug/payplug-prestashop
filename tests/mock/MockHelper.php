@@ -55,7 +55,8 @@ class MockHelper extends Mockery
     }
 
     public static function createToolsMock($classPathname) {
-        $tools = self::createMockFactory($classPathname)
+        $tools = self::createMockFactory($classPathname);
+        $tools
             ->shouldReceive('tool')
             ->andReturnUsing(function ($action, $value, $params2 = false) {
                 switch ($action) {
@@ -89,14 +90,16 @@ class MockHelper extends Mockery
     }
 
     public static function createValidateMock($classPathname) {
-        $validate = self::createMockFactory($classPathname)
+        $validate = self::createMockFactory($classPathname);
+        $validate
             ->shouldReceive('validate')
             ->andReturn(true);
         return $validate;
     }
 
     public static function createContextMock($classPathname) {
-        $context = self::createMockFactory($classPathname)
+        $context = self::createMockFactory($classPathname);
+        $context
             ->shouldReceive('getContext')
             ->andReturn(ContextMock::get());
         return $context;
