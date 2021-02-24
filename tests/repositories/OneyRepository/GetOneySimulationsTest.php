@@ -77,6 +77,7 @@ final class GetOneySimulationsTest extends TestCase
         $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        $this->payplug = Mockery::mock('payplug');
 
         // Method setup
         $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
@@ -111,7 +112,8 @@ final class GetOneySimulationsTest extends TestCase
             new ToolsSpecific(),
             new ValidateSpecific(),
             new OneyEntity(),
-            $this->myLogPhp
+            $this->myLogPhp,
+            $this->payplug
         );
 
         $this->arrayCache = [];
