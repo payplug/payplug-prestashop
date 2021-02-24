@@ -110,6 +110,10 @@ class PaymentRepository extends Repository
                     return $this->displayErrorPayment();
                 }
 
+                if (!$paymentDetails['isPaid'] && isset($this->apiPayment->is_paid)) {
+                    $paymentDetails['isPaid'] = $this->apiPayment->is_paid;
+                }
+
                 return($paymentDetails);
                 break;
             default:
@@ -144,12 +148,11 @@ class PaymentRepository extends Repository
         if ($date->diff($date2)->y !== 0 ||
             $date->diff($date2)->d !== 0 ||
             $date->diff($date2)->h !== 0 ||
-            $date->diff($date2)->i > 0 ||
-            $date->diff($date2)->s > 59) {
-            // Plus d'une minute
+            $date->diff($date2)->i > 3) {
+            // Plus de 3 minutes
             return false;
         } else {
-            // Moins d'une minute
+            // Moins de 3 minutes
             return true;
         }
         exit;
@@ -203,15 +206,17 @@ class PaymentRepository extends Repository
         $this->query
             ->insert()
             ->into(_DB_PREFIX_ . 'payplug_payment')
-            ->fields('id_payment')      ->values(pSQL($paymentDetails['paymentId']))
-            ->fields('payment_method')  ->values(pSQL($paymentDetails['paymentMethod']))
-            ->fields('payment_return')  ->values(pSQL($paymentDetails['paymentReturn']))
-            ->fields('id_cart')         ->values(pSQL($paymentDetails['cartId']))
-            ->fields('cart_hash')       ->values(pSQL($cartHash))
-            ->fields('is_deferred')     ->values(pSQL($paymentDetails['isDeferred']))
-            ->fields('is_embedded')     ->values(pSQL($paymentDetails['isEmbedded']))
-            ->fields('is_mobile_device')->values(pSQL($paymentDetails['isMobileDevice']))
-            ->fields('date_upd')        ->values(pSQL($paymentDate))
+            ->fields('id_payment')          ->values(pSQL($paymentDetails['paymentId']))
+            ->fields('payment_method')      ->values(pSQL($paymentDetails['paymentMethod']))
+            ->fields('payment_hosted_url')  ->values(pSQL($paymentDetails['paymentHostedUrl']))
+            ->fields('payment_return')      ->values(pSQL($paymentDetails['paymentReturn']))
+            ->fields('id_cart')             ->values(pSQL($paymentDetails['cartId']))
+            ->fields('cart_hash')           ->values(pSQL($cartHash))
+            ->fields('authorized_at')       ->values(pSQL($paymentDetails['authorizedAt']))
+            ->fields('is_deferred')         ->values(pSQL($paymentDetails['isDeferred']))
+            ->fields('is_embedded')         ->values(pSQL($paymentDetails['isEmbedded']))
+            ->fields('is_mobile_device')    ->values(pSQL($paymentDetails['isMobileDevice']))
+            ->fields('date_upd')            ->values(pSQL($paymentDate))
         ;
         if (!$this->query->build()) {
             $this->logger->addLog('[insertPaymentCart] Unable to flush DB (build method)', 'error');
@@ -272,6 +277,7 @@ class PaymentRepository extends Repository
             ->table($table)
             ->set($table.'.id_payment =         \''.pSQL($paymentDetails['paymentId']).'\'')
             ->set($table.'.payment_method =     \''.pSQL($paymentDetails['paymentMethod']).'\'')
+            ->set($table.'.payment_hosted_url = \''.pSQL($paymentDetails['paymentHostedUrl']).'\'')
             ->set($table.'.payment_return =     \''.pSQL($paymentDetails['paymentReturn']).'\'')
             ->set($table.'.cart_hash =          \''.pSQL($cartHash).'\'')
             ->set($table.'.is_deferred =        \''.pSQL($paymentDetails['isDeferred']).'\'')
@@ -318,33 +324,38 @@ class PaymentRepository extends Repository
 
     public function getPaymentReturn($paymentDetails)
     {
+        $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+
         if (!$paymentDetails['paymentReturn']) {
-            $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
             $paymentDetails['paymentReturn'] = $paymentStored['payment_return'];
         }
 
+        if (!$paymentDetails['authorizedAt']) {
+            $paymentDetails['authorizedAt'] = $paymentStored['authorized_at'];
+        }
+
         switch ($paymentDetails['paymentMethod']) {
-//                    case 'oneclick':
-//                        $redirect = $payment->is_paid;
-//                        if (!$redirect && $options['is_deferred']) {
-//                            $redirect = (bool)$payment->authorization->authorized_at;
-//                        }
-//                        $paymentReturn = [
-//                            'result' => true,
-//                            'embedded' => true,
-//                            'redirect' => $redirect, // force `true` we are in 3DS 1
-//                            'return_url' => $redirect ?
-//                                $payment->hosted_payment->return_url : $payment->hosted_payment->payment_url,
-//                        ];
-//                        break;
-//                    case 'oney':
-//                        $paymentReturn = [
-//                            'result' => 'new_card',
-//                            'embedded' => false,
-//                            'redirect' => true,
-//                            'return_url' => $payment->hosted_payment->payment_url,
-//                        ];
-//                        break;
+                    case 'oneclick':
+                        $redirect = $paymentDetails['isPaid'];
+                        if (!$redirect && $paymentDetails['isDeferred']) {
+                            $redirect = (bool)$paymentDetails['authorizedAt'];
+                        }
+                        $paymentReturn = [
+                            'result' => true,
+                            'embedded' => true,
+                            'redirect' => $redirect, // force `true` we are in 3DS 1
+                            'return_url' => $redirect ?
+                                $paymentDetails['paymentReturn'] : $paymentDetails['paymentHostedUrl'],
+                        ];
+                        break;
+                    case 'oney':
+                        $paymentReturn = [
+                            'result' => 'new_card',
+                            'embedded' => false,
+                            'redirect' => true,
+                            'return_url' => $paymentDetails['paymentReturn']
+                        ];
+                        break;
                     case 'standard':
                     case 'installment':
                     default:

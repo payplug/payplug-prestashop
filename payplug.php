@@ -4733,19 +4733,21 @@ class Payplug extends PaymentModule
 
         // Prepare details to create / retrieve payment
         $this->paymentDetails = [
-            'paymentMethod' => $payment_method,
-            'paymentTab'    => $payment_tab,
-            'paymentId'     => null,
-            'paymentReturn' => null,
-            'paymentDate'   => null,
-            'isPaid'        => null,
-            'isDeferred'    => $options['is_deferred'],
-            'isEmbedded'    => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
-            'isMobileDevice'=> $this->isMobiledevice(),
-            'cart'          => $cart,
-            'cartId'        => $payment_tab['metadata']['ID Cart'],
-            'cartHash'      => null,
-            'forceHash'     => true
+            'paymentMethod'     => $payment_method,
+            'paymentTab'        => $payment_tab,
+            'paymentId'         => null,
+            'paymentReturn'     => null,
+            'paymentHostedUrl'  => null,
+            'paymentDate'       => null,
+            'authorizedAt'      => null,
+            'isPaid'            => null,
+            'isDeferred'        => $options['is_deferred'],
+            'isEmbedded'        => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
+            'isMobileDevice'    => $this->isMobiledevice(),
+            'cart'              => $cart,
+            'cartId'            => $payment_tab['metadata']['ID Cart'],
+            'cartHash'          => null,
+            'forceHash'         => true
         ];
 
         // Create payment if inexistent
