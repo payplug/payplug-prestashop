@@ -29,7 +29,7 @@ class Repository
 {
     private $entity;
     protected $name;
-    protected $payplug;
+    private $payplug;
 
     public static function factory()
     {
@@ -55,14 +55,6 @@ class Repository
     public function getEntity()
     {
         return $this->entity;
-    }
-
-    public function setPayplug($payplug){
-        $this->payplug = $payplug;
-        return $this;
-    }
-    public function getPayplug(){
-        return $this->payplug;
     }
 
     public function l($string)

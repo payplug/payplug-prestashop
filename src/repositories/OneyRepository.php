@@ -24,21 +24,11 @@
 namespace PayPlug\src\repositories;
 
 use Payplug;
-use PayPlug\classes\MyLogPHP;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\UnexpectedAPIResponseException;
-use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\exceptions\BadParameterException;
-use PayPlug\src\specific\AddressSpecific;
-use PayPlug\src\specific\CartSpecific;
-use PayPlug\src\specific\CarrierSpecific;
-use PayPlug\src\specific\ConfigurationSpecific;
-use PayPlug\src\specific\ContextSpecific;
-use PayPlug\src\specific\CountrySpecific;
-use PayPlug\src\specific\ToolsSpecific;
-use PayPlug\src\specific\ValidateSpecific;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
 class OneyRepository extends Repository
@@ -55,21 +45,21 @@ class OneyRepository extends Repository
     private $toolsSpecific;
     private $validateSpecific;
     private $oneyEntity;
-    protected $payplug;
+    private $payplug;
 
-    public function __construct(CacheRepository $cache,
-                                LoggerRepository $logger,
-                                AddressSpecific $addressSpecific,
-                                CartSpecific $cartSpecific,
-                                CarrierSpecific $carrierSpecific,
-                                ConfigurationSpecific $configurationSpecific,
-                                ContextSpecific $contextSpecific,
-                                CountrySpecific $countrySpecific,
-                                ToolsSpecific $toolsSpecific,
-                                ValidateSpecific $validateSpecific,
-                                OneyEntity $oneyEntity,
-                                MyLogPHP $myLogPHP,
-                                Payplug $payplug)
+    public function __construct($cache,
+                                $logger,
+                                $addressSpecific,
+                                $cartSpecific,
+                                $carrierSpecific,
+                                $configurationSpecific,
+                                $contextSpecific,
+                                $countrySpecific,
+                                $toolsSpecific,
+                                $validateSpecific,
+                                $oneyEntity,
+                                $myLogPHP,
+                                $payplug)
     {
         $this->cache = $cache;
         $this->logger = $logger;
@@ -95,22 +85,6 @@ class OneyRepository extends Repository
             'x4_with_fees',
         ]);
     }
-
-    public static function factory()
-    {
-        return new OneyRepository();
-    }
-//
-//    public function setOperations($operations)
-//    {
-//        $this->oneyEntity->setOperations($operations);
-//        return $this->operations = $this->oneyEntity->getOperations();
-//    }
-//
-//    public function getOperations()
-//    {
-//        return $this->operations;
-//    }
 
     /**
      * @description Assign Oney javascript variable
@@ -589,9 +563,10 @@ class OneyRepository extends Repository
      */
     public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
+
         // get Oney resource
         $payment_list = [];
-        if (!is_int($amount) || !$amount) {
+        if ((!is_float($amount) && !is_int($amount)) || !$amount) {
             return $payment_list;
         }
 
@@ -606,7 +581,6 @@ class OneyRepository extends Repository
             $iso_list = explode(',', $iso_code_list);
             $country = reset($iso_list);
         }
-
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
         $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
