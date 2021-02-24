@@ -69,6 +69,7 @@ final class GetOneyPaymentOptionsListTest extends TestCase
         $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        $this->oneyEntity = Mockery::mock(OneyEntity::class);
 
         // Method setup
         $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
@@ -90,6 +91,12 @@ final class GetOneyPaymentOptionsListTest extends TestCase
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 
         // Method Params
+        $this->oneyEntity
+            ->shouldReceive([
+                'getOperations' => ['x3_with_fees'],
+                'setOperations' => true
+            ]);
+
         $this->payplug = Mockery::mock('payplug');
         $this->payplug
             ->shouldReceive('convertAmount')
@@ -111,7 +118,7 @@ final class GetOneyPaymentOptionsListTest extends TestCase
             new CountrySpecific(),
             $this->tools,
             $this->validate,
-            new OneyEntity(),
+            $this->oneyEntity,
             $this->myLogPhp,
             $this->payplug
         ])->makePartial();
