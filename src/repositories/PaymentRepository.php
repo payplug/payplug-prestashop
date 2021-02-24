@@ -195,6 +195,7 @@ class PaymentRepository extends Repository
         }
 
         $paymentDate = date('Y-m-d H:i:s');
+        $paymentDetails['cart']->date_upd = null;
         $cartHash = hash('sha256',
             $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart'])
         );
@@ -260,6 +261,7 @@ class PaymentRepository extends Repository
     public function updatePaymentTable($paymentDetails)
     {
         $paymentDate = date('Y-m-d H:i:s');
+        $paymentDetails['cart']->date_upd = null;
         $cartHash = hash('sha256',
             $paymentDetails['paymentMethod'].json_encode($cart = $paymentDetails['cart']));
 
@@ -301,6 +303,7 @@ class PaymentRepository extends Repository
         }
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+        $paymentDetails['cart']->date_upd = null;
 
         $cartHash = hash('sha256',
             $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart']));
@@ -318,13 +321,15 @@ class PaymentRepository extends Repository
          * Si le hash est différent avec le même mode de paiement
          * => On met à jour le paiement avec le nouveau pay_id / inst_id
          */
-        } elseif (
-            (($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))
-            ||
-            (($paymentStored['cart_hash'] === $cartHash) && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))
-            ||
-            ($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])
-        ) {
+        } else
+//        (
+//            (($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))
+//            ||
+//            (($paymentStored['cart_hash'] === $cartHash) && ($paymentStored['payment_method'] !== $paymentDetails['paymentMethod']))
+//            ||
+//            ($paymentStored['cart_hash'] !== $cartHash) && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])
+//        )
+        {
             $paymentDetails = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($paymentDetails);
         }
