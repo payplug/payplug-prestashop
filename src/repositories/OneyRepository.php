@@ -583,7 +583,7 @@ class OneyRepository extends Repository
     {
         // get Oney resource
         $payment_list = [];
-        if(!is_int($amount) || !$amount) {
+        if((!is_float($amount) && !is_int($amount)) || !$amount) {
             return $payment_list;
         }
 
