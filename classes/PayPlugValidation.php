@@ -32,6 +32,7 @@ class PayPlugValidation
     public $api_key;
     private $isDeferred;
     private $isOney;
+    private $paymentRepository;
     private $plugin;
 
     public function __construct()
@@ -39,6 +40,8 @@ class PayPlugValidation
         $this->payplug = new Payplug();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
+        $this->paymentRepository = $this->plugin->getPayment();
+
         $this->setConfig();
     }
 
@@ -128,8 +131,15 @@ class PayPlugValidation
 
         $hash = hash('sha256', json_encode($cart));
         $amount = 0;
-        if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id, $hash)) {
-            if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
+
+        $pay_id = $this->paymentRepository->checkPaymentTable((int)$cart_id)['id_payment'];
+
+        if ($this->paymentRepository->checkPaymentTable((int)$cart_id)['payment_method'] == 'installment') {
+            $this->type = 'installment';
+            $this->logger->addLog('This in an installment.');
+        }
+
+        if ($this->type == 'payment') {
                 $this->logger->addLog('Payment is not stored or is already consumed.');
                 $id_order = Order::getOrderByCartId($cart->id);
                 $customer = new Customer((int)$cart->id_customer);
@@ -141,13 +151,11 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 Payplug::redirectForVersion($link_redirect);
-            } elseif ($inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
+            } elseif ($this->type == 'installment') {
                 $this->logger->addLog('Installment is not consumed yet.');
                 $amount = 0;
-                $pay_id = false;
-                $this->type = 'installment';
                 try {
-                    $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                    $installment = \Payplug\InstallmentPlan::retrieve($pay_id);
                     $this->api_key = (bool)$installment->is_live ?
                         Configuration::get('PAYPLUG_LIVE_API_KEY') :
                         Configuration::get('PAYPLUG_TEST_API_KEY');
@@ -183,7 +191,6 @@ class PayPlugValidation
                     ]);
                     Payplug::redirectForVersion($redirect_url_error);
                 }
-            }
         } else {
             $this->logger->addLog('Payment is not consumed yet.');
             try {
@@ -332,7 +339,7 @@ class PayPlugValidation
             $oney_state = $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
 
             if ($this->type == 'installment') {
-                $installment = new PPPaymentInstallment($inst_id);
+                $installment = new PPPaymentInstallment($pay_id);
                 $first_payment = $installment->getFirstPayment();
                 if ($first_payment->isDeferred()) {
                     $order_state = $auth_state;

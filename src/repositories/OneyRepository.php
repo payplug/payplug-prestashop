@@ -54,9 +54,11 @@ class OneyRepository extends Repository
     private $toolsSpecific;
     private $validateSpecific;
     private $oneyEntity;
+    private $payplug;
 
-    public function __construct()
+    public function __construct($payplug)
     {
+        $this->payplug = $payplug;
         $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
         $this->setParams();
     }
@@ -505,25 +507,32 @@ class OneyRepository extends Repository
      */
     public function getOneyDeliveryContext()
     {
-        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
-        if ($this->cartSpecific->isVirtualCart($cart)) {
-            return [
-                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
-                'expected_delivery_date' => date('Y-m-d'),
-                'delivery_type' => 'edelivery',
-            ];
-        }
-
-        $carrier = $this->carrierSpecific->get($cart->id_carrier);
-
         return [
-            'delivery_label' => $carrier->name,
-            'expected_delivery_date' => date(
-                'Y-m-d',
-                strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
-            ),
-            'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
+            'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+            'expected_delivery_date' => date('Y-m-d'),
+            'delivery_type' => 'edelivery',
         ];
+
+//        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+//
+//        if ($this->cartSpecific->isVirtualCart($cart)) {
+//            return [
+//                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+//                'expected_delivery_date' => date('Y-m-d'),
+//                'delivery_type' => 'edelivery',
+//            ];
+//        }
+//
+//        $carrier = $this->carrierSpecific->get($cart->id_carrier);
+//
+//        return [
+//            'delivery_label' => $carrier->name,
+//            'expected_delivery_date' => date(
+//                'Y-m-d',
+//                strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
+//            ),
+//            'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
+//        ];
     }
 
     /**
@@ -1160,7 +1169,7 @@ class OneyRepository extends Repository
      * @description Check if a valid Cart for Oney
      *
      * @param $cart Cart
-     * @param boolean $amount
+     * @param float $amount
      * @param boolean $country
      * @return array
      */

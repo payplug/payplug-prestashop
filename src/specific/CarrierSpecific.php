@@ -49,7 +49,7 @@ class CarrierSpecific implements CarrierInterface
 
     public function getDefaultDelay()
     {
-        return $this->carrier_default_delay;
+        return $this->default_delay;
     }
 
     public function getDefaultDeliveryType()

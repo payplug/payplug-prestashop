@@ -133,7 +133,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $delivery_country = new Country($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
                     $cart = $context->cart;
-                    $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
                 }
 
                 die(json_encode($is_elligible));
