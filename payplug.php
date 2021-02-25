@@ -1906,6 +1906,7 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description ONLY FOR VALIDATION
      * Retrieve installment stored
      *
      * @param int $id_cart
@@ -1914,9 +1915,9 @@ class Payplug extends PaymentModule
     public function getInstallmentByCart($id_cart)
     {
         $req_installment_cart = '
-            SELECT pic.id_installment 
-            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic 
-            WHERE pic.id_cart = ' . (int)$id_cart;
+            SELECT pic.id_payment 
+            FROM ' . _DB_PREFIX_ . 'payplug_payment pic 
+            WHERE pic.id_cart = ' . (int)$id_cart.' AND pic.payment_method = \'installment\'';
         $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
         if (!$res_installment_cart) {
             return false;
@@ -2258,20 +2259,18 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description ONLY FOR VALIDATION
      * Retrieve payment stored
      *
      * @param int $cart_id
-     * @return int OR bool
+     * @return int|bool
      */
-    public function getPaymentByCart($cart_id, $hash = null)
+    public function getPaymentByCart($cart_id)
     {
         $req_payment_cart = new DbQuery();
         $req_payment_cart->select('ppc.id_payment');
-        $req_payment_cart->from('payplug_payment_cart', 'ppc');
-        $req_payment_cart->where('ppc.id_cart = ' . (int)$cart_id);
-        if ($hash != null) {
-            $req_payment_cart->where('ppc.cart_hash = \'' . pSQL($hash) . '\'');
-        }
+        $req_payment_cart->from('payplug_payment', 'ppc');
+        $req_payment_cart->where('ppc.payment_method != \'installment\' AND ppc.id_cart = ' . (int)$cart_id);
         $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
 
         if (!$res_payment_cart) {
