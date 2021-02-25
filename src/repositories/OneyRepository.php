@@ -578,6 +578,11 @@ class OneyRepository extends Repository
      * @param int $amount
      * @param bool $country
      * @return array
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
      */
     public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
