@@ -2810,7 +2810,7 @@ class Payplug extends PaymentModule
         }
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_payment` pi 
+            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
             WHERE pi.id_payment = \'' . $installment->id . '\' 
             AND pi.step = ' . (int)$step;
         $res_installment = DB::getInstance()->getRow($req_installment);
@@ -4757,14 +4757,12 @@ class Payplug extends PaymentModule
 
         // Create payment if inexistent
         if (!$this->payment->checkPaymentTable($cart->id)) {
-//            die('on arrive au cas 1');
             try {
                 $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
                 $this->paymentDetails = $this->payment->insertPaymentTable($this->paymentDetails);
                 if (!$this->paymentDetails) {
                     return false;
                 }
-//                die('CAS 1 => STOP POUR LE MOMENT:: TOUT EST OK! :: NOUVEAU PAIEMENT CRÉÉ ET STORÉ');
                 return $this->payment->getpaymentReturnUrl($this->paymentDetails);
             } catch (Exception $e) {
                 $messages = $this->catchErrorsFromApi($e->__toString());
@@ -4781,20 +4779,16 @@ class Payplug extends PaymentModule
             }
         }
         elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
-//            die('on arrive au cas 2');
             // If payment already exists, and timeout > 1 min : Create a new payment
             $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
             $this->paymentDetails = $this->payment->updatePaymentTable($this->paymentDetails);
             $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
-//            die('CAS 2 => STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC HASH REGÉNÉRÉ CAR TIMEOUT > 1MIN');
             if (!$this->paymentDetails) {
                 return false;
             }
             return $this->payment->getpaymentReturnUrl($this->paymentDetails);
         }
         elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
-//            die('on arrive au cas 3');
-//            die('CAS 3 => STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC MEME HASH CAR TIMEOUT < 1MIN');
             return $this->payment->getpaymentReturnUrl($this->paymentDetails);
         }
     }

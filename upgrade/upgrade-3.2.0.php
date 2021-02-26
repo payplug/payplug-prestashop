@@ -41,10 +41,33 @@ function upgrade_module_3_2_0($object)
         }
     }
 
+    /*
+     * $req_payplug_order_payment = '
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
+            `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_order` INT(11) UNSIGNED NOT NULL,
+            `id_payment` VARCHAR(255) NOT NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+    $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
+
+    if (!$res_payplug_order_payment) {
+        $flag = false;
+    }
+     */
     // add cart_hash field in payplug_payment_cart
-    $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_payment_cart`
-            ADD `cart_hash` VARCHAR(64) NOT NULL
-            AFTER `id_cart`';
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_payment` (
+    `id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `id_payment` VARCHAR(255) NULL,
+    `payment_method` VARCHAR(255) NULL,
+    `payment_url` VARCHAR(255) NULL,
+    `payment_return_url` VARCHAR(255) NULL,
+    `id_cart` INT(11) UNSIGNED NOT NULL,
+    `cart_hash` VARCHAR(64) NULL,
+    `authorized_at` TINYINT(1) NOT NULL DEFAULT 0,
+    `is_paid` TINYINT(1) NOT NULL DEFAULT 0,
+    `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
+    `date_upd` DATETIME NULL, CONSTRAINT lock_cart_unique UNIQUE (id_cart)) ENGINE=' . _MYSQL_ENGINE_;
 
     $flag = $flag && Db::getInstance()->execute($sql);
 

@@ -227,9 +227,7 @@ class PaymentRepository extends Repository
             ->fields('id_cart')             ->values(pSQL($paymentDetails['cartId']))
             ->fields('cart_hash')           ->values(pSQL($cartHash))
             ->fields('authorized_at')       ->values(pSQL($paymentDetails['authorizedAt']))
-            ->fields('is_deferred')         ->values(pSQL($paymentDetails['isDeferred']))
-            ->fields('is_embedded')         ->values(pSQL($paymentDetails['isEmbedded']))
-            ->fields('is_mobile_device')    ->values(pSQL($paymentDetails['isMobileDevice']))
+            ->fields('is_paid')             ->values(pSQL($paymentDetails['isPaid']))
             ->fields('date_upd')            ->values(pSQL($paymentDate))
         ;
         if (!$this->query->build()) {
@@ -301,9 +299,6 @@ class PaymentRepository extends Repository
             ->set($table.'.payment_url =        \''.pSQL($paymentDetails['paymentUrl']).'\'')
             ->set($table.'.payment_return_url = \''.pSQL($paymentDetails['paymentReturnUrl']).'\'')
             ->set($table.'.cart_hash =          \''.pSQL($cartHash).'\'')
-            ->set($table.'.is_deferred =        \''.pSQL($paymentDetails['isDeferred']).'\'')
-            ->set($table.'.is_embedded =        \''.pSQL($paymentDetails['isEmbedded']).'\'')
-            ->set($table.'.is_mobile_device =   \''.pSQL($paymentDetails['isMobileDevice']).'\'')
             ->set($table.'.is_paid =            \''.pSQL($paymentDetails['isPaid']).'\'')
             ->set($table.'.date_upd =           \''.pSQL($paymentDate).'\'')
             ->where($table.'.id_cart =          '.(int)$paymentDetails['cartId'])

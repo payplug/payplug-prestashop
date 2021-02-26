@@ -111,9 +111,6 @@ class SQLtableRepository extends \Payplug
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`cart_hash` VARCHAR(64) NULL')
             ->fields('`authorized_at` TINYINT(1) NOT NULL DEFAULT 0')
-            ->fields('`is_deferred` TINYINT(1) NOT NULL DEFAULT 0')
-            ->fields('`is_embedded` TINYINT(1) NOT NULL DEFAULT 0')
-            ->fields('`is_mobile_device` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`is_paid` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
@@ -121,7 +118,7 @@ class SQLtableRepository extends \Payplug
             ->engine(_MYSQL_ENGINE_)
         ;
 
-        if (!$this->query->build()) {
+        if (!$this->query->build('debug')) {
             $log->error('Installation SQL failed: PAYPLUG_PAYMENT.');
             return false;
         }
