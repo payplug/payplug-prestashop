@@ -330,6 +330,7 @@ class PaymentRepository extends Repository
         }
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+
         $paymentDetails['cart']->date_add = $paymentDetails['cart']->date_upd = null;
 
         $cartHash = hash('sha256',
@@ -347,12 +348,20 @@ class PaymentRepository extends Repository
     {
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
+        if (!$paymentDetails['paymentUrl']) {
+            $paymentDetails['paymentUrl'] = $paymentStored['payment_url'];
+        }
+
         if (!$paymentDetails['paymentReturnUrl']) {
             $paymentDetails['paymentReturnUrl'] = $paymentStored['payment_return_url'];
         }
 
         if (!$paymentDetails['authorizedAt']) {
             $paymentDetails['authorizedAt'] = $paymentStored['authorized_at'];
+        }
+
+        if (!$paymentDetails['isPaid']) {
+            $paymentDetails['isPaid'] = $paymentStored['is_paid'];
         }
 
         switch ($paymentDetails['paymentMethod']) {
@@ -381,15 +390,17 @@ class PaymentRepository extends Repository
             case 'standard':
             case 'installment':
             default:
+                $returnUrl = $paymentDetails['paymentUrl'] ? $paymentDetails['paymentUrl'] :
+                    $paymentDetails['paymentReturnUrl'];
                 $paymentReturnUrl = [
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
                     'redirect' => $paymentDetails['isMobileDevice'],
-                    'return_url' => $paymentDetails['paymentUrl'],
+                    'return_url' => $returnUrl,
                 ];
                 break;
         }
 
         return $paymentReturnUrl;
-            }
-    }
+        }
+}
