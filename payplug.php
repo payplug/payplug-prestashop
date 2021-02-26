@@ -4122,7 +4122,7 @@ class Payplug extends PaymentModule
     {
         $req_payment_cart = '
             SELECT ppc.id_payment 
-            FROM ' . _DB_PREFIX_ . 'payplug_payment_cart ppc  
+            FROM ' . _DB_PREFIX_ . 'payplug_payment ppc  
             WHERE ppc.id_cart = ' . (int)$id_cart . '
             AND ppc.is_pending = 1';
         $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
@@ -4751,6 +4751,7 @@ class Payplug extends PaymentModule
 
         // Create payment if inexistent
         if (!$this->payment->checkPaymentTable($cart->id)) {
+//            die('on arrive au cas 1');
             try {
                 $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
                 $this->paymentDetails = $this->payment->insertPaymentTable($this->paymentDetails);
@@ -4774,6 +4775,7 @@ class Payplug extends PaymentModule
             }
         }
         elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
+//            die('on arrive au cas 2');
             // If payment already exists, and timeout > 1 min : Create a new payment
             $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
             $this->paymentDetails = $this->payment->updatePaymentTable($this->paymentDetails);
@@ -4785,6 +4787,7 @@ class Payplug extends PaymentModule
             return $this->payment->getpaymentReturnUrl($this->paymentDetails);
         }
         elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
+//            die('on arrive au cas 3');
 //            die('CAS 3 => STOP POUR LE MOMENT:: TOUT EST OK! :: PAIEMENT EXISTANT AVEC MEME HASH CAR TIMEOUT < 1MIN');
             return $this->payment->getpaymentReturnUrl($this->paymentDetails);
         }
@@ -4802,7 +4805,7 @@ class Payplug extends PaymentModule
         $timeout_delay = 9;
         $req_payment_cart_exists = '
             SELECT *
-            FROM ' . _DB_PREFIX_ . 'payplug_payment_cart ppc
+            FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
             WHERE ppc.id_cart = ' . (int)$id_cart . '
             AND ppc.id_payment LIKE \'pending\'';
         $res_payment_cart_exists = Db::getInstance()->getRow($req_payment_cart_exists);
@@ -5016,7 +5019,7 @@ class Payplug extends PaymentModule
     public function registerPendingTransaction($id_cart)
     {
         $req_payment_cart = '
-            UPDATE ' . _DB_PREFIX_ . 'payplug_payment_cart ppc  
+            UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc  
             SET ppc.is_pending = 1
             WHERE ppc.id_cart = ' . (int)$id_cart;
         $res_payment_cart = Db::getInstance()->execute($req_payment_cart);

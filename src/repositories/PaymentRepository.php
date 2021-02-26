@@ -81,6 +81,11 @@ class PaymentRepository extends Repository
             return false;
         }
 
+        if (!$paymentDetails['paymentMethod']) {
+            $this->logger->addLog('[createPayment] payment method is null', 'error');
+            return $this->displayErrorPayment($this->l('Error during payment creation'));
+        }
+
         if ($paymentDetails['paymentMethod'] !== 'installment') {
             $apiPayment = Payment::create($paymentDetails['paymentTab']);
             $this->paymentEntity->setApiPayment($apiPayment);
@@ -89,57 +94,39 @@ class PaymentRepository extends Repository
             $this->paymentEntity->setApiPayment($apiPayment);
         }
 
-        switch ($paymentDetails['paymentMethod']):
-            case 'oneclick':
-                $this->apiPayment = $this->paymentEntity->getApiPayment();
+        $this->apiPayment = $this->paymentEntity->getApiPayment();
 
-                if ($this->apiPayment->failure == true && !empty($this->apiPayment->failure->message)) {
-                    return $this->displayErrorPayment($this->apiPayment->failure->message);
-                }
+        if ($this->apiPayment->failure == true && !empty($this->apiPayment->failure->message)) {
+            return $this->displayErrorPayment($this->apiPayment->failure->message);
+        }
 
-                if (!$paymentDetails['paymentReturnUrl'] && isset($this->apiPayment->hosted_payment->payment_url)) {
-                    $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
-                } elseif (!$paymentDetails['paymentUrl'] && isset($this->apiPayment->hosted_payment->payment_url)) {
-                    $paymentDetails['paymentUrl'] = $this->apiPayment->hosted_payment->payment_url;
-                } else {
-                    $this->logger->addLog('[createPayment] hosted_payment->payment_url is null / not set', 'error');
-                    return $this->displayErrorPayment();
-                }
-                break;
-            case 'oney':
-            case 'standard':
-            case 'installment':
-                $this->apiPayment = $this->paymentEntity->getApiPayment();
+        // We can now hydrate our params
+        if (isset($this->apiPayment->id)) {
+            $paymentDetails['paymentId'] = $this->apiPayment->id;
+        } if (!$paymentDetails['paymentId']) {
+            $this->logger->addLog('[createPayment() '.$paymentDetails['paymentMethod'].'] the payment id is null',
+                'error');
+            return $this->displayErrorPayment();
+        }
 
-                if ($this->apiPayment->failure == true && !empty($this->apiPayment->failure->message)) {
-                    return $this->displayErrorPayment($this->apiPayment->failure->message);
-                }
+        if (isset($this->apiPayment->hosted_payment->return_url)) {
+            $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
+        }
 
-                // We can now hydrate the pay_id / inst_id
-                if (!$paymentDetails['paymentId'] && isset($this->apiPayment->id)) {
-                    $paymentDetails['paymentId'] = $this->apiPayment->id;
-                } else {
-                    $this->logger->addLog('[createPayment] $this->apiPayment->id is null / not set', 'error');
-                    return $this->displayErrorPayment();
-                }
+        if (!$paymentDetails['paymentReturnUrl']) {
+            $this->logger->addLog('[createPayment - '.$paymentDetails['paymentMethod'].'] payment return URL is null', 'error');
+            return $this->displayErrorPayment($this->l('Error during payment creation.'));
+        }
 
-                if (!$paymentDetails['paymentReturnUrl'] && isset($this->apiPayment->hosted_payment->payment_url)) {
-                    $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->payment_url;
-                } else {
-                    $this->logger->addLog('[createPayment] hosted_payment->payment_url is null / not set', 'error');
-                    return $this->displayErrorPayment();
-                }
+        if (isset($this->apiPayment->is_paid)) {
+            $paymentDetails['isPaid'] = $this->apiPayment->is_paid;
+        }
 
-                if (!$paymentDetails['isPaid'] && isset($this->apiPayment->is_paid)) {
-                    $paymentDetails['isPaid'] = $this->apiPayment->is_paid;
-                }
+        if (isset($this->apiPayment->hosted_payment->payment_url)) {
+            $paymentDetails['paymentUrl'] = $this->apiPayment->hosted_payment->payment_url;
+        }
 
-                return($paymentDetails);
-                break;
-            default:
-                $this->logger->addLog('[createPayment] $paymentDetails[\'paymentMethod\'] is null', 'error');
-                return false;
-        endswitch;
+        return $paymentDetails;
     }
 
     /**
@@ -183,7 +170,7 @@ class PaymentRepository extends Repository
      * @param string $errorMessage
      * @return array
      */
-    public function displayErrorPayment($errorMessage)
+    public function displayErrorPayment($errorMessage = null)
     {
         if (!$errorMessage) {
             $errorMessage = $this->l('The transaction was not completed and your card was not charged.');
@@ -214,6 +201,11 @@ class PaymentRepository extends Repository
 
         if (!is_array($paymentDetails)) {
             $this->logger->addLog('[insertPaymentTable] The parameter $paymentDetails is not an array', 'error');
+            return false;
+        }
+
+        if (!isset($paymentDetails['paymentId'])) {
+            $this->logger->addLog('[insertPaymentTable] pay_id / inst_id is null', 'error');
             return false;
         }
 
@@ -367,6 +359,7 @@ class PaymentRepository extends Repository
                         if (!$redirect && $paymentDetails['isDeferred']) {
                             $redirect = (bool)$paymentDetails['authorizedAt'];
                         }
+
                         $paymentReturnUrl = [
                             'result' => true,
                             'embedded' => true,
