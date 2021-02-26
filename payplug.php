@@ -1385,9 +1385,9 @@ class Payplug extends PaymentModule
     public function deleteInstallment($inst_id, $cart_id)
     {
         $req_installment_cart = '
-            DELETE FROM ' . _DB_PREFIX_ . 'payplug_installment_cart  
+            DELETE FROM ' . _DB_PREFIX_ . 'payplug_payment  
             WHERE id_cart = ' . (int)$cart_id . ' 
-            AND id_installment = \'' . pSQL($inst_id) . '\'';
+            AND id_payment = \'' . pSQL($inst_id) . '\'';
         $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
         if (!$res_installment_cart) {
             return false;
@@ -2716,8 +2716,8 @@ class Payplug extends PaymentModule
     public function getPayplugInstallmentCart($id_cart)
     {
         $req_cart_installment = '
-            SELECT pic.id_installment
-            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
+            SELECT pic.id_payment
+            FROM ' . _DB_PREFIX_ . 'payplug_payment pic
             WHERE pic.id_cart = ' . (int)$id_cart;
         $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
 
@@ -2787,8 +2787,8 @@ class Payplug extends PaymentModule
         }
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
-            WHERE pi.id_installment = \'' . $installment->id . '\'';
+            FROM `' . _DB_PREFIX_ . 'payplug_payment` pi
+            WHERE pi.id_payment = \'' . $installment->id . '\'';
         $res_installment = DB::getInstance()->executeS($req_installment);
 
         if (!$res_installment) {
@@ -2810,8 +2810,8 @@ class Payplug extends PaymentModule
         }
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
-            WHERE pi.id_installment = \'' . $installment->id . '\' 
+            FROM `' . _DB_PREFIX_ . 'payplug_payment` pi 
+            WHERE pi.id_payment = \'' . $installment->id . '\' 
             AND pi.step = ' . (int)$step;
         $res_installment = DB::getInstance()->getRow($req_installment);
 
@@ -5385,7 +5385,7 @@ class Payplug extends PaymentModule
         if (!$res_installment_cart_exists) {
             //insert
             $req_installment_cart = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_installment_cart (id_installment, id_cart, is_pending, date_upd)
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
                 VALUES (\'' . pSQL($installment_id) . '\', 
                 ' . (int)$id_cart . ', 
                 ' . (int)$is_pending . ', 
@@ -5397,8 +5397,8 @@ class Payplug extends PaymentModule
         } else {
             //update
             $req_installment_cart = '
-                UPDATE ' . _DB_PREFIX_ . 'payplug_installment_cart pic  
-                SET pic.id_installment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
+                UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic  
+                SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
                 WHERE pic.id_cart = ' . (int)$id_cart;
             $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
             if (!$res_installment_cart) {
