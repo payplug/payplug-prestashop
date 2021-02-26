@@ -118,7 +118,7 @@ class SQLtableRepository extends \Payplug
             ->engine(_MYSQL_ENGINE_)
         ;
 
-        if (!$this->query->build('debug')) {
+        if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_PAYMENT.');
             return false;
         }
