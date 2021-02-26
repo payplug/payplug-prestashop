@@ -103,7 +103,9 @@ class PaymentRepository extends Repository
         // We can now hydrate our params
         if (isset($this->apiPayment->id)) {
             $paymentDetails['paymentId'] = $this->apiPayment->id;
-        } if (!$paymentDetails['paymentId']) {
+        }
+
+        if (!$paymentDetails['paymentId']) {
             $this->logger->addLog('[createPayment() '.$paymentDetails['paymentMethod'].'] the payment id is null',
                 'error');
             return $this->displayErrorPayment();
@@ -356,37 +358,37 @@ class PaymentRepository extends Repository
         switch ($paymentDetails['paymentMethod']) {
             case 'oneclick':
                 $redirect = $paymentDetails['isPaid'];
-                        if (!$redirect && $paymentDetails['isDeferred']) {
-                            $redirect = (bool)$paymentDetails['authorizedAt'];
-                        }
-
-                        $paymentReturnUrl = [
-                            'result' => true,
-                            'embedded' => true,
-                            'redirect' => $redirect, // force `true` we are in 3DS 1
-                            'return_url' => $redirect ?
-                                $paymentDetails['paymentReturnUrl'] : $paymentDetails['paymentUrl'],
-                        ];
-                        break;
-                    case 'oney':
-                        $paymentReturnUrl = [
-                            'result' => 'new_card',
-                            'embedded' => false,
-                            'redirect' => true,
-                            'return_url' => $paymentDetails['paymentReturnUrl'],
-                        ];
-                        break;
-                    case 'standard':
-                    case 'installment':
-                    default:
-                        $paymentReturnUrl = [
-                            'result' => 'new_card',
-                            'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
-                            'redirect' => $paymentDetails['isMobileDevice'],
-                            'return_url' => $paymentDetails['paymentReturnUrl'],
-                        ];
-                        break;
+                if (!$redirect && $paymentDetails['isDeferred']) {
+                    $redirect = (bool)$paymentDetails['authorizedAt'];
                 }
+
+                $paymentReturnUrl = [
+                    'result' => true,
+                    'embedded' => true,
+                    'redirect' => $redirect, // force `true` we are in 3DS 1
+                    'return_url' => $redirect ?
+                        $paymentDetails['paymentReturnUrl'] : $paymentDetails['paymentUrl'],
+                ];
+                break;
+            case 'oney':
+                $paymentReturnUrl = [
+                    'result' => 'new_card',
+                    'embedded' => false,
+                    'redirect' => true,
+                    'return_url' => $paymentDetails['paymentUrl'],
+                ];
+                break;
+            case 'standard':
+            case 'installment':
+            default:
+                $paymentReturnUrl = [
+                    'result' => 'new_card',
+                    'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
+                    'redirect' => $paymentDetails['isMobileDevice'],
+                    'return_url' => $paymentDetails['paymentUrl'],
+                ];
+                break;
+        }
 
         return $paymentReturnUrl;
             }
