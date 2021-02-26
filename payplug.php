@@ -1406,7 +1406,7 @@ class Payplug extends PaymentModule
     public function deletePayment($pay_id, $cart_id)
     {
         $req_payment_cart = '
-            DELETE FROM ' . _DB_PREFIX_ . 'payplug_payment_cart  
+            DELETE FROM ' . _DB_PREFIX_ . 'payplug_payment  
             WHERE id_cart = ' . (int)$cart_id . ' 
             AND id_payment = \'' . pSQL($pay_id) . '\'';
         $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
@@ -3039,7 +3039,13 @@ class Payplug extends PaymentModule
         $admin_ajax_url = $this->getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
         $amount_refunded_presta = $this->getTotalRefunded($order->id);
 
-        if ($inst_id = $this->getPayplugInstallmentCart($order->id_cart)) {
+        $inst_id = null;
+        $payment_id = $this->getPayplugInstallmentCart($order->id_cart);
+        if ($payment_id && strpos($payment_id, 'inst') !== false) {
+            $inst_id = $payment_id;
+        }
+        if ($inst_id) {
+
             $payment_list = [];
             if (!$inst_id || empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
                 if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
