@@ -257,9 +257,11 @@ class PayPlugNotifications
         }
         $this->logger->addLog('Payment details:');
 
-            $sql = 'SELECT `id_cart` 
+        $pay_id = $this->resource->id ? $this->resource->id : $this->resource->installment_plan_id;
+
+        $sql = 'SELECT `id_cart` 
                     FROM `' . _DB_PREFIX_ . 'payplug_payment` 
-                    WHERE `id_payment` = "' . $this->resource->installment_plan_id . '"';
+                    WHERE `id_payment` = "' . $pay_id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
         if (!$id_cart) {
