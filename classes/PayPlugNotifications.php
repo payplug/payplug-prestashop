@@ -257,22 +257,33 @@ class PayPlugNotifications
         }
         $this->logger->addLog('Payment details:');
 
-        $pay_id = $this->resource->id ? $this->resource->id : $this->resource->installment_plan_id;
-
-        $sql = 'SELECT `id_cart` 
+        if ($this->is_installment) {
+            $sql = 'SELECT `id_cart` 
                     FROM `' . _DB_PREFIX_ . 'payplug_payment` 
-                    WHERE `id_payment` = "' . $pay_id . '"';
+                    WHERE `id_payment` = "' . $this->resource->installment_plan_id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
-        if (!$id_cart) {
-            $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-            $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
-            $this->logger->addLog($error_msg, 'error');
-            // HOTFIX: MR331
-            // We use custom http code to precisely log this case of desync
-            // between real payment notification and wrong ones.
-            $response_code = ($this->is_oney ? 242 : 500);
-            $this->exitProcess($error_msg, $response_code);
+            if (!$id_cart) {
+                $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->installment_plan_id;
+                $this->logger->addLog($error_msg, 'error');
+                $this->exitProcess($error_msg, 500);
+            }
+        } else {
+            $sql = 'SELECT `id_cart` 
+                    FROM `' . _DB_PREFIX_ . 'payplug_payment` 
+                    WHERE `id_payment` = "' . $this->resource->id . '"';
+            $id_cart = Db::getInstance()->getValue($sql);
+
+            if (!$id_cart) {
+                $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
+                $this->logger->addLog('The cart cannot be found with payment ID: ' . $this->resource->id, 'error');
+                $this->logger->addLog($error_msg, 'error');
+                // HOTFIX: MR331
+                // We use custom http code to precisely log this case of desync
+                // between real payment notification and wrong ones.
+                $response_code = ($this->is_oney ? 242 : 500);
+                $this->exitProcess($error_msg, $response_code);
+            }
         }
 
         $this->logger->addLog('Cart ID: ' . (int)$id_cart, 'debug');
