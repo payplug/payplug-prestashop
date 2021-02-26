@@ -456,6 +456,7 @@ class Payplug extends PaymentModule
                     \'' . $status . '\', 
                     \'' . $date . '\'
                 )';
+
                     $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
 
                     if (!$res_insert_installment) {
@@ -2787,7 +2788,7 @@ class Payplug extends PaymentModule
         }
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_payment` pi
+            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
             WHERE pi.id_payment = \'' . $installment->id . '\'';
         $res_installment = DB::getInstance()->executeS($req_installment);
 
