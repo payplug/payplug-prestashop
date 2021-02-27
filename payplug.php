@@ -2653,6 +2653,7 @@ class Payplug extends PaymentModule
      */
     private function getPaymentStatusByPayment($payment)
     {
+
         /*
             1 => 'not paid',
             2 => 'paid',
@@ -2812,7 +2813,7 @@ class Payplug extends PaymentModule
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
-            WHERE pi.id_payment = \'' . $installment->id . '\' 
+            WHERE pi.id_installment = \'' . $installment->id . '\' 
             AND pi.step = ' . (int)$step;
         $res_installment = DB::getInstance()->getRow($req_installment);
 
@@ -5688,6 +5689,7 @@ class Payplug extends PaymentModule
                     }
                 }
                 $step = $index . '/' . $step_count;
+
                 if ($step2update = $this->getStoredInstallmentTransaction($installment, $step)) {
                     $req_insert_installment = '
                         UPDATE `' . _DB_PREFIX_ . 'payplug_installment` 
