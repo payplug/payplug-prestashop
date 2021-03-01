@@ -368,7 +368,7 @@ $_MODULE['<{payplug}prestashop>oneyrepository_7cf56dac6ba06e2f2afce009f6da06b3']
 $_MODULE['<{payplug}prestashop>oneyrepository_d14ca54db0343b2847cdfc14db5ac044'] = 'Inserisci la tua città.';
 $_MODULE['<{payplug}prestashop>oneyrepository_0e7374c84fe9165359996cfbd2170263'] = 'Il nome della tua città è troppo lungo (massimo 32 caratteri).';
 $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56'] = 'Si prega di cambiarlo con un altro o selezionare un altro metodo di pagamento.';
-$_MODULE['<{payplug}prestashop>oneyrepository_bfb453ab4491fd06201b65460e3037e4'] = ' ';
+$_MODULE['<{payplug}prestashop>oneyrepository_2a6c5d0ced2630c6f524f6d2856d8984'] = ' ';
 $_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Pagamento in %sx';
 $_MODULE['<{payplug}prestashop>oneyrepository_ff9df6bac3078402374e750e02d60715'] = 'Il tuo indirizzo email è troppo lungo e il carattere + non è valido,';
 $_MODULE['<{payplug}prestashop>oneyrepository_a65c018ceba95687ec307a32e4443381'] = 'sostituiscilo con un altro indirizzo (max 100 caratteri). ';

@@ -603,7 +603,6 @@
   background: rgba(126, 189, 0, 0.15);
 }
 .oneyPopin_option {
-  border-bottom: 1px solid #7ebd00;
   display: none;
   position: relative;
   padding: 4px;
@@ -647,11 +646,12 @@
   padding: 21px 0 4px;
 }
 .oneyPopin_legal {
+  border-top: 1px solid #7ebd00;
   display: block;
   font-size: 10px;
   line-height: 1.2em;
   color: #8a8a8a;
-  margin: 8px 0 0;
+  padding: 8px 0 0;
 }
 @media (max-width: 767px) {
   .oneyPopin_legal {

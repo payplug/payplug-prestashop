@@ -200,7 +200,6 @@
   }
 
   &_option {
-    .border(#colorMap[oney], b);
     display: none;
     position: relative;
     padding: 4px;
@@ -255,11 +254,12 @@
   }
 
   &_legal {
+    .border(#colorMap[oney], t);
     display: block;
     font-size: 10px;
     line-height: 1.2em;
     color: #8a8a8a;
-    margin: 8px 0 0;
+    padding: 8px 0 0;
 
     @media (@mobile) {
       padding: 0 0 15px;
