@@ -577,7 +577,7 @@ class OneyRepository extends Repository
     {
         // get Oney resource
         $payment_list = [];
-        if (!is_int($amount) || !$amount) {
+        if (!is_numeric($amount) || !$amount) {
             return $payment_list;
         }
 
