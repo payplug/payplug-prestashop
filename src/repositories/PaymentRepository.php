@@ -347,12 +347,6 @@ class PaymentRepository extends Repository
         if ($paymentStored['cart_hash'] === $cartHash && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return $paymentDetails;
         } else {
-            $this->logger->addLog('cart: '.json_encode($paymentDetails['cart']));
-            if (strpos($paymentStored['id_payment'], 'pay_') !== false) {
-                Payment::abort($paymentStored['id_payment']);
-            } if (strpos($paymentStored['id_payment'], 'inst_') !== false) {
-                InstallmentPlan::abort($paymentStored['id_payment']);
-            }
             $paymentDetails = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($paymentDetails);
         }
