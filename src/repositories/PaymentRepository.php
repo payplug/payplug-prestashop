@@ -183,12 +183,12 @@ class PaymentRepository extends Repository
             return false;
         }
 
-            $this->payplug->setPaymentErrorsCookie([$errorMessage]);
+        $this->payplug->setPaymentErrorsCookie([$errorMessage]);
 
-            return [
-                'result' => false,
-                'response' => $errorMessage,
-            ];
+        return [
+            'result' => false,
+            'response' => $errorMessage,
+        ];
     }
 
     /**
@@ -212,9 +212,14 @@ class PaymentRepository extends Repository
         }
 
         $paymentDate = date('Y-m-d H:i:s');
-        $paymentDetails['cart']->date_add = $paymentDetails['cart']->date_upd = null;
+
+        $cartToHash = $paymentDetails['cart'];
+        $cartToHash->date_add = $cartToHash->date_upd = null;
+        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
+        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart'])
+            $paymentDetails['paymentMethod'].json_encode($cartToHash)
         );
 
         $this->query
@@ -285,9 +290,14 @@ class PaymentRepository extends Repository
         }
 
         $paymentDate = date('Y-m-d H:i:s');
-        $paymentDetails['cart']->date_add = $paymentDetails['cart']->date_upd = null;
+
+        $cartToHash = $paymentDetails['cart'];
+        $cartToHash->date_add = $cartToHash->date_upd = null;
+        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
+        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($cart = $paymentDetails['cart']));
+            $paymentDetails['paymentMethod'].json_encode($cartToHash));
 
         $table = _DB_PREFIX_ .'payplug_payment';
 
@@ -326,14 +336,23 @@ class PaymentRepository extends Repository
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
-        $paymentDetails['cart']->date_add = $paymentDetails['cart']->date_upd = null;
+        $cartToHash = $paymentDetails['cart'];
+        $cartToHash->date_add = $cartToHash->date_upd = null;
+        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
+        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
 
         $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($paymentDetails['cart']));
+            $paymentDetails['paymentMethod'].json_encode($cartToHash));
 
         if ($paymentStored['cart_hash'] === $cartHash && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return $paymentDetails;
         } else {
+            $this->logger->addLog('cart: '.json_encode($paymentDetails['cart']));
+            if (strpos($paymentStored['id_payment'], 'pay_') !== false) {
+                Payment::abort($paymentStored['id_payment']);
+            } if (strpos($paymentStored['id_payment'], 'inst_') !== false) {
+                InstallmentPlan::abort($paymentStored['id_payment']);
+            }
             $paymentDetails = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($paymentDetails);
         }
@@ -397,5 +416,5 @@ class PaymentRepository extends Repository
         }
 
         return $paymentReturnUrl;
-        }
+    }
 }

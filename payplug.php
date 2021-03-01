@@ -3658,8 +3658,9 @@ class Payplug extends PaymentModule
     /**
      * @param array $params
      * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @see Module::hookPaymentReturn()
-     *
      */
     public function hookPaymentReturn($params)
     {
@@ -4779,9 +4780,8 @@ class Payplug extends PaymentModule
                     'response' => count($messages) > 1 ? $messages : reset($messages),
                 ];
             }
-        }
-        elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
-            // If payment already exists, and timeout > 1 min : Create a new payment
+        } elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
+            // If payment already exists, and timeout > 3 min : Create a new payment
             $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
             $this->paymentDetails = $this->payment->updatePaymentTable($this->paymentDetails);
             $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
@@ -4789,8 +4789,8 @@ class Payplug extends PaymentModule
                 return false;
             }
             return $this->payment->getpaymentReturnUrl($this->paymentDetails);
-        }
-        elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
+        } elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
+            // If timeout < 3 min and hash OK
             return $this->payment->getpaymentReturnUrl($this->paymentDetails);
         }
     }

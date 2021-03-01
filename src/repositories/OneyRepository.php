@@ -182,6 +182,13 @@ class OneyRepository extends Repository
      * @param $amount
      * @param bool $country
      * @return void
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function assignOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -390,6 +397,8 @@ class OneyRepository extends Repository
      * @description Display Oney popin payment option
      *
      * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function displayOneyPaymentOptions()
     {
@@ -588,7 +597,7 @@ class OneyRepository extends Repository
     {
         // get Oney resource
         $payment_list = [];
-        if((!is_float($amount) && !is_int($amount)) || !$amount) {
+        if (!is_numeric($amount) || !$amount) {
             return $payment_list;
         }
 
@@ -628,6 +637,11 @@ class OneyRepository extends Repository
      * @param $amount
      * @param bool $country
      * @return array
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -746,6 +760,8 @@ class OneyRepository extends Repository
      * @description Get the Oney required fields from Context
      *
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function getOneyRequiredFields()
     {
@@ -1090,6 +1106,8 @@ class OneyRepository extends Repository
      * Display Oney required fields template
      *
      * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function displayOneyRequiredFields()
     {
@@ -1174,9 +1192,11 @@ class OneyRepository extends Repository
      * @description Check if a valid Cart for Oney
      *
      * @param $cart Cart
-     * @param float $amount
+     * @param bool $amount
      * @param boolean $country
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function isOneyElligible($cart, $amount = false, $country = false)
     {
@@ -1287,6 +1307,8 @@ class OneyRepository extends Repository
      * @param int $id_shipping
      * @param int $id_billing
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function isValidOneyAddresses($id_shipping, $id_billing)
     {
