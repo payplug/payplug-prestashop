@@ -81,7 +81,8 @@ class MockHelper extends Mockery
     }
 
     public static function createTranslateMock($classPathname) {
-        $translate = self::createMockFactory($classPathname)
+        $translate = self::createMockFactory($classPathname);
+        $translate
             ->shouldReceive('translate')
             ->andReturnUsing(function ($module_class, $string, $repository_name) {
                 return $string;
@@ -93,7 +94,30 @@ class MockHelper extends Mockery
         $validate = self::createMockFactory($classPathname);
         $validate
             ->shouldReceive('validate')
-            ->andReturn(true);
+            ->andReturnUsing(function($action, $object) {
+                if ($object === '' || is_null($object)) {
+                    return false;
+                }
+                /*if ($action === 'isEmail') {
+                    switch ($object) {
+                        case 'wrongEmail':
+                        case '':
+                            return false;
+                        default:
+                            return true;
+                    }
+                }
+                if ($action == 'isName') {
+                    switch ($object) {
+                        case null:
+                        case '':
+                            return false;
+                        default:
+                            return true;
+                    }
+                }*/
+                return true;
+            });
         return $validate;
     }
 
@@ -106,7 +130,8 @@ class MockHelper extends Mockery
     }
 
     public static function createAddressMock($classPathname) {
-        $address = self::createMockFactory($classPathname)
+        $address = self::createMockFactory($classPathname);
+        $address
             ->shouldReceive('getAddress')
             ->andReturn(AddressMock::get());
         return $address;

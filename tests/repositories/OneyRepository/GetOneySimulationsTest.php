@@ -33,8 +33,8 @@ use PayPlug\src\specific\ValidateSpecific;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\tests\repositories\OneyRepository\OneyBaseTest;
+
 
 /**
  * @group uni
@@ -45,15 +45,8 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneySimulationsTest extends TestCase
+final class GetOneySimulationsTest extends OneyBaseTest
 {
-    use MockeryPHPUnitIntegration;
-
-    protected $cache;
-    protected $config;
-    protected $logger;
-    protected $myLogPhp;
-    protected $tools;
     protected $oney;
 
     protected $repo;
@@ -72,16 +65,10 @@ final class GetOneySimulationsTest extends TestCase
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-        $this->payplug = Mockery::mock('payplug');
+        parent::setUp();
 
         // Method setup
         $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
 
         $this->cache->shouldReceive('setCacheKey')
             ->andReturnUsing(function ($amount, $country, $operations) {
@@ -109,7 +96,7 @@ final class GetOneySimulationsTest extends TestCase
             $this->config,
             new ContextSpecific(),
             new CountrySpecific(),
-            new ToolsSpecific(),
+            $this->tools,
             new ValidateSpecific(),
             new OneyEntity(),
             $this->myLogPhp,

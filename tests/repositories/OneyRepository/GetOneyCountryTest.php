@@ -22,10 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\mock\MockHelper;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\specific\CarrierSpecific;
+use PayPlug\src\specific\CartSpecific;
+use PayPlug\tests\repositories\OneyRepository\OneyBaseTest;
 
 /**
  * @group unit
@@ -35,28 +36,27 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyCountryTest extends TestCase
+final class GetOneyCountryTest extends OneyBaseTest
 {
-    use MockeryPHPUnitIntegration;
-
-    // Default setup
-    protected $cache;
-    protected $logger;
-    protected $config;
-    protected $myLogPhp;
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-
-        // Method Params
-        $this->payplug = Mockery::mock('payplug');
-        $this->repo = new OneyRepository();
-        $this->repo->setPayplug($this->payplug);
+        parent::setUp();
+        $this->repo = new OneyRepository(
+            $this->cache,
+            $this->logger,
+            $this->address,
+            new CartSpecific(),
+            new CarrierSpecific(),
+            $this->config,
+            $this->context,
+            $this->country,
+            $this->tools,
+            $this->validate,
+            new OneyEntity(),
+            $this->myLogPhp,
+            $this->payplug
+        );
     }
 
     public function testWithEmptyIsoCode()
