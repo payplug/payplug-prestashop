@@ -120,6 +120,10 @@ class PaymentRepository extends Repository
             return $this->displayErrorPayment($this->l('Error during payment creation.'));
         }
 
+        if (isset($this->apiPayment->authorization->authorized_at)) {
+            $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
+        }
+
         if (isset($this->apiPayment->is_paid)) {
             $paymentDetails['isPaid'] = $this->apiPayment->is_paid;
         }
@@ -309,6 +313,7 @@ class PaymentRepository extends Repository
             ->set($table.'.payment_url =        \''.pSQL($paymentDetails['paymentUrl']).'\'')
             ->set($table.'.payment_return_url = \''.pSQL($paymentDetails['paymentReturnUrl']).'\'')
             ->set($table.'.cart_hash =          \''.pSQL($cartHash).'\'')
+            ->set($table.'.authorized_at =      \''.pSQL($paymentDetails['authorizedAt']).'\'')
             ->set($table.'.is_paid =            \''.pSQL($paymentDetails['isPaid']).'\'')
             ->set($table.'.date_upd =           \''.pSQL($paymentDate).'\'')
             ->where($table.'.id_cart =          '.(int)$paymentDetails['cartId'])

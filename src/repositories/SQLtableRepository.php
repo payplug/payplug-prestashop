@@ -110,7 +110,7 @@ class SQLtableRepository extends \Payplug
             ->fields('`payment_return_url` VARCHAR(255) NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`cart_hash` VARCHAR(64) NULL')
-            ->fields('`authorized_at` TINYINT(1) NOT NULL DEFAULT 0')
+            ->fields('`authorized_at` INT(20) NOT NULL DEFAULT 0')
             ->fields('`is_paid` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')

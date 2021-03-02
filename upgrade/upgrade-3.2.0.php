@@ -49,7 +49,7 @@ function upgrade_module_3_2_0($object)
     `payment_return_url` VARCHAR(255) NULL,
     `id_cart` INT(11) UNSIGNED NOT NULL,
     `cart_hash` VARCHAR(64) NULL,
-    `authorized_at` TINYINT(1) NOT NULL DEFAULT 0,
+    `authorized_at` INT(20) NOT NULL DEFAULT 0,
     `is_paid` TINYINT(1) NOT NULL DEFAULT 0,
     `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
     `date_upd` DATETIME NULL, CONSTRAINT lock_cart_unique UNIQUE (id_cart)) ENGINE=' . _MYSQL_ENGINE_;
