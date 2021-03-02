@@ -116,11 +116,12 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentReturnUrl']) {
-            $this->logger->addLog('[createPayment - '.$paymentDetails['paymentMethod'].'] payment return URL is null', 'error');
+            $this->logger->addLog('[createPayment - '.$paymentDetails['paymentMethod'].'] payment return URL is null',
+                'error');
             return $this->displayErrorPayment($this->l('Error during payment creation.'));
         }
 
-        if (isset($this->apiPayment->authorization->authorized_at)) {
+        if (($paymentDetails['paymentMethod'] !== 'installment') && ($this->apiPayment->authorization->authorized_at)) {
             $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
         }
 
