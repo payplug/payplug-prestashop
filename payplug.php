@@ -1459,6 +1459,7 @@ class Payplug extends PaymentModule
 
         $formated = [];
         $with_msg_button = false;
+
         foreach ($errors as $error) {
             if (strpos($error, 'oney_required_field') !== false) {
                 $this->smarty->assign(['is_popin_tpl' => true]);

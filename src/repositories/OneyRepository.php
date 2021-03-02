@@ -497,6 +497,7 @@ class OneyRepository extends Repository
     public function getOneyDeliveryContext()
     {
         $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+
         if ($this->cartSpecific->isVirtualCart($cart)) {
             return [
                 'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
@@ -507,14 +508,23 @@ class OneyRepository extends Repository
 
         $carrier = $this->carrierSpecific->get($cart->id_carrier);
 
-        return [
-            'delivery_label' => $carrier->name,
-            'expected_delivery_date' => date(
-                'Y-m-d',
-                strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
-            ),
-            'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
-        ];
+        if ($this->validateSpecific->validate('isLoadedObject', $carrier)) {
+            return [
+                'delivery_label' => $carrier->name ? $carrier->name : $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date(
+                    'Y-m-d',
+                    strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
+                ),
+                'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
+            ];
+        } else {
+            return [
+                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date('Y-m-d'),
+                'delivery_type' => 'edelivery',
+            ];
+        }
+
     }
 
     /**
