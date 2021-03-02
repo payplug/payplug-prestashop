@@ -54,7 +54,7 @@ class OneyRepository extends Repository
     private $toolsSpecific;
     private $validateSpecific;
     private $oneyEntity;
-    private $payplug;
+    protected $payplug;
 
     public function __construct($payplug)
     {
@@ -1496,7 +1496,8 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in ') . $str_list
+                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in').' '.
+                    $str_list
             ];
         }
 

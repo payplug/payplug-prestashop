@@ -25,8 +25,6 @@ namespace PayPlug\src\repositories;
 
 class TranslationsRepository extends Repository
 {
-    protected $payplug;
-
     public static function factory()
     {
         return new TranslationsRepository();

@@ -37,7 +37,7 @@ class PaymentRepository extends Repository
     private $cartSpecific;
     private $logger;
     private $paymentEntity;
-    private $payplug;
+    protected $payplug;
     private $query;
 
     public function __construct($payplug)
