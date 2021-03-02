@@ -106,8 +106,8 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentId']) {
-            $this->logger->addLog('[createPayment() '.$paymentDetails['paymentMethod'].'] the payment id is null',
-                'error');
+            $this->logger
+                ->addLog('[createPayment() '.$paymentDetails['paymentMethod'].'] the payment id is null', 'error');
             return $this->displayErrorPayment();
         }
 
@@ -116,8 +116,8 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentReturnUrl']) {
-            $this->logger->addLog('[createPayment - '.$paymentDetails['paymentMethod'].'] payment return URL is null',
-                'error');
+            $this->logger
+                ->addLog('[createPayment - '.$paymentDetails['paymentMethod'].'] payment return URL is null', 'error');
             return $this->displayErrorPayment($this->l('Error during payment creation.'));
         }
 
@@ -223,9 +223,7 @@ class PaymentRepository extends Repository
         $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
         $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
 
-        $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($cartToHash)
-        );
+        $cartHash = hash('sha256', $paymentDetails['paymentMethod'].json_encode($cartToHash));
 
         $this->query
             ->insert()
@@ -301,8 +299,7 @@ class PaymentRepository extends Repository
         $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
         $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
 
-        $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($cartToHash));
+        $cartHash = hash('sha256', $paymentDetails['paymentMethod'].json_encode($cartToHash));
 
         $table = _DB_PREFIX_ .'payplug_payment';
 
@@ -347,10 +344,11 @@ class PaymentRepository extends Repository
         $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
         $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
 
-        $cartHash = hash('sha256',
-            $paymentDetails['paymentMethod'].json_encode($cartToHash));
+        $cartHash = hash('sha256', $paymentDetails['paymentMethod'].json_encode($cartToHash));
 
-        if ($paymentStored['cart_hash'] === $cartHash && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+        if ($paymentStored['cart_hash'] === $cartHash
+            &&
+            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return $paymentDetails;
         } else {
             $paymentDetails = $this->createPayment($paymentDetails);

@@ -35,7 +35,8 @@ class PaymentEntity
     /**
      * @return object
      */
-    public function getApiPayment(){
+    public function getApiPayment()
+    {
         return $this->apiPayment;
     }
 
@@ -44,8 +45,9 @@ class PaymentEntity
      * @return $this
      * @throws BadParameterException
      */
-    public function setApiPayment($apiPayment){
-        if(!is_object($apiPayment)) {
+    public function setApiPayment($apiPayment)
+    {
+        if (!is_object($apiPayment)) {
             throw (new BadParameterException('Invalid fields validate, param $apiPayment must be an object'));
         } else {
             $this->apiPayment = $apiPayment;

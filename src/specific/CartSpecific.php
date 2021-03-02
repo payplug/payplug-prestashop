@@ -49,7 +49,8 @@ class CartSpecific implements CartInterface
         return $cart->isVirtualCart();
     }
 
-    public function getProducts($cart) {
+    public function getProducts($cart)
+    {
         if (!is_object($cart)) {
             return false;
         }

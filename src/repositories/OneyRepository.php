@@ -63,7 +63,8 @@ class OneyRepository extends Repository
         $this->setParams();
     }
 
-    protected function setParams(){
+    protected function setParams()
+    {
         $this->cache = CacheRepository::factory();
         $this->logger = LoggerRepository::factory();
 
@@ -800,10 +801,10 @@ class OneyRepository extends Repository
                 ],
             ];
         } elseif ($tools->tool(
-                'strlen',
-                $this->contextSpecific->getContext()->customer->email,
-                'UTF-8'
-            ) > 100) {
+            'strlen',
+            $this->contextSpecific->getContext()->customer->email,
+            'UTF-8'
+        ) > 100) {
             $text = $this->l('Your email address is too long, please change it 
             to a shorter one (max 100 characters).');
             $shipping_fields['email'] = [

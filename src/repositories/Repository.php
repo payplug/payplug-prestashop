@@ -57,11 +57,14 @@ class Repository
         return $this->entity;
     }
 
-    public function setPayplug($payplug){
+    public function setPayplug($payplug)
+    {
         $this->payplug = $payplug;
         return $this;
     }
-    public function getPayplug(){
+
+    public function getPayplug()
+    {
         return $this->payplug;
     }
 
