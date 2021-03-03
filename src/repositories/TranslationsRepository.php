@@ -27,8 +27,9 @@ class TranslationsRepository extends Repository
 {
     protected $payplug;
 
-    private $files = [];
-    private $trans = [];
+    private $method;
+    private $files;
+    private $trans;
 
     public function __construct($payplug)
     {
@@ -53,29 +54,39 @@ class TranslationsRepository extends Repository
         return $translation[$id];
     }
 
-    public function getTranslations() {
-        // set the module files
-        $this->setFiles();
+    private function clearFiles($files, $type_clear = 'file', $path = '')
+    {
+        // List of directory which not must be parsed
+        $arr_exclude = ['img', 'js', 'mails', 'override', 'vendor', 'tests', 'test', 'upgrade'];
 
-        // set the translations key
-        $this->setTranslations();
+        // List of good extention files
+        $arr_good_ext = ['.tpl', '.php'];
 
-        //
-        $this->fillTranslations();
-        return $this->trans;
+        foreach ($files as $key => $file) {
+            if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
+                unset($files[$key]);
+            } elseif ($type_clear === 'file' && !in_array(substr($file, strrpos($file, '.')), $arr_good_ext)) {
+                unset($files[$key]);
+            } elseif ($type_clear === 'directory' && (!is_dir($path . $file) || in_array($file, $arr_exclude))) {
+                unset($files[$key]);
+            }
+        }
+
+        return $files;
     }
 
-    public function getTranslationsToJSON() {
-        // set the module files
-        $this->getTranslations();
-        return json_encode($this->trans);
-    }
+    private function fillTranslations()
+    {
+        // get current file
+        $translation_dir = _PS_MODULE_DIR_ . 'payplug/translations/';
+        $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
+        foreach ($translation_files as $key => $file) {
+            if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
+                continue;
+            }
 
-    private function setFiles(){
-        $array_files = [];
-        $path = _PS_MODULE_DIR_ . 'payplug/';
-        $this->getRecursiveFiles($path, $array_files, 'payplug');
-        return $this->files = $array_files;
+            $this->hydrateFromLangFile($translation_dir, $file);
+        }
     }
 
     private function getRecursiveFiles($path, &$array_files, $module_name)
@@ -104,73 +115,37 @@ class TranslationsRepository extends Repository
         }
     }
 
-    private function clearFiles($files, $type_clear = 'file', $path = '')
+    public function getTranslations()
     {
-        // List of directory which not must be parsed
-        $arr_exclude = ['img', 'js', 'mails', 'override', 'vendor', 'tests', 'test', 'upgrade'];
-
-        // List of good extention files
-        $arr_good_ext = ['.tpl', '.php'];
-
-        foreach ($files as $key => $file) {
-            if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
-                unset($files[$key]);
-            } elseif ($type_clear === 'file' && !in_array(substr($file, strrpos($file, '.')), $arr_good_ext)) {
-                unset($files[$key]);
-            } elseif ($type_clear === 'directory' && (!is_dir($path . $file) || in_array($file, $arr_exclude))) {
-                unset($files[$key]);
-            }
-        }
-
-        return $files;
+        $this->setMethod('l');
+        $this->setFiles();
+        $this->setTrans();
+        $this->fillTranslations();
+        return $this->trans;
     }
 
-    private function setTranslations()
+    private function hydrateFromLangFile($path, $file)
     {
-        $array_check_duplicate = [];
-        foreach ($this->files as &$file) {
-            if ((preg_match('/^(.*).tpl$/', $file['name']) || preg_match('/^(.*).php$/', $file['name'])) && file_exists($file_path = $file['path'] . $file['name'])) {
-                // Get content for this file
-                $content = file_get_contents($file_path);
+        $lang_file = $path . $file;
+        $lang = substr(basename($file), 0, -4);
 
-                // Module files can now be ignored by adding this string in a file
-                if (strpos($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION') !== false) {
-                    continue;
-                }
+        @include $lang_file;
 
-                // Get file type
-                $type_file = substr($file['name'], -4) == '.tpl' ? 'tpl' : 'php';
+        $translations = $GLOBALS['_MODULE'];
 
-                // Parse this content
-                $matches = $this->userParseFile($content, $type_file);
-
-                // Write each translation on its module file
-                $template_name = substr(basename($file['name']), 0, -4);
-
-                foreach ($matches as $key) {
-                    $md5_key = md5($key);
-                    $trans_key = '<{payplug}prestashop>' . strtolower($template_name) . '_' . $md5_key;
-
-                    // to avoid duplicate entry
-                    if (!in_array($trans_key, $array_check_duplicate)) {
-                        $array_check_duplicate[] = $trans_key;
-                        $this->trans[$trans_key] = [
-                            'default' => $key
-                        ];
-                    }
-                }
-            }
+        foreach ($this->trans as $key => &$trans) {
+            $this->trans[$key][$lang] = isset($translations[$key]) ? $translations[$key] : '';
         }
     }
 
-    private function userParseFile($content, $type_file = false)
+    private function parseFile($content, $type_file = false)
     {
         // Parsing modules file
         if ($type_file == 'php') {
-            $regex = '/->l\(\s*(\')' . _PS_TRANS_PATTERN_ . '\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
+            $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
         } else {
             // In tpl file look for something that should contain mod='module_name' according to the documentation
-            $regex = '/\{l\s*s=([\'\"])' . _PS_TRANS_PATTERN_ . '\1.*\s+mod=\'payplug\'.*\}/U';
+            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+mod=\'payplug\'.*\}/U';
         }
 
         if (!is_array($regex)) {
@@ -199,31 +174,56 @@ class TranslationsRepository extends Repository
         return array_unique($strings);
     }
 
-    private function fillTranslations()
+    private function setFiles()
     {
-        // get current file
-        $translation_dir = _PS_MODULE_DIR_ . 'payplug/translations/';
-        $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
-        foreach ($translation_files as $key => $file) {
-            if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
-                continue;
+        $array_files = [];
+        $path = _PS_MODULE_DIR_ . 'payplug/';
+        $this->getRecursiveFiles($path, $array_files, 'payplug');
+        return $this->files = $array_files;
+    }
+
+    private function setMethod($method)
+    {
+        $this->method = $method;
+    }
+
+    private function setTrans()
+    {
+        $this->trans = [];
+        $array_check_duplicate = [];
+        foreach ($this->files as &$file) {
+            if ((preg_match('/^(.*).tpl$/', $file['name']) || preg_match('/^(.*).php$/',
+                        $file['name'])) && file_exists($file_path = $file['path'] . $file['name'])) {
+                // Get content for this file
+                $content = file_get_contents($file_path);
+
+                // Module files can now be ignored by adding this string in a file
+                if (strpos($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION') !== false) {
+                    continue;
+                }
+
+                // Get file type
+                $type_file = substr($file['name'], -4) == '.tpl' ? 'tpl' : 'php';
+
+                // Parse this content
+                $matches = $this->parseFile($content, $type_file);
+
+                // Write each translation on its module file
+                $template_name = substr(basename($file['name']), 0, -4);
+
+                foreach ($matches as $key) {
+                    $md5_key = md5($key);
+                    $trans_key = '<{payplug}prestashop>' . strtolower($template_name) . '_' . $md5_key;
+
+                    // to avoid duplicate entry
+                    if (!in_array($trans_key, $array_check_duplicate)) {
+                        $array_check_duplicate[] = $trans_key;
+                        $this->trans[$trans_key] = [
+                            'default' => $key
+                        ];
+                    }
+                }
             }
-
-            $this->setFromLangFile($translation_dir, $file);
         }
     }
-
-    private function setFromLangFile($path, $file) {
-        $lang_file = $path . $file;
-        $lang = substr(basename($file), 0, -4);
-
-        @include $lang_file;
-
-        $translations = $GLOBALS['_MODULE'];
-
-        foreach ($this->trans as $key => &$trans) {
-            $this->trans[$key][$lang] = isset($translations[$key]) ? $translations[$key] : '';
-        }
-    }
-
 }
