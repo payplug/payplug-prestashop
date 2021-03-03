@@ -121,8 +121,10 @@ class PaymentRepository extends Repository
             return $this->displayErrorPayment($this->l('Error during payment creation.'));
         }
 
-        if (($paymentDetails['paymentMethod'] !== 'installment') && ($this->apiPayment->authorization->authorized_at)) {
-            $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
+        if (($paymentDetails['paymentMethod'] !== 'installment') && ($this->apiPayment->authorization !== null)) {
+            if ($this->apiPayment->authorization->authorized_at !== null) {
+                $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
+            }
         }
 
         if (isset($this->apiPayment->is_paid)) {
