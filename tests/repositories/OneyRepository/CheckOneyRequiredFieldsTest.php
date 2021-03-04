@@ -21,6 +21,7 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\tests\mock\AddresstMock;
@@ -29,7 +30,6 @@ use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\tests\mock\CountryMock;
 use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\repositories\OneyRepository\BaseTest;
 
 /**
  * @group unit

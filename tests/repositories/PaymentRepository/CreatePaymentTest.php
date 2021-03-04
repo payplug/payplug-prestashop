@@ -22,6 +22,8 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\tests\repositories\PaymentRepository;
+
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\src\specific\AddressSpecific;

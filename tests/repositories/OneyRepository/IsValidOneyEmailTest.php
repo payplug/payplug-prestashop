@@ -22,14 +22,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\tests\repositories\OneyRepository;
+
 use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
-use PayPlug\tests\repositories\OneyRepository\BaseTest;
+use PayPlug\src\repositories\OneyRepository;
 
 /**
  * @group unit

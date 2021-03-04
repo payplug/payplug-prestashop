@@ -29,7 +29,6 @@ use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
-use PayPlug\tests\repositories\OneyRepository\BaseTest;
 
 /**
  * @group unit
