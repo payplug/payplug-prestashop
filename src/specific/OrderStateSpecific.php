@@ -48,5 +48,4 @@ class OrderStateSpecific implements OrderStateInterface
     {
         return $this->orderState->delete();
     }
-
 }
