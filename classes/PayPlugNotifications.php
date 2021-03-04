@@ -893,19 +893,20 @@ class PayPlugNotifications
             } elseif (isset($meta['ID Cart'])) {
                 $cart_id = (int)$meta['ID Cart'];
                 $this->logger->addLog('Cart ID : ' . $cart_id);
-                $this->cart = new Cart($cart_id);
-
-                if (!Validate::isLoadedObject($this->cart)) {
-                    $this->logger->addLog('Cart cannot be loaded.', 'error');
-                    $this->logger->addLog('$cart_id : '.$cart_id, 'debug');
-                    $this->exitProcess('Cart cannot be loaded.', 500);
-                }
             } else {
                 $this->logger->addLog(
                     'Can\'t be refunded, because there is an error during retrieving Cart ID.',
                     'error'
                 );
                 $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
+            }
+
+            $this->cart = new Cart($cart_id);
+
+            if (!Validate::isLoadedObject($this->cart)) {
+                $this->logger->addLog('Cart cannot be loaded.', 'error');
+                $this->logger->addLog('$cart_id : '.$cart_id, 'debug');
+                $this->exitProcess('Cart cannot be loaded.', 500);
             }
 
             $id_order = (int)Order::getOrderByCartId($cart_id);
