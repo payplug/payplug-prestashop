@@ -27,11 +27,8 @@ use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\UnexpectedAPIResponseException;
-use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\specific\AddressSpecific;
-use PayPlug\src\specific\CartSpecific;
-use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
@@ -45,58 +42,51 @@ class OneyRepository extends Repository
     private $cache;
     private $log;
     private $logger;
-    private $operations;
-    private $cartSpecific;
-    private $carrierSpecific;
     private $configurationSpecific;
     private $contextSpecific;
     private $countrySpecific;
     private $toolsSpecific;
     private $validateSpecific;
-    private $oneyEntity;
-    protected $payplug;
+    private $payplug;
 
-    public function __construct($payplug)
+    public function __construct($cache,
+                                $logger,
+                                $addressSpecific,
+                                $cartSpecific,
+                                $carrierSpecific,
+                                $configurationSpecific,
+                                $contextSpecific,
+                                $countrySpecific,
+                                $toolsSpecific,
+                                $validateSpecific,
+                                $oneyEntity,
+                                $myLogPHP,
+                                $payplug)
     {
+        $this->cache = $cache;
+        $this->logger = $logger;
+        $this->addressSpecific = $addressSpecific;
+        $this->cartSpecific = $cartSpecific;
+        $this->carrierSpecific = $carrierSpecific;
+        $this->configurationSpecific = $configurationSpecific;
+        $this->contextSpecific = $contextSpecific;
+        $this->countrySpecific = $countrySpecific;
+        $this->toolsSpecific = $toolsSpecific;
+        $this->validateSpecific = $validateSpecific;
+        $this->oneyEntity = $oneyEntity;
+        $this->log = $myLogPHP;
         $this->payplug = $payplug;
-        $this->log = \Payplug\classes\MyLogPHP::factory('payplug/log/install-log.csv');
+
         $this->setParams();
     }
 
     protected function setParams()
     {
-        $this->cache = CacheRepository::factory();
-        $this->logger = LoggerRepository::factory();
-
-        $this->addressSpecific = AddressSpecific::factory();
-        $this->cartSpecific = CartSpecific::factory();
-        $this->carrierSpecific = CarrierSpecific::factory();
-        $this->configurationSpecific = ConfigurationSpecific::factory();
-        $this->contextSpecific = ContextSpecific::factory();
-        $this->countrySpecific = CountrySpecific::factory();
-        $this->toolsSpecific = ToolsSpecific::factory();
-        $this->validateSpecific = ValidateSpecific::factory();
-        $this->oneyEntity = new OneyEntity();
-
         $this->oneyEntity->setOperations([
             'x3_with_fees',
             'x4_with_fees',
         ]);
-
-        $this->operations = $this->oneyEntity->getOperations();
     }
-
-    public static function factory()
-    {
-        return new OneyRepository();
-    }
-
-    public function getOperations()
-    {
-        return $this->operations;
-    }
-
-
 
     /**
      * @description Assign Oney javascript variable
@@ -421,7 +411,7 @@ class OneyRepository extends Repository
     /**
      * @description Format Oney simulation from resource
      *
-     * @param string $method
+     * @param bool $operation
      * @param array $resource
      * @param bool $total_amount
      * @return array
@@ -430,7 +420,7 @@ class OneyRepository extends Repository
     {
         $tools = $this->toolsSpecific;
 
-        if (!in_array($operation, $this->operations) || !$operation) {
+        if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -517,32 +507,35 @@ class OneyRepository extends Repository
      */
     public function getOneyDeliveryContext()
     {
-        return [
-            'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
-            'expected_delivery_date' => date('Y-m-d'),
-            'delivery_type' => 'edelivery',
-        ];
+        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
 
-//        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
-//
-//        if ($this->cartSpecific->isVirtualCart($cart)) {
-//            return [
-//                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
-//                'expected_delivery_date' => date('Y-m-d'),
-//                'delivery_type' => 'edelivery',
-//            ];
-//        }
-//
-//        $carrier = $this->carrierSpecific->get($cart->id_carrier);
-//
-//        return [
-//            'delivery_label' => $carrier->name,
-//            'expected_delivery_date' => date(
-//                'Y-m-d',
-//                strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
-//            ),
-//            'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
-//        ];
+        if ($this->cartSpecific->isVirtualCart($cart)) {
+            return [
+                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date('Y-m-d'),
+                'delivery_type' => 'edelivery',
+            ];
+        }
+
+        $carrier = $this->carrierSpecific->get($cart->id_carrier);
+
+        if ($this->validateSpecific->validate('isLoadedObject', $carrier)) {
+            return [
+                'delivery_label' => $carrier->name ? $carrier->name : $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date(
+                    'Y-m-d',
+                    strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
+                ),
+                'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
+            ];
+        } else {
+            return [
+                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date('Y-m-d'),
+                'delivery_type' => 'edelivery',
+            ];
+        }
+
     }
 
     /**
@@ -596,6 +589,7 @@ class OneyRepository extends Repository
      */
     public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
+
         // get Oney resource
         $payment_list = [];
         if (!is_numeric($amount) || !$amount) {
@@ -613,10 +607,9 @@ class OneyRepository extends Repository
             $iso_list = explode(',', $iso_code_list);
             $country = reset($iso_list);
         }
-
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->operations);
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
 
         if (!$oney_sims['result']) {
             return $payment_list;

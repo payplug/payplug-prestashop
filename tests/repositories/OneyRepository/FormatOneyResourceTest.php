@@ -22,11 +22,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\tests\mock\MockHelper;
+use PayPlug\src\entities\OneyEntity;
+use PayPlug\src\specific\CarrierSpecific;
+use PayPlug\src\specific\CartSpecific;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\tests\repositories\OneyRepository\BaseTest;
+
 
 /**
  * @group unit
@@ -36,21 +38,8 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class FormatOneyResourceTest extends TestCase
+final class FormatOneyResourceTest extends BaseTest
 {
-    use MockeryPHPUnitIntegration;
-
-    // Default setup
-    protected $cache;
-    protected $config;
-    protected $logger;
-    protected $myLogPhp;
-
-    // Method setup
-    protected $translate;
-
-    // Method Params
-    protected $payplug;
     protected $repo;
     protected $tab;
 
@@ -59,18 +48,7 @@ final class FormatOneyResourceTest extends TestCase
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-
-        // Method setup
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-
-        // Method Params
-        $this->payplug = Mockery::mock('payplug');
+        parent::setUp();
         $this->payplug
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
@@ -80,9 +58,21 @@ final class FormatOneyResourceTest extends TestCase
                 return (int)$amount * 100;
             });
 
-        $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
-        $this->repo->setParams();
-        $this->repo->setPayplug($this->payplug);
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->cache,
+            $this->logger,
+            $this->address,
+            new CartSpecific(),
+            new CarrierSpecific(),
+            $this->config,
+            $this->context,
+            $this->country,
+            $this->tools,
+            $this->validate,
+            new OneyEntity(),
+            $this->myLogPhp,
+            $this->payplug
+        ])->makePartial();
 
         $this->repo
             ->shouldAllowMockingProtectedMethods()

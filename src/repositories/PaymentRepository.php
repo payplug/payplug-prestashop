@@ -40,17 +40,18 @@ class PaymentRepository extends Repository
     protected $payplug;
     private $query;
 
-    public function __construct($payplug)
+    public function __construct($payplug,
+                                $cartSpecific,
+                                $logger,
+                                $paymentEntity,
+                                $query)
     {
         $this->payplug = $payplug;
-        $this->setParams();
-    }
+        $this->cartSpecific = $cartSpecific;
+        $this->logger = $logger;
+        $this->paymentEntity = $paymentEntity;
+        $this->query = $query;
 
-    public function setParams()
-    {
-        $this->cartSpecific = CartSpecific::factory();
-        $this->query = QueryRepository::factory();
-        $this->paymentEntity = new PaymentEntity();
         $this->setLogger();
     }
 
@@ -59,7 +60,6 @@ class PaymentRepository extends Repository
      */
     public function setLogger()
     {
-        $this->logger = new LoggerRepository();
         $this->logger->setParams(['process' => 'payment']);
     }
 

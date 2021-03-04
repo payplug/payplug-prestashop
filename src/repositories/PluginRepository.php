@@ -23,7 +23,13 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\classes\MyLogPHP;
+use PayPlug\src\entities\OneyEntity;
+use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\CarrierSpecific;
+use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
@@ -33,9 +39,15 @@ use PayPlug\src\specific\ValidateSpecific;
 
 class PluginRepository extends Repository
 {
+    // Entities
+    private $oneyEntity;
+    private $paymentEntity;
+
+    // Repositories & necessary classes
     private $cache;
     private $card;
     private $logger;
+    private $myLogPhp;
     private $oney;
     private $plugin;
     private $order_state;
@@ -43,6 +55,9 @@ class PluginRepository extends Repository
     private $translate;
 
     // Specific classes
+    private $address;
+    private $carrier;
+    private $cart;
     private $configuration;
     private $context;
     private $country;
@@ -53,27 +68,57 @@ class PluginRepository extends Repository
 
     public function __construct($payplug = null)
     {
+        $this->address  = new AddressSpecific();
         $this->cache    = new CacheRepository();
-        $this->card     = new CardRepository();
-        $this->card->setPayplug($payplug);
+        $this->card     = new CardRepository($payplug);
+        $this->carrier  = new CarrierSpecific();
+        $this->cart     = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();
-        $this->oney     = new OneyRepository($payplug);
-        $this->payment  = new PaymentRepository($payplug);
+        $this->myLogPhp = new MyLogPHP();
+        $this->oneyEntity = new OneyEntity();
+        $this->paymentEntity = new PaymentEntity();
         $this->plugin   = new PluginEntity();
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
-        $this->translate = new TranslationsRepository();
-        $this->translate->setPayplug($payplug);
-        $this->validate = new ValidateSpecific();
+        $this->translate = new TranslationsRepository($payplug);
         $this->order_state = new OrderStateRepository();
+        $this->validate = new ValidateSpecific();
+
+        $this->oney = new OneyRepository(
+            $this->cache,
+            $this->logger,
+            $this->address,
+            $this->cart,
+            $this->carrier,
+            $this->configuration,
+            $this->context,
+            $this->country,
+            $this->tools,
+            $this->validate,
+            $this->oneyEntity,
+            $this->myLogPhp,
+            $payplug
+        );
+
+        $this->payment  = new PaymentRepository(
+            $payplug,
+            $this->cart,
+            $this->logger,
+            $this->paymentEntity,
+            $this->query
+        );
+
         $this->plugin
             ->setApiVersion('2019-08-06')
+            ->setAddress($this->address)
             ->setCache($this->cache)
             ->setCard($this->card)
+            ->setCarrier($this->carrier)
+            ->setCart($this->cart)
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)

@@ -22,12 +22,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
+use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\ContextSpecific;
+use PayPlug\src\specific\CountrySpecific;
 use PayPlug\tests\mock\CarrierMock;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\tests\repositories\OneyRepository\BaseTest;
+
 
 /**
  * @group unit
@@ -37,41 +41,13 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyPaymentOptionsListTest extends TestCase
+final class GetOneyPaymentOptionsListTest extends BaseTest
 {
-    use MockeryPHPUnitIntegration;
-
-    // Default setup
-    protected $cache;
-    protected $logger;
-    protected $config;
-    protected $myLogPhp;
-
-    // Method setup
-    protected $cart;
-    protected $carrier;
-    protected $context;
-    protected $oneyEntity;
-    protected $tools;
-    protected $translate;
-    protected $validate;
-
     protected $list;
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-
-        // Method setup
-        $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
-        $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-        $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
+        parent::setUp();
 
         $this->carrier->shouldReceive([
             'get' => CarrierMock::get(),
@@ -86,7 +62,13 @@ final class GetOneyPaymentOptionsListTest extends TestCase
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 
         // Method Params
-        $this->payplug = Mockery::mock('payplug');
+        $this->oneyEntity = Mockery::mock(OneyEntity::class);
+        $this->oneyEntity
+            ->shouldReceive([
+                'getOperations' => ['x3_with_fees'],
+                'setOperations' => true
+            ]);
+
         $this->payplug
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
@@ -96,9 +78,21 @@ final class GetOneyPaymentOptionsListTest extends TestCase
                 return (int)$amount * 100;
             });
 
-        $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
-        $this->repo->setParams();
-        $this->repo->setPayplug($this->payplug);
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->cache,
+            $this->logger,
+            new AddressSpecific(),
+            $this->cart,
+            $this->carrier,
+            $this->config,
+            new ContextSpecific(),
+            new CountrySpecific(),
+            $this->tools,
+            $this->validate,
+            $this->oneyEntity,
+            $this->myLogPhp,
+            $this->payplug
+        ])->makePartial();
 
         $this->repo
             ->shouldAllowMockingProtectedMethods()
@@ -106,9 +100,6 @@ final class GetOneyPaymentOptionsListTest extends TestCase
                 'getOneySimulations' => [
                     'result' => true,
                     'simulations' => OneySimulationsMock::get()
-                ],
-                'getMethods' => [
-                    'x3_with_fees',
                 ]
             ]);
 
@@ -181,34 +172,5 @@ final class GetOneyPaymentOptionsListTest extends TestCase
             $this->list,
             $response
         );
-    }
-
-    public function getOneyPaymentOptionsList($amount, $country = false)
-    {
-        // get Oney resource
-        $payment_list = [];
-        $amount = $this->payplug->convertAmount($amount);
-
-        if (!$country) {
-            $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
-            $iso_list = explode(',', $iso_code_list);
-            $country = reset($iso_list);
-        }
-
-        $country = $this->toolsSpecific->tool('strtoupper', $country);
-
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->methods);
-
-        if (!$oney_sims['result']) {
-            return $payment_list;
-        }
-
-        foreach ($oney_sims['simulations'] as $method => $oney_sim) {
-            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
-            }
-        }
-
-        return $payment_list;
     }
 }

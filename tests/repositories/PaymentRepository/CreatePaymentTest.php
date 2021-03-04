@@ -24,8 +24,11 @@
 
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
+use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
+use PayPlug\src\specific\ContextSpecific;
+use PayPlug\src\specific\CountrySpecific;
 use PayPlug\tests\repositories\OneyRepository\BaseTest;
 
 /**
@@ -36,63 +39,28 @@ use PayPlug\tests\repositories\OneyRepository\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyCountryTest extends BaseTest
+final class CreatePaymentTest extends BaseTest
 {
-
     public function setUp()
     {
+        $this->email = 'mock@payplug.com';
+
         parent::setUp();
+
         $this->repo = new OneyRepository(
             $this->cache,
             $this->logger,
-            $this->address,
+            new AddressSpecific(),
             new CartSpecific(),
             new CarrierSpecific(),
             $this->config,
-            $this->context,
-            $this->country,
+            new ContextSpecific(),
+            new CountrySpecific(),
             $this->tools,
             $this->validate,
             new OneyEntity(),
             $this->myLogPhp,
             $this->payplug
-        );
-    }
-
-    public function testWithEmptyIsoCode()
-    {
-        $this->assertSame(
-            false,
-            $this->repo->getOneyCountry(null)
-        );
-    }
-
-    public function testWithWrongIsoCode()
-    {
-        $this->assertSame(
-            false,
-            $this->repo->getOneyCountry(42)
-        );
-    }
-
-    public function testGetDefaultIsoCode()
-    {
-        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
-
-        foreach($overseas_iso as $iso) {
-            $this->assertSame(
-                'FR',
-                $this->repo->getOneyCountry($iso)
-            );
-        }
-    }
-
-    public function testGetCustomIsoCode()
-    {
-        $iso_code = 'BE';
-        $this->assertSame(
-            $iso_code,
-            $this->repo->getOneyCountry($iso_code)
         );
     }
 }
