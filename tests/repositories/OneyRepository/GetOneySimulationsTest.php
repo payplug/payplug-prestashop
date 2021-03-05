@@ -34,6 +34,8 @@ use PayPlug\src\specific\ValidateSpecific;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
+use PayPlug\tests\repositories\BaseTest;
+
 
 /**
  * @group uni

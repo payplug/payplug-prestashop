@@ -28,6 +28,8 @@ use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
+use PayPlug\tests\repositories\BaseTest;
+
 
 /**
  * @group unit

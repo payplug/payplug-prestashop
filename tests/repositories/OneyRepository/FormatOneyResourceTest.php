@@ -29,6 +29,8 @@ use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
+use PayPlug\tests\repositories\BaseTest;
+
 
 /**
  * @group unit

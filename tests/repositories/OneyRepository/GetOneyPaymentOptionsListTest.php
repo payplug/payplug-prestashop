@@ -32,6 +32,8 @@ use PayPlug\src\specific\CountrySpecific;
 use PayPlug\tests\mock\CarrierMock;
 use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\repositories\BaseTest;
+
 
 /**
  * @group unit

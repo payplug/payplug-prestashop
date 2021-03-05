@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\OneyRepository;
+namespace PayPlug\tests\repositories;
 
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;

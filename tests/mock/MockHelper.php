@@ -49,7 +49,7 @@ class MockHelper extends Mockery
         $loggerMock
             ->shouldReceive('addLog')
             ->andReturnUsing(function($message, $level) use (&$arrayLog) {
-                $arrayLog[] = $level .' '.' '.$message;
+                $arrayLog = ['level' => $level, 'message' => $message];
                 return $arrayLog;
             });
     }
@@ -122,10 +122,18 @@ class MockHelper extends Mockery
     }
 
     public static function createContextMock($classPathname) {
-        $context = self::createMockFactory($classPathname);
+        $context = \Mockery::mock($classPathname);
         $context
             ->shouldReceive('getContext')
             ->andReturn(ContextMock::get());
+        return $context;
+    }
+
+    public static function createSetParamstMock($classPathname) {
+        $context = \Mockery::mock($classPathname);
+        $context
+            ->shouldReceive('setParams')
+            ->andReturnSelf();
         return $context;
     }
 

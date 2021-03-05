@@ -24,20 +24,18 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\src\specific\AddressSpecific;
-use PayPlug\src\specific\CarrierSpecific;
-use PayPlug\src\specific\CartSpecific;
-use PayPlug\src\specific\ContextSpecific;
-use PayPlug\src\specific\CountrySpecific;
-use PayPlug\tests\repositories\OneyRepository\BaseTest;
+use PayPlug\src\entities\PaymentEntity;
+use PayPlug\src\repositories\PaymentRepository;
+use PayPlug\tests\repositories\BaseTest;
+
+use PayPlug\tests\mock\MockHelper;
+
 
 /**
  * @group unit
  * @group repository
- * @group oney
- * @group oney_repository
+ * @group payment
+ * @group payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -45,24 +43,75 @@ final class CreatePaymentTest extends BaseTest
 {
     public function setUp()
     {
-        $this->email = 'mock@payplug.com';
-
         parent::setUp();
 
-        $this->repo = new OneyRepository(
-            $this->cache,
+        $this->logger->shouldReceive([
+            'setParams' => $this->logger,
+//            'addLog' => $this->logger,
+        ]);
+
+        $this->repo = new PaymentRepository(
+            $this->payplug,
+            $this->cart,
             $this->logger,
-            new AddressSpecific(),
-            new CartSpecific(),
-            new CarrierSpecific(),
-            $this->config,
-            new ContextSpecific(),
-            new CountrySpecific(),
-            $this->tools,
-            $this->validate,
-            new OneyEntity(),
-            $this->myLogPhp,
-            $this->payplug
+            new PaymentEntity(),
+            null
+        );
+
+        $this->payplug
+            ->shouldReceive('setPaymentErrorsCookie')
+            ->andReturn(true);
+    }
+
+    public function paymentDetailsParameters()
+    {
+        // Test if (!$paymentDetails)
+        yield [null, '[createPayment] $paymentDetails is null'];
+
+        // Test if (!$paymentDetails['paymentTab'])
+        yield [
+            ['paymentTab' => null],
+            '[createPayment] $paymentDetails[\'paymentTab\'] is null'
+        ];
+
+        // Test if (!$paymentDetails['paymentMethod'])
+        yield [
+            [
+                'paymentTab' => ['field' => 'value'],
+                'paymentMethod' => null
+            ],
+            '[createPayment] $paymentDetails[\'paymentMethod\'] is null'
+        ];
+    }
+
+    /**
+     * @dataProvider paymentDetailsParameters
+     * @param array $parameter
+     * @param string $logMessage
+     */
+    public function testMethodWithEmptyParams($parameter, $logMessage)
+    {
+        $arrayLog = [];
+        MockHelper::createAddLogMock($this->logger, $arrayLog);
+
+        $response = $this->repo->createPayment($parameter);
+
+        // Test 1 : On va checker return $this->displayErrorPayment
+        $this->assertFalse(
+            $response['result'],
+            'ERROR : the response is true'
+        );
+
+        // Test 2 : On compare les messages du retour
+        $this->assertSame(
+            $response['response'],
+            'Error during payment creation'
+        );
+
+        // Test 3 : On compare le message du logger à écrire et celui écrit
+        $this->assertSame(
+            $arrayLog['message'],
+            $logMessage
         );
     }
 }

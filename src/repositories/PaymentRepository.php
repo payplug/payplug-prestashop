@@ -73,16 +73,16 @@ class PaymentRepository extends Repository
     {
         if (!$paymentDetails) {
             $this->logger->addLog('[createPayment] $paymentDetails is null', 'error');
-            return false;
+            return $this->displayErrorPayment($this->l('Error during payment creation'));
         }
 
         if (!$paymentDetails['paymentTab']) {
             $this->logger->addLog('[createPayment] $paymentDetails[\'paymentTab\'] is null', 'error');
-            return false;
+            return $this->displayErrorPayment($this->l('Error during payment creation'));
         }
 
         if (!$paymentDetails['paymentMethod']) {
-            $this->logger->addLog('[createPayment] payment method is null', 'error');
+            $this->logger->addLog('[createPayment] $paymentDetails[\'paymentMethod\'] is null', 'error');
             return $this->displayErrorPayment($this->l('Error during payment creation'));
         }
 
