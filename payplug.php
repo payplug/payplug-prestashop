@@ -4163,7 +4163,7 @@ private $payment;
          * Create payment if inexistent
          */
         if (!$this->payment->checkPaymentTable($cart->id)) {
-            // Create payment
+            // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
@@ -4201,17 +4201,72 @@ private $payment;
             }
 
         } elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
-            // If payment already exists, and timeout > 3 min : Create a new payment
-            $this->paymentDetails = $this->payment->createPayment($this->paymentDetails);
-            $this->paymentDetails = $this->payment->updatePaymentTable($this->paymentDetails);
-            $this->paymentDetails = $this->payment->checkHash($this->paymentDetails);
-            if (!$this->paymentDetails) {
-                return false;
+            /*
+             * If payment already exists, and timeout > 3 min : Create a new payment
+             */
+
+            // Create payment or installment
+            $createPayment = $this->payment->createPayment($this->paymentDetails);
+
+            if ($createPayment['result'] && $createPayment['paymentDetails']) {
+                $this->paymentDetails = $createPayment['paymentDetails'];
+            } elseif (!$createPayment['result']) {
+                return [
+                    'result' => false,
+                    'paymentDetails' => $createPayment['paymentDetails'],
+                    'response' => $createPayment['response']
+                ];
             }
-            return $this->payment->getPaymentReturnUrl($this->paymentDetails);
+
+            // Update payment table
+            $updatePaymentTable = $this->payment->updatePaymentTable($this->paymentDetails);
+            if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
+                $this->paymentDetails = $updatePaymentTable['paymentDetails'];
+            } elseif (!$updatePaymentTable['result']) {
+                return [
+                    'result' => false,
+                    'paymentDetails' => $updatePaymentTable['paymentDetails'],
+                    'response' => $updatePaymentTable['response']
+                ];
+            }
+
+            // Check hash
+            $checkHash = $this->payment->checkHash($this->paymentDetails);
+            if ($checkHash['result'] && $checkHash['paymentDetails']) {
+                $this->paymentDetails = $checkHash['paymentDetails'];
+            } elseif (!$checkHash['result']) {
+                return [
+                    'result' => false,
+                    'paymentDetails' => $checkHash['paymentDetails'],
+                    'response' => $checkHash['response']
+                ];
+            }
+
+            $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
+            if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
+                return $getpaymentReturnUrl['url'];
+            } elseif (!$getpaymentReturnUrl['result']) {
+                return [
+                    'result' => false,
+                    'url' => $getpaymentReturnUrl['url'],
+                    'response' => $getpaymentReturnUrl['response']
+                ];
+            }
+
         } elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
-            // If timeout < 3 min and hash OK
-            return $this->payment->getpaymentReturnUrl($this->paymentDetails);
+            /*
+             * If timeout < 3 min and hash OK
+             */
+            $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
+            if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
+                return $getpaymentReturnUrl['url'];
+            } elseif (!$getpaymentReturnUrl['result']) {
+                return [
+                    'result' => false,
+                    'url' => $getpaymentReturnUrl['url'],
+                    'response' => $getpaymentReturnUrl['response']
+                ];
+            }
         }
     }
 
