@@ -4207,7 +4207,6 @@ private $payment;
 
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
-
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $this->paymentDetails = $createPayment['paymentDetails'];
             } elseif (!$createPayment['result']) {
