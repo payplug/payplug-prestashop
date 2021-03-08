@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories;
 
+use Mockery;
+use Payplug\Payment;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -68,5 +70,10 @@ class BaseTest extends TestCase
         $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
         $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+    }
+
+    public function apiCall()
+    {
+        $this->paymentApi = Mockery::mock('alias:'.Payment::class);
     }
 }

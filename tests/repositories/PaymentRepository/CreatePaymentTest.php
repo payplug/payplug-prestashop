@@ -26,10 +26,10 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\tests\repositories\BaseTest;
-
 use PayPlug\tests\mock\MockHelper;
-
+use PayPlug\tests\mock\PaymentMock;
+use PayPlug\tests\mock\PaymentTabMock;
+use PayPlug\tests\repositories\BaseTest;
 
 /**
  * @group unit
@@ -41,16 +41,18 @@ use PayPlug\tests\mock\MockHelper;
  */
 final class CreatePaymentTest extends BaseTest
 {
+    private $paymentRepository;
+
     public function setUp()
     {
         parent::setUp();
+        parent::apiCall();
 
         $this->logger->shouldReceive([
             'setParams' => $this->logger,
-//            'addLog' => $this->logger,
         ]);
 
-        $this->repo = new PaymentRepository(
+        $this->paymentRepository = new PaymentRepository(
             $this->payplug,
             $this->cart,
             $this->logger,
@@ -63,6 +65,11 @@ final class CreatePaymentTest extends BaseTest
             ->andReturn(true);
     }
 
+    /**
+     * Parameters to test method with empty $paiementDetails
+     *
+     * @return \Generator
+     */
     public function paymentDetailsParameters()
     {
         // Test if (!$paymentDetails)
@@ -85,6 +92,8 @@ final class CreatePaymentTest extends BaseTest
     }
 
     /**
+     * Test methos with nulled $paiementDetails
+     *
      * @dataProvider paymentDetailsParameters
      * @param array $parameter
      * @param string $logMessage
@@ -94,7 +103,7 @@ final class CreatePaymentTest extends BaseTest
         $arrayLog = [];
         MockHelper::createAddLogMock($this->logger, $arrayLog);
 
-        $response = $this->repo->createPayment($parameter);
+        $response = $this->paymentRepository->createPayment($parameter);
 
         // Test 1 : On va checker return $this->displayErrorPayment
         $this->assertFalse(
@@ -114,4 +123,56 @@ final class CreatePaymentTest extends BaseTest
             $logMessage
         );
     }
+
+    /**
+     * Test creation payment 'standard'
+     */
+    public function testCreatePaymentWithValidData()
+    {
+        $arrayLog = [];
+        MockHelper::createAddLogMock($this->logger, $arrayLog);
+        
+        $paymentDetails = [
+            'paymentTab'    => PaymentTabMock::getStandard(),
+            'paymentMethod' => 'standard'
+        ];
+
+        $paymentMockStandard = PaymentMock::getStandard();
+        
+        $this->paymentApi
+            ->shouldReceive('create')
+            ->andReturn($paymentMockStandard);
+
+        $response = $this->paymentRepository->createPayment($paymentDetails);
+    }
+
+    public function testCreatePaymentWithInvalidData()
+    {
+        $paymentDetails = [
+        'paymentTab'    => PaymentTabMock::getStandard(),
+        'paymentMethod' => 'standard'
+        ];
+
+        $arrayLog = [];
+        MockHelper::createAddLogMock($this->logger, $arrayLog);
+
+        $paymentMockStandard = PaymentMock::getStandard();
+
+        $this->paymentApi
+            ->shouldReceive('create')
+            ->andReturn([
+                'result' => false,
+                'payment_tab' => $paymentDetails['paymentTab'],
+                'response' => [0 => 'Payplug\\Exception\\BadRequestException: [400]: Bad request']
+            ]);
+
+        $response = $this->paymentRepository->createPayment($paymentDetails);
+
+        var_dump($arrayLog);
+    }
+
+//    public function testCreatePaymentThrowException($parameter)
+//    {
+//
+//    }
 }
