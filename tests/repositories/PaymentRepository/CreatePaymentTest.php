@@ -73,12 +73,12 @@ final class CreatePaymentTest extends BaseTest
     public function paymentDetailsParameters()
     {
         // Test if (!$paymentDetails)
-        yield [null, '[createPayment] $paymentDetails is null'];
+        yield [null, 'paymentDetails: null'];
 
         // Test if (!$paymentDetails['paymentTab'])
         yield [
             ['paymentTab' => null],
-            '[createPayment] $paymentDetails[\'paymentTab\'] is null'
+            'paymentDetails: {"paymentTab":null}'
         ];
 
         // Test if (!$paymentDetails['paymentMethod'])
@@ -87,7 +87,7 @@ final class CreatePaymentTest extends BaseTest
                 'paymentTab' => ['field' => 'value'],
                 'paymentMethod' => null
             ],
-            '[createPayment] $paymentDetails[\'paymentMethod\'] is null'
+            'paymentDetails: {"paymentTab":{"field":"value"},"paymentMethod":null}'
         ];
     }
 
@@ -114,7 +114,7 @@ final class CreatePaymentTest extends BaseTest
         // Test 2 : On compare les messages du retour
         $this->assertSame(
             $response['response'],
-            'Error during payment creation'
+            '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
         );
 
         // Test 3 : On compare le message du logger à écrire et celui écrit
@@ -131,17 +131,21 @@ final class CreatePaymentTest extends BaseTest
     {
         $arrayLog = [];
         MockHelper::createAddLogMock($this->logger, $arrayLog);
-        
+
         $paymentDetails = [
-            'paymentTab'    => PaymentTabMock::getStandard(),
+            'paymentTab' => PaymentTabMock::getStandard(),
             'paymentMethod' => 'standard'
         ];
 
         $paymentMockStandard = PaymentMock::getStandard();
-        
+
         $this->paymentApi
             ->shouldReceive('create')
-            ->andReturn($paymentMockStandard);
+            ->andReturn([
+                'result' => true,
+                'paimentDetails' => $paymentDetails,
+                'response' => '[createPayment] Payment successfully created'
+            ]);
 
         $response = $this->paymentRepository->createPayment($paymentDetails);
     }
@@ -149,8 +153,8 @@ final class CreatePaymentTest extends BaseTest
     public function testCreatePaymentWithInvalidData()
     {
         $paymentDetails = [
-        'paymentTab'    => PaymentTabMock::getStandard(),
-        'paymentMethod' => 'standard'
+            'paymentTab' => PaymentTabMock::getStandard(),
+            'paymentMethod' => 'standard'
         ];
 
         $arrayLog = [];
@@ -162,13 +166,11 @@ final class CreatePaymentTest extends BaseTest
             ->shouldReceive('create')
             ->andReturn([
                 'result' => false,
-                'payment_tab' => $paymentDetails['paymentTab'],
-                'response' => [0 => 'Payplug\\Exception\\BadRequestException: [400]: Bad request']
+                'paymentDetails' => $paymentDetails,
+                'response' => '[createPayment] Exception. Unable to create payment. Error: Bad request'
             ]);
 
         $response = $this->paymentRepository->createPayment($paymentDetails);
-
-        var_dump($arrayLog);
     }
 
 //    public function testCreatePaymentThrowException($parameter)
