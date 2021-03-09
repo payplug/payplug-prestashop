@@ -1,7 +1,7 @@
 <?php
 
-global $_MODULE';
-$_MODULE = array()';
+global $_MODULE;
+$_MODULE = array();
 $_MODULE['<{payplug}prestashop>payplug_f157d7333585b8ce4db9722f383d3bcb'] = 'Il pagamento frazionato non può essere annullato.';
 $_MODULE['<{payplug}prestashop>payplug_6339057c04eafb3954cf17cd06847efc'] = 'Le modificazioni non sono state aggiornate.';
 $_MODULE['<{payplug}prestashop>payplug_8186e25dabeca93837acfc5664c7fd00'] = 'L\'indirizzo mail e/o la password sono errati.';
