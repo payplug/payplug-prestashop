@@ -173,8 +173,8 @@ final class CreatePaymentTest extends BaseTest
         $response = $this->paymentRepository->createPayment($paymentDetails);
     }
 
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+    public function testCreatePaymentThrowException($parameter)
+    {
+
+    }
 }

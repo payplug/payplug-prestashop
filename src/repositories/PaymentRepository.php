@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -23,6 +24,7 @@
 
 namespace PayPlug\src\repositories;
 
+use DateTime;
 use Exception;
 use Payplug;
 use Payplug\InstallmentPlan;
@@ -49,85 +51,76 @@ class PaymentRepository extends Repository
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
 
-        $this->setLogger();
-    }
-
-    /**
-     * @description Set the logger
-     */
-    public function setLogger()
-    {
         $this->logger->setParams(['process' => 'payment']);
     }
 
     /**
-     * @description Check if payment created < 1min in DB
-     * @param $idCart
-     * @return bool
-     * @throws Exception
-     */
-    public function checkTimeoutPayment($idCart)
-    {
-        if (!$idCart || !is_int($idCart)) {
-            return $this->paymentError(
-                ['name' => 'id cart', 'value' => $idCart],
-                '[checkTimeoutPayment] problem with $idCart parameter');
-        }
-
-        $dateStored = $this->checkPaymentTable($idCart)['date_upd'];
-
-        $date = new \DateTime($dateStored);
-        $date2 = new \DateTime('now');
-
-        if ($date->diff($date2)->y !== 0 ||
-            $date->diff($date2)->d !== 0 ||
-            $date->diff($date2)->h !== 0 ||
-            $date->diff($date2)->i > 3) {
-            // Plus de 3 minutes
-            return false;
-        } else {
-            // Moins de 3 minutes
-            return true;
-        }
-        exit;
-    }
-
-    /**
-     * @description Display an error if problem in creation
-     * @param array $element
-     * @param null $errorMessage
-     * @param string $level
+     * @description Compare hash (sha256 on payment method and cart)
+     * Create an other payment request if cart or payment method changed
+     * and update payment table in consequence
+     * @param $paymentDetails
      * @return array
      */
-    public function paymentError($element, $errorMessage = null, $level = 'error')
+    public function checkHash($paymentDetails)
     {
-        $element['value'] = json_encode($element['value']);
-
-        if (!$errorMessage) {
-            $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
+        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cartId']) {
+            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array');
         }
 
-        if (!is_string($errorMessage)) {
-            $this->paymentError($element, '[paymentError] The error message in parameter is not a string.');
+        $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+
+        $cartToHash = $paymentDetails['cart'];
+        $cartToHash->date_add = $cartToHash->date_upd = null;
+        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
+        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+
+        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+
+        if ($paymentStored['cart_hash'] === $cartHash
+            &&
+            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+            return [
+                'result' => true,
+                'paymentDetails' => $paymentDetails,
+                'response' => 'OK. Comparaison result: Same hash and same payment method.'
+            ];
+        } else {
+            // Create payment or installment
+            try {
+                $createPayment = $this->createPayment($paymentDetails);
+            } catch (Payplug\Exception\ConfigurationNotSetException $e) {
+                return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                    '[checkHash -> createPayment] Error: '.$e->getMessage());
+            }
+
+            if ($createPayment['result'] && $createPayment['paymentDetails']) {
+                $paymentDetails = $createPayment['paymentDetails'];
+            } elseif (!$createPayment['result']) {
+                return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                    $createPayment['response']);
+            }
+
+            // Update payment table
+            $updatePaymentTable = $this->updatePaymentTable($paymentDetails);
+            if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
+                $paymentDetails = $updatePaymentTable['paymentDetails'];
+            } elseif (!$updatePaymentTable['result']) {
+                return $this->paymentError(
+                    ['name' => 'paymentDetails', 'value' => $updatePaymentTable['paymentDetails']],
+                    $updatePaymentTable['response']);
+            }
+
+            return [
+                'result' => true,
+                'paymentDetails' => $paymentDetails,
+                'response' => 'Payment created and updated successfully'
+            ];
         }
-
-        $this->logger->setParams(['process' => 'paymentRepository']);
-        $this->logger->addLog($errorMessage, $level);
-        $this->logger->addLog($element['name'].': '.$element['value'], 'debug');
-
-        $this->payplug->setPaymentErrorsCookie([
-            $this->l('The transaction was not completed and your card was not charged.')
-        ]);
-
-        return [
-            'result' => false,
-            $element['name'] => $element['value'],
-            'response' => $errorMessage,
-        ];
     }
 
     /**
-     * @description Check if existing payment or installment hashed
+     * @description Check if existing payment / installment in payment table
      * @param integer $idCart
      * @return bool|array
      */
@@ -154,115 +147,32 @@ class PaymentRepository extends Repository
     }
 
     /**
-     * @description Insert payment with all details in table
-     * @param array $paymentDetails
+     * @description Check if payment created < 3 min in DB
+     * @param $idCart
      * @return array|bool
+     * @throws Exception
      */
-    public function insertPaymentTable($paymentDetails)
+    public function checkTimeoutPayment($idCart)
     {
-        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['paymentId']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array');
+        if (!$idCart || !is_int($idCart)) {
+            return $this->paymentError(['name' => 'id cart', 'value' => $idCart],
+                '[checkTimeoutPayment] problem with $idCart parameter');
         }
 
-        $paymentDate = date('Y-m-d H:i:s');
+        $dateStored = $this->checkPaymentTable($idCart)['date_upd'];
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+        $date = new DateTime($dateStored);
+        $date2 = new DateTime('now');
 
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
-
-        $this->query
-            ->insert()
-            ->into(_DB_PREFIX_ . 'payplug_payment')
-            ->fields('id_payment')->values(pSQL($paymentDetails['paymentId']))
-            ->fields('payment_method')->values(pSQL($paymentDetails['paymentMethod']))
-            ->fields('payment_url')->values(pSQL($paymentDetails['paymentUrl']))
-            ->fields('payment_return_url')->values(pSQL($paymentDetails['paymentReturnUrl']))
-            ->fields('id_cart')->values(pSQL($paymentDetails['cartId']))
-            ->fields('cart_hash')->values(pSQL($cartHash))
-            ->fields('authorized_at')->values(pSQL($paymentDetails['authorizedAt']))
-            ->fields('is_paid')->values(pSQL($paymentDetails['isPaid']))
-            ->fields('date_upd')->values(pSQL($paymentDate));
-
-        try {
-            if (!$this->query->build()) {
-                return $this->paymentError(['name' => 'DB Query', 'value' => $this->query],
-                    '[insertPaymentCart] Unable to flush DB (build method)');
-            }
-        } catch (\Exception $e) {
-            return [
-                'result' => false,
-                'paymentDetails' => $paymentDetails,
-                'response' => '[insertPaymentTable] Error: ' . $e->getMessage()
-            ];
-        }
-
-        return [
-            'result' => true,
-            'paymentDetails' => $paymentDetails,
-            'response' => 'Insert data in DB successfully'
-        ];
-    }
-
-    public function checkHash($paymentDetails)
-    {
-        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cartId']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array');
-        }
-
-        $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
-
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
-
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
-
-        if ($paymentStored['cart_hash'] === $cartHash
-            &&
-            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
-            return [
-                'result' => true,
-                'paymentDetails' => $paymentDetails,
-                'response' => 'OK. Comparaison result: Same hash and same payment method.'
-            ];
+        if ($date->diff($date2)->y !== 0 ||
+            $date->diff($date2)->d !== 0 ||
+            $date->diff($date2)->h !== 0 ||
+            $date->diff($date2)->i > 3) {
+            // Plus de 3 minutes
+            return false;
         } else {
-
-            // Create payment or installment
-            $createPayment = $this->createPayment($paymentDetails);
-
-            if ($createPayment['result'] && $createPayment['paymentDetails']) {
-                $paymentDetails = $createPayment['paymentDetails'];
-            } elseif (!$createPayment['result']) {
-                return [
-                    'result' => false,
-                    'paymentDetails' => $createPayment['paymentDetails'],
-                    'response' => $createPayment['response']
-                ];
-            }
-
-            // Update payment table
-            $updatePaymentTable = $this->updatePaymentTable($paymentDetails);
-            if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
-                $paymentDetails = $updatePaymentTable['paymentDetails'];
-            } elseif (!$updatePaymentTable['result']) {
-                return [
-                    'result' => false,
-                    'paymentDetails' => $updatePaymentTable['paymentDetails'],
-                    'response' => $updatePaymentTable['response']
-                ];
-            }
-
-            return [
-                'result' => true,
-                'paymentDetails' => $paymentDetails,
-                'response' => 'Payment created and updated successfully'
-            ];
+            // Moins de 3 minutes
+            return true;
         }
     }
 
@@ -283,7 +193,7 @@ class PaymentRepository extends Repository
                 if ($apiPayment = Payment::create($paymentDetails['paymentTab'])) {
                     $this->paymentEntity->setApiPayment($apiPayment);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create payment. Error: ' . $e->getMessage()
                 );
@@ -292,7 +202,7 @@ class PaymentRepository extends Repository
             try {
                 $apiPayment = InstallmentPlan::create($paymentDetails['paymentTab']);
                 $this->paymentEntity->setApiPayment($apiPayment);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to installment plan. Error: ' . $e->getMessage()
                 );
@@ -348,59 +258,10 @@ class PaymentRepository extends Repository
     }
 
     /**
-     * @description Update hash and payment id in Payplug Payment Cart table
+     * @description Generate and return correct payment return url
      * @param array $paymentDetails
      * @return array
      */
-    public function updatePaymentTable($paymentDetails)
-    {
-        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array');
-        }
-
-        $paymentDate = date('Y-m-d H:i:s');
-
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
-
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
-
-        $table = _DB_PREFIX_ . 'payplug_payment';
-
-        $this->query
-            ->update()
-            ->table($table)
-            ->set($table . '.id_payment =         \'' . pSQL($paymentDetails['paymentId']) . '\'')
-            ->set($table . '.payment_method =     \'' . pSQL($paymentDetails['paymentMethod']) . '\'')
-            ->set($table . '.payment_url =        \'' . pSQL($paymentDetails['paymentUrl']) . '\'')
-            ->set($table . '.payment_return_url = \'' . pSQL($paymentDetails['paymentReturnUrl']) . '\'')
-            ->set($table . '.cart_hash =          \'' . pSQL($cartHash) . '\'')
-            ->set($table . '.authorized_at =      \'' . pSQL($paymentDetails['authorizedAt']) . '\'')
-            ->set($table . '.is_paid =            \'' . pSQL($paymentDetails['isPaid']) . '\'')
-            ->set($table . '.date_upd =           \'' . pSQL($paymentDate) . '\'')
-            ->where($table . '.id_cart =          ' . (int)$paymentDetails['cartId']);
-
-        try {
-            if (!$this->query->build()) {
-                return $this->paymentError(['name' => 'paymentDetails', 'value' => $this->query],
-                    '[updatePaymentTable] Unable to fetch the query on DB but no throw');
-            }
-        } catch (\Exception $e) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updatePaymentTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
-            );
-        }
-
-        return [
-            'result' => true,
-            'paymentDetails' => $paymentDetails,
-            'response' => 'Update DB with new payment creation successfully'
-        ];
-    }
-
     public function getPaymentReturnUrl($paymentDetails)
     {
         if (!$paymentDetails) {
@@ -467,6 +328,145 @@ class PaymentRepository extends Repository
             'result' => true,
             'url' => $paymentReturnUrl,
             'response' => 'Return URL successfully generated'
+        ];
+    }
+
+    /**
+     * @description Insert payment with all details in table
+     * @param array $paymentDetails
+     * @return array|bool
+     */
+    public function insertPaymentTable($paymentDetails)
+    {
+        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['paymentId']) {
+            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array');
+        }
+
+        $paymentDate = date('Y-m-d H:i:s');
+
+        $cartToHash = $paymentDetails['cart'];
+        $cartToHash->date_add = $cartToHash->date_upd = null;
+        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
+        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+
+        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+
+        $this->query
+            ->insert()
+            ->into(_DB_PREFIX_ . 'payplug_payment')
+            ->fields('id_payment')->values(pSQL($paymentDetails['paymentId']))
+            ->fields('payment_method')->values(pSQL($paymentDetails['paymentMethod']))
+            ->fields('payment_url')->values(pSQL($paymentDetails['paymentUrl']))
+            ->fields('payment_return_url')->values(pSQL($paymentDetails['paymentReturnUrl']))
+            ->fields('id_cart')->values(pSQL($paymentDetails['cartId']))
+            ->fields('cart_hash')->values(pSQL($cartHash))
+            ->fields('authorized_at')->values(pSQL($paymentDetails['authorizedAt']))
+            ->fields('is_paid')->values(pSQL($paymentDetails['isPaid']))
+            ->fields('date_upd')->values(pSQL($paymentDate));
+
+        try {
+            if (!$this->query->build()) {
+                return $this->paymentError(['name' => 'DB Query', 'value' => $this->query],
+                    '[insertPaymentCart] Unable to flush DB (build method)');
+            }
+        } catch (Exception $e) {
+            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] Error: ' . $e->getMessage());
+        }
+
+        return [
+            'result' => true,
+            'paymentDetails' => $paymentDetails,
+            'response' => 'Insert data in DB successfully'
+        ];
+    }
+
+    /**
+     * @description Return an error with some details in logger
+     * @param array $element
+     * @param null $errorMessage
+     * @param string $level
+     * @return array
+     */
+    public function paymentError($element, $errorMessage = null, $level = 'error')
+    {
+        $element['value'] = json_encode($element['value']);
+
+        if (!$errorMessage) {
+            $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
+        }
+
+        if (!is_string($errorMessage)) {
+            $this->paymentError($element, '[paymentError] The error message in parameter is not a string.');
+        }
+
+        $this->logger->setParams(['process' => 'paymentRepository']);
+        $this->logger->addLog($errorMessage, $level);
+        $this->logger->addLog($element['name'].': '.$element['value'], 'debug');
+
+        $this->payplug->setPaymentErrorsCookie([
+            $this->l('The transaction was not completed and your card was not charged.')
+        ]);
+
+        return [
+            'result' => false,
+            $element['name'] => $element['value'],
+            'response' => $errorMessage,
+        ];
+    }
+
+    /**
+     * @description Update hash and payment id in Payplug Payment Cart table
+     * @param array $paymentDetails
+     * @return array
+     */
+    public function updatePaymentTable($paymentDetails)
+    {
+        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
+            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array');
+        }
+
+        $paymentDate = date('Y-m-d H:i:s');
+
+        $cartToHash = $paymentDetails['cart'];
+        $cartToHash->date_add = $cartToHash->date_upd = null;
+        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
+        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+
+        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+
+        $table = _DB_PREFIX_ . 'payplug_payment';
+
+        $this->query
+            ->update()
+            ->table($table)
+            ->set($table . '.id_payment =         \'' . pSQL($paymentDetails['paymentId']) . '\'')
+            ->set($table . '.payment_method =     \'' . pSQL($paymentDetails['paymentMethod']) . '\'')
+            ->set($table . '.payment_url =        \'' . pSQL($paymentDetails['paymentUrl']) . '\'')
+            ->set($table . '.payment_return_url = \'' . pSQL($paymentDetails['paymentReturnUrl']) . '\'')
+            ->set($table . '.cart_hash =          \'' . pSQL($cartHash) . '\'')
+            ->set($table . '.authorized_at =      \'' . pSQL($paymentDetails['authorizedAt']) . '\'')
+            ->set($table . '.is_paid =            \'' . pSQL($paymentDetails['isPaid']) . '\'')
+            ->set($table . '.date_upd =           \'' . pSQL($paymentDate) . '\'')
+            ->where($table . '.id_cart =          ' . (int)$paymentDetails['cartId']);
+
+        try {
+            if (!$this->query->build()) {
+                return $this->paymentError(['name' => 'paymentDetails', 'value' => $this->query],
+                    '[updatePaymentTable] Unable to fetch the query on DB but no throw');
+            }
+        } catch (Exception $e) {
+            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[updatePaymentTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
+            );
+        }
+
+        return [
+            'result' => true,
+            'paymentDetails' => $paymentDetails,
+            'response' => 'Update DB with new payment creation successfully'
         ];
     }
 }
