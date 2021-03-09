@@ -49,20 +49,21 @@ class OneyRepository extends Repository
     private $validateSpecific;
     private $payplug;
 
-    public function __construct($cache,
-                                $logger,
-                                $addressSpecific,
-                                $cartSpecific,
-                                $carrierSpecific,
-                                $configurationSpecific,
-                                $contextSpecific,
-                                $countrySpecific,
-                                $toolsSpecific,
-                                $validateSpecific,
-                                $oneyEntity,
-                                $myLogPHP,
-                                $payplug)
-    {
+    public function __construct(
+        $cache,
+        $logger,
+        $addressSpecific,
+        $cartSpecific,
+        $carrierSpecific,
+        $configurationSpecific,
+        $contextSpecific,
+        $countrySpecific,
+        $toolsSpecific,
+        $validateSpecific,
+        $oneyEntity,
+        $myLogPHP,
+        $payplug
+    ) {
         $this->cache = $cache;
         $this->logger = $logger;
         $this->addressSpecific = $addressSpecific;
@@ -344,7 +345,6 @@ class OneyRepository extends Repository
         $min_amount = $this->payplug->convertAmount($limits['min'], true);
         $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-        $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
 
         $this->contextSpecific->getContext()->smarty->assign([
@@ -535,7 +535,6 @@ class OneyRepository extends Repository
                 'delivery_type' => 'edelivery',
             ];
         }
-
     }
 
     /**

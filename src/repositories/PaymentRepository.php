@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -39,12 +38,13 @@ class PaymentRepository extends Repository
     private $paymentEntity;
     private $query;
 
-    public function __construct($payplug,
-                                $cartSpecific,
-                                $logger,
-                                $paymentEntity,
-                                $query)
-    {
+    public function __construct(
+        $payplug,
+        $cartSpecific,
+        $logger,
+        $paymentEntity,
+        $query
+    ) {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
         $this->logger = $logger;
@@ -55,17 +55,19 @@ class PaymentRepository extends Repository
     }
 
     /**
-     * @description Compare hash (sha256 on payment method and cart)
+     * @description Compare hash (sha256 on payment method + cart)
      * Create an other payment request if cart or payment method changed
      * and update payment table in consequence
-     * @param $paymentDetails
+     * @param array $paymentDetails
      * @return array
      */
     public function checkHash($paymentDetails)
     {
         if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cartId']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array');
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array'
+            );
         }
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
@@ -90,15 +92,19 @@ class PaymentRepository extends Repository
             try {
                 $createPayment = $this->createPayment($paymentDetails);
             } catch (Payplug\Exception\ConfigurationNotSetException $e) {
-                return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[checkHash -> createPayment] Error: '.$e->getMessage());
+                return $this->paymentError(
+                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                    '[checkHash -> createPayment] Error: '.$e->getMessage()
+                );
             }
 
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $paymentDetails = $createPayment['paymentDetails'];
             } elseif (!$createPayment['result']) {
-                return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    $createPayment['response']);
+                return $this->paymentError(
+                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                    $createPayment['response']
+                );
             }
 
             // Update payment table
@@ -108,7 +114,8 @@ class PaymentRepository extends Repository
             } elseif (!$updatePaymentTable['result']) {
                 return $this->paymentError(
                     ['name' => 'paymentDetails', 'value' => $updatePaymentTable['paymentDetails']],
-                    $updatePaymentTable['response']);
+                    $updatePaymentTable['response']
+                );
             }
 
             return [
@@ -127,8 +134,10 @@ class PaymentRepository extends Repository
     public function checkPaymentTable($idCart)
     {
         if (!$idCart || !is_int($idCart)) {
-            return $this->paymentError(['name' => 'cart id', 'value' => $idCart],
-                '[checkPaymentTable] Problem with $idCart parameter');
+            return $this->paymentError(
+                ['name' => 'cart id', 'value' => $idCart],
+                '[checkPaymentTable] Problem with $idCart parameter'
+            );
         }
 
         $reqCheck = $this->query
@@ -155,8 +164,10 @@ class PaymentRepository extends Repository
     public function checkTimeoutPayment($idCart)
     {
         if (!$idCart || !is_int($idCart)) {
-            return $this->paymentError(['name' => 'id cart', 'value' => $idCart],
-                '[checkTimeoutPayment] problem with $idCart parameter');
+            return $this->paymentError(
+                ['name' => 'id cart', 'value' => $idCart],
+                '[checkTimeoutPayment] problem with $idCart parameter'
+            );
         }
 
         $dateStored = $this->checkPaymentTable($idCart)['date_upd'];
@@ -184,8 +195,10 @@ class PaymentRepository extends Repository
     public function createPayment($paymentDetails)
     {
         if (!$paymentDetails || !$paymentDetails['paymentTab'] || !$paymentDetails['paymentMethod']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] $paymentDetails or paymentTab or paymentMethod is null');
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
+            );
         }
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
@@ -194,7 +207,8 @@ class PaymentRepository extends Repository
                     $this->paymentEntity->setApiPayment($apiPayment);
                 }
             } catch (Exception $e) {
-                return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                return $this->paymentError(
+                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create payment. Error: ' . $e->getMessage()
                 );
             }
@@ -203,7 +217,8 @@ class PaymentRepository extends Repository
                 $apiPayment = InstallmentPlan::create($paymentDetails['paymentTab']);
                 $this->paymentEntity->setApiPayment($apiPayment);
             } catch (Exception $e) {
-                return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+                return $this->paymentError(
+                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to installment plan. Error: ' . $e->getMessage()
                 );
             }
@@ -212,8 +227,10 @@ class PaymentRepository extends Repository
         $this->apiPayment = $this->paymentEntity->getApiPayment();
 
         if ($this->apiPayment->failure == true && !empty($this->apiPayment->failure->message)) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $this->apiPayment],
-                (string)$this->apiPayment->failure->message);
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $this->apiPayment],
+                (string)$this->apiPayment->failure->message
+            );
         }
 
         // We can now hydrate our params
@@ -222,7 +239,8 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentId']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment ' . (string)$paymentDetails['paymentMethod'] . '] The payment id is null.'
             );
         }
@@ -232,8 +250,10 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentReturnUrl']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] payment return URL is null.');
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[createPayment] payment return URL is null.'
+            );
         }
 
         if (($paymentDetails['paymentMethod'] !== 'installment') && ($this->apiPayment->authorization !== null)) {
@@ -265,8 +285,10 @@ class PaymentRepository extends Repository
     public function getPaymentReturnUrl($paymentDetails)
     {
         if (!$paymentDetails) {
-            return $this->paymentError(['name' => 'paiementDetails', 'value' => $paymentDetails],
-                '[getPaymentReturnUrl] $paymentDetails is null');
+            return $this->paymentError(
+                ['name' => 'paiementDetails', 'value' => $paymentDetails],
+                '[getPaymentReturnUrl] $paymentDetails is null'
+            );
         }
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
@@ -339,8 +361,10 @@ class PaymentRepository extends Repository
     public function insertPaymentTable($paymentDetails)
     {
         if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['paymentId']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array');
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array'
+            );
         }
 
         $paymentDate = date('Y-m-d H:i:s');
@@ -367,12 +391,16 @@ class PaymentRepository extends Repository
 
         try {
             if (!$this->query->build()) {
-                return $this->paymentError(['name' => 'DB Query', 'value' => $this->query],
-                    '[insertPaymentCart] Unable to flush DB (build method)');
+                return $this->paymentError(
+                    ['name' => 'DB Query', 'value' => $this->query],
+                    '[insertPaymentCart] Unable to flush DB (build method)'
+                );
             }
         } catch (Exception $e) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] Error: ' . $e->getMessage());
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] Error: ' . $e->getMessage()
+            );
         }
 
         return [
@@ -424,8 +452,10 @@ class PaymentRepository extends Repository
     public function updatePaymentTable($paymentDetails)
     {
         if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array');
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
+            );
         }
 
         $paymentDate = date('Y-m-d H:i:s');
@@ -454,11 +484,14 @@ class PaymentRepository extends Repository
 
         try {
             if (!$this->query->build()) {
-                return $this->paymentError(['name' => 'paymentDetails', 'value' => $this->query],
-                    '[updatePaymentTable] Unable to fetch the query on DB but no throw');
+                return $this->paymentError(
+                    ['name' => 'paymentDetails', 'value' => $this->query],
+                    '[updatePaymentTable] Unable to fetch the query on DB but no throw'
+                );
             }
         } catch (Exception $e) {
-            return $this->paymentError(['name' => 'paymentDetails', 'value' => $paymentDetails],
+            return $this->paymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[updatePaymentTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
             );
         }
