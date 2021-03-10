@@ -55,7 +55,7 @@ $_MODULE['<{payplug}prestashop>payplug_f72b996f8ba1f2e9714f3deed50a9b50'] = 'Non
 $_MODULE['<{payplug}prestashop>payplug_32d476ce168c7d2b7a2effde748a5417'] = 'Solo tra 100 € e 3000 €';
 $_MODULE['<{payplug}prestashop>payplug_b28e6912cffb002b99655a502003eb26'] = 'Non disponibile per questo metodo di spedizione';
 $_MODULE['<{payplug}prestashop>payplug_e392ef33b693419db4bc7a0b1a627956'] = 'Il tuo carrello non è disponibile';
-$_MODULE['<{payplug}prestashop>payplug_524e93f7ff4da45758a2ed592312d651'] = 'Paga con la carta in %sx con Oney';
+$_MODULE['<{payplug}prestashop>payplug_524e93f7ff4da45758a2ed592312d651'] = 'Paga con la carta in %sx con Oney (Eccetto prepagate)';
 $_MODULE['<{payplug}prestashop>payplug_210e4b1214694fe3fecea26d4a8a46bd'] = 'PayPlug : Impossibile cancellare il save card del cliente.';
 $_MODULE['<{payplug}prestashop>payplug_0cd871d76eb947535142f232479aee0a'] = 'PayPlug : Impossibile esportare il save card del cliente.';
 $_MODULE['<{payplug}prestashop>payplug_5fd9a718e5c073bb745cd970a6f1a5f3'] = 'in corso';
@@ -387,6 +387,7 @@ $_MODULE['<{payplug}prestashop>oneyrepository_7eab6a6607c367867b134afc2df95e2e']
 $_MODULE['<{payplug}prestashop>oneyrepository_b286504b1d4d5ee1aeb919ad1e1255b8'] = 'Francia, Martinica, Guadalupa, Isola della Riunione, Maiotta o Guyana francese';
 $_MODULE['<{payplug}prestashop>oneyrepository_1007e1b7f894dfbf72a0eaa80f3bc57e'] = 'Italia';
 $_MODULE['<{payplug}prestashop>oneyrepository_5308afbb384f19d7878caf5698c5e6f3'] = 'Per un pagamento con Oney, gli indirizzi di consegna e fatturazione devono essere in';
+$_MODULE['<{payplug}prestashop>oneyrepository_2a6c5d0ced2630c6f524f6d2856d8984'] = ' ';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Nessun campo è stato completato';
 $_MODULE['<{payplug}prestashop>translationsrepository_f5146f3861c487374c38fb5ec78cda73'] = 'Almeno un campo non è stato completato correttamente.';
 $_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c84ab97f'] = 'Le tue informazioni sono state salvate';

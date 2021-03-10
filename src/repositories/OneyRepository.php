@@ -507,7 +507,7 @@ class OneyRepository extends Repository
         $carrier = $this->carrierSpecific->get($cart->id_carrier);
 
         return [
-            'delivery_label' => $carrier->name,
+            'delivery_label' => $carrier->name ? $carrier->name : $this->configurationSpecific->get('PS_SHOP_NAME'),
             'expected_delivery_date' => date(
                 'Y-m-d',
                 strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
