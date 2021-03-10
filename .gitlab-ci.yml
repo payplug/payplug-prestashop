@@ -1,5 +1,6 @@
 stages:
   - tests
+  - translations
   - build
 
 unit tests:
@@ -8,6 +9,12 @@ unit tests:
   script:
     - composer install
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
+
+translations:
+  image: composer:1.9
+  stage: test
+  script:
+    - php ci/translations.php
 
 build zip release:
   image: composer:1.9

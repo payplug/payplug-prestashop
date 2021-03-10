@@ -78,7 +78,7 @@ class TranslationsRepository extends Repository
     private function fillTranslations()
     {
         // get current file
-        $translation_dir = _PS_MODULE_DIR_ . 'payplug/translations/';
+        $translation_dir = dirname(__FILE__) . '/../../translations/';
         $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
         foreach ($translation_files as $key => $file) {
             if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
@@ -177,7 +177,7 @@ class TranslationsRepository extends Repository
     private function setFiles()
     {
         $array_files = [];
-        $path = _PS_MODULE_DIR_ . 'payplug/';
+        $path = dirname(__FILE__) . '/../../';
         $this->getRecursiveFiles($path, $array_files, 'payplug');
         return $this->files = $array_files;
     }
