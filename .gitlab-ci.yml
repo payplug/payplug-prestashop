@@ -10,9 +10,9 @@ unit tests:
     - composer install
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
 
-translations:
+check module translations:
   image: composer:1.9
-  stage: test
+  stage: translations
   script:
     - php ci/translations.php
 
