@@ -44,7 +44,8 @@ class PaymentRepository extends Repository
         $logger,
         $paymentEntity,
         $query
-    ) {
+    )
+    {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
         $this->logger = $logger;
@@ -94,7 +95,7 @@ class PaymentRepository extends Repository
             } catch (Payplug\Exception\ConfigurationNotSetException $e) {
                 return $this->paymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[checkHash -> createPayment] Error: '.$e->getMessage()
+                    '[checkHash -> createPayment] Error: ' . $e->getMessage()
                 );
             }
 
@@ -166,7 +167,7 @@ class PaymentRepository extends Repository
         if (!$idCart || !is_int($idCart)) {
             return $this->paymentError(
                 ['name' => 'id cart', 'value' => $idCart],
-                '[checkTimeoutPayment] problem with $idCart parameter'
+                '[checkTimeoutPayment] Problem with $idCart parameter'
             );
         }
 
@@ -286,7 +287,7 @@ class PaymentRepository extends Repository
     {
         if (!$paymentDetails) {
             return $this->paymentError(
-                ['name' => 'paiementDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[getPaymentReturnUrl] $paymentDetails is null'
             );
         }
@@ -417,7 +418,7 @@ class PaymentRepository extends Repository
      * @param string $level
      * @return array
      */
-    public function paymentError($element, $errorMessage = null, $level = 'error')
+    public function paymentError($element = [], $errorMessage = null, $level = 'error')
     {
         $element['value'] = json_encode($element['value']);
 
@@ -431,7 +432,7 @@ class PaymentRepository extends Repository
 
         $this->logger->setParams(['process' => 'paymentRepository']);
         $this->logger->addLog($errorMessage, $level);
-        $this->logger->addLog($element['name'].': '.$element['value'], 'debug');
+        $this->logger->addLog($element['name'] . ': ' . $element['value'], 'debug');
 
         $this->payplug->setPaymentErrorsCookie([
             $this->l('The transaction was not completed and your card was not charged.')
@@ -502,4 +503,5 @@ class PaymentRepository extends Repository
             'response' => 'Update DB with new payment creation successfully'
         ];
     }
+
 }
