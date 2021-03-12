@@ -64,7 +64,11 @@ class PaymentRepository extends Repository
      */
     public function checkHash($paymentDetails)
     {
-        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cartId']) {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cartId'])
+            || !$paymentDetails['cartId']
+        ) {
             return $this->paymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array'
