@@ -144,7 +144,7 @@ final class CheckHashTest extends BaseTest
     {
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[checkHash -> createPayment] Error: An error occured'
+            '[checkHash -> createPayment] Error: An error occurred'
         ];
 
         $this->paymentRepository
@@ -158,7 +158,7 @@ final class CheckHashTest extends BaseTest
 
         $this->paymentRepository
             ->shouldReceive('createPayment')
-            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occured', 500);
+            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occurred', 500);
 
         $this->assertSame(
             $expected_error,
@@ -166,9 +166,14 @@ final class CheckHashTest extends BaseTest
         );
     }
 
+    public function testWithValidCreatePayment()
+    {
+
+    }
+
     public function testWithInvalidCreatePayment()
     {
-        $error_message = 'An error occured in payment creation';
+        $error_message = 'An error occurred in payment creation';
 
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
@@ -194,18 +199,7 @@ final class CheckHashTest extends BaseTest
         );
     }
 
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+    public function testWithValidUpdatePaymentTable()
+    {
+    }
 }

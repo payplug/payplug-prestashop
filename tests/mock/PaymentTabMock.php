@@ -4,13 +4,38 @@ namespace PayPlug\tests\mock;
 
 class PaymentTabMock
 {
-    public static function get()
-    {
-    }
-
     public static function getStandard()
     {
-        $tab = [
+        return self::getRaw();
+    }
+
+    public static function getInstallment()
+    {
+        $tab = self::getRaw();
+        return array_merge($tab, [
+                'paymentTab' => [
+                    'schedule' => [
+                        0 => [
+                            'date' => 'TODAY',
+                            'amount' => 9280
+                        ],
+                        1 => [
+                            'date' => '2021-04-15',
+                            'amount' => 9280
+                        ],
+                        2 => [
+                            'date' => '2021-05-15',
+                            'amount' => 9280
+                        ]
+                    ]
+                ]
+            ]
+        );
+    }
+
+    public static function getRaw()
+    {
+        return [
             'currency' => 'EUR',
             'shipping' => [
                 'title' => null,
@@ -57,6 +82,5 @@ class PaymentTabMock
             'allow_save_card' => true,
             'amount' => 3480,
         ];
-        return $tab;
     }
 }
