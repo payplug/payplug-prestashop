@@ -5685,20 +5685,26 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
-        $req_all_cards = new DbQuery();
-        $req_all_cards->select('pc.*');
-        $req_all_cards->from('payplug_card', 'pc');
-        $res_all_cards = Db::getInstance()->executeS($req_all_cards);
+        try {
+            $req_all_cards = new DbQuery();
+            $req_all_cards->select('pc.*');
+            $req_all_cards->from('payplug_card', 'pc');
+            $res_all_cards = Db::getInstance()->executeS($req_all_cards);
 
-        if (!empty($res_all_cards)) {
-            foreach ($res_all_cards as $card) {
-                $id_customer = $card['id_customer'];
-                $id_payplug_card = $card['id_payplug_card'];
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
-                    return false;
+            if (!empty($res_all_cards)) {
+                foreach ($res_all_cards as $card) {
+                    $id_customer = $card['id_customer'];
+                    $id_payplug_card = $card['id_payplug_card'];
+                    if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
+                        return false;
+                    }
                 }
             }
+        } catch (Exception $e) {
+            // todo: return error log
+            return true;
         }
+
         return true;
     }
 
