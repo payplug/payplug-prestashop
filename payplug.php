@@ -1253,7 +1253,7 @@ class Payplug extends PaymentModule
             $os = Configuration::get($state['cfg']);
 
             // if we don't find order state either, try with template name
-            if (!$sandbox && $state['template'] != null) {
+            if (!$os && !$sandbox && $state['template'] != null) {
                 $sql = 'SELECT DISTINCT `id_order_state`
                         FROM `' . _DB_PREFIX_ . 'order_state_lang` 
                         WHERE `template` = \'' . pSQL($state['template']) . '\'';
