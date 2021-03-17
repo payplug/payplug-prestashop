@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 require_once(dirname(__FILE__) . '/../vendor/autoload.php');
@@ -7,8 +6,6 @@ $repo = new PayPlug\src\repositories\TranslationsRepository('');
 $translations = $repo->getTranslations();
 $missing_translations = [];
 $available_languages = ['fr','en','gb','it'];
-
-$messages = [];
 
 foreach ($translations as $key => $trans) {
     foreach ($available_languages as $lang) {
@@ -30,7 +27,6 @@ if (!empty($missing_translations)) {
 }
 
 if (!empty($messages)) {
-    var_dump($messages);
     foreach ($messages as $message) {
         echo $message . "\n";
     }
