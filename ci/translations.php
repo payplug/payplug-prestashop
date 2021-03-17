@@ -30,6 +30,7 @@ if (!empty($missing_translations)) {
 }
 
 if (!empty($messages)) {
+    var_dump($messages);
     foreach ($messages as $message) {
         echo $message . "\n";
     }
