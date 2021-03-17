@@ -14,7 +14,7 @@ check module translations:
   stage: translations
   script:
     - composer dump-autoload -o
-    - ci/translations
+    - ci/translations.php
 
 build zip release:
   image: composer:1.9
