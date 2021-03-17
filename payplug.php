@@ -5685,6 +5685,19 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
+        $res_all_cards = [];
+
+        try {
+            $exists = Db::getInstance('SHOW TABLES LIKE "%payplug_card%"');
+        } catch (Exception $e) {
+            // todo: add error log - payplug_card does not seem to exist
+            return true;
+        }
+
+        if(!$exists) {
+            return true;
+        }
+
         $req_all_cards = new DbQuery();
         $req_all_cards->select('pc.*');
         $req_all_cards->from('payplug_card', 'pc');
@@ -5699,6 +5712,7 @@ class Payplug extends PaymentModule
                 }
             }
         }
+
         return true;
     }
 
