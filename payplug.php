@@ -5688,13 +5688,20 @@ class Payplug extends PaymentModule
         $res_all_cards = [];
 
         try {
-            $req_all_cards = new DbQuery();
-            $req_all_cards->select('pc.*');
-            $req_all_cards->from('payplug_card', 'pc');
-            $res_all_cards = Db::getInstance()->executeS($req_all_cards);
+            $exists = Db::getInstance('SHOW TABLES LIKE "%payplug_card%"');
         } catch (Exception $e) {
             // todo: add error log - payplug_card does not seem to exist
+            return true;
         }
+
+        if(!$exists) {
+            return true;
+        }
+
+        $req_all_cards = new DbQuery();
+        $req_all_cards->select('pc.*');
+        $req_all_cards->from('payplug_card', 'pc');
+        $res_all_cards = Db::getInstance()->executeS($req_all_cards);
 
         if (!empty($res_all_cards)) {
             foreach ($res_all_cards as $card) {
