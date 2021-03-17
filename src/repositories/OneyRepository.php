@@ -47,7 +47,7 @@ class OneyRepository extends Repository
     private $countrySpecific;
     private $toolsSpecific;
     private $validateSpecific;
-    private $payplug;
+    protected $payplug;
 
     public function __construct(
         $cache,

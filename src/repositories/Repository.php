@@ -29,7 +29,7 @@ class Repository
 {
     private $entity;
     protected $name;
-    private $payplug;
+    protected $payplug;
 
     public static function factory()
     {

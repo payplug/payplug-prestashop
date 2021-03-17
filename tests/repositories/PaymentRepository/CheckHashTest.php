@@ -168,7 +168,23 @@ final class CheckHashTest extends BaseTest
 
     public function testWithValidCreatePayment()
     {
+        $this->paymentRepository
+            ->shouldReceive([
+                'checkPaymentTable' => [
+                    'cart_hash' => 'different_hash',
+                    'payment_method' => $this->paymentDetails['paymentMethod'],
+                ],
+                'createPayment' => [
+                    'result' => true,
+                    'paymentDetails' => $this->paymentDetails,
+                    'response' => '[createPayment] Payment successfully created'
+                ]
+            ]);
 
+        $this->assertSame(
+            'QUOI METTRE ICI',
+            $this->paymentRepository->checkHash($this->paymentDetails)
+        );
     }
 
     public function testWithInvalidCreatePayment()

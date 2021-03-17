@@ -114,7 +114,6 @@ class CardRepository extends Repository
      *
      * @param int $id_customer
      * @param int $id_payplug_card
-     * @param string $api_key
      * @return bool
      * @throws ConfigurationNotSetException
      */
@@ -180,6 +179,7 @@ class CardRepository extends Repository
      *
      * @param int $id_customer
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function deleteCards($id_customer)
     {
@@ -253,6 +253,7 @@ class CardRepository extends Repository
     /**
      * @param $payment
      * @return Exception|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardBrandByPayment($payment)
     {

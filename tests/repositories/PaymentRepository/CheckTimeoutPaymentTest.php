@@ -86,6 +86,7 @@ final class CheckTimeoutPaymentTest extends BaseTest
      * @dataProvider checkTimeoutPaymentParameters
      * @param array $parameter
      * @param string $logMessage
+     * @throws \Exception
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
@@ -110,18 +111,5 @@ final class CheckTimeoutPaymentTest extends BaseTest
         );
     }
 
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+
 }

@@ -507,5 +507,4 @@ class PaymentRepository extends Repository
             'response' => 'Insert data in DB successfully'
         ];
     }
-
 }
