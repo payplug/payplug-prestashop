@@ -29,6 +29,8 @@ if (!empty($missing_translations)) {
 }
 
 if (!empty($messages)) {
-    $return = implode($messages,"\n");
-    die($return);
+    foreach ($messages as $message) {
+        echo $message . "\n";
+    }
+    die(1);
 }
