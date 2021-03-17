@@ -1,4 +1,5 @@
 stages:
+  - tests
   - translations
   - build
 
