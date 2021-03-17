@@ -5688,7 +5688,7 @@ class Payplug extends PaymentModule
         $res_all_cards = [];
 
         try {
-            $exists = Db::getInstance('SHOW TABLES LIKE "%payplug_card%"');
+            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "'._DB_PREFIX_.'payplug_card"');
         } catch (Exception $e) {
             // todo: add error log - payplug_card does not seem to exist
             return true;
