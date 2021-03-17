@@ -1,5 +1,7 @@
 <?php
-
+$messages = [
+        'coucou'
+];
 //require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 //
 //$repo = new PayPlug\src\repositories\TranslationsRepository('');
@@ -26,3 +28,9 @@
 //    }
 //}
 
+if (!empty($messages)) {
+    foreach ($messages as $message) {
+        echo $message . "\n";
+    }
+    die(1);
+}
