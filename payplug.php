@@ -100,7 +100,7 @@ class Payplug extends PaymentModule
     private $log_install;
 
     /** @var array */
-    public $payment_status = array();
+    public $payment_status = [];
 
     /** @var array */
     private $routes = [
