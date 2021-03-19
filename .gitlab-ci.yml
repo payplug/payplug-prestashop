@@ -8,7 +8,6 @@ stages:
   - releasy-review
   - releasy-release
 
-
 unit tests:
   image: composer:1.9
   stage: tests
