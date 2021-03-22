@@ -30,6 +30,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 class PayPlugNotifications
 {
     private $can_save_card = true;
+    private $plugin;
     public $resource;
     public $flag;
     public $except;
@@ -108,7 +109,7 @@ class PayPlugNotifications
             $this->payplug->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
     }
 
@@ -297,7 +298,7 @@ class PayPlugNotifications
             $this->cart = new Cart($id_cart);
         } catch (Exception $exception) {
             $this->logger->addLog('The cart cannot be loaded: ' . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
         if (!Validate::isLoadedObject($this->cart)) {
             $this->logger->addLog('The cart cannot be loaded.', 'error');
@@ -322,7 +323,7 @@ class PayPlugNotifications
         } catch (Exception $exception) {
             $this->logger->addLog('The address cannot be loaded: '
                 . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
         if (!Validate::isLoadedObject($address)) {
             $this->logger->addLog('The address cannot be loaded.', 'error');
@@ -366,7 +367,7 @@ class PayPlugNotifications
                 'The current state cannot be loaded: ' . $exception->getMessage(),
                 'error'
             );
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
 
         // if it's a refused oney payment, we switch to cancelled status
@@ -393,7 +394,7 @@ class PayPlugNotifications
                     'Please check if order state ' . (int)$new_order_state . ' exists.',
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
 
             $order->current_state = $order_history->id_order_state;
@@ -404,7 +405,7 @@ class PayPlugNotifications
                     'Order cannot be updated: ' . $exception->getMessage(),
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
@@ -432,7 +433,7 @@ class PayPlugNotifications
                     'Please check if order state ' . (int)$new_order_state . ' exists.',
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
 
             $order->current_state = $order_history->id_order_state;
@@ -443,7 +444,7 @@ class PayPlugNotifications
                     'Order cannot be updated: ' . $exception->getMessage(),
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
@@ -512,7 +513,7 @@ class PayPlugNotifications
                             'Please check if order state ' . (int)$new_order_state . ' exists.',
                             'error'
                         );
-                        $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                        $this->exitProcess($exception->getMessage(), 500);
                     }
                     $this->exitProcess('The payment has failed and order has been cancelled.');
                 }
@@ -539,7 +540,7 @@ class PayPlugNotifications
                     $message->save();
                 } catch (Exception $exception) {
                     $this->logger->addLog('The message cannot be saved: ' . $exception->getMessage(), 'error');
-                    $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                    $this->exitProcess($exception->getMessage(), 500);
                 }
             }
 
@@ -574,7 +575,7 @@ class PayPlugNotifications
                     'Please check if order state ' . (int)$new_order_state . ' exists.',
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
 
             try {
@@ -585,7 +586,7 @@ class PayPlugNotifications
                     'Order cannot be updated: ' . $exception->getMessage(),
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
             $this->logger->addLog('Order updated.');
             $this->exitProcess('Order updated.');
@@ -689,7 +690,7 @@ class PayPlugNotifications
                 'Customer cannot be loaded: ' . $exception->getMessage(),
                 'error'
             );
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(),500);
         }
         if (!Validate::isLoadedObject($customer)) {
             $this->logger->addLog('Customer cannot be loaded.', 'error');
@@ -757,7 +758,7 @@ class PayPlugNotifications
             );
         } catch (Exception $exception) {
             $this->logger->addLog('Order cannot be validated: ' . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
         if (!$is_order_validated) {
             $this->logger->addLog('Order cannot be validated.', 'error');
@@ -788,7 +789,7 @@ class PayPlugNotifications
                     'Payment cannot be patched: ' . $exception->getMessage(),
                     'error'
                 );
-                $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                $this->exitProcess($exception->getMessage(), 500);
             }
 
             if (!$this->payplug->addPayplugOrderPayment($order->id, $this->payment->id)) {
@@ -872,7 +873,7 @@ class PayPlugNotifications
             $this->setOrderStates();
         } catch (ConfigurationNotSetException $exception) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
 
         if ($this->payment->installment_plan_id) {
@@ -949,7 +950,7 @@ class PayPlugNotifications
                         'Please check if order state ' . (int)$new_order_state . ' exists.',
                         'error'
                     );
-                    $this->exitProcess($exception->getMessage(), $exception->getCode(), 500);
+                    $this->exitProcess($exception->getMessage(), 500);
                 }
             } else {
                 $this->logger->addLog('Order status is already \'refunded\'');
@@ -995,6 +996,8 @@ class PayPlugNotifications
 
     /**
      * @description Entry point to treat the notification
+     * @param string $str
+     * @param int $http_code
      */
     private function exitProcess($str = '', $http_code = 200)
     {
