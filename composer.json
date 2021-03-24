@@ -14,13 +14,13 @@
         "exclude": [
             "!vendor/*",
             ".*",
+            "ci",
             "tests",
             "view/css/less",
             "controllers/tools",
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "composer.*"
         ]
     },
     "autoload": {
@@ -34,13 +34,13 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "./composer.sh"
+            "./ci/composer.sh"
         ],
         "post-update-cmd": [
-            "./composer.sh"
+            "./ci/composer.sh"
         ],
         "install-dev": [
-            "./composer_dev.sh"
+            "./ci/composer_dev.sh"
         ]
     }
 }
