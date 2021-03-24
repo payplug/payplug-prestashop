@@ -690,7 +690,7 @@ class PayPlugNotifications
                 'Customer cannot be loaded: ' . $exception->getMessage(),
                 'error'
             );
-            $this->exitProcess($exception->getMessage(),500);
+            $this->exitProcess($exception->getMessage(), 500);
         }
         if (!Validate::isLoadedObject($customer)) {
             $this->logger->addLog('Customer cannot be loaded.', 'error');
@@ -906,7 +906,7 @@ class PayPlugNotifications
 
             if (!Validate::isLoadedObject($this->cart)) {
                 $this->logger->addLog('Cart cannot be loaded.', 'error');
-                $this->logger->addLog('$cart_id : '.$cart_id, 'debug');
+                $this->logger->addLog('$cart_id : ' . $cart_id, 'debug');
                 $this->exitProcess('Cart cannot be loaded.', 500);
             }
 
