@@ -35,13 +35,26 @@ function upgrade_module_3_1_2()
     }
 
     // Update payplug card table
-    $sql_requests = [
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP PRIMARY KEY',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP `position`',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
-        ADD PRIMARY KEY (`id_payplug_card`)',
-    ];
+    $sql_requests = [];
+
+    try {
+        $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "'._DB_PREFIX_.'payplug_card"');
+    } catch (Exception $e) {
+        return $flag;
+    }
+
+    if ($exists) {
+        $sql_payplug_card = [
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP PRIMARY KEY',
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP `position`',
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+                ADD PRIMARY KEY (`id_payplug_card`)',
+        ];
+
+        $sql_requests = array_merge($sql_requests, $sql_payplug_card);
+    }
+
 
     try {
         foreach ($sql_requests as $sql_request) {
