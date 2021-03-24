@@ -20,7 +20,7 @@
             "controllers/tools",
             "views/templates/front/tools",
             "test.php",
-            "*.zip",
+            "*.zip"
         ]
     },
     "autoload": {
