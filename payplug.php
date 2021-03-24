@@ -1265,6 +1265,7 @@ class Payplug extends PaymentModule
             // before creating a new order state, we should check if a previous state correspond to our needs
             $previous_order_state_id = $this->findOrderState($state['name'], $sandbox);
             if ($previous_order_state_id) {
+                $log->info('Update order state with: ' . $previous_order_state_id);
                 return Configuration::updateValue($key_config, $previous_order_state_id);
             }
 
@@ -1302,6 +1303,8 @@ class Payplug extends PaymentModule
             }
             $os = $order_state->id;
             $log->info('ID: ' . $os);
+        } else {
+            $log->info('Order state already exists: ' . $os);
         }
 
         return Configuration::updateValue($key_config, $os);
@@ -5685,16 +5688,14 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
-        $res_all_cards = [];
-
         try {
-            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "'._DB_PREFIX_.'payplug_card"');
+            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
         } catch (Exception $e) {
             // todo: add error log - payplug_card does not seem to exist
             return true;
         }
 
-        if(!$exists) {
+        if (!$exists) {
             return true;
         }
 
@@ -5726,16 +5727,14 @@ class Payplug extends PaymentModule
      */
     public function uninstallModuleTab($tabClass)
     {
-        //$tabRepository = $this->get('prestashop.core.admin.tab.repository');
-        //$idTab = $tabRepository->findOneIdByClassName($tabClass);
-        //deprecated but without any retro-compatibility solution... thx Prestashop
         $idTab = Tab::getIdFromClassName($tabClass);
-        if ($idTab != 0) {
+
+        if ($idTab) {
             $tab = new Tab($idTab);
-            $tab->delete();
-            return true;
+            return $tab->delete();
         }
-        return false;
+
+        return true;
     }
 
     /**
