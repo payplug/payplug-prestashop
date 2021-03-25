@@ -24,11 +24,6 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
-
 /**
  * @group unit
  * @group repository
@@ -37,32 +32,8 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class InsertPaymentTableTest extends BaseTest
+final class InsertPaymentTableTest extends BasePaymentRepository
 {
-    private $paymentRepository;
-
-    public function setUp()
-    {
-        parent::setUp();
-        parent::apiCall();
-
-        $this->logger->shouldReceive([
-            'setParams' => $this->logger,
-        ]);
-
-        $this->paymentRepository = new PaymentRepository(
-            $this->payplug,
-            $this->cart,
-            $this->logger,
-            new PaymentEntity(),
-            null
-        );
-
-        $this->payplug
-            ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
-    }
-
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -78,18 +49,10 @@ final class InsertPaymentTableTest extends BaseTest
         yield [null, 'paymentDetails: null'];
 
         // Test if (!is_array($paymentDetails))
-        yield [
-            [(string)'I am a string!'],
-            'paymentDetails: ["I am a string!"]'
-        ];
+        yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
 
         // Test if (!$paymentDetails['paymentId'])
-        yield [
-            [
-                'paymentId' => null
-            ],
-            'paymentDetails: {"paymentId":null}'
-        ];
+        yield [['paymentId' => null], 'paymentDetails: {"paymentId":null}'];
     }
 
     /**
@@ -101,10 +64,7 @@ final class InsertPaymentTableTest extends BaseTest
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $arrayLog = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLog);
-
-        $response = $this->paymentRepository->insertPaymentTable($parameter);
+        $response = $this->repo->insertPaymentTable($parameter);
 
         $this->assertFalse(
             $response['result'],
@@ -117,7 +77,7 @@ final class InsertPaymentTableTest extends BaseTest
         );
 
         $this->assertSame(
-            $arrayLog['message'],
+            $this->arrayLogger['message'],
             $logMessage
         );
     }

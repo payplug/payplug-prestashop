@@ -24,12 +24,8 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\PaymentMock;
 use PayPlug\tests\mock\PaymentTabMock;
-use PayPlug\tests\repositories\BaseTest;
 
 /**
  * @group unit
@@ -39,32 +35,8 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class CreatePaymentTest extends BaseTest
+final class CreatePaymentTest extends BasePaymentRepository
 {
-    private $paymentRepository;
-
-    public function setUp()
-    {
-        parent::setUp();
-        parent::apiCall();
-
-        $this->logger->shouldReceive([
-            'setParams' => $this->logger,
-        ]);
-
-        $this->paymentRepository = new PaymentRepository(
-            $this->payplug,
-            $this->cart,
-            $this->logger,
-            new PaymentEntity(),
-            null
-        );
-
-        $this->payplug
-            ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
-    }
-
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -100,10 +72,7 @@ final class CreatePaymentTest extends BaseTest
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $arrayLog = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLog);
-
-        $response = $this->paymentRepository->createPayment($parameter);
+        $response = $this->repo->createPayment($parameter);
 
         // Test 1 : On va checker return $this->displayErrorPayment
         $this->assertFalse(
@@ -119,7 +88,7 @@ final class CreatePaymentTest extends BaseTest
 
         // Test 3 : On compare le message du logger à écrire et celui écrit
         $this->assertSame(
-            $arrayLog['message'],
+            $this->arrayLogger['message'],
             $logMessage
         );
     }
@@ -129,9 +98,6 @@ final class CreatePaymentTest extends BaseTest
      */
     public function testCreatePaymentWithValidData()
     {
-        $arrayLog = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLog);
-
         $paymentDetails = [
             'paymentTab' => PaymentTabMock::getStandard(),
             'paymentMethod' => 'standard'
@@ -147,7 +113,7 @@ final class CreatePaymentTest extends BaseTest
                 'response' => '[createPayment] Payment successfully created'
             ]);
 
-        $response = $this->paymentRepository->createPayment($paymentDetails);
+        $response = $this->repo->createPayment($paymentDetails);
     }
 
     public function testCreatePaymentWithInvalidData()
@@ -156,9 +122,6 @@ final class CreatePaymentTest extends BaseTest
             'paymentTab' => PaymentTabMock::getStandard(),
             'paymentMethod' => 'standard'
         ];
-
-        $arrayLog = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLog);
 
         $paymentMockStandard = PaymentMock::getStandard();
 
@@ -170,7 +133,7 @@ final class CreatePaymentTest extends BaseTest
                 'response' => '[createPayment] Exception. Unable to create payment. Error: Bad request'
             ]);
 
-        $response = $this->paymentRepository->createPayment($paymentDetails);
+        $response = $this->repo->createPayment($paymentDetails);
     }
 
 //    public function testCreatePaymentThrowException($parameter)
