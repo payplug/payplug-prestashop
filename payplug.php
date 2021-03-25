@@ -1318,7 +1318,6 @@ class Payplug extends PaymentModule
      */
     public function createOrderStates()
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $this->log_install->info('Order state creation starting.');
 
         foreach ($this->order_states as $key => $state) {
@@ -1328,7 +1327,7 @@ class Payplug extends PaymentModule
 
         $this->order_state->removeIdsUnusedByPayPlug();
 
-        $log->info('Order state creation ended.');
+        $this->log_install->info('Order state creation ended.');
         return true;
     }
 
