@@ -1,6 +1,12 @@
+include:
+  - project: 'payplug/releasy'
+    file: '/templates/main.gitlab-ci.yml'
+
 stages:
   - tests
   - build
+  - releasy-review
+  - releasy-release
 
 unit tests:
   image: composer:1.9
