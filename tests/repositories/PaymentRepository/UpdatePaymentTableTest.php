@@ -24,11 +24,6 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
-
 /**
  * @group unit
  * @group repository
@@ -37,32 +32,8 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class UpdatePaymentTableTest extends BaseTest
+final class UpdatePaymentTableTest extends BasePaymentRepository
 {
-    private $paymentRepository;
-
-    public function setUp()
-    {
-        parent::setUp();
-        parent::apiCall();
-
-        $this->logger->shouldReceive([
-            'setParams' => $this->logger,
-        ]);
-
-        $this->paymentRepository = new PaymentRepository(
-            $this->payplug,
-            $this->cart,
-            $this->logger,
-            new PaymentEntity(),
-            null
-        );
-
-        $this->payplug
-            ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
-    }
-
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -77,16 +48,10 @@ final class UpdatePaymentTableTest extends BaseTest
         yield [null, 'paymentDetails: null'];
 
         // Test if (!is_array($paymentDetails))
-        yield [
-            [(string)'I am a string!'],
-            'paymentDetails: ["I am a string!"]'
-        ];
+        yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
 
         // Test if (!$paymentDetails['cart'])
-        yield [
-            ['cart' => null],
-            'paymentDetails: {"cart":null}'
-        ];
+        yield [['cart' => null], 'paymentDetails: {"cart":null}'];
     }
 
     /**
@@ -98,10 +63,7 @@ final class UpdatePaymentTableTest extends BaseTest
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $arrayLog = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLog);
-
-        $response = $this->paymentRepository->updatePaymentTable($parameter);
+        $response = $this->repo->updatePaymentTable($parameter);
 
         $this->assertFalse(
             $response['result'],
@@ -114,7 +76,7 @@ final class UpdatePaymentTableTest extends BaseTest
         );
 
         $this->assertSame(
-            $arrayLog['message'],
+            $this->arrayLogger['message'],
             $logMessage
         );
     }

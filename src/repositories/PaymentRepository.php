@@ -291,7 +291,11 @@ class PaymentRepository extends Repository
      */
     public function updatePaymentTable($paymentDetails)
     {
-        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cart'])
+            || !$paymentDetails['cart']
+        ) {
             return $this->paymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
@@ -458,7 +462,11 @@ class PaymentRepository extends Repository
      */
     public function insertPaymentTable($paymentDetails)
     {
-        if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['paymentId']) {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['paymentId'])
+            || !$paymentDetails['paymentId']
+        ) {
             return $this->paymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array'

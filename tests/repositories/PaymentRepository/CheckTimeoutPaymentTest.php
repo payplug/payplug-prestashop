@@ -24,11 +24,6 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
-
 /**
  * @group unit
  * @group repository
@@ -37,32 +32,8 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class CheckTimeoutPaymentTest extends BaseTest
+final class CheckTimeoutPaymentTest extends BasePaymentRepository
 {
-    private $paymentRepository;
-
-    public function setUp()
-    {
-        parent::setUp();
-        parent::apiCall();
-
-        $this->logger->shouldReceive([
-            'setParams' => $this->logger,
-        ]);
-
-        $this->paymentRepository = new PaymentRepository(
-            $this->payplug,
-            $this->cart,
-            $this->logger,
-            new PaymentEntity(),
-            null
-        );
-
-        $this->payplug
-            ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
-    }
-
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -90,10 +61,7 @@ final class CheckTimeoutPaymentTest extends BaseTest
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $arrayLog = [];
-        MockHelper::createAddLogMock($this->logger, $arrayLog);
-
-        $response = $this->paymentRepository->checkTimeoutPayment($parameter);
+        $response = $this->repo->checkTimeoutPayment($parameter);
 
         $this->assertFalse(
             $response['result'],
@@ -106,7 +74,7 @@ final class CheckTimeoutPaymentTest extends BaseTest
         );
 
         $this->assertSame(
-            $arrayLog['message'],
+            $this->arrayLogger['message'],
             $logMessage
         );
     }
