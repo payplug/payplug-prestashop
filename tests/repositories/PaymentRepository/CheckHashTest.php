@@ -27,6 +27,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -208,7 +209,33 @@ final class CheckHashTest extends BasePaymentRepository
         );
     }
 
-    public function testWithValidUpdatePaymentTable()
+    public function testWithValidMethod()
     {
+        $this->repo
+            ->shouldReceive([
+                'checkPaymentTable' => [
+                    'cart_hash' => 'different_hash',
+                    'payment_method' => $this->paymentDetails['paymentMethod'],
+                ],
+                'createPayment' => [
+                    'result' => true,
+                    'paymentDetails' => $this->paymentDetails,
+                    'response' => '[createPayment] Payment successfully created'
+                ],
+                'updatePaymentTable' => [
+                    'result' => true,
+                    'response' => 'Success message',
+                    'paymentDetails' => $this->paymentDetails
+                ]
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => 'Payment created and updated successfully'
+            ],
+            $this->repo->checkHash($this->paymentDetails)
+        );
     }
 }
