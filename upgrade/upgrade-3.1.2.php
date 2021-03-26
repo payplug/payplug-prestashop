@@ -45,7 +45,8 @@ function upgrade_module_3_1_2()
 
     if ($exists) {
         $sql_payplug_card = [
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
+            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` 
+                CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
             'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` DROP PRIMARY KEY',
             'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` DROP `position`',
             'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
