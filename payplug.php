@@ -4217,14 +4217,14 @@ class Payplug extends PaymentModule
             }
 
             // Update payment table
-            $updatePaymentTable = $this->payment->updatePaymentTable($this->paymentDetails);
-            if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
-                $this->paymentDetails = $updatePaymentTable['paymentDetails'];
-            } elseif (!$updatePaymentTable['result']) {
+            $updateTable = $this->payment->updateTable($this->paymentDetails);
+            if ($updateTable['result'] && $updateTable['paymentDetails']) {
+                $this->paymentDetails = $updateTable['paymentDetails'];
+            } elseif (!$updateTable['result']) {
                 return [
                     'result' => false,
-                    'paymentDetails' => $updatePaymentTable['paymentDetails'],
-                    'response' => $updatePaymentTable['response']
+                    'paymentDetails' => $updateTable['paymentDetails'],
+                    'response' => $updateTable['response']
                 ];
             }
 

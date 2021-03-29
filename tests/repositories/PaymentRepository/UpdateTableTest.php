@@ -32,14 +32,14 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  *
  * @runTestsInSeparateProcesses
  */
-final class UpdatePaymentTableTest extends BasePaymentRepository
+final class UpdateTableTest extends BasePaymentRepository
 {
     /**
      * Parameters to test method with empty $paiementDetails
      *
      * @return \Generator
      */
-    public function checkUpdatePaymentTableParameters()
+    public function checkUpdateTableParameters()
     {
         /*
          * if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
@@ -57,13 +57,13 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkUpdatePaymentTableParameters
+     * @dataProvider checkUpdateTableParameters
      * @param array $parameter
      * @param string $logMessage
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $response = $this->repo->updatePaymentTable($parameter);
+        $response = $this->repo->updateTable($parameter);
 
         $this->assertFalse(
             $response['result'],
@@ -72,7 +72,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
         $this->assertSame(
             $response['response'],
-            '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
+            '[updateTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
         );
 
         $this->assertSame(
