@@ -58,7 +58,7 @@ class BasePaymentRepository extends BaseTest
             $this->cart,
             $this->logger,
             $this->payment,
-            null
+            $this->query
         ])->makePartial();
 
         $this->arrayCache = [];
