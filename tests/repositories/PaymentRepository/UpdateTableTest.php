@@ -25,6 +25,7 @@
 namespace PayPlug\tests\repositories\PaymentRepository;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -39,44 +40,29 @@ final class UpdateTableTest extends BasePaymentRepository
      *
      * @return \Generator
      */
-    public function checkUpdateTableParameters()
+    public function invalidDataProvider()
     {
-        /*
-         * if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
-         */
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!is_array($paymentDetails))
         yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
-
-        // Test if (!$paymentDetails['cart'])
         yield [['cart' => null], 'paymentDetails: {"cart":null}'];
     }
 
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkUpdateTableParameters
+     * @dataProvider invalidDataProvider
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
-        $response = $this->repo->updateTable($parameter);
-
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $logMessage
+            ]);
 
         $this->assertSame(
-            $response['response'],
-            '[updateTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
-        );
-
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->updateTable($parameter),
             $logMessage
         );
     }

@@ -70,8 +70,9 @@ class BaseTest extends TestCase
         $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
 
         // Method setup
+        $this->constant = MockHelper::createConstantMock('Payplug\src\specific\ConstantSpecific');
+        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
         $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
     }
 }
