@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
+use PayPlug\tests\mock\CartMock;
+
 /**
  * @group unit
  * @group repository
@@ -34,6 +36,24 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  */
 final class CheckTimeoutPaymentTest extends BasePaymentRepository
 {
+    private $paymentDetails;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $cart = CartMock::get();
+        $cart->date_add = $cart->date_upd = null;
+        $cart->id_address_delivery = (string)$cart->id_address_delivery;
+        $cart->id_address_invoice = (string)$cart->id_address_invoice;
+
+        $this->paymentDetails = [
+            'cartId' => $cart->id,
+            'cart' => $cart,
+            'paymentMethod' => 'payment_method'
+        ];
+    }
+
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -61,23 +81,44 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $response = $this->repo->checkTimeoutPayment($parameter);
-
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $logMessage
+            ]);
 
         $this->assertSame(
-            $response['response'],
-            '[checkTimeoutPayment] Problem with $idCart parameter'
-        );
-
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->checkTimeoutPayment($parameter),
             $logMessage
         );
     }
 
+    public function testWithTimeoutLessThan3min()
+    {
+        $this->repo
+            ->shouldReceive([
+                'checkPaymentTable' => [
+                    'date_upd' => (new \DateTime('-2 min'))->format('Y-m-d H:i:s')
+                ]
+            ]);
 
+        $this->assertSame(
+            true,
+            $this->repo->checkTimeoutPayment($this->paymentDetails['cartId'])
+        );
+    }
+
+    public function testWithTimoutMoreThan3min()
+    {
+        $this->repo
+            ->shouldReceive([
+                'checkPaymentTable' => [
+                    'date_upd' => (new \DateTime('+5 min'))->format('Y-m-d H:i:s')
+                ]
+            ]);
+
+        $this->assertSame(
+            false,
+            $this->repo->checkTimeoutPayment($this->paymentDetails['cartId'])
+        );
+    }
 }
