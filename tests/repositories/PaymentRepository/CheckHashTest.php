@@ -79,7 +79,7 @@ final class CheckHashTest extends BaseTest
      *
      * @return \Generator
      */
-    public function checkHashParameters()
+    public function InvalidDataProvider()
     {
         // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
@@ -100,11 +100,11 @@ final class CheckHashTest extends BaseTest
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkHashParameters
+     * @dataProvider InvalidDataProvider
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->paymentRepository
             ->shouldReceive([
