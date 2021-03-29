@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
+use PayPlug\tests\mock\CartMock;
+
 /**
  * @group unit
  * @group repository
@@ -34,6 +36,28 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  */
 final class UpdatePaymentTableTest extends BasePaymentRepository
 {
+    private $paymentDetails;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $cart = CartMock::get();
+        $cart->date_add = $cart->date_upd = null;
+        $cart->id_address_delivery = (string)$cart->id_address_delivery;
+        $cart->id_address_invoice = (string)$cart->id_address_invoice;
+
+        $this->paymentDetails = [
+            'cartId' => $cart->id,
+            'cart' => $cart,
+            'paymentMethod' => 'payment_method',
+            'paymentUrl' => 'payment_url',
+            'authorizedAt' => 'authorized_at',
+            'isPaid' => 'is_paid',
+        ];
+    }
+
+
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -81,11 +105,28 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
         );
     }
 
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
+    public function testCreatePaymentWithValidData()
+    {
+//        $hash = hash('sha256', $this->paymentDetails['paymentMethod'] . json_encode($this->paymentDetails['cart']));
+        $this->query
+            ->shouldReceive([
+                'update' => true,
+                'table' => true,
+                'set' => true,
+                'where' => true,
+                'build' => true,
+            ]);
+
+        $this->assertSame(
+            $this->repo->updatePaymentTable($this->paymentDetails),
+            [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => 'Update DB with new payment creation successfully'
+            ]
+        );
+    }
+
 //    public function testCreatePaymentWithInvalidData()
 //    {
 //
