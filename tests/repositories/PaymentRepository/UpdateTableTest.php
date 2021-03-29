@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
+use PayPlug\tests\mock\CartMock;
+
 /**
  * @group dev
  * @group unit
@@ -67,6 +69,21 @@ final class UpdateTableTest extends BasePaymentRepository
         );
     }
 
+    public function testWithCreatePaymentThrowingException()
+    {
+        $paymentDetails = [
+            'cart' => CartMock::get(),
+            'paymentId' => 1,
+            'paymentMethod' => 'standard',
+            'paymentUrl' => 'htt://www.monsite.com',
+            'paymentReturnUrl' => 'htt://www.monsite.com',
+            'authorizedAt' => '2021-01-01 00:00:00',
+            'isPaid' => true,
+            'cartId' => 1
+        ];
+
+        $response = $this->repo->updateTable($paymentDetails);
+    }
 //    public function testCreatePaymentWithValidData()
 //    {
 //

@@ -30,6 +30,12 @@ class Repository
     private $entity;
     protected $name;
     protected $payplug;
+    protected $constant;
+
+    public function __construct()
+    {
+        $this->constant = ConstantSpecific::factory();
+    }
 
     public static function factory()
     {

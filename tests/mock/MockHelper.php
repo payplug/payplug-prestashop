@@ -80,6 +80,15 @@ class MockHelper extends Mockery
         return $tools;
     }
 
+    public static function createConstantMock($classPathname) {
+        $constant = self::createMockFactory($classPathname);
+        $constant
+            ->shouldReceive([
+                'get' => 'constant'
+            ]);
+        return $constant;
+    }
+
     public static function createTranslateMock($classPathname) {
         $translate = self::createMockFactory($classPathname);
         $translate

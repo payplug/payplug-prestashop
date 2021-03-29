@@ -311,20 +311,19 @@ class PaymentRepository extends Repository
 
         $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
 
-        $table = _DB_PREFIX_ . 'payplug_payment';
-
+        $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
         $this->query
             ->update()
             ->table($table)
-            ->set($table . '.id_payment =         \'' . pSQL($paymentDetails['paymentId']) . '\'')
-            ->set($table . '.payment_method =     \'' . pSQL($paymentDetails['paymentMethod']) . '\'')
-            ->set($table . '.payment_url =        \'' . pSQL($paymentDetails['paymentUrl']) . '\'')
-            ->set($table . '.payment_return_url = \'' . pSQL($paymentDetails['paymentReturnUrl']) . '\'')
-            ->set($table . '.cart_hash =          \'' . pSQL($cartHash) . '\'')
-            ->set($table . '.authorized_at =      \'' . pSQL($paymentDetails['authorizedAt']) . '\'')
-            ->set($table . '.is_paid =            \'' . pSQL($paymentDetails['isPaid']) . '\'')
-            ->set($table . '.date_upd =           \'' . pSQL($paymentDate) . '\'')
-            ->where($table . '.id_cart =          ' . (int)$paymentDetails['cartId']);
+            ->set('id_payment =         \'' . pSQL($paymentDetails['paymentId']) . '\'')
+            ->set('payment_method =     \'' . pSQL($paymentDetails['paymentMethod']) . '\'')
+            ->set('payment_url =        \'' . pSQL($paymentDetails['paymentUrl']) . '\'')
+            ->set('payment_return_url = \'' . pSQL($paymentDetails['paymentReturnUrl']) . '\'')
+            ->set('cart_hash =          \'' . pSQL($cartHash) . '\'')
+            ->set('authorized_at =      \'' . pSQL($paymentDetails['authorizedAt']) . '\'')
+            ->set('is_paid =            \'' . pSQL($paymentDetails['isPaid']) . '\'')
+            ->set('date_upd =           \'' . pSQL($paymentDate) . '\'')
+            ->where('id_cart =          ' . (int)$paymentDetails['cartId']);
 
         try {
             if (!$this->query->build()) {
