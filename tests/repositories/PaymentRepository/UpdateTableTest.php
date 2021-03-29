@@ -56,7 +56,7 @@ final class UpdateTableTest extends BasePaymentRepository
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithInvalidData($parameter, $logMessage)
+    public function atestMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
@@ -69,7 +69,7 @@ final class UpdateTableTest extends BasePaymentRepository
         );
     }
 
-    public function testWithCreatePaymentThrowingException()
+    public function testWithUpdateThrowingException()
     {
         $paymentDetails = [
             'cart' => CartMock::get(),

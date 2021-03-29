@@ -37,13 +37,15 @@ class PaymentRepository extends Repository
     private $logger;
     private $paymentEntity;
     private $query;
+    private $constant;
 
     public function __construct(
         $payplug,
         $cartSpecific,
         $logger,
         $paymentEntity,
-        $query
+        $query,
+        $constant
     )
     {
         $this->payplug = $payplug;
@@ -51,6 +53,7 @@ class PaymentRepository extends Repository
         $this->logger = $logger;
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
+        $this->constant = $constant;
 
         $this->logger->setParams(['process' => 'payment']);
     }
@@ -312,6 +315,7 @@ class PaymentRepository extends Repository
         $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
 
         $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
+
         $this->query
             ->update()
             ->table($table)

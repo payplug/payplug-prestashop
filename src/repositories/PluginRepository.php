@@ -111,7 +111,8 @@ class PluginRepository extends Repository
             $this->cart,
             $this->logger,
             $this->paymentEntity,
-            $this->query
+            $this->query,
+            $this->constant
         );
 
         $this->plugin
