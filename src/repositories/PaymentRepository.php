@@ -319,14 +319,14 @@ class PaymentRepository extends Repository
         $this->query
             ->update()
             ->table($table)
-            ->set('id_payment =         \'' . pSQL($paymentDetails['paymentId']) . '\'')
-            ->set('payment_method =     \'' . pSQL($paymentDetails['paymentMethod']) . '\'')
-            ->set('payment_url =        \'' . pSQL($paymentDetails['paymentUrl']) . '\'')
-            ->set('payment_return_url = \'' . pSQL($paymentDetails['paymentReturnUrl']) . '\'')
-            ->set('cart_hash =          \'' . pSQL($cartHash) . '\'')
-            ->set('authorized_at =      \'' . pSQL($paymentDetails['authorizedAt']) . '\'')
-            ->set('is_paid =            \'' . pSQL($paymentDetails['isPaid']) . '\'')
-            ->set('date_upd =           \'' . pSQL($paymentDate) . '\'')
+            ->set('id_payment =         \'' . $paymentDetails['paymentId'] . '\'')
+            ->set('payment_method =     \'' . $paymentDetails['paymentMethod'] . '\'')
+            ->set('payment_url =        \'' . $paymentDetails['paymentUrl'] . '\'')
+            ->set('payment_return_url = \'' . $paymentDetails['paymentReturnUrl'] . '\'')
+            ->set('cart_hash =          \'' . $cartHash . '\'')
+            ->set('authorized_at =      \'' . $paymentDetails['authorizedAt'] . '\'')
+            ->set('is_paid =            \'' . $paymentDetails['isPaid'] . '\'')
+            ->set('date_upd =           \'' . $paymentDate . '\'')
             ->where('id_cart =          ' . (int)$paymentDetails['cartId']);
 
         try {

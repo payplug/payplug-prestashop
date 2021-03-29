@@ -37,6 +37,24 @@ use PayPlug\tests\mock\CartMock;
  */
 final class UpdateTableTest extends BasePaymentRepository
 {
+    private $paymentDetails;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->paymentDetails = [
+            'cart' => CartMock::get(),
+            'paymentId' => 1,
+            'paymentMethod' => 'standard',
+            'paymentUrl' => 'htt://www.monsite.com',
+            'paymentReturnUrl' => 'htt://www.monsite.com',
+            'authorizedAt' => '2021-01-01 00:00:00',
+            'isPaid' => true,
+            'cartId' => 1
+        ];
+    }
+
     /**
      * Parameters to test method with empty $paiementDetails
      *
@@ -56,7 +74,7 @@ final class UpdateTableTest extends BasePaymentRepository
      * @param array $parameter
      * @param string $logMessage
      */
-    public function atestMethodWithInvalidData($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
@@ -71,31 +89,79 @@ final class UpdateTableTest extends BasePaymentRepository
 
     public function testWithUpdateThrowingException()
     {
-        $paymentDetails = [
-            'cart' => CartMock::get(),
-            'paymentId' => 1,
-            'paymentMethod' => 'standard',
-            'paymentUrl' => 'htt://www.monsite.com',
-            'paymentReturnUrl' => 'htt://www.monsite.com',
-            'authorizedAt' => '2021-01-01 00:00:00',
-            'isPaid' => true,
-            'cartId' => 1
+        $expected_error = [
+            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
+            '[updateTable] Unable to fetch the query on DB. Error: Build method throw exception'
         ];
 
-        $response = $this->repo->updateTable($paymentDetails);
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query
+            ]);
+
+        $this->query
+            ->shouldReceive('build')
+            ->andThrow('Exception', 'Build method throw exception', 500);
+
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $expected_error
+            ]);
+
+        $this->assertSame(
+            $expected_error,
+            $this->repo->updateTable($this->paymentDetails)
+        );
     }
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+
+    public function testWithUpdateReturningError()
+    {
+        $expected_error = [
+            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
+            '[updateTable] Unable to fetch the query on DB but no throw'
+        ];
+
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query,
+                'build' => false
+            ]);
+
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $expected_error
+            ]);
+
+        $this->assertSame(
+            $expected_error,
+            $this->repo->updateTable($this->paymentDetails)
+        );
+    }
+
+    public function testWithValidMethod()
+    {
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query,
+                'build' => true
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => 'Update DB with new payment creation successfully'
+            ],
+            $this->repo->updateTable($this->paymentDetails)
+        );
+    }
 }
