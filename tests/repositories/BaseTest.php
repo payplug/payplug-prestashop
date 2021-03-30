@@ -24,6 +24,7 @@
 
 namespace PayPlug\tests\repositories;
 
+use PayPlug\src\repositories\QueryRepository;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -51,6 +52,7 @@ class BaseTest extends TestCase
     protected $tools;
     protected $repo;
     protected $assign;
+    protected $query;
 
     protected $arrayCache;
     protected $arrayLogger;
@@ -71,6 +73,7 @@ class BaseTest extends TestCase
 
         // Method setup
         $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
+        $this->query = \Mockery::mock(QueryRepository::class);
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
         $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
     }
