@@ -34,57 +34,88 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  */
 final class ReturnErrorTest extends BasePaymentRepository
 {
-//    /**
-//     * Parameters to test method with empty $paiementDetails
-//     *
-//     * @return \Generator
-//     */
-//    public function checkPaymentErrorParameters()
-//    {
-//        // Test if (!$paymentDetails)
-//        yield [null, ': null'];
-//
-//    }
-//
-//    /**
-//     * Test methods with nulled $paiementDetails
-//     *
-//     * @dataProvider checkPaymentErrorParameters
-//     * @param array $parameter
-//     * @param string $logMessage
-//     */
-//    public function testMethodWithEmptyParams($parameter, $logMessage)
-//    {
-//        $response = $this->repo->returnError($parameter);
-//
-//        $this->assertFalse(
-//            $response['result'],
-//            'ERROR : the response is true'
-//        );
-//
-//        $this->assertSame(
-//            $response['response'],
-//            '[PaymentRepository] Error during payment creation process.'
-//        );
-//
-//        $this->assertSame(
-//            $this->arrayLogger['message'],
-//            $logMessage
-//        );
-//    }
-//
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+    private $response;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->response = [
+            'result' => false,
+            'name' => 'value',
+            'response' => 'error message',
+        ];
+    }
+
+    public function InvalidElementDataProvider()
+    {
+        yield[null];
+        yield['wrong_parameter'];
+        yield[42];
+    }
+
+    /**
+     * @dataProvider InvalidElementDataProvider
+     */
+    public function testMethodWithEmptyElement($element)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'response' => 'Test with empty $element params',
+            ],
+            $this->repo->returnError($element, 'Test with empty $element params')
+        );
+    }
+
+    public function InvalidMessageDataProvider()
+    {
+        yield[null];
+        yield[['wrong error message']];
+        yield[42];
+    }
+
+    /**
+     * @dataProvider InvalidMessageDataProvider
+     */
+    public function testMethodWithWrongMessage($message)
+    {
+        $element = [
+            'name' => 'unit_test',
+            'value' => 'empty message',
+        ];
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'unit_test' => '"empty message"',
+                'response' => '[PaymentRepository] Error during payment creation process.'
+            ],
+            $this->repo->returnError($element, $message)
+        );
+    }
+
+    public function testMethodWithValidData()
+    {
+        $element = [
+            'name' => 'unit_test',
+            'value' => 'empty message',
+        ];
+
+        $message = 'Test valide return error method';
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'unit_test' => '"empty message"',
+                'response' => 'Test valide return error method'
+            ],
+            $this->repo->returnError($element, $message)
+        );
+
+        $this->assertSame(
+            2,
+            count($this->arrayLogger)
+        );
+    }
 }

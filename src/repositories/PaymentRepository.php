@@ -139,23 +139,26 @@ class PaymentRepository extends Repository
      */
     public function returnError($element = [], $errorMessage = null, $level = 'error')
     {
-        $element['value'] = json_encode($element['value']);
-
-        if (!$errorMessage) {
+        if (!$errorMessage || !is_string($errorMessage)) {
             $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
         }
-
-        if (!is_string($errorMessage)) {
-            $this->returnError($element, '[returnError] The error message in parameter is not a string.');
-        }
-
-        $this->logger->setParams(['process' => 'paymentRepository']);
-        $this->logger->addLog($errorMessage, $level);
-        $this->logger->addLog($element['name'] . ': ' . $element['value'], 'debug');
 
         $this->payplug->setPaymentErrorsCookie([
             $this->l('The transaction was not completed and your card was not charged.')
         ]);
+
+        $this->logger->setParams(['process' => 'paymentRepository']);
+        $this->logger->addLog($errorMessage, $level);
+
+        if (!is_array($element) || empty($element)) {
+            return [
+                'result' => false,
+                'response' => $errorMessage,
+            ];
+        }
+
+        $element['value'] = json_encode($element['value']);
+        $this->logger->addLog($element['name'] . ': ' . $element['value'], 'debug');
 
         return [
             'result' => false,
