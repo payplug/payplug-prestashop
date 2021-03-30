@@ -104,36 +104,4 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
             $logMessage
         );
     }
-
-    public function testCreatePaymentWithValidData()
-    {
-//        $hash = hash('sha256', $this->paymentDetails['paymentMethod'] . json_encode($this->paymentDetails['cart']));
-        $this->query
-            ->shouldReceive([
-                'update' => true,
-                'table' => true,
-                'set' => true,
-                'where' => true,
-                'build' => true,
-            ]);
-
-        $this->assertSame(
-            $this->repo->updatePaymentTable($this->paymentDetails),
-            [
-                'result' => true,
-                'paymentDetails' => $this->paymentDetails,
-                'response' => 'Update DB with new payment creation successfully'
-            ]
-        );
-    }
-
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
 }

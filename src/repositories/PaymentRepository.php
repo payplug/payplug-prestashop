@@ -200,7 +200,9 @@ class PaymentRepository extends Repository
      */
     public function createPayment($paymentDetails)
     {
-        if (!$paymentDetails || !$paymentDetails['paymentTab'] || !$paymentDetails['paymentMethod']) {
+        if (!$paymentDetails
+            || !$paymentDetails['paymentTab']
+            || !$paymentDetails['paymentMethod']) {
             return $this->paymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
