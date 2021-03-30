@@ -55,7 +55,7 @@ final class ReturnErrorTest extends BasePaymentRepository
 //     */
 //    public function testMethodWithEmptyParams($parameter, $logMessage)
 //    {
-//        $response = $this->repo->paymentError($parameter);
+//        $response = $this->repo->returnError($parameter);
 //
 //        $this->assertFalse(
 //            $response['result'],
