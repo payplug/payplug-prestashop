@@ -1,6 +1,12 @@
+include:
+  - project: 'payplug/releasy'
+    file: '/templates/main.gitlab-ci.yml'
+
 stages:
   - tests
   - build
+  - releasy-review
+  - releasy-release
 
 unit tests:
   image: composer:1.9
@@ -14,6 +20,8 @@ build zip release:
   stage: build
   before_script:
     - composer install --no-dev
+    - ./assets_revision.sh
+    - git status
     - mkdir payplug
   script:
     - shopt -s extglob
