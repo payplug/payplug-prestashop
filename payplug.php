@@ -279,7 +279,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.2';
+        $this->version = '3.1.4';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -1253,7 +1253,7 @@ class Payplug extends PaymentModule
             $os = Configuration::get($state['cfg']);
 
             // if we don't find order state either, try with template name
-            if (!$sandbox && $state['template'] != null) {
+            if (!$os && !$sandbox && $state['template'] != null) {
                 $sql = 'SELECT DISTINCT `id_order_state`
                         FROM `' . _DB_PREFIX_ . 'order_state_lang` 
                         WHERE `template` = \'' . pSQL($state['template']) . '\'';
@@ -2108,8 +2108,8 @@ class Payplug extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.2.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.2.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -2897,8 +2897,8 @@ class Payplug extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.2.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.2.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -3387,7 +3387,7 @@ class Payplug extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.1.2.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
 
         $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
@@ -3555,13 +3555,13 @@ class Payplug extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.1.2.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.1.2.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.1.2.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.1.2.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
             ]);
         }
     }
@@ -3592,7 +3592,7 @@ class Payplug extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.1.2.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
@@ -5685,6 +5685,19 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
+        $res_all_cards = [];
+
+        try {
+            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "'._DB_PREFIX_.'payplug_card"');
+        } catch (Exception $e) {
+            // todo: add error log - payplug_card does not seem to exist
+            return true;
+        }
+
+        if(!$exists) {
+            return true;
+        }
+
         $req_all_cards = new DbQuery();
         $req_all_cards->select('pc.*');
         $req_all_cards->from('payplug_card', 'pc');
@@ -5699,6 +5712,7 @@ class Payplug extends PaymentModule
                 }
             }
         }
+
         return true;
     }
 
