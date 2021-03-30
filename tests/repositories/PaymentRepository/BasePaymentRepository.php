@@ -73,7 +73,7 @@ class BasePaymentRepository extends BaseTest
 
         $this->constant
             ->shouldReceive('get')
-            ->andReturn('test');
+            ->andReturn('constant');
 
         $this->apiCall();
     }
