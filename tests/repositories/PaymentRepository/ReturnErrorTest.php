@@ -32,7 +32,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  *
  * @runTestsInSeparateProcesses
  */
-final class PaymentErrorTest extends BasePaymentRepository
+final class ReturnErrorTest extends BasePaymentRepository
 {
 //    /**
 //     * Parameters to test method with empty $paiementDetails
