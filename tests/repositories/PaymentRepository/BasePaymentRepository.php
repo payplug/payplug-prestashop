@@ -28,6 +28,7 @@ use Payplug\Payment;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\mock\PaymentTabMock;
 use PayPlug\tests\repositories\BaseTest;
 
 /**

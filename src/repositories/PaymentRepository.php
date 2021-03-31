@@ -484,15 +484,15 @@ class PaymentRepository extends Repository
         $this->query
             ->insert()
             ->into(_DB_PREFIX_ . 'payplug_payment')
-            ->fields('id_payment')->values(pSQL($paymentDetails['paymentId']))
-            ->fields('payment_method')->values(pSQL($paymentDetails['paymentMethod']))
-            ->fields('payment_url')->values(pSQL($paymentDetails['paymentUrl']))
-            ->fields('payment_return_url')->values(pSQL($paymentDetails['paymentReturnUrl']))
-            ->fields('id_cart')->values(pSQL($paymentDetails['cartId']))
-            ->fields('cart_hash')->values(pSQL($cartHash))
-            ->fields('authorized_at')->values(pSQL($paymentDetails['authorizedAt']))
-            ->fields('is_paid')->values(pSQL($paymentDetails['isPaid']))
-            ->fields('date_upd')->values(pSQL($paymentDate));
+            ->fields('id_payment')->values($paymentDetails['paymentId'])
+            ->fields('payment_method')->values($paymentDetails['paymentMethod'])
+            ->fields('payment_url')->values($paymentDetails['paymentUrl'])
+            ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
+            ->fields('id_cart')->values($paymentDetails['cartId'])
+            ->fields('cart_hash')->values($cartHash)
+            ->fields('authorized_at')->values($paymentDetails['authorizedAt'])
+            ->fields('is_paid')->values($paymentDetails['isPaid'])
+            ->fields('date_upd')->values($paymentDate);
 
         try {
             if (!$this->query->build()) {
