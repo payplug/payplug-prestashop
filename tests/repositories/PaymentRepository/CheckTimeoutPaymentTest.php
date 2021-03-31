@@ -83,7 +83,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'returnError' => $logMessage
+                'returnPaymentError' => $logMessage
             ]);
 
         $this->assertSame(

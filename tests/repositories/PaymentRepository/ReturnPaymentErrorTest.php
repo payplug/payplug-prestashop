@@ -32,7 +32,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  *
  * @runTestsInSeparateProcesses
  */
-final class ReturnErrorTest extends BasePaymentRepository
+final class ReturnPaymentErrorTest extends BasePaymentRepository
 {
     private $response;
 
@@ -64,7 +64,7 @@ final class ReturnErrorTest extends BasePaymentRepository
                 'result' => false,
                 'response' => 'Test with empty $element params',
             ],
-            $this->repo->returnError($element, 'Test with empty $element params')
+            $this->repo->returnPaymentError($element, 'Test with empty $element params')
         );
     }
 
@@ -91,7 +91,7 @@ final class ReturnErrorTest extends BasePaymentRepository
                 'unit_test' => '"empty message"',
                 'response' => '[PaymentRepository] Error during payment creation process.'
             ],
-            $this->repo->returnError($element, $message)
+            $this->repo->returnPaymentError($element, $message)
         );
     }
 
@@ -110,7 +110,7 @@ final class ReturnErrorTest extends BasePaymentRepository
                 'unit_test' => '"empty message"',
                 'response' => 'Test valide return error method'
             ],
-            $this->repo->returnError($element, $message)
+            $this->repo->returnPaymentError($element, $message)
         );
 
         $this->assertSame(

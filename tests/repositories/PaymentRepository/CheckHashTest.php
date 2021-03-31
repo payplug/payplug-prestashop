@@ -88,7 +88,7 @@ final class CheckHashTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'returnError' => $logMessage
+                'returnPaymentError' => $logMessage
             ]);
 
         $this->assertSame(
@@ -133,7 +133,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'cart_hash' => 'different_hash',
                     'payment_method' => $this->paymentDetails['paymentMethod'],
                 ],
-                'returnError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->repo
@@ -165,7 +165,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'result' => false,
                     'response' => $error_message
                 ],
-                'returnError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->assertSame(
@@ -199,7 +199,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'response' => $error_message,
                     'paymentDetails' => $this->paymentDetails
                 ],
-                'returnError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->assertSame(
