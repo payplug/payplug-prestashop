@@ -194,7 +194,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'paymentDetails' => $this->paymentDetails,
                     'response' => '[createPayment] Payment successfully created'
                 ],
-                'updateTable' => [
+                'updatePaymentTable' => [
                     'result' => false,
                     'response' => $error_message,
                     'paymentDetails' => $this->paymentDetails
@@ -221,7 +221,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'paymentDetails' => $this->paymentDetails,
                     'response' => '[createPayment] Payment successfully created'
                 ],
-                'updateTable' => [
+                'updatePaymentTable' => [
                     'result' => true,
                     'response' => 'Success message',
                     'paymentDetails' => $this->paymentDetails

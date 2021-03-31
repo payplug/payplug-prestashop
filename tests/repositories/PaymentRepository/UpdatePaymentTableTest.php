@@ -35,7 +35,7 @@ use PayPlug\tests\mock\CartMock;
  *
  * @runTestsInSeparateProcesses
  */
-final class UpdateTableTest extends BasePaymentRepository
+final class UpdatePaymentTableTest extends BasePaymentRepository
 {
     private $paymentDetails;
 
@@ -82,7 +82,7 @@ final class UpdateTableTest extends BasePaymentRepository
             ]);
 
         $this->assertSame(
-            $this->repo->updateTable($parameter),
+            $this->repo->updatePaymentTable($parameter),
             $logMessage
         );
     }
@@ -91,7 +91,7 @@ final class UpdateTableTest extends BasePaymentRepository
     {
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[updateTable] Unable to fetch the query on DB. Error: Build method throw exception'
+            '[updatePaymentTable] Unable to fetch the query on DB. Error: Build method throw exception'
         ];
 
         $this->query
@@ -113,7 +113,7 @@ final class UpdateTableTest extends BasePaymentRepository
 
         $this->assertSame(
             $expected_error,
-            $this->repo->updateTable($this->paymentDetails)
+            $this->repo->updatePaymentTable($this->paymentDetails)
         );
     }
 
@@ -121,7 +121,7 @@ final class UpdateTableTest extends BasePaymentRepository
     {
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[updateTable] Unable to fetch the query on DB but no throw'
+            '[updatePaymentTable] Unable to fetch the query on DB but no throw'
         ];
 
         $this->query
@@ -140,7 +140,7 @@ final class UpdateTableTest extends BasePaymentRepository
 
         $this->assertSame(
             $expected_error,
-            $this->repo->updateTable($this->paymentDetails)
+            $this->repo->updatePaymentTable($this->paymentDetails)
         );
     }
 
@@ -161,7 +161,7 @@ final class UpdateTableTest extends BasePaymentRepository
                 'paymentDetails' => $this->paymentDetails,
                 'response' => 'Update DB with new payment creation successfully'
             ],
-            $this->repo->updateTable($this->paymentDetails)
+            $this->repo->updatePaymentTable($this->paymentDetails)
         );
     }
 }

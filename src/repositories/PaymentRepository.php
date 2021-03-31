@@ -116,13 +116,13 @@ class PaymentRepository extends Repository
             }
 
             // Update payment table
-            $updateTable = $this->updateTable($paymentDetails);
-            if ($updateTable['result'] && $updateTable['paymentDetails']) {
-                $paymentDetails = $updateTable['paymentDetails'];
-            } elseif (!$updateTable['result']) {
+            $updatePaymentTable = $this->updatePaymentTable($paymentDetails);
+            if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
+                $paymentDetails = $updatePaymentTable['paymentDetails'];
+            } elseif (!$updatePaymentTable['result']) {
                 return $this->paymentError(
-                    ['name' => 'paymentDetails', 'value' => $updateTable['paymentDetails']],
-                    $updateTable['response']
+                    ['name' => 'paymentDetails', 'value' => $updatePaymentTable['paymentDetails']],
+                    $updatePaymentTable['response']
                 );
             }
 
@@ -292,7 +292,7 @@ class PaymentRepository extends Repository
      * @param array $paymentDetails
      * @return array
      */
-    public function updateTable($paymentDetails)
+    public function updatePaymentTable($paymentDetails)
     {
         if (!$paymentDetails
             || !is_array($paymentDetails)
@@ -301,7 +301,7 @@ class PaymentRepository extends Repository
         ) {
             return $this->paymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updateTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
+                '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
             );
         }
 
@@ -333,13 +333,13 @@ class PaymentRepository extends Repository
             if (!$this->query->build()) {
                 return $this->paymentError(
                     ['name' => 'paymentDetails', 'value' => $this->query],
-                    '[updateTable] Unable to fetch the query on DB but no throw'
+                    '[updatePaymentTable] Unable to fetch the query on DB but no throw'
                 );
             }
         } catch (Exception $e) {
             return $this->paymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updateTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
+                '[updatePaymentTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
             );
         }
 
