@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -60,7 +59,7 @@ final class CheckHashTest extends BasePaymentRepository
      *
      * @return \Generator
      */
-    public function checkHashParameters()
+    public function InvalidDataProvider()
     {
         // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
@@ -81,15 +80,15 @@ final class CheckHashTest extends BasePaymentRepository
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkHashParameters
+     * @dataProvider InvalidDataProvider
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'paymentError' => $logMessage
+                'returnPaymentError' => $logMessage
             ]);
 
         $this->assertSame(
@@ -134,7 +133,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'cart_hash' => 'different_hash',
                     'payment_method' => $this->paymentDetails['paymentMethod'],
                 ],
-                'paymentError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->repo
@@ -166,7 +165,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'result' => false,
                     'response' => $error_message
                 ],
-                'paymentError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->assertSame(
@@ -200,7 +199,7 @@ final class CheckHashTest extends BasePaymentRepository
                     'response' => $error_message,
                     'paymentDetails' => $this->paymentDetails
                 ],
-                'paymentError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->assertSame(

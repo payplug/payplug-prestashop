@@ -27,6 +27,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -42,98 +43,125 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     {
         parent::setUp();
 
-        $cart = CartMock::get();
-        $cart->date_add = $cart->date_upd = null;
-        $cart->id_address_delivery = (string)$cart->id_address_delivery;
-        $cart->id_address_invoice = (string)$cart->id_address_invoice;
-
         $this->paymentDetails = [
-            'cartId' => $cart->id,
-            'cart' => $cart,
-            'paymentMethod' => 'payment_method',
-            'paymentUrl' => 'payment_url',
-            'authorizedAt' => 'authorized_at',
-            'isPaid' => 'is_paid',
+            'cart' => CartMock::get(),
+            'paymentId' => 1,
+            'paymentMethod' => 'standard',
+            'paymentUrl' => 'htt://www.monsite.com',
+            'paymentReturnUrl' => 'htt://www.monsite.com',
+            'authorizedAt' => '2021-01-01 00:00:00',
+            'isPaid' => true,
+            'cartId' => 1
         ];
     }
-
 
     /**
      * Parameters to test method with empty $paiementDetails
      *
      * @return \Generator
      */
-    public function checkUpdatePaymentTableParameters()
+    public function invalidDataProvider()
     {
-        /*
-         * if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['cart']) {
-         */
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!is_array($paymentDetails))
         yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
-
-        // Test if (!$paymentDetails['cart'])
         yield [['cart' => null], 'paymentDetails: {"cart":null}'];
     }
 
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkUpdatePaymentTableParameters
+     * @dataProvider invalidDataProvider
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
-        $response = $this->repo->updatePaymentTable($parameter);
-
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $logMessage
+            ]);
 
         $this->assertSame(
-            $response['response'],
-            '[updatePaymentTable] $paymentDetails or cart is null, or $paymentDetails is not an array'
-        );
-
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->updatePaymentTable($parameter),
             $logMessage
         );
     }
 
-    public function testCreatePaymentWithValidData()
+    public function testWithUpdateThrowingException()
     {
-//        $hash = hash('sha256', $this->paymentDetails['paymentMethod'] . json_encode($this->paymentDetails['cart']));
+        $expected_error = [
+            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
+            '[updatePaymentTable] Unable to fetch the query on DB. Error: Build method throw exception'
+        ];
+
         $this->query
             ->shouldReceive([
-                'update' => true,
-                'table' => true,
-                'set' => true,
-                'where' => true,
-                'build' => true,
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query
+            ]);
+
+        $this->query
+            ->shouldReceive('build')
+            ->andThrow('Exception', 'Build method throw exception', 500);
+
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $expected_error
             ]);
 
         $this->assertSame(
-            $this->repo->updatePaymentTable($this->paymentDetails),
+            $expected_error,
+            $this->repo->updatePaymentTable($this->paymentDetails)
+        );
+    }
+
+    public function testWithUpdateReturningError()
+    {
+        $expected_error = [
+            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
+            '[updatePaymentTable] Unable to fetch the query on DB but no throw'
+        ];
+
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query,
+                'build' => false
+            ]);
+
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $expected_error
+            ]);
+
+        $this->assertSame(
+            $expected_error,
+            $this->repo->updatePaymentTable($this->paymentDetails)
+        );
+    }
+
+    public function testWithValidMethod()
+    {
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query,
+                'build' => true
+            ]);
+
+        $this->assertSame(
             [
                 'result' => true,
                 'paymentDetails' => $this->paymentDetails,
                 'response' => 'Update DB with new payment creation successfully'
-            ]
+            ],
+            $this->repo->updatePaymentTable($this->paymentDetails)
         );
     }
-
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
 }
