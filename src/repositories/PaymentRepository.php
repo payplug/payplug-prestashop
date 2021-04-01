@@ -506,7 +506,7 @@ class PaymentRepository extends Repository
 
         $this->query
             ->insert()
-            ->into(_DB_PREFIX_ . 'payplug_payment')
+            ->into($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
             ->fields('id_payment')->values($paymentDetails['paymentId'])
             ->fields('payment_method')->values($paymentDetails['paymentMethod'])
             ->fields('payment_url')->values($paymentDetails['paymentUrl'])
