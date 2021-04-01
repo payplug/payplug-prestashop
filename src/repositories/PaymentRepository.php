@@ -394,6 +394,13 @@ class PaymentRepository extends Repository
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
+        if (!$paymentStored) {
+            return $this->paymentError(
+                ['name' => 'paymentStored', 'value' => false],
+                '[getPaymentReturnUrl] $paymentStored is null or invalid'
+            );
+        }
+
         if (!$paymentDetails['paymentUrl']) {
             $paymentDetails['paymentUrl'] = $paymentStored['payment_url'];
         }
@@ -408,6 +415,13 @@ class PaymentRepository extends Repository
 
         if (!$paymentDetails['isPaid']) {
             $paymentDetails['isPaid'] = $paymentStored['is_paid'];
+        }
+
+        if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
+            return $this->paymentError(
+                ['name' => 'paymentUrl', 'value' => false],
+                '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] && $paymentDetails[\'paymentReturnUrl\'] are null'
+            );
         }
 
         switch ($paymentDetails['paymentMethod']) {
