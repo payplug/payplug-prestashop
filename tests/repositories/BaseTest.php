@@ -51,6 +51,7 @@ class BaseTest extends TestCase
     protected $validate;
     protected $tools;
     protected $repo;
+    protected $query;
     protected $assign;
     protected $query;
 
@@ -76,5 +77,7 @@ class BaseTest extends TestCase
         $this->query = \Mockery::mock(QueryRepository::class);
         $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
         $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+
+        define('_DB_PREFIX_', 'ps_');
     }
 }
