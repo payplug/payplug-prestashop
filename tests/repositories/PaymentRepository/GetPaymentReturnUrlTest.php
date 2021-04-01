@@ -24,7 +24,10 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
+use PayPlug\tests\mock\CartMock;
+
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -40,11 +43,22 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
     {
         parent::setUp();
 
-        $this->paymentDetails = [
-            'paymentReturnUrl' => 'payment_return_url',
-            'paymentUrl' => 'payment_url'
-        ];
+        $cart = CartMock::get();
+        $cart->date_add = $cart->date_upd = null;
+        $cart->id_address_delivery = (string)$cart->id_address_delivery;
+        $cart->id_address_invoice = (string)$cart->id_address_invoice;
 
+        $this->paymentDetails = [
+            'cartId' => $cart->id,
+            'cart' => $cart,
+            'authorizedAt' => true,
+            'isEmbedded' => true,
+            'isMobileDevice' => true,
+            'isPaid' => true,
+            'paymentMethod' => 'payment_method',
+            'paymentReturnUrl' => 'payment_return_url',
+            'paymentUrl' => 'payment_return_url'
+        ];
     }
 
     /**
@@ -52,54 +66,79 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
      *
      * @return \Generator
      */
-    public function checkGetPaymentReturnUrlParameters()
+    public function invalidPaymentDetailDataProvider()
     {
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
     }
 
-    public function checkGetPaymentReturnUrlPaymentMethods()
+    public function validPaymentMethodDataProvider()
     {
-        yield ['oneclick'];
-        yield ['oney'];
-        yield ['standard'];
-        yield ['installment'];
+        yield [
+            'oneclick',
+            [
+                'result' => true,
+                'embedded' => true,
+                'redirect' => true,
+                'return_url' => 'payment_return_url',
+            ]
+        ];
+        yield [
+            'oney',
+            [
+                'result' => 'new_card',
+                'embedded' => false,
+                'redirect' => true,
+                'return_url' => 'payment_return_url',
+            ]
+        ];
+        yield [
+            'standard',
+            [
+                'result' => 'new_card',
+                'embedded' => false,
+                'redirect' => true,
+                'return_url' => 'payment_return_url',
+            ]
+        ];
+        yield [
+            'installment',
+            [
+                'result' => 'new_card',
+                'embedded' => false,
+                'redirect' => true,
+                'return_url' => 'payment_return_url',
+            ]
+        ];
     }
 
+    public function invalidPaymentMethodDataProvider()
+    {
+        yield ['wrong_payment_method'];
+        yield [''];
+        yield [null];
+        yield [42];
+    }
 
     /**
-     * Test methods with nulled $paiementDetails
-     *
-     * @dataProvider checkGetPaymentReturnUrlParameters
-     * @param array $parameter
-     * @param string $logMessage
+     * @dataProvider invalidPaymentDetailDataProvider
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $response = $this->repo->getpaymentReturnUrl($parameter);
-
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
+        $this->repo
+            ->shouldReceive([
+                'returnPaymentError' => $logMessage
+            ]);
 
         $this->assertSame(
-            $response['response'],
-            '[getPaymentReturnUrl] $paymentDetails is null'
-        );
-
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->getpaymentReturnUrl($parameter),
             $logMessage
         );
     }
 
     /**
-     * @group returnUrl
-     * @dataProvider checkGetPaymentReturnUrlPaymentMethods
-     * @param string $paymentMethod
+     * @dataProvider validPaymentMethodDataProvider
      */
-    public function testMethodWithValidData($paymentMethod)
+    public function testMethodWithValidData($paymentMethod, $paymentReturnUrl)
     {
         $this->repo
             ->shouldReceive([
@@ -108,39 +147,50 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
         $this->paymentDetails['paymentMethod'] = $paymentMethod;
 
-        $this->assertTrue($this->repo->getPaymentReturnUrl($this->paymentDetails)['result']);
+        $this->assertSame(
+            [
+                'result' => true,
+                'url' => $paymentReturnUrl,
+                'response' => 'Return URL successfully generated'
+            ],
+            $this->repo->getPaymentReturnUrl($this->paymentDetails)
+        );
+    }
 
-        $this->assertSame('payment_url', $this->repo->getPaymentReturnUrl($this->paymentDetails)['url']['return_url']);
+    public function testMethodWithEmptyPaymentTable()
+    {
+        $errorMessage = 'checkPaymentTable return empty result';
 
-        $this->assertSame('Return URL successfully generated',
-            $this->repo->getPaymentReturnUrl($this->paymentDetails)['response']);
+        $this->repo
+            ->shouldReceive([
+                'checkPaymentTable' => false,
+                'returnPaymentError' => $errorMessage
+            ]);
+
+        $this->assertSame(
+            $errorMessage,
+            $this->repo->getPaymentReturnUrl($this->paymentDetails)
+        );
     }
 
     /**
-     * @group returnUrl
+     * @dataProvider invalidPaymentMethodDataProvider
      */
-    public function testMethodWithInvalidData()
+    public function testMethodWithInvalidPaymentMethod($paymentMethod)
     {
-        // Step 1 : With return false in checkPaymentTable
+        $errorMessage = 'Error: invalid payment method given';
         $this->repo
             ->shouldReceive([
-                'checkPaymentTable' => false
+                'checkPaymentTable' => ['key' => 'value'],
+                'returnPaymentError' => $errorMessage
             ]);
 
-        $this->assertFalse($this->repo->getPaymentReturnUrl($this->paymentDetails)['result']);
-        $this->assertSame($this->repo->getPaymentReturnUrl($this->paymentDetails)['response'],
-            '[getPaymentReturnUrl] $paymentStored is null or invalid');
+        $this->paymentDetails['paymentMethod'] = $paymentMethod;
 
-        // Step 2 : With good return in checkPaymentTable but invalid payment method
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => ['key' => 'value']
-            ]);
-
-        $this->paymentDetails['paymentMethod'] = mt_rand();
-
-        $this->assertFalse($this->repo->getPaymentReturnUrl($this->paymentDetails)['result']);
-        $this->assertSame($this->repo->getPaymentReturnUrl($this->paymentDetails)['response'],
-            '[getPaymentReturnUrl] $paymentStored is null or invalid');    }
+        $this->assertSame(
+            $errorMessage,
+            $this->repo->getPaymentReturnUrl($this->paymentDetails)
+        );
+    }
 
 }
