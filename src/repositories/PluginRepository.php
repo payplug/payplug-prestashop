@@ -31,6 +31,7 @@ use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ConstantSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\ProductSpecific;

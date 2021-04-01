@@ -41,14 +41,8 @@ final class CheckPaymentTableTest extends BasePaymentRepository
      */
     public function checkPaymentTableParameters()
     {
-        // Test if (!$idCart)
         yield [null, 'cart id: null'];
-
-        // Test if (!is_int($idCart))
-        yield [
-            (string)'I am a string!',
-            'cart id: "I am a string!"'
-        ];
+        yield [(string)'I am a string!', 'cart id: "I am a string!"'];
     }
 
     /**
@@ -62,7 +56,7 @@ final class CheckPaymentTableTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'paymentError' => $logMessage
+                'returnPaymentError' => $logMessage
             ]);
 
         $this->assertSame(

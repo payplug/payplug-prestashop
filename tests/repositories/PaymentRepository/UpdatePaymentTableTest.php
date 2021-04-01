@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -78,7 +77,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'paymentError' => $logMessage
+                'returnPaymentError' => $logMessage
             ]);
 
         $this->assertSame(
@@ -108,7 +107,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
         $this->repo
             ->shouldReceive([
-                'paymentError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->assertSame(
@@ -135,7 +134,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
         $this->repo
             ->shouldReceive([
-                'paymentError' => $expected_error
+                'returnPaymentError' => $expected_error
             ]);
 
         $this->assertSame(

@@ -24,7 +24,6 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
-use \Exception;
 use PayPlug\tests\mock\CartMock;
 
 /**
@@ -43,9 +42,16 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     {
         parent::setUp();
 
+        $cart = CartMock::get();
+
         $this->paymentDetails = [
+            'cartId' => $cart->id,
+            'authorizedAt' => true,
+            'isPaid' => true,
             'paymentId' => 'pay_5SnSQwmPty5UgKbUgrZQuT',
             'paymentMethod' => 'standard',
+            'paymentUrl' => 'payment_return_url',
+            'paymentReturnUrl' => 'payment_return_url',
             'cart' => CartMock::get()
         ];
     }
@@ -73,7 +79,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'paymentError' => $logMessage
+                'returnPaymentError' => $logMessage
             ]);
 
         $this->assertSame(

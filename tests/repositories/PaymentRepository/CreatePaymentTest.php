@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\PaymentRepository;
 
 use PayPlug\tests\mock\PaymentMock;
-use PayPlug\tests\mock\PaymentTabMock;
 
 /**
  * @group unit
@@ -44,21 +43,10 @@ final class CreatePaymentTest extends BasePaymentRepository
      */
     public function paymentDetailsParameters()
     {
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!$paymentDetails['paymentTab'])
+        yield [['paymentTab' => null], 'paymentDetails: {"paymentTab":null}'];
         yield [
-            ['paymentTab' => null],
-            'paymentDetails: {"paymentTab":null}'
-        ];
-
-        // Test if (!$paymentDetails['paymentMethod'])
-        yield [
-            [
-                'paymentTab' => ['field' => 'value'],
-                'paymentMethod' => null
-            ],
+            ['paymentTab' => ['field' => 'value'], 'paymentMethod' => null],
             'paymentDetails: {"paymentTab":{"field":"value"},"paymentMethod":null}'
         ];
     }
@@ -72,23 +60,13 @@ final class CreatePaymentTest extends BasePaymentRepository
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $response = $this->repo->createPayment($parameter);
+        $this->repo
+            ->shouldReceive([
+                'returnPaymentError' => $logMessage
+            ]);
 
-        // Test 1 : On va checker return $this->displayErrorPayment
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
-
-        // Test 2 : On compare les messages du retour
         $this->assertSame(
-            $response['response'],
-            '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
-        );
-
-        // Test 3 : On compare le message du logger à écrire et celui écrit
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->createPayment($parameter),
             $logMessage
         );
     }
