@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -60,7 +59,7 @@ final class CheckHashTest extends BasePaymentRepository
      *
      * @return \Generator
      */
-    public function checkHashParameters()
+    public function InvalidDataProvider()
     {
         // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
@@ -81,11 +80,11 @@ final class CheckHashTest extends BasePaymentRepository
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkHashParameters
+     * @dataProvider InvalidDataProvider
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
