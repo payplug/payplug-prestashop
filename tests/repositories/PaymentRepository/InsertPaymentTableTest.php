@@ -24,6 +24,9 @@
 
 namespace PayPlug\tests\repositories\PaymentRepository;
 
+use \Exception;
+use PayPlug\tests\mock\CartMock;
+
 /**
  * @group unit
  * @group repository
@@ -34,66 +37,113 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  */
 final class InsertPaymentTableTest extends BasePaymentRepository
 {
+    private $paymentDetails;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->paymentDetails = [
+            'paymentId' => 'pay_5SnSQwmPty5UgKbUgrZQuT',
+            'paymentMethod' => 'standard',
+            'cart' => CartMock::get()
+        ];
+    }
+
     /**
      * Parameters to test method with empty $paiementDetails
      *
      * @return \Generator
      */
-    public function checkInsertPaymentTableParameters()
+    public function invalidDataProvider()
     {
-        /*
-         * if (!$paymentDetails || !is_array($paymentDetails) || !$paymentDetails['paymentId']) {
-         */
-
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!is_array($paymentDetails))
         yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
-
-        // Test if (!$paymentDetails['paymentId'])
         yield [['paymentId' => null], 'paymentDetails: {"paymentId":null}'];
     }
 
     /**
      * Test methods with nulled $paiementDetails
      *
-     * @dataProvider checkInsertPaymentTableParameters
+     * @dataProvider invalidDataProvider
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithInvalidData($parameter, $logMessage)
     {
-        $response = $this->repo->insertPaymentTable($parameter);
-
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
+        $this->repo
+            ->shouldReceive([
+                'paymentError' => $logMessage
+            ]);
 
         $this->assertSame(
-            $response['response'],
-            '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array'
-        );
-
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->insertPaymentTable($parameter),
             $logMessage
         );
     }
 
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+    public function testInsertPaymentTableWithValidData()
+    {
+        $this->query
+            ->shouldReceive([
+                'insert' => $this->query,
+                'into' => $this->query,
+                'fields' => $this->query,
+                'values' => $this->query,
+                'build' => true
+            ]);
+
+        $this->assertTrue($this->repo->insertPaymentTable($this->paymentDetails)['result']);
+
+        $this->repo
+            ->shouldReceive([
+                $this->repo->insertPaymentTable($this->paymentDetails)['response'],
+                'Insert data in DB successfully'
+            ]);
+
+    }
+
+    public function testInsertPaymentTableWithInvalidData()
+    {
+        $this->query
+            ->shouldReceive([
+                'insert' => $this->query,
+                'into' => $this->query,
+                'fields' => $this->query,
+                'values' => $this->query,
+                'build' => false
+            ]);
+
+        $this->assertFalse($this->repo->insertPaymentTable($this->paymentDetails)['result']);
+
+        $this->repo
+            ->shouldReceive([
+                $this->repo->insertPaymentTable($this->paymentDetails)['response'],
+                '[insertPaymentCart] Unable to flush DB (build method)'
+            ]);
+    }
+
+    public function testInsertPaymentTableThrowException()
+    {
+        $this->query
+            ->shouldReceive([
+                'insert' => $this->query,
+                'into' => $this->query,
+                'fields' => $this->query,
+                'values' => $this->query,
+            ]);
+
+        $this->query
+            ->shouldReceive('build')
+            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'Bad Request', 400)
+        ;
+
+        $this->assertFalse($this->repo->insertPaymentTable($this->paymentDetails)['result']);
+            $this->assertSame(
+            $this->repo->insertPaymentTable($this->paymentDetails)['response'],
+            '[insertPaymentTable] Error: Bad Request'
+        );
+
+    }
+
 }
