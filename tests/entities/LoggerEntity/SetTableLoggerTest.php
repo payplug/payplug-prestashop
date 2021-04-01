@@ -42,7 +42,7 @@ final class SetTableLoggerTest extends TestCase
         $this->logger->setTable('test_table');
     }
 
-    public function testUpdateTable()
+    public function testUpdatePaymentTable()
     {
         $this->logger->setTable('another_table');
         $this->assertSame(

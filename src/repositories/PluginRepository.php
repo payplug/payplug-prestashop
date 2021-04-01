@@ -60,6 +60,7 @@ class PluginRepository extends Repository
     private $cart;
     private $configuration;
     private $context;
+    private $constant;
     private $country;
     private $product;
     private $query;
@@ -74,6 +75,7 @@ class PluginRepository extends Repository
         $this->carrier  = new CarrierSpecific();
         $this->cart     = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
+        $this->constant  = new ConstantSpecific();
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
         $this->logger   = new LoggerRepository();
@@ -109,7 +111,8 @@ class PluginRepository extends Repository
             $this->cart,
             $this->logger,
             $this->paymentEntity,
-            $this->query
+            $this->query,
+            $this->constant
         );
 
         $this->plugin

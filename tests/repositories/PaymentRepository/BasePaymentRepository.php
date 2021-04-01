@@ -58,7 +58,8 @@ class BasePaymentRepository extends BaseTest
             $this->cart,
             $this->logger,
             $this->payment,
-            $this->query
+            $this->query,
+            $this->constant
         ])->makePartial();
 
         $this->arrayCache = [];
@@ -69,6 +70,10 @@ class BasePaymentRepository extends BaseTest
         $this->payplug
             ->shouldReceive('setPaymentErrorsCookie')
             ->andReturn(true);
+
+        $this->constant
+            ->shouldReceive('get')
+            ->andReturn('constant');
 
         $this->apiCall();
     }

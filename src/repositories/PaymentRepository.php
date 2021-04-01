@@ -37,19 +37,23 @@ class PaymentRepository extends Repository
     private $logger;
     private $paymentEntity;
     private $query;
+    private $constant;
 
     public function __construct(
         $payplug,
         $cartSpecific,
         $logger,
         $paymentEntity,
-        $query
-    ) {
+        $query,
+        $constant
+    )
+    {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
         $this->logger = $logger;
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
+        $this->constant = $constant;
 
         $this->logger->setParams(['process' => 'payment']);
     }
@@ -203,7 +207,9 @@ class PaymentRepository extends Repository
      */
     public function createPayment($paymentDetails)
     {
-        if (!$paymentDetails || !$paymentDetails['paymentTab'] || !$paymentDetails['paymentMethod']) {
+        if (!$paymentDetails
+            || !$paymentDetails['paymentTab']
+            || !$paymentDetails['paymentMethod']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
@@ -313,20 +319,20 @@ class PaymentRepository extends Repository
 
         $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
 
-        $table = _DB_PREFIX_ . 'payplug_payment';
+        $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
 
         $this->query
             ->update()
             ->table($table)
-            ->set($table . '.id_payment =         \'' . pSQL($paymentDetails['paymentId']) . '\'')
-            ->set($table . '.payment_method =     \'' . pSQL($paymentDetails['paymentMethod']) . '\'')
-            ->set($table . '.payment_url =        \'' . pSQL($paymentDetails['paymentUrl']) . '\'')
-            ->set($table . '.payment_return_url = \'' . pSQL($paymentDetails['paymentReturnUrl']) . '\'')
-            ->set($table . '.cart_hash =          \'' . pSQL($cartHash) . '\'')
-            ->set($table . '.authorized_at =      \'' . pSQL($paymentDetails['authorizedAt']) . '\'')
-            ->set($table . '.is_paid =            \'' . pSQL($paymentDetails['isPaid']) . '\'')
-            ->set($table . '.date_upd =           \'' . pSQL($paymentDate) . '\'')
-            ->where($table . '.id_cart =          ' . (int)$paymentDetails['cartId']);
+            ->set('id_payment =         \'' . $paymentDetails['paymentId'] . '\'')
+            ->set('payment_method =     \'' . $paymentDetails['paymentMethod'] . '\'')
+            ->set('payment_url =        \'' . $paymentDetails['paymentUrl'] . '\'')
+            ->set('payment_return_url = \'' . $paymentDetails['paymentReturnUrl'] . '\'')
+            ->set('cart_hash =          \'' . $cartHash . '\'')
+            ->set('authorized_at =      \'' . $paymentDetails['authorizedAt'] . '\'')
+            ->set('is_paid =            \'' . $paymentDetails['isPaid'] . '\'')
+            ->set('date_upd =           \'' . $paymentDate . '\'')
+            ->where('id_cart =          ' . (int)$paymentDetails['cartId']);
 
         try {
             if (!$this->query->build()) {
@@ -397,6 +403,13 @@ class PaymentRepository extends Repository
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
+        if (!$paymentStored) {
+            return $this->paymentError(
+                ['name' => 'paymentStored', 'value' => false],
+                '[getPaymentReturnUrl] $paymentStored is null or invalid'
+            );
+        }
+
         if (!$paymentDetails['paymentUrl']) {
             $paymentDetails['paymentUrl'] = $paymentStored['payment_url'];
         }
@@ -411,6 +424,13 @@ class PaymentRepository extends Repository
 
         if (!$paymentDetails['isPaid']) {
             $paymentDetails['isPaid'] = $paymentStored['is_paid'];
+        }
+
+        if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
+            return $this->paymentError(
+                ['name' => 'paymentUrl', 'value' => false],
+                '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] && $paymentDetails[\'paymentReturnUrl\'] are null'
+            );
         }
 
         switch ($paymentDetails['paymentMethod']) {
