@@ -53,6 +53,7 @@ class BaseTest extends TestCase
     protected $repo;
     protected $query;
     protected $assign;
+    protected $query;
 
     protected $arrayCache;
     protected $arrayLogger;
