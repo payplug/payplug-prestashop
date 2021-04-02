@@ -188,7 +188,7 @@ class PaymentRepository extends Repository
         $reqCheck = $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_ . 'payplug_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
             ->where('id_cart = ' . (int)$idCart);
 
         $resCheck = $reqCheck->build();
@@ -404,7 +404,7 @@ class PaymentRepository extends Repository
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
         if (!$paymentStored) {
-            return $this->paymentError(
+            return $this->returnPaymentError(
                 ['name' => 'paymentStored', 'value' => false],
                 '[getPaymentReturnUrl] $paymentStored is null or invalid'
             );
@@ -427,7 +427,7 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
-            return $this->paymentError(
+            return $this->returnPaymentError(
                 ['name' => 'paymentUrl', 'value' => false],
                 '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] && $paymentDetails[\'paymentReturnUrl\'] are null'
             );
@@ -458,7 +458,6 @@ class PaymentRepository extends Repository
                 break;
             case 'standard':
             case 'installment':
-            default:
                 $returnUrl = $paymentDetails['paymentUrl'] ? $paymentDetails['paymentUrl'] :
                     $paymentDetails['paymentReturnUrl'];
                 $paymentReturnUrl = [
@@ -467,6 +466,12 @@ class PaymentRepository extends Repository
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
+                break;
+            default:
+                return $this->returnPaymentError(
+                    ['name' => 'paymentStored', 'value' => false],
+                    '[getPaymentReturnUrl] Invalid payment method given'
+                );
                 break;
         }
 
