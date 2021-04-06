@@ -195,6 +195,8 @@ var $document, $window, payplugModule = {
                             } else {
                                 oney.cta.enable();
                             }
+                        } else if(!with_schedule) {
+                            oney.cta.enable();
                         }
                     } else if (oney.cta.props.loaded) {
                         if (typeof data.popin != 'undefined') {
