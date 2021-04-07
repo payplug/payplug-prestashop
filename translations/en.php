@@ -2,7 +2,6 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{payplug}prestashop>payplug_a24854748a79644ea78a127748b9e081'] = 'The online payment solution combining simplicity and first-rate support to boost your sales.';
 $_MODULE['<{payplug}prestashop>payplug_1249590cfb27680c6f59bd041edd812d'] = 'Cannot abort installment.';
 $_MODULE['<{payplug}prestashop>payplug_50c92213aac3437fd7b6081ccb274cd8'] = 'Settings not updated';
 $_MODULE['<{payplug}prestashop>payplug_60b031efb994d5c853cfc4816fab262e'] = 'The email and/or password was not correct.';
@@ -76,7 +75,6 @@ $_MODULE['<{payplug}prestashop>payplug_c103a7a8c6477682b63c04caa7ba3742'] = 'Loa
 $_MODULE['<{payplug}prestashop>payplug_4f0bf6b154224f9396e825390f1505c0'] = 'PHP cURL extension must be enabled on your server';
 $_MODULE['<{payplug}prestashop>payplug_1bc77cff14a05fb30f08d8955ed7e14a'] = 'Your server must run PHP 5.3 or greater';
 $_MODULE['<{payplug}prestashop>payplug_54f6fe59aa2a70d7c5e97d3654097900'] = 'OpenSSL 1.0.1 or later';
-$_MODULE['<{payplug}prestashop>payplug_1b27bcd0ef1c144b6359d3483d2382ea'] = 'Le module PayPlug n\'a pas été installé en raison d\'une erreur. Les modifications apportées ont bien été annulées.';
 $_MODULE['<{payplug}prestashop>payplug_8a2e7c47a20874fa31a77f1f49b4efb0'] = 'The email and/or password was not correct.';
 $_MODULE['<{payplug}prestashop>payplug_8d35cab66fcaf4267ea162539ce7cec3'] = 'Settings not updated';
 $_MODULE['<{payplug}prestashop>payplug_d91212e96d7d90b874228f43999f7e4e'] = 'The transaction was not completed and your card was not charged.';
