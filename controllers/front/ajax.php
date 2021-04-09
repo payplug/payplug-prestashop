@@ -95,6 +95,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
+                $is_elligible = null;
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $group = $tools->tool('getValue', 'group');
                     // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
@@ -133,7 +134,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $delivery_country = new Country($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
                     $cart = $context->cart;
-                    $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount);
                 }
 
                 die(json_encode($is_elligible));

@@ -29,7 +29,7 @@ class Repository
 {
     private $entity;
     protected $name;
-    protected $payplug;
+    private $payplug;
 
     public static function factory()
     {
@@ -68,6 +68,6 @@ class Repository
     public function l($string)
     {
         $this->setName();
-        return TranslationSpecific::translate($this->payplug, $string, $this->name);
+        return TranslationSpecific::translate($this->payplug, $string, $this->getName());
     }
 }

@@ -33,33 +33,60 @@ class PayplugLock extends ObjectModel
     /** @var int */
     const IPN_PRINT = 777;
     const VAL_PRINT = 888;
+
+    /** @var int */
+    public $id_payplug_lock;
+
+    /** @var int */
+    public $id_cart;
+
+    /** @var datetime */
+    public $date_add;
+
+    /** @var datetime */
+    public $date_upd;
+
+    /** @var string */
+    protected $table;
+
+    /** @var string */
+    protected $identifier;
+
+    /** @var array */
+    protected $fieldsRequired = [];
+
+    /** @var array */
+    protected $fieldsValidate = [];
+
+    /** @var array */
+    protected $fieldsValidateLang = [];
+
     /** @var array */
     public static $definition = [
-        'table' => 'payplug_lock',
+        'table'   => 'payplug_lock',
         'primary' => 'id_payplug_lock',
         'multishop' => true,
-        'fields' => [
+        'fields'  => [
             'id_cart' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true],
         ]
     ];
-    /** @var int */
-    public $id_payplug_lock;
-    /** @var int */
-    public $id_cart;
-    /** @var datetime */
-    public $date_add;
-    /** @var datetime */
-    public $date_upd;
-    /** @var string */
-    protected $table;
-    /** @var string */
-    protected $identifier;
-    /** @var array */
-    protected $fieldsRequired = [];
-    /** @var array */
-    protected $fieldsValidate = [];
-    /** @var array */
-    protected $fieldsValidateLang = [];
+
+    /**
+     * get fields
+     *
+     * @return array
+     */
+    public function getFields()
+    {
+        parent::validateFields();
+
+        $fields = [];
+        $fields['id_cart'] = (int)($this->id_cart);
+        $fields['date_add'] = pSQL($this->date_add);
+        $fields['date_upd'] = pSQL($this->date_upd);
+
+        return $fields;
+    }
 
     /**
      * Check
@@ -103,50 +130,6 @@ class PayplugLock extends ObjectModel
 
                 $time = new DateTime('now');
             }
-        }
-    }
-
-    public static function existsLockG2($id_cart)
-    {
-        $req_lock = '
-            SELECT pl.*  
-            FROM ' . _DB_PREFIX_ . 'payplug_lock pl 
-            WHERE pl.id_cart = ' . (int)$id_cart;
-        $res_lock = Db::getInstance()->getRow($req_lock);
-        if (!$res_lock) {
-            return false;
-        } else {
-            return $res_lock;
-        }
-    }
-
-    /**
-     * Sleep time
-     *
-     * @param int $seconds
-     * @return void
-     */
-    private static function usleep($seconds)
-    {
-        $start = microtime();
-
-        do {
-            // Wait !
-            $current = microtime();
-        } while (($current - $start) < $seconds);
-    }
-
-    public static function deleteLockG2($id_cart)
-    {
-        $req_lock = '
-            DELETE 
-            FROM ' . _DB_PREFIX_ . 'payplug_lock 
-            WHERE id_cart = ' . (int)$id_cart;
-        $res_lock = Db::getInstance()->execute($req_lock);
-        if (!$res_lock) {
-            return false;
-        } else {
-            return true;
         }
     }
 
@@ -202,8 +185,6 @@ class PayplugLock extends ObjectModel
         return $lock->save();
     }
 
-    //TODO: check multishop si cart_id identiques ou uniques
-
     /**
      * Delete lock
      *
@@ -221,6 +202,23 @@ class PayplugLock extends ObjectModel
         }
     }
 
+    /**
+     * Sleep time
+     *
+     * @param  int $seconds
+     * @return void
+     */
+    private static function usleep($seconds)
+    {
+        $start = microtime();
+
+        do {
+            // Wait !
+            $current = microtime();
+        } while (($current - $start) < $seconds);
+    }
+
+    //TODO: check multishop si cart_id identiques ou uniques
     public static function createLockG2($id_cart, $process_print = 'none')
     {
         // check if has lock
@@ -261,20 +259,31 @@ class PayplugLock extends ObjectModel
         }
     }
 
-    /**
-     * get fields
-     *
-     * @return array
-     */
-    public function getFields()
+    public static function deleteLockG2($id_cart)
     {
-        parent::validateFields();
+        $req_lock = '
+            DELETE 
+            FROM '._DB_PREFIX_.'payplug_lock 
+            WHERE id_cart = '.(int)$id_cart;
+        $res_lock = Db::getInstance()->execute($req_lock);
+        if (!$res_lock) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-        $fields = [];
-        $fields['id_cart'] = (int)($this->id_cart);
-        $fields['date_add'] = pSQL($this->date_add);
-        $fields['date_upd'] = pSQL($this->date_upd);
-
-        return $fields;
+    public static function existsLockG2($id_cart)
+    {
+        $req_lock = '
+            SELECT pl.*  
+            FROM '._DB_PREFIX_.'payplug_lock pl 
+            WHERE pl.id_cart = '.(int)$id_cart;
+        $res_lock = Db::getInstance()->getRow($req_lock);
+        if (!$res_lock) {
+            return false;
+        } else {
+            return $res_lock;
+        }
     }
 }
