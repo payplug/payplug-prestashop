@@ -1106,7 +1106,7 @@ class Payplug extends PaymentModule
      */
     protected function checkRequirements()
     {
-        $php_min_version = 50300;
+        $php_min_version = 50600;
         $curl_min_version = '7.21';
         $openssl_min_version = 0x1000100f;
         $report = [
