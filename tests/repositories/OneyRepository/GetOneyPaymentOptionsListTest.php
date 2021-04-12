@@ -66,13 +66,7 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
             });
 
         $this->repo
-            ->shouldAllowMockingProtectedMethods()
-            ->shouldReceive([
-                'getOneySimulations' => [
-                    'result' => true,
-                    'simulations' => OneySimulationsMock::get()
-                ]
-            ]);
+            ->shouldAllowMockingProtectedMethods();
 
         $this->list = OneySimulationsMock::getFormated();
     }
@@ -89,6 +83,13 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
      */
     public function testGetList($amount, $country)
     {
+        $this->repo
+            ->shouldReceive([
+                'getOneySimulations' => [
+                    'result' => true,
+                    'simulations' => OneySimulationsMock::get()
+                ]
+            ]);
         $this->assertSame(
             $this->list,
             $this->repo->getOneyPaymentOptionsList($amount, $country)

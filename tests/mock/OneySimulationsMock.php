@@ -41,8 +41,8 @@ class OneySimulationsMock
                     ],
                 ],
                 'total_cost' => 350,
-                'nominal_annual_percentage_rate' => 17.76,
-                'effective_annual_percentage_rate' => 19.27,
+                'nominal_annual_percentage_rate' => number_format(17.76, 2),
+                'effective_annual_percentage_rate' => number_format(19.27, 2),
                 'down_payment_amount' => 8392,
             ],
             'x4_with_fees' => [
@@ -61,10 +61,83 @@ class OneySimulationsMock
                     ],
                 ],
                 'total_cost' => 531,
-                'nominal_annual_percentage_rate' => 18.05,
-                'effective_annual_percentage_rate' => 19.62,
+                'nominal_annual_percentage_rate' => number_format(18.05, 2),
+                'effective_annual_percentage_rate' => number_format(19.62, 2),
                 'down_payment_amount' => 6562,
             ],
+        ];
+
+        return $simulations;
+    }
+
+    public static function getFormated()
+    {
+        $simulations = [
+            'x3_with_fees' => [
+                'installments' => [
+                    [
+                        'date' => '2021-02-19T01:00:00.000Z',
+                        'amount' => number_format(80.42, 2),
+                        'value' => '80,42 €',
+                    ],
+                    [
+                        'date' => '2021-03-19T01:00:00.000Z',
+                        'amount' => number_format(80.41, 2),
+                        'value' => '80,41 €',
+                    ],
+                ],
+                'total_cost' => [
+                    'amount' => number_format(3.5, 2),
+                    'value' => '3,50 €',
+                ],
+                'nominal_annual_percentage_rate' => number_format(17.76, 2),
+                'effective_annual_percentage_rate' => number_format(19.27, 2),
+                'down_payment_amount' => [
+                    'amount' => number_format(83.92, 2),
+                    'value' => '83,92 €',
+                ],
+                'split' => 3,
+                'title' => 'Payment in 3x',
+                'total_amount' => [
+                    'amount' => number_format(15003.5, 2),
+                    'value' => '15,003,50 €',
+                ]
+            ],
+            'x4_with_fees' => [
+                'installments' => [
+                    [
+                        'date' => '2021-02-19T01:00:00.000Z',
+                        'amount' => number_format(60.31, 2),
+                        'value' => '60,31 €',
+                    ],
+                    [
+                        'date' => '2021-03-19T01:00:00.000Z',
+                        'amount' => number_format(60.31, 2),
+                        'value' => '60,31 €',
+                    ],
+                    [
+                        'date' => '2021-04-19T00:00:00.000Z',
+                        'amount' => number_format(60.32, 2),
+                        'value' => '60,32 €',
+                    ],
+                ],
+                'total_cost' => [
+                    'amount' => number_format(5.31, 2),
+                    'value' => '5,31 €',
+                ],
+                'nominal_annual_percentage_rate' => number_format(18.05, 2),
+                'effective_annual_percentage_rate' => number_format(19.62, 2),
+                'down_payment_amount' => [
+                    'amount' => number_format(65.62, 2),
+                    'value' => '65,62 €',
+                ],
+                'split' => 4,
+                'title' => 'Payment in 4x',
+                'total_amount' => [
+                    'amount' => number_format(15005.31, 2),
+                    'value' => '15,005,31 €',
+                ],
+            ]
         ];
 
         return $simulations;

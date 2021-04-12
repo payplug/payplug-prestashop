@@ -24,13 +24,12 @@
 
 namespace PayPlug\tests\mock;
 
-class ContextMock
+class CurrencyMock
 {
     public static function get(){
-        $context = new \stdClass();
-        $context->cart = CartMock::get();
-        $context->customer = CustomerMock::get();
-        $context->currency = CurrencyMock::get();
-        return $context;
+        $currency = new \stdClass();
+        $currency->id = 1;
+        $currency->iso_code = 'EUR';
+        return $currency;
     }
 }
