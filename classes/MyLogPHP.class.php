@@ -57,7 +57,8 @@ class MyLogPHP
             'FILE';
     }
 
-    public static function factory($installLog) {
+    public static function factory($installLog)
+    {
         return new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_.$installLog);
     }
 

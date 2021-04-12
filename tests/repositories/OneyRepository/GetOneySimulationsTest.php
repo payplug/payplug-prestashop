@@ -22,14 +22,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\tests\repositories\OneyRepository;
+
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
-use PayPlug\src\repositories\OneyRepository;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 
 /**
- * @group uni
+ * @group test
  * @group unit
  * @group repository
  * @group oney
@@ -37,18 +37,9 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneySimulationsTest extends TestCase
+final class GetOneySimulationsTest extends BaseOneyRepository
 {
-    use MockeryPHPUnitIntegration;
-
-    protected $cache;
-    protected $config;
-    protected $logger;
-    protected $myLogPhp;
-    protected $tools;
-    protected $oney;
-
-    protected $repo;
+    protected $oneyMock;
 
     protected $amount = [
         'lower' => 99,
@@ -59,20 +50,12 @@ final class GetOneySimulationsTest extends TestCase
     protected $operation = 'x3_with_fees';
     protected $operations = ['x3_with_fees','x4_with_fees'];
 
-    protected $arrayCache;
-    protected $arrayLogger;
-
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        parent::setUp();
 
         // Method setup
-        $this->oney = MockHelper::createMockFactory('Payplug\OneySimulation');
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+        $this->oneyMock = MockHelper::createMockFactory('Payplug\OneySimulation');
 
         $this->cache->shouldReceive('setCacheKey')
             ->andReturnUsing(function ($amount, $country, $operations) {
@@ -90,13 +73,6 @@ final class GetOneySimulationsTest extends TestCase
 
         $this->logger->shouldReceive('setParams')
             ->andReturn(true);
-
-        $this->repo = new OneyRepository();
-
-        $this->arrayCache = [];
-        $this->arrayLogger = [];
-
-        MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
     }
 
     public function testGetOneySimulationsWithoutCacheValid()
@@ -109,7 +85,7 @@ final class GetOneySimulationsTest extends TestCase
             ->shouldReceive('getCacheByKey')
             ->andReturn(false);
 
-        $this->oney->shouldReceive('getSimulations')
+        $this->oneyMock->shouldReceive('getSimulations')
             ->andReturn($simulations);
 
         foreach($this->operations as $operation) {
@@ -157,7 +133,7 @@ final class GetOneySimulationsTest extends TestCase
             ->shouldReceive('getCacheByKey')
             ->andReturn(null);
 
-        $this->oney->shouldReceive('getSimulations')
+        $this->oneyMock->shouldReceive('getSimulations')
             ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403);
 
         $this->assertSame(
@@ -168,7 +144,7 @@ final class GetOneySimulationsTest extends TestCase
             ]
         );
 
-        $this->assertSame(count($this->arrayLogger), 1);
+        $this->assertSame(count($this->arrayLogger), 2);
         $this->assertSame(count($this->arrayCache), 0);
     }
 
@@ -180,7 +156,7 @@ final class GetOneySimulationsTest extends TestCase
             ->shouldReceive('getCacheByKey')
             ->andReturn(false);
 
-        $this->oney->shouldReceive('getSimulations')
+        $this->oneyMock->shouldReceive('getSimulations')
             ->andReturn($simulations);
 
         $this->cache->shouldReceive('setCache')
@@ -194,6 +170,6 @@ final class GetOneySimulationsTest extends TestCase
             ]
         );
 
-        $this->assertSame(count($this->arrayLogger), 1);
+        $this->assertSame(count($this->arrayLogger), 2);
     }
 }

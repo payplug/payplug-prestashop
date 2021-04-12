@@ -22,11 +22,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\tests\mock\MockHelper;
+namespace PayPlug\tests\repositories\OneyRepository;
+
 use PayPlug\tests\mock\OneySimulationsMock;
-use PayPlug\src\repositories\OneyRepository;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 
 /**
  * @group unit
@@ -36,21 +35,8 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class FormatOneyResourceTest extends TestCase
+final class FormatOneyResourceTest extends BaseOneyRepository
 {
-    use MockeryPHPUnitIntegration;
-
-    // Default setup
-    protected $cache;
-    protected $config;
-    protected $logger;
-    protected $myLogPhp;
-
-    // Method setup
-    protected $translate;
-
-    // Method Params
-    protected $payplug;
     protected $repo;
     protected $tab;
 
@@ -59,18 +45,8 @@ final class FormatOneyResourceTest extends TestCase
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        parent::setUp();
 
-        // Method setup
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-
-        // Method Params
-        $this->payplug = Mockery::mock('payplug');
         $this->payplug
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
@@ -79,10 +55,6 @@ final class FormatOneyResourceTest extends TestCase
                 }
                 return (int)$amount * 100;
             });
-
-        $this->repo = \Mockery::mock(OneyRepository::class)->makePartial();
-        $this->repo->setParams();
-        $this->repo->setPayplug($this->payplug);
 
         $this->repo
             ->shouldAllowMockingProtectedMethods()
@@ -138,7 +110,7 @@ final class FormatOneyResourceTest extends TestCase
     {
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
-            'amount'=> (float)3.5,
+            'amount'=> number_format(3.5, 2),
             'value'=> '3,50 €'
         ];
         $this->assertSame(
@@ -151,7 +123,7 @@ final class FormatOneyResourceTest extends TestCase
     {
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
-            'amount' => (float)83.92,
+            'amount' => number_format(83.92, 2),
             'value' => '83,92 €'
         ];
         $this->assertSame(
@@ -173,7 +145,7 @@ final class FormatOneyResourceTest extends TestCase
         $this->assertSame(
             [
                 'date' => '2021-02-19T01:00:00.000Z',
-                'amount' => (float)80.42,
+                'amount' => number_format(80.42, 2),
                 'value' => '80,42 €'
             ],
             $response['installments'][0]
@@ -181,7 +153,7 @@ final class FormatOneyResourceTest extends TestCase
         $this->assertSame(
             [
                 'date' => '2021-03-19T01:00:00.000Z',
-                'amount' => (float)80.41,
+                'amount' => number_format(80.41, 2),
                 'value' => '80,41 €'
             ],
             $response['installments'][1]
@@ -200,7 +172,7 @@ final class FormatOneyResourceTest extends TestCase
     {
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
-            'amount' => (float)3.5,
+            'amount' => number_format(3.5, 2),
             'value' => '3,50 €'
         ];
         $this->assertSame(
@@ -213,7 +185,7 @@ final class FormatOneyResourceTest extends TestCase
     {
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, 100);
         $expected_value = [
-            'amount' => (float)4.5,
+            'amount' => number_format(4.5, 2),
             'value' => '4,50 €'
         ];
         $this->assertSame(

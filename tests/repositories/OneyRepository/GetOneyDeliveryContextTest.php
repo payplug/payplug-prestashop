@@ -22,12 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\repositories\OneyRepository;
+namespace PayPlug\tests\repositories\OneyRepository;
+
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\MockHelper;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 
 /**
  * @group unit
@@ -37,41 +36,8 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyDeliveryContextTest extends TestCase
+final class GetOneyDeliveryContextTest extends BaseOneyRepository
 {
-    use MockeryPHPUnitIntegration;
-
-    // Default setup
-    protected $cache;
-    protected $logger;
-    protected $config;
-    protected $myLogPhp;
-
-    // Method setup
-    protected $cart;
-    protected $carrier;
-    protected $context;
-
-    public function setUp()
-    {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-
-        // Method setup
-        $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
-        $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
-
-        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
-
-        // Method Params
-        $this->payplug = Mockery::mock('payplug');
-        $this->repo = new OneyRepository();
-        $this->repo->setPayplug($this->payplug);
-    }
-
     public function testGetContextFromVirtual()
     {
         $this->cart->shouldReceive('get')

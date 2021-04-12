@@ -22,10 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\mock\MockHelper;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+namespace PayPlug\tests\repositories\OneyRepository;
 
 /**
  * @group unit
@@ -35,41 +32,14 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class IsValidOneyEmailTest extends TestCase
+final class IsValidOneyEmailTest extends BaseOneyRepository
 {
-    use MockeryPHPUnitIntegration;
-
-    // Default setup
-    protected $cache;
-    protected $logger;
-    protected $config;
-    protected $myLogPhp;
-
-    // Method setup
-    protected $validate;
-    protected $tools;
-    protected $translate;
-
-    // Method Params
     protected $email;
-    protected $repo;
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-
-        // Method setup
-        $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-
-        // Method Params
+        parent::setUp();
         $this->email = 'mock@payplug.com';
-        $this->repo = new OneyRepository();
     }
 
     public function testWithValidEmail()
@@ -98,8 +68,7 @@ final class IsValidOneyEmailTest extends TestCase
 
     public function testWithInValidEmail()
     {
-        $this->validate->andReturn(false); // force Validate::isEmail = false
-        $response = $this->repo->isValidOneyEmail('mock-payplug.com');
+        $response = $this->repo->isValidOneyEmail(null);
         $this->assertSame(
             [
                 'result' => false,

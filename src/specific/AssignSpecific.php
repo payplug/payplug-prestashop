@@ -21,30 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlug\src\specific;
 
-class TranslationsRepository extends Repository
+use PayPlug\src\interfaces\AssignInterface;
+use Context;
+
+class AssignSpecific implements AssignInterface
 {
     public static function factory()
     {
-        return new TranslationsRepository();
+        return new self();
     }
 
-    public function translate($id)
+    public function assign($parameters = [])
     {
-        if (!is_int($id)) {
-            return false;
-        }
-
-        $translation = [
-            // controllers/front/ajax.php
-            1 => $this->l('Empty payment data'),
-            2 => $this->l('At least one of the fields is not correctly completed.'),
-            3 => $this->l('Your information has been saved'),
-            4 => $this->l('An error occurred. Please retry in few seconds.'),
-            5 => $this->l('Oney is momentarily unavailable.'),
-        ];
-
-        return $translation[$id];
+        return Context::getContext()->smarty->assign($parameters);
     }
 }

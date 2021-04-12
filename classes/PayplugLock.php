@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2021 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -91,8 +91,8 @@ class PayplugLock extends ObjectModel
     /**
      * Check
      *
-     * @param  int $id_cart
-     * @param  int $loop_time
+     * @param int $id_cart
+     * @param int $loop_time
      * @return void
      */
     public static function check($id_cart, $loop_time = 1, $process = 'none')
@@ -136,7 +136,7 @@ class PayplugLock extends ObjectModel
     /**
      * Check if exists
      *
-     * @param  int $id_cart
+     * @param int $id_cart
      * @return bool
      */
     public static function exists($id_cart)
@@ -153,7 +153,7 @@ class PayplugLock extends ObjectModel
     /**
      * Set instance of PayplugLock
      *
-     * @param  int $id_cart
+     * @param int $id_cart
      * @return PayplugLock
      */
     public static function getInstanceByCart($id_cart)
@@ -161,7 +161,7 @@ class PayplugLock extends ObjectModel
         $req_lock = new DbQuery();
         $req_lock->select('pl.id_payplug_lock');
         $req_lock->from('payplug_lock', 'pl');
-        $req_lock->where('id_cart = '.(int)$id_cart);
+        $req_lock->where('id_cart = ' . (int)$id_cart);
         $id = (int)Db::getInstance()->getValue($req_lock);
 
         if ($id == 0) {
@@ -174,7 +174,7 @@ class PayplugLock extends ObjectModel
     /**
      * Create lock
      *
-     * @param  int $id_cart
+     * @param int $id_cart
      * @return bool
      */
     public static function addLock($id_cart)
@@ -188,7 +188,7 @@ class PayplugLock extends ObjectModel
     /**
      * Delete lock
      *
-     * @param  int $id_cart
+     * @param int $id_cart
      * @return bool
      */
     public static function deleteLock($id_cart)
@@ -233,19 +233,12 @@ class PayplugLock extends ObjectModel
             }
         }
 
-        $req_lock = 'INSERT INTO '._DB_PREFIX_.'payplug_lock (id_cart,id_order,date_add,date_upd)
+        $req_lock = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_lock (id_cart, id_order, date_add, date_upd)
             VALUE (
-                '.(int)$id_cart.',
-                IFNULL(
-                    (
-                        SELECT o.id_order 
-                        FROM '._DB_PREFIX_.'orders o 
-                        WHERE o.id_cart = '.(int)$id_cart.' 
-                    ), 
-                    \''.pSQL($process_print).'\'
-                ),
-                \''.date('Y-m-d H:i:s').'\',
-                \''.date('Y-m-d H:i:s').'\'
+                ' . (int)$id_cart . ',
+                \'' . pSQL($process_print) . '\', 
+                \'' . date('Y-m-d H:i:s') . '\',
+                \'' . date('Y-m-d H:i:s') . '\'
             )';
 
         // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock

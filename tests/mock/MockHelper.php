@@ -49,13 +49,14 @@ class MockHelper extends Mockery
         $loggerMock
             ->shouldReceive('addLog')
             ->andReturnUsing(function($message, $level) use (&$arrayLog) {
-                $arrayLog[] = $level .' '.' '.$message;
+                $arrayLog = ['level' => $level, 'message' => $message];
                 return $arrayLog;
             });
     }
 
     public static function createToolsMock($classPathname) {
-        $tools = self::createMockFactory($classPathname)
+        $tools = self::createMockFactory($classPathname);
+        $tools
             ->shouldReceive('tool')
             ->andReturnUsing(function ($action, $value, $params2 = false) {
                 switch ($action) {
@@ -80,7 +81,8 @@ class MockHelper extends Mockery
     }
 
     public static function createTranslateMock($classPathname) {
-        $translate = self::createMockFactory($classPathname)
+        $translate = self::createMockFactory($classPathname);
+        $translate
             ->shouldReceive('translate')
             ->andReturnUsing(function ($module_class, $string, $repository_name) {
                 return $string;
@@ -89,23 +91,50 @@ class MockHelper extends Mockery
     }
 
     public static function createValidateMock($classPathname) {
-        $validate = self::createMockFactory($classPathname)
+        $validate = self::createMockFactory($classPathname);
+        $validate
             ->shouldReceive('validate')
-            ->andReturn(true);
+            ->andReturnUsing(function($action, $object) {
+                if ($object === '' || is_null($object)) {
+                    return false;
+                }
+                if ($action == 'isLoadedObject' && !is_object($object)) {
+                    return false;
+                }
+                return true;
+            });
         return $validate;
     }
 
     public static function createContextMock($classPathname) {
-        $context = self::createMockFactory($classPathname)
+        $context = \Mockery::mock($classPathname);
+        $context
             ->shouldReceive('getContext')
             ->andReturn(ContextMock::get());
         return $context;
     }
 
+    public static function createSetParamstMock($classPathname) {
+        $context = \Mockery::mock($classPathname);
+        $context
+            ->shouldReceive('setParams')
+            ->andReturnSelf();
+        return $context;
+    }
+
     public static function createAddressMock($classPathname) {
-        $address = self::createMockFactory($classPathname)
+        $address = self::createMockFactory($classPathname);
+        $address
             ->shouldReceive('getAddress')
             ->andReturn(AddressMock::get());
         return $address;
+    }
+
+    public static function createAssignMock($classPathname) {
+        $assign = self::createMockFactory($classPathname);
+        $assign
+            ->shouldReceive('assign')
+            ->andReturn(true);
+        return $assign;
     }
 }

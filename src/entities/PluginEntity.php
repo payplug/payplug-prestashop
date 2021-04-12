@@ -37,12 +37,17 @@ class PluginEntity
     private $logger;
     private $oney;
     private $order_state;
+    private $payment;
     private $translate;
 
     // Specific classes
+    private $address;
+    private $cart;
+    private $carrier;
     private $configuration;
     private $context;
     private $country;
+    private $currency;
     private $product;
     private $tools;
     private $query;
@@ -144,7 +149,7 @@ class PluginEntity
         if (!is_object($logger)) {
             throw (
                 new BadParameterException(
-                    'Invalid Logger object, param $card must be a LoggerRepository'
+                    'Invalid Logger object, param $logger must be a LoggerRepository'
                 )
             );
         } else {
@@ -170,7 +175,7 @@ class PluginEntity
         if (!is_object($oney)) {
             throw (
                 new BadParameterException(
-                    'Invalid Oney object, param $card must be a OneyRepository'
+                    'Invalid Oney object, param $oney must be a OneyRepository'
                 )
             );
         } else {
@@ -196,11 +201,92 @@ class PluginEntity
         if (!is_object($cache)) {
             throw (
                 new BadParameterException(
-                    'Invalid Cache object, param $card must be a CacheRepository'
+                    'Invalid Cache object, param $cache must be a CacheRepository'
                 )
             );
         } else {
             $this->cache = $cache;
+            return $this;
+        }
+    }
+
+    /**
+     * @return object
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @param object $address
+     * @return PluginEntity
+     * @throws BadParameterException
+     */
+    public function setAddress($address)
+    {
+        if (!is_object($address)) {
+            throw (
+            new BadParameterException(
+                'Invalid adress param object, param $address must be an AddressSpecific'
+            )
+            );
+        } else {
+            $this->address = $address;
+            return $this;
+        }
+    }
+
+    /**
+     * @return object
+     */
+    public function getCart()
+    {
+        return $this->cart;
+    }
+
+    /**
+     * @param object $cart
+     * @return PluginEntity
+     * @throws BadParameterException
+     */
+    public function setCart($cart)
+    {
+        if (!is_object($cart)) {
+            throw (
+            new BadParameterException(
+                'Invalid cart object, param $cart must be CartSpecific'
+            )
+            );
+        } else {
+            $this->cart = $cart;
+            return $this;
+        }
+    }
+
+    /**
+     * @return object
+     */
+    public function getCarrier()
+    {
+        return $this->carrier;
+    }
+
+    /**
+     * @param object $carrier
+     * @return PluginEntity
+     * @throws BadParameterException
+     */
+    public function setCarrier($carrier)
+    {
+        if (!is_object($carrier)) {
+            throw (
+            new BadParameterException(
+                'Invalid carrier object, param $carrier must be CarrierSpecific'
+            )
+            );
+        } else {
+            $this->carrier = $carrier;
             return $this;
         }
     }
@@ -216,13 +302,14 @@ class PluginEntity
     /**
      * @param object $configuration
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setConfiguration($configuration)
     {
         if (!is_object($configuration)) {
             throw (
                 new BadParameterException(
-                    'Invalid Configuration object, param $card must be a ConfigurationSpecific'
+                    'Invalid Configuration object, param $configuration must be a ConfigurationSpecific'
                 )
             );
         } else {
@@ -248,7 +335,7 @@ class PluginEntity
         if (!is_object($context)) {
             throw (
                 new BadParameterException(
-                    'Invalid Context object, param $card must be a ContextSpecific'
+                    'Invalid Context object, param $context must be a ContextSpecific'
                 )
             );
         } else {
@@ -274,11 +361,37 @@ class PluginEntity
         if (!is_object($country)) {
             throw (
                 new BadParameterException(
-                    'Invalid Country object, param $card must be a ContextSpecific'
+                    'Invalid Country object, param $country must be a CountrySpecific'
                 )
             );
         } else {
             $this->country = $country;
+            return $this;
+        }
+    }
+
+    /**
+     * @return object
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param object $currency
+     * @return PluginEntity
+     */
+    public function setCurrency($currency)
+    {
+        if (!is_object($currency)) {
+            throw (
+            new BadParameterException(
+                'Invalid Currency object, param $currency must be a CurrencySpecific'
+            )
+            );
+        } else {
+            $this->currency = $currency;
             return $this;
         }
     }
@@ -300,7 +413,7 @@ class PluginEntity
         if (!is_object($product)) {
             throw (
                 new BadParameterException(
-                    'Invalid Product object, param $card must be a ProductSpecific'
+                    'Invalid Product object, param $product must be a ProductSpecific'
                 )
             );
         } else {
@@ -326,7 +439,7 @@ class PluginEntity
         if (!is_object($tools)) {
             throw (
             new BadParameterException(
-                'Invalid Tools object, param $card must be a ToolsSpecific'
+                'Invalid Tools object, param $tools must be a ToolsSpecific'
             )
             );
         } else {
@@ -352,7 +465,7 @@ class PluginEntity
         if (!is_object($query)) {
             throw (
                 new BadParameterException(
-                    'Invalid Query object, param $card must be a QueryRepository'
+                    'Invalid Query object, param $query must be a QueryRepository'
                 )
             );
         } else {
@@ -378,7 +491,7 @@ class PluginEntity
         if (!is_object($validate)) {
             throw (
                 new BadParameterException(
-                    'Invalid Validate object, param $card must be a ValidateSpecific'
+                    'Invalid Validate object, param $validate must be ValidateSpecific'
                 )
             );
         } else {
@@ -415,6 +528,24 @@ class PluginEntity
 
     /**
      * @return object
+     */
+    public function getPayment()
+    {
+        return $this->payment;
+    }
+
+    /**
+     * @param object $payment
+     * @return PluginEntity
+     */
+    public function setPayment($payment)
+    {
+        $this->payment = $payment;
+        return $this;
+    }
+
+    /**
+     * @return mixed
      */
     public function getTranslate()
     {

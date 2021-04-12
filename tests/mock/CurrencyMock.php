@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -21,30 +22,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlug\tests\mock;
 
-class TranslationsRepository extends Repository
+class CurrencyMock
 {
-    public static function factory()
-    {
-        return new TranslationsRepository();
-    }
-
-    public function translate($id)
-    {
-        if (!is_int($id)) {
-            return false;
-        }
-
-        $translation = [
-            // controllers/front/ajax.php
-            1 => $this->l('Empty payment data'),
-            2 => $this->l('At least one of the fields is not correctly completed.'),
-            3 => $this->l('Your information has been saved'),
-            4 => $this->l('An error occurred. Please retry in few seconds.'),
-            5 => $this->l('Oney is momentarily unavailable.'),
-        ];
-
-        return $translation[$id];
+    public static function get(){
+        $currency = new \stdClass();
+        $currency->id = 1;
+        $currency->iso_code = 'EUR';
+        return $currency;
     }
 }
