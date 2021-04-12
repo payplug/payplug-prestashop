@@ -19,6 +19,16 @@ services:
       - database
     links:
        - database
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - 8000:80
+    depends_on:
+      - database
   database:
     image: mysql:5.7
     environment:
