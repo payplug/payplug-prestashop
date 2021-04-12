@@ -63,29 +63,6 @@ class Payplug extends Module
         }
     }
 
-    public function getContent()
-    {
-        if ($this->module) {
-            return $this->module->getContent();
-        } else {
-            return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
-        }
-    }
-
-    public function hookActionAdminControllerSetMedia()
-    {
-        if ($this->module) {
-            return $this->module->hookActionAdminControllerSetMedia();
-        }
-    }
-
-    public function hookHeader($params)
-    {
-        if ($this->module) {
-            return $this->module->hookHeader($params);
-        }
-    }
-
     /**
      * @return array
      */
@@ -142,5 +119,271 @@ class Payplug extends Module
         }
 
         return $report;
+    }
+
+    /**
+     * @param bool $force_all
+     * @return bool
+     * @see Module::disable()
+     *
+     */
+    public function disable($force_all = false)
+    {
+        if ($this->module) {
+            return $this->module->disable($force_all);
+        }
+    }
+
+    /**
+     * @return string
+     * @see Module::getContent()
+     */
+    public function getContent()
+    {
+        if ($this->module) {
+            return $this->module->getContent();
+        } else {
+            return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
+        }
+    }
+
+    /**
+     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
+     */
+    public function hookActionAdminControllerSetMedia()
+    {
+        if ($this->module) {
+            return $this->module->hookActionAdminControllerSetMedia();
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionAdminPerformanceControllerAfter($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionAdminPerformanceControllerAfter($params);
+        }
+    }
+
+    /**
+     * @description Automatically update PayPlugCarrier after someone update a Prestashop Carrier
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionCarrierUpdate($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionCarrierUpdate($params);
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionClearCompileCache($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionClearCompileCache($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionDeleteGDPRCustomer($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionDeleteGDPRCustomer($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionExportGDPRData($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionExportGDPRData($params);
+        }
+    }
+
+    /**
+     * @description Automatically add and populate a PayPlugCarrier after someone add a Prestashop Carrier
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionObjectCarrierAddAfter($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionObjectCarrierAddAfter($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionOrderStatusUpdate($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionOrderStatusUpdate($params);
+        }
+    }
+
+    /**
+     * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     * @param $params
+     * @return mixed
+     */
+    public function hookAdminOrder($params)
+    {
+        if ($this->module) {
+            return $this->module->hookAdminOrder($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookCustomerAccount($params)
+    {
+        if ($this->module) {
+            return $this->module->hookCustomerAccount($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookDisplayAdminOrderMain($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayAdminOrderMain($params);
+        }
+    }
+
+    /**
+     * @description Display Oney CTA on Shopping cart page
+     * @param $params
+     * @return mixed
+     */
+    public function hookDisplayBeforeShoppingCartBlock($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayBeforeShoppingCartBlock($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookDisplayExpressCheckout($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayExpressCheckout($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookDisplayProductPriceBlock($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayProductPriceBlock($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookHeader($params)
+    {
+        if ($this->module) {
+            return $this->module->hookHeader($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     *
+     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
+     */
+    public function hookPayment($params)
+    {
+        if ($this->module) {
+            return $this->module->hookPayment($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookPaymentOptions($params)
+    {
+        if ($this->module) {
+            return $this->module->hookPaymentOptions($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookPaymentReturn($params)
+    {
+        if ($this->module) {
+            return $this->module->hookPaymentReturn($params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookRegisterGDPRConsent($params)
+    {
+        if ($this->module) {
+            return $this->module->hookRegisterGDPRConsent($params);
+        }
+    }
+
+    /**
+     * @description Install plugin
+     * @return bool|mixed
+     * @see Module::install()
+     */
+    public function install()
+    {
+        if ($this->module) {
+            return $this->module->install();
+        }
+    }
+
+    /**
+     * @description Uninstall plugin
+     * @return bool|mixed
+     * @see Module::uninstall()
+     */
+    public function uninstall()
+    {
+        if ($this->module) {
+            return $this->module->uninstall();
+        }
     }
 }

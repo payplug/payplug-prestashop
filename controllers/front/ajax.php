@@ -54,9 +54,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         }
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-        include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
+        include_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
-        $this->payplug = new \Payplug();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->toolsSpecific = $this->plugin->getTools();
 

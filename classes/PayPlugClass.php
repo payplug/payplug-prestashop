@@ -514,13 +514,13 @@ class PayPlugClass extends PaymentModule
                 $this->saveConfiguration();
 
                 $this->assignContentVar();
-                $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
                 $this->context->smarty->assign([
                     'title' => '',
                     'type' => 'save',
                 ]);
-                $popin = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
+                $popin = $this->fetchTemplate('/views/templates/admin/popin.tpl');
 
                 die(json_encode(['popin' => $popin, 'content' => $content]));
             }
@@ -545,7 +545,7 @@ class PayPlugClass extends PaymentModule
                 Configuration::updateValue('PAYPLUG_SHOW', 1);
 
                 $this->assignContentVar();
-                $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
                 die(json_encode(['content' => $content]));
             } else {
@@ -569,14 +569,14 @@ class PayPlugClass extends PaymentModule
                 if ((bool)$api_key) {
                     Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 0);
                     $this->assignContentVar();
-                    $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+                    $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
                     die(json_encode(['content' => $content]));
                 } else {
                     $this->context->smarty->assign([
                         'title' => '',
                         'type' => 'activate',
                     ]);
-                    $popin = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
+                    $popin = $this->fetchTemplate('/views/templates/admin/popin.tpl');
                     die(json_encode(['popin' => $popin]));
                 }
             } else {
@@ -1456,7 +1456,7 @@ class PayPlugClass extends PaymentModule
     public function displayGDPRConsent()
     {
         $this->context->smarty->assign(['id_module' => $this->id]);
-        return $this->display(__FILE__, 'customer/gdpr_consent.tpl');
+        return $this->fetchTemplate('customer/gdpr_consent.tpl');
     }
 
     /**
@@ -1500,7 +1500,7 @@ class PayPlugClass extends PaymentModule
             'with_msg_button' => $with_msg_button
         ]);
 
-        return $this->display(__FILE__, '_partials/messages.tpl');
+        return $this->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
@@ -1528,7 +1528,7 @@ class PayPlugClass extends PaymentModule
             'with_msg_button' => $with_msg_button
         ]);
 
-        return $this->display(__FILE__, '_partials/messages.tpl');
+        return $this->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
@@ -1589,20 +1589,9 @@ class PayPlugClass extends PaymentModule
             'site_url' => $this->site_url,
             'inst_id' => $inst_id,
         ]);
-        $this->html = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin/popin.tpl');
 
         die(json_encode(['content' => $this->html]));
-    }
-
-    /**
-     * @param bool $force_all
-     * @return bool
-     * @see Module::enable()
-     *
-     */
-    public function enable($force_all = false)
-    {
-        return parent::enable($force_all);
     }
 
     /**
@@ -1613,7 +1602,13 @@ class PayPlugClass extends PaymentModule
      */
     public function fetchTemplateRC($file)
     {
-        $output = $this->display(__FILE__, $file);
+        $output = $this->fetchTemplate($file);
+        return $output;
+    }
+
+    public function fetchTemplate($file)
+    {
+        $output = $this->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
         return $output;
     }
 
@@ -1877,7 +1872,7 @@ class PayPlugClass extends PaymentModule
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->version,
         ]);
-        $this->html = $this->fetchTemplateRC('/views/templates/admin/panel/fieldset.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin/panel/fieldset.tpl');
 
         return $this->html;
     }
@@ -1897,7 +1892,7 @@ class PayPlugClass extends PaymentModule
 
         $this->assignContentVar();
 
-        $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
+        $this->html .= $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
         return $this->html;
     }
@@ -2026,7 +2021,7 @@ class PayPlugClass extends PaymentModule
 
         $this->assignContentVar();
 
-        $this->html = $this->fetchTemplateRC('/views/templates/admin/login.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin/login.tpl');
 
         return $this->html;
     }
@@ -2787,7 +2782,7 @@ class PayPlugClass extends PaymentModule
             'amount_available' => $amount_available,
         ]);
 
-        $this->html = $this->fetchTemplateRC('/views/templates/admin//order/refund_data.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin//order/refund_data.tpl');
 
         return $this->html;
     }
@@ -2908,7 +2903,7 @@ class PayPlugClass extends PaymentModule
             'PAYPLUG_KEEP_CARDS' => $PAYPLUG_KEEP_CARDS,
         ]);
 
-        $this->html .= $this->fetchTemplateRC('/views/templates/admin/admin_uninstall_configuration.tpl');
+        $this->html .= $this->fetchTemplate('/views/templates/admin/admin_uninstall_configuration.tpl');
 
         return $this->html;
     }
@@ -3391,7 +3386,7 @@ class PayPlugClass extends PaymentModule
             $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
 
-        $this->html .= $this->fetchTemplateRC('/views/templates/admin/order/order.tpl');
+        $this->html .= $this->fetchTemplate('/views/templates/admin/order/order.tpl');
         return $this->html;
     }
 
@@ -3438,7 +3433,7 @@ class PayPlugClass extends PaymentModule
             'payplug_cards_url' => $payplug_cards_url
         ]);
 
-        return $this->display(__FILE__, 'customer/my_account.tpl');
+        return $this->fetchTemplate('customer/my_account.tpl');
     }
 
     /**
@@ -3460,7 +3455,7 @@ class PayPlugClass extends PaymentModule
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
         ]);
-        return $this->display(__FILE__, 'oney/cta.tpl');
+        return $this->fetchTemplate('oney/cta.tpl');
     }
 
     public function hookDisplayProductPriceBlock($param)
@@ -3520,7 +3515,7 @@ class PayPlugClass extends PaymentModule
             $this->smarty->assign(['popin' => true]);
         }
         $this->smarty->assign(['env' => 'product']);
-        return $this->display(__FILE__, 'oney/cta.tpl');
+        return $this->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -3613,7 +3608,7 @@ class PayPlugClass extends PaymentModule
                         'payment_url' => $payment['return_url'],
                         'api_url' => $this->plugin->getApiUrl(),
                     ]);
-                    return $this->display(__FILE__, 'checkout/embedded.tpl');
+                    return $this->fetchTemplate('checkout/embedded.tpl');
                 }
             } else {
                 $this->setPaymentErrorsCookie([
@@ -3706,7 +3701,7 @@ class PayPlugClass extends PaymentModule
             $context['reference'] = $order->reference;
         }
         $this->smarty->assign($context);
-        return $this->display(__FILE__, 'checkout/order-confirmation.tpl');
+        return $this->fetchTemplate('checkout/order-confirmation.tpl');
     }
 
     public function hookRegisterGDPRConsent()
@@ -4317,83 +4312,6 @@ class PayPlugClass extends PaymentModule
         }
 
         return $result;
-    }
-
-    /**
-     * @return void
-     * @see Module::postProcess()
-     *
-     */
-    private function postProcess()
-    {
-        $curl_exists = extension_loaded('curl');
-        $openssl_exists = extension_loaded('openssl');
-
-        if (Tools::getValue('submitDisable')) {
-            Configuration::updateValue('PAYPLUG_SHOW', false);
-
-            $this->assignContentVar();
-            $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
-
-            $this->context->smarty->assign([
-                'title' => '',
-                'type' => 'save',
-            ]);
-            $popin = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
-
-            die(json_encode(['popin' => $popin, 'content' => $content]));
-        }
-
-        if (Tools::isSubmit('submitAccount')) {
-            /*
-             * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
-             * Because pwd with special chars don't work
-             */
-            $password = $_POST['PAYPLUG_PASSWORD'];
-            $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
-                $this->validationErrors['username_password'] =
-                    $this->l('The email and/or password was not correct.');
-            } elseif ($curl_exists && $openssl_exists) {
-                if ($this->login($email, $password)) {
-                    Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
-                    Configuration::updateValue('PAYPLUG_SHOW', 1);
-
-                    $this->assignContentVar();
-                    $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
-
-                    die(json_encode(['content' => $content]));
-                } else {
-                    $this->validationErrors['username_password'] =
-                        $this->l('The email and/or password was not correct.');
-                }
-            }
-        }
-
-        if (Tools::isSubmit('submitDisconnect')) {
-            $this->createConfig();
-            Configuration::updateValue('PAYPLUG_SHOW', 0);
-
-            // force reload configuration to be sure all config are reset
-            Configuration::loadConfiguration();
-
-            $this->assignContentVar();
-            $content = $this->fetchTemplateRC('/views/templates/admin/admin.tpl');
-
-            die(json_encode(['content' => $content]));
-        }
-
-        if (Tools::isSubmit('submitSettings')) {
-            if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
-                $this->displayError($this->l('Settings not updated'));
-            } else {
-                $this->saveConfiguration();
-            }
-        }
-
-        if (Tools::isSubmit('submitUninstallSettings')) {
-            Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
-        }
     }
 
     /**
@@ -5854,7 +5772,7 @@ class PayPlugClass extends PaymentModule
             'this_path' => $this->_path,
         ]);
 
-        return $this->display(__FILE__, 'checkout/payment/display.tpl');
+        return $this->fetchTemplate('checkout/payment/display.tpl');
     }
 
     /**
@@ -6180,5 +6098,124 @@ class PayPlugClass extends PaymentModule
         } while (!$cart_lock);
 
         return true;
+    }
+
+
+    /**
+     * @return void
+     * @see Module::postProcess()
+     */
+    private function postProcess()
+    {
+        if (Tools::isSubmit('submitAccount')) {
+            $this->module->submitAccount();
+        }
+
+        if (Tools::getValue('submitDisable')) {
+            $this->module->submitDisable();
+        }
+
+        if (Tools::getValue('submitDisconnect')) {
+            $this->module->submitDisconnect();
+        }
+
+        if (Tools::isSubmit('submitSettings')) {
+            $this->module->submitSettings();
+        }
+
+        if (Tools::isSubmit('submitUninstallSettings')) {
+            $this->module->submitUninstallSettings();
+        }
+    }
+
+    /**
+     * @description Process account submit
+     * @throws \Payplug\Exception\BadRequestException
+     */
+    public function submitAccount()
+    {
+        $curl_exists = extension_loaded('curl');
+        $openssl_exists = extension_loaded('openssl');
+
+        /*
+         * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+         * Because pwd with special chars don't work
+         */
+        $password = $_POST['PAYPLUG_PASSWORD'];
+        $email = Tools::getValue('PAYPLUG_EMAIL');
+
+        if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            $this->validationErrors['username_password'] =
+                $this->l('The email and/or password was not correct.');
+        } elseif ($curl_exists && $openssl_exists) {
+            if ($this->login($email, $password)) {
+                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
+                Configuration::updateValue('PAYPLUG_SHOW', 1);
+
+                $this->assignContentVar();
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+                die(json_encode(['content' => $content]));
+            } else {
+                $this->validationErrors['username_password'] =
+                    $this->l('The email and/or password was not correct.');
+            }
+        }
+    }
+
+    /**
+     * @description Process disable plugin submit
+     */
+    public function submitDisable()
+    {
+        Configuration::updateValue('PAYPLUG_SHOW', false);
+
+        $this->assignContentVar();
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        $this->context->smarty->assign([
+            'title' => '',
+            'type' => 'save',
+        ]);
+        $popin = $this->fetchTemplate('/views/templates/admin/popin.tpl');
+
+        die(json_encode(['popin' => $popin, 'content' => $content]));
+    }
+
+    /**
+     * @description Process disconnect submit
+     */
+    public function submitDisconnect()
+    {
+        $this->createConfig();
+        Configuration::updateValue('PAYPLUG_SHOW', 0);
+
+        // force reload configuration to be sure all config are reset
+        Configuration::loadConfiguration();
+
+        $this->assignContentVar();
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        die(json_encode(['content' => $content]));
+    }
+
+    /**
+     * @description Process settings submit
+     */
+    public function submitSettings()
+    {
+        if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
+            $this->displayError($this->l('Settings not updated'));
+        } else {
+            $this->saveConfiguration();
+        }
+    }
+
+    /**
+     * @description Process uninstall submit
+     */
+    public function submitUninstallSettings()
+    {
+        Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
     }
 }
