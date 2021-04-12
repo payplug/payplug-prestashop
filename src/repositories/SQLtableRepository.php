@@ -23,7 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
-class SQLtableRepository extends \Payplug
+class SQLtableRepository extends \PayPlugClass
 {
     /**
      * Install SQL tables used by module
