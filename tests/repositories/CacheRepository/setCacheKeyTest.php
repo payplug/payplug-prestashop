@@ -22,10 +22,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\tests\mock\MockHelper;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+namespace PayPlug\tests\repositories\CacheRepository;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group cache
@@ -35,18 +35,11 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  */
 final class setCacheKeyTest extends BaseCacheRepository
 {
-    use MockeryPHPUnitIntegration;
-
-    protected $query;
-    protected $config;
-
-    protected $repo;
-
     public function invalidDataProvider()
     {
-        yield [15000, 'FR', 'not a array', 'Operations is not a valid int'];
-        yield ['not numeric', 'FR', ['operation'], 'Amount is not a valid string'];
-        yield [15000, false, ['operation'], 'Country is not a valid array'];
+        yield [15000, 'FR', 'not a array', 'Operations is not a valid array'];
+        yield ['not numeric', 'FR', ['operation'], 'Amount is not a valid int'];
+        yield [15000, false, ['operation'], 'Country is not a valid string'];
     }
 
     /**
@@ -69,7 +62,10 @@ final class setCacheKeyTest extends BaseCacheRepository
             'get' => false
         ]);
         $this->assertSame(
-            'Payplug::OneySimulations_15000_FR_operation_live',
+            [
+                'result' => 'Payplug::OneySimulations_15000_FR_operation_live',
+                'message' => 'success'
+            ],
             $this->repo->setCacheKey(15000, 'FR', ['operation'])
         );
     }

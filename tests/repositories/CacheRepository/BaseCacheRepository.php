@@ -24,6 +24,7 @@
 
 namespace PayPlug\tests\repositories\CacheRepository;
 
+use PayPlug\src\entities\CardEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\BaseTest;
@@ -38,18 +39,23 @@ use PayPlug\tests\repositories\BaseTest;
  */
 class BaseCacheRepository extends BaseTest
 {
+    protected $cacheEntity;
+
     public function setUp()
     {
         parent::setUp();
 
-        $this->repo = \Mockery::mock(CacheRepository::class, [])->makePartial();
-
-        $this->repo->shouldReceive([
-            'setStdParams' => true,
-        ]);
+        $this->cacheEntity = new CardEntity();
         $this->logger->shouldReceive([
             'setParams' => $this->logger,
         ]);
+
+        $this->repo = \Mockery::mock(CacheRepository::class, [
+            $this->cacheEntity,
+            $this->query,
+            $this->config,
+            $this->logger
+        ])->makePartial();
 
         $this->arrayCache = [];
         $this->arrayLogger = [];
