@@ -25,6 +25,7 @@
 namespace PayPlug\tests\repositories\CacheRepository;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group cache
@@ -32,40 +33,35 @@ namespace PayPlug\tests\repositories\CacheRepository;
  *
  * @runTestsInSeparateProcesses
  */
-final class setCacheKeyTest extends BaseCacheRepository
+final class GetCacheByKeyTest extends BaseCacheRepository
 {
+    private $cacheKey;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->cacheKey = 'Payplug::OneySimulations_15000_FR_operation_live';
+    }
+
     public function invalidDataProvider()
     {
-        yield [15000, 'FR', 'not a array', 'Operations is not a valid array'];
-        yield ['not numeric', 'FR', ['operation'], 'Amount is not a valid int'];
-        yield [15000, false, ['operation'], 'Country is not a valid string'];
+        yield [false];
+        yield [[]];
+        yield [42];
+        yield [''];
     }
 
     /**
      * @dataProvider invalidDataProvider
      */
-    public function testWithInvalidDataProvider($amount, $country, $operations, $errorMsg)
+    public function testWithInvalidDataProvider($cacheKey)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => $errorMsg
+                'message' => 'Invalid cache key format'
             ],
-            $this->repo->setCacheKey($amount, $country, $operations)
-        );
-    }
-
-    public function testWithValidData()
-    {
-        $this->config->shouldReceive([
-            'get' => false
-        ]);
-        $this->assertSame(
-            [
-                'result' => 'Payplug::OneySimulations_15000_FR_operation_live',
-                'message' => 'success'
-            ],
-            $this->repo->setCacheKey(15000, 'FR', ['operation'])
+            $this->repo->getCacheByKey($cacheKey)
         );
     }
 }

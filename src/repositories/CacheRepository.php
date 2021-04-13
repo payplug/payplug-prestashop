@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\repositories;
 
+use DateInterval;
+use DateTime;
 use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\exceptions\BadParameterException;
@@ -73,7 +75,7 @@ class CacheRepository extends Repository
 
             $this->query
                 ->insert()
-                ->into(_DB_PREFIX_ . $this->cacheEntity->getTable())
+                ->into(_DB_PREFIX_ . 'payplug_cache')
                 ->fields('cache_key')->values(pSQL($cache_key))
                 ->fields('cache_value')->values(json_encode($cache_value))
                 ->fields('date_add')->values(pSQL($cache->getDateAdd()))
@@ -138,19 +140,49 @@ class CacheRepository extends Repository
      */
     public function getCacheByKey($cache_key)
     {
+        if (!is_string($cache_key) || !$cache_key) {
+            return [
+                'result' => false,
+                'message' => 'Invalid cache key format'
+            ];
+        }
+
         $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_ . $this->cacheEntity->getTable())
+            ->from(_DB_PREFIX_ . 'payplug_cache')
             ->where('`cache_key` = \'' . (string)$cache_key . '\'');
 
         $cache = $this->query->build();
 
         if (!$cache) {
-            return false;
+            return [
+                'result' => false,
+                'message' => 'No cache found'
+            ];
         }
 
-        return $cache;
+        // if the cache is older than 48 hours, return false after delete it
+        $lifetime = new \DateInterval('P2D');
+        $date_limit = new \DateTime('now');
+        $date_limit->sub($lifetime);
+        $date_add = new \DateTime($cache['date_add']);
+        if ($date_limit > $date_add) {
+            $this->query
+                ->delete()
+                ->from(_DB_PREFIX_ . 'payplug_cache')
+                ->where('`cache_key` = \'' . (string)$cache_key . '\'');
+            return [
+                'result' => false,
+                'message' => 'The current cache has been deleted'
+            ];
+        }
+
+
+        return [
+            'result' => $cache,
+            'message' => 'Success'
+        ];
     }
 
     /**
@@ -163,7 +195,7 @@ class CacheRepository extends Repository
     {
         $this->query
             ->truncate()
-            ->table(_DB_PREFIX_ . $this->cacheEntity->getTable());
+            ->table(_DB_PREFIX_ . 'payplug_cache');
 
         if (!$this->query->build()) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
