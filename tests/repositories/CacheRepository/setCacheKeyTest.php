@@ -35,7 +35,7 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class setCacheKeyTest extends TestCase
+final class setCacheKeyTest extends BaseCacheRepository
 {
     use MockeryPHPUnitIntegration;
 
@@ -48,21 +48,37 @@ final class setCacheKeyTest extends TestCase
     {
         $this->query = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_SANDBOX_MODE')
             ->andReturn(false);
-
-        $this->repo = new CacheRepository();
     }
 
-    public function testCacheIdHasValidatedFormat()
+    public function invalidDataProvider()
     {
-        //todo : finalize this test
-//        $cacheId = $this->repo->setCacheKey(500, 'FR', ['x3_with_fees'])['result'];
-//        $this->assertRegExp(
-//            '/Payplug::OneySimulations_\d{5,6}_[A-Z]{2}_(x\d{1}_with_fees|x\d{1}_with_fees_x\d{1}_with_fees)_live/',
-//            $cacheId
-//        );
+        yield [15000, 'FR', 'not a array', 'Operations is not a valid int'];
+        yield ['not numeric', 'FR', ['operation'], 'Amount is not a valid string'];
+        yield [15000, false, ['operation'], 'Country is not a valid array'];
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     */
+    public function testWithInvalidDataProvider($amount, $country, $operations, $errorMsg)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => $errorMsg
+            ],
+            $this->repo->setCacheKey($amount, $country, $operations)
+        );
+    }
+
+    public function testWithValidData()
+    {
+        $this->assertSame(
+            'Payplug::OneySimulations_15000_FR_operation_live',
+            $this->repo->setCacheKey(15000, 'FR', ['operation'])
+        );
     }
 }
