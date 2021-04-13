@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\CacheRepository;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group cache

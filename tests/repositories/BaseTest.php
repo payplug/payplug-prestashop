@@ -40,12 +40,14 @@ class BaseTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    protected $assign;
     protected $cache;
     protected $carrier;
     protected $cart;
     protected $config;
     protected $constant;
     protected $country;
+    protected $currency;
     protected $logger;
     protected $myLogPhp;
 
@@ -63,11 +65,13 @@ class BaseTest extends TestCase
 
     public function setUp()
     {
+        $this->assign = MockHelper::createAssignMock('Payplug\src\specific\AssignSpecific');
         $this->carrier      = MockHelper::createMockFactory('Payplug\src\specific\CarrierSpecific');
         $this->cart         = MockHelper::createMockFactory('Payplug\src\specific\CartSpecific');
         $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->constant     = MockHelper::createMockFactory('Payplug\src\specific\ConstantSpecific');
         $this->country      = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
+        $this->currency = MockHelper::createMockFactory('Payplug\src\specific\CurrencySpecific');
         $this->logger       = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->query        = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
 
