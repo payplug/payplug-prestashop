@@ -29,7 +29,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
 
 
 /**
- * @group test
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -111,7 +111,10 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
         $this->cache
             ->shouldReceive('getCacheByKey')
-            ->andReturn($cache);
+            ->andReturn([
+                'result' => $cache,
+                'message' => 'Success'
+            ]);
 
         $this->assertEquals(
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),

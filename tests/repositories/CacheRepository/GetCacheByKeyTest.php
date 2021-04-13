@@ -94,17 +94,24 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         $date_limit = new \DateTime('now');
         $date_limit->sub($lifetime);
 
+        $cache = [
+            'cache_key' => $this->cacheKey,
+            'date_add' => $date_limit->format('Y-m-d H:i:s'),
+            'date_upd' => $date_limit->format('Y-m-d H:i:s')
+        ];
+
         $this->query
             ->shouldReceive([
-                'delete' => $this->query,
                 'select' => $this->query,
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => [
-                    'date_add' => $date_limit->format('Y-m-d H:i:s')
-                ]
+                'build' => [$cache]
             ]);
+
+        $this->repo
+            ->shouldReceive('deleteCacheByKey')
+            ->andReturn(true);
 
         $this->assertSame(
             [
@@ -130,7 +137,7 @@ final class GetCacheByKeyTest extends BaseCacheRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => $cache
+                'build' => [$cache]
             ]);
 
         $this->assertSame(
