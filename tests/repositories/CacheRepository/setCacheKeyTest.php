@@ -42,15 +42,6 @@ final class setCacheKeyTest extends BaseCacheRepository
 
     protected $repo;
 
-    public function setUp()
-    {
-        $this->query = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->config->shouldReceive('get')
-            ->with('PAYPLUG_SANDBOX_MODE')
-            ->andReturn(false);
-    }
-
     public function invalidDataProvider()
     {
         yield [15000, 'FR', 'not a array', 'Operations is not a valid int'];
@@ -74,6 +65,9 @@ final class setCacheKeyTest extends BaseCacheRepository
 
     public function testWithValidData()
     {
+        $this->config->shouldReceive([
+            'get' => false
+        ]);
         $this->assertSame(
             'Payplug::OneySimulations_15000_FR_operation_live',
             $this->repo->setCacheKey(15000, 'FR', ['operation'])

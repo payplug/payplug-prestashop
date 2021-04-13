@@ -31,8 +31,8 @@ use PayPlug\tests\repositories\BaseTest;
 /**
  * @group unit
  * @group repository
- * @group oney
- * @group oney_repository
+ * @group cache
+ * @group cache_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -42,7 +42,7 @@ class BaseCacheRepository extends BaseTest
     {
         parent::setUp();
 
-        $this->repo = \Mockery::mock(CacheRepository::class)->makePartial();
+        $this->repo = \Mockery::mock(CacheRepository::class, [])->makePartial();
 
         $this->repo->shouldReceive([
             'setStdParams' => true,
