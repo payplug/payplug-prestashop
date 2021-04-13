@@ -67,25 +67,23 @@ class CacheRepository extends Repository
         // check if exists
         $cache = $this->getCacheByKey($cache_key);
 
-        if (!$cache) {
+        if (!$cache['result']) {
             $this->cacheEntity->setDateAdd($this->logger->udate('Y-m-d H:i:s'));
-
-            $cache = $this->cacheEntity;
 
             $this->query
                 ->insert()
                 ->into($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
                 ->fields('cache_key')->values(pSQL($cache_key))
                 ->fields('cache_value')->values(json_encode($cache_value))
-                ->fields('date_add')->values(pSQL($cache->getDateAdd()))
-                ->fields('date_upd')->values(pSQL($cache->getDateAdd()));
+                ->fields('date_add')->values(pSQL($this->cacheEntity->getDateAdd()))
+                ->fields('date_upd')->values(pSQL($this->cacheEntity->getDateAdd()));
 
             if (!$this->query->build()) {
                 return false;
             }
-
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -152,14 +150,16 @@ class CacheRepository extends Repository
             ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
             ->where('`cache_key` = \'' . (string)$cache_key . '\'');
 
-        $cache = $this->query->build();
+        $result = $this->query->build();
 
-        if (!$cache) {
+        if (!$result) {
             return [
                 'result' => false,
                 'message' => 'No cache found'
             ];
         }
+
+        $cache = reset($result);
 
         // if the cache is older than 48 hours, return false after delete it
         $lifetime = new \DateInterval('P2D');
@@ -167,21 +167,32 @@ class CacheRepository extends Repository
         $date_limit->sub($lifetime);
         $date_add = new \DateTime($cache['date_add']);
         if ($date_limit > $date_add) {
-            $this->query
-                ->delete()
-                ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
-                ->where('`cache_key` = \'' . (string)$cache_key . '\'');
+            $this->deleteCacheByKey($cache_key);
+
             return [
                 'result' => false,
                 'message' => 'The current cache has been deleted'
             ];
         }
 
-
         return [
             'result' => $cache,
             'message' => 'Success'
         ];
+    }
+
+    /**
+     * @description Delete cache for a given key
+     * @param $cache_key
+     */
+    public function deleteCacheByKey($cache_key)
+    {
+        $this->query
+            ->delete()
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
+            ->where('`cache_key` = \'' . (string)$cache_key . '\'')
+            ->build()
+        ;
     }
 
     /**
