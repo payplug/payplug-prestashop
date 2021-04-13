@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\CacheRepository;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group cache
@@ -40,7 +39,11 @@ final class GetCacheByKeyTest extends BaseCacheRepository
     public function setUp()
     {
         parent::setUp();
+
         $this->cacheKey = 'Payplug::OneySimulations_15000_FR_operation_live';
+        $this->constant
+            ->shouldReceive('get')
+            ->andReturn(true);
     }
 
     public function invalidDataProvider()
@@ -62,6 +65,80 @@ final class GetCacheByKeyTest extends BaseCacheRepository
                 'message' => 'Invalid cache key format'
             ],
             $this->repo->getCacheByKey($cacheKey)
+        );
+    }
+
+    public function testWithNoCacheFoundInDB()
+    {
+        $this->query
+            ->shouldReceive([
+                'select' => $this->query,
+                'fields' => $this->query,
+                'from' => $this->query,
+                'where' => $this->query,
+                'build' => false
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'No cache found'
+            ],
+            $this->repo->getCacheByKey($this->cacheKey)
+        );
+    }
+
+    public function testWithOutdatedCacheReturn()
+    {
+        $lifetime = new \DateInterval('P2D');
+        $date_limit = new \DateTime('now');
+        $date_limit->sub($lifetime);
+
+        $this->query
+            ->shouldReceive([
+                'delete' => $this->query,
+                'select' => $this->query,
+                'fields' => $this->query,
+                'from' => $this->query,
+                'where' => $this->query,
+                'build' => [
+                    'date_add' => $date_limit->format('Y-m-d H:i:s')
+                ]
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'The current cache has been deleted'
+            ],
+            $this->repo->getCacheByKey($this->cacheKey)
+        );
+    }
+
+    public function testWithValidData()
+    {
+        $date_limit = new \DateTime('now');
+        $cache = [
+            'cache_key' => $this->cacheKey,
+            'date_add' => $date_limit->format('Y-m-d H:i:s'),
+            'date_upd' => $date_limit->format('Y-m-d H:i:s')
+        ];
+
+        $this->query
+            ->shouldReceive([
+                'select' => $this->query,
+                'fields' => $this->query,
+                'from' => $this->query,
+                'where' => $this->query,
+                'build' => $cache
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => $cache,
+                'message' => 'Success'
+            ],
+            $this->repo->getCacheByKey($this->cacheKey)
         );
     }
 }

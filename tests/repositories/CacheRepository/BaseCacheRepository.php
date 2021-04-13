@@ -54,7 +54,8 @@ class BaseCacheRepository extends BaseTest
             $this->cacheEntity,
             $this->query,
             $this->config,
-            $this->logger
+            $this->logger,
+            $this->constant
         ])->makePartial();
 
         $this->arrayCache = [];

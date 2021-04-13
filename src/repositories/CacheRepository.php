@@ -23,10 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use DateInterval;
-use DateTime;
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\exceptions\BadParameterException;
 
 class CacheRepository extends Repository
@@ -35,17 +31,20 @@ class CacheRepository extends Repository
     private $query;
     private $config;
     private $logger;
+    private $constant;
 
     public function __construct(
         $cacheEntity,
         $query,
         $config,
-        $logger
+        $logger,
+        $constant
     ) {
         $this->cacheEntity = $cacheEntity;
         $this->config = $config;
         $this->logger = $logger;
         $this->query = $query;
+        $this->constant = $constant;
 
         $this->logger->setParams(['process' => 'cache']);
     }
@@ -75,7 +74,7 @@ class CacheRepository extends Repository
 
             $this->query
                 ->insert()
-                ->into(_DB_PREFIX_ . 'payplug_cache')
+                ->into($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
                 ->fields('cache_key')->values(pSQL($cache_key))
                 ->fields('cache_value')->values(json_encode($cache_value))
                 ->fields('date_add')->values(pSQL($cache->getDateAdd()))
@@ -150,7 +149,7 @@ class CacheRepository extends Repository
         $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_ . 'payplug_cache')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
             ->where('`cache_key` = \'' . (string)$cache_key . '\'');
 
         $cache = $this->query->build();
@@ -170,7 +169,7 @@ class CacheRepository extends Repository
         if ($date_limit > $date_add) {
             $this->query
                 ->delete()
-                ->from(_DB_PREFIX_ . 'payplug_cache')
+                ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
                 ->where('`cache_key` = \'' . (string)$cache_key . '\'');
             return [
                 'result' => false,
@@ -195,7 +194,7 @@ class CacheRepository extends Repository
     {
         $this->query
             ->truncate()
-            ->table(_DB_PREFIX_ . 'payplug_cache');
+            ->table($this->constant->get('_DB_PREFIX_') . 'payplug_cache');
 
         if (!$this->query->build()) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';

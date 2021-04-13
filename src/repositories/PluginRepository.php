@@ -24,12 +24,16 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
+
+use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\entities\PluginEntity;
+
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ConstantSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\CurrencySpecific;
@@ -77,6 +81,7 @@ class PluginRepository extends Repository
         $this->cart     = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
         $this->context  = new ContextSpecific();
+        $this->constant  = new ConstantSpecific();
         $this->country  = new CountrySpecific();
         $this->currency  = new CurrencySpecific();
         $this->logger   = new LoggerRepository();
@@ -96,7 +101,8 @@ class PluginRepository extends Repository
             $this->cacheEntity,
             $this->query,
             $this->configuration,
-            $this->logger
+            $this->logger,
+            $this->constant
         );
 
         $this->oney = new OneyRepository(
