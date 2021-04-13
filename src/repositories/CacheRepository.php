@@ -137,21 +137,21 @@ class CacheRepository extends Repository
         if (!is_int($amount)) {
             return [
                 'result' => false,
-                'message' => 'Amount is not an int'
+                'message' => 'Amount is not a valid int'
             ];
         }
 
         if (!is_string($country)) {
             return [
                 'result' => false,
-                'message' => 'Country is not a string'
+                'message' => 'Country is not a valid string'
             ];
         }
 
         if (!is_array($operations)) {
             return [
                 'result' => false,
-                'message' => 'Operations is not an array'
+                'message' => 'Operations is not a valid array'
             ];
         }
 
