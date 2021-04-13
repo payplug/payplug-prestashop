@@ -45,54 +45,12 @@ class CacheRepository extends Repository
         $this->logger = $logger;
         $this->query = $query;
 
-        $this->setStdParams();
-        $this->setLogger();
+        $this->logger->setParams(['process' => 'cache']);
     }
 
     public static function factory()
     {
         return new CacheRepository();
-    }
-
-    /**
-     * @description Hydrate entities standard parameters
-     *
-     * @throws BadParameterException
-     */
-    public function setStdParams()
-    {
-        $this->cacheEntity
-            ->setTable('payplug_cache')
-            ->setDefinition([
-                'table' => $this->cacheEntity->getTable(),
-                'primary' => 'id_' . $this->cacheEntity->getTable(),
-                'fields' => [
-                    /*
-                     * Different types,
-                     * according to modules/gamification/tests/mocks/ObjectModel.php :
-                     * TYPE_INT = 1;
-                     * TYPE_BOOL = 2;
-                     * TYPE_STRING = 3;
-                     * TYPE_FLOAT = 4;
-                     * TYPE_DATE = 5;
-                     * TYPE_HTML = 6;
-                     * TYPE_NOTHING = 7;
-                     * TYPE_SQL = 8;
-                     */
-                    'cache_key' => ['type' => 3, 'validate' => 'isString', 'required' => true],
-                    'cache_value' => ['type' => 3, 'validate' => 'isString', 'required' => true],
-                    'date_add' => ['type' => 5, 'validate' => 'isDate'],
-                    'date_upd' => ['type' => 5, 'validate' => 'isDate'],
-                ]
-            ]);
-    }
-
-    /**
-     * @description Set PayPlug Logger
-     */
-    private function setLogger()
-    {
-        $this->logger->setParams(['process' => $this->cacheEntity->getTable()]);
     }
 
     /**
