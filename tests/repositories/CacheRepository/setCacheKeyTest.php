@@ -22,9 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
-use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
