@@ -34,11 +34,17 @@ class CacheRepository extends Repository
     private $config;
     private $logger;
 
-    public function __construct()
-    {
-        $this->cacheEntity = new CacheEntity();
-        $this->query = QueryRepository::factory();
-        $this->config = ConfigurationSpecific::factory();
+    public function __construct(
+        $cacheEntity,
+        $query,
+        $config,
+        $logger
+    ) {
+        $this->cacheEntity = $cacheEntity;
+        $this->config = $config;
+        $this->logger = $logger;
+        $this->query = $query;
+
         $this->setStdParams();
         $this->setLogger();
     }
@@ -86,7 +92,6 @@ class CacheRepository extends Repository
      */
     private function setLogger()
     {
-        $this->logger = new LoggerRepository();
         $this->logger->setParams(['process' => $this->cacheEntity->getTable()]);
     }
 

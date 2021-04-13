@@ -41,6 +41,7 @@ use PayPlug\src\specific\AssignSpecific;
 class PluginRepository extends Repository
 {
     // Entities
+    private $cacheEntity;
     private $oneyEntity;
 
     // Repositories & necessary classes
@@ -71,7 +72,6 @@ class PluginRepository extends Repository
     public function __construct($payplug = null)
     {
         $this->address  = new AddressSpecific();
-        $this->cache    = new CacheRepository();
         $this->card     = new CardRepository($payplug);
         $this->carrier  = new CarrierSpecific();
         $this->cart     = new CartSpecific();
@@ -90,6 +90,14 @@ class PluginRepository extends Repository
         $this->order_state = new OrderStateRepository();
         $this->validate = new ValidateSpecific();
         $this->assign = new AssignSpecific();
+
+        $this->cacheEntity = new CacheEntity();
+        $this->cache    = new CacheRepository(
+            $this->cacheEntity,
+            $this->query,
+            $this->configuration,
+            $this->logger
+        );
 
         $this->oney = new OneyRepository(
             $this->cache,
