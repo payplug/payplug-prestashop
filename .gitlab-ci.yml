@@ -7,7 +7,6 @@ php cs fixer:
   image: composer:1.9
   stage: check php
   script:
-    - composer install
     - composer require friendsofphp/php-cs-fixer
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
 
