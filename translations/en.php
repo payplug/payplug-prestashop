@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{payplug}prestashop>payplug_f157d7333585b8ce4db9722f383d3bcb'] = 'Cannot abort installment.';
 $_MODULE['<{payplug}prestashop>payplug_6339057c04eafb3954cf17cd06847efc'] = 'Settings not updated';
 $_MODULE['<{payplug}prestashop>payplug_8186e25dabeca93837acfc5664c7fd00'] = 'The email and/or password was not correct.';
