@@ -1,6 +1,14 @@
 stages:
+  - check php
   - tests
   - build
+
+php cs fixer:
+  image: composer:1.9
+  stage: check php
+  script:
+    - composer install
+    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
 
 unit tests:
   image: composer:1.9
