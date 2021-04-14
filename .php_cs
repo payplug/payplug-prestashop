@@ -8,7 +8,7 @@ $finder = PhpCsFixer\Finder::create()
 $config = new PhpCsFixer\Config();
 return $config->setRules([
         '@PSR2' => true,
-        'strict_param' => true,
+        'strict_param' => false,
         'array_syntax' => ['syntax' => 'short'],
     ])
     ->setFinder($finder)
