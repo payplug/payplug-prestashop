@@ -1,6 +1,6 @@
 #!/bin/sh
 
- source ~/.bash_profile
+# source ~/.bash_profile
 
 ## Lib Phone Number
 rm -rf vendor/giggsey/libphonenumberlight;
