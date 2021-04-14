@@ -24,12 +24,16 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
+
+use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\entities\PluginEntity;
+
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ConstantSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\CurrencySpecific;
@@ -41,6 +45,7 @@ use PayPlug\src\specific\AssignSpecific;
 class PluginRepository extends Repository
 {
     // Entities
+    private $cacheEntity;
     private $oneyEntity;
 
     // Repositories & necessary classes
@@ -71,12 +76,12 @@ class PluginRepository extends Repository
     public function __construct($payplug = null)
     {
         $this->address  = new AddressSpecific();
-        $this->cache    = new CacheRepository();
         $this->card     = new CardRepository($payplug);
         $this->carrier  = new CarrierSpecific();
         $this->cart     = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
         $this->context  = new ContextSpecific();
+        $this->constant  = new ConstantSpecific();
         $this->country  = new CountrySpecific();
         $this->currency  = new CurrencySpecific();
         $this->logger   = new LoggerRepository();
@@ -90,6 +95,15 @@ class PluginRepository extends Repository
         $this->order_state = new OrderStateRepository();
         $this->validate = new ValidateSpecific();
         $this->assign = new AssignSpecific();
+
+        $this->cacheEntity = new CacheEntity();
+        $this->cache    = new CacheRepository(
+            $this->cacheEntity,
+            $this->query,
+            $this->configuration,
+            $this->logger,
+            $this->constant
+        );
 
         $this->oney = new OneyRepository(
             $this->cache,

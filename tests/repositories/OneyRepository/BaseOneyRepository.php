@@ -48,6 +48,7 @@ class BaseOneyRepository extends BaseTest
         parent::setUp();
 
         $this->oney = $this->oney ? $this->oney : new OneyEntity();
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->repo = \Mockery::mock(OneyRepository::class, [
             $this->cache,

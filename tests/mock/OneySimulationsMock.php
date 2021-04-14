@@ -172,6 +172,6 @@ class OneySimulationsMock
             'date_add' => '2021-01-01 00:00:00',
             'date_upd' => '2021-01-01 00:00:00',
         ];
-        return [$cache];
+        return $cache;
     }
 }

@@ -920,10 +920,10 @@ class OneyRepository extends Repository
 
         // Checks if the current simulation is already saved in the database
         // If not, we do a simulation for Oney, and we will store it to the DB
-        $cache_from_bdd = $this->cache->getCacheByKey($cache_key['result']);
+        $cache = $this->cache->getCacheByKey($cache_key['result']);
 
-        if ($cache_from_bdd) {
-            return $tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
+        if ($cache['result']) {
+            return $tools->tool('jsonDecode', $cache['result']['cache_value'], true);
         }
 
         try {

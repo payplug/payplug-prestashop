@@ -22,10 +22,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\tests\repositories\CacheRepository;
+
+use PayPlug\src\entities\CardEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
-use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\tests\repositories\BaseTest;
 
 /**
  * @group unit
@@ -35,34 +37,30 @@ use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
  *
  * @runTestsInSeparateProcesses
  */
-final class setCacheKeyTest extends TestCase
+class BaseCacheRepository extends BaseTest
 {
-    use MockeryPHPUnitIntegration;
-
-    protected $query;
-    protected $config;
-
-    protected $repo;
+    protected $cacheEntity;
 
     public function setUp()
     {
-        $this->query = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
+        parent::setUp();
 
-        $this->config->shouldReceive('get')
-            ->with('PAYPLUG_SANDBOX_MODE')
-            ->andReturn(false);
+        $this->cacheEntity = new CardEntity();
+        $this->logger->shouldReceive([
+            'setParams' => $this->logger,
+        ]);
 
-        $this->repo = new CacheRepository();
-    }
+        $this->repo = \Mockery::mock(CacheRepository::class, [
+            $this->cacheEntity,
+            $this->query,
+            $this->config,
+            $this->logger,
+            $this->constant
+        ])->makePartial();
 
-    public function testCacheIdHasValidatedFormat()
-    {
-        //todo : finalize this test
-//        $cacheId = $this->repo->setCacheKey(500, 'FR', ['x3_with_fees'])['result'];
-//        $this->assertRegExp(
-//            '/Payplug::OneySimulations_\d{5,6}_[A-Z]{2}_(x\d{1}_with_fees|x\d{1}_with_fees_x\d{1}_with_fees)_live/',
-//            $cacheId
-//        );
+        $this->arrayCache = [];
+        $this->arrayLogger = [];
+
+        MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
     }
 }
