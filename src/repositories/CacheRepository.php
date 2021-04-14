@@ -96,7 +96,7 @@ class CacheRepository extends Repository
      */
     public function setCacheKey($amount, $country, $operations)
     {
-        if (!is_int($amount)) {
+        if (!is_numeric($amount)) {
             return [
                 'result' => false,
                 'message' => 'Amount is not a valid int'
