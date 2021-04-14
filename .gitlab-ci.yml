@@ -8,6 +8,7 @@ php cs fixer:
   stage: check php
   script:
     - composer install
+    - composer require friendsofphp/php-cs-fixer
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
 
 unit tests:
