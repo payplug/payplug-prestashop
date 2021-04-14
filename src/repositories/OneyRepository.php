@@ -170,7 +170,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->contextSpecific->getContext()->smarty->assign([
@@ -600,7 +600,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->contextSpecific->getContext()->smarty->assign([
