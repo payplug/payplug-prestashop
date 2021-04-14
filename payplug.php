@@ -40,6 +40,8 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class Payplug extends PaymentModule
 {
+    public $test_fixer = array();
+
     private $card; // 3.0
 
     private $tools; // 3.0
@@ -293,8 +295,6 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
-
-        $test_fonction = array();
     }
 
     private function initializeAccessors()
