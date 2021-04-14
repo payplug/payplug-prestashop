@@ -1,7 +1,13 @@
+include:
+  - project: 'payplug/releasy'
+    file: '/templates/main.gitlab-ci.yml'
+
 stages:
   - check php
   - tests
   - build
+  - releasy-review
+  - releasy-release
 
 php cs fixer:
   image: composer:1.9

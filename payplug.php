@@ -26,7 +26,7 @@
  */
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.class.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHPClass.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
@@ -279,7 +279,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.3';
+        $this->version = '3.1.4';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -1106,7 +1106,7 @@ class Payplug extends PaymentModule
      */
     protected function checkRequirements()
     {
-        $php_min_version = 50300;
+        $php_min_version = 50600;
         $curl_min_version = '7.21';
         $openssl_min_version = 0x1000100f;
         $report = [
@@ -4529,7 +4529,7 @@ class Payplug extends PaymentModule
             $default_language = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->getIsoCodeList();
             if (in_array(Tools::strtoupper($default_language->iso_code), $iso_code_list, true)) {
-                $iso_code = $default_language->iso_code;
+                $iso_code = Tools::strtoupper($default_language->iso_code);
             } else {
                 $iso_code = 'FR';
             }
