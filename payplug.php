@@ -293,6 +293,8 @@ class Payplug extends PaymentModule
         $this->setSecretKey();
         $this->setUserAgent();
         $this->loadSpecificPrestaClasses();
+
+        $test_fonction = array();
     }
 
     private function initializeAccessors()
