@@ -29,7 +29,7 @@ build zip release:
   before_script:
     - composer install --no-dev
     - ./assets_revision.sh
-    - chmod +x ./auto_index.sh
+    - chmod +x find ./vendor -type d -exec cp index.php {} \;
     - git status
     - mkdir payplug
   script:
