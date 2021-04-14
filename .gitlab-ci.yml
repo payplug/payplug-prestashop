@@ -23,6 +23,7 @@ build zip release:
   before_script:
     - composer install --no-dev
     - ./assets_revision.sh
+    - ./auto_index.sh
     - git status
     - mkdir payplug
   script:
