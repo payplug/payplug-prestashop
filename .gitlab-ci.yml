@@ -7,7 +7,7 @@ php cs fixer:
   image: composer:1.9
   stage: check php
   script:
-    - composer require friendsofphp/php-cs-fixer
+    - composer install
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
 
 unit tests:
