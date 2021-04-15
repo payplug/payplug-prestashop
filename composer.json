@@ -16,7 +16,7 @@
         "exclude": [
             "!vendor/*",
             ".*",
-	        "assets_revision.sh",
+	        "*.sh",
             "tests",
             "view/css/less",
             "controllers/tools",
