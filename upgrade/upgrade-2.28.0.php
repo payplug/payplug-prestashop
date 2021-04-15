@@ -58,9 +58,13 @@ function upgrade_module_2_28_0($object)
     foreach ($states as $state) {
         if ($state != null) {
             $s = new OrderState((int)$state);
-            $s->logable = false;
-            $s->invoice = false;
-            $s->update();
+
+            // update object only if order state exist
+            if (Validate::isLoadedObject($s)) {
+                $s->logable = false;
+                $s->invoice = false;
+                $s->update();
+            }
         }
     }
 
