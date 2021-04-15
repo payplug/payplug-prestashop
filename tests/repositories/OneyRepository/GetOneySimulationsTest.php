@@ -29,7 +29,6 @@ use PayPlug\tests\mock\OneySimulationsMock;
 
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -48,93 +47,84 @@ final class GetOneySimulationsTest extends BaseOneyRepository
     ];
     protected $iso = 'FR';
     protected $operation = 'x3_with_fees';
-    protected $operations = ['x3_with_fees','x4_with_fees'];
+    protected $operations = ['x3_with_fees', 'x4_with_fees'];
+    protected $cacheKey = 'Payplug::OneySimulations_500_FR_x3_with_fees_live';
+    protected $simulations;
 
     public function setUp()
     {
         parent::setUp();
 
         // Method setup
-        $this->oneyMock = MockHelper::createMockFactory('Payplug\OneySimulation');
-
-        $this->cache->shouldReceive('setCacheKey')
-            ->andReturnUsing(function ($amount, $country, $operations) {
-                $cache_id = 'Payplug::OneySimulations_' .
-                    (int)$amount . '_' .
-                    (string)$country . '_' .
-                    (string)implode('_', $operations) . '_' .
-                    ($this->config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
-                return ['result' => $cache_id];
-            });
+        $this->oneyMock = MockHelper::createMockFactory('alias:Payplug\OneySimulation');
 
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_SANDBOX_MODE')
             ->andReturn(false);
 
-        $this->logger->shouldReceive('setParams')
-            ->andReturn(true);
-    }
-
-    public function testGetOneySimulationsWithoutCacheValid()
-    {
-        MockHelper::createSetCacheMock($this->cache, $this->arrayCache);
-
-        $simulations = OneySimulationsMock::get()[$this->operation];
-
-        $this->cache
-            ->shouldReceive('getCacheByKey')
-            ->andReturn(false);
-
-        $this->oneyMock->shouldReceive('getSimulations')
-            ->andReturn($simulations);
-
-        foreach($this->operations as $operation) {
-            $this->assertEquals(
-                $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$operation]),
-                [
-                    'result' => true,
-                    'simulations' => $simulations
-                ]
-            );
-        }
-
-        $this->assertSame(count($this->arrayCache), count($this->operations));
-        $this->assertSame(count($this->arrayLogger), 0);
-    }
-
-    public function testGetOneySimulationsWithCacheValid()
-    {
-        MockHelper::createSetCacheMock($this->cache, $this->arrayCache);
-
-        $cache = OneySimulationsMock::getFromCache();
-        $simulations = OneySimulationsMock::get();
-
-        $this->cache
-            ->shouldReceive('getCacheByKey')
-            ->andReturn([
-                'result' => $cache,
-                'message' => 'Success'
+        $this->logger
+            ->shouldReceive([
+                'setParams' => true
             ]);
 
-        $this->assertEquals(
-            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
-             [
-                'result' => true,
-                'simulations' => $simulations
-             ]
-        );
-
-        $this->assertSame(count($this->arrayLogger), 0);
-        $this->assertSame(count($this->arrayCache), 0);
+        $this->simulations = OneySimulationsMock::get()[$this->operation];
     }
 
-    public function testGetOneySimulationsThrowException()
+    public function testWithoutInvalidCacheKey()
     {
-        MockHelper::createSetCacheMock($this->cache, $this->arrayCache);
-
         $this->cache
-            ->shouldReceive('getCacheByKey')
-            ->andReturn(null);
+            ->shouldReceive([
+                'setCacheKey' => [
+                    'result' => false,
+                    'message' => 'set cacheKey error message'
+                ]
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'error' => 'set cacheKey error message'
+            ],
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
+        );
+    }
+
+    public function testWithExistingCache()
+    {
+        $this->cache
+            ->shouldReceive([
+                'setCacheKey' => [
+                    'result' => $this->cacheKey,
+                    'message' => 'Success'
+                ],
+                'getCacheByKey' => [
+                    'result' => OneySimulationsMock::getFromCache(),
+                    'message' => 'Success'
+                ]
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'simulations' => OneySimulationsMock::get()
+            ],
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
+        );
+    }
+
+    public function testWithExceptionThrowed()
+    {
+        $this->cache
+            ->shouldReceive([
+                'setCacheKey' => [
+                    'result' => $this->cacheKey,
+                    'message' => 'Success'
+                ],
+                'getCacheByKey' => [
+                    'result' => false,
+                    'message' => 'No cache found'
+                ]
+            ]);
 
         $this->oneyMock->shouldReceive('getSimulations')
             ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403);
@@ -147,32 +137,101 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ]
         );
 
-        $this->assertSame(count($this->arrayLogger), 2);
-        $this->assertSame(count($this->arrayCache), 0);
+        $this->assertSame(count($this->arrayLogger), 1);
     }
 
-    public function testGetOneySimulationsCantSetCache()
+    public function testWithSimulationReturningError()
     {
-        $simulations = OneySimulationsMock::get()[$this->operation];
-
         $this->cache
-            ->shouldReceive('getCacheByKey')
-            ->andReturn(false);
+            ->shouldReceive([
+                'setCacheKey' => [
+                    'result' => $this->cacheKey,
+                    'message' => 'Success'
+                ],
+                'getCacheByKey' => [
+                    'result' => false,
+                    'message' => 'No cache found'
+                ]
+            ]);
 
-        $this->oneyMock->shouldReceive('getSimulations')
-            ->andReturn($simulations);
+        $this->oneyMock
+            ->shouldReceive([
+                'getSimulations' => [
+                    'object' => 'error',
+                    'message' => 'error while getting simulations'
+                ]
+            ]);
 
-        $this->cache->shouldReceive('setCache')
-            ->andReturn(false);
+        $this->assertSame(
+            [
+                'result' => false,
+                'error' => 'error while getting simulations'
+            ],
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
+        );
+    }
 
-        $this->assertEquals(
-            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
+    public function testWhenSimulationCantBeCached()
+    {
+        $this->cache
+            ->shouldReceive([
+                'setCacheKey' => [
+                    'result' => $this->cacheKey,
+                    'message' => 'Success'
+                ],
+                'getCacheByKey' => [
+                    'result' => false,
+                    'message' => 'No cache found'
+                ],
+                'setCache' => false
+            ]);
+
+        $this->oneyMock
+            ->shouldReceive([
+                'getSimulations' => $this->simulations
+            ]);
+
+        ksort($this->simulations);
+
+        $this->assertSame(
             [
                 'result' => true,
-                'simulations' => $simulations
-            ]
+                'simulations' => $this->simulations
+            ],
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
+        $this->assertSame(count($this->arrayLogger), 1);
+    }
 
-        $this->assertSame(count($this->arrayLogger), 2);
+    public function testWhenSimulationCached()
+    {
+        $this->cache
+            ->shouldReceive([
+                'setCacheKey' => [
+                    'result' => $this->cacheKey,
+                    'message' => 'Success'
+                ],
+                'getCacheByKey' => [
+                    'result' => false,
+                    'message' => 'No cache found'
+                ],
+                'setCache' => true
+            ]);
+
+        $this->oneyMock
+            ->shouldReceive([
+                'getSimulations' => $this->simulations
+            ]);
+
+        ksort($this->simulations);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'simulations' => $this->simulations
+            ],
+            $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
+        );
+        $this->assertSame(count($this->arrayLogger), 0);
     }
 }

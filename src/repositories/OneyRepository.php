@@ -940,22 +940,20 @@ class OneyRepository extends Repository
                     'result' => false,
                     'error' => $simulations['message']
                 ];
-            } else {
-                if ($simulations) {
-                    ksort($simulations);
-                    $to_cache = [
-                        'result' => true,
-                        'simulations' => $simulations
-                    ];
+            } elseif ($simulations) {
+                ksort($simulations);
+                $to_cache = [
+                    'result' => true,
+                    'simulations' => $simulations
+                ];
 
-                    // $cache_id = cache_key in db
-                    // $to_cache = cache_value in db
-                    if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
-                        $this->logger->setParams(['process' => '[Oney Repository] setCache']);
-                        $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
-                        $error_level = 'error';
-                        $this->logger->addLog($error_message, $error_level);
-                    }
+                // $cache_id = cache_key in db
+                // $to_cache = cache_value in db
+                if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
+                    $this->logger->setParams(['process' => '[Oney Repository] setCache']);
+                    $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
+                    $error_level = 'error';
+                    $this->logger->addLog($error_message, $error_level);
                 }
             }
 

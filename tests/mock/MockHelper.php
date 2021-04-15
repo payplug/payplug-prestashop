@@ -49,7 +49,7 @@ class MockHelper extends Mockery
         $loggerMock
             ->shouldReceive('addLog')
             ->andReturnUsing(function($message, $level) use (&$arrayLog) {
-                $arrayLog = ['level' => $level, 'message' => $message];
+                $arrayLog[] = ['level' => $level, 'message' => $message];
                 return $arrayLog;
             });
     }
