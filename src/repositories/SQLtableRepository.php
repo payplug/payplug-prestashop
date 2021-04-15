@@ -235,6 +235,7 @@ class SQLtableRepository extends \Payplug
     /**
      * Remove SQL tables used by module
      *
+     * @param $keep_cards
      * @return bool
      */
     public function uninstallSQL($keep_cards = false)
@@ -264,5 +265,53 @@ class SQLtableRepository extends \Payplug
 
         $log->info('Uninstallation SQL ended.');
         return $flag;
+    }
+
+    /**
+     * Check if existing table
+     * @param string $table
+     * @param int|bool $canUsePayplugLogger
+     * @return bool
+     */
+    public function checkExistingTable($table, $canUsePayplugLogger = 1)
+    {
+        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $logger = null;
+
+        if ($canUsePayplugLogger) {
+            $logger = new LoggerRepository();
+            $logger->setParams(['process' => 'SQLtableRepository']);
+        }
+
+        if (!$table || !is_string($table)) {
+            if ($canUsePayplugLogger) {
+                $logger->addLog('checkExistingTable() : parameter $table is not a string', 'error');
+                $logger->addLog('$table value : ' . json_encode($table), 'error');
+            }
+
+            if ($log) {
+                $log->error('[SQLtableRepository] checkExistingTable() : parameter $table is not a string');
+            }
+
+                return false;
+        }
+
+        $this->query
+            ->ifExist()
+            ->table($table);
+            if (!$this->query->build()) {
+                if ($log) {
+                    $log->error('[SQLtableRepository] checkExistingTable() : Error during send request in DB');
+                }
+
+                if ($canUsePayplugLogger) {
+                    $logger->addLog('[SQLtableRepository] checkExistingTable() : Error during send request in DB',
+                        'error');
+                }
+
+                return false;
+            }
+
+        return true;
     }
 }
