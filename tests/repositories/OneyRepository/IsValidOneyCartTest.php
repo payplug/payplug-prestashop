@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\OneyRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group oney
