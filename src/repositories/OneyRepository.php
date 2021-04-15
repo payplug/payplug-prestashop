@@ -935,10 +935,7 @@ class OneyRepository extends Repository
 
             $simulations = \Payplug\OneySimulation::getSimulations($data);
 
-            if (isset($simulations['details'])
-                && $simulations['details'] == 'Access to this feature is not available.') {
-                $this->payplug->updatePermissions();
-            } elseif (isset($simulations['object']) && $simulations['object'] == 'error') {
+            if (isset($simulations['object']) && $simulations['object'] == 'error') {
                 return [
                     'result' => false,
                     'error' => $simulations['message']
