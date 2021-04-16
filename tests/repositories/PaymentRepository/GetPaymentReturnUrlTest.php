@@ -44,7 +44,6 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             'paymentReturnUrl' => 'payment_return_url',
             'paymentUrl' => 'payment_url'
         ];
-
     }
 
     /**
@@ -112,8 +111,10 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
         $this->assertSame('payment_url', $this->repo->getPaymentReturnUrl($this->paymentDetails)['url']['return_url']);
 
-        $this->assertSame('Return URL successfully generated',
-            $this->repo->getPaymentReturnUrl($this->paymentDetails)['response']);
+        $this->assertSame(
+            'Return URL successfully generated',
+            $this->repo->getPaymentReturnUrl($this->paymentDetails)['response']
+        );
     }
 
     /**
@@ -128,8 +129,10 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             ]);
 
         $this->assertFalse($this->repo->getPaymentReturnUrl($this->paymentDetails)['result']);
-        $this->assertSame($this->repo->getPaymentReturnUrl($this->paymentDetails)['response'],
-            '[getPaymentReturnUrl] $paymentStored is null or invalid');
+        $this->assertSame(
+            $this->repo->getPaymentReturnUrl($this->paymentDetails)['response'],
+            '[getPaymentReturnUrl] $paymentStored is null or invalid'
+        );
 
         // Step 2 : With good return in checkPaymentTable but invalid payment method
         $this->repo
@@ -140,7 +143,9 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
         $this->paymentDetails['paymentMethod'] = mt_rand();
 
         $this->assertFalse($this->repo->getPaymentReturnUrl($this->paymentDetails)['result']);
-        $this->assertSame($this->repo->getPaymentReturnUrl($this->paymentDetails)['response'],
-            '[getPaymentReturnUrl] $paymentStored is null or invalid');    }
-
+        $this->assertSame(
+            $this->repo->getPaymentReturnUrl($this->paymentDetails)['response'],
+            '[getPaymentReturnUrl] $paymentStored is null or invalid'
+        );
+    }
 }

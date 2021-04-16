@@ -33,7 +33,6 @@ use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\repositories\BaseTest;
 
-
 /**
  * @group unit
  * @group repository

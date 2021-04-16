@@ -30,7 +30,6 @@ use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\tests\repositories\BaseTest;
 
-
 /**
  * @group unit
  * @group repository
@@ -41,7 +40,6 @@ use PayPlug\tests\repositories\BaseTest;
  */
 final class GetOneyCountryTest extends BaseTest
 {
-
     public function setUp()
     {
         parent::setUp();
@@ -82,7 +80,7 @@ final class GetOneyCountryTest extends BaseTest
     {
         $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
 
-        foreach($overseas_iso as $iso) {
+        foreach ($overseas_iso as $iso) {
             $this->assertSame(
                 'FR',
                 $this->repo->getOneyCountry($iso)

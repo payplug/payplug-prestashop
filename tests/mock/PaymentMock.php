@@ -199,8 +199,7 @@ class PaymentMock
             'refundable_until' => 1630501567,
         ];
 
-        dump($paiement); exit;
-
+        dump($paiement);
+        exit;
     }
-
 }

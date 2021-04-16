@@ -12,7 +12,9 @@ class PaymentTabMock
     public static function getInstallment()
     {
         $tab = self::getRaw();
-        return array_merge($tab, [
+        return array_merge(
+            $tab,
+            [
                 'paymentTab' => [
                     'schedule' => [
                         0 => [

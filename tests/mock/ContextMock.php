@@ -26,7 +26,8 @@ namespace PayPlug\tests\mock;
 
 class ContextMock
 {
-    public static function get(){
+    public static function get()
+    {
         $context = new \stdClass();
         $context->cart = CartMock::get();
         $context->customer = CustomerMock::get();

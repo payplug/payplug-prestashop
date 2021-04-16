@@ -30,7 +30,6 @@ use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
 use PayPlug\tests\repositories\BaseTest;
 
-
 /**
  * @group unit
  * @group repository
@@ -65,7 +64,8 @@ final class GetOneyPaymentContextTest extends BaseTest
                 return (int)$amount * 100;
             });
 
-        $this->repo = new OneyRepository($this->cache,
+        $this->repo = new OneyRepository(
+            $this->cache,
             $this->logger,
             $this->address,
             $this->cart,

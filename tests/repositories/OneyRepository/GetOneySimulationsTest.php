@@ -36,7 +36,6 @@ use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\repositories\BaseTest;
 
-
 /**
  * @group uni
  * @group unit
@@ -123,7 +122,7 @@ final class GetOneySimulationsTest extends BaseTest
         $this->oney->shouldReceive('getSimulations')
             ->andReturn($simulations);
 
-        foreach($this->operations as $operation) {
+        foreach ($this->operations as $operation) {
             $this->assertEquals(
                 $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$operation]),
                 [
@@ -150,7 +149,7 @@ final class GetOneySimulationsTest extends BaseTest
 
         $this->assertEquals(
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
-             [
+            [
                 'result' => true,
                 'simulations' => $simulations
              ]
