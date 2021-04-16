@@ -1350,7 +1350,7 @@ class OneyRepository extends Repository
             ];
         }
 
-        $nb_products = $this->contextSpecific->getContext()->cart->nbProducts();
+        $nb_products = $this->cartSpecific->nbProducts($cart);
 
         // todo: set as a constant
         $max = 1000;
