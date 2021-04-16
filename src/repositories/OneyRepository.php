@@ -980,7 +980,7 @@ class OneyRepository extends Repository
      */
     public function hasOneyRequiredFields($payment_data = [])
     {
-        if (!$payment_data) {
+        if (!$payment_data || !is_array($payment_data) || empty($payment_data)) {
             return false;
         }
 
@@ -990,12 +990,8 @@ class OneyRepository extends Repository
         $shipping = $payment_data['shipping'];
 
         // Validate email format
-        if ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100
-            && $tools->tool('$shipping[\'email\']', '+') !== false) {
-            return true;
-        } elseif ($tools->tool('strlen', $shipping['email'], 'UTF-8') > 100) {
-            return true;
-        } elseif (strpos($shipping['email'], '+') !== false) {
+        $is_valid_email = $this->isValidOneyEmail($shipping['email']);
+        if (!$is_valid_email['result']) {
             return true;
         }
 
