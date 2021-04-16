@@ -58,7 +58,6 @@ class QuerySpecific implements QueryInterface
             }
 
             return $this->db->$action($SQLRequest);
-
         } catch (\Exception $e) {
             var_dump($e);
         }

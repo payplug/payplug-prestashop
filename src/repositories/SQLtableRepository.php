@@ -296,8 +296,10 @@ class SQLtableRepository extends \Payplug
             }
 
             if ($canUsePayplugLogger) {
-                $logger->addLog('[SQLtableRepository] checkExistingTable() : Error during send request in DB',
-                    'error');
+                $logger->addLog(
+                    '[SQLtableRepository] checkExistingTable() : Error during send request in DB',
+                    'error'
+                );
             }
 
             return false;
