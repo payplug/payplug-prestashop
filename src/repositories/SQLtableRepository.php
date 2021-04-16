@@ -86,12 +86,37 @@ class SQLtableRepository extends \Payplug
             ->fields('`id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_payment` VARCHAR(255) NOT NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`cart_hash` VARCHAR(64) NOT NULL')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
             ->engine(_MYSQL_ENGINE_);
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_PAYMENT_CART.');
+            return false;
+        }
+
+        // Create PayPlug Payment table
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_.'payplug_payment')
+            ->fields('`id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_payment` VARCHAR(255) NULL')
+            ->fields('`payment_method` VARCHAR(255) NULL')
+            ->fields('`payment_url` VARCHAR(255) NULL')
+            ->fields('`payment_return_url` VARCHAR(255) NULL')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`cart_hash` VARCHAR(64) NULL')
+            ->fields('`authorized_at` INT(20) NOT NULL DEFAULT 0')
+            ->fields('`is_paid` TINYINT(1) NOT NULL DEFAULT 0')
+            ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
+            ->fields('`date_upd` DATETIME NULL')
+            ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
+            ->engine(_MYSQL_ENGINE_)
+        ;
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_PAYMENT.');
             return false;
         }
 
@@ -237,13 +262,14 @@ class SQLtableRepository extends \Payplug
         $flag = true;
 
         $tables = [
-            _DB_PREFIX_ . 'payplug_lock',
-            _DB_PREFIX_ . 'payplug_payment_cart',
-            _DB_PREFIX_ . 'payplug_installment',
-            _DB_PREFIX_ . 'payplug_installment_cart',
-            _DB_PREFIX_ . 'payplug_logger',
-            _DB_PREFIX_ . 'payplug_cache',
-            _DB_PREFIX_ . 'payplug_order_payment',
+            _DB_PREFIX_.'payplug_lock',
+            _DB_PREFIX_.'payplug_payment_cart',
+            _DB_PREFIX_.'payplug_payment',
+            _DB_PREFIX_.'payplug_installment',
+            _DB_PREFIX_.'payplug_installment_cart',
+            _DB_PREFIX_.'payplug_logger',
+            _DB_PREFIX_.'payplug_cache',
+            _DB_PREFIX_.'payplug_order_payment',
         ];
 
         if (!$keep_cards) {

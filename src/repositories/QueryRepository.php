@@ -106,7 +106,12 @@ class QueryRepository extends Repository
 
     public function __construct()
     {
-        $this->specific_class = new QuerySpecific();
+        $this->specific_class = QuerySpecific::factory();
+    }
+
+    public static function factory()
+    {
+        return new QueryRepository();
     }
 
     public function select()

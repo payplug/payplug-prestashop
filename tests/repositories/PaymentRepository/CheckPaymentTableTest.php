@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * 2013 - 2021 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+namespace PayPlug\tests\repositories\PaymentRepository;
+
+/**
+ * @group unit
+ * @group repository
+ * @group payment
+ * @group payment_repository
+ *
+ * @runTestsInSeparateProcesses
+ */
+final class CheckPaymentTableTest extends BasePaymentRepository
+{
+    /**
+     * Parameters to test method with empty $paiementDetails
+     *
+     * @return \Generator
+     */
+    public function checkPaymentTableParameters()
+    {
+        // Test if (!$idCart)
+        yield [null, 'cart id: null'];
+
+        // Test if (!is_int($idCart))
+        yield [
+            (string)'I am a string!',
+            'cart id: "I am a string!"'
+        ];
+    }
+
+    /**
+     * Test methods with nulled $paiementDetails
+     *
+     * @dataProvider checkPaymentTableParameters
+     * @param array $parameter
+     * @param string $logMessage
+     */
+    public function testMethodWithEmptyParams($parameter, $logMessage)
+    {
+        $response = $this->repo->checkPaymentTable($parameter);
+
+        $this->assertFalse(
+            $response['result'],
+            'ERROR : the response is true'
+        );
+
+        $this->assertSame(
+            $response['response'],
+            '[checkPaymentTable] Problem with $idCart parameter'
+        );
+
+        $this->assertSame(
+            $this->arrayLogger['message'],
+            $logMessage
+        );
+    }
+
+//    public function testCreatePaymentWithValidData()
+//    {
+//
+//    }
+//
+//    public function testCreatePaymentWithInvalidData()
+//    {
+//
+//    }
+//
+//    public function testCreatePaymentThrowException($parameter)
+//    {
+//
+//    }
+}

@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\QueryInterface;
-use Db;
+use \Db;
 
 class QuerySpecific implements QueryInterface
 {
@@ -37,6 +37,11 @@ class QuerySpecific implements QueryInterface
         } catch (\Exception $e) {
             var_dump($e);
         }
+    }
+
+    public static function factory()
+    {
+        return new QuerySpecific();
     }
 
     /**

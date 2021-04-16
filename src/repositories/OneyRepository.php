@@ -47,21 +47,46 @@ class OneyRepository extends Repository
     private $countrySpecific;
     private $toolsSpecific;
     private $validateSpecific;
-
     protected $payplug;
 
-    public function __construct($payplug)
-    {
+    public function __construct(
+        $cache,
+        $logger,
+        $addressSpecific,
+        $cartSpecific,
+        $carrierSpecific,
+        $configurationSpecific,
+        $contextSpecific,
+        $countrySpecific,
+        $toolsSpecific,
+        $validateSpecific,
+        $oneyEntity,
+        $myLogPHP,
+        $payplug
+    ) {
+        $this->cache = $cache;
+        $this->logger = $logger;
+        $this->addressSpecific = $addressSpecific;
+        $this->cartSpecific = $cartSpecific;
+        $this->carrierSpecific = $carrierSpecific;
+        $this->configurationSpecific = $configurationSpecific;
+        $this->contextSpecific = $contextSpecific;
+        $this->countrySpecific = $countrySpecific;
+        $this->toolsSpecific = $toolsSpecific;
+        $this->validateSpecific = $validateSpecific;
+        $this->oneyEntity = $oneyEntity;
+        $this->log = $myLogPHP;
         $this->payplug = $payplug;
-        $this->addressSpecific = new AddressSpecific();
-        $this->cache = new CacheRepository();
-        $this->configurationSpecific = new ConfigurationSpecific();
-        $this->countrySpecific = new CountrySpecific();
-        $this->logger = new LoggerRepository();
-        $this->toolsSpecific = new ToolsSpecific();
-        $this->validateSpecific = new ValidateSpecific();
-        $this->log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $this->contextSpecific = new ContextSpecific();
+
+        $this->setParams();
+    }
+
+    protected function setParams()
+    {
+        $this->oneyEntity->setOperations([
+            'x3_with_fees',
+            'x4_with_fees',
+        ]);
     }
 
     /**
@@ -149,6 +174,13 @@ class OneyRepository extends Repository
      * @param $amount
      * @param bool $country
      * @return void
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function assignOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -221,7 +253,7 @@ class OneyRepository extends Repository
         $validate = $this->validateSpecific;
         $errors = [];
 
-        if (!$payment_data) {
+        if (!$payment_data || !is_array($payment_data)) {
             return [$this->l('Please fill in the required fields')];
         }
 
@@ -234,25 +266,9 @@ class OneyRepository extends Repository
             }
             switch ($field) {
                 case 'email':
-                    if (empty($data)) {
-                        $text = $this->l('The email address is empty.');
-                        $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100
-                        && $tools->tool('strpos', $data, '+') !== false) {
-                        $text = $this->l('Your email address is too long and the + character is not valid, 
-                        please change it to another address (max 100 characters).');
-                        $errors[] = $text;
-                    } elseif ($tools->tool('strlen', $data, 'UTF-8') > 100) {
-                        $text = $this->l('Your email address is too long, 
-                        please change it to a shorter one (max 100 characters).');
-                        $errors[] = $text;
-                    } elseif (strpos($data, '+') !== false) {
-                        $text = $this->l('The + character is not valid. 
-                        Please change your email address (100 characters max).');
-                        $errors[] = $text;
-                    } elseif (!$this->validateSpecific->validate('isEmail', $data)) {
-                        $text = $this->l('Invalid address email.');
-                        $errors[] = $text;
+                    $is_valid_email = $this->isValidOneyEmail($data);
+                    if (!$is_valid_email['result']) {
+                        $errors[] = $is_valid_email['message'];
                     }
                     break;
                 case 'mobile_phone_number':
@@ -267,7 +283,7 @@ class OneyRepository extends Repository
                     }
                     break;
                 case 'first_name':
-                    if (!$validate->validate('isPostCode', $data)) {
+                    if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
                             $this->l('Please enter your shipping firstname.') :
                             $this->l('Please enter your billing firstname.');
@@ -275,7 +291,7 @@ class OneyRepository extends Repository
                     }
                     break;
                 case 'last_name':
-                    if (!$validate->validate('isPostCode', $data)) {
+                    if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
                             $this->l('Please enter your shipping lastname.') :
                             $this->l('Please enter your billing lastname.');
@@ -283,7 +299,7 @@ class OneyRepository extends Repository
                     }
                     break;
                 case 'address1':
-                    if (!$validate->validate('isPostCode', $data)) {
+                    if (!$validate->validate('isAddress', $data)) {
                         $text = $type == 'shipping' ?
                             $this->l('Please enter your shipping address.') :
                             $this->l('Please enter your billing address.');
@@ -310,6 +326,8 @@ class OneyRepository extends Repository
                         $errors[] = $text;
                     }
                     break;
+                default:
+                    break;
             }
         }
 
@@ -327,27 +345,17 @@ class OneyRepository extends Repository
         $min_amount = $this->payplug->convertAmount($limits['min'], true);
         $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-        $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
 
-        $legal_text = 'Offre de financement avec apport obligatoire, réservée aux particuliers 
-        et valable pour tout achat de %s à %s. ';
-        $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
-        $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
-        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
-        $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
-
-        $tos_url = $config->get('PAYPLUG_ONEY_TOS_URL');
-        if (strpos($tos_url, 'http://') === false && strpos($tos_url, 'https://') === false && $tos_url) {
-            $tos_url = $tools->tool('getShopProtocol') . $tos_url;
-        }
-
         $this->contextSpecific->getContext()->smarty->assign([
-            'tos_active' => $config->get('PAYPLUG_ONEY_TOS'),
-            'tos_url' => $tos_url,
             'legal_notice' => sprintf(
-                $this->l($legal_text),
+                $this->l('Offre de financement avec apport obligatoire, réservée aux particuliers 
+                    et valable pour tout achat de %s à %s.
+                    Sous réserve d\'acceptation par Oney Bank. 
+                    Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. 
+                    Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
+                    546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr 
+                    Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr'),
                 $tools->tool('displayPrice', $min_amount),
                 $tools->tool('displayPrice', $max_amount)
             )
@@ -380,6 +388,8 @@ class OneyRepository extends Repository
      * @description Display Oney popin payment option
      *
      * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function displayOneyPaymentOptions()
     {
@@ -401,16 +411,27 @@ class OneyRepository extends Repository
     /**
      * @description Format Oney simulation from resource
      *
-     * @param string $method
+     * @param bool $operation
      * @param array $resource
      * @param bool $total_amount
      * @return array
      */
-    public function formatOneyResource($method, $resource, $total_amount = false)
+    public function formatOneyResource($operation = false, $resource = [], $total_amount = false)
     {
         $tools = $this->toolsSpecific;
 
-        $type = explode('_', $method);
+        if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
+            return false;
+        }
+        if (!is_array($resource) || empty($resource)) {
+            return false;
+        }
+
+        if ($total_amount && !is_int($total_amount)) {
+            return false;
+        }
+
+        $type = explode('_', $operation);
 
         $resource['split'] = (int)str_replace('x', '', $type[0]);
         $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
@@ -438,6 +459,7 @@ class OneyRepository extends Repository
             'amount' => $total_amount,
             'value' => $tools->tool('displayPrice', $total_amount),
         ];
+
         return $resource;
     }
 
@@ -450,6 +472,9 @@ class OneyRepository extends Repository
      */
     public function getOneyCountry($iso_country)
     {
+        if (!$iso_country || !is_string($iso_country)) {
+            return false;
+        }
         $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
         if (in_array($iso_country, $overseas_iso, true)) {
             return 'FR';
@@ -482,7 +507,9 @@ class OneyRepository extends Repository
      */
     public function getOneyDeliveryContext()
     {
-        if ($this->contextSpecific->getContext()->cart->isVirtualCart()) {
+        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+
+        if ($this->cartSpecific->isVirtualCart($cart)) {
             return [
                 'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date('Y-m-d'),
@@ -490,16 +517,24 @@ class OneyRepository extends Repository
             ];
         }
 
-        $carrier = new \Carrier($this->contextSpecific->getContext()->cart->id_carrier);
+        $carrier = $this->carrierSpecific->get($cart->id_carrier);
 
-        return [
-            'delivery_label' => $carrier->name,
-            'expected_delivery_date' => date(
-                'Y-m-d',
-                strtotime('+' . \PayPlugCarrier::CARRIER_DEFAULT_DELAY . ' day')
-            ),
-            'delivery_type' => \PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE
-        ];
+        if ($this->validateSpecific->validate('isLoadedObject', $carrier)) {
+            return [
+                'delivery_label' => $carrier->name ? $carrier->name : $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date(
+                    'Y-m-d',
+                    strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
+                ),
+                'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
+            ];
+        } else {
+            return [
+                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'expected_delivery_date' => date('Y-m-d'),
+                'delivery_type' => 'edelivery',
+            ];
+        }
     }
 
     /**
@@ -510,7 +545,12 @@ class OneyRepository extends Repository
     public function getOneyPaymentContext()
     {
         $cart_context = [];
-        $products = $this->contextSpecific->getContext()->cart->getProducts();
+        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+        if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
+            return ['cart' => $cart_context];
+        }
+
+        $products = $this->cartSpecific->getProducts($cart);
         $delivery_context = $this->getOneyDeliveryContext();
 
         foreach ($products as $product) {
@@ -537,25 +577,38 @@ class OneyRepository extends Repository
     /**
      * @description Get Oney payment options
      *
-     * @param $amount
+     * @param int $amount
      * @param bool $country
      * @return array
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
      */
-    public function getOneyPaymentOptionsList($amount, $country = false)
+    public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
+
         // get Oney resource
         $payment_list = [];
+        if (!is_numeric($amount) || !$amount) {
+            return $payment_list;
+        }
+
         $amount = $this->payplug->convertAmount($amount);
 
         if (!$country) {
             $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
+            if (!$iso_code_list) {
+                return $payment_list;
+            }
+
             $iso_list = explode(',', $iso_code_list);
             $country = reset($iso_list);
         }
-
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->payplug->available_oney_payments);
+        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
 
         if (!$oney_sims['result']) {
             return $payment_list;
@@ -577,6 +630,11 @@ class OneyRepository extends Repository
      * @param $amount
      * @param bool $country
      * @return array
+     * @throws BadParameterException
+     * @throws ConfigurationNotSetException
+     * @throws ConnectionException
+     * @throws HttpException
+     * @throws UnexpectedAPIResponseException
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -695,6 +753,8 @@ class OneyRepository extends Repository
      * @description Get the Oney required fields from Context
      *
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function getOneyRequiredFields()
     {
@@ -904,18 +964,19 @@ class OneyRepository extends Repository
      */
     public function getOneySimulations($amount, $country, $operation)
     {
-        $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
+        $cache_key = $this->cache->setCacheKey($amount, $country, $operation);
 
-        $cache_id = 'Payplug::OneySimulations_' .
-            (int)$amount . '_' .
-            (string)$country . '_' .
-            (string)implode('_', $operation) . '_' .
-            ($config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
+        if (!$cache_key['result']) {
+            return [
+                'result' => false,
+                'error' => $cache_key['message']
+            ];
+        }
 
         // Checks if the current simulation is already saved in the database
         // If not, we do a simulation for Oney, and we will store it to the DB
-        $cache_from_bdd = $this->cache->getCacheByKey($cache_id);
+        $cache_from_bdd = $this->cache->getCacheByKey($cache_key['result']);
 
         if ($cache_from_bdd) {
             return $tools->tool('jsonDecode', $cache_from_bdd[0]['cache_value'], true);
@@ -948,7 +1009,7 @@ class OneyRepository extends Repository
 
                     // $cache_id = cache_key in db
                     // $to_cache = cache_value in db
-                    if (!$this->cache->setCache($cache_id, $to_cache)) {
+                    if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
                         $this->logger->setParams(['process' => '[Oney Repository] setCache']);
                         $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                         $error_level = 'error';
@@ -961,7 +1022,10 @@ class OneyRepository extends Repository
                 'result' => true,
                 'simulations' => $simulations
             ];
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
+            $this->logger->setParams(['process' => '[Oney Repository] OneySimulation::getSimulations']);
+            $this->logger->addLog($exception->getMessage(), 'error');
+
             return [
                 'result' => false,
                 'error' => $exception->__toString()
@@ -1035,6 +1099,8 @@ class OneyRepository extends Repository
      * Display Oney required fields template
      *
      * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function displayOneyRequiredFields()
     {
@@ -1077,9 +1143,7 @@ class OneyRepository extends Repository
         if (!$config->updateValue('PAYPLUG_ONEY', 0) ||
             !$config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
             !$config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150') ||
-            !$config->updateValue('PAYPLUG_ONEY_TOS', 0) ||
-            !$config->updateValue('PAYPLUG_ONEY_TOS_URL', '')
+            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
         ) {
             $this->log->error('Installation failed: Oney config');
             $flag = false;
@@ -1121,9 +1185,11 @@ class OneyRepository extends Repository
      * @description Check if a valid Cart for Oney
      *
      * @param $cart Cart
-     * @param boolean $amount
+     * @param bool $amount
      * @param boolean $country
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function isOneyElligible($cart, $amount = false, $country = false)
     {
@@ -1234,6 +1300,8 @@ class OneyRepository extends Repository
      * @param int $id_shipping
      * @param int $id_billing
      * @return array
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function isValidOneyAddresses($id_shipping, $id_billing)
     {
@@ -1421,11 +1489,43 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in ') . $str_list
+                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in').' '.
+                    $str_list
             ];
         }
 
         return ['result' => true, 'error' => false];
+    }
+
+    /**
+     * @description Check given email is valid to use Oney payment
+     * @param $email
+     * @return array
+     */
+    public function isValidOneyEmail($email)
+    {
+        $tools = $this->toolsSpecific;
+        $validate = $this->validateSpecific;
+        $error = false;
+
+        if (!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
+            $error = $this->l('Your email address is not a valid email');
+        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
+            && $tools->tool('strpos', $email, '+') !== false) {
+            $error = $this->l('Your email address is too long and the + character is not valid, 
+                        please change it to another address (max 100 characters).');
+        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
+            $error = $this->l('Your email address is too long, 
+                        please change it to a shorter one (max 100 characters).');
+        } elseif (strpos($email, '+') !== false) {
+            $error = $this->l('The + character is not valid. 
+                        Please change your email address (100 characters max).');
+        }
+
+        return [
+            'result' => $error ? false : true,
+            'message' => $error,
+        ];
     }
 
     /**
@@ -1448,8 +1548,6 @@ class OneyRepository extends Repository
         return ($config->deleteByName('PAYPLUG_ONEY')
             && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_TOS')
-            && $config->deleteByName('PAYPLUG_ONEY_TOS_URL'));
+            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
     }
 }
