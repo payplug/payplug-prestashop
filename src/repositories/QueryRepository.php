@@ -145,6 +145,12 @@ class QueryRepository extends Repository
         return $this;
     }
 
+    public function ifExist()
+    {
+        $this->query['type'] = 'SHOW TABLES LIKE';
+        return $this;
+    }
+
     public function drop()
     {
         $this->query['type'] = 'DROP';
@@ -394,6 +400,12 @@ class QueryRepository extends Repository
             }
 
             $sql = 'DROP TABLE IF EXISTS '.implode($this->query['table'])."\n";
+        } elseif ($this->query['type'] == 'SHOW TABLES LIKE') {
+            if (!$this->query['table']) {
+                throw new PrestaShopException('Table name not set in QueryRepository. Cannot check if exists.');
+            }
+            $table = str_replace('`', '', implode($this->query['table']));
+            $sql = "SHOW TABLES LIKE '%{$table}%'\n";
         } else {
             $sql = $this->query['type'].' ';
         }
@@ -430,7 +442,12 @@ class QueryRepository extends Repository
             exit;
         }
 
-        $result = $this->specific_class->query($sql);
+        try {
+            $result = $this->specific_class->query($sql);
+        } catch (\Exception $e) {
+            return false;
+            // @todo : AddLog
+        }
 
         if (isset($param) && $param == 'unique_value') {
             $result = reset($result[0]);
