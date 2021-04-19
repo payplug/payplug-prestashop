@@ -49,7 +49,7 @@ class PrestashopSpecific16
         $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
 
         Media::addJsDef([
-            'payplug_ajax_url' => PayplugBackward::getModuleLink('payplug', 'ajax', [], true),
+            'payplug_ajax_url' => $this->payplug->context->link->getModuleLink('payplug', 'ajax', [], true),
         ]);
         $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
     }

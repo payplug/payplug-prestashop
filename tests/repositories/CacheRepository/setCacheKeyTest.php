@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * 2013 - 2021 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+use PayPlug\src\repositories\CacheRepository;
+use PayPlug\tests\mock\MockHelper;
+use PHPUnit\Framework\TestCase;
+use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
+/**
+ * @group unit
+ * @group repository
+ * @group cache
+ * @group cache_repository
+ *
+ * @runTestsInSeparateProcesses
+ */
+final class setCacheKeyTest extends TestCase
+{
+    use MockeryPHPUnitIntegration;
+
+    protected $query;
+    protected $config;
+
+    protected $repo;
+
+    public function setUp()
+    {
+        $this->query = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
+        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
+
+        $this->config->shouldReceive('get')
+            ->with('PAYPLUG_SANDBOX_MODE')
+            ->andReturn(false);
+
+        $this->repo = new CacheRepository();
+    }
+
+    public function testCacheIdHasValidatedFormat()
+    {
+        //todo : finalize this test
+//        $cacheId = $this->repo->setCacheKey(500, 'FR', ['x3_with_fees'])['result'];
+//        $this->assertRegExp(
+//            '/Payplug::OneySimulations_\d{5,6}_[A-Z]{2}_(x\d{1}_with_fees|x\d{1}_with_fees_x\d{1}_with_fees)_live/',
+//            $cacheId
+//        );
+    }
+}

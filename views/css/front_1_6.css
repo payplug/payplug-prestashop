@@ -170,16 +170,7 @@
   cursor: pointer;
 }
 /* Payplug payment option */
-@media (max-width: 767px) {
-  .payplugPaymentOption {
-    display: flex;
-  }
-}
 .payplugPaymentOption label {
-  display: flex !important;
-  flex-direction: row-reverse;
-  align-items: center;
-  justify-content: flex-end;
   margin: 0;
 }
 .payplugPaymentOption img {

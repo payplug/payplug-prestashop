@@ -2,9 +2,6 @@
 
 # source ~/.bash_profile
 
-## Auto index
-find ./vendor -type d -exec cp index.php {} \;
-
 ## Lib Phone Number
 rm -rf vendor/giggsey/libphonenumberlight;
 rm -rf vendor/giggsey/libphonenumber-for-php/src/carrier;
