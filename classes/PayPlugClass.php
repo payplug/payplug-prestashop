@@ -3450,7 +3450,7 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
             $inst_status = $installment->is_active ?
                 $this->l('ongoing') :
                 (
-                $installment->is_fully_paid ?
+                    $installment->is_fully_paid ?
                     $this->l('paid') :
                     $this->l('suspended')
                 );
@@ -4406,12 +4406,12 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
         if (preg_match(
-                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
+            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
                         iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|
                         palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|
                         up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-                $useragent
-            ) || preg_match(
+            $useragent
+        ) || preg_match(
                 '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
             an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
                 br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
@@ -5100,7 +5100,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
-// Prepare details to create / retrieve payment
+        // Prepare details to create / retrieve payment
         $this->paymentDetails = [
             'paymentMethod' => $payment_method,
             'paymentTab' => $payment_tab,
@@ -5123,7 +5123,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
 * Create payment if inexistent
 */
         if (!$this->payment->checkPaymentTable($cart->id)) {
-// Create payment or installment
+            // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
@@ -5136,7 +5136,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
                 ];
             }
 
-// Insert payment to paymentTable
+            // Insert payment to paymentTable
             $insertPaymentTable = $this->payment->insertPaymentTable($this->paymentDetails);
             if ($insertPaymentTable['result'] && $insertPaymentTable['paymentDetails']) {
                 $this->paymentDetails = $insertPaymentTable['paymentDetails'];
@@ -5148,7 +5148,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
                 ];
             }
 
-// Generate the return URL
+            // Generate the return URL
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
             if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
                 return $getpaymentReturnUrl['url'];
@@ -5164,7 +5164,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
 * If payment already exists, and timeout > 3 min : Create a new payment
 */
 
-// Create payment or installment
+            // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $this->paymentDetails = $createPayment['paymentDetails'];
@@ -5176,7 +5176,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
                 ];
             }
 
-// Update payment table
+            // Update payment table
             $updatePaymentTable = $this->payment->updatePaymentTable($this->paymentDetails);
             if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
                 $this->paymentDetails = $updatePaymentTable['paymentDetails'];
@@ -5188,7 +5188,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
                 ];
             }
 
-// Check hash
+            // Check hash
             $checkHash = $this->payment->checkHash($this->paymentDetails);
             if ($checkHash['result'] && $checkHash['paymentDetails']) {
                 $this->paymentDetails = $checkHash['paymentDetails'];
