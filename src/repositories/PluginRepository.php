@@ -79,13 +79,13 @@ class PluginRepository extends Repository
         $this->logger   = new LoggerRepository();
         $this->myLogPhp = new MyLogPHP();
         $this->oneyEntity = new OneyEntity();
+        $this->order_state = new OrderStateRepository();
         $this->paymentEntity = new PaymentEntity();
         $this->plugin   = new PluginEntity();
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
         $this->tools    = new ToolsSpecific();
         $this->translate = new TranslationsRepository($payplug);
-        $this->order_state = new OrderStateRepository();
         $this->validate = new ValidateSpecific();
 
         $this->oney = new OneyRepository(

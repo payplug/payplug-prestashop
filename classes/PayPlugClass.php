@@ -45,11 +45,15 @@ class PayPlugClass extends PaymentModule
     /** @var string */
     private $api_test;
 
+    /**
+     * @var array
+     */
     public $available_oney_payments = [
         'x3_with_fees',
         'x4_with_fees',
     ];
 
+    /** @var CardRepository */
     private $card;
 
     /** @var array */
@@ -58,6 +62,9 @@ class PayPlugClass extends PaymentModule
     /** @var PayPlugConfiguration */
     public $configuration;
 
+    /**
+     * @var
+     */
     public $constantFile;
 
     /** @var string */
@@ -100,8 +107,14 @@ class PayPlugClass extends PaymentModule
     /** @var MyLogPHP */
     private $log_install;
 
+    /**
+     * @var
+     */
     private $logger;
 
+    /**
+     * @var
+     */
     public $oney;
 
     public $oney_order_state = [
@@ -130,6 +143,9 @@ class PayPlugClass extends PaymentModule
      */
     public $oneyLogoUrl;
 
+    /**
+     * @var
+     */
     public $order_state;
 
     public $order_states = [
@@ -243,20 +259,35 @@ class PayPlugClass extends PaymentModule
         ],
     ];
 
+    /**
+     * @var
+     */
     private $payment;
 
     /** @var array */
     public $payment_status = [];
 
+    /**
+     * @var
+     */
     private $paymentDetails;
 
     /** @var PluginEntity */
     protected $plugin;
 
+    /**
+     * @var
+     */
     protected $PrestashopSpecificClass;
 
+    /**
+     * @var
+     */
     protected $PrestashopSpecificObject;
 
+    /**
+     * @var
+     */
     protected $query;
 
     /** @var string */
@@ -265,6 +296,9 @@ class PayPlugClass extends PaymentModule
     /** @var bool */
     private $ssl_enable;
 
+    /**
+     * @var
+     */
     private $tools;
 
     /** @var array */
@@ -278,24 +312,9 @@ class PayPlugClass extends PaymentModule
      */
     public function __construct()
     {
-        $this->name = 'payplug';
-        $this->author = 'PayPlug';
-        $this->bootstrap = true;
         $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
-        $this->currencies = true;
-        $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('The online payment solution combining simplicity 
-        and first-rate support to boost your sales.');
-        $this->displayName = 'PayPlug';
-        $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
-        $this->need_instance = true;
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
-        $this->tab = 'payments_gateways';
-        $this->version = '3.1.4';
-        $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
-
         $this->setLoggers();
         $this->loadEntities();
 

@@ -42,7 +42,6 @@ class Payplug extends Module
         $this->name = 'payplug';
         $this->author = 'PayPlug';
         $this->bootstrap = true;
-        $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
@@ -51,15 +50,15 @@ class Payplug extends Module
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.3';
+        $this->version = '3.1.5';
 
         parent::__construct();
+
+        $this->module = false;
+
         $requirement = $this->checkRequirements();
         if ($requirement['php']['up2date']) {
-            require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
-            $this->module = new PayPlugClass();
-        } else {
-            $this->module = false;
+            $this->setModule();
         }
     }
 
@@ -373,6 +372,12 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->install();
         }
+    }
+
+    private function setModule()
+    {
+        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
+        $this->module = new PayPlugClass();
     }
 
     /**
