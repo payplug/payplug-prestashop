@@ -30,6 +30,21 @@ class HookRepository extends Repository
         $this->payplug = $payplug;
     }
 
+    public function actionAdminControllerSetMedia()
+    {
+        if ($this->payplug->context->controller->controller_name == 'AdminOrders') {
+            $this->setMedia([
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+            ]);
+        } else {
+            $this->payplug->setMedia([
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+            ]);
+        }
+    }
+
     public function exe($method = false, $params = false)
     {
         if (!$method || !is_string($method)) {
@@ -45,9 +60,5 @@ class HookRepository extends Repository
         }
 
         return $this->$method($params);
-    }
-
-    public function test(){
-        return 'hello wolrd';
     }
 }
