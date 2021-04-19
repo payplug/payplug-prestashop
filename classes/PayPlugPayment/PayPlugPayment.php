@@ -804,7 +804,7 @@ class PayPlugPayment
     public function setPaymentUrl()
     {
         $this->payment_url = [
-            'return' => PayplugBackward::getModuleLink(
+            'return' => Context::getContext()->link->getModuleLink(
                 'payplug',
                 'validation',
                 [
@@ -812,7 +812,7 @@ class PayPlugPayment
                     'cartid' => (int)$this->cart->id],
                 true
             ),
-            'cancel' => PayplugBackward::getModuleLink(
+            'cancel' => Context::getContext()->link->getModuleLink(
                 'payplug',
                 'validation',
                 [
@@ -820,7 +820,7 @@ class PayPlugPayment
                     'cartid' => (int)$this->cart->id],
                 true
             ),
-            'notification' => PayplugBackward::getModuleLink(
+            'notification' => Context::getContext()->link->getModuleLink(
                 'payplug',
                 'ipn',
                 [],
