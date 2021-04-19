@@ -312,7 +312,21 @@ class PayPlugClass extends PaymentModule
      */
     public function __construct()
     {
+        $this->name = 'payplug';
+        $this->author = 'PayPlug';
+        $this->bootstrap = true;
         $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
+        $this->currencies = true;
+        $this->currencies_mode = 'checkbox';
+        $this->description = $this->l('The online payment solution combining simplicity 
+        and first-rate support to boost your sales.');
+        $this->displayName = 'PayPlug';
+        $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
+        $this->need_instance = true;
+        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
+        $this->tab = 'payments_gateways';
+        $this->version = '3.1.4';
+        $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
         $this->setLoggers();
