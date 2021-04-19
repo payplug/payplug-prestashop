@@ -31,6 +31,8 @@ if (!defined('_PS_VERSION_')) {
 
 class Payplug extends Module
 {
+    public $dependencies;
+
     /**
      * Constructor
      *
@@ -59,6 +61,7 @@ class Payplug extends Module
         $requirement = $this->checkRequirements();
         if ($requirement['php']['up2date']) {
             $this->setModule();
+            $this->setDependencies();
         }
     }
 
@@ -372,6 +375,12 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->install();
         }
+    }
+
+    public function setDependencies()
+    {
+        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugDependencies.php');
+        $this->dependencies = new PayPlugDependencies();
     }
 
     private function setModule()

@@ -23,6 +23,31 @@
 
 namespace PayPlug\src\repositories;
 
-class HookRepository extends \Payplug
+class HookRepository extends Repository
 {
+    public function _construct($payplug)
+    {
+        $this->payplug = $payplug;
+    }
+
+    public function exe($method = false, $params = false)
+    {
+        if (!$method || !is_string($method)) {
+            return false;
+        }
+
+        if (!is_array($params)) {
+            return false;
+        }
+
+        if (!method_exists($this, $method)) {
+            return false;
+        }
+
+        return $this->$method($params);
+    }
+
+    public function test(){
+        return 'hello wolrd';
+    }
 }

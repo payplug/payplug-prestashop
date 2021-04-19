@@ -4002,7 +4002,7 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
         return $this->fetchTemplate('checkout/order-confirmation.tpl');
     }
 
-    public function hookRegisterGDPRConsent()
+    public function hookRegisterGDPRConsent($params)
     {
     }
 

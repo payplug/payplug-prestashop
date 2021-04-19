@@ -46,6 +46,7 @@ class PluginRepository extends Repository
     // Repositories & necessary classes
     private $cache;
     private $card;
+    private $hook;
     private $logger;
     private $myLogPhp;
     private $oney;
@@ -76,6 +77,7 @@ class PluginRepository extends Repository
         $this->configuration = new ConfigurationSpecific();
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
+        $this->hook  = new HookRepository($payplug);
         $this->logger   = new LoggerRepository();
         $this->myLogPhp = new MyLogPHP();
         $this->oneyEntity = new OneyEntity();
@@ -122,6 +124,7 @@ class PluginRepository extends Repository
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)
+            ->setHook($this->hook)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
             ->setProduct($this->product)
