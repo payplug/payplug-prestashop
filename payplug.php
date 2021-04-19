@@ -134,6 +134,8 @@ class Payplug extends PaymentModule
      */
     public $oneyLogoUrl;
 
+    public $order_state;
+
     public $order_states = [
         'paid' => [
             'cfg' => 'PS_OS_PAYMENT',
@@ -1411,7 +1413,7 @@ class Payplug extends PaymentModule
      */
     protected function checkRequirements()
     {
-        $php_min_version = 50300;
+        $php_min_version = 50600;
         $curl_min_version = '7.21';
         $openssl_min_version = 0x1000100f;
         $report = [
@@ -1577,7 +1579,7 @@ class Payplug extends PaymentModule
             $os = Configuration::get($state['cfg']);
 
             // if we don't find order state either, try with template name
-            if (!$sandbox && $state['template'] != null) {
+            if (!$os && !$sandbox && $state['template'] != null) {
                 $sql = 'SELECT DISTINCT `id_order_state`
                         FROM `' . _DB_PREFIX_ . 'order_state_lang` 
                         WHERE `template` = \'' . pSQL($state['template']) . '\'';
@@ -1589,6 +1591,7 @@ class Payplug extends PaymentModule
             // before creating a new order state, we should check if a previous state correspond to our needs
             $previous_order_state_id = $this->findOrderState($state['name'], $sandbox);
             if ($previous_order_state_id) {
+                $log->info('Update order state with: ' . $previous_order_state_id);
                 return Configuration::updateValue($key_config, $previous_order_state_id);
             }
 
@@ -1626,6 +1629,8 @@ class Payplug extends PaymentModule
             }
             $os = $order_state->id;
             $log->info('ID: ' . $os);
+        } else {
+            $log->info('Order state already exists: ' . $os);
         }
 
         return Configuration::updateValue($key_config, $os);
@@ -1639,7 +1644,6 @@ class Payplug extends PaymentModule
      */
     public function createOrderStates()
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $this->log_install->info('Order state creation starting.');
 
         foreach ($this->order_states as $key => $state) {
@@ -1649,7 +1653,7 @@ class Payplug extends PaymentModule
 
         $this->order_state->removeIdsUnusedByPayPlug();
 
-        $log->info('Order state creation ended.');
+        $this->log_install->info('Order state creation ended.');
         return true;
     }
 
@@ -1914,17 +1918,6 @@ class Payplug extends PaymentModule
         $this->html = $this->fetchTemplateRC('/views/templates/admin/popin.tpl');
 
         die(json_encode(['content' => $this->html]));
-    }
-
-    /**
-     * @param bool $force_all
-     * @return bool
-     * @see Module::enable()
-     *
-     */
-    public function enable($force_all = false)
-    {
-        return parent::enable($force_all);
     }
 
     /**
@@ -3423,7 +3416,7 @@ class Payplug extends PaymentModule
             $inst_status = $installment->is_active ?
                 $this->l('ongoing') :
                 (
-                    $installment->is_fully_paid ?
+                $installment->is_fully_paid ?
                     $this->l('paid') :
                     $this->l('suspended')
                 );
@@ -4379,13 +4372,13 @@ class Payplug extends PaymentModule
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
         if (preg_match(
-            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
+                '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
             iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|
             palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|
             up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-            $useragent
-        ) || preg_match(
-            '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
+                $useragent
+            ) || preg_match(
+                '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
             an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
             br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
             dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|
@@ -4402,8 +4395,8 @@ class Payplug extends PaymentModule
             tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|
             vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|
             wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-            Tools::substr($useragent, 0, 4)
-        )) {
+                Tools::substr($useragent, 0, 4)
+            )) {
             return true;
         }
         return false;
@@ -6030,6 +6023,17 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
+        try {
+            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
+        } catch (Exception $e) {
+            // todo: add error log - payplug_card does not seem to exist
+            return true;
+        }
+
+        if (!$exists) {
+            return true;
+        }
+
         $req_all_cards = new DbQuery();
         $req_all_cards->select('pc.*');
         $req_all_cards->from('payplug_card', 'pc');
@@ -6057,16 +6061,14 @@ class Payplug extends PaymentModule
      */
     public function uninstallModuleTab($tabClass)
     {
-        //$tabRepository = $this->get('prestashop.core.admin.tab.repository');
-        //$idTab = $tabRepository->findOneIdByClassName($tabClass);
-        //deprecated but without any retro-compatibility solution... thx Prestashop
         $idTab = Tab::getIdFromClassName($tabClass);
-        if ($idTab != 0) {
+
+        if ($idTab) {
             $tab = new Tab($idTab);
-            $tab->delete();
-            return true;
+            return $tab->delete();
         }
-        return false;
+
+        return true;
     }
 
     /**
