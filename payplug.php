@@ -827,7 +827,7 @@ class Payplug extends PaymentModule
             'price2display' => $price2display,
         ]);
 
-        $front_ajax_url = PayplugBackward::getModuleLink($this->name, 'ajax', [], true);
+        $front_ajax_url = $this->context->link->getModuleLink($this->name, 'ajax', [], true);
 
         $this->smarty->assign([
             'front_ajax_url' => $front_ajax_url,
@@ -843,8 +843,8 @@ class Payplug extends PaymentModule
 
         $payment_url = 'index.php?controller=order&step=3';
 
-        $payment_controller_url = PayplugBackward::getModuleLink($this->name, 'payment', [], true);
-        $installment_controller_url = PayplugBackward::getModuleLink($this->name, 'payment', ['i' => 1], true);
+        $payment_controller_url = $this->context->link->getModuleLink($this->name, 'payment', [], true);
+        $installment_controller_url = $this->context->link->getModuleLink($this->name, 'payment', ['i' => 1], true);
         $current_lang = explode('-', $this->context->language->language_code);
         $current_lang = $current_lang[0];
         if (in_array($current_lang, ['it', 'en'], true)) {
@@ -2591,7 +2591,7 @@ class Payplug extends PaymentModule
                 ];
                 $paymentOption['one_click_' . $card['id_payplug_card']]['tpl'] = 'one_click.tpl';
                 $paymentOption['one_click_' . $card['id_payplug_card']]['payment_controller_url'] =
-                    PayplugBackward::getModuleLink(
+                    $this->context->link->getModuleLink(
                         $this->name,
                         'payment',
                         [],
@@ -2640,7 +2640,7 @@ class Payplug extends PaymentModule
         ];
         $paymentOption['standard']['tpl'] = 'standard.tpl';
         $paymentOption['standard']['extra_classes'] = 'payplug default';
-        $paymentOption['standard']['payment_controller_url'] = PayplugBackward::getModuleLink(
+        $paymentOption['standard']['payment_controller_url'] = $this->context->link->getModuleLink(
             $this->name,
             'payment',
             ['type' => 'standard']
@@ -2692,7 +2692,7 @@ class Payplug extends PaymentModule
                     ],
                 ];
                 $paymentOption['installment']['tpl'] = 'installment.tpl';
-                $paymentOption['installment']['payment_controller_url'] = PayplugBackward::getModuleLink(
+                $paymentOption['installment']['payment_controller_url'] = $this->context->link->getModuleLink(
                     $this->name,
                     'payment',
                     ['type' => 'installment', 'i' => 1],
@@ -2713,7 +2713,7 @@ class Payplug extends PaymentModule
                 $paymentOption['installment']['moduleName'] = 'payplug';
 
                 $this->smarty->assign([
-                    'installment_controller_url' => PayplugBackward::getModuleLink(
+                    'installment_controller_url' => $this->context->link->getModuleLink(
                         $this->name,
                         'payment',
                         ['i' => 1],
@@ -2810,7 +2810,7 @@ class Payplug extends PaymentModule
 
                 $paymentOption[$payment_key]['tpl'] = $oneyTpl;
                 $paymentOption[$payment_key]['extra_classes'] = sprintf('oney%sx', $split);
-                $paymentOption[$payment_key]['payment_controller_url'] = PayplugBackward::getModuleLink(
+                $paymentOption[$payment_key]['payment_controller_url'] = $this->context->link->getModuleLink(
                     $this->name,
                     'payment',
                     ['type' => 'oney', 'io' => sprintf('%s', $split)],
@@ -3907,7 +3907,7 @@ class Payplug extends PaymentModule
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => PayplugBackward::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
-            'front_ajax_url' => PayplugBackward::getModuleLink($this->name, 'ajax', [], true),
+            'front_ajax_url' => $this->context->link->getModuleLink($this->name, 'ajax', [], true),
             'api_url' => $this->plugin->getApiUrl(),
             'price2display' => $price2display,
             'this_path' => $this->_path,
