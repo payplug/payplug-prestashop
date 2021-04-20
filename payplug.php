@@ -21,9 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\backward\PayPlugBackward;
-use PayPlug\classes\MyLogPHP;
-
 /**
  * Core file of PayPlug module
  */
