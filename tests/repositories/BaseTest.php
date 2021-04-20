@@ -29,11 +29,6 @@ use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
- * @group unit
- * @group repository
- * @group base
- * @group oney_repository
- *
  * @runTestsInSeparateProcesses
  */
 class BaseTest extends TestCase

@@ -32,11 +32,6 @@ use PayPlug\tests\mock\PaymentTabMock;
 use PayPlug\tests\repositories\BaseTest;
 
 /**
- * @group unit
- * @group repository
- * @group payment
- * @group payment_repository
- *
  * @runTestsInSeparateProcesses
  */
 class BasePaymentRepository extends BaseTest
