@@ -24,7 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\entities\ConfigurationEntity;
-use PayPlug\src\entities\OrderStateEntity;
+use PayPlug\src\specific\OrderStateSpecific;
 
 class OrderStateRepository extends Repository
 {
@@ -159,8 +159,8 @@ class OrderStateRepository extends Repository
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
-                $os = new OrderStateEntity($payplug_os_id);
-                $os->delete();
+                $os = new OrderStateSpecific($payplug_os_id);
+                $os->softDelete();
             }
         }
     }

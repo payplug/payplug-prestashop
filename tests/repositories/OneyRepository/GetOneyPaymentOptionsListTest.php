@@ -34,7 +34,6 @@ use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\BaseTest;
 
-
 /**
  * @group unit
  * @group repository

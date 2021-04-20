@@ -30,7 +30,6 @@ use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
 use PayPlug\tests\repositories\BaseTest;
 
-
 /**
  * @group unit
  * @group repository

@@ -28,7 +28,8 @@ use \Mockery;
 
 class MockHelper extends Mockery
 {
-    public static function createMockFactory($classPathname) {
+    public static function createMockFactory($classPathname)
+    {
         $mock = \Mockery::mock('alias:'. $classPathname);
         $mock->shouldReceive('factory')
             ->andReturnSelf();
@@ -36,25 +37,28 @@ class MockHelper extends Mockery
         return $mock;
     }
 
-    public static function createSetCacheMock($cacheMock, &$arrayCache) {
+    public static function createSetCacheMock($cacheMock, &$arrayCache)
+    {
         $cacheMock
             ->shouldReceive('setCache')
-            ->andReturnUsing(function($cache_id, $to_cache) use (&$arrayCache) {
+            ->andReturnUsing(function ($cache_id, $to_cache) use (&$arrayCache) {
                 $arrayCache[$cache_id] = $to_cache;
                 return $arrayCache;
             });
     }
 
-    public static function createAddLogMock($loggerMock, &$arrayLog) {
+    public static function createAddLogMock($loggerMock, &$arrayLog)
+    {
         $loggerMock
             ->shouldReceive('addLog')
-            ->andReturnUsing(function($message, $level) use (&$arrayLog) {
-                $arrayLog[] = ['level' => $level, 'message' => $message];
+            ->andReturnUsing(function ($message, $level) use (&$arrayLog) {
+                $arrayLog = ['level' => $level, 'message' => $message];
                 return $arrayLog;
             });
     }
 
-    public static function createToolsMock($classPathname) {
+    public static function createToolsMock($classPathname)
+    {
         $tools = self::createMockFactory($classPathname);
         $tools
             ->shouldReceive('tool')
@@ -70,7 +74,7 @@ class MockHelper extends Mockery
                         return strtoupper($value);
                     case 'displayPrice':
                         $value = number_format($value, 2) . ' €';
-                        return str_replace('.',',',$value);
+                        return str_replace('.', ',', $value);
                     default:
                         break;
                 }
@@ -80,7 +84,8 @@ class MockHelper extends Mockery
         return $tools;
     }
 
-    public static function createTranslateMock($classPathname) {
+    public static function createTranslateMock($classPathname)
+    {
         $translate = self::createMockFactory($classPathname);
         $translate
             ->shouldReceive('translate')
@@ -90,11 +95,12 @@ class MockHelper extends Mockery
         return $translate;
     }
 
-    public static function createValidateMock($classPathname) {
+    public static function createValidateMock($classPathname)
+    {
         $validate = self::createMockFactory($classPathname);
         $validate
             ->shouldReceive('validate')
-            ->andReturnUsing(function($action, $object) {
+            ->andReturnUsing(function ($action, $object) {
                 if ($object === '' || is_null($object)) {
                     return false;
                 }
@@ -121,7 +127,8 @@ class MockHelper extends Mockery
         return $validate;
     }
 
-    public static function createContextMock($classPathname) {
+    public static function createContextMock($classPathname)
+    {
         $context = \Mockery::mock($classPathname);
         $context
             ->shouldReceive('getContext')
@@ -129,7 +136,8 @@ class MockHelper extends Mockery
         return $context;
     }
 
-    public static function createSetParamstMock($classPathname) {
+    public static function createSetParamstMock($classPathname)
+    {
         $context = \Mockery::mock($classPathname);
         $context
             ->shouldReceive('setParams')
@@ -137,7 +145,8 @@ class MockHelper extends Mockery
         return $context;
     }
 
-    public static function createAddressMock($classPathname) {
+    public static function createAddressMock($classPathname)
+    {
         $address = self::createMockFactory($classPathname);
         $address
             ->shouldReceive('getAddress')

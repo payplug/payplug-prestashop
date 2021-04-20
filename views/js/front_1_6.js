@@ -46,7 +46,8 @@ var $document,
                     .on('submit', '.payplugOneClick form', payplugModule.payment.oneclick);
 
                 $(window).on('load', payplugModule.payment.clean)
-                    .on('load', payplugModule.payment.checkerrors);
+                    .on('load', payplugModule.payment.checkerrors)
+                    .on('load', payplugModule.payment.handleOPC);
 
                 if (typeof can_use_oney != 'undefined' && can_use_oney) {
                     payplugModule.oney.init();
@@ -234,6 +235,20 @@ var $document,
                         }
                     }
                 });
+            },
+            handleOPC: function () {
+                if (typeof updatePaymentMethods != 'function') {
+                    return false;
+                }
+
+                var original = updatePaymentMethods;
+                updatePaymentMethods = function (json) {
+                    original.call(this, json);
+                    payplugModule.payment.clean();
+                    if (typeof can_use_oney != 'undefined' && can_use_oney) {
+                        payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                    }
+                };
             },
         },
         deleleCard: function (id_card, url) {
@@ -555,8 +570,6 @@ var $document,
                         .on('click', '.oneyPayment_button', oney_payment.send)
                         .on('click', '.oneyPayment_trigger', oney_payment.trigger);
 
-                    oney_payment.handleCheckoutCGV();
-
                     oney_payment.form.init();
                 },
                 select: function () {
@@ -634,16 +647,6 @@ var $document,
                 close: function () {
                     payplugModule.oney.payment.props.open = false;
                     $('.oneyPayment').removeClass('-open');
-                },
-                handleCheckoutCGV: function () {
-                    if (typeof updatePaymentMethods != 'function') {
-                        return false;
-                    }
-                    var original = updatePaymentMethods;
-                    updatePaymentMethods = function (json) {
-                        original.call(this, json);
-                        payplugModule.oney.load(payplugModule.oney.payment.props.open);
-                    };
                 },
                 form: {
                     init: function () {
