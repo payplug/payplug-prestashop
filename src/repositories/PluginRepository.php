@@ -31,6 +31,7 @@ use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ConstantSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\ProductSpecific;
@@ -61,6 +62,7 @@ class PluginRepository extends Repository
     private $cart;
     private $configuration;
     private $context;
+    private $constant;
     private $country;
     private $product;
     private $query;
@@ -75,6 +77,7 @@ class PluginRepository extends Repository
         $this->carrier  = new CarrierSpecific();
         $this->cart     = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
+        $this->constant  = new ConstantSpecific();
         $this->context  = new ContextSpecific();
         $this->country  = new CountrySpecific();
         $this->hook  = new HookRepository($payplug);
@@ -111,7 +114,8 @@ class PluginRepository extends Repository
             $this->cart,
             $this->logger,
             $this->paymentEntity,
-            $this->query
+            $this->query,
+            $this->constant
         );
 
         $this->plugin

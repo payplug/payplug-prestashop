@@ -41,14 +41,8 @@ final class CheckPaymentTableTest extends BasePaymentRepository
      */
     public function checkPaymentTableParameters()
     {
-        // Test if (!$idCart)
         yield [null, 'cart id: null'];
-
-        // Test if (!is_int($idCart))
-        yield [
-            (string)'I am a string!',
-            'cart id: "I am a string!"'
-        ];
+        yield [(string)'I am a string!', 'cart id: "I am a string!"'];
     }
 
     /**
@@ -60,36 +54,48 @@ final class CheckPaymentTableTest extends BasePaymentRepository
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $response = $this->repo->checkPaymentTable($parameter);
-
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
+        $this->repo
+            ->shouldReceive([
+                'returnPaymentError' => $logMessage
+            ]);
 
         $this->assertSame(
-            $response['response'],
-            '[checkPaymentTable] Problem with $idCart parameter'
-        );
-
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->checkPaymentTable($parameter),
             $logMessage
         );
     }
 
-//    public function testCreatePaymentWithValidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentWithInvalidData()
-//    {
-//
-//    }
-//
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+    public function testCheckPaymentWithValidData()
+    {
+        $this->query
+            ->shouldReceive([
+                'select' => $this->query,
+                'fields' => $this->query,
+                'from' => $this->query,
+                'where' => $this->query,
+                'build' => ['item1', 'item2'],
+            ]);
+
+        $this->assertSame(
+            'item2',
+            $this->repo->checkPaymentTable(1)
+        );
+    }
+
+    public function testCheckPaymentWithInvalidData()
+    {
+        $this->query
+            ->shouldReceive([
+                'select' => $this->query,
+                'fields' => $this->query,
+                'from' => $this->query,
+                'where' => $this->query,
+                'build' => false,
+            ]);
+
+        $this->assertSame(
+            false,
+            $this->repo->checkPaymentTable(1)
+        );
+    }
 }

@@ -42,7 +42,7 @@ final class SetTableCardTest extends TestCase
         $this->card->setTable('test_table');
     }
 
-    public function testUpdateTable()
+    public function testUpdatePaymentTable()
     {
         $this->card->setTable('another_table');
         $this->assertSame(
