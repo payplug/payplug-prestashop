@@ -106,7 +106,6 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 $this->repo->insertPaymentTable($this->paymentDetails)['response'],
                 'Insert data in DB successfully'
             ]);
-
     }
 
     public function testInsertPaymentTableWithInvalidData()
@@ -145,11 +144,9 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         ;
 
         $this->assertFalse($this->repo->insertPaymentTable($this->paymentDetails)['result']);
-            $this->assertSame(
+        $this->assertSame(
             $this->repo->insertPaymentTable($this->paymentDetails)['response'],
             '[insertPaymentTable] Error: Bad Request'
         );
-
     }
-
 }

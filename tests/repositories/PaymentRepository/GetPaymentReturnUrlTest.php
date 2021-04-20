@@ -191,5 +191,4 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             $this->repo->getPaymentReturnUrl($this->paymentDetails)
         );
     }
-
 }

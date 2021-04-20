@@ -127,7 +127,6 @@ final class CreatePaymentTest extends BasePaymentRepository
             $this->repo->createPayment($paymentDetails)['response'],
             '[createPayment] Exception. Unable to create payment. Error: Bad request'
         );
-
     }
 
     public function testCreatePaymentWithEmptyReturnUrl()

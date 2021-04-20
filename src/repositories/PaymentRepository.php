@@ -46,8 +46,7 @@ class PaymentRepository extends Repository
         $paymentEntity,
         $query,
         $constant
-    )
-    {
+    ) {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
         $this->logger = $logger;
