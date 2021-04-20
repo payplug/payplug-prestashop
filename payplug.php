@@ -155,7 +155,7 @@ class Payplug extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if ($this->module) {
-            return $this->module->hookActionAdminControllerSetMedia();
+            return $this->dependencies->hook->exe('actionAdminControllerSetMedia');
         }
     }
 
