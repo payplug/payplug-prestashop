@@ -29,14 +29,6 @@ use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\BaseTest;
 
-/**
- * @group unit
- * @group repository
- * @group cache
- * @group cache_repository
- *
- * @runTestsInSeparateProcesses
- */
 class BaseCacheRepository extends BaseTest
 {
     protected $cacheEntity;

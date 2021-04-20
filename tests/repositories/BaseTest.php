@@ -58,7 +58,6 @@ class BaseTest extends TestCase
     public function setUp()
     {
         $this->assign = MockHelper::createAssignMock('Payplug\src\specific\AssignSpecific');
-        $this->cache        = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
         $this->carrier      = MockHelper::createMockFactory('Payplug\src\specific\CarrierSpecific');
         $this->cart         = MockHelper::createMockFactory('Payplug\src\specific\CartSpecific');
         $this->config       = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');

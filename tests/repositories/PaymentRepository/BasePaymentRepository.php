@@ -31,9 +31,6 @@ use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\PaymentTabMock;
 use PayPlug\tests\repositories\BaseTest;
 
-/**
- * @runTestsInSeparateProcesses
- */
 class BasePaymentRepository extends BaseTest
 {
     protected $payment;
@@ -44,6 +41,7 @@ class BasePaymentRepository extends BaseTest
         parent::setUp();
 
         $this->payment = $this->payment ? $this->payment : new PaymentEntity();
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->logger->shouldReceive([
             'setParams' => $this->logger,

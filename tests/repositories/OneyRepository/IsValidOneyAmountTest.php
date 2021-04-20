@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\OneyRepository;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group oney

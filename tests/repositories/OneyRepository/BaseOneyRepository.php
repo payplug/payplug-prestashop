@@ -28,14 +28,6 @@ use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\BaseTest;
 
-/**
- * @group unit
- * @group repository
- * @group oney
- * @group oney_repository
- *
- * @runTestsInSeparateProcesses
- */
 class BaseOneyRepository extends BaseTest
 {
     protected $oney;
