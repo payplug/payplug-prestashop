@@ -161,7 +161,8 @@ class OneySimulationsMock
         return $simulations;
     }
 
-    public static function getFromCache(){
+    public static function getFromCache()
+    {
         $cache_value = [
             'result' => true,
             'simulations' => self::get()

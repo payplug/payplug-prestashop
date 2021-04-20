@@ -54,7 +54,7 @@ final class GetOneyCountryTest extends BaseOneyRepository
     {
         $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
 
-        foreach($overseas_iso as $iso) {
+        foreach ($overseas_iso as $iso) {
             $this->assertSame(
                 'FR',
                 $this->repo->getOneyCountry($iso)

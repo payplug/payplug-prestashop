@@ -71,7 +71,8 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
         $this->list = OneySimulationsMock::getFormated();
     }
 
-    public function validListDataProvider() {
+    public function validListDataProvider()
+    {
         yield [15000, null];
         yield [15000, false];
         yield [15000, ''];
@@ -96,7 +97,8 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
         );
     }
 
-    public function invalidListDataProvider() {
+    public function invalidListDataProvider()
+    {
         yield [0, 'FR'];
         yield [false, 'FR'];
         yield [null, 'FR'];

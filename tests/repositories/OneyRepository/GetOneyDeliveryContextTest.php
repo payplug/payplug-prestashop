@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\OneyRepository;
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
 
-
 /**
  * @group unit
  * @group repository

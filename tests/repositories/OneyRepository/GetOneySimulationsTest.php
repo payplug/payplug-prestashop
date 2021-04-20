@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\OneyRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 
-
 /**
  * @group unit
  * @group repository

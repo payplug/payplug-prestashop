@@ -26,7 +26,8 @@ namespace PayPlug\tests\mock;
 
 class CountryMock
 {
-    public static function get(){
+    public static function get()
+    {
         $country = new \stdClass();
 
         $country->id = 1;

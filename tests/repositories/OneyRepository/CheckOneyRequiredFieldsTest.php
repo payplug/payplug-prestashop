@@ -45,7 +45,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
             ->andReturn(CountryMock::get());
 
         $this->payplug->shouldReceive('isValidMobilePhoneNumber')
-            ->andReturnUsing(function($phone_number) {
+            ->andReturnUsing(function ($phone_number) {
                 return (!is_null($phone_number) && $phone_number !== '');
             });
 
@@ -81,7 +81,8 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         );
     }
 
-    public function validPaymentDataProvider() {
+    public function validPaymentDataProvider()
+    {
         yield ['mobile_phone_number'];
         yield ['first_name'];
         yield ['last_name'];
@@ -112,7 +113,8 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         );
     }
 
-    public function invalidPaymentDataProvider() {
+    public function invalidPaymentDataProvider()
+    {
         yield ['mobile_phone_number', 'Please enter your mobile phone number.'];
         yield ['first_name', 'Please enter your %s firstname.'];
         yield ['last_name', 'Please enter your %s lastname.'];

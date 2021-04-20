@@ -57,14 +57,6 @@ class Repository
         return $this->entity;
     }
 
-    public function setPayplug($payplug){
-        $this->payplug = $payplug;
-        return $this;
-    }
-    public function getPayplug(){
-        return $this->payplug;
-    }
-
     public function l($string)
     {
         $this->setName();

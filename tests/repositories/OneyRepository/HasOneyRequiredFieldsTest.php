@@ -34,13 +34,14 @@ namespace PayPlug\tests\repositories\OneyRepository;
  */
 final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 {
-    public function setUp(){
+    public function setUp()
+    {
         parent::setUp();
 
         $this->payplug
             ->shouldReceive('isValidMobilePhoneNumber')
-            ->andReturnUsing( function($phone, $country) {
-                if(!$phone) {
+            ->andReturnUsing(function ($phone, $country) {
+                if (!$phone) {
                     return false;
                 }
                 return true;

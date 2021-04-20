@@ -21,38 +21,37 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
 
-use PayPlug\src\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
-
-/**
- * @group entity
- * @group card
- * @group card_entity
- */
-final class GetIdCardTest extends TestCase
+class PaymentEntity
 {
-    protected $card;
+    /**
+     * @var object $apiPayment
+     */
+    private $apiPayment;
 
-    protected function setUp()
+    /**
+     * @return object
+     */
+    public function getApiPayment()
     {
-        $this->card = new CardEntity();
-        $this->card->setId(42);
+        return $this->apiPayment;
     }
 
-    public function testReturnId()
+    /**
+     * @param $apiPayment
+     * @return $this
+     * @throws BadParameterException
+     */
+    public function setApiPayment($apiPayment)
     {
-        $this->assertSame(
-            42,
-            $this->card->getId()
-        );
-    }
-
-    public function testIdIsAnInt()
-    {
-        $this->assertTrue(
-            is_int($this->card->getId())
-        );
+        if (!is_object($apiPayment)) {
+            throw (new BadParameterException('Invalid fields validate, param $apiPayment must be an object'));
+        } else {
+            $this->apiPayment = $apiPayment;
+            return $this;
+        }
     }
 }

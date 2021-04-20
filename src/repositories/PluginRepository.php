@@ -66,6 +66,7 @@ class PluginRepository extends Repository
     private $cart;
     private $configuration;
     private $context;
+    private $constant;
     private $country;
     private $currency;
     private $product;
@@ -76,10 +77,12 @@ class PluginRepository extends Repository
     public function __construct($payplug = null)
     {
         $this->address  = new AddressSpecific();
+        $this->assign = new AssignSpecific();
         $this->card     = new CardRepository($payplug);
         $this->carrier  = new CarrierSpecific();
         $this->cart     = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
+        $this->constant  = new ConstantSpecific();
         $this->context  = new ContextSpecific();
         $this->constant  = new ConstantSpecific();
         $this->country  = new CountrySpecific();
@@ -94,7 +97,6 @@ class PluginRepository extends Repository
         $this->translate = new TranslationsRepository($payplug);
         $this->order_state = new OrderStateRepository();
         $this->validate = new ValidateSpecific();
-        $this->assign = new AssignSpecific();
 
         $this->cacheEntity = new CacheEntity();
         $this->cache    = new CacheRepository(
@@ -121,6 +123,15 @@ class PluginRepository extends Repository
             $this->myLogPhp,
             $payplug,
             $this->assign
+        );
+
+        $this->payment  = new PaymentRepository(
+            $payplug,
+            $this->cart,
+            $this->logger,
+            $this->paymentEntity,
+            $this->query,
+            $this->constant
         );
 
         $this->plugin

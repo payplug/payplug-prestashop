@@ -54,8 +54,6 @@ class PayPlugBackward
         }
     }
 
-
-
     /**
      * Get an order object by its cart id.
      *

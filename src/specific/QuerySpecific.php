@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\QueryInterface;
-use Db;
+use \Db;
 
 class QuerySpecific implements QueryInterface
 {
@@ -51,17 +51,17 @@ class QuerySpecific implements QueryInterface
      */
     public function query($SQLRequest)
     {
-//        if (stripos($SQLRequest,'UPDATE') !== false) {
-//            var_dump($SQLRequest); exit;
-//
-//        }
-
         try {
             $action = 'execute';
 
             if (stripos($SQLRequest, 'SELECT') !== false) {
                 $action = 'executeS';
             }
+
+            if (stripos($SQLRequest, 'SHOW TABLES LIKE') !== false) {
+                $action = 'ExecuteS';
+            }
+
             return $this->db->$action($SQLRequest);
         } catch (\Exception $e) {
             var_dump($e);

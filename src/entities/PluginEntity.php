@@ -122,9 +122,9 @@ class PluginEntity
     {
         if (!is_object($card)) {
             throw (
-                new BadParameterException(
-                    'Invalid Card object, param $card must be a CardRepository'
-                )
+            new BadParameterException(
+                'Invalid Card object, param $card must be a CardRepository'
+            )
             );
         } else {
             $this->card = $card;
@@ -516,9 +516,9 @@ class PluginEntity
     {
         if (!is_object($order_state)) {
             throw (
-                new BadParameterException(
-                    'Invalid Validate object, param $order_state must be an OrderState'
-                )
+            new BadParameterException(
+                'Invalid Validate object, param $order_state must be an OrderState'
+            )
             );
         } else {
             $this->order_state = $order_state;
@@ -560,9 +560,9 @@ class PluginEntity
     {
         if (!is_object($translate)) {
             throw (
-                new BadParameterException(
-                    'Invalid Validate object, param $translate must be a Translate'
-                )
+            new BadParameterException(
+                'Invalid Validate object, param $translate must be a Translate'
+            )
             );
         } else {
             $this->translate = $translate;

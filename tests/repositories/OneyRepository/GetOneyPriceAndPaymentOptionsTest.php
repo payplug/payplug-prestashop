@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\OneyRepository;
 use PayPlug\tests\mock\CountryMock;
 use PayPlug\tests\mock\CartMock;
 
-
 /**
  * @group unit
  * @group repository
@@ -58,7 +57,8 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
         $this->cartMock = CartMock::get();
     }
 
-    public function validDataProvider() {
+    public function validDataProvider()
+    {
         yield [CartMock::get(), 15000, false];
         yield [null, 15000, false];
     }

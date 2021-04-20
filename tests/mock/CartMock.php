@@ -46,7 +46,7 @@ class CartMock
 
     public static function getProducts()
     {
-        $products = [
+        return [
             [
                 'id_product' => 1,
                 'cart_quantity' => 1,
@@ -79,7 +79,5 @@ class CartMock
                 'attributes' => 'Color : White',
             ]
         ];
-
-        return $products;
     }
 }

@@ -36,8 +36,8 @@ use PayPlug\tests\mock\CartMock;
  */
 final class IsValidOneyCartTest extends BaseOneyRepository
 {
-
-    public function invalidCartDataProvider(){
+    public function invalidCartDataProvider()
+    {
         yield ['wrong cart'];
         yield [['cart array']];
         yield [null];

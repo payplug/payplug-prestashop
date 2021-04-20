@@ -28,14 +28,6 @@ use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-/**
- * @group unit
- * @group repository
- * @group base
- * @group oney_repository
- *
- * @runTestsInSeparateProcesses
- */
 class BaseTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
@@ -66,23 +58,24 @@ class BaseTest extends TestCase
     public function setUp()
     {
         $this->assign = MockHelper::createAssignMock('Payplug\src\specific\AssignSpecific');
+        $this->cache        = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
         $this->carrier      = MockHelper::createMockFactory('Payplug\src\specific\CarrierSpecific');
         $this->cart         = MockHelper::createMockFactory('Payplug\src\specific\CartSpecific');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
+        $this->config       = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
         $this->constant     = MockHelper::createMockFactory('Payplug\src\specific\ConstantSpecific');
         $this->country      = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
         $this->currency = MockHelper::createMockFactory('Payplug\src\specific\CurrencySpecific');
         $this->logger       = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->query        = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
 
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        $this->myLogPhp     = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
 
-        $this->payplug = \Mockery::mock('payplug');
+        $this->payplug      = \Mockery::mock('payplug');
 
-        $this->address = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
-        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
+        $this->address      = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
+        $this->context      = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
         $this->tools        = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-        $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
+        $this->translate    = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
+        $this->validate     = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
     }
 }

@@ -24,7 +24,6 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-
 use PayPlug\tests\mock\CurrencyMock;
 
 /**
@@ -69,7 +68,8 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
         ];
     }
 
-    public function testWithCurrencyObject(){
+    public function testWithCurrencyObject()
+    {
         $this->currency->shouldReceive('getCurrency')
             ->andReturn($this->currencyMock);
 
@@ -79,7 +79,8 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
         );
     }
 
-    public function validDataProvider() {
+    public function validDataProvider()
+    {
         yield ['wrong_parameter'];
         yield [''];
         yield [1];
@@ -90,7 +91,8 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
     /**
      * @dataProvider validDataProvider
      */
-    public function testWithValidDataProvider($data){
+    public function testWithValidDataProvider($data)
+    {
         $this->currency->shouldReceive('getCurrency')
             ->andReturn($this->currencyMock);
 

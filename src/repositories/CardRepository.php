@@ -114,7 +114,6 @@ class CardRepository extends Repository
      *
      * @param int $id_customer
      * @param int $id_payplug_card
-     * @param string $api_key
      * @return bool
      * @throws ConfigurationNotSetException
      */
@@ -180,6 +179,7 @@ class CardRepository extends Repository
      *
      * @param int $id_customer
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function deleteCards($id_customer)
     {
@@ -253,6 +253,7 @@ class CardRepository extends Repository
     /**
      * @param $payment
      * @return Exception|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardBrandByPayment($payment)
     {
@@ -267,7 +268,7 @@ class CardRepository extends Repository
         if ($payment->card->brand != '') {
             $brand = $payment->card->brand;
         } else {
-            $brand = $this->l('Unavailable');
+            $brand = '';
         }
         return $brand;
     }
@@ -288,7 +289,7 @@ class CardRepository extends Repository
         }
 
         if ($payment->card->exp_month === null) {
-            $card_expiry_date = $this->l('Unavailable');
+            $card_expiry_date = '';
         } else {
             $card_expiry_date = date(
                 'm/y',
@@ -316,7 +317,7 @@ class CardRepository extends Repository
         if ($payment->card->last4 != '') {
             $card_mask = '**** **** **** ' . $payment->card->last4;
         } else {
-            $card_mask = $this->l('Unavailable');
+            $card_mask = '';
         }
         return $card_mask;
     }

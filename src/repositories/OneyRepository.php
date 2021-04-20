@@ -202,7 +202,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->assign->assign([
@@ -527,7 +527,6 @@ class OneyRepository extends Repository
                 'delivery_type' => 'edelivery',
             ];
         }
-
     }
 
     /**
@@ -646,7 +645,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-        $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
         );
 
         $this->assign->assign([
@@ -767,8 +766,8 @@ class OneyRepository extends Repository
             if ($errors) {
                 $message = reset($errors);
                 switch ($key) {
-                    case 'email' :
-                    case 'mobile_phone_number' :
+                    case 'email':
+                    case 'mobile_phone_number':
                         $shipping_fields[$key] = [
                             'text' => $message,
                             'input' => [
@@ -780,7 +779,7 @@ class OneyRepository extends Repository
                             ],
                         ];
                         break;
-                    case 'city' :
+                    case 'city':
                         $shipping_fields['city'] = [
                             'text' => $message,
                             'input' => [
@@ -837,7 +836,7 @@ class OneyRepository extends Repository
                 if ($errors) {
                     $message = reset($errors);
                     switch ($key) {
-                        case 'mobile_phone_number' :
+                        case 'mobile_phone_number':
                             $billing_fields[$key] = [
                                 'text' => $message,
                                 'input' => [
@@ -849,7 +848,7 @@ class OneyRepository extends Repository
                                 ],
                             ];
                             break;
-                        case 'city' :
+                        case 'city':
                             $billing_fields['city'] = [
                                 'text' => $message,
                                 'input' => [
