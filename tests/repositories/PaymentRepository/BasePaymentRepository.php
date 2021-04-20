@@ -30,14 +30,6 @@ use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\BaseTest;
 
-/**
- * @group unit
- * @group repository
- * @group payment
- * @group payment_repository
- *
- * @runTestsInSeparateProcesses
- */
 class BasePaymentRepository extends BaseTest
 {
     protected $payment;
@@ -58,7 +50,8 @@ class BasePaymentRepository extends BaseTest
             $this->cart,
             $this->logger,
             $this->payment,
-            $this->query
+            $this->query,
+            $this->constant
         ])->makePartial();
 
         $this->arrayCache = [];
@@ -69,6 +62,10 @@ class BasePaymentRepository extends BaseTest
         $this->payplug
             ->shouldReceive('setPaymentErrorsCookie')
             ->andReturn(true);
+
+        $this->constant
+            ->shouldReceive('get')
+            ->andReturn('constant');
 
         $this->apiCall();
     }

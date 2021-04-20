@@ -42,7 +42,7 @@ final class SetTableCacheTest extends TestCase
         $this->cache->setTable('test_table');
     }
 
-    public function testUpdateTable()
+    public function testUpdatePaymentTable()
     {
         $this->cache->setTable('another_table');
         $this->assertSame(

@@ -24,34 +24,30 @@
 
 namespace PayPlug\tests\repositories;
 
-use PayPlug\src\repositories\QueryRepository;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-/**
- * @group unit
- * @group repository
- * @group base
- * @group oney_repository
- *
- * @runTestsInSeparateProcesses
- */
 class BaseTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    // Default setup
     protected $cache;
-    protected $logger;
+    protected $carrier;
+    protected $cart;
     protected $config;
+    protected $constant;
+    protected $country;
+    protected $logger;
     protected $myLogPhp;
 
-    // Method setup
-    protected $validate;
+    protected $payplug;
+
+    protected $address;
+    protected $context;
     protected $tools;
-    protected $repo;
-    protected $assign;
+    protected $translate;
+    protected $validate;
     protected $query;
 
     protected $arrayCache;
@@ -59,22 +55,23 @@ class BaseTest extends TestCase
 
     public function setUp()
     {
-        // Default setup for Oney Repository using
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->logger = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->config = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->myLogPhp = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
-        $this->payplug = \Mockery::mock('payplug');
-        $this->address = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
-        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
-        $this->country = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
-        $this->cart = MockHelper::createContextMock('Payplug\src\specific\CartSpecific');
-        $this->carrier = MockHelper::createContextMock('Payplug\src\specific\CarrierSpecific');
+        $this->cache        = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->carrier      = MockHelper::createMockFactory('Payplug\src\specific\CarrierSpecific');
+        $this->cart         = MockHelper::createMockFactory('Payplug\src\specific\CartSpecific');
+        $this->config       = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
+        $this->constant     = MockHelper::createMockFactory('Payplug\src\specific\ConstantSpecific');
+        $this->country      = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
+        $this->logger       = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
+        $this->query        = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
 
-        // Method setup
-        $this->translate = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-        $this->query = \Mockery::mock(QueryRepository::class);
-        $this->validate = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
-        $this->tools = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+        $this->myLogPhp     = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+
+        $this->payplug      = \Mockery::mock('payplug');
+
+        $this->address      = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
+        $this->context      = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
+        $this->tools        = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
+        $this->translate    = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
+        $this->validate     = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
     }
 }

@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\PaymentRepository;
 
 use PayPlug\tests\mock\PaymentMock;
-use PayPlug\tests\mock\PaymentTabMock;
 
 /**
  * @group unit
@@ -44,27 +43,16 @@ final class CreatePaymentTest extends BasePaymentRepository
      */
     public function paymentDetailsParameters()
     {
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!$paymentDetails['paymentTab'])
+        yield [['paymentTab' => null], 'paymentDetails: {"paymentTab":null}'];
         yield [
-            ['paymentTab' => null],
-            'paymentDetails: {"paymentTab":null}'
-        ];
-
-        // Test if (!$paymentDetails['paymentMethod'])
-        yield [
-            [
-                'paymentTab' => ['field' => 'value'],
-                'paymentMethod' => null
-            ],
+            ['paymentTab' => ['field' => 'value'], 'paymentMethod' => null],
             'paymentDetails: {"paymentTab":{"field":"value"},"paymentMethod":null}'
         ];
     }
 
     /**
-     * Test methos with nulled $paiementDetails
+     * Test methods with nulled $paiementDetails
      *
      * @dataProvider paymentDetailsParameters
      * @param array $parameter
@@ -72,23 +60,13 @@ final class CreatePaymentTest extends BasePaymentRepository
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
-        $response = $this->repo->createPayment($parameter);
+        $this->repo
+            ->shouldReceive([
+                'returnPaymentError' => $logMessage
+            ]);
 
-        // Test 1 : On va checker return $this->displayErrorPayment
-        $this->assertFalse(
-            $response['result'],
-            'ERROR : the response is true'
-        );
-
-        // Test 2 : On compare les messages du retour
         $this->assertSame(
-            $response['response'],
-            '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
-        );
-
-        // Test 3 : On compare le message du logger à écrire et celui écrit
-        $this->assertSame(
-            $this->arrayLogger['message'],
+            $this->repo->createPayment($parameter),
             $logMessage
         );
     }
@@ -99,45 +77,78 @@ final class CreatePaymentTest extends BasePaymentRepository
     public function testCreatePaymentWithValidData()
     {
         $paymentDetails = [
-            'paymentTab' => PaymentTabMock::getStandard(),
+            'paymentTab' => mt_rand(),
             'paymentMethod' => 'standard'
         ];
 
-        $paymentMockStandard = PaymentMock::getStandard();
-
         $this->paymentApi
-            ->shouldReceive('create')
-            ->andReturn([
-                'result' => true,
-                'paimentDetails' => $paymentDetails,
-                'response' => '[createPayment] Payment successfully created'
+            ->shouldReceive([
+                'create' => PaymentMock::getStandard()
             ]);
 
-        $response = $this->repo->createPayment($paymentDetails);
+        $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
+        $this->assertSame(
+            $this->repo->createPayment($paymentDetails)['response'],
+            '[createPayment] Payment successfully created'
+        );
     }
 
     public function testCreatePaymentWithInvalidData()
     {
         $paymentDetails = [
-            'paymentTab' => PaymentTabMock::getStandard(),
+            'paymentTab' => mt_rand(),
             'paymentMethod' => 'standard'
         ];
 
-        $paymentMockStandard = PaymentMock::getStandard();
-
         $this->paymentApi
-            ->shouldReceive('create')
-            ->andReturn([
-                'result' => false,
-                'paymentDetails' => $paymentDetails,
-                'response' => '[createPayment] Exception. Unable to create payment. Error: Bad request'
+            ->shouldReceive([
+                'create' => mt_rand()
             ]);
 
-        $response = $this->repo->createPayment($paymentDetails);
+        $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
+        $this->assertSame(
+            $this->repo->createPayment($paymentDetails)['response'],
+            '[createPayment] Exception. Unable to create payment. Error: Invalid fields validate, param $apiPayment must be an object'
+        );
     }
 
-//    public function testCreatePaymentThrowException($parameter)
-//    {
-//
-//    }
+    public function testCreatePaymentThrowException()
+    {
+        $paymentDetails = [
+            'paymentTab' => mt_rand(),
+            'paymentMethod' => 'standard'
+        ];
+
+        $this->paymentApi
+            ->shouldReceive(['create' => mt_rand()])
+            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400);
+
+        $this->assertSame(
+            $this->repo->createPayment($paymentDetails)['response'],
+            '[createPayment] Exception. Unable to create payment. Error: Bad request'
+        );
+    }
+
+    public function testCreatePaymentWithEmptyReturnUrl()
+    {
+        $paymentDetails = [
+            'paymentTab' => mt_rand(),
+            'paymentMethod' => 'standard',
+            'paymentReturnUrl' => null
+        ];
+
+        $paymentMock = PaymentMock::getStandard();
+        $paymentMock->hosted_payment->return_url = null;
+
+        $this->paymentApi
+            ->shouldReceive([
+                'create' => $paymentMock,
+            ]);
+
+        $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
+        $this->assertSame(
+            $this->repo->createPayment($paymentDetails)['response'],
+            '[createPayment] payment return URL is null.'
+        );
+    }
 }
