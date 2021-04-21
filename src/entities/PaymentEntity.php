@@ -27,9 +27,7 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class PaymentEntity
 {
-    /**
-     * @var object $apiPayment
-     */
+    /** @var object */
     private $apiPayment;
 
     /**
@@ -42,16 +40,16 @@ class PaymentEntity
 
     /**
      * @param $apiPayment
-     * @return $this
+     * @return self
      * @throws BadParameterException
      */
     public function setApiPayment($apiPayment)
     {
         if (!is_object($apiPayment)) {
-            throw (new BadParameterException('Invalid fields validate, param $apiPayment must be an object'));
-        } else {
-            $this->apiPayment = $apiPayment;
-            return $this;
+            throw (new BadParameterException('Invalid param, $apiPayment must be an object'));
         }
+
+        $this->apiPayment = $apiPayment;
+        return $this;
     }
 }
