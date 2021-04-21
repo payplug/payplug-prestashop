@@ -37,7 +37,6 @@ use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\repositories\BaseTest;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group oney
