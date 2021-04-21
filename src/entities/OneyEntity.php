@@ -47,9 +47,9 @@ class OneyEntity
     {
         if (!is_array($operations)) {
             throw (new BadParameterException('Invalid fields validate, param $methods must be an array'));
-        } else {
-            $this->operations = $operations;
-            return $this;
         }
+
+        $this->operations = $operations;
+        return $this;
     }
 }
