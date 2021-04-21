@@ -27,9 +27,11 @@ use PayPlug\classes\MyLogPHP;
 
 use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\entities\OneyEntity;
+use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\entities\PluginEntity;
 
 use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\AssignSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
@@ -40,13 +42,13 @@ use PayPlug\src\specific\CurrencySpecific;
 use PayPlug\src\specific\ProductSpecific;
 use PayPlug\src\specific\ToolsSpecific;
 use PayPlug\src\specific\ValidateSpecific;
-use PayPlug\src\specific\AssignSpecific;
 
 class PluginRepository extends Repository
 {
     // Entities
     private $cacheEntity;
     private $oneyEntity;
+    private $paymentEntity;
 
     // Repositories & necessary classes
     private $cache;
@@ -76,6 +78,10 @@ class PluginRepository extends Repository
 
     public function __construct($payplug = null)
     {
+        $this->cacheEntity = new CacheEntity();
+        $this->oneyEntity = new OneyEntity();
+        $this->paymentEntity = new PaymentEntity();
+
         $this->address  = new AddressSpecific();
         $this->assign = new AssignSpecific();
         $this->card     = new CardRepository($payplug);
@@ -89,7 +95,6 @@ class PluginRepository extends Repository
         $this->currency  = new CurrencySpecific();
         $this->logger   = new LoggerRepository();
         $this->myLogPhp = new MyLogPHP();
-        $this->oneyEntity = new OneyEntity();
         $this->plugin   = new PluginEntity();
         $this->product  = new ProductSpecific();
         $this->query    = new QueryRepository();
@@ -98,7 +103,6 @@ class PluginRepository extends Repository
         $this->order_state = new OrderStateRepository();
         $this->validate = new ValidateSpecific();
 
-        $this->cacheEntity = new CacheEntity();
         $this->cache    = new CacheRepository(
             $this->cacheEntity,
             $this->query,

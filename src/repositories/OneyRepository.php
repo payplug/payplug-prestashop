@@ -42,7 +42,6 @@ class OneyRepository extends Repository
     private $currencySpecific;
     private $toolsSpecific;
     private $validateSpecific;
-    private $payplug;
     private $assign;
 
     public function __construct(
