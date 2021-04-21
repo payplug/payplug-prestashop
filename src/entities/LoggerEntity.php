@@ -27,79 +27,39 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class LoggerEntity
 {
-    /**
-     * @var string $process
-     */
-    private $process;
 
-    /**
-     * @var text $content
-     */
+    /** @var string */
     private $content;
 
-    /**
-     * @var datetime $dateAdd
-     */
+    /** @var string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss' */
     private $date_add;
 
-    /**
-     * @var datetime $dateUpd
-     */
+    /** @var string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss' */
     private $date_upd;
 
-    /**
-     * @var array $definition
-     */
+    /** @var array */
     private $definition;
 
-    /**
-     * @var int $limitNumber
-     */
-    private $limit_number;
-
-    /**
-     * @var string $limitDate
-     */
-    private $limitDate;
-
-    /**
-     * @var string $id
-     */
+    /** @var string */
     private $id;
 
-    /**
-     * @var string $type
-     */
-    private $type;
-    /**
-        * @var string $table
-        */
+    /** @var int */
+    private $limit_number;
+
+    /** @var string */
+    private $limitDate;
+
+    /** @var string */
+    private $process;
+
+    /** @var string */
     private $table;
+
+    /** @var string */
+    private $type;
 
     /**
      * @return string
-     */
-    public function getProcess()
-    {
-        return $this->process;
-    }
-
-    /**
-     * @param string $process
-     * @return LoggerEntity
-     */
-    public function setProcess($process)
-    {
-        if (!is_string($process)) {
-            throw (new BadParameterException('Invalid setProcess, param $process must be a string'));
-        } else {
-            $this->process = $process;
-            return $this;
-        }
-    }
-
-    /**
-     * @return text
      */
     public function getContent()
     {
@@ -107,21 +67,7 @@ class LoggerEntity
     }
 
     /**
-     * @param string $content
-     * @return LoggerEntity
-     */
-    public function setContent($content)
-    {
-        if (!is_string($content)) {
-            throw (new BadParameterException('Invalid content, param $content must be a string'));
-        } else {
-            $this->content = $content;
-            return $this;
-        }
-    }
-
-    /**
-     * @return datetime
+     * @return string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
      */
     public function getDateAdd()
     {
@@ -129,47 +75,11 @@ class LoggerEntity
     }
 
     /**
-     * @param string $date_add
-     * @return LoggerEntity
-     */
-    public function setDateAdd($date_add)
-    {
-        if (!is_string($date_add) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
-            throw (
-            new BadParameterException(
-                'Invalid datetime format, param $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
-            )
-            );
-        } else {
-            $this->date_add = $date_add;
-            return $this;
-        }
-    }
-
-    /**
-     * @return datetime
+     * @return string with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
      */
     public function getDateUpd()
     {
         return $this->date_upd;
-    }
-
-    /**
-     * @param $date_upd
-     * @return LoggerEntity
-     */
-    public function setDateUpd($date_upd)
-    {
-        if (!is_string($date_upd) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
-            throw (
-            new BadParameterException(
-                'Invalid datetime format, param $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
-            )
-            );
-        } else {
-            $this->date_upd = $date_upd;
-            return $this;
-        }
     }
 
     /**
@@ -181,39 +91,11 @@ class LoggerEntity
     }
 
     /**
-     * @param array $definition
-     * @return LoggerEntity
+     * @return string
      */
-    public function setDefinition($definition)
+    public function getId()
     {
-        if (!is_array($definition)) {
-            throw (new BadParameterException('Invalid definition, param $definition must be an array'));
-        } else {
-            $this->definition = $definition;
-            return $this;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getLimitNumber()
-    {
-        return $this->limit_number;
-    }
-
-    /**
-     * @param int $limit_number
-     * @return LoggerEntity
-     */
-    public function setLimitNumber($limit_number)
-    {
-        if (!is_int($limit_number)) {
-            throw (new BadParameterException('Invalid limit number, param $limit_number must be an integer'));
-        } else {
-            $this->limit_number = $limit_number;
-            return $this;
-        }
+        return $this->id;
     }
 
     /**
@@ -225,61 +107,19 @@ class LoggerEntity
     }
 
     /**
-     * @param string $limitDate
-     * @return LoggerEntity
+     * @return int
      */
-    public function setLimitDate($limitDate)
+    public function getLimitNumber()
     {
-        if (!is_string($limitDate)) {
-            throw (new BadParameterException('Invalid limit_date, param $limit_number must be an integer'));
-        } else {
-            $this->limitDate = $limitDate;
-            return $this;
-        }
+        return $this->limit_number;
     }
 
     /**
      * @return string
      */
-    public function getId()
+    public function getProcess()
     {
-        return $this->id;
-    }
-
-    /**
-     * @param string $id
-     * @return LoggerEntity
-     */
-    public function setId($id)
-    {
-        if (!is_string($id)) {
-            throw (new BadParameterException('Invalid id, param $id must be an string'));
-        } else {
-            $this->id = $id;
-            return $this;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return LoggerEntity
-     */
-    public function setType($type)
-    {
-        if (!is_string($type)) {
-            throw (new BadParameterException('Invalid type, param $type must be a string'));
-        } else {
-            $this->type = $type;
-            return $this;
-        }
+        return $this->process;
     }
 
     /**
@@ -291,16 +131,168 @@ class LoggerEntity
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $content
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setContent($content)
+    {
+        if (!is_string($content)) {
+            throw (new BadParameterException('Invalid param, $content must be a string'));
+        }
+
+        $this->content = $content;
+        return $this;
+    }
+
+    /**
+     * @param string $date_add
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setDateAdd($date_add)
+    {
+        if (!is_string($date_add) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
+            throw (
+                new BadParameterException(
+                    'Invalid param, $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
+                )
+            );
+        }
+
+        $this->date_add = $date_add;
+        return $this;
+    }
+
+    /**
+     * @param $date_upd
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setDateUpd($date_upd)
+    {
+        if (!is_string($date_upd) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
+            throw (
+                new BadParameterException(
+                    'Invalid param, $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
+                )
+            );
+        }
+
+        $this->date_upd = $date_upd;
+        return $this;
+    }
+
+    /**
+     * @param array $definition
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setDefinition($definition)
+    {
+        if (!is_array($definition)) {
+            throw (new BadParameterException('Invalid param, $definition must be an array'));
+        }
+
+        $this->definition = $definition;
+        return $this;
+    }
+
+    /**
+     * @param string $id
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setId($id)
+    {
+        if (!is_string($id)) {
+            throw (new BadParameterException('Invalid param, $id must be an string'));
+        }
+
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @param string $limitDate
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setLimitDate($limitDate)
+    {
+        if (!is_string($limitDate)) {
+            throw (new BadParameterException('Invalid param, $limit_number must be an integer'));
+        }
+
+        $this->limitDate = $limitDate;
+        return $this;
+    }
+
+    /**
+     * @param int $limit_number
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setLimitNumber($limit_number)
+    {
+        if (!is_int($limit_number)) {
+            throw (new BadParameterException('Invalid limit param, $limit_number must be an integer'));
+        }
+
+        $this->limit_number = $limit_number;
+        return $this;
+    }
+
+    /**
+     * @param string $process
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setProcess($process)
+    {
+        if (!is_string($process)) {
+            throw (new BadParameterException('Invalid param, $process must be a string'));
+        }
+
+        $this->process = $process;
+        return $this;
+    }
+
+    /**
      * @param string $table
-     * @return LoggerEntity
+     * @return self
+     * @throws BadParameterException
      */
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw (new BadParameterException('Invalid table, param $table must be a string'));
-        } else {
-            $this->table= $table;
-            return $this;
+            throw (new BadParameterException('Invalid param, $table must be a string'));
         }
+
+        $this->table = $table;
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setType($type)
+    {
+        if (!is_string($type)) {
+            throw (new BadParameterException('Invalid param, $type must be a string'));
+        }
+
+        $this->type = $type;
+        return $this;
     }
 }
