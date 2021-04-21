@@ -177,7 +177,7 @@ final class GetOneySimulationsTest extends BaseTest
             ]
         );
 
-        $this->assertSame(count($this->arrayLogger), 1);
+        $this->assertSame(count($this->arrayLogger), 2);
         $this->assertSame(count($this->arrayCache), 0);
     }
 
@@ -203,6 +203,6 @@ final class GetOneySimulationsTest extends BaseTest
             ]
         );
 
-        $this->assertSame(count($this->arrayLogger), 1);
+        $this->assertSame(count($this->arrayLogger), 2);
     }
 }
