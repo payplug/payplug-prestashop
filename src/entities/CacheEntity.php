@@ -112,11 +112,7 @@ class CacheEntity
     public function setCacheKey($cache_key)
     {
         if (!is_string($cache_key)) {
-            throw (
-                new BadParameterException(
-                    'Invalid param, $cache_key must be a string.'
-                )
-            );
+            throw (new BadParameterException('Invalid argument, $cache_key must be a string.'));
         }
 
         $this->cache_key = $cache_key;
@@ -131,11 +127,7 @@ class CacheEntity
     public function setCacheValue($cache_value)
     {
         if (!is_string($cache_value)) {
-            throw (
-                new BadParameterException(
-                    'Invalid param, $cache_value must be a string.'
-                )
-            );
+            throw (new BadParameterException('Invalid argument, $cache_value must be a string.'));
         }
 
         $this->cache_value = $cache_value;
@@ -152,7 +144,7 @@ class CacheEntity
         if (!is_string($date_add) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
             throw (
                 new BadParameterException(
-                    'Invalid param, $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
+                    'Invalid argument, $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
                 )
             );
         }
@@ -171,7 +163,7 @@ class CacheEntity
         if (!is_string($date_upd) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
             throw (
                 new BadParameterException(
-                    'Invalid param, $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
+                    'Invalid argument, $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
                 )
             );
         }
@@ -188,7 +180,7 @@ class CacheEntity
     public function setDefinition($definition)
     {
         if (!is_array($definition)) {
-            throw (new BadParameterException('Invalid param, $definition must be an array'));
+            throw (new BadParameterException('Invalid argument, $definition must be an array'));
         }
 
         $this->definition = $definition;
@@ -203,7 +195,7 @@ class CacheEntity
     public function setIdPayPlugCache($id_payplug_cache)
     {
         if (!is_string($id_payplug_cache)) {
-            throw (new BadParameterException('Invalid param, $id_payplug_cache must be a string'));
+            throw (new BadParameterException('Invalid argument, $id_payplug_cache must be a string'));
         }
 
         $this->id_payplug_cache = $id_payplug_cache;
@@ -218,7 +210,7 @@ class CacheEntity
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw (new BadParameterException('Invalid param, $table must be a string'));
+            throw (new BadParameterException('Invalid argument, $table must be a string'));
         }
 
         $this->table = $table;

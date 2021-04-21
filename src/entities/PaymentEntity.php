@@ -46,7 +46,7 @@ class PaymentEntity
     public function setApiPayment($apiPayment)
     {
         if (!is_object($apiPayment)) {
-            throw (new BadParameterException('Invalid param, $apiPayment must be an object'));
+            throw (new BadParameterException('Invalid argument, $apiPayment must be an object'));
         }
 
         $this->apiPayment = $apiPayment;
