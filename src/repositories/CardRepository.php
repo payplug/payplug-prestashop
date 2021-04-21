@@ -35,10 +35,9 @@ class CardRepository extends Repository
     private $query;
     private $toolsSpecific;
 
-    protected $payplug;
-
-    public function __construct()
+    public function __construct($payplug)
     {
+        $this->payplug = $payplug;
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->query = new QueryRepository();
