@@ -27,9 +27,7 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class OneyEntity
 {
-    /**
-     * @var array $operations
-     */
+    /** @var array */
     private $operations;
 
     /**
@@ -41,8 +39,8 @@ class OneyEntity
     }
 
     /**
-     * @param $operations
-     * @return $this
+     * @param array $operations
+     * @return self
      * @throws BadParameterException
      */
     public function setOperations($operations)
