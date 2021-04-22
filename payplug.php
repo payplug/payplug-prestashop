@@ -3127,10 +3127,12 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        return $this
-            ->getPlugin()
-            ->getCache()
-            ->flushCache();
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+            return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache();
+        }
     }
 
     /**
@@ -3162,10 +3164,12 @@ class Payplug extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        return $this
-            ->getPlugin()
-            ->getCache()
-            ->flushCache();
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+            return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache();
+        }
     }
 
     /**
