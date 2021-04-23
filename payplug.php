@@ -5227,7 +5227,9 @@ class Payplug extends PaymentModule
                     'response' => $getpaymentReturnUrl['response']
                 ];
             }
-        } elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
+        } elseif ($this->payment->checkTimeoutPayment($cart->id)
+            && $this->payment->checkHash($this->paymentDetails)
+            && $this->payment->isValidApiPayment($this->paymentDetails)) {
             /*
              * If timeout < 3 min and hash OK
              */

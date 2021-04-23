@@ -46,7 +46,8 @@ class PaymentRepository extends Repository
         $paymentEntity,
         $query,
         $constant
-    ) {
+    )
+    {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
         $this->logger = $logger;
@@ -539,6 +540,61 @@ class PaymentRepository extends Repository
             'result' => true,
             'paymentDetails' => $paymentDetails,
             'response' => 'Insert data in DB successfully'
+        ];
+    }
+
+    /**
+     * @description Check if the payment is valid in API,
+     * bc if cancelled, to recreate another one
+     * @param array $paymentDetails
+     * @return array
+     * @throws Payplug\Exception\ConfigurationNotSetException
+     */
+    public function isValidApiPayment($paymentDetails)
+    {
+        try {
+            $storedPayment = $this->checkPaymentTable($paymentDetails['cartId']);
+        } catch (Exception $e) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] Error: ' . $e->getMessage()
+            );
+        }
+
+        if (!$storedPayment || !$storedPayment['payment_method'] || !$storedPayment['id_payment']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] $storedPayment or payment_method or id_payment is null'
+            );
+        }
+
+        if ($storedPayment['payment_method'] == 'installment') {
+            $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
+            $firstSchedule = end($retrievedInstallment->schedule[0]->payment_ids);
+            /*
+             * Try to see if the first schedule was cancelled
+             */
+            $storedPayment['id_payment'] = $firstSchedule;
+        }
+
+        if (!$storedPayment['id_payment']) {
+            return $this->returnPaymentError(
+                ['name' => 'storedPayment', 'value' => $storedPayment],
+                '[isValidApiPayment] $storedPayment[\'id_payment\'] is null'
+            );
+        }
+
+        $retrievedPayment = Payment::retrieve($storedPayment['id_payment']);
+
+        if ($retrievedPayment->failure) {
+            $payment = $this->createPayment($paymentDetails);
+            return $this->updatePaymentTable($payment['paymentDetails']);
+        }
+
+        return [
+            'result' => true,
+            'paymentDetails' => $paymentDetails,
+            'response' => 'Valid API payment/installment'
         ];
     }
 }
