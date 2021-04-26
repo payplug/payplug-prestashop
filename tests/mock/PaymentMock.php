@@ -196,7 +196,8 @@ class PaymentMock
         ]
     ];
 
-    public static function getOneClick() {
+    public static function getOneClick()
+    {
         return Payment::fromAttributes(self::$payment_parameters['oneclick']);
     }
 }

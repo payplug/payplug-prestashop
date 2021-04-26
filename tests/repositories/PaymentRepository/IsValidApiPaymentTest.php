@@ -28,11 +28,6 @@ use PayPlug\tests\mock\PaymentMock;
 
 final class IsValidApiPaymentTest extends BasePaymentRepository
 {
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
     /**
      * Parameters to test method with empty $paiementDetails
      *
