@@ -174,9 +174,8 @@ class PaymentMock
         ];
     }
 
-    public static function paramsOneClick()
-    {
-        return [
+    public static $payment_parameters = [
+        'oneclick' => [
             'is_paid' => true,
             'paid_at' => 1614949567,
             'is_3ds' => false,
@@ -194,10 +193,10 @@ class PaymentMock
             ],
             'refundable_after' => 1614949567,
             'refundable_until' => 1630501567,
-        ];
-    }
+        ]
+    ];
 
     public static function getOneClick() {
-        return Payment::fromAttributes(self::paramsOneClick());
+        return Payment::fromAttributes(self::$payment_parameters['oneclick']);
     }
 }
