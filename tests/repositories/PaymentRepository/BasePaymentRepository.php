@@ -38,6 +38,7 @@ class BasePaymentRepository extends BaseTest
 {
     protected $payment;
     protected $paymentApi;
+    protected $repo;
 
     public function setUp()
     {

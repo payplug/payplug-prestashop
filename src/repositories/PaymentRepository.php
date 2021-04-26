@@ -552,6 +552,18 @@ class PaymentRepository extends Repository
      */
     public function isValidApiPayment($paymentDetails)
     {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cartId'])
+            || !$paymentDetails['cartId']
+            || !is_int($paymentDetails['cartId'])
+        ) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] $paymentDetail or cartId is null, or $paymentDetail is not an array'
+            );
+        }
+
         try {
             $storedPayment = $this->checkPaymentTable($paymentDetails['cartId']);
         } catch (Exception $e) {
