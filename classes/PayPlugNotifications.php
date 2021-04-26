@@ -260,8 +260,8 @@ class PayPlugNotifications
 
         if ($this->is_installment) {
             $sql = 'SELECT `id_cart` 
-                    FROM `' . _DB_PREFIX_ . 'payplug_installment_cart` 
-                    WHERE `id_installment` = "' . $this->resource->installment_plan_id . '"';
+                    FROM `' . _DB_PREFIX_ . 'payplug_payment` 
+                    WHERE `id_payment` = "' . $this->resource->installment_plan_id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
@@ -271,7 +271,7 @@ class PayPlugNotifications
             }
         } else {
             $sql = 'SELECT `id_cart` 
-                    FROM `' . _DB_PREFIX_ . 'payplug_payment_cart` 
+                    FROM `' . _DB_PREFIX_ . 'payplug_payment` 
                     WHERE `id_payment` = "' . $this->resource->id . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
