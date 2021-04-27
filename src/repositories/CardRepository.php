@@ -38,7 +38,6 @@ class CardRepository extends Repository
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
-
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->query = new QueryRepository();

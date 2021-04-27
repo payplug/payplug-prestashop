@@ -42,6 +42,8 @@ class BaseTest extends TestCase
     protected $currency;
     protected $logger;
     protected $myLogPhp;
+    protected $repo;
+
 
     protected $payplug;
 
