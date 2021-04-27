@@ -176,7 +176,8 @@ var $document,
                 event.stopPropagation();
 
                 var $link = $(this),
-                    is_inst = $link.is('.installment');
+                    is_inst = $link.is('.installment'),
+                    spinner_url= $('input:hidden[name=spinner_url]').val();
 
                 if (($('#form_payplug_payment').length && !is_inst)) {
                     return false;
