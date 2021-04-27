@@ -6,6 +6,28 @@ use Payplug\Resource\Payment;
 
 class PaymentMock
 {
+    public static $payment_parameters = [
+        'oneclick' => [
+            'is_paid' => true,
+            'paid_at' => 1614949567,
+            'is_3ds' => false,
+            'card' => [
+                'last4' => '0001',
+                'country' => 'FR',
+                'exp_year' => 2030,
+                'exp_month' => 9,
+                'brand' => 'CB',
+                'id' => 'card_3EOJHyQXNCG8gZ452cUA0y',
+                'metadata' => null,
+            ],
+            'hosted_payment' => [
+                'paid_at' => 1614949567,
+            ],
+            'refundable_after' => 1614949567,
+            'refundable_until' => 1630501567,
+        ]
+    ];
+
     public static function getStandard()
     {
         $resource = self::getDefault();
@@ -173,28 +195,6 @@ class PaymentMock
             ]
         ];
     }
-
-    public static $payment_parameters = [
-        'oneclick' => [
-            'is_paid' => true,
-            'paid_at' => 1614949567,
-            'is_3ds' => false,
-            'card' => [
-                'last4' => '0001',
-                'country' => 'FR',
-                'exp_year' => 2030,
-                'exp_month' => 9,
-                'brand' => 'CB',
-                'id' => 'card_3EOJHyQXNCG8gZ452cUA0y',
-                'metadata' => null,
-            ],
-            'hosted_payment' => [
-                'paid_at' => 1614949567,
-            ],
-            'refundable_after' => 1614949567,
-            'refundable_until' => 1630501567,
-        ]
-    ];
 
     public static function getOneClick()
     {
