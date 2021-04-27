@@ -20,6 +20,7 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 /**
  * Core file of PayPlug module
  */
@@ -2391,9 +2392,9 @@ class PayPlugClass extends PaymentModule
     public function getInstallmentByCart($id_cart)
     {
         $req_installment_cart = '
-SELECT pic.id_payment
-FROM ' . _DB_PREFIX_ . 'payplug_payment pic
-WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
+            SELECT pic.id_payment 
+            FROM ' . _DB_PREFIX_ . 'payplug_payment pic 
+            WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
         $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
         if (!$res_installment_cart) {
             return false;
@@ -2945,8 +2946,8 @@ WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment
     public function getPayplugInstallmentCart($id_cart)
     {
         $req_cart_installment = '
-SELECT pic.id_payment
-FROM ' . _DB_PREFIX_ . 'payplug_payment pic
+            SELECT pic.id_payment
+            FROM ' . _DB_PREFIX_ . 'payplug_payment pic
             WHERE pic.id_cart = ' . (int)$id_cart;
         $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
 
@@ -3022,7 +3023,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment pic
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
-WHERE pi.id_payment = \'' . $installment->id . '\'';
+            WHERE pi.id_payment = \'' . $installment->id . '\'';
         $res_installment = DB::getInstance()->executeS($req_installment);
 
         if (!$res_installment) {
@@ -3164,10 +3165,12 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        return $this
-            ->getPlugin()
-            ->getCache()
-            ->flushCache();
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+            return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache();
+        }
     }
 
     /**
@@ -3199,10 +3202,12 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
      */
     public function hookActionClearCompileCache($params)
     {
-        return $this
-            ->getPlugin()
-            ->getCache()
-            ->flushCache();
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+            return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache();
+        }
     }
 
     /**
@@ -4412,7 +4417,7 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
             up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
             $useragent
         ) || preg_match(
-                '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
+            '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
             an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
             br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
             dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|
@@ -4429,8 +4434,8 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
             tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|
             vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|
             wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-                Tools::substr($useragent, 0, 4)
-            )) {
+            Tools::substr($useragent, 0, 4)
+        )) {
             return true;
         }
         return false;
@@ -4480,7 +4485,7 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
         $timeout_delay = 9;
         $req_payment_cart_exists = '
             SELECT *
-FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
+            FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
             WHERE ppc.id_cart = ' . (int)$id_cart . '
             AND ppc.id_payment LIKE \'pending\'';
         $res_payment_cart_exists = Db::getInstance()->getRow($req_payment_cart_exists);
@@ -4519,7 +4524,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
     {
         $req_payment_cart = '
             SELECT ppc.id_payment 
-FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
+            FROM ' . _DB_PREFIX_ . 'payplug_payment ppc  
             WHERE ppc.id_cart = ' . (int)$id_cart . '
             AND ppc.is_pending = 1';
         $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
@@ -5120,8 +5125,8 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
         ];
 
         /*
-* Create payment if inexistent
-*/
+         * Create payment if inexistent
+         */
         if (!$this->payment->checkPaymentTable($cart->id)) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
@@ -5161,8 +5166,8 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
             }
         } elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
             /*
-* If payment already exists, and timeout > 3 min : Create a new payment
-*/
+             * If payment already exists, and timeout > 3 min : Create a new payment
+             */
 
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
@@ -5210,10 +5215,12 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
                     'response' => $getpaymentReturnUrl['response']
                 ];
             }
-        } elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
+        } elseif ($this->payment->checkTimeoutPayment($cart->id)
+            && $this->payment->checkHash($this->paymentDetails)
+            && $this->payment->isValidApiPayment($this->paymentDetails)) {
             /*
-* If timeout < 3 min and hash OK
-*/
+             * If timeout < 3 min and hash OK
+             */
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
             if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
                 return $getpaymentReturnUrl['url'];
@@ -5414,7 +5421,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
     public function registerPendingTransaction($id_cart)
     {
         $req_payment_cart = '
-UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc
+            UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc  
             SET ppc.is_pending = 1
             WHERE ppc.id_cart = ' . (int)$id_cart;
         $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
@@ -5786,7 +5793,7 @@ UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc
         if (!$res_installment_cart_exists) {
             //insert
             $req_installment_cart = '
-INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
                 VALUES (\'' . pSQL($installment_id) . '\', 
                 ' . (int)$id_cart . ', 
                 ' . (int)$is_pending . ', 
@@ -5798,8 +5805,8 @@ INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending,
         } else {
             //update
             $req_installment_cart = '
-UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic
-SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
+                UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic  
+                SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
                 WHERE pic.id_cart = ' . (int)$id_cart;
             $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
             if (!$res_installment_cart) {

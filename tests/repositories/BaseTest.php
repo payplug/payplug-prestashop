@@ -40,6 +40,8 @@ class BaseTest extends TestCase
     protected $country;
     protected $logger;
     protected $myLogPhp;
+    protected $repo;
+
 
     protected $payplug;
 
