@@ -46,8 +46,7 @@ class PaymentRepository extends Repository
         $paymentEntity,
         $query,
         $constant
-    )
-    {
+    ) {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
         $this->logger = $logger;
@@ -582,11 +581,11 @@ class PaymentRepository extends Repository
 
         if ($storedPayment['payment_method'] == 'installment') {
             $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
-            $firstSchedule = end($retrievedInstallment->schedule[0]->payment_ids);
+            $firstSchedule = $retrievedInstallment->schedule[0]->payment_ids;
             /*
              * Try to see if the first schedule was cancelled
              */
-            $storedPayment['id_payment'] = $firstSchedule;
+            $storedPayment['id_payment'] = end($firstSchedule);
         }
 
         if (!$storedPayment['id_payment']) {
