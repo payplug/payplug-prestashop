@@ -314,7 +314,7 @@ class SQLtableRepository extends \Payplug
         }
 
         $this->query
-            ->ifExist()
+            ->ifExists()
             ->table($table);
         if (!$this->query->build()) {
             if ($log) {
