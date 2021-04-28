@@ -56,68 +56,25 @@ class Payplug extends Module
 
         $this->module = false;
 
-        $requirement = $this->checkRequirements();
-        if ($requirement['php']['up2date']) {
+        if ($this->isValidPHPVersion()) {
             $this->setModule();
         }
     }
 
     /**
+     * @description test if php requiremnt is valid
      * @return array
      */
-    protected function checkRequirements()
+    protected function isValidPHPVersion()
     {
-        $php_min_version = 50600;
-        $curl_min_version = '7.21';
-        $openssl_min_version = 0x1000100f;
-        $report = [
-            'php' => [
-                'version' => 0,
-                'installed' => true,
-                'up2date' => false,
-            ],
-            'curl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-            'openssl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-        ];
+        $php_min_version = 80600;
 
-        //PHP
         if (!defined('PHP_VERSION_ID')) {
-            $report['php']['version'] = PHP_VERSION;
             $php_version = explode('.', PHP_VERSION);
             define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
         }
-        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
 
-        //cURL
-        $curl_exists = extension_loaded('curl');
-        if ($curl_exists) {
-            $curl_version = curl_version();
-            $report['curl']['version'] = $curl_version['version'];
-            $report['curl']['installed'] = true;
-            $report['curl']['up2date'] = version_compare(
-                $curl_version['version'],
-                $curl_min_version,
-                '>='
-            ) ? true : false;
-        }
-
-        //OpenSSl
-        $openssl_exists = extension_loaded('openssl');
-        if ($openssl_exists) {
-            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
-            $report['openssl']['installed'] = true;
-            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
-        }
-
-        return $report;
+        return PHP_VERSION_ID >= $php_min_version;
     }
 
     /**
@@ -142,6 +99,8 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->getContent();
         } else {
+            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+            $this->context->smarty->assign('url_logo',__PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png');
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
     }

@@ -19,10 +19,10 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
 <div class="panel panel-show">
     <div class="panel-heading">{l s='PRESENTATION' mod='payplug'}</div>
     <div class="panel-row">
+        <img src="{$url_logo|escape:'htmlall':'UTF-8'}" />
         <p class="block-title">{l s='The payment solution that increases your sales' mod='payplug'}</p>
         <p>{l s='PayPlug provides merchants all the benefits of a full online payment solution.' mod='payplug'}</p>
         <ul>
@@ -34,9 +34,11 @@
             <li>{l s='Web interface to manage and export transaction history' mod='payplug'}</li>
             <li>{l s='Funds available on your bank account within 2 to 5 business days' mod='payplug'}</li>
         </ul>
-
-        <p class="alert alert-danger">
-            {l s='Your PHP Version is to outdated to use our module.'}
-        </p>
+    </div>
+</div>
+<div class="panel panel-show">
+    <div class="panel-row">
+        <p>La version de PHP que vous utilisez n'est pas compatible avec cette version du module PayPlug car elle est antérieure à PHP 5.6.</p>
+        <p>Rendez-vous sur <a target="_blank" href="javascript:void(0);" class="payplugLink">notre page support</a> pour récupérer une version compatible avec votre boutique.</p>
     </div>
 </div>
