@@ -122,7 +122,7 @@ var $document,
                                     window.location.href = data.return_url;
                                     return false;
                                 }
-                                var is_one_click = id_cart != 'new_card';
+                                var is_one_click = options['id_card'] != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
                             } else {
