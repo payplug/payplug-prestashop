@@ -2915,6 +2915,24 @@ class Payplug extends PaymentModule
         return $res_cart_installment;
     }
 
+
+    /**
+     * @description get cart installment backward
+     * @deprecated use for installment from PayPlug 3.1.3 or further
+     * @param $id_cart
+     * @return mixed
+     */
+    public function getPayplugInstallmentCartBackward($id_cart)
+    {
+        $req_cart_installment = '
+            SELECT pic.id_installment
+            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
+            WHERE pic.id_cart = ' . (int)$id_cart;
+        $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
+
+        return $res_cart_installment;
+    }
+
     /**
      * @description
      * get order payment
@@ -3334,6 +3352,12 @@ class Payplug extends PaymentModule
 
         $inst_id = null;
         $payment_id = $this->getPayplugInstallmentCart($order->id_cart);
+
+        // Backward if order validated before
+        if (!$payment_id) {
+            $payment_id = $this->getPayplugInstallmentCartBackward($order->id_cart);
+        }
+
         if ($payment_id && strpos($payment_id, 'inst') !== false) {
             $inst_id = $payment_id;
         }
