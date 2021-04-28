@@ -100,7 +100,7 @@ class Payplug extends Module
             return $this->module->getContent();
         } else {
             $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
-            $this->context->smarty->assign('url_logo',__PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png');
+            $this->context->smarty->assign('url_logo', __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png');
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
     }
