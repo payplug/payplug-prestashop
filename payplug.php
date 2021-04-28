@@ -674,6 +674,7 @@ class Payplug extends PaymentModule
             'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
+            'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
 
@@ -912,6 +913,13 @@ class Payplug extends PaymentModule
             'checked' => $configurations['oney'],
             'label_left' => $this->l('yes'),
             'label_right' => $this->l('no'),
+        ];
+
+        $switch['oney_tos'] = [
+            'name' => 'payplug_oney_tos',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_tos'],
         ];
 
         $switch['oney_optimized'] = [
@@ -5539,6 +5547,7 @@ class Payplug extends PaymentModule
             }
         }
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
+        Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         if (Tools::getValue('PAYPLUG_SHOW')) {
             $this->enable();

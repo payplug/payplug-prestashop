@@ -29,12 +29,6 @@ function upgrade_module_3_1_4()
 {
     $flag = true;
 
-    if (Configuration::get('PAYPLUG_ONEY_TOS')) {
-        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS')) {
-            $flag = false;
-        }
-    }
-
     if (Configuration::get('PAYPLUG_ONEY_TOS_URL')) {
         if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')) {
             $flag = false;
