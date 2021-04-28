@@ -6026,31 +6026,24 @@ class Payplug extends PaymentModule
      */
     private function uninstallCards()
     {
-        try {
-            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
-        } catch (Exception $e) {
-            // todo: add error log - payplug_card does not seem to exist
-            return true;
-        }
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
+            $cards = $this->query
+                ->select()
+                ->fields('*')
+                ->from(_DB_PREFIX_ . 'payplug_card')
+                ->build();
 
-        if (!$exists) {
-            return true;
-        }
-
-        $req_all_cards = new DbQuery();
-        $req_all_cards->select('pc.*');
-        $req_all_cards->from('payplug_card', 'pc');
-        $res_all_cards = Db::getInstance()->executeS($req_all_cards);
-
-        if (!empty($res_all_cards)) {
-            foreach ($res_all_cards as $card) {
-                $id_customer = $card['id_customer'];
-                $id_payplug_card = $card['id_payplug_card'];
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
-                    return false;
+            if ($cards) {
+                foreach ($cards as $card) {
+                    $id_customer = $card['id_customer'];
+                    $id_payplug_card = $card['id_payplug_card'];
+                    if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
+                        return false;
+                    }
                 }
             }
         }
+
         return true;
     }
 
