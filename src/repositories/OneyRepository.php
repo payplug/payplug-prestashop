@@ -1422,14 +1422,6 @@ class OneyRepository extends Repository
     }
 
     /**
-     * @description Install Oney feature
-     */
-    public function uninstallOney()
-    {
-        return $this->deleteOneyConfig() && (new SQLtableRepository())->uninstallOneySql();
-    }
-
-    /**
      * @description Delete basic configuration
      *
      * @return bool

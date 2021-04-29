@@ -5948,8 +5948,6 @@ class PayPlugClass extends PaymentModule
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
-        } elseif (!$this->oney->uninstallOney()) {
-            $log->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;
