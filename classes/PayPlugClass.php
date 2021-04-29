@@ -673,6 +673,7 @@ class PayPlugClass extends PaymentModule
             'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
+            'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
 
@@ -911,6 +912,13 @@ class PayPlugClass extends PaymentModule
             'checked' => $configurations['oney'],
             'label_left' => $this->l('yes'),
             'label_right' => $this->l('no'),
+        ];
+
+        $switch['oney_tos'] = [
+            'name' => 'payplug_oney_tos',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_tos'],
         ];
 
         $switch['oney_optimized'] = [
@@ -2920,6 +2928,24 @@ class PayPlugClass extends PaymentModule
         return $res_cart_installment;
     }
 
+
+    /**
+     * @description get cart installment backward
+     * @deprecated use for installment from PayPlug 3.1.3 or further
+     * @param $id_cart
+     * @return mixed
+     */
+    public function getPayplugInstallmentCartBackward($id_cart)
+    {
+        $req_cart_installment = '
+            SELECT pic.id_installment
+            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
+            WHERE pic.id_cart = ' . (int)$id_cart;
+        $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
+
+        return $res_cart_installment;
+    }
+
     /**
      * @description
      * get order payment
@@ -3303,6 +3329,12 @@ class PayPlugClass extends PaymentModule
 
         $inst_id = null;
         $payment_id = $this->getPayplugInstallmentCart($order->id_cart);
+
+        // Backward if order validated before
+        if (!$payment_id) {
+            $payment_id = $this->getPayplugInstallmentCartBackward($order->id_cart);
+        }
+
         if ($payment_id && strpos($payment_id, 'inst') !== false) {
             $inst_id = $payment_id;
         }
@@ -5421,6 +5453,7 @@ class PayPlugClass extends PaymentModule
         Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
+        Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         if (Tools::getValue('PAYPLUG_SHOW')) {
             $this->enable();
@@ -5932,31 +5965,24 @@ class PayPlugClass extends PaymentModule
      */
     private function uninstallCards()
     {
-        try {
-            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
-        } catch (Exception $e) {
-            // todo: add error log - payplug_card does not seem to exist
-            return true;
-        }
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
+            $cards = $this->query
+                ->select()
+                ->fields('*')
+                ->from(_DB_PREFIX_ . 'payplug_card')
+                ->build();
 
-        if (!$exists) {
-            return true;
-        }
-
-        $req_all_cards = new DbQuery();
-        $req_all_cards->select('pc.*');
-        $req_all_cards->from('payplug_card', 'pc');
-        $res_all_cards = Db::getInstance()->executeS($req_all_cards);
-
-        if (!empty($res_all_cards)) {
-            foreach ($res_all_cards as $card) {
-                $id_customer = $card['id_customer'];
-                $id_payplug_card = $card['id_payplug_card'];
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
-                    return false;
+            if ($cards) {
+                foreach ($cards as $card) {
+                    $id_customer = $card['id_customer'];
+                    $id_payplug_card = $card['id_payplug_card'];
+                    if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
+                        return false;
+                    }
                 }
             }
         }
+
         return true;
     }
 
