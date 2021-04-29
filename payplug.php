@@ -231,6 +231,17 @@ class Payplug extends Module
     }
 
     /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookDisplayBackOfficeFooter($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayBackOfficeFooter($params);
+        }
+    }
+
+    /**
      * @description Display Oney CTA on Shopping cart page
      * @param $params
      * @return mixed
