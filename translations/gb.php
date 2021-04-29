@@ -213,6 +213,7 @@ $_MODULE['<{payplug}prestashop>installment_2020b5dcab00eaaf6621fe30c8806aec'] = 
 $_MODULE['<{payplug}prestashop>oney_7cdcd23423a3d3025ac7ccb5a3bbfe1c'] = 'Activate Oney Payments';
 $_MODULE['<{payplug}prestashop>oney_fe6c0722a97f8fc5aed036c7f16c8339'] = 'Allow customers to spread out payments over 3 or 4 installments from %d € to %d €.';
 $_MODULE['<{payplug}prestashop>oney_f990e553cdc4c29c2efffba33e08a8c7'] = 'Learn more.';
+$_MODULE['<{payplug}prestashop>oney_bfd65bf2ef4e13b630973235f69e1bb4'] = 'I integrated the mandatory fields to my terms and conditions on my website.';
 $_MODULE['<{payplug}prestashop>oney_f6f9ad2fe95ca5059086924e0a5afa0d'] = 'To qualify the payment and avoid fraud, Oney must know your carriers and the average delivery time.';
 $_MODULE['<{payplug}prestashop>oney_914419aa32f04011357d3b604a86d7eb'] = 'Carrier';
 $_MODULE['<{payplug}prestashop>oney_cf3e7360cfed1e0c6fdd0090bee0ea05'] = 'Delivery type';

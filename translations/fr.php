@@ -213,6 +213,7 @@ $_MODULE['<{payplug}prestashop>installment_2020b5dcab00eaaf6621fe30c8806aec'] = 
 $_MODULE['<{payplug}prestashop>oney_7cdcd23423a3d3025ac7ccb5a3bbfe1c'] = 'Activer les paiements avec Oney';
 $_MODULE['<{payplug}prestashop>oney_fe6c0722a97f8fc5aed036c7f16c8339'] = 'Permettez à vos clients d’échelonner le paiement de leurs commandes en 3x, 4x à partir de %d € jusqu’à %d €.';
 $_MODULE['<{payplug}prestashop>oney_f990e553cdc4c29c2efffba33e08a8c7'] = 'En savoir plus.';
+$_MODULE['<{payplug}prestashop>oney_bfd65bf2ef4e13b630973235f69e1bb4'] = 'J’ai intégré les mentions obligatoires Oney aux CGV sur mon site.';
 $_MODULE['<{payplug}prestashop>oney_f6f9ad2fe95ca5059086924e0a5afa0d'] = 'Pour qualifier le paiement et éviter la fraude, Oney doit connaître vos transporteurs et le délai moyen de livraison.';
 $_MODULE['<{payplug}prestashop>oney_914419aa32f04011357d3b604a86d7eb'] = 'Livraison à domicile';
 $_MODULE['<{payplug}prestashop>oney_cf3e7360cfed1e0c6fdd0090bee0ea05'] = 'Type de livraison';
