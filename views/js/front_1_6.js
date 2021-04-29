@@ -122,7 +122,7 @@ var $document,
                                     window.location.href = data.return_url;
                                     return false;
                                 }
-                                var is_one_click = id_cart != 'new_card';
+                                var is_one_click = options['id_card'] != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
                             } else {
@@ -188,10 +188,6 @@ var $document,
                     return false;
                 }
 
-                if (!$('.ppoverlay').length) {
-                    $('body').append('<div class="ppoverlay"><img class="loader" src="' + spinner_url + '" /></div>');
-                }
-
                 payplugModule.payment.send({id_card: 'new_card', is_inst: is_inst});
 
                 return false;
@@ -199,9 +195,6 @@ var $document,
             oneclick: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!$('.ppoverlay').length) {
-                    $('body').append('<div class="ppoverlay"></div>');
-                }
                 var idCard = $('input[name=payplug_card]:checked').val();
                 payplugModule.payment.send({id_card: idCard});
             },
