@@ -98,14 +98,6 @@
     font-size: 14px;
     font-style: italic;
     font-weight: 400;
-
-    &.-invalidCarrier {
-      padding: 0 15px;
-      color: #colorMap[error];
-      font-size: 13px;
-      font-style: normal;
-      margin: 0 0 16px;
-    }
   }
 
   &_logo {
@@ -141,8 +133,7 @@
     font-size: 15px;
     .borderRadius(2px);
 
-    &.-disabled,
-    .-invalidCarrier & {
+    &.-disabled {
       background: #colorMap[grey];
       cursor: default;
       outline: none;
