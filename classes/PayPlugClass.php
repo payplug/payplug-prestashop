@@ -3721,9 +3721,9 @@ class PayPlugClass extends PaymentModule
     {
         if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
             $this->assignContentVar();
-            $this->context->smarty->assign(array(
+            $this->context->smarty->assign([
                 'js_def' => Media::getJsDef(),
-            ));
+            ]);
             return $this->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
         }
     }
