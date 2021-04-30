@@ -4733,23 +4733,23 @@ class PayPlugClass extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('submitAccount')) {
-            $this->module->submitAccount();
+            $this->submitAccount();
         }
 
         if (Tools::getValue('submitDisable')) {
-            $this->module->submitDisable();
+            $this->submitDisable();
         }
 
         if (Tools::getValue('submitDisconnect')) {
-            $this->module->submitDisconnect();
+            $this->submitDisconnect();
         }
 
         if (Tools::isSubmit('submitSettings')) {
-            $this->module->submitSettings();
+            $this->submitSettings();
         }
 
         if (Tools::isSubmit('submitUninstallSettings')) {
-            $this->module->submitUninstallSettings();
+            $this->submitUninstallSettings();
         }
     }
 
@@ -5818,6 +5818,77 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
+     * @description Process account submit
+     * @throws \Payplug\Exception\BadRequestException
+     */
+    public function submitAccount()
+    {
+        $curl_exists = extension_loaded('curl');
+        $openssl_exists = extension_loaded('openssl');
+
+        /*
+         * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+         * Because pwd with special chars don't work
+         */
+        $password = $_POST['PAYPLUG_PASSWORD'];
+        $email = Tools::getValue('PAYPLUG_EMAIL');
+
+        if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            $this->validationErrors['username_password'] =
+                $this->l('The email and/or password was not correct.');
+        } elseif ($curl_exists && $openssl_exists) {
+            if ($this->login($email, $password)) {
+                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
+                Configuration::updateValue('PAYPLUG_SHOW', 1);
+
+                $this->assignContentVar();
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+                die(json_encode(['content' => $content]));
+            } else {
+                $this->validationErrors['username_password'] =
+                    $this->l('The email and/or password was not correct.');
+            }
+        }
+    }
+
+    /**
+     * @description Process disable plugin submit
+     */
+    public function submitDisable()
+    {
+        Configuration::updateValue('PAYPLUG_SHOW', false);
+
+        $this->assignContentVar();
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        $this->context->smarty->assign([
+            'title' => '',
+            'type' => 'save',
+        ]);
+        $popin = $this->fetchTemplate('/views/templates/admin/popin.tpl');
+
+        die(json_encode(['popin' => $popin, 'content' => $content]));
+    }
+
+    /**
+     * @description Process disconnect submit
+     */
+    public function submitDisconnect()
+    {
+        $this->createConfig();
+        Configuration::updateValue('PAYPLUG_SHOW', 0);
+
+        // force reload configuration to be sure all config are reset
+        Configuration::loadConfiguration();
+
+        $this->assignContentVar();
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        die(json_encode(['content' => $content]));
+    }
+
+    /**
      * @description submit password
      *
      * @param string $pwd
@@ -5852,6 +5923,26 @@ class PayPlugClass extends PaymentModule
         } else {
             die(json_encode(['content' => 'live_ok_not_premium']));
         }
+    }
+
+    /**
+     * @description Process settings submit
+     */
+    public function submitSettings()
+    {
+        if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
+            $this->displayError($this->l('Settings not updated'));
+        } else {
+            $this->saveConfiguration();
+        }
+    }
+
+    /**
+     * @description Process uninstall submit
+     */
+    public function submitUninstallSettings()
+    {
+        Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
     }
 
     /**
