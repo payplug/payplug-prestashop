@@ -130,9 +130,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
-                    $delivery_address = new Address($context->cart->id_address_delivery);
-                    $delivery_country = new Country($delivery_address->id_country);
-                    $cart = $context->cart;
                     $is_elligible = $this->oney->isValidOneyAmount($amount);
                 }
 
