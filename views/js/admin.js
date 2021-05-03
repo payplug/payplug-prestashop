@@ -788,7 +788,6 @@ var $document, $window, payplug = {
         init: function () {
             var {oney} = payplug,
                 {identifier, switcher} = oney.props;
-            $document.on('keyup', 'input[name=payplug_oney_tos_url]', oney.urlCheck);
 
             $('input[name=' + switcher + ']').trigger('switchSelected');
         },

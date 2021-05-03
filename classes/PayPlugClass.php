@@ -20,6 +20,7 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 /**
  * Core file of PayPlug module
  */
@@ -35,7 +36,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class PayPlugClass extends PaymentModule
 {
@@ -45,15 +45,11 @@ class PayPlugClass extends PaymentModule
     /** @var string */
     private $api_test;
 
-    /**
-     * @var array
-     */
     public $available_oney_payments = [
         'x3_with_fees',
         'x4_with_fees',
     ];
 
-    /** @var CardRepository */
     private $card;
 
     /** @var array */
@@ -62,9 +58,6 @@ class PayPlugClass extends PaymentModule
     /** @var PayPlugConfiguration */
     public $configuration;
 
-    /**
-     * @var
-     */
     public $constantFile;
 
     /** @var string */
@@ -90,7 +83,7 @@ class PayPlugClass extends PaymentModule
     ];
 
     /** @var array */
-    public $errors = [];
+    public $errors = []; // PaymentRepository
 
     /** @var string */
     private $html = '';
@@ -107,14 +100,8 @@ class PayPlugClass extends PaymentModule
     /** @var MyLogPHP */
     private $log_install;
 
-    /**
-     * @var
-     */
     private $logger;
 
-    /**
-     * @var
-     */
     public $oney;
 
     public $oney_order_state = [
@@ -143,9 +130,6 @@ class PayPlugClass extends PaymentModule
      */
     public $oneyLogoUrl;
 
-    /**
-     * @var
-     */
     public $order_state;
 
     public $order_states = [
@@ -259,35 +243,20 @@ class PayPlugClass extends PaymentModule
         ],
     ];
 
-    /**
-     * @var
-     */
     private $payment;
 
     /** @var array */
     public $payment_status = [];
 
-    /**
-     * @var
-     */
     private $paymentDetails;
 
     /** @var PluginEntity */
     protected $plugin;
 
-    /**
-     * @var
-     */
     protected $PrestashopSpecificClass;
 
-    /**
-     * @var
-     */
     protected $PrestashopSpecificObject;
 
-    /**
-     * @var
-     */
     protected $query;
 
     /** @var string */
@@ -296,9 +265,6 @@ class PayPlugClass extends PaymentModule
     /** @var bool */
     private $ssl_enable;
 
-    /**
-     * @var
-     */
     private $tools;
 
     /** @var array */
@@ -317,13 +283,15 @@ class PayPlugClass extends PaymentModule
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
+        $this->description = $this->l('The online payment solution combining simplicity 
+        and first-rate support to boost your sales.');
         $this->displayName = 'PayPlug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
         $this->version = '3.1.5';
+        $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
 
@@ -704,6 +672,7 @@ class PayPlugClass extends PaymentModule
             'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
+            'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
 
@@ -942,6 +911,13 @@ class PayPlugClass extends PaymentModule
             'checked' => $configurations['oney'],
             'label_left' => $this->l('yes'),
             'label_right' => $this->l('no'),
+        ];
+
+        $switch['oney_tos'] = [
+            'name' => 'payplug_oney_tos',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_tos'],
         ];
 
         $switch['oney_optimized'] = [
@@ -2249,7 +2225,6 @@ class PayPlugClass extends PaymentModule
         return $available_options;
     }
 
-
     /**
      * Check various configurations
      *
@@ -2380,6 +2355,7 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
+     * @description ONLY FOR VALIDATION
      * Retrieve installment stored
      *
      * @param int $id_cart
@@ -2388,9 +2364,9 @@ class PayPlugClass extends PaymentModule
     public function getInstallmentByCart($id_cart)
     {
         $req_installment_cart = '
-SELECT pic.id_payment
-FROM ' . _DB_PREFIX_ . 'payplug_payment pic
-WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
+            SELECT pic.id_payment 
+            FROM ' . _DB_PREFIX_ . 'payplug_payment pic 
+            WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
         $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
         if (!$res_installment_cart) {
             return false;
@@ -2878,6 +2854,7 @@ WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment
      */
     private function getPaymentStatusByPayment($payment)
     {
+
         /*
             1 => 'not paid',
             2 => 'paid',
@@ -2942,8 +2919,26 @@ WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment
     public function getPayplugInstallmentCart($id_cart)
     {
         $req_cart_installment = '
-SELECT pic.id_payment
-FROM ' . _DB_PREFIX_ . 'payplug_payment pic
+            SELECT pic.id_payment
+            FROM ' . _DB_PREFIX_ . 'payplug_payment pic
+            WHERE pic.id_cart = ' . (int)$id_cart;
+        $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
+
+        return $res_cart_installment;
+    }
+
+
+    /**
+     * @description get cart installment backward
+     * @deprecated use for installment from PayPlug 3.1.3 or further
+     * @param $id_cart
+     * @return mixed
+     */
+    public function getPayplugInstallmentCartBackward($id_cart)
+    {
+        $req_cart_installment = '
+            SELECT pic.id_installment
+            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
             WHERE pic.id_cart = ' . (int)$id_cart;
         $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
 
@@ -3019,7 +3014,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment pic
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
-WHERE pi.id_payment = \'' . $installment->id . '\'';
+            WHERE pi.id_payment = \'' . $installment->id . '\'';
         $res_installment = DB::getInstance()->executeS($req_installment);
 
         if (!$res_installment) {
@@ -3161,31 +3156,12 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        return $this
-            ->getPlugin()
-            ->getCache()
-            ->flushCache();
-    }
-
-    /**
-     * Automatically update PayPlugCarrier after someone update a Prestashop Carrier
-     *
-     * @param array $params List of parameters used when the hook was triggered
-     * @return void
-     */
-    public function hookActionCarrierUpdate($params)
-    {
-        $updated_carrier = $params['carrier'];
-        $payplug_carrier = PayPlugCarrier::getPayPlugCarrierByIdCarrier((int)$params['id_carrier']);
-
-        // if the payplug carrier don't exists, set default value
-        if (!Validate::isLoadedObject($payplug_carrier)) {
-            $payplug_carrier->delay = '1';
-            $payplug_carrier->delivery_type = 'carrier';
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+            return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache();
         }
-
-        $payplug_carrier->id_carrier = (int)$updated_carrier->id;
-        $payplug_carrier->save();
     }
 
     /**
@@ -3196,10 +3172,12 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
      */
     public function hookActionClearCompileCache($params)
     {
-        return $this
-            ->getPlugin()
-            ->getCache()
-            ->flushCache();
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+            return $this
+                ->getPlugin()
+                ->getCache()
+                ->flushCache();
+        }
     }
 
     /**
@@ -3226,20 +3204,6 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
         } else {
             return json_encode($cards);
         }
-    }
-
-    /**
-     * Automatically add and populate a PayPlugCarrier after someone add a Prestashop Carrier
-     *
-     * @param array $params List of parameters used when the hook was triggered
-     * @return void
-     */
-    public function hookActionObjectCarrierAddAfter($params)
-    {
-        $new_carrier = $params['object'];
-        $new_pp_carrier = new PayPlugCarrier();
-        $new_pp_carrier->populateFromCarrier($new_carrier);
-        $new_pp_carrier->save();
     }
 
     /**
@@ -3364,6 +3328,12 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
 
         $inst_id = null;
         $payment_id = $this->getPayplugInstallmentCart($order->id_cart);
+
+        // Backward if order validated before
+        if (!$payment_id) {
+            $payment_id = $this->getPayplugInstallmentCartBackward($order->id_cart);
+        }
+
         if ($payment_id && strpos($payment_id, 'inst') !== false) {
             $inst_id = $payment_id;
         }
@@ -3704,6 +3674,21 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
 
         $this->html .= $this->fetchTemplate('/views/templates/admin/order/order.tpl');
         return $this->html;
+    }
+
+    /**
+     * @param $params
+     * @return string
+     */
+    public function hookDisplayBackOfficeFooter($params)
+    {
+        if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
+            $this->assignContentVar();
+            $this->context->smarty->assign([
+                'js_def' => Media::getJsDef(),
+            ]);
+            return $this->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
+        }
     }
 
     /**
@@ -4269,6 +4254,7 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
         $hooksToRegister = [
             'adminOrder',
             'displayAdminOrderMain',
+            'displayBackOfficeFooter',
             'customerAccount',
             'header',
             'paymentReturn',
@@ -4402,32 +4388,31 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
     {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
 
-        if (preg_match(
-            '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|
-            iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|
-            palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|
-            up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',
-            $useragent
-        ) || preg_match(
-            '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|
-            an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|
-            br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|
-            dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|
-            fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|
-            hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|
-            ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|
-            lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|
-            mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|
-            n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|
-            pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|
-            qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|
-            sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|
-            sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|
-            tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|
-            vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|
-            wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
-            Tools::substr($useragent, 0, 4)
-        )) {
+        $reg1 = '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|';
+        $reg1 .= 'iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|';
+        $reg1 .= 'palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|';
+        $reg1 .= 'up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i';
+
+        $reg2 = '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|';
+        $reg2 .= 'an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|';
+        $reg2 .= 'br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|';
+        $reg2 .= 'dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|';
+        $reg2 .= 'ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|';
+        $reg2 .= 'hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|';
+        $reg2 .= 'iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|';
+        $reg2 .= 'klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|';
+        $reg2 .= 'ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|';
+        $reg2 .= 'mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|';
+        $reg2 .= 'ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|';
+        $reg2 .= 'pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|';
+        $reg2 .= 'qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|';
+        $reg2 .= 'sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|';
+        $reg2 .= 'sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|';
+        $reg2 .= 'tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|';
+        $reg2 .= 'vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|';
+        $reg2 .= 'wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i';
+
+        if (preg_match($reg1, $useragent) || preg_match($reg2, Tools::substr($useragent, 0, 4))) {
             return true;
         }
         return false;
@@ -4477,7 +4462,7 @@ WHERE pi.id_payment = \'' . $installment->id . '\'';
         $timeout_delay = 9;
         $req_payment_cart_exists = '
             SELECT *
-FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
+            FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
             WHERE ppc.id_cart = ' . (int)$id_cart . '
             AND ppc.id_payment LIKE \'pending\'';
         $res_payment_cart_exists = Db::getInstance()->getRow($req_payment_cart_exists);
@@ -4516,7 +4501,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
     {
         $req_payment_cart = '
             SELECT ppc.id_payment 
-FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
+            FROM ' . _DB_PREFIX_ . 'payplug_payment ppc  
             WHERE ppc.id_cart = ' . (int)$id_cart . '
             AND ppc.is_pending = 1';
         $res_payment_cart = Db::getInstance()->getValue($req_payment_cart);
@@ -4722,27 +4707,28 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
     /**
      * @return void
      * @see Module::postProcess()
+     *
      */
     private function postProcess()
     {
         if (Tools::isSubmit('submitAccount')) {
-            $this->module->submitAccount();
+            $this->submitAccount();
         }
 
         if (Tools::getValue('submitDisable')) {
-            $this->module->submitDisable();
+            $this->submitDisable();
         }
 
         if (Tools::getValue('submitDisconnect')) {
-            $this->module->submitDisconnect();
+            $this->submitDisconnect();
         }
 
         if (Tools::isSubmit('submitSettings')) {
-            $this->module->submitSettings();
+            $this->submitSettings();
         }
 
         if (Tools::isSubmit('submitUninstallSettings')) {
-            $this->module->submitUninstallSettings();
+            $this->submitUninstallSettings();
         }
     }
 
@@ -5117,8 +5103,8 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
         ];
 
         /*
-        * Create payment if inexistent
-        */
+         * Create payment if inexistent
+         */
         if (!$this->payment->checkPaymentTable($cart->id)) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
@@ -5207,10 +5193,12 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
                     'response' => $getpaymentReturnUrl['response']
                 ];
             }
-        } elseif ($this->payment->checkTimeoutPayment($cart->id) && $this->payment->checkHash($this->paymentDetails)) {
+        } elseif ($this->payment->checkTimeoutPayment($cart->id)
+            && $this->payment->checkHash($this->paymentDetails)
+            && $this->payment->isValidApiPayment($this->paymentDetails)) {
             /*
-            * If timeout < 3 min and hash OK
-            */
+             * If timeout < 3 min and hash OK
+             */
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
             if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
                 return $getpaymentReturnUrl['url'];
@@ -5411,7 +5399,7 @@ FROM ' . _DB_PREFIX_ . 'payplug_payment ppc
     public function registerPendingTransaction($id_cart)
     {
         $req_payment_cart = '
-UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc
+            UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc  
             SET ppc.is_pending = 1
             WHERE ppc.id_cart = ' . (int)$id_cart;
         $res_payment_cart = Db::getInstance()->execute($req_payment_cart);
@@ -5479,20 +5467,8 @@ UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc
         Configuration::updateValue('PAYPLUG_INST_MODE', Tools::getValue('PAYPLUG_INST_MODE'));
         Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
-        if ((int)Tools::getValue('payplug_oney') == 1) {
-            $carriers = PayPlugCarrier::getAll();
-            foreach ($carriers as $carrier) {
-                if ((int)(Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay')) < 0) {
-                    $this->displayError($this->l('Settings not updated'));
-                }
-                $carrier->delivery_type = Tools::getValue(
-                    'payplug_carrier_' . (int)$carrier->id . '_delivery_type'
-                );
-                $carrier->delay = (int)Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay');
-                $carrier->save();
-            }
-        }
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
+        Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         if (Tools::getValue('PAYPLUG_SHOW')) {
             $this->enable();
@@ -5783,7 +5759,7 @@ UPDATE ' . _DB_PREFIX_ . 'payplug_payment ppc
         if (!$res_installment_cart_exists) {
             //insert
             $req_installment_cart = '
-INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
+                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
                 VALUES (\'' . pSQL($installment_id) . '\', 
                 ' . (int)$id_cart . ', 
                 ' . (int)$is_pending . ', 
@@ -5795,8 +5771,8 @@ INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending,
         } else {
             //update
             $req_installment_cart = '
-UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic
-SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
+                UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic  
+                SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
                 WHERE pic.id_cart = ' . (int)$id_cart;
             $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
             if (!$res_installment_cart) {
@@ -5805,6 +5781,77 @@ SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQ
         }
 
         return true;
+    }
+
+    /**
+     * @description Process account submit
+     * @throws \Payplug\Exception\BadRequestException
+     */
+    public function submitAccount()
+    {
+        $curl_exists = extension_loaded('curl');
+        $openssl_exists = extension_loaded('openssl');
+
+        /*
+         * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+         * Because pwd with special chars don't work
+         */
+        $password = $_POST['PAYPLUG_PASSWORD'];
+        $email = Tools::getValue('PAYPLUG_EMAIL');
+
+        if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            $this->validationErrors['username_password'] =
+                $this->l('The email and/or password was not correct.');
+        } elseif ($curl_exists && $openssl_exists) {
+            if ($this->login($email, $password)) {
+                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
+                Configuration::updateValue('PAYPLUG_SHOW', 1);
+
+                $this->assignContentVar();
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+                die(json_encode(['content' => $content]));
+            } else {
+                $this->validationErrors['username_password'] =
+                    $this->l('The email and/or password was not correct.');
+            }
+        }
+    }
+
+    /**
+     * @description Process disable plugin submit
+     */
+    public function submitDisable()
+    {
+        Configuration::updateValue('PAYPLUG_SHOW', false);
+
+        $this->assignContentVar();
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        $this->context->smarty->assign([
+            'title' => '',
+            'type' => 'save',
+        ]);
+        $popin = $this->fetchTemplate('/views/templates/admin/popin.tpl');
+
+        die(json_encode(['popin' => $popin, 'content' => $content]));
+    }
+
+    /**
+     * @description Process disconnect submit
+     */
+    public function submitDisconnect()
+    {
+        $this->createConfig();
+        Configuration::updateValue('PAYPLUG_SHOW', 0);
+
+        // force reload configuration to be sure all config are reset
+        Configuration::loadConfiguration();
+
+        $this->assignContentVar();
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        die(json_encode(['content' => $content]));
     }
 
     /**
@@ -5842,6 +5889,26 @@ SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQ
         } else {
             die(json_encode(['content' => 'live_ok_not_premium']));
         }
+    }
+
+    /**
+     * @description Process settings submit
+     */
+    public function submitSettings()
+    {
+        if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
+            $this->displayError($this->l('Settings not updated'));
+        } else {
+            $this->saveConfiguration();
+        }
+    }
+
+    /**
+     * @description Process uninstall submit
+     */
+    public function submitUninstallSettings()
+    {
+        Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
     }
 
     /**
@@ -5987,8 +6054,6 @@ SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQ
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
-        } elseif (!$this->oney->uninstallOney()) {
-            $log->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;
@@ -6004,31 +6069,24 @@ SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQ
      */
     private function uninstallCards()
     {
-        try {
-            $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
-        } catch (Exception $e) {
-            // todo: add error log - payplug_card does not seem to exist
-            return true;
-        }
+        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
+            $cards = $this->query
+                ->select()
+                ->fields('*')
+                ->from(_DB_PREFIX_ . 'payplug_card')
+                ->build();
 
-        if (!$exists) {
-            return true;
-        }
-
-        $req_all_cards = new DbQuery();
-        $req_all_cards->select('pc.*');
-        $req_all_cards->from('payplug_card', 'pc');
-        $res_all_cards = Db::getInstance()->executeS($req_all_cards);
-
-        if (!empty($res_all_cards)) {
-            foreach ($res_all_cards as $card) {
-                $id_customer = $card['id_customer'];
-                $id_payplug_card = $card['id_payplug_card'];
-                if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
-                    return false;
+            if ($cards) {
+                foreach ($cards as $card) {
+                    $id_customer = $card['id_customer'];
+                    $id_payplug_card = $card['id_payplug_card'];
+                    if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
+                        return false;
+                    }
                 }
             }
         }
+
         return true;
     }
 

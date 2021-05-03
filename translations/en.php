@@ -139,6 +139,7 @@ $_MODULE['<{payplug}prestashop>details_e7f9e382dc50889098cbe56f2554c77b'] = 'Cre
 $_MODULE['<{payplug}prestashop>details_c7d4153f748ba1dd21ae002c37c00906'] = 'Card mask';
 $_MODULE['<{payplug}prestashop>details_217c01a08bee4c2fa33d59a6ddc69806'] = '3-D Secure';
 $_MODULE['<{payplug}prestashop>details_5abc7a3ac0ae1545cc801303727f53da'] = 'Expiry Date';
+$_MODULE['<{payplug}prestashop>details_453e6aa38d87b28ccae545967c53004f'] = 'Unavailable';
 $_MODULE['<{payplug}prestashop>details_650be61892bf690026089544abbd9d26'] = 'Mode';
 $_MODULE['<{payplug}prestashop>refunded_4bf290898e0226ffb1041cd114347e4d'] = 'Refund your customer on his card directly with Payplug';
 $_MODULE['<{payplug}prestashop>refunded_7ca1373ac3a64cc5381dc5b5b5c74219'] = 'This transaction was entirely refunded with Payplug';
@@ -388,5 +389,4 @@ $_MODULE['<{payplug}prestashop>translationsrepository_f5146f3861c487374c38fb5ec7
 $_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c84ab97f'] = 'Your information has been saved';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'An error occurred. Please retry in few seconds.';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Oney is momentarily unavailable.';
-$_MODULE['<{payplug}prestashop>cardrepository_453e6aa38d87b28ccae545967c53004f'] = 'Unavailable';
 $_MODULE['<{payplug}prestashop>cardrepository_0d2d5fa0cfffc8577f948d683a82079e'] = 'Card sucessfully deleted.';

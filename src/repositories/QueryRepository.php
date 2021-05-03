@@ -150,7 +150,7 @@ class QueryRepository extends Repository
         return $this;
     }
 
-    public function ifExist()
+    public function ifExists()
     {
         $this->query['type'] = 'SHOW TABLES LIKE';
         return $this;
