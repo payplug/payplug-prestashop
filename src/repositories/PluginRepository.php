@@ -47,6 +47,7 @@ class PluginRepository extends Repository
     // Repositories & necessary classes
     private $cache;
     private $card;
+    private $hook;
     private $logger;
     private $myLogPhp;
     private $oney;
@@ -70,26 +71,32 @@ class PluginRepository extends Repository
 
     public function __construct($payplug = null)
     {
-        $this->address  = new AddressSpecific();
-        $this->cache    = new CacheRepository();
-        $this->card     = new CardRepository($payplug);
-        $this->carrier  = new CarrierSpecific();
-        $this->cart     = new CartSpecific();
+        $this->address = new AddressSpecific();
+        $this->cache = new CacheRepository();
+        $this->card = new CardRepository($payplug);
+        $this->carrier = new CarrierSpecific();
+        $this->cart = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
-        $this->constant  = new ConstantSpecific();
-        $this->context  = new ContextSpecific();
-        $this->country  = new CountrySpecific();
-        $this->logger   = new LoggerRepository();
+        $this->constant = new ConstantSpecific();
+        $this->context = new ContextSpecific();
+        $this->country = new CountrySpecific();
+        $this->logger = new LoggerRepository();
         $this->myLogPhp = new MyLogPHP();
         $this->oneyEntity = new OneyEntity();
         $this->order_state = new OrderStateRepository();
         $this->paymentEntity = new PaymentEntity();
-        $this->plugin   = new PluginEntity();
-        $this->product  = new ProductSpecific();
-        $this->query    = new QueryRepository();
-        $this->tools    = new ToolsSpecific();
+        $this->plugin = new PluginEntity();
+        $this->product = new ProductSpecific();
+        $this->query = new QueryRepository();
+        $this->tools = new ToolsSpecific();
         $this->translate = new TranslationsRepository($payplug);
         $this->validate = new ValidateSpecific();
+
+
+        $this->hook = new HookRepository(
+            $payplug,
+            $this->constant
+        );
 
         $this->oney = new OneyRepository(
             $this->cache,
@@ -107,7 +114,7 @@ class PluginRepository extends Repository
             $payplug
         );
 
-        $this->payment  = new PaymentRepository(
+        $this->payment = new PaymentRepository(
             $payplug,
             $this->cart,
             $this->logger,
@@ -126,6 +133,7 @@ class PluginRepository extends Repository
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)
+            ->setHook($this->hook)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
             ->setProduct($this->product)
@@ -134,8 +142,7 @@ class PluginRepository extends Repository
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
-            ->setOrderState($this->order_state)
-        ;
+            ->setOrderState($this->order_state);
         $this->setEntity($this->plugin);
     }
 }

@@ -281,7 +281,6 @@ class PayPlugClass extends PaymentModule
         $this->name = 'payplug';
         $this->author = 'PayPlug';
         $this->bootstrap = true;
-        $this->constantFile = _PS_MODULE_DIR_ . 'payplug/payplug.php';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('The online payment solution combining simplicity 
@@ -291,7 +290,7 @@ class PayPlugClass extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.4';
+        $this->version = '3.1.5';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -3999,7 +3998,7 @@ class PayPlugClass extends PaymentModule
         return $this->fetchTemplate('checkout/order-confirmation.tpl');
     }
 
-    public function hookRegisterGDPRConsent()
+    public function hookRegisterGDPRConsent($params)
     {
     }
 
@@ -5145,8 +5144,8 @@ class PayPlugClass extends PaymentModule
             }
         } elseif (!$this->payment->checkTimeoutPayment($cart->id)) {
             /*
-             * If payment already exists, and timeout > 3 min : Create a new payment
-             */
+            * If payment already exists, and timeout > 3 min : Create a new payment
+            */
 
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
