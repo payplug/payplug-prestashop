@@ -31,6 +31,11 @@ class Repository
     protected $name;
     protected $payplug;
 
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function setName()
     {
         $this->name = (new \ReflectionClass($this))->getShortName();
@@ -55,6 +60,6 @@ class Repository
     public function l($string)
     {
         $this->setName();
-        return TranslationSpecific::translate($this->payplug, $string, $this->name);
+        return TranslationSpecific::translate($this->payplug, $string, $this->getName());
     }
 }

@@ -114,7 +114,7 @@ class PayPlugPaymentOney extends PayplugPayment
         $this->payment_tab['payment_context'] = $this->generateCartTab();
         $this->payment_tab['payment_method'] = $this->getPaymentMethodFromType();
         $this->payment_tab['hosted_payment']['return_url'] =
-            PayplugBackward::getModuleLink(
+            Context::getContext()->link->getModuleLink(
                 'payplug',
                 'validation',
                 ['ps' => 1, 'cartid' => (int)$this->cart->id],

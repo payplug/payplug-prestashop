@@ -24,6 +24,14 @@ $(document).ready(function() {
     if(typeof payplug_errors != 'undefined' && payplug_errors) {
         return false;
     }
+
     var url = $('#payplug_form_js').data('payment-url');
+
+    // (PrestaShop 1.7 only) : If Internet Explorer, redirect instead
+    if(!!window.MSInputMethodContext && !!document.documentMode){
+        window.location.href = url;
+        return false;
+    }
+
     Payplug.showPayment(url);
 });
