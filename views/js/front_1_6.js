@@ -578,10 +578,6 @@ var $document,
                 },
                 send: function (event) {
                     event.preventDefault();
-                    // if invalid carrier return
-                    if ($('.oneyPayment').is('.-invalidCarrier')) {
-                        return false;
-                    }
 
                     if ($('.oneyRequired').length) {
                         payplugModule.oney.payment.form.open();

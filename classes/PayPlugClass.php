@@ -36,7 +36,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugCarrier.php');
 
 class PayPlugClass extends PaymentModule
 {
@@ -3167,27 +3166,6 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * Automatically update PayPlugCarrier after someone update a Prestashop Carrier
-     *
-     * @param array $params List of parameters used when the hook was triggered
-     * @return void
-     */
-    public function hookActionCarrierUpdate($params)
-    {
-        $updated_carrier = $params['carrier'];
-        $payplug_carrier = PayPlugCarrier::getPayPlugCarrierByIdCarrier((int)$params['id_carrier']);
-
-        // if the payplug carrier don't exists, set default value
-        if (!Validate::isLoadedObject($payplug_carrier)) {
-            $payplug_carrier->delay = '1';
-            $payplug_carrier->delivery_type = 'carrier';
-        }
-
-        $payplug_carrier->id_carrier = (int)$updated_carrier->id;
-        $payplug_carrier->save();
-    }
-
-    /**
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param array $params
@@ -3227,20 +3205,6 @@ class PayPlugClass extends PaymentModule
         } else {
             return json_encode($cards);
         }
-    }
-
-    /**
-     * Automatically add and populate a PayPlugCarrier after someone add a Prestashop Carrier
-     *
-     * @param array $params List of parameters used when the hook was triggered
-     * @return void
-     */
-    public function hookActionObjectCarrierAddAfter($params)
-    {
-        $new_carrier = $params['object'];
-        $new_pp_carrier = new PayPlugCarrier();
-        $new_pp_carrier->populateFromCarrier($new_carrier);
-        $new_pp_carrier->save();
     }
 
     /**
@@ -5488,19 +5452,6 @@ class PayPlugClass extends PaymentModule
         Configuration::updateValue('PAYPLUG_INST_MODE', Tools::getValue('PAYPLUG_INST_MODE'));
         Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
-        if ((int)Tools::getValue('payplug_oney') == 1) {
-            $carriers = PayPlugCarrier::getAll();
-            foreach ($carriers as $carrier) {
-                if ((int)(Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay')) < 0) {
-                    $this->displayError($this->l('Settings not updated'));
-                }
-                $carrier->delivery_type = Tools::getValue(
-                    'payplug_carrier_' . (int)$carrier->id . '_delivery_type'
-                );
-                $carrier->delay = (int)Tools::getValue('payplug_carrier_' . (int)$carrier->id . '_delay');
-                $carrier->save();
-            }
-        }
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
         Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
@@ -6088,8 +6039,6 @@ class PayPlugClass extends PaymentModule
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
-        } elseif (!$this->oney->uninstallOney()) {
-            $log->error('Uninstall failed: Oney.');
         } else {
             $log->info('Uninstall succeeded.');
             return true;

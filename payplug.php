@@ -128,18 +128,6 @@ class Payplug extends Module
     }
 
     /**
-     * @description Automatically update PayPlugCarrier after someone update a Prestashop Carrier
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionCarrierUpdate($params)
-    {
-        if ($this->module) {
-            return $this->module->hookActionCarrierUpdate($params);
-        }
-    }
-
-    /**
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      * @param $params
      * @return mixed
@@ -170,18 +158,6 @@ class Payplug extends Module
     {
         if ($this->module) {
             return $this->module->hookActionExportGDPRData($params);
-        }
-    }
-
-    /**
-     * @description Automatically add and populate a PayPlugCarrier after someone add a Prestashop Carrier
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionObjectCarrierAddAfter($params)
-    {
-        if ($this->module) {
-            return $this->module->hookActionObjectCarrierAddAfter($params);
         }
     }
 

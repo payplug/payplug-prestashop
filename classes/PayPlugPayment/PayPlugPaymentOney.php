@@ -229,28 +229,9 @@ class PayPlugPaymentOney extends PayplugPayment
                 return $delivery_data;
             }
 
-            $payplug_carrier = new PayPlugCarrier();
-            $payplug_carrier = $payplug_carrier->getByIdCarrier($carrier->id);
-
-            if (!Validate::isLoadedObject($payplug_carrier)) {
-                // todo: log error
-                $delay = PayPlugCarrier::CARRIER_DEFAULT_DELAY;
-                $delivery_type = PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE;
-                $delivery_data['delivery_label'] = $this->module->getConfiguration('PS_SHOP_NAME');
-                $delivery_data['expected_delivery_date'] = date(
-                    'Y-m-d',
-                    strtotime(date('Y-m-d') . ' + ' . $delay . ' days')
-                );
-                $delivery_data['delivery_type'] = $delivery_type;
-                return $delivery_data;
-            }
-
             $delivery_data['delivery_label'] = $carrier->name;
-            $delivery_data['expected_delivery_date'] = date(
-                'Y-m-d',
-                strtotime(date('Y-m-d') . ' + ' . $payplug_carrier->delay . ' days')
-            );
-            $delivery_data['delivery_type'] = $payplug_carrier->delivery_type;
+            $delivery_data['expected_delivery_date'] = date('Y-m-d');
+            $delivery_data['delivery_type'] = 'storepickup';
         }
 
         return $delivery_data;
