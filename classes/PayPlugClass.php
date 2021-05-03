@@ -3678,6 +3678,21 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
+     * @param $params
+     * @return string
+     */
+    public function hookDisplayBackOfficeFooter($params)
+    {
+        if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
+            $this->assignContentVar();
+            $this->context->smarty->assign([
+                'js_def' => Media::getJsDef(),
+            ]);
+            return $this->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
+        }
+    }
+
+    /**
      * Display Oney CTA on Shopping cart page
      *
      * @param array $params
@@ -4240,6 +4255,7 @@ class PayPlugClass extends PaymentModule
         $hooksToRegister = [
             'adminOrder',
             'displayAdminOrderMain',
+            'displayBackOfficeFooter',
             'customerAccount',
             'header',
             'paymentReturn',
