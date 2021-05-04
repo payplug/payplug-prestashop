@@ -20,25 +20,29 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel panel-show">
-    <div class="panel-heading">{l s='PRESENTATION' mod='payplug'}</div>
+    <div class="panel-heading">{l s='admin.phpversion.heading' mod='payplug'}</div>
     <div class="panel-row">
         <img src="{$url_logo|escape:'htmlall':'UTF-8'}" />
-        <p class="block-title">{l s='The payment solution that increases your sales' mod='payplug'}</p>
-        <p>{l s='PayPlug provides merchants all the benefits of a full online payment solution.' mod='payplug'}</p>
+        <p class="block-title">{l s='admin.phpversion.title' mod='payplug'}</p>
+        <p>{l s='admin.phpversion.headlist' mod='payplug'}</p>
         <ul>
-            <li>{l s='Accept all Visa and MasterCard credit and debit cards' mod='payplug'}</li>
-            <li>{l s='Display the payment form directly on your website, without redirection' mod='payplug'}</li>
-            <li>{l s='Customise your payment page with your own colours and design' mod='payplug'}</li>
-            <li>{l s='Avoid fraud by using Verified by Visa and MasterCard Secure Code' mod='payplug'}</li>
-            <li>{l s='Automatic order update and email confirmation' mod='payplug'}</li>
-            <li>{l s='Web interface to manage and export transaction history' mod='payplug'}</li>
-            <li>{l s='Funds available on your bank account within 2 to 5 business days' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.card' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.integrated' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.custom' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.secure' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.automatic' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.history' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.fast' mod='payplug'}</li>
         </ul>
     </div>
 </div>
 <div class="panel panel-show">
     <div class="panel-row">
-        <p>La version de PHP que vous utilisez n'est pas compatible avec cette version du module PayPlug car elle est antérieure à PHP 5.6.</p>
-        <p>Rendez-vous sur <a target="_blank" href="javascript:void(0);" class="payplugLink">notre page support</a> pour récupérer une version compatible avec votre boutique.</p>
+        <p>{l s='admin.phpversion.wrongPhpVersion' mod='payplug'}</p>
+        <p>
+            {l s='admin.phpversion.beforeLink' mod='payplug'}
+            <a target="_blank" href="{$faq_url|escape:'htmlall':'UTF-8'}" class="payplugLink">{l s='admin.phpversion.link' mod='payplug'}</a>
+            {l s='admin.phpversion.afterLink' mod='payplug'}
+        </p>
     </div>
 </div>

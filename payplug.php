@@ -70,7 +70,7 @@ class Payplug extends Module
      */
     protected function isValidPHPVersion()
     {
-        $php_min_version = 50600;
+        $php_min_version = 80600;
 
         if (!defined('PHP_VERSION_ID')) {
             $php_version = explode('.', PHP_VERSION);
@@ -102,8 +102,19 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->getContent();
         } else {
+
+            $iso_code = Context::getContext()->language->iso_code;
+            if ($iso_code == 'en' || $iso_code == 'gb') {
+                $iso_code = 'en-gb';
+            }
+            $faq_url = 'https://support.payplug.com/hc/' . $iso_code.'/articles/360021267140';
+            $this->context->smarty->assign('faq_url', $faq_url);
+
+            $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
+            $this->context->smarty->assign('url_logo', $logo_url);
+
             $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
-            $this->context->smarty->assign('url_logo', __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png');
+
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
     }
