@@ -28,6 +28,11 @@ use PayPlug\src\interfaces\AddressInterface;
 
 class AddressSpecific implements AddressInterface
 {
+    public static function factory()
+    {
+        return new self();
+    }
+
     public function getAddress($idAddress)
     {
         return new Address($idAddress);

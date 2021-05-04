@@ -46,7 +46,8 @@ var $document,
                     .on('submit', '.payplugOneClick form', payplugModule.payment.oneclick);
 
                 $(window).on('load', payplugModule.payment.clean)
-                    .on('load', payplugModule.payment.checkerrors);
+                    .on('load', payplugModule.payment.checkerrors)
+                    .on('load', payplugModule.payment.handleOPC);
 
                 if (typeof can_use_oney != 'undefined' && can_use_oney) {
                     payplugModule.oney.init();
@@ -116,7 +117,12 @@ var $document,
                         if (data.result) {
                             // redirect to success url
                             if (data.embedded && !data.redirect) {
-                                var is_one_click = id_cart != 'new_card';
+                                // If Internet Explorer, redirect instead
+                                if(!!window.MSInputMethodContext && !!document.documentMode){
+                                    window.location.href = data.return_url;
+                                    return false;
+                                }
+                                var is_one_click = options['id_card'] != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
                             } else {
@@ -182,10 +188,6 @@ var $document,
                     return false;
                 }
 
-                if (!$('.ppoverlay').length) {
-                    $('body').append('<div class="ppoverlay"><img class="loader" src="' + spinner_url + '" /></div>');
-                }
-
                 payplugModule.payment.send({id_card: 'new_card', is_inst: is_inst});
 
                 return false;
@@ -193,9 +195,6 @@ var $document,
             oneclick: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!$('.ppoverlay').length) {
-                    $('body').append('<div class="ppoverlay"></div>');
-                }
                 var idCard = $('input[name=payplug_card]:checked').val();
                 payplugModule.payment.send({id_card: idCard});
             },
@@ -229,6 +228,20 @@ var $document,
                         }
                     }
                 });
+            },
+            handleOPC: function () {
+                if (typeof updatePaymentMethods != 'function') {
+                    return false;
+                }
+
+                var original = updatePaymentMethods;
+                updatePaymentMethods = function (json) {
+                    original.call(this, json);
+                    payplugModule.payment.clean();
+                    if (typeof can_use_oney != 'undefined' && can_use_oney) {
+                        payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                    }
+                };
             },
         },
         deleleCard: function (id_card, url) {
@@ -550,8 +563,6 @@ var $document,
                         .on('click', '.oneyPayment_button', oney_payment.send)
                         .on('click', '.oneyPayment_trigger', oney_payment.trigger);
 
-                    oney_payment.handleCheckoutCGV();
-
                     oney_payment.form.init();
                 },
                 select: function () {
@@ -629,16 +640,6 @@ var $document,
                 close: function () {
                     payplugModule.oney.payment.props.open = false;
                     $('.oneyPayment').removeClass('-open');
-                },
-                handleCheckoutCGV: function () {
-                    if (typeof updatePaymentMethods != 'function') {
-                        return false;
-                    }
-                    var original = updatePaymentMethods;
-                    updatePaymentMethods = function (json) {
-                        original.call(this, json);
-                        payplugModule.oney.load(payplugModule.oney.payment.props.open);
-                    };
                 },
                 form: {
                     init: function () {

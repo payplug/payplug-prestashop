@@ -199,11 +199,11 @@ label.payplugSwitch_label {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
-  -webkit-transition: background 0.26666667s;
-  -moz-transition: background 0.26666667s;
-  -ms-transition: background 0.26666667s;
-  -o-transition: background 0.26666667s;
-  transition: background 0.26666667s;
+  -webkit-transition: background 0.4s/1.5;
+  -moz-transition: background 0.4s/1.5;
+  -ms-transition: background 0.4s/1.5;
+  -o-transition: background 0.4s/1.5;
+  transition: background 0.4s/1.5;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -416,29 +416,6 @@ button.payplugLink:hover {
 .payplugOney_error {
   display: none;
   color: #e56876;
-}
-.payplugOneyTOS {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-}
-p.payplugOneyTOS_text {
-  margin: 0 8px 0 0;
-  line-height: 31px;
-}
-.payplugOneyTOS_input {
-  margin: initial;
-  display: inline-block;
-  width: 250px;
-}
-.payplugOneyTOS_error {
-  width: 100%;
-  display: none;
-  color: #dd2525;
-  padding: 0 0 0 10px;
-}
-.payplugOneyTOS_error.-show {
-  display: block;
 }
 /* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
