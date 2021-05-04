@@ -426,9 +426,11 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
+            $err = '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] ';
+            $err .= '&& $paymentDetails[\'paymentReturnUrl\'] are null';
             return $this->returnPaymentError(
                 ['name' => 'paymentUrl', 'value' => false],
-                '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] && $paymentDetails[\'paymentReturnUrl\'] are null'
+                $err
             );
         }
 
@@ -471,7 +473,6 @@ class PaymentRepository extends Repository
                     ['name' => 'paymentStored', 'value' => false],
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
-                break;
         }
 
         return [

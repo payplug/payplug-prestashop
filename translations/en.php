@@ -193,6 +193,7 @@ $_MODULE['<{payplug}prestashop>deferred_be43c72d18421ca43a83bbd732189ac6'] = 'Yo
 $_MODULE['<{payplug}prestashop>installment_ce1625aabc7130c36cd4e64e518c8615'] = 'Enable payments by installments';
 $_MODULE['<{payplug}prestashop>installment_ac924ae7c6cbcfe26ea8928845727f3f'] = 'Allow customers to spread out payments over 2, 3 or 4 installments.';
 $_MODULE['<{payplug}prestashop>installment_f990e553cdc4c29c2efffba33e08a8c7'] = 'Learn more.';
+$_MODULE['<{payplug}prestashop>oney_bfd65bf2ef4e13b630973235f69e1bb4'] = 'I integrated the mandatory fields to my terms and conditions on my website.';
 $_MODULE['<{payplug}prestashop>installment_381665869000be567e4a891084207172'] = 'Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.';
 $_MODULE['<{payplug}prestashop>installment_7650b35a9e3fe0a7dcfc75b1f8868a78'] = 'You can consult all your past and pending installment payments in';
 $_MODULE['<{payplug}prestashop>installment_7e4e22d718065b41f435fac4c02a0f08'] = 'a dedicated menu';
