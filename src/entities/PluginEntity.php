@@ -34,6 +34,7 @@ class PluginEntity
     // Our classes
     private $cache;
     private $card;
+    private $hook;
     private $logger;
     private $oney;
     private $order_state;
@@ -367,6 +368,24 @@ class PluginEntity
             $this->country = $country;
             return $this;
         }
+    }
+
+    /**
+     * @return object
+     */
+    public function getHook()
+    {
+        return $this->hook;
+    }
+
+    /**
+     * @param object $hook
+     * @return PluginEntity
+     */
+    public function setHook($hook)
+    {
+        $this->hook = $hook;
+        return $this;
     }
 
     /**

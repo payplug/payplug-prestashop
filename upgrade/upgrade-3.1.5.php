@@ -15,23 +15,22 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-class PayplugValidationModuleFrontController extends ModuleFrontController
+function upgrade_module_3_1_5()
 {
-    public function postProcess()
-    {
-        $payplug = new PayPlugClass();
-        $validation = $payplug->setValidation();
-        $validation->treat();
-    }
+    $flag = true;
+
+    $sql = 'DROP TABLE IF EXISTS '._DB_PREFIX_.'payplug_carrier';
+    $flag = $flag && Db::getInstance()->execute($sql);
+
+    return $flag;
 }

@@ -250,7 +250,7 @@ class PayPlugPayment
         // todo: set an object rather than a integer
         $this->card = $id_card;
 
-        $this->module = new Payplug();
+        $this->module = new PayplugClass();
 
         $this->debug = $this->module->getConfiguration('PAYPLUG_DEBUG_MODE');
 
