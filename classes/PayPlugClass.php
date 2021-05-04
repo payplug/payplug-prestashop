@@ -23,14 +23,31 @@
 
 namespace PayPlug\classes;
 
+// Global
+use Exception;
+
+// PayPlug
+use Payplug\Authentication;
+use Payplug\Core\HttpClient;
+use Payplug\Exception\BadRequestException;
+use Payplug\Exception\ConfigurationException;
+use Payplug\InstallmentPlan;
+use Payplug\Payment;
+use Payplug\Payplug;
+use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
+use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
+
+// Prestashop
 use Cart;
 use Configuration;
+use Context;
 use Currency;
 use Media;
 use Module;
 use MyLogPHPClass;
+use OrderState;
 use Tools;
 use Validate;
 
@@ -313,15 +330,15 @@ class PayPlugClass extends \PaymentModule
         $id_order = Tools::getValue('id_order');
 
         try {
-            $abort = \Payplug\InstallmentPlan::abort($inst_id);
+            $abort = InstallmentPlan::abort($inst_id);
         } catch (Exception $e) {
             if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
                 $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                $abort = \Payplug\InstallmentPlan::abort($inst_id);
+                $abort = InstallmentPlan::abort($inst_id);
                 $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
             } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
                 $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                $abort = \Payplug\InstallmentPlan::abort($inst_id);
+                $abort = InstallmentPlan::abort($inst_id);
                 $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
             }
         }
@@ -389,7 +406,7 @@ class PayPlugClass extends \PaymentModule
     public function addPayplugInstallment($installment, $order)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
 
         if ($this->getStoredInstallment($installment)) {
@@ -965,7 +982,7 @@ class PayPlugClass extends \PaymentModule
     {
         if (!is_object($payment)) {
             try {
-                $payment = \Payplug\Payment::retrieve($payment);
+                $payment = Payment::retrieve($payment);
             } catch (Exception $exception) {
                 return $exception;
             }
@@ -1572,7 +1589,7 @@ class PayPlugClass extends \PaymentModule
 
     public function createOrderState($name, $state, $sandbox = true, $force = false)
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
 
         $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
@@ -2054,12 +2071,12 @@ class PayPlugClass extends \PaymentModule
      *
      * @param string $api_key
      * @param boolean $sandbox
-     * @return array OR bool
+     * @return array | bool
      */
     public function getAccount($api_key, $sandbox = true)
     {
         $this->setSecretKey($api_key);
-        $response = \Payplug\Authentication::getAccount();
+        $response = Authentication::getAccount();
         $json_answer = $response['httpResponse'];
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
@@ -2870,11 +2887,11 @@ class PayPlugClass extends \PaymentModule
             11 => 'abandoned',
         */
         if (!is_object($payment)) {
-            $payment = \Payplug\Payment::retrieve($payment);
+            $payment = Payment::retrieve($payment);
         }
 
         if ($payment->installment_plan_id !== null) {
-            $installment = \Payplug\InstallmentPlan::retrieve($payment->installment_plan_id);
+            $installment = InstallmentPlan::retrieve($payment->installment_plan_id);
         } else {
             $installment = null;
         }
@@ -3010,7 +3027,7 @@ class PayPlugClass extends \PaymentModule
     public function getStoredInstallment($installment)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
         $req_installment = '
             SELECT pi.*
@@ -3033,7 +3050,7 @@ class PayPlugClass extends \PaymentModule
     public function getStoredInstallmentTransaction($installment, $step)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
         $req_installment = '
             SELECT pi.*
@@ -3157,7 +3174,7 @@ class PayPlugClass extends \PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+        if ((new SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
             return $this
                 ->getPlugin()
                 ->getCache()
@@ -3173,7 +3190,7 @@ class PayPlugClass extends \PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+        if ((new SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
             return $this
                 ->getPlugin()
                 ->getCache()
@@ -3250,7 +3267,7 @@ class PayPlugClass extends \PaymentModule
      * @return string
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationException
      */
     public function hookAdminOrder($params)
     {
@@ -3294,7 +3311,7 @@ class PayPlugClass extends \PaymentModule
      * @return string
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationException
      * @see Module::hookAdminOrder()
      */
     public function hookDisplayAdminOrderMain($params)
@@ -4075,7 +4092,7 @@ class PayPlugClass extends \PaymentModule
         }
 
         try {
-            \Payplug\Payplug::init(['secretKey' => $payplug_key, 'apiVersion' => $this->plugin->getApiVersion()]);
+            Payplug::init(['secretKey' => $payplug_key, 'apiVersion' => $this->plugin->getApiVersion()]);
 
             return $payplug_key;
         } catch (Exception $e) {
@@ -4092,7 +4109,7 @@ class PayPlugClass extends \PaymentModule
      */
     public function install()
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to install.');
         $install = [
             'flag' => true,
@@ -4204,7 +4221,7 @@ class PayPlugClass extends \PaymentModule
             ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
 
         $log->info('----------------> Install SQL. <----------------');
-        if (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
+        if (!(new SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
             $log->error('Install failed: SQL.');
             $install['flag'] = false;
             $install['error'] = 'Création des tables SQL';
@@ -4250,7 +4267,7 @@ class PayPlugClass extends \PaymentModule
      */
     protected function installHook()
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
 
         $hooksToRegister = [
             'adminOrder',
@@ -4430,12 +4447,12 @@ class PayPlugClass extends \PaymentModule
     {
         switch ($type) {
             case 'installment':
-                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                $installment = InstallmentPlan::retrieve($payment_id);
                 if ($installment && $installment->is_active) {
                     $schedules = $installment->schedule;
                     foreach ($schedules as $schedule) {
                         foreach ($schedule->payment_ids as $pay_id) {
-                            $inst_payment = \Payplug\Payment::retrieve($pay_id);
+                            $inst_payment = Payment::retrieve($pay_id);
                             if ($inst_payment && $inst_payment->is_paid) {
                                 return true;
                             }
@@ -4445,7 +4462,7 @@ class PayPlugClass extends \PaymentModule
                 break;
             case 'payment':
             default:
-                $payment = \Payplug\Payment::retrieve($payment_id);
+                $payment = Payment::retrieve($payment_id);
                 return $payment && $payment->is_paid;
         }
         return false;
@@ -4567,12 +4584,12 @@ class PayPlugClass extends \PaymentModule
      * @param string $email
      * @param string $password
      * @return bool
-     * @throws \Payplug\Exception\BadRequestException
+     * @throws BadRequestException
      */
     private function login($email, $password)
     {
         try {
-            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+            $response = Authentication::getKeysByLogin($email, $password);
 
             $json_answer = $response['httpResponse'];
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
@@ -4598,7 +4615,7 @@ class PayPlugClass extends \PaymentModule
      * @param string $pay_mode
      * @param null $inst_id
      * @return string
-     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationException
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -4610,7 +4627,7 @@ class PayPlugClass extends \PaymentModule
         if ($pay_id == null) {
             if ($inst_id != null) {
                 try {
-                    $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                    $installment = InstallmentPlan::retrieve($inst_id);
                     if (isset($installment->schedule)) {
                         $total_amount = $amount;
                         $refund_to_go = [];
@@ -4618,7 +4635,7 @@ class PayPlugClass extends \PaymentModule
                         foreach ($installment->schedule as $schedule) {
                             if (!empty($schedule->payment_ids)) {
                                 foreach ($schedule->payment_ids as $p_id) {
-                                    $p = \Payplug\Payment::retrieve($p_id);
+                                    $p = Payment::retrieve($p_id);
                                     if ($p->is_paid && !$p->is_refunded && $amount > 0) {
                                         $amount_refundable = (int)($p->amount - $p->amount_refunded);
                                         $truly_refundable_amount += $amount_refundable;
@@ -4648,7 +4665,7 @@ class PayPlugClass extends \PaymentModule
                         if (!empty($refund_to_go)) {
                             foreach ($refund_to_go as $refnd) {
                                 try {
-                                    $refund = \Payplug\Refund::create($refnd['id'], $refnd['data']);
+                                    $refund = Refund::create($refnd['id'], $refnd['data']);
                                 } catch (Exception $e) {
                                     return ('error');
                                 }
@@ -4669,7 +4686,7 @@ class PayPlugClass extends \PaymentModule
             ];
 
             try {
-                $refund = \Payplug\Refund::create($pay_id, $data);
+                $refund = Refund::create($pay_id, $data);
             } catch (Exception $e) {
                 return ('error');
             }
@@ -5284,7 +5301,7 @@ class PayPlugClass extends \PaymentModule
                     foreach ($installment->schedule as $schedule) {
                         if (!empty($schedule->payment_ids)) {
                             foreach ($schedule->payment_ids as $p_id) {
-                                $p = \Payplug\Payment::retrieve($p_id);
+                                $p = Payment::retrieve($p_id);
                                 if ($p->is_paid && !$p->is_refunded) {
                                     $amount_available += (int)($p->amount - $p->amount_refunded);
                                 }
@@ -5415,12 +5432,12 @@ class PayPlugClass extends \PaymentModule
      * Retrieve payment informations
      *
      * @param $inst_id
-     * @return bool|\Payplug\Resource\InstallmentPlan|null
+     * @return bool|InstallmentPlan|null
      */
     public function retrieveInstallment($inst_id)
     {
         try {
-            $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+            $installment = InstallmentPlan::retrieve($inst_id);
         } catch (Exception $e) {
             return false;
         }
@@ -5431,12 +5448,12 @@ class PayPlugClass extends \PaymentModule
      * Retrieve payment informations
      *
      * @param string $pay_id
-     * @return bool|\Payplug\Resource\Payment|null
+     * @return bool|Payment|null
      */
     public function retrievePayment($pay_id)
     {
         try {
-            $payment = \Payplug\Payment::retrieve($pay_id);
+            $payment = Payment::retrieve($pay_id);
         } catch (Exception $e) {
             return false;
         }
@@ -5697,8 +5714,8 @@ class PayPlugClass extends \PaymentModule
      * @description Set the current secret key used to interact with PayPlug API
      *
      * @param bool $token
-     * @return bool|\Payplug\Payplug
-     * @throws \Payplug\Exception\ConfigurationException
+     * @return bool|Payplug
+     * @throws ConfigurationException
      */
     public function setSecretKey($token = false)
     {
@@ -5710,7 +5727,7 @@ class PayPlugClass extends \PaymentModule
             return false;
         }
 
-        return \Payplug\Payplug::init([
+        return Payplug::init([
             'secretKey' => $token,
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
@@ -5724,7 +5741,7 @@ class PayPlugClass extends \PaymentModule
     private function setUserAgent()
     {
         if ($this->current_api_key != null) {
-            \Payplug\Core\HttpClient::addDefaultUserAgentProduct(
+            HttpClient::addDefaultUserAgentProduct(
                 'PayPlug-Prestashop',
                 $this->version,
                 'Prestashop/' . _PS_VERSION_
@@ -5786,7 +5803,7 @@ class PayPlugClass extends \PaymentModule
 
     /**
      * @description Process account submit
-     * @throws \Payplug\Exception\BadRequestException
+     * @throws BadRequestException
      */
     public function submitAccount()
     {
@@ -6032,7 +6049,7 @@ class PayPlugClass extends \PaymentModule
      */
     public function uninstall()
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to uninstall.');
 
         $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
@@ -6051,7 +6068,7 @@ class PayPlugClass extends \PaymentModule
             $log->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $log->error('Uninstall failed: configuration.');
-        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->uninstallSQL($keep_cards)) {
+        } elseif (!(SQLtableRepository())->uninstallSQL($keep_cards)) {
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
@@ -6070,7 +6087,7 @@ class PayPlugClass extends \PaymentModule
      */
     private function uninstallCards()
     {
-        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
+        if ((new SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
             $cards = $this->query
                 ->select()
                 ->fields('*')
@@ -6133,7 +6150,7 @@ class PayPlugClass extends \PaymentModule
     public function updatePayplugInstallment($installment)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
         if (isset($installment->schedule)) {
             $step_count = count($installment->schedule);
@@ -6143,7 +6160,7 @@ class PayPlugClass extends \PaymentModule
                 $pay_id = '';
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
-                    $payment = \Payplug\Payment::retrieve($pay_id);
+                    $payment = Payment::retrieve($pay_id);
                     $status = $this->getPaymentStatusByPayment($payment);
                 } else {
                     if ((int)$installment->is_active == 1) {
