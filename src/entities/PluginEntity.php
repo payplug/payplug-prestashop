@@ -35,6 +35,7 @@ class PluginEntity
     private $cache;
     private $card;
     private $hook;
+    private $install;
     private $logger;
     private $oney;
     private $order_state;
@@ -91,6 +92,7 @@ class PluginEntity
     /**
      * @param string $api_version
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setApiVersion($api_version)
     {
@@ -117,6 +119,7 @@ class PluginEntity
     /**
      * @param object $card
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setCard($card)
     {
@@ -143,13 +146,14 @@ class PluginEntity
     /**
      * @param object $logger
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setLogger($logger)
     {
         if (!is_object($logger)) {
             throw (
             new BadParameterException(
-                'Invalid Logger object, param $card must be a LoggerRepository'
+                'Invalid Logger object, param $logger must be a LoggerRepository'
             )
             );
         } else {
@@ -169,13 +173,14 @@ class PluginEntity
     /**
      * @param object $oney
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setOney($oney)
     {
         if (!is_object($oney)) {
             throw (
             new BadParameterException(
-                'Invalid Oney object, param $card must be a OneyRepository'
+                'Invalid Oney object, param $oney must be a OneyRepository'
             )
             );
         } else {
@@ -195,13 +200,14 @@ class PluginEntity
     /**
      * @param object $cache
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setCache($cache)
     {
         if (!is_object($cache)) {
             throw (
             new BadParameterException(
-                'Invalid Cache object, param $card must be a CacheRepository'
+                'Invalid Cache object, param $cache must be a CacheRepository'
             )
             );
         } else {
@@ -309,7 +315,7 @@ class PluginEntity
         if (!is_object($configuration)) {
             throw (
             new BadParameterException(
-                'Invalid Configuration object, param $card must be a ConfigurationSpecific'
+                'Invalid Configuration object, param $configuration must be a ConfigurationSpecific'
             )
             );
         } else {
@@ -329,13 +335,14 @@ class PluginEntity
     /**
      * @param object $context
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setContext($context)
     {
         if (!is_object($context)) {
             throw (
             new BadParameterException(
-                'Invalid Context object, param $card must be a ContextSpecific'
+                'Invalid Context object, param $context must be a ContextSpecific'
             )
             );
         } else {
@@ -355,13 +362,14 @@ class PluginEntity
     /**
      * @param object $country
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setCountry($country)
     {
         if (!is_object($country)) {
             throw (
             new BadParameterException(
-                'Invalid Country object, param $card must be a ContextSpecific'
+                'Invalid Country object, param $country must be a ContextSpecific'
             )
             );
         } else {
@@ -389,6 +397,32 @@ class PluginEntity
     }
 
     /**
+     * @return mixed
+     */
+    public function getInstall()
+    {
+        return $this->install;
+    }
+
+    /**
+     * @param mixed $install
+     * @return PluginEntity
+     */
+    public function setInstall($install)
+    {
+        if (!is_object($install)) {
+            throw (
+            new BadParameterException(
+                'Invalid Install object, param $install must be a ProductSpecific'
+            )
+            );
+        } else {
+            $this->install = $install;
+            return $this;
+        }
+    }
+
+    /**
      * @return object
      */
     public function getProduct()
@@ -399,13 +433,14 @@ class PluginEntity
     /**
      * @param object $product
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setProduct($product)
     {
         if (!is_object($product)) {
             throw (
             new BadParameterException(
-                'Invalid Product object, param $card must be a ProductSpecific'
+                'Invalid Product object, param $product must be a ProductSpecific'
             )
             );
         } else {
@@ -425,13 +460,14 @@ class PluginEntity
     /**
      * @param object $tools
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setTools($tools)
     {
         if (!is_object($tools)) {
             throw (
             new BadParameterException(
-                'Invalid Tools object, param $card must be a ToolsSpecific'
+                'Invalid Tools object, param $tools must be a ToolsSpecific'
             )
             );
         } else {
@@ -451,13 +487,14 @@ class PluginEntity
     /**
      * @param object $query
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setQuery($query)
     {
         if (!is_object($query)) {
             throw (
             new BadParameterException(
-                'Invalid Query object, param $card must be a QueryRepository'
+                'Invalid Query object, param $query must be a QueryRepository'
             )
             );
         } else {
@@ -477,6 +514,7 @@ class PluginEntity
     /**
      * @param object $validate
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setValidate($validate)
     {
@@ -503,6 +541,7 @@ class PluginEntity
     /**
      * @param object $order_state
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setOrderState($order_state)
     {
@@ -547,6 +586,7 @@ class PluginEntity
     /**
      * @param object $translate
      * @return PluginEntity
+     * @throws BadParameterException
      */
     public function setTranslate($translate)
     {

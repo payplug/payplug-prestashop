@@ -21,23 +21,24 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-/**
- * Core file of PayPlug module
- */
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHPClass.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
+namespace PayPlug\classes;
+
+use PayPlug\src\repositories\PluginRepository;
+use PayPlug\backward\PayPlugBackward;
+use Cart;
+use Configuration;
+use Currency;
+use Media;
+use Module;
+use MyLogPHPClass;
+use Tools;
+use Validate;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
-
-class PayPlugClass extends PaymentModule
+class PayPlugClass extends \PaymentModule
 {
     /** @var string */
     private $api_live;
@@ -515,7 +516,7 @@ class PayPlugClass extends PaymentModule
              */
             $password = $_POST['PAYPLUG_PASSWORD'];
             $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
                     'content' => null,
                     'error' => $this->l('The email and/or password was not correct.')
@@ -540,7 +541,7 @@ class PayPlugClass extends PaymentModule
 
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
-            if (!$password || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode(['content' => null, 'error' => $this->l('The password you entered is invalid')]));
             }
 
@@ -4054,7 +4055,7 @@ class PayPlugClass extends PaymentModule
 
     private function initializeAccessors()
     {
-        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
+        $this->setPlugin((new PluginRepository($this))->getEntity());
 
         $this->card = $this->getPlugin()->getCard();
         $this->logger = $this->getPlugin()->getLogger();
@@ -5608,8 +5609,8 @@ class PayPlugClass extends PaymentModule
      */
     private function setLoggers()
     {
-        $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
-        $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $this->log_general = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
+        $this->log_install = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
         $this->logger->setParams(['process' => 'payplug.php']);
 
@@ -5799,7 +5800,7 @@ class PayPlugClass extends PaymentModule
         $password = $_POST['PAYPLUG_PASSWORD'];
         $email = Tools::getValue('PAYPLUG_EMAIL');
 
-        if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+        if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             $this->validationErrors['username_password'] =
                 $this->l('The email and/or password was not correct.');
         } elseif ($curl_exists && $openssl_exists) {

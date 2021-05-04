@@ -21,13 +21,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 /**
  * Check if prestashop Context
  */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 
 class Payplug extends Module
 {
@@ -46,7 +47,9 @@ class Payplug extends Module
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
+        $this->description = $this->l(
+            'The online payment solution combining simplicity and first-rate support to boost your sales.'
+        );
         $this->displayName = 'PayPlug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
@@ -66,11 +69,11 @@ class Payplug extends Module
 
     /**
      * @description test if php requiremnt is valid
-     * @return array
+     * @return bool
      */
     protected function isValidPHPVersion()
     {
-        $php_min_version = 80600;
+        $php_min_version = 50445;
 
         if (!defined('PHP_VERSION_ID')) {
             $php_version = explode('.', PHP_VERSION);
@@ -102,7 +105,6 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->getContent();
         } else {
-
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
                 $iso_code = 'en-gb';
@@ -125,7 +127,7 @@ class Payplug extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if ($this->module) {
-            return $this->dependencies->hook->exe('actionAdminControllerSetMedia');
+            return $this->dependencies->getDependency('hook')->exe('actionAdminControllerSetMedia');
         }
     }
 
@@ -136,6 +138,10 @@ class Payplug extends Module
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
+        /*
+         * @todo
+         * RAJOUTER LE TEST DE LA TABLE PAYPLUG CACHE AVANT D'EXECUTER CE CODE
+         */
         if ($this->module) {
             return $this->module->hookActionAdminPerformanceControllerAfter($params);
         }
@@ -148,6 +154,10 @@ class Payplug extends Module
      */
     public function hookActionClearCompileCache($params)
     {
+        /*
+         * @todo
+         * RAJOUTER LE TEST DE LA TABLE PAYPLUG CACHE AVANT D'EXECUTER CE CODE
+         */
         if ($this->module) {
             return $this->module->hookActionClearCompileCache($params);
         }
@@ -336,14 +346,12 @@ class Payplug extends Module
 
     public function setDependencies()
     {
-        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugDependencies.php');
-        $this->dependencies = new PayPlugDependencies();
+        $this->dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
     private function setModule()
     {
-        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
-        $this->module = new PayPlugClass();
+        $this->module = new \PayPlug\classes\PayPlugClass();
     }
 
     /**
