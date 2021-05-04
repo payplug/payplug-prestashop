@@ -3249,7 +3249,7 @@ class Payplug extends PaymentModule
         $order = new Order((int)$params['id_order']);
         $active = Module::isEnabled($this->name);
         if (!$active
-            || !$order->payment == $this->displayName
+            || $order->payment != $this->displayName
             || !$this->isReferredPaymentsActive()
             || !$this->isReferredAutoActive()
             || $params['newOrderStatus']->id != Configuration::get('PAYPLUG_DEFERRED_STATE')
