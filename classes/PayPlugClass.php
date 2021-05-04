@@ -27,6 +27,7 @@ namespace PayPlug\classes;
 use Exception;
 
 // PayPlug
+use MyLogPHPClass;
 use Payplug\Authentication;
 use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
@@ -38,15 +39,22 @@ use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
+use PayPlugValidation;
 
 // Prestashop
+use Address;
 use Cart;
 use Configuration;
 use Context;
+use Country;
 use Currency;
+use Customer;
+use Db;
+use DbQuery;
+use Language;
 use Media;
 use Module;
-use MyLogPHPClass;
+use Order;
 use OrderState;
 use Tools;
 use Validate;
@@ -2011,7 +2019,7 @@ class PayPlugClass extends \PaymentModule
 
         try {
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!$phone_util->isValidNumber($parsed)) {
