@@ -22,8 +22,7 @@
  */
 
 use PayPlug\classes\PayPlugClass;
-
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+use PayPlug\classes\PayplugLock;
 
 class PayPlugValidation
 {

@@ -21,7 +21,8 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+use PayPlug\classes\PayPlugClass;
+use PayPlug\classes\PayplugLock;
 
 /**
  * Class PayPlugNotifications
@@ -66,7 +67,7 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
-        $this->payplug = new PayPlugClass();
+        $this->payplug = new \PayPlug\classes\PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
