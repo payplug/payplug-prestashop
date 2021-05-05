@@ -25,6 +25,11 @@ namespace PayPlug\src\repositories;
 
 class TranslationsRepository extends Repository
 {
+    public function __construct($payplug)
+    {
+        $this->payplug = $payplug;
+    }
+
     public static function factory()
     {
         return new TranslationsRepository();

@@ -35,10 +35,9 @@ class CardRepository extends Repository
     private $query;
     private $toolsSpecific;
 
-    protected $payplug;
-
-    public function __construct()
+    public function __construct($payplug)
     {
+        $this->payplug = $payplug;
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
         $this->query = new QueryRepository();
@@ -154,8 +153,7 @@ class CardRepository extends Repository
         $config = $this->configurationSpecific;
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
 
-        $req_card_id =
-            $this->query
+        $cards = $this->query
                 ->select()
                 ->fields('pc.id_card')
                 ->from(_DB_PREFIX_ .'payplug_card', 'pc')
@@ -163,14 +161,12 @@ class CardRepository extends Repository
                 ->where('pc.id_payplug_card = ' . (int)$id_payplug_card)
                 ->where('pc.id_company = ' . (int)$id_company)
                 ->where('pc.is_sandbox = ' . (int)$is_sandbox)
-            ;
+                ->build();
 
-        $res_card_id = $req_card_id->build()[0]['id_card'];
-
-        if (!$res_card_id) {
+        if (empty($cards)) {
             return false;
         } else {
-            return $res_card_id;
+            return $cards[0]['id_card'];
         }
     }
 

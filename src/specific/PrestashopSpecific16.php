@@ -24,9 +24,6 @@
 namespace PayPlug\src\specific;
 
 use Media;
-
-use PayplugBackward;
-use PayPlugCarrier;
 use Validate;
 
 class PrestashopSpecific16
@@ -49,7 +46,7 @@ class PrestashopSpecific16
         $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
 
         Media::addJsDef([
-            'payplug_ajax_url' => $this->payplug->context->link->getModuleLink('payplug', 'ajax', [], true),
+            'payplug_ajax_url' => $this->contextSpecific->link->getModuleLink('payplug', 'ajax', [], true),
         ]);
         $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
     }
@@ -91,23 +88,6 @@ class PrestashopSpecific16
                 }
             }
 
-            // only if we have carrier need for this cart
-            // check the carrier type of each available carrier
-            if ($carrier_ids) {
-                $has_valid_carrier = false;
-                foreach ($carrier_ids as $carrier_id) {
-                    if ($has_valid_carrier) {
-                        continue;
-                    }
-
-                    $pc = new PayPlugCarrier();
-                    $pc = $pc->getByIdCarrier($carrier_id);
-                    if ($pc->delivery_type) {
-                        $has_valid_carrier = true;
-                    }
-                }
-            }
-
             if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
                 $is_elligible = $this->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
@@ -115,11 +95,6 @@ class PrestashopSpecific16
                 $id_currency = $this->contextSpecific->currency->id;
                 $amount = $cart->getOrderTotal(true, Cart::BOTH);
                 $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
-                $error = !$is_elligible['result'];
-            }
-
-            if (!$error && $has_valid_carrier) {
-                $is_elligible = $this->oney->isValidOneyCarrier($cart);
                 $error = !$is_elligible['result'];
             }
 

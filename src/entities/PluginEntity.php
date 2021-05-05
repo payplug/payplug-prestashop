@@ -58,6 +58,9 @@ class PluginEntity
     private $country;
 
     /** @var object */
+    private $hook;
+
+    /** @var object */
     private $logger;
 
     /** @var object */
@@ -162,6 +165,14 @@ class PluginEntity
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * @return object
+     */
+    public function getHook()
+    {
+        return $this->hook;
     }
 
     /**
@@ -383,6 +394,21 @@ class PluginEntity
         }
 
         $this->country = $country;
+        return $this;
+    }
+
+    /**
+     * @param object $hook
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setHook($hook)
+    {
+        if (!is_object($hook)) {
+            throw (new BadParameterException('Invalid argument, $hook must be a HookRepository'));
+        }
+
+        $this->hook = $hook;
         return $this;
     }
 

@@ -28,9 +28,6 @@ use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-/**
- * @runTestsInSeparateProcesses
- */
 class BaseTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
@@ -43,6 +40,8 @@ class BaseTest extends TestCase
     protected $country;
     protected $logger;
     protected $myLogPhp;
+    protected $repo;
+
 
     protected $payplug;
 

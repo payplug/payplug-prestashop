@@ -426,9 +426,11 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
+            $err = '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] ';
+            $err .= '&& $paymentDetails[\'paymentReturnUrl\'] are null';
             return $this->returnPaymentError(
                 ['name' => 'paymentUrl', 'value' => false],
-                '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] && $paymentDetails[\'paymentReturnUrl\'] are null'
+                $err
             );
         }
 
@@ -471,7 +473,6 @@ class PaymentRepository extends Repository
                     ['name' => 'paymentStored', 'value' => false],
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
-                break;
         }
 
         return [
@@ -517,8 +518,8 @@ class PaymentRepository extends Repository
             ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
             ->fields('id_cart')->values($paymentDetails['cartId'])
             ->fields('cart_hash')->values($cartHash)
-            ->fields('authorized_at')->values($paymentDetails['authorizedAt'])
-            ->fields('is_paid')->values($paymentDetails['isPaid'])
+            ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
+            ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
             ->fields('date_upd')->values($paymentDate);
 
         try {
@@ -539,6 +540,73 @@ class PaymentRepository extends Repository
             'result' => true,
             'paymentDetails' => $paymentDetails,
             'response' => 'Insert data in DB successfully'
+        ];
+    }
+
+    /**
+     * @description Check if the payment is valid in API,
+     * bc if cancelled, to recreate another one
+     * @param array $paymentDetails
+     * @return array
+     * @throws Payplug\Exception\ConfigurationNotSetException
+     */
+    public function isValidApiPayment($paymentDetails)
+    {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cartId'])
+            || !$paymentDetails['cartId']
+            || !is_int($paymentDetails['cartId'])
+        ) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] $paymentDetail or cartId is null, or $paymentDetail is not an array'
+            );
+        }
+
+        try {
+            $storedPayment = $this->checkPaymentTable($paymentDetails['cartId']);
+        } catch (Exception $e) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] Error: ' . $e->getMessage()
+            );
+        }
+
+        if (!$storedPayment || !$storedPayment['payment_method'] || !$storedPayment['id_payment']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] $storedPayment or payment_method or id_payment is null'
+            );
+        }
+
+        if ($storedPayment['payment_method'] == 'installment') {
+            $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
+            $firstSchedule = $retrievedInstallment->schedule[0]->payment_ids;
+            /*
+             * Try to see if the first schedule was cancelled
+             */
+            $storedPayment['id_payment'] = end($firstSchedule);
+        }
+
+        if (!$storedPayment['id_payment']) {
+            return $this->returnPaymentError(
+                ['name' => 'storedPayment', 'value' => $storedPayment],
+                '[isValidApiPayment] $storedPayment[\'id_payment\'] is null'
+            );
+        }
+
+        $retrievedPayment = Payment::retrieve($storedPayment['id_payment']);
+
+        if ($retrievedPayment->failure) {
+            $payment = $this->createPayment($paymentDetails);
+            return $this->updatePaymentTable($payment['paymentDetails']);
+        }
+
+        return [
+            'result' => true,
+            'paymentDetails' => $paymentDetails,
+            'response' => 'Valid API payment/installment'
         ];
     }
 }

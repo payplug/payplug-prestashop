@@ -25,29 +25,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_1_4()
+function upgrade_module_3_1_5()
 {
     $flag = true;
 
-    if (Configuration::get('PAYPLUG_ONEY_TOS_URL')) {
-        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')) {
-            $flag = false;
-        }
-    }
-
-    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_payment` (
-    `id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `id_payment` VARCHAR(255) NULL,
-    `payment_method` VARCHAR(255) NULL,
-    `payment_url` VARCHAR(255) NULL,
-    `payment_return_url` VARCHAR(255) NULL,
-    `id_cart` INT(11) UNSIGNED NOT NULL,
-    `cart_hash` VARCHAR(64) NULL,
-    `authorized_at` INT(20) NOT NULL DEFAULT 0,
-    `is_paid` TINYINT(1) NOT NULL DEFAULT 0,
-    `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
-    `date_upd` DATETIME NULL, CONSTRAINT lock_cart_unique UNIQUE (id_cart)) ENGINE=' . _MYSQL_ENGINE_;
-
+    $sql = 'DROP TABLE IF EXISTS '._DB_PREFIX_.'payplug_carrier';
     $flag = $flag && Db::getInstance()->execute($sql);
 
     return $flag;

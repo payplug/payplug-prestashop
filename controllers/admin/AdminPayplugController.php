@@ -33,7 +33,7 @@ class AdminPayplugController extends ModuleAdminController
 
     public function getContent()
     {
-        $payplug = new Payplug();
+        $payplug = new PayplugClass();
         if (Tools::getValue('_ajax') == 1) {
             $payplug->adminAjaxController();
         }
