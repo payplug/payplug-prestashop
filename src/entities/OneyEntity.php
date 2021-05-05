@@ -27,9 +27,7 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class OneyEntity
 {
-    /**
-     * @var array $operations
-     */
+    /** @var array */
     private $operations;
 
     /**
@@ -41,17 +39,17 @@ class OneyEntity
     }
 
     /**
-     * @param $operations
-     * @return $this
+     * @param array $operations
+     * @return self
      * @throws BadParameterException
      */
     public function setOperations($operations)
     {
         if (!is_array($operations)) {
-            throw (new BadParameterException('Invalid fields validate, param $methods must be an array'));
-        } else {
-            $this->operations = $operations;
-            return $this;
+            throw (new BadParameterException('Invalid argument, $operations must be an array'));
         }
+
+        $this->operations = $operations;
+        return $this;
     }
 }

@@ -95,20 +95,24 @@ final class CreatePaymentTest extends BasePaymentRepository
 
     public function testCreatePaymentWithInvalidData()
     {
+        $paymentTab = mt_rand();
         $paymentDetails = [
-            'paymentTab' => mt_rand(),
+            'paymentTab' => $paymentTab,
             'paymentMethod' => 'standard'
         ];
 
         $this->paymentApi
             ->shouldReceive([
-                'create' => mt_rand()
+                'create' => $paymentTab
             ]);
 
-        $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
         $this->assertSame(
-            $this->repo->createPayment($paymentDetails)['response'],
-            '[createPayment] Exception. Unable to create payment. Error: Invalid fields validate, param $apiPayment must be an object'
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($paymentDetails),
+                'response' => '[createPayment] Exception. Unable to create payment. Error: Invalid argument, $apiPayment must be an object'
+            ],
+            $this->repo->createPayment($paymentDetails)
         );
     }
 
