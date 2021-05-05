@@ -81,7 +81,6 @@ class PluginRepository extends Repository
         $this->constant = new ConstantSpecific();
         $this->context = new ContextSpecific();
         $this->country = new CountrySpecific();
-        $this->install = new InstallRepository();
         $this->logger = new LoggerRepository();
         $this->myLogPhp = new MyLogPHP();
         $this->oneyEntity = new OneyEntity();
@@ -99,6 +98,8 @@ class PluginRepository extends Repository
             $payplug,
             $this->constant
         );
+
+        $this->install = new InstallRepository($payplug);
 
         $this->oney = new OneyRepository(
             $this->cache,
