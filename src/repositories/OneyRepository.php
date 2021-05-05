@@ -329,7 +329,7 @@ class OneyRepository extends Repository
             )
         ]);
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/popin.tpl');
+        return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
 
     /**
@@ -349,7 +349,7 @@ class OneyRepository extends Repository
             ]
         ];
         $this->contextSpecific->getContext()->smarty->assign($vars);
-        return $this->payplug->display($this->payplug->constantFile, 'oney/schedule.tpl');
+        return $this->payplug->fetchTemplate('oney/schedule.tpl');
     }
 
     /**
@@ -372,7 +372,7 @@ class OneyRepository extends Repository
                 'oney_required_fields' => $this->getOneyRequiredFields(),
             ]);
 
-            return $this->payplug->display($this->payplug->constantFile, 'oney/payment/payment.tpl');
+            return $this->payplug->fetchTemplate('oney/payment/payment.tpl');
         }
     }
 
@@ -465,7 +465,7 @@ class OneyRepository extends Repository
             'payplug_oney_loading_msg' => $this->l('Loading')
         ]);
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/cta.tpl');
+        return $this->payplug->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -1082,7 +1082,7 @@ class OneyRepository extends Repository
             'oney_required_fields' => $fields
         ]);
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/required.tpl');
+        return $this->payplug->fetchTemplate('oney/required.tpl');
     }
 
     /**
