@@ -40,7 +40,7 @@ use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\repositories\PluginRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
-use PayPlugValidation;
+use PayPlug\src\specific\HookSpecific;
 
 // Prestashop
 use Address;
@@ -57,6 +57,7 @@ use Media;
 use Module;
 use Order;
 use OrderState;
+use Tab;
 use Tools;
 use Validate;
 
@@ -1444,7 +1445,7 @@ class PayPlugClass extends \PaymentModule
     /**
      * @return array
      */
-    protected function checkRequirements()
+    public function checkRequirements()
     {
         $php_min_version = 50600;
         $curl_min_version = '7.21';
@@ -1533,7 +1534,7 @@ class PayPlugClass extends \PaymentModule
      *
      * @return bool
      */
-    protected function createConfig()
+    public function createConfig()
     {
         return (Configuration::updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
             && Configuration::updateValue('PAYPLUG_COMPANY_ID', null)
@@ -1697,6 +1698,8 @@ class PayPlugClass extends \PaymentModule
      */
     private function deleteConfig()
     {
+        (new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv'))
+            ->info('Starting to deleteConfig().');
         return (Configuration::deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
             && Configuration::deleteByName('PAYPLUG_COMPANY_ID')
             && Configuration::deleteByName('PAYPLUG_COMPANY_ID_TEST')
@@ -4115,13 +4118,21 @@ class PayPlugClass extends \PaymentModule
     }
 
     /**
-     * @return bool
+     * @return array|bool
      * @throws Exception
      * @see Module::install()
-     *
      */
     public function install()
     {
+        if (!parent::install()) {
+            return false;
+        }
+
+        $installHook = $this->installHook();
+        if (!$installHook['flag'] || $installHook['error']) {
+            return $this->install->installError($installHook['error']);
+        }
+
         return $this->install->install();
     }
 
@@ -4132,37 +4143,20 @@ class PayPlugClass extends \PaymentModule
     protected function installHook()
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log->info('----------------> Install hooks. <----------------');
+        $hooksToRegister = (new HookSpecific)->getHooksToRegister((string)(_PS_VERSION_[0] . '.' . _PS_VERSION_[2]));
 
-        $hooksToRegister = [
-            'adminOrder',
-            'displayAdminOrderMain',
-            'displayBackOfficeFooter',
-            'customerAccount',
-            'header',
-            'paymentReturn',
-            'actionAdminPerformanceControllerAfter',
-            'moduleRoutes'
-        ];
+        foreach ($hooksToRegister as $hookToRegister) {
+            $log->info('Install Hook ' . $hookToRegister . '.');
+            if (!$this->registerHook($hookToRegister)) {
+                return $this->install->installError('Install failed: Hook ' . $hookToRegister);
+            }
+        }
 
-        $install = [
+        return [
             'flag' => true,
             'error' => false
         ];
-
-        foreach ($hooksToRegister as $hookToRegister) {
-            $install['flag'] = true;
-            $log->info('Try to install Hook ' . $hookToRegister . '.');
-            if (!$this->registerHook($hookToRegister)) {
-                $log->error('Install failed: Hook ' . $hookToRegister . '.');
-                $install['flag'] = false;
-                $install['error'] = $hookToRegister;
-                return $install;
-            } else {
-                $log->info('Install success: Hook ' . $hookToRegister . '.');
-                $install['flag'] = true;
-            }
-        }
-        return $install;
     }
 
     /**
@@ -5615,7 +5609,7 @@ class PayPlugClass extends \PaymentModule
 
     public function setValidation()
     {
-        return new PayPlugValidation();
+        return new \PayPlug\classes\PayPlugValidation();
     }
 
     /**
@@ -5919,20 +5913,22 @@ class PayPlugClass extends \PaymentModule
         $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
         if (!$keep_cards) {
             $log->info('Saved cards will be deleted.');
-            if (!$this->uninstallCards()) {
-                $log->error('Unable to delete saved cards.');
-            } else {
-                $log->info('Saved cards successfully deleted.');
-            }
+//            if (!$this->uninstallCards()) {
+//                $log->error('Unable to delete saved cards.');
+//            } else {
+//                $log->info('Saved cards successfully deleted.');
+//            }
         } else {
             $log->info('Cards will be kept.');
         }
 
+        $log->info('Continue uninstalling.');
+        $log->info('Starting to uninstall parent::uninstall().');
         if (!parent::uninstall()) {
             $log->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $log->error('Uninstall failed: configuration.');
-        } elseif (!(SQLtableRepository())->uninstallSQL($keep_cards)) {
+        } elseif (!(new SQLtableRepository())->uninstallSQL($keep_cards)) {
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');
@@ -5940,6 +5936,7 @@ class PayPlugClass extends \PaymentModule
             $log->info('Uninstall succeeded.');
             return true;
         }
+        $log->info('Uninstall failed.');
         return false;
     }
 
@@ -5999,6 +5996,8 @@ class PayPlugClass extends \PaymentModule
      */
     public function uninstallTab()
     {
+        (new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv'))
+            ->info('Starting to uninstallTab().');
         if ((class_exists($this->PrestashopSpecificClass))
             && (method_exists($this->PrestashopSpecificObject, 'uninstallTab'))) {
             return $this->PrestashopSpecificObject->uninstallTab();

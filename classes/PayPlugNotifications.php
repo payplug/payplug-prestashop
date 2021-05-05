@@ -21,8 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugClass;
-use PayPlug\classes\PayplugLock;
+namespace PayPlug\classes;
+
+use Db;
+use Cart;
+use Configuration;
+use Context;
+use Currency;
+use Customer;
+use Exception;
+use Message;
+use Order;
+use OrderHistory;
+use Tools;
+use Validate;
 
 /**
  * Class PayPlugNotifications

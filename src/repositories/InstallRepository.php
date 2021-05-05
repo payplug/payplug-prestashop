@@ -23,17 +23,21 @@
 
 namespace PayPlug\src\repositories;
 
+use Exception;
 use PayPlug\classes\MyLogPHP;
-use \Shop;
-use \Tools;
+use Shop;
+use Tools;
 
-class InstallRepository extends Repository
+class InstallRepository extends \PaymentModule
 {
     protected $payplug;
+    private $myLogPHP;
 
     public function __construct($payplug)
     {
+        parent::__construct();
         $this->payplug = $payplug;
+        $this->myLogPHP = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
 
     /**
@@ -44,7 +48,7 @@ class InstallRepository extends Repository
      */
     public function install()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = $this->myLogPHP;
         $log->info('Starting to install.');
         $install = [
             'flag' => true,
@@ -53,32 +57,19 @@ class InstallRepository extends Repository
 
         $report = $this->payplug->checkRequirements();
         if (!$report['php']['up2date'] && $install['flag']) {
-            $this->payplug->_errors[] = Tools::displayError(
-                $this->payplug->l('Your server must run PHP 5.3 or greater')
-            );
-            $log->error('Install failed: PHP Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'Configuration PHP inf. version 5.3';
+            $this->installError('Your server must run PHP 5.3 or greater');
         } else {
             $log->info('Install success: PHP Requirement.');
         }
 
         if (!$report['curl']['up2date'] && $install['flag']) {
-            $this->payplug->_errors[] = Tools::displayError(
-                $this->payplug->l('PHP cURL extension must be enabled on your server')
-            );
-            $log->error('Install failed: cURL Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'cURL Requirement';
+            $this->installError('PHP cURL extension must be enabled on your server');
         } else {
             $log->info('Install success: cURL Requirement.');
         }
 
         if (!$report['openssl']['up2date'] && $install['flag']) {
-            $this->payplug->_errors[] = Tools::displayError($this->payplug->l('OpenSSL 1.0.1 or later'));
-            $log->error('Install failed: OpenSSL Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'OpenSSL Requirement';
+            $this->installError('Install failed: OpenSSL Requirement.');
         } else {
             $log->info('Install success: OpenSSL Requirement.');
         }
@@ -87,101 +78,38 @@ class InstallRepository extends Repository
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
-        $log->info('Starting to install parent::install().');
-        if (!parent::install() && $install['flag']) {
-            $log->error('Install failed: parent::install().');
-            $install['flag'] = false;
-            $install['error'] = 'parent::install()';
-            return false;
-        } else {
-            $log->info('Install success: parent::install().');
-        }
-
-        $log->info('----------------> Install hooks. <----------------');
-        $hooksToRegister = [
-            'paymentReturn',
-            'Header',
-            'adminOrder',
-            'displayAdminOrderMain',
-            'actionOrderStatusUpdate',
-            'customerAccount',
-            'paymentOptions',
-            'Payment',
-            'moduleRoutes',
-            'registerGDPRConsent',
-            'actionDeleteGDPRCustomer',
-            'actionExportGDPRData',
-            'actionObjectCarrierAddAfter',
-            'actionCarrierUpdate',
-            'displayProductPriceBlock',
-            'displayExpressCheckout',
-            'actionClearCompileCache',
-            'displayBeforeShoppingCartBlock',
-            'actionAdminControllerSetMedia',
-        ];
-
-        foreach ($hooksToRegister as $hookToRegister) {
-            $log->info('Try to install Hook ' . $hookToRegister . '.');
-            if (!$this->payplug->registerHook($hookToRegister) && $install['flag']) {
-                $log->error('Install failed: Hook ' . $hookToRegister . '.');
-                $install['flag'] = false;
-                $install['error'] = 'Hook ' . $hookToRegister . ' non greffé';
-                break;
-            } else {
-                $log->info('Install success: Hook ' . $hookToRegister . '.');
-            }
-        }
-
-        //install hook 1.6
-        $log->info('----------------> Install hooks 1.6. <----------------');
-        if ($install['flag']) {
-            $installHook16 = $this->payplug->installHook();
-            $install['flag'] = $installHook16['flag'];
-            $install['error'] = $installHook16['error'];
-        }
-        $log->info('----------------> Install hooks: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
         $log->info('----------------> Install configuration. <----------------');
         if (!$this->payplug->createConfig() && $install['flag']) {
-            $log->error('Install failed: configuration.');
-            $install['flag'] = false;
-            $install['error'] = 'Création des éléments de configuration  ($this->payplug->createConfig)';
+            $this->installError('Install failed: create config');
         }
         $log->info('----------------> Install configuration: ' .
-            ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+            ($install['flag'] ? 'success' : 'failed') . ' <----------------');
 
         $log->info('----------------> Install order states. <----------------');
 
         if (!$this->payplug->createOrderStates() && $install['flag']) {
-            $log->error('Install failed: order states.');
-            $install['flag'] = false;
+            $this->installError('Install failed: create order states.');
         }
         $log->info('----------------> Install order states: ' .
-            ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+            ($install['flag'] ? 'success' : 'failed') . ' <----------------');
 
         $log->info('----------------> Install SQL. <----------------');
         if (!(new SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
-            $log->error('Install failed: SQL.');
-            $install['flag'] = false;
-            $install['error'] = 'Création des tables SQL';
+            $this->installError('Install failed: SQL.');
         }
-        $log->info('----------------> Install SQL: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+        $log->info('----------------> Install SQL: ' . ($install['flag'] ? 'success' : 'failed') . ' <---------------');
 
         $log->info('----------------> Install tab. <----------------');
         if (!$this->payplug->installTab() && $install['flag']) {
-            $log->error('Install failed: tab.');
-            $install['flag'] = false;
-            $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
+            $this->installError('Install failed: Tab.');
         }
-        $log->info('----------------> Install tab: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+        $log->info('---------------> Install tab: ' . ($install['flag'] ? 'success' : 'failed') . ' <----------------');
 
         $log->info('----------------> Install Oney. <----------------');
-        if (!$this->payplug->oney->installOney() && $install['flag']) {
-            $log->error('Install failed: Oney.');
-            $install['flag'] = false;
-            $install['error'] = 'Oney ($this->payplug->installOney)';
+        if (!(new PluginRepository())->getEntity()->getOney()->installOney() && $install['flag']) {
+            $this->installError('Install failed: Oney.');
         }
-        $log->info('----------------> Install Oney: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
+        $log->info('---------------> Install Oney: ' . ($install['flag'] ? 'success' : 'failed') . ' <---------------');
 
         if ($install['flag']) {
             $log->info('Install succeeded.');
@@ -198,5 +126,16 @@ class InstallRepository extends Repository
         en raison d\'une erreur. Les modifications apportées ont bien été annulées.');
         $this->payplug->context->controller->errors[] = $install['error'];
         return false;
+    }
+
+    public function installError($error)
+    {
+        $this->myLogPHP->error($error);
+        $this->payplug->_errors[] = Tools::displayError($this->payplug->l($error));
+
+        return [
+            'flag' => false,
+            'error' => $error
+        ];
     }
 }

@@ -32,6 +32,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 
 class Payplug extends Module
 {
+    /** Include dependencies */
     public $dependencies;
 
     /**
@@ -339,9 +340,7 @@ class Payplug extends Module
      */
     public function install()
     {
-        if ($this->module) {
-            return $this->module->install();
-        }
+        return $this->module->install();
     }
 
     public function setDependencies()

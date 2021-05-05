@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\classes\PayPlugClass;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
@@ -1225,10 +1226,12 @@ class OneyRepository extends Repository
 
         $flag = true;
 
+        $payplugClass = new PayPlugClass();
+
         foreach ($oney_order_state as $key => $state) {
             $flag = $flag
-                && $this->payplug->createOrderState($key, $state, true)
-                && $this->payplug->createOrderState($key, $state, false);
+                && $payplugClass->createOrderState($key, $state, true)
+                && $payplugClass->createOrderState($key, $state, false);
         }
         return $flag;
     }

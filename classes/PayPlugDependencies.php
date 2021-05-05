@@ -40,6 +40,9 @@ class PayPlugDependencies
     /** @var InstallRepository */
     private $install;
 
+    /** @var MyLogPHP */
+    private $mylogphp;
+
     /** @var PluginEntity */
     private $plugin;
 
@@ -50,11 +53,11 @@ class PayPlugDependencies
 
     private function initializeAccessors()
     {
-        $this->setPlugin((new PluginRepository($this))->getEntity());
+        $this->setPlugin((new PluginRepository(new PayPlugClass))->getEntity());
 
         $this->hook = $this->getPlugin()->getHook();
-
         $this->install = $this->getPlugin()->getInstall();
+        $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
 
     public function getPlugin()
