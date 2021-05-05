@@ -102,7 +102,6 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->getContent();
         } else {
-
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
                 $iso_code = 'en-gb';
