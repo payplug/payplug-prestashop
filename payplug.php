@@ -100,6 +100,10 @@ class Payplug extends Module
     public function getContent()
     {
         if ($this->module) {
+            if (!$this->isValidInstallation()) {
+                $this->install(true);
+            }
+
             return $this->module->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
@@ -323,16 +327,29 @@ class Payplug extends Module
 
     /**
      * @description Install plugin
-     * @return bool|mixed
+     * @param bool $soft_install
+     * @return bool
      * @see Module::install()
      */
-    public function install()
+    public function install($soft_install = false)
     {
         if ($this->module) {
-            return $this->module->install();
+            return $this->module->install($soft_install);
         } else {
             return parent::install();
         }
+    }
+
+    /**
+     * @description Check if mobile is validated installation
+     * @return bool
+     */
+    public function isValidInstallation()
+    {
+        if (Validate::isLoadedObject($this)) {
+            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
+        }
+        return true;
     }
 
     public function setDependencies()
@@ -357,5 +374,7 @@ class Payplug extends Module
         if ($this->module) {
             return $this->module->uninstall();
         }
+
+        return parent::uninstall();
     }
 }
