@@ -330,6 +330,8 @@ class Payplug extends Module
     {
         if ($this->module) {
             return $this->module->install();
+        } else {
+            return parent::install();
         }
     }
 
