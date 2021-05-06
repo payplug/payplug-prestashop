@@ -333,11 +333,16 @@ class Payplug extends Module
      */
     public function install($soft_install = false)
     {
-        if ($this->module) {
-            return $this->module->install($soft_install);
-        } else {
-            return parent::install();
+        if (!$soft_install) {
+            if (!parent::install()) {
+                return false;
+            }
         }
+        if ($this->module) {
+            return $this->module->install();
+        }
+
+        return false;
     }
 
     /**
