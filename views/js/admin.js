@@ -331,7 +331,7 @@ var $document, $window, payplug = {
                 {switcher} = tools,
                 showIdentifier = show.props.identifier,
                 switcherIdentifier = switcher.props.identifier,
-                $switcher = $('.'+showIdentifier).find('.'+switcherIdentifier);
+                $switcher = $('.' + showIdentifier).find('.' + switcherIdentifier);
 
             switcher.left($switcher, true);
         },
@@ -406,7 +406,7 @@ var $document, $window, payplug = {
                     email = $('input[name=PAYPLUG_EMAIL]').val(),
                     pwd = $('input[name=PAYPLUG_PASSWORD]').val();
 
-                if(!tools.validate.isEmail(email) || !pwd.length) {
+                if (!tools.validate.isEmail(email) || !pwd.length) {
                     return;
                 }
             } else if (parseInt(event.keyCode) != 13) {
@@ -817,9 +817,20 @@ var $document, $window, payplug = {
             }
         },
     },
+    standard: {
+        props: {
+            switcher: 'payplug_standard',
+        },
+        init: function () {
+            var {standard, deferred} = payplug,
+                {switcher} = standard.props;
+            $document.on('switchSelected', 'input[name=' + switcher + ']', deferred.check);
+        }
+    },
     installment: {
         props: {
             identifier: 'payplugInstallment',
+            switcher: 'payplug_inst',
             query: null,
             error: null,
             limits: {
@@ -828,9 +839,11 @@ var $document, $window, payplug = {
             }
         },
         init: function () {
-            var {installment} = payplug;
+            var {installment, deferred} = payplug,
+                {switcher} = installment.props;
             $document.on('change', 'input[name=PAYPLUG_INST_MODE]', installment.select)
-                .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check);
+                .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check)
+                .on('switchSelected', 'input[name=' + switcher + ']', deferred.check);
         },
         select: function (event) {
             event.preventDefault();
@@ -873,6 +886,15 @@ var $document, $window, payplug = {
                 .on('switchSelected', 'input[name=' + switcher + ']', deferred.select)
                 .on('change', '.' + identifier + ' select', deferred.select);
             $('.' + identifier + ' input[type=checkbox]').trigger('change');
+        },
+        check: function () {
+            var {standard, installment, deferred} = payplug;
+
+            if (!parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
+                && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())
+                && parseInt($('input[name=' + deferred.props.switcher + ']:checked').val())) {
+                $('input[name=' + deferred.props.switcher + '][value=0]').trigger('click');
+            }
         },
         change: function (event) {
             var {deferred} = payplug,
@@ -1089,7 +1111,7 @@ var $document, $window, payplug = {
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
 
-                if($(event.target).is('.' + identifier + '_close') && $popup.find('.payplugButton.-close')) {
+                if ($(event.target).is('.' + identifier + '_close') && $popup.find('.payplugButton.-close')) {
                     $popup.find('.payplugButton.-close').trigger('click');
                 }
 
@@ -1129,8 +1151,8 @@ var $document, $window, payplug = {
             }
         },
         validate: {
-            isEmail: function(email){
-                if(typeof email == 'undefined' || !email) {
+            isEmail: function (email) {
+                if (typeof email == 'undefined' || !email) {
                     return false;
                 }
 
