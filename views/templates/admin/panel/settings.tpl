@@ -41,6 +41,7 @@
     </div>
 
     <div class="payplugSettings_advanced">
+        {include file='./settings/standard.tpl'}
         {include file='./settings/one_click.tpl'}
         {include file='./settings/oney.tpl'}
         {include file='./settings/installment.tpl'}

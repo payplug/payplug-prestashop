@@ -405,3 +405,5 @@ $_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 
 $_MODULE['<{payplug}prestashop>php_version_6c55f8dc7a5345a058639f6e4781e5b8'] = 'Go to our ';
 $_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 'support page';
 $_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' to obtain a version compatible with your store.';
+$_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Payment by credit card';
+$_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Offer payment by credit card to your customers.';
