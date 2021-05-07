@@ -2130,7 +2130,7 @@ class PayPlugClass extends PaymentModule
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
-        $oney = $this->getConfiguration('PAYPLUG_ONEY') && $this->checkVersion();
+        $oney = $this->getConfiguration('PAYPLUG_ONEY');
 
         $options = [
             'standard' => true,
