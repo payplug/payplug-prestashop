@@ -4084,12 +4084,14 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
+     * @description Install PayPlug Module
+     *
+     * @param bool $soft_install
      * @return bool
      * @throws Exception
      * @see Module::install()
-     *
      */
-    public function install()
+    public function install($soft_install = false)
     {
         $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to install.');
@@ -4130,14 +4132,18 @@ class PayPlugClass extends PaymentModule
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
-        $log->info('Starting to install parent::install().');
-        if (!parent::install() && $install['flag']) {
-            $log->error('Install failed: parent::install().');
-            $install['flag'] = false;
-            $install['error'] = 'parent::install()';
-            return false;
+        if ($soft_install) {
+            $log->info('Module already install with parent method.');
         } else {
-            $log->info('Install success: parent::install().');
+            $log->info('Starting to install parent::install().');
+            if (!parent::install() && $install['flag']) {
+                $log->error('Install failed: parent::install().');
+                $install['flag'] = false;
+                $install['error'] = 'parent::install()';
+                return false;
+            } else {
+                $log->info('Install success: parent::install().');
+            }
         }
 
         $log->info('----------------> Install hooks. <----------------');
