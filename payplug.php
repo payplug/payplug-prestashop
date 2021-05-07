@@ -65,22 +65,6 @@ class Payplug extends Module
     }
 
     /**
-     * @description test if php requiremnt is valid
-     * @return array
-     */
-    protected function isValidPHPVersion()
-    {
-        $php_min_version = 50600;
-
-        if (!defined('PHP_VERSION_ID')) {
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-
-        return PHP_VERSION_ID >= $php_min_version;
-    }
-
-    /**
      * @param bool $force_all
      * @return bool
      * @see Module::disable()
@@ -333,16 +317,11 @@ class Payplug extends Module
      */
     public function install($soft_install = false)
     {
-        if (!$soft_install) {
-            if (!parent::install()) {
-                return false;
-            }
-        }
         if ($this->module) {
-            return $this->module->install();
+            return $this->module->install($soft_install);
         }
 
-        return false;
+        return parent::install();
     }
 
     /**
@@ -355,6 +334,22 @@ class Payplug extends Module
             return Configuration::hasKey('PAYPLUG_COMPANY_ID');
         }
         return true;
+    }
+
+    /**
+     * @description test if php requiremnt is valid
+     * @return array
+     */
+    protected function isValidPHPVersion()
+    {
+        $php_min_version = 50600;
+
+        if (!defined('PHP_VERSION_ID')) {
+            $php_version = explode('.', PHP_VERSION);
+            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+        }
+
+        return PHP_VERSION_ID >= $php_min_version;
     }
 
     public function setDependencies()
