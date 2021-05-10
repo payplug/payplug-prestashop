@@ -34,10 +34,6 @@ function upgrade_module_2_26_0($object)
 
     $flag = true;
 
-    if (!$object->checkVersion()) {
-        return $flag;
-    }
-
     // run the method who install Oney feature
     $flag = $object->getPlugin()->getOney()->installOney();
 
