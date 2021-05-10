@@ -35,10 +35,13 @@ if (!defined('_PS_VERSION_')) {
 class PayPlugDependencies
 {
     /** @var HookRepository */
-    private $hook;
+    public $hook;
 
     /** @var InstallRepository */
     private $install;
+
+    /** @var object */
+    public $payplug;
 
     /** @var PluginEntity */
     private $plugin;
@@ -50,10 +53,10 @@ class PayPlugDependencies
 
     private function initializeAccessors()
     {
-        $this->setPlugin((new PluginRepository($this))->getEntity());
+        $this->payplug = new PayPlugClass();
+        $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
 
         $this->hook = $this->getPlugin()->getHook();
-
         $this->install = $this->getPlugin()->getInstall();
     }
 

@@ -518,8 +518,8 @@ class PaymentRepository extends Repository
             ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
             ->fields('id_cart')->values($paymentDetails['cartId'])
             ->fields('cart_hash')->values($cartHash)
-            ->fields('authorized_at')->values($paymentDetails['authorizedAt'])
-            ->fields('is_paid')->values($paymentDetails['isPaid'])
+            ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
+            ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
             ->fields('date_upd')->values($paymentDate);
 
         try {

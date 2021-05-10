@@ -1496,16 +1496,6 @@ class PayPlugClass extends \PaymentModule
     }
 
     /**
-     * Check Prestashop version for new feature
-     * @param string $min
-     * @return bool
-     */
-    public function checkVersion($min = '1.6')
-    {
-        return (bool)version_compare(_PS_VERSION_, $min, '>=');
-    }
-
-    /**
      * Format amount float to int or int to float
      *
      * @param $amount
@@ -2156,7 +2146,7 @@ class PayPlugClass extends \PaymentModule
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
-        $oney = $this->getConfiguration('PAYPLUG_ONEY') && $this->checkVersion();
+        $oney = $this->getConfiguration('PAYPLUG_ONEY');
 
         $options = [
             'standard' => true,
@@ -4110,12 +4100,14 @@ class PayPlugClass extends \PaymentModule
     }
 
     /**
+     * @description Install PayPlug Module
+     *
+     * @param bool $soft_install
      * @return bool
      * @throws Exception
      * @see Module::install()
-     *
      */
-    public function install()
+    public function install($soft_install = false)
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Starting to install.');
@@ -4156,14 +4148,18 @@ class PayPlugClass extends \PaymentModule
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
-        $log->info('Starting to install parent::install().');
-        if (!parent::install() && $install['flag']) {
-            $log->error('Install failed: parent::install().');
-            $install['flag'] = false;
-            $install['error'] = 'parent::install()';
-            return false;
+        if ($soft_install) {
+            $log->info('Module already install with parent method.');
         } else {
-            $log->info('Install success: parent::install().');
+            $log->info('Starting to install parent::install().');
+            if (!parent::install() && $install['flag']) {
+                $log->error('Install failed: parent::install().');
+                $install['flag'] = false;
+                $install['error'] = 'parent::install()';
+                return false;
+            } else {
+                $log->info('Install success: parent::install().');
+            }
         }
 
         $log->info('----------------> Install hooks. <----------------');
