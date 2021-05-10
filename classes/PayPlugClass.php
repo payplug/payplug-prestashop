@@ -1470,16 +1470,6 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * Check Prestashop version for new feature
-     * @param string $min
-     * @return bool
-     */
-    public function checkVersion($min = '1.6')
-    {
-        return (bool)version_compare(_PS_VERSION_, $min, '>=');
-    }
-
-    /**
      * Format amount float to int or int to float
      *
      * @param $amount

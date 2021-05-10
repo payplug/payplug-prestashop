@@ -27,6 +27,7 @@
 
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
 
 if (!defined('_PS_VERSION_')) {
@@ -36,10 +37,13 @@ if (!defined('_PS_VERSION_')) {
 
 class PayPlugDependencies
 {
-    /** @var HookRepository */
+    /** @var object HookRepository */
     public $hook;
 
-    /** @var PluginEntity */
+    /** @var object */
+    public $payplug;
+
+    /** @var object PluginEntity */
     private $plugin;
 
     public function __construct()
@@ -49,7 +53,8 @@ class PayPlugDependencies
 
     private function initializeAccessors()
     {
-        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
+        $this->payplug = new PayPlugClass();
+        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this->payplug))->getEntity());
 
         $this->hook = $this->getPlugin()->getHook();
     }
