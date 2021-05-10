@@ -56,6 +56,8 @@ use Media;
 use Module;
 use Order;
 use OrderState;
+use Shop;
+use Tab;
 use Tools;
 use Validate;
 
@@ -6072,7 +6074,7 @@ class PayPlugClass extends \PaymentModule
             $log->error('Uninstall failed: parent.');
         } elseif (!$this->deleteConfig()) {
             $log->error('Uninstall failed: configuration.');
-        } elseif (!(SQLtableRepository())->uninstallSQL($keep_cards)) {
+        } elseif (!(new SQLtableRepository())->uninstallSQL($keep_cards)) {
             $log->error('Uninstall failed: sql.');
         } elseif (!$this->uninstallTab()) {
             $log->error('Uninstall failed: tab.');

@@ -23,7 +23,10 @@
 
 namespace PayPlug\src\repositories;
 
-class SQLtableRepository extends \PayPlugClass
+use PayPlug\classes\PayPlugClass;
+use PayPlug\classes\MyLogPHP;
+
+class SQLtableRepository extends PayPlugClass
 {
     /**
      * Install SQL tables used by module
@@ -33,7 +36,7 @@ class SQLtableRepository extends \PayPlugClass
     public function installSQL()
     {
         // Use old log system, because PayPlug Cache table doesn't exist yet.
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Installation SQL Starting.');
 
         if (!defined('_MYSQL_ENGINE_')) {
@@ -215,7 +218,7 @@ class SQLtableRepository extends \PayPlugClass
      */
     public function uninstallSQL($keep_cards = false)
     {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Uninstallation SQL starting.');
 
         $flag = true;
@@ -251,7 +254,7 @@ class SQLtableRepository extends \PayPlugClass
      */
     public function checkExistingTable($table, $canUsePayplugLogger = 1)
     {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $logger = null;
 
         if ($canUsePayplugLogger) {
