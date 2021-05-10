@@ -23,30 +23,18 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
+use PayPlug\src\interfaces\ShopInterface;
+use Shop;
 
-class ToolsSpecific implements ToolsInterface
+class ShopSpecific implements ShopInterface
 {
-    public static function factory()
+    public function isFeatureActive()
     {
-        return new ToolsSpecific();
+        return Shop::isFeatureActive();
     }
 
-    public function tool($action, $param1 = null, $param2 = null)
+    public function setContext()
     {
-        if (isset($action)) {
-            return Tools::$action($param1, $param2);
-        }
-    }
-
-    public function displayError($string = false)
-    {
-        return Tools::displayError($string);
-    }
-
-    public function strtoupper($string = false)
-    {
-        return Tools::strtoupper($string);
+        return Shop::setContext(Shop::CONTEXT_ALL);
     }
 }

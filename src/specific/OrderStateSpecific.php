@@ -35,6 +35,16 @@ class OrderStateSpecific implements OrderStateInterface
         return $this->orderState = new OrderState($id);
     }
 
+    public function delete()
+    {
+        return $this->orderState->delete();
+    }
+
+    public static function getOrderState($id = null)
+    {
+        return new OrderState($id);
+    }
+
     public function softDelete()
     {
         if (method_exists($this->orderState, 'softDelete')) {
@@ -42,10 +52,5 @@ class OrderStateSpecific implements OrderStateInterface
         } else {
             return $this->delete();
         }
-    }
-
-    public function delete()
-    {
-        return $this->orderState->delete();
     }
 }

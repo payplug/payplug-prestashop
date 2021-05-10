@@ -1086,38 +1086,6 @@ class OneyRepository extends Repository
     }
 
     /**
-     * @description Install Oney feature
-     */
-    public function installOney()
-    {
-        $this->log->info('Starting to install.');
-        return $this->installOneyConfig()
-            && $this->installOneyOrderStates();
-    }
-
-    /**
-     * @description Install Oney Config
-     *
-     * @return boolean
-     */
-    public function installOneyConfig()
-    {
-        $this->log->info('Install Oney config');
-
-        $config = $this->configurationSpecific;
-        $flag = true;
-        if (!$config->updateValue('PAYPLUG_ONEY', 0) ||
-            !$config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
-            !$config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-            !$config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
-        ) {
-            $this->log->error('Installation failed: Oney config');
-            $flag = false;
-        }
-        return $flag;
-    }
-
-    /**
      * @description Check if Oney allow a given currency
      *
      * @param $id_currency
@@ -1193,44 +1161,6 @@ class OneyRepository extends Repository
         }
 
         return ['result' => true, 'error' => false];
-    }
-
-    /**
-     * @description Install Oney Order State
-     */
-    public function installOneyOrderStates()
-    {
-        $oney_order_state = [
-            'oney_pg' => [
-                'cfg' => null,
-                'template' => null,
-
-                // OS have to be "logable" to register transaction_id
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#a1f8a1',
-                'name' => [
-                    'en' => 'Oney - Pending',
-                    'fr' => 'Oney - En attente',
-                    'es' => 'Oney - Pending',
-                    'it' => 'Oney - Pending',
-                ],
-            ],
-        ];
-
-        $flag = true;
-
-        foreach ($oney_order_state as $key => $state) {
-            $flag = $flag
-                && $this->payplug->createOrderState($key, $state, true)
-                && $this->payplug->createOrderState($key, $state, false);
-        }
-        return $flag;
     }
 
     /**

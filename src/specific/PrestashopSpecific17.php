@@ -24,6 +24,8 @@
 namespace PayPlug\src\specific;
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+use Tab;
+use Language;
 
 class PrestashopSpecific17
 {
@@ -85,5 +87,46 @@ class PrestashopSpecific17
         }
 
         return $paymentOptions;
+    }
+
+    public function installTab()
+    {
+        $install = [];
+
+        $translationsAdminPayPlug = [
+            'en' => 'PayPlug',
+            'gb' => 'PayPlug',
+            'it' => 'PayPlug',
+            'fr' => 'PayPlug'
+        ];
+        $install['flag'] = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
+
+        $translationsAdminPayPlugInstallment = [
+            'en' => 'Installment Plans',
+            'gb' => 'Installment Plans',
+            'it' => 'Pagamenti frazionati',
+            'fr' => 'Paiements en plusieurs fois'
+        ];
+
+        $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
+
+        $tab = new Tab();
+
+        foreach (Language::getLanguages(false) as $language) {
+            $iso_code = Tools::strtolower($language['iso_code']);
+            if (isset($translations[$iso_code])) {
+                $tab->name[(int)$language['id_lang']] = $translationsAdminPayPlugInstallment[$iso_code];
+            } else {
+                $tab->name[(int)$language['id_lang']] = $translationsAdminPayPlugInstallment['en'];
+            }
+        }
+
+        $tab->class_name = 'AdminPayPlugInstallment';
+
+        $tab->module = $this->payplug->name;
+        $tab->id_parent = $adminPayPlugId;
+        $install['flag'] = $install['flag'] && $tab->save();
+
+        return $install['flag'];
     }
 }

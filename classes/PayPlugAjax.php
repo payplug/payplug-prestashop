@@ -21,7 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace Payplug\classes;
+
 use PayPlug\src\repositories\CardRepository;
+use Product;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -41,7 +44,7 @@ class PayPlugAjax
 
     public function __construct()
     {
-        $this->payplug = new \PayPlugClass();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->card = $this->plugin->getCard();
         $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
