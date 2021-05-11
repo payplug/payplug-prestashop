@@ -39,7 +39,6 @@ use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
-use PayPlugValidation;
 
 // Prestashop
 use Address;
@@ -5580,7 +5579,7 @@ class PayPlugClass extends PaymentModule
      * @return bool
      * @throws Exception
      */
-    private function uninstallCards()
+    public function uninstallCards()
     {
         if ((new SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
             $cards = $this->query
