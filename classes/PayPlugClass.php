@@ -693,6 +693,7 @@ class PayPlugClass extends PaymentModule
             'email' => Configuration::get('PAYPLUG_EMAIL'),
             'sandbox_mode' => Configuration::get('PAYPLUG_SANDBOX_MODE'),
             'embedded_mode' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
+            'standard' => Configuration::get('PAYPLUG_STANDARD'),
             'one_click' => Configuration::get('PAYPLUG_ONE_CLICK'),
             'inst' => Configuration::get('PAYPLUG_INST'),
             'inst_mode' => Configuration::get('PAYPLUG_INST_MODE'),
@@ -933,6 +934,14 @@ class PayPlugClass extends PaymentModule
             'name' => 'payplug_one_click',
             'active' => $connected,
             'checked' => $configurations['one_click'],
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        ];
+
+        $switch['standard'] = [
+            'name' => 'payplug_standard',
+            'active' => $connected,
+            'checked' => $configurations['standard'],
             'label_left' => $this->l('yes'),
             'label_right' => $this->l('no'),
         ];
@@ -1567,58 +1576,6 @@ class PayPlugClass extends PaymentModule
         }
 
         return Configuration::updateValue($key_config, $os);
-    }
-
-    /**
-     * Delete basic configuration
-     *
-     * @return bool
-     */
-    private function deleteConfig()
-    {
-        return (Configuration::deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
-            && Configuration::deleteByName('PAYPLUG_COMPANY_ID')
-            && Configuration::deleteByName('PAYPLUG_COMPANY_ID_TEST')
-            && Configuration::deleteByName('PAYPLUG_COMPANY_STATUS')
-            && Configuration::deleteByName('PAYPLUG_CONFIGURATION_OK')
-            && Configuration::deleteByName('PAYPLUG_CURRENCIES')
-            && Configuration::deleteByName('PAYPLUG_DEBUG_MODE')
-            && Configuration::deleteByName('PAYPLUG_EMAIL')
-            && Configuration::deleteByName('PAYPLUG_EMBEDDED_MODE')
-            && Configuration::deleteByName('PAYPLUG_INST')
-            && Configuration::deleteByName('PAYPLUG_INST_MIN_AMOUNT')
-            && Configuration::deleteByName('PAYPLUG_INST_MODE')
-            && Configuration::deleteByName('PAYPLUG_KEEP_CARDS')
-            && Configuration::deleteByName('PAYPLUG_LIVE_API_KEY')
-            && Configuration::deleteByName('PAYPLUG_MAX_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_MIN_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_OFFER')
-            && Configuration::deleteByName('PAYPLUG_ONE_CLICK')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ERROR')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PAID')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PENDING')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_REFUND')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
-            && Configuration::deleteByName('PAYPLUG_ONEY')
-            && Configuration::deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_SANDBOX_MODE')
-            && Configuration::deleteByName('PAYPLUG_SHOW')
-            && Configuration::deleteByName('PAYPLUG_TEST_API_KEY')
-            && Configuration::deleteByName('PAYPLUG_DEFERRED')
-            && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO')
-            && Configuration::deleteByName('PAYPLUG_DEFERRED_STATE')
-        );
     }
 
     /**
@@ -5618,47 +5575,8 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @description Uninstall plugin
-     *
-     * @return bool
-     * @throws Exception
-     * @see Module::uninstall()
-     */
-    public function uninstall()
-    {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Starting to uninstall.');
-
-        $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
-        if (!$keep_cards) {
-            $log->info('Saved cards will be deleted.');
-            if (!$this->uninstallCards()) {
-                $log->error('Unable to delete saved cards.');
-            } else {
-                $log->info('Saved cards successfully deleted.');
-            }
-        } else {
-            $log->info('Cards will be kept.');
-        }
-
-        if (!parent::uninstall()) {
-            $log->error('Uninstall failed: parent.');
-        } elseif (!$this->deleteConfig()) {
-            $log->error('Uninstall failed: configuration.');
-        } elseif (!(new SQLtableRepository())->uninstallSQL($keep_cards)) {
-            $log->error('Uninstall failed: sql.');
-        } elseif (!$this->uninstallTab()) {
-            $log->error('Uninstall failed: tab.');
-        } else {
-            $log->info('Uninstall succeeded.');
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @description Delete saved cards when uninstalling module
-     *
+     * todo: move this method in CardRepository
      * @return bool
      * @throws Exception
      */
@@ -5683,41 +5601,6 @@ class PayPlugClass extends PaymentModule
         }
 
         return true;
-    }
-
-    /**
-     * @description Uninstall module installment tab
-     *
-     * @param $tabClass
-     * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function uninstallModuleTab($tabClass)
-    {
-        $idTab = Tab::getIdFromClassName($tabClass);
-
-        if ($idTab) {
-            $tab = new Tab($idTab);
-            return $tab->delete();
-        }
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function uninstallTab()
-    {
-        if ((class_exists($this->PrestashopSpecificClass))
-            && (method_exists($this->PrestashopSpecificObject, 'uninstallTab'))) {
-            return $this->PrestashopSpecificObject->uninstallTab();
-        }
-        return ($this->uninstallModuleTab('AdminPayPlug')
-            && $this->uninstallModuleTab('AdminPayPlugInstallment'));
     }
 
     /**

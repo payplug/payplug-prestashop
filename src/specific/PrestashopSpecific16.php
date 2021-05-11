@@ -174,6 +174,7 @@ class PrestashopSpecific16
         ];
     }
 
+    // todo: set Tab install process in a specific
     public function installTab()
     {
         $translationsAdminPayPlugInstallment = [
@@ -202,8 +203,18 @@ class PrestashopSpecific16
         return $tab->save();
     }
 
+    // todo: set Tab uninstall process in a specific
     public function uninstallTab()
     {
-        return ($this->payplug->uninstallModuleTab('AdminPayPlugInstallment'));
+        $flag = true;
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        return $flag;
     }
 }

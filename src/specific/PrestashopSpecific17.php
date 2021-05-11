@@ -89,6 +89,7 @@ class PrestashopSpecific17
         return $paymentOptions;
     }
 
+    // todo: set Tab install process in a specific
     public function installTab()
     {
         $install = [];
@@ -128,5 +129,27 @@ class PrestashopSpecific17
         $install['flag'] = $install['flag'] && $tab->save();
 
         return $install['flag'];
+    }
+
+    // todo: set Tab uninstall process in a specific
+    public function uninstallTab()
+    {
+        $flag = true;
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlug');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        return $flag;
     }
 }

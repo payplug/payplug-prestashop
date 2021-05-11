@@ -33,6 +33,9 @@ class InstallRepository extends Repository
     /** @var object */
     protected $constant;
 
+    /** @var object */
+    protected $log;
+
     /** @var object OrderStateRepository */
     protected $order_state;
 
@@ -184,6 +187,8 @@ class InstallRepository extends Repository
         $this->tools = $tools;
 
         $this->payplug = $payplug;
+
+        $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
     }
 
     /**
@@ -256,6 +261,9 @@ class InstallRepository extends Repository
             && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
             && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
             && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
             && $this->config->updateValue('PAYPLUG_EMAIL', null)
             && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
             && $this->config->updateValue('PAYPLUG_INST', null)
@@ -266,18 +274,15 @@ class InstallRepository extends Repository
             && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
             && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
             && $this->config->updateValue('PAYPLUG_OFFER', '')
-            && $this->config->updateValue('PAYPLUG_ONEY', null)
             && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
-            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
-            && $this->config->updateValue('PAYPLUG_SHOW', 0)
-            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
-            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
-            && $this->config->updateValue('PAYPLUG_ONEY', 0)
+            && $this->config->updateValue('PAYPLUG_ONEY', null)
             && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
             && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
             && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
+            && $this->config->updateValue('PAYPLUG_SHOW', 0)
+            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
+            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
         );
     }
 
@@ -296,6 +301,59 @@ class InstallRepository extends Repository
         return true;
     }
 
+
+    /**
+     * @description Delete basic configuration
+     * @return bool
+     */
+    private function deleteConfig()
+    {
+        return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
+            && $this->config->deleteByName('PAYPLUG_CONFIGURATION_OK')
+            && $this->config->deleteByName('PAYPLUG_CURRENCIES')
+            && $this->config->deleteByName('PAYPLUG_DEBUG_MODE')
+            && $this->config->deleteByName('PAYPLUG_DEFERRED')
+            && $this->config->deleteByName('PAYPLUG_DEFERRED_AUTO')
+            && $this->config->deleteByName('PAYPLUG_DEFERRED_STATE')
+            && $this->config->deleteByName('PAYPLUG_EMAIL')
+            && $this->config->deleteByName('PAYPLUG_EMBEDDED_MODE')
+            && $this->config->deleteByName('PAYPLUG_INST')
+            && $this->config->deleteByName('PAYPLUG_INST_MIN_AMOUNT')
+            && $this->config->deleteByName('PAYPLUG_INST_MODE')
+            && $this->config->deleteByName('PAYPLUG_KEEP_CARDS')
+            && $this->config->deleteByName('PAYPLUG_LIVE_API_KEY')
+            && $this->config->deleteByName('PAYPLUG_MAX_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_MIN_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_OFFER')
+            && $this->config->deleteByName('PAYPLUG_ONE_CLICK')
+            && $this->config->deleteByName('PAYPLUG_ONEY')
+            && $this->config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            && $this->config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
+            && $this->config->deleteByName('PAYPLUG_SANDBOX_MODE')
+            && $this->config->deleteByName('PAYPLUG_SHOW')
+            && $this->config->deleteByName('PAYPLUG_STANDARD')
+            && $this->config->deleteByName('PAYPLUG_TEST_API_KEY')
+        );
+    }
+
     /**
      * @todo: repatriate uninstall code
      * @description Install PayPlug Module
@@ -305,8 +363,8 @@ class InstallRepository extends Repository
      */
     public function install()
     {
-        $log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
-        $log->info('Starting to install again.');
+
+        $this->log->info('Starting to install again.');
         $install = [
             'flag' => true,
             'error' => false
@@ -316,19 +374,19 @@ class InstallRepository extends Repository
         $report = $this->checkRequirements();
         if (!$report['php']['up2date'] && $install['flag']) {
             $this->_errors[] = $this->tools->displayError($this->l('Your server must run PHP 5.3 or greater'));
-            $log->error('Install failed: PHP Requirement.');
+            $this->log->error('Install failed: PHP Requirement.');
             $install['flag'] = false;
             $install['error'] = 'Configuration PHP inf. version 5.3';
         }
         if (!$report['curl']['up2date'] && $install['flag']) {
             $this->_errors[] = $this->tools->displayError($this->l('PHP cURL extension must be enabled on your server'));
-            $log->error('Install failed: cURL Requirement.');
+            $this->log->error('Install failed: cURL Requirement.');
             $install['flag'] = false;
             $install['error'] = 'cURL Requirement';
         }
         if (!$report['openssl']['up2date'] && $install['flag']) {
             $this->_errors[] = $this->tools->displayError($this->l('OpenSSL 1.0.1 or later'));
-            $log->error('Install failed: OpenSSL Requirement.');
+            $this->log->error('Install failed: OpenSSL Requirement.');
             $install['flag'] = false;
             $install['error'] = 'OpenSSL Requirement';
         }
@@ -339,38 +397,38 @@ class InstallRepository extends Repository
 
         // Set payplug config
         if (!$this->createConfig() && $install['flag']) {
-            $log->error('Install failed: configuration.');
+            $this->log->error('Install failed: configuration.');
             $install['flag'] = false;
             $install['error'] = 'Création des éléments de configuration  ($this->createConfig)';
         }
 
         // Install order state
         if (!$this->createOrderStates() && $install['flag']) {
-            $log->error('Install failed: order states.');
+            $this->log->error('Install failed: order states.');
             $install['flag'] = false;
         }
 
         // Install SQL
         if (!(new SQLtableRepository())->installSQL()) {
-            $log->error('Install failed: SQL.');
+            $this->log->error('Install failed: SQL.');
             $install['flag'] = false;
             $install['error'] = 'Création des tables SQL';
         }
 
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab() && $install['flag']) {
-            $log->error('Install failed: tab.');
+            $this->log->error('Install failed: tab.');
             $install['flag'] = false;
             $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
         }
 
         if ($install['flag']) {
-            $log->info('Install succeeded.');
+            $this->log->info('Install succeeded.');
             return true;
         }
 
-        $log->info('Install failed.');
-        $log->info('Install error: ' . $install['error']);
+        $this->log->info('Install failed.');
+        $this->log->info('Install error: ' . $install['error']);
 
         // revert installation
         $this->uninstall();
@@ -382,11 +440,35 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Uninstall plugin
+     * @description Uninstall PayPlug Module
      * @return bool
      */
     public function uninstall()
     {
-        return $this->payplug->uninstall();
+        $this->log->info('Starting to uninstall.');
+
+        $keep_cards = (bool)$this->config->get('PAYPLUG_KEEP_CARDS');
+        if (!$keep_cards) {
+            $this->log->info('Saved cards will be deleted.');
+            if (!$this->payplug->uninstallCards()) {
+                $this->log->error('Unable to delete saved cards.');
+            } else {
+                $this->log->info('Saved cards successfully deleted.');
+            }
+        } else {
+            $this->log->info('Cards will be kept.');
+        }
+
+        if (!$this->deleteConfig()) {
+            $this->log->error('Uninstall failed: configuration.');
+        } elseif (!(new SQLtableRepository())->uninstallSQL($keep_cards)) {
+            $this->log->error('Uninstall failed: sql.');
+        } elseif (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
+            $this->log->error('Uninstall failed: tab.');
+        } else {
+            $this->log->info('Uninstall succeeded.');
+            return true;
+        }
+        return false;
     }
 }
