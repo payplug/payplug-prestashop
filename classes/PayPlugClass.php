@@ -57,8 +57,7 @@ use Module;
 use Order;
 use OrderState;
 use PaymentModule;
-use Shop;
-use Tab;
+use Product;
 use Tools;
 use Validate;
 
@@ -5579,7 +5578,7 @@ class PayPlugClass extends PaymentModule
      * @return bool
      * @throws Exception
      */
-    private function uninstallCards()
+    public function uninstallCards()
     {
         if ((new SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
             $cards = $this->query
