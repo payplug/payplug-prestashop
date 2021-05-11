@@ -39,7 +39,6 @@ use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
-use PayPlugValidation;
 
 // Prestashop
 use Address;

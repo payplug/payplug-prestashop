@@ -363,7 +363,6 @@ class InstallRepository extends Repository
      */
     public function install()
     {
-
         $this->log->info('Starting to install again.');
         $install = [
             'flag' => true,
