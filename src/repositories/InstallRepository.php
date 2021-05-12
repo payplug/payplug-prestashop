@@ -405,9 +405,11 @@ class InstallRepository extends Repository
         }
 
         // Install tab
+         $this->log->info('Début Tab');
         if (!$this->payplug->PrestashopSpecificObject->installTab() && $install['flag']) {
             $this->installError($this->l('Install failed: Install Tab'));
         }
+         $this->log->info('Fin Tab.');
 
         if ($install['flag']) {
             $this->log->info('Install successful.');
