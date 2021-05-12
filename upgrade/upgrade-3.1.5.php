@@ -25,21 +25,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_1_5($object)
+function upgrade_module_3_1_5()
 {
     $flag = true;
 
-    if (Configuration::get('PAYPLUG_ONEY_TOS')) {
-        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS')) {
-            $flag = false;
-        }
-    }
-
-    if (Configuration::get('PAYPLUG_ONEY_TOS_URL')) {
-        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')) {
-            $flag = false;
-        }
-    }
+    $sql = 'DROP TABLE IF EXISTS '._DB_PREFIX_.'payplug_carrier';
+    $flag = $flag && Db::getInstance()->execute($sql);
 
     return $flag;
 }

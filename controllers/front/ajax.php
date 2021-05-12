@@ -54,9 +54,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         }
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-        include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
+        include_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
-        $this->payplug = new \Payplug();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->toolsSpecific = $this->plugin->getTools();
 
@@ -130,9 +130,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
-                    $delivery_address = new Address($context->cart->id_address_delivery);
-                    $delivery_country = new Country($delivery_address->id_country);
-                    $cart = $context->cart;
                     $is_elligible = $this->oney->isValidOneyAmount($amount);
                 }
 

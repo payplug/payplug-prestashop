@@ -122,7 +122,7 @@ var $document,
                                     window.location.href = data.return_url;
                                     return false;
                                 }
-                                var is_one_click = id_cart != 'new_card';
+                                var is_one_click = options['id_card'] != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
                                 payplugModule.payment.props.pending = false;
                             } else {
@@ -182,14 +182,11 @@ var $document,
                 event.stopPropagation();
 
                 var $link = $(this),
-                    is_inst = $link.is('.installment');
+                    is_inst = $link.is('.installment'),
+                    spinner_url= $('input:hidden[name=spinner_url]').val();
 
                 if (($('#form_payplug_payment').length && !is_inst)) {
                     return false;
-                }
-
-                if (!$('.ppoverlay').length) {
-                    $('body').append('<div class="ppoverlay"><img class="loader" src="' + spinner_url + '" /></div>');
                 }
 
                 payplugModule.payment.send({id_card: 'new_card', is_inst: is_inst});
@@ -199,9 +196,6 @@ var $document,
             oneclick: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!$('.ppoverlay').length) {
-                    $('body').append('<div class="ppoverlay"></div>');
-                }
                 var idCard = $('input[name=payplug_card]:checked').val();
                 payplugModule.payment.send({id_card: idCard});
             },
@@ -498,6 +492,9 @@ var $document,
                     payplugModule.oney.popin.close();
                 },
                 handleProductEvent: function () {
+                    $document.on('click', '.product_quantity_down, .product_quantity_up', function () {
+                        return payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                    });
                     $document.on('change', 'input[name=qty]', function () {
                         return payplugModule.oney.load(payplugModule.oney.payment.props.open);
                     });
@@ -585,10 +582,6 @@ var $document,
                 },
                 send: function (event) {
                     event.preventDefault();
-                    // if invalid carrier return
-                    if ($('.oneyPayment').is('.-invalidCarrier')) {
-                        return false;
-                    }
 
                     if ($('.oneyRequired').length) {
                         payplugModule.oney.payment.form.open();

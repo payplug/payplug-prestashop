@@ -53,6 +53,7 @@ class PluginRepository extends Repository
     // Repositories & necessary classes
     private $cache;
     private $card;
+    private $hook;
     private $logger;
     private $myLogPhp;
     private $oney;
@@ -111,6 +112,12 @@ class PluginRepository extends Repository
             $this->constant
         );
 
+
+        $this->hook = new HookRepository(
+            $payplug,
+            $this->constant
+        );
+
         $this->oney = new OneyRepository(
             $this->cache,
             $this->logger,
@@ -129,7 +136,7 @@ class PluginRepository extends Repository
             $this->assign
         );
 
-        $this->payment  = new PaymentRepository(
+        $this->payment = new PaymentRepository(
             $payplug,
             $this->cart,
             $this->logger,
@@ -149,6 +156,7 @@ class PluginRepository extends Repository
             ->setContext($this->context)
             ->setCountry($this->country)
             ->setCurrency($this->currency)
+            ->setHook($this->hook)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
             ->setProduct($this->product)
@@ -157,8 +165,7 @@ class PluginRepository extends Repository
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
-            ->setOrderState($this->order_state)
-        ;
+            ->setOrderState($this->order_state);
         $this->setEntity($this->plugin);
     }
 }

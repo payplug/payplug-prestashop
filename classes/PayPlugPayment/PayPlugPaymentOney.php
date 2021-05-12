@@ -113,13 +113,12 @@ class PayPlugPaymentOney extends PayplugPayment
         $this->payment_tab['authorized_amount'] = $this->getCartAmount($this->payment_tab['currency']);
         $this->payment_tab['payment_context'] = $this->generateCartTab();
         $this->payment_tab['payment_method'] = $this->getPaymentMethodFromType();
-        $this->payment_tab['hosted_payment']['return_url'] =
-            Context::getContext()->link->getModuleLink(
-                'payplug',
-                'validation',
-                ['ps' => 1, 'cartid' => (int)$this->cart->id],
-                true
-            );
+        $this->payment_tab['hosted_payment']['return_url'] = PayplugBackward::getModuleLink(
+            'payplug',
+            'validation',
+            ['ps' => 1, 'cartid' => (int)$this->cart->id],
+            true
+        );
         $this->payment_tab['force_3ds'] = false;
         $this->payment_tab['auto_capture'] = true;
 
@@ -197,7 +196,7 @@ class PayPlugPaymentOney extends PayplugPayment
         if (Validate::isLoadedObject($manufacturer)) {
             $name = $manufacturer->name;
         } else {
-            $name = $this->module->getConfiguration('PS_SHOP_NAME');
+            $name = Configuration::get('PS_SHOP_NAME');
         }
         $item['brand'] = $name;
 
@@ -220,7 +219,7 @@ class PayPlugPaymentOney extends PayplugPayment
         }
 
         if ($this->cart->isVirtualCart()) {
-            $delivery_data['delivery_label'] = $this->module->getConfiguration('PS_SHOP_NAME');
+            $delivery_data['delivery_label'] = Configuration::get('PS_SHOP_NAME');
             $delivery_data['expected_delivery_date'] = date('Y-m-d');
             $delivery_data['delivery_type'] = 'edelivery';
         } else {
@@ -229,28 +228,9 @@ class PayPlugPaymentOney extends PayplugPayment
                 return $delivery_data;
             }
 
-            $payplug_carrier = new PayPlugCarrier();
-            $payplug_carrier = $payplug_carrier->getByIdCarrier($carrier->id);
-
-            if (!Validate::isLoadedObject($payplug_carrier)) {
-                // todo: log error
-                $delay = PayPlugCarrier::CARRIER_DEFAULT_DELAY;
-                $delivery_type = PayPlugCarrier::CARRIER_DEFAULT_DELIVERY_TYPE;
-                $delivery_data['delivery_label'] = $this->module->getConfiguration('PS_SHOP_NAME');
-                $delivery_data['expected_delivery_date'] = date(
-                    'Y-m-d',
-                    strtotime(date('Y-m-d') . ' + ' . $delay . ' days')
-                );
-                $delivery_data['delivery_type'] = $delivery_type;
-                return $delivery_data;
-            }
-
             $delivery_data['delivery_label'] = $carrier->name;
-            $delivery_data['expected_delivery_date'] = date(
-                'Y-m-d',
-                strtotime(date('Y-m-d') . ' + ' . $payplug_carrier->delay . ' days')
-            );
-            $delivery_data['delivery_type'] = $payplug_carrier->delivery_type;
+            $delivery_data['expected_delivery_date'] = date('Y-m-d');
+            $delivery_data['delivery_type'] = 'storepickup';
         }
 
         return $delivery_data;

@@ -29,6 +29,12 @@ function upgrade_module_3_1_4()
 {
     $flag = true;
 
+    if (Configuration::get('PAYPLUG_ONEY_TOS_URL')) {
+        if (!Configuration::deleteByName('PAYPLUG_ONEY_TOS_URL')) {
+            $flag = false;
+        }
+    }
+
     $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_payment` (
     `id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `id_payment` VARCHAR(255) NULL,

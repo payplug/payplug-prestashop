@@ -426,9 +426,11 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
+            $err = '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] ';
+            $err .= '&& $paymentDetails[\'paymentReturnUrl\'] are null';
             return $this->returnPaymentError(
                 ['name' => 'paymentUrl', 'value' => false],
-                '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] && $paymentDetails[\'paymentReturnUrl\'] are null'
+                $err
             );
         }
 
@@ -471,7 +473,6 @@ class PaymentRepository extends Repository
                     ['name' => 'paymentStored', 'value' => false],
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
-                break;
         }
 
         return [
@@ -517,8 +518,8 @@ class PaymentRepository extends Repository
             ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
             ->fields('id_cart')->values($paymentDetails['cartId'])
             ->fields('cart_hash')->values($cartHash)
-            ->fields('authorized_at')->values($paymentDetails['authorizedAt'])
-            ->fields('is_paid')->values($paymentDetails['isPaid'])
+            ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
+            ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
             ->fields('date_upd')->values($paymentDate);
 
         try {
@@ -581,11 +582,11 @@ class PaymentRepository extends Repository
 
         if ($storedPayment['payment_method'] == 'installment') {
             $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
-            $firstSchedule = end($retrievedInstallment->schedule[0]->payment_ids);
+            $firstSchedule = $retrievedInstallment->schedule[0]->payment_ids;
             /*
              * Try to see if the first schedule was cancelled
              */
-            $storedPayment['id_payment'] = $firstSchedule;
+            $storedPayment['id_payment'] = end($firstSchedule);
         }
 
         if (!$storedPayment['id_payment']) {
