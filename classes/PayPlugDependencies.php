@@ -43,6 +43,9 @@ class PayPlugDependencies
     /** @var MyLogPHP */
     private $mylogphp;
 
+    /** @var object */
+    public $payplug;
+
     /** @var PluginEntity */
     private $plugin;
 
@@ -53,7 +56,8 @@ class PayPlugDependencies
 
     private function initializeAccessors()
     {
-        $this->setPlugin((new PluginRepository(new PayPlugClass))->getEntity());
+        $this->payplug = new PayPlugClass();
+        $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
 
         $this->hook = $this->getPlugin()->getHook();
         $this->install = $this->getPlugin()->getInstall();

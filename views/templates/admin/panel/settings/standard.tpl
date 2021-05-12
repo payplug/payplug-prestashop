@@ -19,16 +19,14 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
-<script type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1/form.latest.js"></script>
-{if isset($payplug_payment_options) && $payplug_payment_options}
-    {foreach $payplug_payment_options as $method => $payplug_payment_option}
-        {include file=$payplug_payment_option.tpl payplug_payment_option=$payplug_payment_option method=$method}
-    {/foreach}
-{/if}
-
-<form style="display: none;">
-    <input type="hidden" name="front_ajax_url" value="{$front_ajax_url|escape:'htmlall':'UTF-8'}" />
-    <input type="hidden" name="id_cart" value="{$cart->id|escape:'htmlall':'UTF-8'}" />
-    <input type="hidden" name="spinner_url" value="{$spinner_url|escape:'htmlall':'UTF-8'}" />
-</form>
+<div class="panel-row separate_margin_block">
+    <div class="payplugPanel">
+        <div class="payplugPanel_label">{l s='admin.panel.setting.standard.label' mod='payplug'}</div>
+        <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.standard}</div>
+    </div>
+    <div class="payplugPanel">
+        <div class="payplugPanel_content">
+            <p>{l s='admin.panel.setting.standard.content' mod='payplug'}</p>
+        </div>
+    </div>
+</div>

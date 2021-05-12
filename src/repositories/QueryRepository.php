@@ -451,9 +451,9 @@ class QueryRepository extends Repository
             // @todo : AddLog
         }
 
-        if (isset($param) && $param == 'unique_value') {
-            $result = reset($result[0]);
-        }
+//        if (isset($param) && $param == 'unique_value') {
+//            $result = reset($result[0]);
+//        }
 
         $this->query = null;
         $sql = null;

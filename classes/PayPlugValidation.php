@@ -45,7 +45,7 @@ class PayPlugValidation
 
     public function __construct()
     {
-        $this->payplug = new \PayPlug\classes\PayPlugClass();
+        $this->payplug = new PayPlugClass();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
         $this->setConfig();

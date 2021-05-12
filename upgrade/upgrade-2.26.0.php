@@ -32,14 +32,8 @@ function upgrade_module_2_26_0($object)
         return true;
     }
 
-    $flag = true;
-
-    if (!$object->checkVersion()) {
-        return $flag;
-    }
-
     // run the method who install Oney feature
-    $flag = $object->getPlugin()->getOney()->installOney();
+    $flag = $object->dependencies->getPlugin()->getOney()->installOney();
 
     //adding new configurations
     if (!PayplugBackward::updateConfiguration('PAYPLUG_ONEY_OPTIMIZED', 0)) {

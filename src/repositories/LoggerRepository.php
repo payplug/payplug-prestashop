@@ -113,7 +113,7 @@ class LoggerRepository extends Repository
         }
 
         $debugBacktrace = debug_backtrace();
-        $debug = reset($debugBacktrace);
+//        $debug = reset($debugBacktrace);
 
         $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T
         $entry = [

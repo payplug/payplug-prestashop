@@ -253,7 +253,7 @@ class SQLtableRepository extends PayPlugClass
      */
     public function checkExistingTable($table, $canUsePayplugLogger = 1)
     {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $logger = null;
 
         if ($canUsePayplugLogger) {

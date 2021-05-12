@@ -331,7 +331,7 @@ var $document, $window, payplug = {
                 {switcher} = tools,
                 showIdentifier = show.props.identifier,
                 switcherIdentifier = switcher.props.identifier,
-                $switcher = $('.'+showIdentifier).find('.'+switcherIdentifier);
+                $switcher = $('.' + showIdentifier).find('.' + switcherIdentifier);
 
             switcher.left($switcher, true);
         },
@@ -406,7 +406,7 @@ var $document, $window, payplug = {
                     email = $('input[name=PAYPLUG_EMAIL]').val(),
                     pwd = $('input[name=PAYPLUG_PASSWORD]').val();
 
-                if(!tools.validate.isEmail(email) || !pwd.length) {
+                if (!tools.validate.isEmail(email) || !pwd.length) {
                     return;
                 }
             } else if (parseInt(event.keyCode) != 13) {
@@ -718,13 +718,15 @@ var $document, $window, payplug = {
                 dataType: 'json',
                 data: {_ajax: 1, has_live_key: 1},
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert('An error occurred while trying to checking your verified status. ' +
-                        'Maybe you clicked too fast before scripts are fully loaded ' +
-                        'or maybe you have a different back-office url than expected.' +
-                        'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    if (errorThrown != 'abort') {
+                        alert('An error occurred while trying to checking your verified status. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    }
                 },
                 success: function (response) {
                     if (response.result) {
@@ -1089,7 +1091,7 @@ var $document, $window, payplug = {
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
 
-                if($(event.target).is('.' + identifier + '_close') && $popup.find('.payplugButton.-close')) {
+                if ($(event.target).is('.' + identifier + '_close') && $popup.find('.payplugButton.-close')) {
                     $popup.find('.payplugButton.-close').trigger('click');
                 }
 
@@ -1129,8 +1131,8 @@ var $document, $window, payplug = {
             }
         },
         validate: {
-            isEmail: function(email){
-                if(typeof email == 'undefined' || !email) {
+            isEmail: function (email) {
+                if (typeof email == 'undefined' || !email) {
                     return false;
                 }
 

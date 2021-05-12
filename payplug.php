@@ -30,9 +30,8 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 
-class Payplug extends Module
+class Payplug extends PaymentModule
 {
-    /** Include dependencies */
     public $dependencies;
 
     /**
@@ -63,25 +62,9 @@ class Payplug extends Module
         $this->module = false;
 
         if ($this->isValidPHPVersion()) {
-            $this->setModule();
             $this->setDependencies();
+            $this->setModule();
         }
-    }
-
-    /**
-     * @description test if php requiremnt is valid
-     * @return bool
-     */
-    protected function isValidPHPVersion()
-    {
-        $php_min_version = 50600;
-
-        if (!defined('PHP_VERSION_ID')) {
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-
-        return PHP_VERSION_ID >= $php_min_version;
     }
 
     /**
@@ -104,6 +87,10 @@ class Payplug extends Module
     public function getContent()
     {
         if ($this->module) {
+            if (!$this->isValidInstallation()) {
+                $this->install(true);
+            }
+
             return $this->module->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
@@ -120,6 +107,36 @@ class Payplug extends Module
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
+    }
+
+    /**
+     * @description Get the module hook list from current Prestashop version
+     */
+    private function getHookList()
+    {
+        return [
+            'actionAdminControllerSetMedia',
+            'actionAdminPerformanceControllerAfter',
+            'actionCarrierUpdate',
+            'actionClearCompileCache',
+            'actionDeleteGDPRCustomer',
+            'actionExportGDPRData',
+            'actionObjectCarrierAddAfter',
+            'actionOrderStatusUpdate',
+            'adminOrder',
+            'customerAccount',
+            'displayAdminOrderMain',
+            'displayBackOfficeFooter',
+            'displayBeforeShoppingCartBlock',
+            'displayExpressCheckout',
+            'displayProductPriceBlock',
+            'header',
+            'moduleRoutes',
+            'payment',
+            'paymentReturn',
+            'paymentOptions',
+            'registerGDPRConsent',
+        ];
     }
 
     /**
@@ -335,12 +352,67 @@ class Payplug extends Module
 
     /**
      * @description Install plugin
-     * @return bool|mixed
+     * @param bool $soft_install
+     * @return bool
      * @see Module::install()
      */
-    public function install()
+    public function install($soft_install = false)
     {
-        return $this->module->install();
+        if ($this->module) {
+            $valid_installation = true;
+
+            // Use for update module is not fully installed
+            if (!$soft_install) {
+                $this->dependencies = null;
+                $valid_installation = $valid_installation && parent::install();
+                $this->setDependencies();
+            }
+
+            // Install configuration
+            if ($valid_installation) {
+                $valid_installation = $valid_installation && $this->dependencies->getDependency('install')->install();
+            }
+
+            // Install hook
+            if ($valid_installation) {
+                $hook_list = $this->getHookList();
+                foreach ($hook_list as $hook) {
+                    $valid_installation = $valid_installation && $this->registerHook($hook);
+                }
+            }
+
+            return $valid_installation;
+        }
+
+        return parent::install();
+    }
+
+    /**
+     * @description Check if mobile is validated installation
+     * @return bool
+     */
+    public function isValidInstallation()
+    {
+        if (Validate::isLoadedObject($this)) {
+            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
+        }
+        return true;
+    }
+
+    /**
+     * @description test if php requiremnt is valid
+     * @return array
+     */
+    protected function isValidPHPVersion()
+    {
+        $php_min_version = 50600;
+
+        if (!defined('PHP_VERSION_ID')) {
+            $php_version = explode('.', PHP_VERSION);
+            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+        }
+
+        return PHP_VERSION_ID >= $php_min_version;
     }
 
     public function setDependencies()
@@ -350,7 +422,7 @@ class Payplug extends Module
 
     private function setModule()
     {
-        $this->module = new \PayPlug\classes\PayPlugClass();
+        $this->module = $this->dependencies->payplug;
     }
 
     /**
@@ -361,7 +433,9 @@ class Payplug extends Module
     public function uninstall()
     {
         if ($this->module) {
-            return $this->module->uninstall();
+            return parent::uninstall() && $this->dependencies->getDependency('install')->uninstall();
         }
+
+        return parent::uninstall();
     }
 }

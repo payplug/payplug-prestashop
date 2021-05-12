@@ -39,4 +39,14 @@ class ToolsSpecific implements ToolsInterface
             return Tools::$action($param1, $param2);
         }
     }
+
+    public function displayError($string = false)
+    {
+        return Tools::displayError($string);
+    }
+
+    public function strtoupper($string = false)
+    {
+        return Tools::strtoupper($string);
+    }
 }

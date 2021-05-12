@@ -21,35 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\entities;
+namespace PayPlug\src\specific;
 
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\interfaces\ShopInterface;
+use Shop;
 
-class PaymentEntity
+class ShopSpecific implements ShopInterface
 {
-    /** @var object */
-    private $apiPayment;
-
-    /**
-     * @return object
-     */
-    public function getApiPayment()
+    public function isFeatureActive()
     {
-        return $this->apiPayment;
+        return Shop::isFeatureActive();
     }
 
-    /**
-     * @param $apiPayment
-     * @return self
-     * @throws BadParameterException
-     */
-    public function setApiPayment($apiPayment)
+    public function setContext()
     {
-        if (!is_object($apiPayment)) {
-            throw (new BadParameterException('Invalid argument, $apiPayment must be an object'));
-        }
-
-        $this->apiPayment = $apiPayment;
-        return $this;
+        return Shop::setContext(Shop::CONTEXT_ALL);
     }
 }

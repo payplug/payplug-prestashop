@@ -21,35 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\entities;
+namespace PayPlug\src\specific;
 
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\interfaces\LanguageInterface;
+use Language;
 
-class PaymentEntity
+class LanguageSpecific implements LanguageInterface
 {
-    /** @var object */
-    private $apiPayment;
-
-    /**
-     * @return object
-     */
-    public function getApiPayment()
+    public function getLanguages($active = false)
     {
-        return $this->apiPayment;
-    }
-
-    /**
-     * @param $apiPayment
-     * @return self
-     * @throws BadParameterException
-     */
-    public function setApiPayment($apiPayment)
-    {
-        if (!is_object($apiPayment)) {
-            throw (new BadParameterException('Invalid argument, $apiPayment must be an object'));
-        }
-
-        $this->apiPayment = $apiPayment;
-        return $this;
+        return Language::getLanguages($active);
     }
 }
