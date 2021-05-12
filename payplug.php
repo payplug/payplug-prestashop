@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 
-class Payplug extends Module
+class Payplug extends PaymentModule
 {
     public $dependencies;
 
@@ -60,8 +60,8 @@ class Payplug extends Module
         $this->module = false;
 
         if ($this->isValidPHPVersion()) {
-            $this->setModule();
             $this->setDependencies();
+            $this->setModule();
         }
     }
 
@@ -105,6 +105,38 @@ class Payplug extends Module
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
+    }
+
+    /**
+     * @description Get the module hook list from current Prestashop version
+     */
+    private function getHookList()
+    {
+        $hooksToRegister = [
+            'actionAdminControllerSetMedia',
+            'actionAdminPerformanceControllerAfter',
+            'actionCarrierUpdate',
+            'actionClearCompileCache',
+            'actionDeleteGDPRCustomer',
+            'actionExportGDPRData',
+            'actionObjectCarrierAddAfter',
+            'actionOrderStatusUpdate',
+            'adminOrder',
+            'customerAccount',
+            'displayAdminOrderMain',
+            'displayBackOfficeFooter',
+            'displayBeforeShoppingCartBlock',
+            'displayExpressCheckout',
+            'displayProductPriceBlock',
+            'header',
+            'moduleRoutes',
+            'payment',
+            'paymentReturn',
+            'paymentOptions',
+            'registerGDPRConsent',
+        ];
+
+        return $hooksToRegister;
     }
 
     /**
@@ -327,7 +359,29 @@ class Payplug extends Module
     public function install($soft_install = false)
     {
         if ($this->module) {
-            return $this->module->install($soft_install);
+            $valid_installation = true;
+
+            // Use for update module is not fully installed
+            if (!$soft_install) {
+                $this->dependencies = null;
+                $valid_installation = $valid_installation && parent::install();
+                $this->setDependencies();
+            }
+
+            // Install configuration
+            if ($valid_installation) {
+                $valid_installation = $valid_installation && $this->dependencies->getDependency('install')->install();
+            }
+
+            // Install hook
+            if ($valid_installation) {
+                $hook_list = $this->getHookList();
+                foreach ($hook_list as $hook) {
+                    $valid_installation = $valid_installation && $this->registerHook($hook);
+                }
+            }
+
+            return $valid_installation;
         }
 
         return parent::install();
@@ -368,7 +422,7 @@ class Payplug extends Module
 
     private function setModule()
     {
-        $this->module = new \PayPlug\classes\PayPlugClass();
+        $this->module = $this->dependencies->payplug;
     }
 
     /**
@@ -379,7 +433,7 @@ class Payplug extends Module
     public function uninstall()
     {
         if ($this->module) {
-            return $this->module->uninstall();
+            return parent::uninstall() && $this->dependencies->getDependency('install')->uninstall();
         }
 
         return parent::uninstall();

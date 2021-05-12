@@ -23,30 +23,13 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
+use PayPlug\src\interfaces\LanguageInterface;
+use Language;
 
-class ToolsSpecific implements ToolsInterface
+class LanguageSpecific implements LanguageInterface
 {
-    public static function factory()
+    public function getLanguages($active = false)
     {
-        return new ToolsSpecific();
-    }
-
-    public function tool($action, $param1 = null, $param2 = null)
-    {
-        if (isset($action)) {
-            return Tools::$action($param1, $param2);
-        }
-    }
-
-    public function displayError($string = false)
-    {
-        return Tools::displayError($string);
-    }
-
-    public function strtoupper($string = false)
-    {
-        return Tools::strtoupper($string);
+        return Language::getLanguages($active);
     }
 }

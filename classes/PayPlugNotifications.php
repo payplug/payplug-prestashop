@@ -21,8 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugClass;
-use PayPlug\classes\PayplugLock;
+namespace PayPlug\classes;
+
+use Db;
+use Cart;
+use Configuration;
+use Context;
+use Currency;
+use Customer;
+use Exception;
+use Message;
+use Order;
+use OrderHistory;
+use Tools;
+use Validate;
 
 /**
  * Class PayPlugNotifications
@@ -67,7 +79,7 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
-        $this->payplug = new \PayPlug\classes\PayPlugClass();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
@@ -460,7 +472,7 @@ class PayPlugNotifications
             if ($this->payment->installment_plan_id !== null) {
                 $is_amount_correct = (bool)$this->payment->is_paid;
             } else {
-                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect(
+                $is_amount_correct = (bool)PayPlugClass::checkAmountPaidIsCorrect(
                     $this->payment->amount / 100,
                     $order
                 );
@@ -872,7 +884,7 @@ class PayPlugNotifications
         try {
             $this->payment = $this->payplug->retrievePayment($refund->payment_id);
             $this->setOrderStates();
-        } catch (ConfigurationNotSetException $exception) {
+        } catch (Exception $exception) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
             $this->exitProcess($exception->getMessage(), 500);
         }

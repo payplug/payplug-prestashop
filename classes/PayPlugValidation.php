@@ -21,8 +21,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugClass;
-use PayPlug\classes\PayplugLock;
+namespace PayPlug\classes;
+
+use Db;
+use Cart;
+use Configuration;
+use Customer;
+use Exception;
+use Order;
+use Tools;
+use Validate;
 
 class PayPlugValidation
 {
@@ -37,7 +45,7 @@ class PayPlugValidation
 
     public function __construct()
     {
-        $this->payplug = new \PayPlug\classes\PayPlugClass();
+        $this->payplug = new PayPlugClass();
         $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
         $this->setConfig();
