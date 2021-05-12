@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\specific;
 
+use Configuration;
 use Language;
 use Media;
 use Validate;
@@ -68,7 +69,7 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)$this->payplug->getConfiguration('PAYPLUG_ONEY_OPTIMIZED');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -79,7 +80,7 @@ class PrestashopSpecific16
             $img_lang = 'default';
         }
 
-        if ($this->payplug->getConfiguration('PAYPLUG_ONEY')) {
+        if (Configuration::get('PAYPLUG_ONEY')) {
             // check if at least one carrier is available for this cart
             // get the available carrier
 
@@ -124,7 +125,7 @@ class PrestashopSpecific16
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
-                if ((bool)$this->payplug->getConfiguration('PAYPLUG_ONE_CLICK')
+                if ((bool)Configuration::get('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
                     && ($payment_method == 'standard')) {
                     continue;

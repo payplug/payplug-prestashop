@@ -819,10 +819,10 @@ class PayPlugClass extends PaymentModule
      */
     public function assignPaymentOptions($cart)
     {
-        $one_click = $this->getConfiguration('PAYPLUG_ONE_CLICK');
-        $installment = $this->getConfiguration('PAYPLUG_INST');
-        $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
-        $installment_min_amount = $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT');
+        $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
+        $installment = Configuration::get('PAYPLUG_INST');
+        $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
+        $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
 
         if (!$this->checkCurrency($cart) ||
             !$this->checkAmount($cart)) {
@@ -835,7 +835,7 @@ class PayPlugClass extends PaymentModule
 
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
 
-        $use_taxes = $this->getConfiguration('PS_TAX');
+        $use_taxes = Configuration::get('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
         $base_total_tax_exc = $cart->getOrderTotal(false);
 
@@ -1944,26 +1944,26 @@ class PayPlugClass extends PaymentModule
         ];
 
         if (!$this->active ||
-            !$this->getConfiguration('PAYPLUG_SHOW') ||
+            !Configuration::get('PAYPLUG_SHOW') ||
             !$this->checkCurrency($cart) ||
             !$this->checkAmount($cart)) {
             return $options;
         }
 
         // check if installment allowed
-        $installment = $this->getConfiguration('PAYPLUG_INST');
-        $installment_min_amount = $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT');
+        $installment = Configuration::get('PAYPLUG_INST');
+        $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
         $order_total = $cart->getOrderTotal(true);
         $installment = $installment && $order_total >= $installment_min_amount;
 
         // check if one click allowed
-        $one_click = $this->getConfiguration('PAYPLUG_ONE_CLICK');
+        $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
         $payplug_card = $this->card;
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
-        $oney = $this->getConfiguration('PAYPLUG_ONEY');
+        $oney = Configuration::get('PAYPLUG_ONEY');
 
         $options = [
             'standard' => true,
@@ -2078,15 +2078,6 @@ class PayPlugClass extends PaymentModule
         $this->html = $this->fetchTemplate('/views/templates/admin/panel/fieldset.tpl');
 
         return $this->html;
-    }
-
-    public function getConfiguration($key)
-    {
-        if (isset($this->_conf[$key])) {
-            return $this->_conf[$key]['value'];
-        } else {
-            return Configuration::get($key);
-        }
     }
 
     /**
@@ -2501,8 +2492,8 @@ class PayPlugClass extends PaymentModule
         if ($options['installment']) {
             $use_taxes = (bool)Configuration::get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-            if ($cart_amount >= $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT')) {
-                $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
+            if ($cart_amount >= Configuration::get('PAYPLUG_INST_MIN_AMOUNT')) {
+                $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
                 $paymentOption['installment']['name'] = 'installment';
                 $paymentOption['installment']['inputs'] = [
                     'pc' => [
@@ -2763,9 +2754,9 @@ class PayPlugClass extends PaymentModule
 
     /**
      * @description get cart installment backward
-     * @deprecated use for installment from PayPlug 3.1.3 or further
      * @param $id_cart
      * @return mixed
+     * @deprecated use for installment from PayPlug 3.1.3 or further
      */
     public function getPayplugInstallmentCartBackward($id_cart)
     {
@@ -3318,9 +3309,9 @@ class PayPlugClass extends PaymentModule
 
             // Update order state if is pending
             $state_addons = $payment->is_live ? '' : '_TEST';
-            $paid_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-            $oney_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
-            $cancelled_state = $this->getConfiguration('PS_OS_CANCELED');
+            $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $oney_state = Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+            $cancelled_state = Configuration::get('PS_OS_CANCELED');
 
             if ($is_oney) {
                 // update order state from payment status
@@ -3572,11 +3563,8 @@ class PayPlugClass extends PaymentModule
 
     public function hookDisplayProductPriceBlock($param)
     {
-        if ((!$this->getConfiguration('PAYPLUG_ONEY'))
-            || (!$this->oney->isOneyAllowed())
-            || (Dispatcher::getInstance()->getController() == 'category')
-            || (Dispatcher::getInstance()->getController() == 'index')
-        ) {
+        $current_controller = Dispatcher::getInstance()->getController();
+        if (!$this->oney->isOneyAllowed() || in_array($current_controller, ['category', 'index'])) {
             return false;
         }
 
@@ -3584,8 +3572,11 @@ class PayPlugClass extends PaymentModule
         if ($action == 'quickview') {
             return false;
         }
-        if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
-            return;
+        if (!isset($param['product'])
+            || !isset($param['type'])
+            || !in_array($param['type'], ['after_price', 'price'])
+        ) {
+            return false;
         }
 
         if ($action == 'refresh') {
@@ -3714,7 +3705,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        $use_taxes = $this->getConfiguration('PS_TAX');
+        $use_taxes = Configuration::get('PS_TAX');
         $base_total_tax_inc = $params['cart']->getOrderTotal(true);
         $base_total_tax_exc = $params['cart']->getOrderTotal(false);
 
@@ -3726,7 +3717,7 @@ class PayPlugClass extends PaymentModule
 
         $cart = $params['cart'];
 
-        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3903,7 +3894,7 @@ class PayPlugClass extends PaymentModule
         if ($sandbox === null) {
             $payplug_key = $this->current_api_key;
         } else {
-            $payplug_key = $this->getConfiguration('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
+            $payplug_key = Configuration::get('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
         }
 
         try {
@@ -3923,7 +3914,7 @@ class PayPlugClass extends PaymentModule
      */
     public function isAllowed()
     {
-        if (!Module::isEnabled($this->name) || !$this->getConfiguration('PAYPLUG_SHOW')) {
+        if (!Module::isEnabled($this->name) || !Configuration::get('PAYPLUG_SHOW')) {
             return false;
         }
         return true;
@@ -4644,7 +4635,7 @@ class PayPlugClass extends PaymentModule
             'authorizedAt' => null,
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
-            'isEmbedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
+            'isEmbedded' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
             'isMobileDevice' => $this->isMobiledevice(),
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],

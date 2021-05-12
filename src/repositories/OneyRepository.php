@@ -96,7 +96,7 @@ class OneyRepository extends Repository
     {
         $js_var = [
             'loading_msg' => $this->l('Loading'),
-            'can_use_oney' => $this->payplug->getConfiguration('PAYPLUG_ONEY'),
+            'can_use_oney' => $this->configurationSpecific->get('PAYPLUG_ONEY'),
         ];
         return \Media::addJsDef($js_var);
     }
@@ -111,7 +111,7 @@ class OneyRepository extends Repository
      */
     public function assignOneyPaymentOptions($cart)
     {
-        if (!$this->payplug->getConfiguration('PAYPLUG_ONEY')) {
+        if (!$this->configurationSpecific->get('PAYPLUG_ONEY')) {
             return false;
         }
 

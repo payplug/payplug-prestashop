@@ -403,7 +403,7 @@ class Payplug extends PaymentModule
      * @description test if php requiremnt is valid
      * @return array
      */
-    protected function isValidPHPVersion()
+    public function isValidPHPVersion()
     {
         $php_min_version = 50600;
 
