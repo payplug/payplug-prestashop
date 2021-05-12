@@ -37,7 +37,7 @@ class PayPlugValidation
     public function __construct()
     {
         $this->payplug = new PayPlugClass();
-        $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
+        $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
         $this->setConfig();
     }
@@ -321,15 +321,15 @@ class PayPlugValidation
                 $state_addons = ($installment->is_live ? '' : '_TEST');
             }
 
-            $pending_state = $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
-            $paid_state = $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $pending_state = Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
+            $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
             /*
             * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
             * We keep this $inst_state to give more readability.
             */
-            $inst_state = $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-            $auth_state = $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_AUTH' . $state_addons);
-            $oney_state = $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+            $inst_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $auth_state = Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons);
+            $oney_state = Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
 
             if ($this->type == 'installment') {
                 $installment = new PPPaymentInstallment($inst_id);

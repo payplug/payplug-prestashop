@@ -68,8 +68,8 @@ class PayPlugNotifications
         $this->resp = [];
         $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
-        $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
-        $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
+        $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
 
         $this->setLogger();
         $this->getResource();
@@ -82,15 +82,15 @@ class PayPlugNotifications
     {
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
         $this->order_states = [
-            'pending' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
-            'paid' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'error' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
-            'inst' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'auth' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
-            'exp' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
-            'oney' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
-            'cancelled' => $this->payplug->getConfiguration('PS_OS_CANCELED'),
-            'refund' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
+            'pending' => Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
+            'paid' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
+            'error' => Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
+            'inst' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
+            'auth' => Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
+            'exp' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
+            'oney' => Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
+            'cancelled' => Configuration::get('PS_OS_CANCELED'),
+            'refund' => Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
         ];
     }
 
@@ -104,8 +104,8 @@ class PayPlugNotifications
         try {
             $resource = json_decode($body);
             $this->api_key = (bool)$resource->is_live ?
-                $this->payplug->getConfiguration('PAYPLUG_LIVE_API_KEY') :
-                $this->payplug->getConfiguration('PAYPLUG_TEST_API_KEY');
+                Configuration::get('PAYPLUG_LIVE_API_KEY') :
+                Configuration::get('PAYPLUG_TEST_API_KEY');
             $this->payplug->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
