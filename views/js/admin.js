@@ -781,6 +781,30 @@ var $document, $window, payplug = {
             });
         },
     },
+    standard: {
+        props: {
+            identifier: 'payplugPanel',
+            switcher: 'payplug_standard',
+            error: null,
+        },
+        init: function () {
+            var {standard} = payplug,
+                {identifier, switcher} = standard.props;
+            $document.on('switchSelected', 'input[name=' + switcher + ']', standard.change);
+        },
+        change: function () {
+
+            var $switcher = payplug.standard,
+                {standard} = payplug,
+                {identifier} = $switcher.props;
+
+            if (!parseInt($(this).val())) {
+                $('input[name=payplug_one_click]').parent().addClass('-disabled');
+            } else {
+                $('input[name=payplug_one_click]').parent().removeClass('-disabled');
+            }
+        },
+    },
     oney: {
         props: {
             identifier: 'payplugOney',
