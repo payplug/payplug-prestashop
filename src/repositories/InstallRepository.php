@@ -278,7 +278,7 @@ class InstallRepository extends Repository
             && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
             && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
             && $this->config->updateValue('PAYPLUG_OFFER', '')
-            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
+            && $this->config->updateValue('PAYPLUG_ONE_CLICK', 1)
             && $this->config->updateValue('PAYPLUG_ONEY', null)
             && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
             && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
@@ -405,11 +405,9 @@ class InstallRepository extends Repository
         }
 
         // Install tab
-         $this->log->info('Début Tab');
         if (!$this->payplug->PrestashopSpecificObject->installTab() && $install['flag']) {
             $this->installError($this->l('Install failed: Install Tab'));
         }
-         $this->log->info('Fin Tab.');
 
         if ($install['flag']) {
             $this->log->info('Install successful.');
@@ -471,5 +469,4 @@ class InstallRepository extends Repository
             'error' => $error
         ];
     }
-
 }

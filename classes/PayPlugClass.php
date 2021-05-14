@@ -793,6 +793,7 @@ class PayPlugClass extends PaymentModule
             'PAYPLUG_SANDBOX_MODE' => $configurations['sandbox_mode'],
             'PAYPLUG_EMBEDDED_MODE' => $configurations['embedded_mode'],
             'PAYPLUG_ONE_CLICK' => $configurations['one_click'],
+            'PAYPLUG_STANDARD' => $configurations['standard'],
             'PAYPLUG_INST' => $configurations['inst'],
             'PAYPLUG_INST_MODE' => $configurations['inst_mode'],
             'PAYPLUG_INST_MIN_AMOUNT' => $configurations['inst_min_amount'],
@@ -820,6 +821,7 @@ class PayPlugClass extends PaymentModule
      */
     public function assignPaymentOptions($cart)
     {
+        $standard = Configuration::get('PAYPLUG_STANDARD');
         $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
         $installment = Configuration::get('PAYPLUG_INST');
         $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
@@ -2016,7 +2018,7 @@ class PayPlugClass extends PaymentModule
         $permissions = $this->getAccountPermissions();
 
         $available_options = [
-            'standard' => true,
+            'standard' => (int)Configuration::get('PAYPLUG_STANDARD') === 1,
             'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0,
             'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1,
             'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1,
@@ -4327,7 +4329,8 @@ class PayPlugClass extends PaymentModule
             'company' => (int)Configuration::get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')),
             'inst_mode' => (int)Configuration::get('PAYPLUG_INST_MODE'),
             'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED'),
-            'oney' => (int)Configuration::get('PAYPLUG_ONEY')
+            'oney' => (int)Configuration::get('PAYPLUG_ONEY'),
+            'standard' => (int)Configuration::get('PAYPLUG_STANDARD')
         ];
 
         $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
@@ -5014,6 +5017,7 @@ class PayPlugClass extends PaymentModule
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
         Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
+        Configuration::updateValue('PAYPLUG_STANDARD', Tools::getValue('payplug_standard'));
         if (Tools::getValue('PAYPLUG_SHOW')) {
             $this->enable();
         }
