@@ -23,16 +23,20 @@
 
 namespace PayPlug\classes;
 
+use Address;
 use Db;
 use Cart;
 use Configuration;
 use Context;
+use Country;
 use Currency;
 use Customer;
 use Exception;
+use Language;
 use Message;
 use Order;
 use OrderHistory;
+use Shop;
 use Tools;
 use Validate;
 
