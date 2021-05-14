@@ -796,13 +796,12 @@ var $document, $window, payplug = {
 
             var $switcher = payplug.standard,
                 {standard} = payplug,
-                {identifier} = $switcher.props,
-                $oneclick = $('input[name=payplug_one_click]').parent();
+                {identifier} = $switcher.props;
 
             if (!parseInt($(this).val())) {
-                $oneclick.parent().addClass('-disabled');
+                $('input[name=payplug_one_click]').parent().addClass('-disabled');
             } else {
-                $oneclick.parent().removeClass('-disabled');
+                $('input[name=payplug_one_click]').parent().removeClass('-disabled');
             }
         },
     },
