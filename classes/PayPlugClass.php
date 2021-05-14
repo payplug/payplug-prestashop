@@ -2016,7 +2016,7 @@ class PayPlugClass extends PaymentModule
         $permissions = $this->getAccountPermissions();
 
         $available_options = [
-            'standard' => true,
+            'standard' => (int)Configuration::get('PAYPLUG_STANDARD') === 1,
             'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0,
             'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1,
             'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1,
