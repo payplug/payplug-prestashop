@@ -27,6 +27,7 @@
     <div class="payplugPanel">
         <div class="payplugPanel_content">
             <p>{l s='admin.panel.setting.standard.content' mod='payplug'}</p>
+            {include file='./one_click.tpl'}
         </div>
     </div>
 </div>
