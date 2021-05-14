@@ -48,14 +48,9 @@ class AdminPayplugController extends ModuleAdminController
 
         $payplug->checkConfiguration();
 
-        $PAYPLUG_SHOW = Configuration::get('PAYPLUG_SHOW');
         $PAYPLUG_EMAIL = Configuration::get('PAYPLUG_EMAIL');
-        $PAYPLUG_SANDBOX_MODE = Configuration::get('PAYPLUG_SANDBOX_MODE');
-        $PAYPLUG_EMBEDDED_MODE = Configuration::get('PAYPLUG_EMBEDDED_MODE');
-        $PAYPLUG_ONE_CLICK = Configuration::get('PAYPLUG_ONE_CLICK');
         $PAYPLUG_TEST_API_KEY = Configuration::get('PAYPLUG_TEST_API_KEY');
         $PAYPLUG_LIVE_API_KEY = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        $PAYPLUG_DEBUG_MODE = Configuration::get('PAYPLUG_DEBUG_MODE');
 
         if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
             $connected = true;
@@ -68,22 +63,6 @@ class AdminPayplugController extends ModuleAdminController
                 'validationErrors' => $payplug->validationErrors,
             ]);
         }
-
-        $valid_key = Payplug::setAPIKey();
-        if (!empty($valid_key)) {
-            $permissions = $payplug->getAccount($valid_key);
-            $premium = $permissions['can_save_cards'];
-        } else {
-            $verified = false;
-            $premium = false;
-        }
-        if (!empty($PAYPLUG_LIVE_API_KEY)) {
-            $verified = true;
-        } else {
-            $verified = false;
-        }
-
-        $is_active = (!empty($PAYPLUG_SHOW) && $PAYPLUG_SHOW == 1) ? true : false;
 
         $p_error = '';
         if (!$connected) {
@@ -107,28 +86,7 @@ class AdminPayplugController extends ModuleAdminController
         $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
         $payplug->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
 
-        $admin_ajax_url = $payplug->getAdminAjaxUrl();
-
-        $login_infos = [];
-
-        $this->context->smarty->assign([
-            'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
-            'admin_ajax_url' => $admin_ajax_url,
-            'check_configuration' => $payplug->check_configuration,
-            'pp_version' => $payplug->version,
-            'connected' => $connected,
-            'verified' => $verified,
-            'premium' => $premium,
-            'is_active' => $is_active,
-            'site_url' => $payplug->site_url,
-            'PAYPLUG_SANDBOX_MODE' => $PAYPLUG_SANDBOX_MODE,
-            'PAYPLUG_EMBEDDED_MODE' => $PAYPLUG_EMBEDDED_MODE,
-            'PAYPLUG_ONE_CLICK' => $PAYPLUG_ONE_CLICK,
-            'PAYPLUG_SHOW' => $PAYPLUG_SHOW,
-            'PAYPLUG_DEBUG_MODE' => $PAYPLUG_DEBUG_MODE,
-            'login_infos' => $login_infos,
-        ]);
+        $payplug->assignContentVar();
 
         $this->html .= $payplug->fetchTemplateRC('/views/templates/admin/admin.tpl');
 
