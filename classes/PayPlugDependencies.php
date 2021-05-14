@@ -35,10 +35,13 @@ if (!defined('_PS_VERSION_')) {
 class PayPlugDependencies
 {
     /** @var HookRepository */
-    public $hook;
+    private $hook;
 
     /** @var InstallRepository */
     private $install;
+
+    /** @var MyLogPHP */
+    private $mylogphp;
 
     /** @var object */
     public $payplug;
@@ -58,6 +61,7 @@ class PayPlugDependencies
 
         $this->hook = $this->getPlugin()->getHook();
         $this->install = $this->getPlugin()->getInstall();
+        $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
 
     public function getPlugin()

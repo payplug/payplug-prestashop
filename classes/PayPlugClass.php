@@ -58,6 +58,7 @@ use Order;
 use OrderState;
 use PaymentModule;
 use Product;
+use Tab;
 use Tools;
 use Validate;
 

@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\PayPlugClass;
 use PayPlug\classes\MyLogPHP;
+use PayPlug\classes\PayPlugClass;
 
 class SQLtableRepository extends PayPlugClass
 {
@@ -35,7 +35,6 @@ class SQLtableRepository extends PayPlugClass
      */
     public function installSQL()
     {
-        // Use old log system, because PayPlug Cache table doesn't exist yet.
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Installation SQL Starting.');
 
@@ -219,7 +218,7 @@ class SQLtableRepository extends PayPlugClass
     public function uninstallSQL($keep_cards = false)
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Uninstallation SQL starting.');
+        $log->info('uninstallSQL() starting.');
 
         $flag = true;
 

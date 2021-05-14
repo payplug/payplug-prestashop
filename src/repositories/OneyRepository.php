@@ -572,7 +572,9 @@ class OneyRepository extends Repository
             }
 
             $iso_list = explode(',', $iso_code_list);
-            $country = reset($iso_list);
+            if (isset($iso_list)) {
+                $country = reset($iso_list);
+            }
         }
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 

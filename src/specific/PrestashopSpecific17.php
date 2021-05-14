@@ -24,6 +24,7 @@
 namespace PayPlug\src\specific;
 
 use Language;
+use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Tab;
 use Tools;
@@ -93,6 +94,7 @@ class PrestashopSpecific17
     // todo: set Tab install process in a specific
     public function installTab()
     {
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $installed = true;
         $moduleName = $this->payplug->name;
 
@@ -113,6 +115,8 @@ class PrestashopSpecific17
                 $tab->name[$id_lang] = $translationsAdminPayPlug['en'];
             }
         }
+
+        $rand = mt_rand();
         $tab->class_name = 'AdminPayPlug';
         $tab->module = $moduleName;
 
@@ -135,7 +139,7 @@ class PrestashopSpecific17
                 $tab->name[$id_lang] = $translationsAdminPayPlugInstallment['en'];
             }
         }
-        $tab->class_name = 'AdminPayPlug';
+        $tab->class_name = 'AdminPayPlugInstallment';
         $tab->module = $moduleName;
         $tab->id_parent = Tab::getIdFromClassName('AdminPayPlug');
 

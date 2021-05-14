@@ -165,6 +165,7 @@ class PluginRepository extends Repository
         $this->install = new InstallRepository(
             $this->configuration,
             $this->constant,
+            $this->context,
             $this->order_state,
             $this->shop,
             $this->tools,

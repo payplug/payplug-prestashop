@@ -34,6 +34,9 @@ class InstallRepository extends Repository
     protected $constant;
 
     /** @var object */
+    protected $context;
+
+    /** @var object */
     protected $log;
 
     /** @var object OrderStateRepository */
@@ -178,10 +181,11 @@ class InstallRepository extends Repository
     /** @var object */
     protected $payplug;
 
-    public function __construct($config, $constant, $order_state, $shop, $tools, $payplug)
+    public function __construct($config, $constant, $context, $order_state, $shop, $tools, $payplug)
     {
         $this->config = $config;
         $this->constant = $constant;
+        $this->context = $context;
         $this->order_state = $order_state;
         $this->shop = $shop;
         $this->tools = $tools;
@@ -301,7 +305,6 @@ class InstallRepository extends Repository
         return true;
     }
 
-
     /**
      * @description Delete basic configuration
      * @return bool
@@ -372,22 +375,14 @@ class InstallRepository extends Repository
         // check requirement
         $report = $this->checkRequirements();
         if (!$report['php']['up2date'] && $install['flag']) {
-            $this->_errors[] = $this->tools->displayError($this->l('Your server must run PHP 5.3 or greater'));
-            $this->log->error('Install failed: PHP Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'Configuration PHP inf. version 5.3';
+            $this->installError($this->l('Install failed: PHP Requirement.'));
         }
         if (!$report['curl']['up2date'] && $install['flag']) {
-            $this->_errors[] = $this->tools->displayError($this->l('PHP cURL extension must be enabled on your server'));
-            $this->log->error('Install failed: cURL Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'cURL Requirement';
+            $this->installError($this->l('Install failed: cURL Requirement.'));
         }
+
         if (!$report['openssl']['up2date'] && $install['flag']) {
-            $this->_errors[] = $this->tools->displayError($this->l('OpenSSL 1.0.1 or later'));
-            $this->log->error('Install failed: OpenSSL Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'OpenSSL Requirement';
+            $this->installError($this->l('Install failed: OpenSSL Requirement.'));
         }
 
         if ($this->shop->isFeatureActive()) {
@@ -396,33 +391,28 @@ class InstallRepository extends Repository
 
         // Set payplug config
         if (!$this->createConfig() && $install['flag']) {
-            $this->log->error('Install failed: configuration.');
-            $install['flag'] = false;
-            $install['error'] = 'Création des éléments de configuration  ($this->createConfig)';
+            $this->installError($this->l('Install failed: createConfig()'));
         }
 
         // Install order state
         if (!$this->createOrderStates() && $install['flag']) {
-            $this->log->error('Install failed: order states.');
-            $install['flag'] = false;
+            $this->installError($this->l('Install failed: Create order states.'));
         }
 
         // Install SQL
         if (!(new SQLtableRepository())->installSQL()) {
-            $this->log->error('Install failed: SQL.');
-            $install['flag'] = false;
-            $install['error'] = 'Création des tables SQL';
+            $this->installError($this->l('Install failed: Install SQL tables.'));
         }
 
         // Install tab
+         $this->log->info('Début Tab');
         if (!$this->payplug->PrestashopSpecificObject->installTab() && $install['flag']) {
-            $this->log->error('Install failed: tab.');
-            $install['flag'] = false;
-            $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
+            $this->installError($this->l('Install failed: Install Tab'));
         }
+         $this->log->info('Fin Tab.');
 
         if ($install['flag']) {
-            $this->log->info('Install succeeded.');
+            $this->log->info('Install successful.');
             return true;
         }
 
@@ -470,4 +460,16 @@ class InstallRepository extends Repository
         }
         return false;
     }
+
+    public function installError($error)
+    {
+        $this->myLogPHP->error($error);
+        $this->payplug->_errors[] = Tools::displayError($this->payplug->l($error));
+
+        return [
+            'flag' => false,
+            'error' => $error
+        ];
+    }
+
 }
