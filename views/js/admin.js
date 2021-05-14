@@ -793,16 +793,18 @@ var $document, $window, payplug = {
             $document.on('switchSelected', 'input[name=' + switcher + ']', standard.change);
         },
         change: function () {
-
             var $switcher = payplug.standard,
                 {standard} = payplug,
                 {identifier} = $switcher.props,
-                $oneclick = $('input[name=payplug_one_click]');
+                $oneclick_group = $('.oneclick'),
+                $oneclick_input = $('input[name=payplug_one_click]');
 
             if (!parseInt($(this).val())) {
-                $oneclick.parent().addClass('-disabled');
+                $oneclick_group.addClass('-disabled');
+                $oneclick_input.parent().addClass('-disabled');
             } else {
-                $oneclick.parent().removeClass('-disabled');
+                $oneclick_group.removeClass('-disabled');
+                $oneclick_input.parent().removeClass('-disabled');
             }
         },
     },

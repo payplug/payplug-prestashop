@@ -158,6 +158,7 @@ label.payplugSwitch_label {
 }
 .-disabled label.payplugSwitch_label {
   cursor: default;
+  color: #ccc;
 }
 .payplugSwitch_label.-left {
   color: #fff;
@@ -326,6 +327,9 @@ button.payplugLink:hover {
 .payplugPanel_content input[type=tel]:focus,
 .payplugPanel_content input[type=text]:focus {
   background: transparent;
+}
+.payplugPanel_content.-disabled {
+  color: #ccc;
 }
 .payplugPanel_section {
   display: flex;

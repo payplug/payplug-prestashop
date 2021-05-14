@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel-row separate_margin_block">
-    <div class="payplugPanel">
+    <div class="payplugPanel oneclick">
         <div class="payplugPanel_label">{l s='Enable one-click payments' mod='payplug'}</div>
         <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
     </div>
