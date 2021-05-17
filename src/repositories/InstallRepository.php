@@ -37,7 +37,7 @@ class InstallRepository extends Repository
     protected $context;
 
     /** @var object */
-    protected $log;
+    public $log;
 
     /** @var object OrderStateRepository */
     protected $order_state;
@@ -181,13 +181,14 @@ class InstallRepository extends Repository
     /** @var object */
     protected $payplug;
 
-    public function __construct($config, $constant, $context, $order_state, $shop, $tools, $payplug)
+    public function __construct($config, $constant, $context, $order_state, $shop, $sql, $tools, $payplug)
     {
         $this->config = $config;
         $this->constant = $constant;
         $this->context = $context;
         $this->order_state = $order_state;
         $this->shop = $shop;
+        $this->sql = $sql;
         $this->tools = $tools;
 
         $this->payplug = $payplug;
@@ -367,64 +368,63 @@ class InstallRepository extends Repository
     public function install()
     {
         $this->log->info('Starting to install again.');
-        $install = [
-            'flag' => true,
-            'error' => false
-        ];
 
         // check requirement
         $report = $this->checkRequirements();
-        if (!$report['php']['up2date'] && $install['flag']) {
-            $this->installError($this->l('Install failed: PHP Requirement.'));
+        if (!$report['php']['up2date']) {
+            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
         }
-        if (!$report['curl']['up2date'] && $install['flag']) {
-            $this->installError($this->l('Install failed: cURL Requirement.'));
+        if (!$report['curl']['up2date']) {
+            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
+        }
+        if (!$report['openssl']['up2date']) {
+            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
         }
 
-        if (!$report['openssl']['up2date'] && $install['flag']) {
-            $this->installError($this->l('Install failed: OpenSSL Requirement.'));
-        }
-
+        //
         if ($this->shop->isFeatureActive()) {
             $this->shop->setContext();
         }
 
         // Set payplug config
-        if (!$this->createConfig() && $install['flag']) {
-            $this->installError($this->l('Install failed: createConfig()'));
+        if (!$this->createConfig()) {
+            return $this->setInstallError($this->l('Install failed: createConfig()'));
         }
 
         // Install order state
-        if (!$this->createOrderStates() && $install['flag']) {
-            $this->installError($this->l('Install failed: Create order states.'));
+        if (!$this->createOrderStates()) {
+            return $this->setInstallError($this->l('Install failed: Create order states.'));
         }
 
         // Install SQL
-        if (!(new SQLtableRepository())->installSQL()) {
-            $this->installError($this->l('Install failed: Install SQL tables.'));
+        if (!$this->sql->installSQL()) {
+            return $this->setInstallError($this->l('Install failed: Install SQL tables.'));
         }
 
         // Install tab
-        $this->log->info('Début Tab');
-        if (!$this->payplug->PrestashopSpecificObject->installTab() && $install['flag']) {
-            $this->installError($this->l('Install failed: Install Tab'));
+        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
+            return $this->setInstallError($this->l('Install failed: Install Tab'));
         }
-        $this->log->info('Fin Tab.');
 
-        if ($install['flag']) {
-            $this->log->info('Install successful.');
-            return true;
-        }
+        $this->log->info('Install successful.');
+        return true;
+    }
+
+    /**
+     * @description Set error on module installation
+     * @param $error
+     */
+    public function setInstallError($error)
+    {
+        $this->myLogPHP->error($error);
+        $this->payplug->_errors[] = $this->tools->displayError($error);
 
         $this->log->info('Install failed.');
-        $this->log->info('Install error: ' . $install['error']);
+        $this->log->info('Install error: ' . $error);
 
         // revert installation
         $this->uninstall();
-        $install['error'] = (isset($install['error'])) ? 'Élément en cause : ' . $install['error'] : '';
-        $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé 
-        en raison d\'une erreur. Les modifications apportées ont bien été annulées.');
-        $this->context->controller->errors[] = $install['error'];
+
         return false;
     }
 
@@ -459,16 +459,5 @@ class InstallRepository extends Repository
             return true;
         }
         return false;
-    }
-
-    public function installError($error)
-    {
-        $this->myLogPHP->error($error);
-        $this->payplug->_errors[] = Tools::displayError($this->payplug->l($error));
-
-        return [
-            'flag' => false,
-            'error' => $error
-        ];
     }
 }

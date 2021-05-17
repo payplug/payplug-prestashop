@@ -60,6 +60,7 @@ class PluginRepository extends Repository
     private $order_state;
     private $payment;
     private $query;
+    private $sql;
     private $translate;
 
     // Specific classes
@@ -123,6 +124,7 @@ class PluginRepository extends Repository
         $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
+        $this->sql = new SQLtableRepository();
         $this->translate = new TranslationsRepository($this->payplug);
 
         $this->hookRepo = new HookRepository(
@@ -168,6 +170,7 @@ class PluginRepository extends Repository
             $this->context,
             $this->order_state,
             $this->shop,
+            $this->sql,
             $this->tools,
             $this->payplug
         );
