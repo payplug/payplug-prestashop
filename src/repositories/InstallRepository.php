@@ -176,6 +176,9 @@ class InstallRepository extends Repository
     protected $shop;
 
     /** @var object */
+    protected $sql;
+
+    /** @var object */
     protected $tools;
 
     /** @var object */
@@ -450,7 +453,7 @@ class InstallRepository extends Repository
 
         if (!$this->deleteConfig()) {
             $this->log->error('Uninstall failed: configuration.');
-        } elseif (!(new SQLtableRepository())->uninstallSQL($keep_cards)) {
+        } elseif (!$this->sql->uninstallSQL($keep_cards)) {
             $this->log->error('Uninstall failed: sql.');
         } elseif (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
             $this->log->error('Uninstall failed: tab.');

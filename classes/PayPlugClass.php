@@ -293,6 +293,9 @@ class PayPlugClass extends PaymentModule
     /** @var string */
     public $site_url;
 
+    /** @var object */
+    private $sql;
+
     /** @var bool */
     private $ssl_enable;
 
@@ -2983,7 +2986,7 @@ class PayPlugClass extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        if ((new SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+        if ($this->sql->checkExistingTable('payplug_cache', 1)) {
             return $this
                 ->getPlugin()
                 ->getCache()
@@ -2999,7 +3002,7 @@ class PayPlugClass extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        if ((new SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+        if ($this->sql->checkExistingTable('payplug_cache', 1)) {
             return $this
                 ->getPlugin()
                 ->getCache()
@@ -3888,6 +3891,7 @@ class PayPlugClass extends PaymentModule
         $this->oney = $this->getPlugin()->getOney();
         $this->payment = $this->getPlugin()->getPayment();
         $this->query = $this->getPlugin()->getQuery();
+        $this->sql = $this->getPlugin()->getSql();
         $this->tools = $this->getPlugin()->getTools();
         $this->order_state = $this->getPlugin()->getOrderState();
     }
@@ -5574,7 +5578,7 @@ class PayPlugClass extends PaymentModule
      */
     public function uninstallCards()
     {
-        if ((new SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
+        if ($this->sql->checkExistingTable('payplug_card', 1)) {
             $cards = $this->query
                 ->select()
                 ->fields('*')
