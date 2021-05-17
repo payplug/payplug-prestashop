@@ -414,7 +414,7 @@ class InstallRepository extends Repository
      * @description Set error on module installation
      * @param $error
      */
-    public function setInstallError($error)
+    public function setInstallError($error = '')
     {
         $this->myLogPHP->error($error);
         $this->payplug->_errors[] = $this->tools->displayError($error);
@@ -425,6 +425,12 @@ class InstallRepository extends Repository
         // revert installation
         $this->uninstall();
 
+        return false;
+    }
+
+    public function setUninstallError($error = '')
+    {
+        $this->log->error($error);
         return false;
     }
 
@@ -439,25 +445,29 @@ class InstallRepository extends Repository
         $keep_cards = (bool)$this->config->get('PAYPLUG_KEEP_CARDS');
         if (!$keep_cards) {
             $this->log->info('Saved cards will be deleted.');
+
             if (!$this->payplug->uninstallCards()) {
-                $this->log->error('Unable to delete saved cards.');
-            } else {
-                $this->log->info('Saved cards successfully deleted.');
+                return $this->setUninstallError('Unable to delete saved cards.');
             }
+
+            $this->log->info('Saved cards successfully deleted.');
         } else {
             $this->log->info('Cards will be kept.');
         }
 
         if (!$this->deleteConfig()) {
-            $this->log->error('Uninstall failed: configuration.');
-        } elseif (!(new SQLtableRepository())->uninstallSQL($keep_cards)) {
-            $this->log->error('Uninstall failed: sql.');
-        } elseif (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
-            $this->log->error('Uninstall failed: tab.');
-        } else {
-            $this->log->info('Uninstall succeeded.');
-            return true;
+            return $this->setUninstallError('Uninstall failed: configuration.');
         }
-        return false;
+
+        if (!$this->sql->uninstallSQL($keep_cards)) {
+            return $this->setUninstallError('Uninstall failed: sql.');
+        }
+
+        if (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
+            return $this->setUninstallError('Uninstall failed: tab.');
+        }
+
+        $this->log->info('Uninstall succeeded.');
+        return true;
     }
 }
