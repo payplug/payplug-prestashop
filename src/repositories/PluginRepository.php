@@ -125,7 +125,7 @@ class PluginRepository extends Repository
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository($this->payplug);
 
-        $this->hookRepo = new HookRepository(
+        $this->hook = new HookRepository(
             $this->payplug,
             $this->constant
         );
