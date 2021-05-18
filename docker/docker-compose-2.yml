@@ -1,14 +1,14 @@
 version: '3'
 services:
-  presta:
-    image: prestashop/prestashop:1.7.7-7.3
+  presta_2:
+    image: prestashop/prestashop:1.6-5.6-apache
     volumes:
       - ../:/var/www/html/modules/payplug
     environment:
       - PS_DEV_MODE=1
       - DB_NAME=prestashop
-      - DB_SERVER=database
-      - PS_DOMAIN=localhost
+      - DB_SERVER=database_2
+      - PS_DOMAIN=localhost:8001
       - PS_INSTALL_AUTO=1
       - ADMIN_MAIL=admin@example.com
       - ADMIN_PASSWD=password
@@ -16,22 +16,22 @@ services:
       - PS_LANGUAGE=fr
       - PS_COUNTRY=FR
     ports:
-      - "80:80"
+      - "8001:80"
     depends_on:
-      - database
+      - database_2
     links:
-       - database
-  phpmyadmin:
+       - database_2
+  phpmyadmin_2:
     image: phpmyadmin/phpmyadmin
     restart: always
     environment:
-      PMA_HOST: database
+      PMA_HOST: database_2
       MYSQL_ROOT_PASSWORD: admin
     ports:
-      - 8000:80
+      - 8002:80
     depends_on:
-      - database
-  database:
+      - database_2
+  database_2:
     image: mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=admin
@@ -39,6 +39,6 @@ services:
       - MYSQL_USER=ps_user
       - MYSQL_PASSWORD=admin
     expose:
-      - 3306
+      - 3308
     ports:
-      - "3306:3306"
+      - "3308:3306"
