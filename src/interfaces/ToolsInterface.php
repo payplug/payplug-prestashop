@@ -26,6 +26,4 @@ namespace PayPlug\src\interfaces;
 interface ToolsInterface
 {
     public function tool($action, $param1, $param2);
-    public function displayError($string);
-    public function strtoupper($string);
 }

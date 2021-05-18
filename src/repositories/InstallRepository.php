@@ -304,7 +304,7 @@ class InstallRepository extends Repository
     public function setInstallError($error = '')
     {
         $this->myLogPHP->error($error);
-        $this->payplug->_errors[] = $this->tools->displayError($error);
+        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
 
         $this->log->info('Install failed.');
         $this->log->info('Install error: ' . $error);

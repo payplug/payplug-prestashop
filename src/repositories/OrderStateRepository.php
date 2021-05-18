@@ -44,7 +44,7 @@ class OrderStateRepository extends Repository
     public function create($name, $state, $sandbox = true, $force = false)
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $key_config = 'PAYPLUG_ORDER_STATE_' . $this->tools->strtoupper($name) . ($sandbox ? '_TEST' : '');
+        $key_config = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $name) . ($sandbox ? '_TEST' : '');
 
         $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
         $os = $this->configuration->get($key_config);
