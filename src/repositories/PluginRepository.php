@@ -24,9 +24,12 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
+
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\OrderStateEntity;
+
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
@@ -48,6 +51,7 @@ class PluginRepository extends Repository
     private $oneyEntity;
     private $paymentEntity;
     private $plugin;
+    private $order_state_entity;
 
     // Repositories & necessary classes
     private $cache;
@@ -115,6 +119,7 @@ class PluginRepository extends Repository
         $this->oneyEntity = new OneyEntity();
         $this->paymentEntity = new PaymentEntity();
         $this->plugin = new PluginEntity();
+        $this->order_state_entity = new OrderStateEntity();
     }
 
     private function setRepositories()
@@ -167,6 +172,7 @@ class PluginRepository extends Repository
             $this->constant,
             $this->context,
             $this->order_state,
+            $this->order_state_entity,
             $this->shop,
             $this->tools,
             $this->payplug

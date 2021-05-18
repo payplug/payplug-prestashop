@@ -42,135 +42,8 @@ class InstallRepository extends Repository
     /** @var object OrderStateRepository */
     protected $order_state;
 
-    /** @var array */
-    private $order_states_list = [
-        'paid' => [
-            'cfg' => 'PS_OS_PAYMENT',
-            'template' => 'payment',
-            'logable' => true,
-            'send_email' => true,
-            'paid' => true,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => true,
-            'color' => '#04b404',
-            'name' => [
-                'en' => 'Payment accepted',
-                'fr' => 'Paiement effectué',
-                'es' => 'Pago efectuado',
-                'it' => 'Pagamento effettuato',
-            ],
-        ],
-        'refund' => [
-            'cfg' => 'PS_OS_REFUND',
-            'template' => 'refund',
-            'logable' => false,
-            'send_email' => true,
-            'paid' => false,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => true,
-            'color' => '#ea3737',
-            'name' => [
-                'en' => 'Refunded',
-                'fr' => 'Remboursé',
-                'es' => 'Reembolsado',
-                'it' => 'Rimborsato',
-            ],
-        ],
-        'pending' => [
-            'cfg' => 'PS_OS_PENDING',
-            'template' => null,
-            'logable' => false,
-            'send_email' => false,
-            'paid' => false,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => true,
-            'color' => '#a1f8a1',
-            'name' => [
-                'en' => 'Payment in progress',
-                'fr' => 'Paiement en cours',
-                'es' => 'Pago en curso',
-                'it' => 'Pagamento in corso',
-            ],
-        ],
-        'error' => [
-            'cfg' => 'PS_OS_ERROR',
-            'template' => 'payment_error',
-            'logable' => false,
-            'send_email' => true,
-            'paid' => false,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => false,
-            'color' => '#8f0621',
-            'name' => [
-                'en' => 'Payment failed',
-                'fr' => 'Paiement échoué',
-                'es' => 'Payment failed',
-                'it' => 'Payment failed',
-            ],
-        ],
-        'auth' => [
-            'cfg' => null,
-            'template' => null,
-            'logable' => false,
-            'send_email' => false,
-            'paid' => true,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => false,
-            'color' => '#04b404',
-            'name' => [
-                'en' => 'Payment authorized',
-                'fr' => 'Paiement autorisé',
-                'es' => 'Pago',
-                'it' => 'Pagamento',
-            ],
-        ],
-        'exp' => [
-            'cfg' => null,
-            'template' => null,
-            'logable' => false,
-            'send_email' => false,
-            'paid' => false,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => false,
-            'color' => '#8f0621',
-            'name' => [
-                'en' => 'Authoriation expired',
-                'es' => 'Autorización vencida',
-                'fr' => 'Autorisation expirée',
-                'it' => 'Autorizzazione scaduta',
-            ],
-        ],
-        'oney_pg' => [
-            'cfg' => null,
-            'template' => null,
-            'logable' => false,
-            'send_email' => false,
-            'paid' => false,
-            'module_name' => 'payplug',
-            'hidden' => false,
-            'delivery' => false,
-            'invoice' => false,
-            'color' => '#a1f8a1',
-            'name' => [
-                'en' => 'Oney - Pending',
-                'fr' => 'Oney - En attente',
-                'es' => 'Oney - Pending',
-                'it' => 'Oney - Pending',
-            ],
-        ]
-    ];
+    /** @var object */
+    protected $order_state_entity;
 
     /** @var object */
     protected $shop;
@@ -181,18 +54,29 @@ class InstallRepository extends Repository
     /** @var object */
     protected $payplug;
 
-    public function __construct($config, $constant, $context, $order_state, $shop, $tools, $payplug)
-    {
+    public function __construct(
+        $config,
+        $constant,
+        $context,
+        $order_state,
+        $order_state_entity,
+        $shop,
+        $tools,
+        $payplug
+    ) {
         $this->config = $config;
         $this->constant = $constant;
         $this->context = $context;
         $this->order_state = $order_state;
+        $this->order_state_entity = $order_state_entity;
         $this->shop = $shop;
         $this->tools = $tools;
 
         $this->payplug = $payplug;
 
         $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
+
+        $this->setParams();
     }
 
     /**
@@ -296,7 +180,8 @@ class InstallRepository extends Repository
      */
     public function createOrderStates()
     {
-        foreach ($this->order_states_list as $key => $state) {
+        $order_states_list = $this->order_state_entity->getList();
+        foreach ($order_states_list as $key => $state) {
             $this->order_state->create($key, $state, true);
             $this->order_state->create($key, $state, false);
         }
@@ -358,10 +243,10 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @todo: repatriate uninstall code
-     * @description Install PayPlug Module
      * @param bool $soft_install
      * @return bool
+     * @todo: repatriate uninstall code
+     * @description Install PayPlug Module
      * @see Module::install()
      */
     public function install()
@@ -426,6 +311,138 @@ class InstallRepository extends Repository
         en raison d\'une erreur. Les modifications apportées ont bien été annulées.');
         $this->context->controller->errors[] = $install['error'];
         return false;
+    }
+
+    protected function setParams()
+    {
+        $this->order_state_entity->setList([
+            'paid' => [
+                'cfg' => 'PS_OS_PAYMENT',
+                'template' => 'payment',
+                'logable' => true,
+                'send_email' => true,
+                'paid' => true,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#04b404',
+                'name' => [
+                    'en' => 'Payment accepted',
+                    'fr' => 'Paiement effectué',
+                    'es' => 'Pago efectuado',
+                    'it' => 'Pagamento effettuato',
+                ],
+            ],
+            'refund' => [
+                'cfg' => 'PS_OS_REFUND',
+                'template' => 'refund',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#ea3737',
+                'name' => [
+                    'en' => 'Refunded',
+                    'fr' => 'Remboursé',
+                    'es' => 'Reembolsado',
+                    'it' => 'Rimborsato',
+                ],
+            ],
+            'pending' => [
+                'cfg' => 'PS_OS_PENDING',
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#a1f8a1',
+                'name' => [
+                    'en' => 'Payment in progress',
+                    'fr' => 'Paiement en cours',
+                    'es' => 'Pago en curso',
+                    'it' => 'Pagamento in corso',
+                ],
+            ],
+            'error' => [
+                'cfg' => 'PS_OS_ERROR',
+                'template' => 'payment_error',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#8f0621',
+                'name' => [
+                    'en' => 'Payment failed',
+                    'fr' => 'Paiement échoué',
+                    'es' => 'Payment failed',
+                    'it' => 'Payment failed',
+                ],
+            ],
+            'auth' => [
+                'cfg' => null,
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => true,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#04b404',
+                'name' => [
+                    'en' => 'Payment authorized',
+                    'fr' => 'Paiement autorisé',
+                    'es' => 'Pago',
+                    'it' => 'Pagamento',
+                ],
+            ],
+            'exp' => [
+                'cfg' => null,
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#8f0621',
+                'name' => [
+                    'en' => 'Authoriation expired',
+                    'es' => 'Autorización vencida',
+                    'fr' => 'Autorisation expirée',
+                    'it' => 'Autorizzazione scaduta',
+                ],
+            ],
+            'oney_pg' => [
+                'cfg' => null,
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#a1f8a1',
+                'name' => [
+                    'en' => 'Oney - Pending',
+                    'fr' => 'Oney - En attente',
+                    'es' => 'Oney - Pending',
+                    'it' => 'Oney - Pending',
+                ],
+            ]
+        ]);
     }
 
     /**
