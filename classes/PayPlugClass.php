@@ -21,21 +21,52 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-/**
- * Core file of PayPlug module
- */
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHPClass.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/backward/PayPlugBackward.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/src/specific/PrestashopLoaderSpecific.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPaymentInstallment.php');
+namespace PayPlug\classes;
+
+// Global
+use Exception;
+
+// PayPlug
+use MyLogPHPClass;
+use Payplug\Authentication;
+use Payplug\Core\HttpClient;
+use Payplug\Exception\BadRequestException;
+use Payplug\Exception\ConfigurationException;
+use Payplug\InstallmentPlan;
+use Payplug\Payment;
+use Payplug\Payplug;
+use Payplug\Refund;
+use PayPlug\src\repositories\PluginRepository;
+use PayPlug\src\repositories\SQLtableRepository;
+use PayPlug\backward\PayPlugBackward;
+
+// Prestashop
+use Address;
+use Cart;
+use Configuration;
+use Context;
+use Country;
+use Currency;
+use Customer;
+use Db;
+use DbQuery;
+use Dispatcher;
+use Language;
+use Media;
+use Module;
+use Order;
+use OrderState;
+use PaymentModule;
+use Product;
+use Tab;
+use Tools;
+use Validate;
+
+use libphonenumberlight;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 
 class PayPlugClass extends PaymentModule
 {
@@ -253,14 +284,17 @@ class PayPlugClass extends PaymentModule
     /** @var PluginEntity */
     protected $plugin;
 
-    protected $PrestashopSpecificClass;
+    public $PrestashopSpecificClass;
 
-    protected $PrestashopSpecificObject;
+    public $PrestashopSpecificObject;
 
     protected $query;
 
     /** @var string */
     public $site_url;
+
+    /** @var object */
+    private $sql;
 
     /** @var bool */
     private $ssl_enable;
@@ -312,15 +346,15 @@ class PayPlugClass extends PaymentModule
         $id_order = Tools::getValue('id_order');
 
         try {
-            $abort = \Payplug\InstallmentPlan::abort($inst_id);
+            $abort = InstallmentPlan::abort($inst_id);
         } catch (Exception $e) {
             if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
                 $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                $abort = \Payplug\InstallmentPlan::abort($inst_id);
+                $abort = InstallmentPlan::abort($inst_id);
                 $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
             } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
                 $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                $abort = \Payplug\InstallmentPlan::abort($inst_id);
+                $abort = InstallmentPlan::abort($inst_id);
                 $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
             }
         }
@@ -388,7 +422,7 @@ class PayPlugClass extends PaymentModule
     public function addPayplugInstallment($installment, $order)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
 
         if ($this->getStoredInstallment($installment)) {
@@ -515,7 +549,7 @@ class PayPlugClass extends PaymentModule
              */
             $password = $_POST['PAYPLUG_PASSWORD'];
             $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
                     'content' => null,
                     'error' => $this->l('The email and/or password was not correct.')
@@ -540,7 +574,7 @@ class PayPlugClass extends PaymentModule
 
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
-            if (!$password || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+            if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode(['content' => null, 'error' => $this->l('The password you entered is invalid')]));
             }
 
@@ -661,6 +695,7 @@ class PayPlugClass extends PaymentModule
             'email' => Configuration::get('PAYPLUG_EMAIL'),
             'sandbox_mode' => Configuration::get('PAYPLUG_SANDBOX_MODE'),
             'embedded_mode' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
+            'standard' => Configuration::get('PAYPLUG_STANDARD'),
             'one_click' => Configuration::get('PAYPLUG_ONE_CLICK'),
             'inst' => Configuration::get('PAYPLUG_INST'),
             'inst_mode' => Configuration::get('PAYPLUG_INST_MODE'),
@@ -788,10 +823,10 @@ class PayPlugClass extends PaymentModule
      */
     public function assignPaymentOptions($cart)
     {
-        $one_click = $this->getConfiguration('PAYPLUG_ONE_CLICK');
-        $installment = $this->getConfiguration('PAYPLUG_INST');
-        $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
-        $installment_min_amount = $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT');
+        $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
+        $installment = Configuration::get('PAYPLUG_INST');
+        $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
+        $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
 
         if (!$this->checkCurrency($cart) ||
             !$this->checkAmount($cart)) {
@@ -804,7 +839,7 @@ class PayPlugClass extends PaymentModule
 
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
 
-        $use_taxes = $this->getConfiguration('PS_TAX');
+        $use_taxes = Configuration::get('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
         $base_total_tax_exc = $cart->getOrderTotal(false);
 
@@ -852,7 +887,7 @@ class PayPlugClass extends PaymentModule
         }
 
         $this->smarty->assign([
-            'spinner_url' => PayplugBackward::getHttpHost(true)
+            'spinner_url' => Tools::getHttpHost(true)
                 . __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
             'payment_url' => $payment_url,
             'payment_controller_url' => $payment_controller_url,
@@ -901,6 +936,14 @@ class PayPlugClass extends PaymentModule
             'name' => 'payplug_one_click',
             'active' => $connected,
             'checked' => $configurations['one_click'],
+            'label_left' => $this->l('yes'),
+            'label_right' => $this->l('no'),
+        ];
+
+        $switch['standard'] = [
+            'name' => 'payplug_standard',
+            'active' => $connected,
+            'checked' => $configurations['standard'],
             'label_left' => $this->l('yes'),
             'label_right' => $this->l('no'),
         ];
@@ -964,7 +1007,7 @@ class PayPlugClass extends PaymentModule
     {
         if (!is_object($payment)) {
             try {
-                $payment = \Payplug\Payment::retrieve($payment);
+                $payment = Payment::retrieve($payment);
             } catch (Exception $exception) {
                 return $exception;
             }
@@ -1296,7 +1339,7 @@ class PayPlugClass extends PaymentModule
         $payplug_test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
         $payplug_live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
 
-        $report = $this->checkRequirements();
+        $report = $this->plugin->getInstall()->checkRequirements();
 
         if (empty($payplug_email) || (empty($payplug_test_api_key) && empty($payplug_live_api_key))) {
             $is_payplug_connected = false;
@@ -1412,74 +1455,6 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @return array
-     */
-    protected function checkRequirements()
-    {
-        $php_min_version = 50600;
-        $curl_min_version = '7.21';
-        $openssl_min_version = 0x1000100f;
-        $report = [
-            'php' => [
-                'version' => 0,
-                'installed' => true,
-                'up2date' => false,
-            ],
-            'curl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-            'openssl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-        ];
-
-        //PHP
-        if (!defined('PHP_VERSION_ID')) {
-            $report['php']['version'] = PHP_VERSION;
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
-
-        //cURL
-        $curl_exists = extension_loaded('curl');
-        if ($curl_exists) {
-            $curl_version = curl_version();
-            $report['curl']['version'] = $curl_version['version'];
-            $report['curl']['installed'] = true;
-            $report['curl']['up2date'] = version_compare(
-                $curl_version['version'],
-                $curl_min_version,
-                '>='
-            ) ? true : false;
-        }
-
-        //OpenSSl
-        $openssl_exists = extension_loaded('openssl');
-        if ($openssl_exists) {
-            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
-            $report['openssl']['installed'] = true;
-            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
-        }
-
-        return $report;
-    }
-
-    /**
-     * Check Prestashop version for new feature
-     * @param string $min
-     * @return bool
-     */
-    public function checkVersion($min = '1.6')
-    {
-        return (bool)version_compare(_PS_VERSION_, $min, '>=');
-    }
-
-    /**
      * Format amount float to int or int to float
      *
      * @param $amount
@@ -1495,40 +1470,6 @@ class PayPlugClass extends PaymentModule
             $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
             return (int)Tools::ps_round($amount);
         }
-    }
-
-    /**
-     * @description
-     * Create basic configuration
-     *
-     * @return bool
-     */
-    protected function createConfig()
-    {
-        return (Configuration::updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
-            && Configuration::updateValue('PAYPLUG_COMPANY_ID', null)
-            && Configuration::updateValue('PAYPLUG_COMPANY_STATUS', '')
-            && Configuration::updateValue('PAYPLUG_CURRENCIES', 'EUR')
-            && Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0)
-            && Configuration::updateValue('PAYPLUG_EMAIL', null)
-            && Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 0)
-            && Configuration::updateValue('PAYPLUG_INST', null)
-            && Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
-            && Configuration::updateValue('PAYPLUG_INST_MODE', 3)
-            && Configuration::updateValue('PAYPLUG_KEEP_CARDS', 0)
-            && Configuration::updateValue('PAYPLUG_LIVE_API_KEY', null)
-            && Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
-            && Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
-            && Configuration::updateValue('PAYPLUG_OFFER', '')
-            && Configuration::updateValue('PAYPLUG_ONEY', null)
-            && Configuration::updateValue('PAYPLUG_ONE_CLICK', null)
-            && Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 1)
-            && Configuration::updateValue('PAYPLUG_SHOW', 0)
-            && Configuration::updateValue('PAYPLUG_TEST_API_KEY', null)
-            && Configuration::updateValue('PAYPLUG_DEFERRED', 0)
-            && Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', 0)
-            && Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0)
-        );
     }
 
     /**
@@ -1571,7 +1512,7 @@ class PayPlugClass extends PaymentModule
 
     public function createOrderState($name, $state, $sandbox = true, $force = false)
     {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $key_config = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($name) . ($sandbox ? '_TEST' : '');
 
         $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
@@ -1637,79 +1578,6 @@ class PayPlugClass extends PaymentModule
         }
 
         return Configuration::updateValue($key_config, $os);
-    }
-
-    /**
-     * Create usual status
-     *
-     * @return bool
-     * @throws Exception
-     */
-    public function createOrderStates()
-    {
-        $this->log_install->info('Order state creation starting.');
-
-        foreach ($this->order_states as $key => $state) {
-            $this->createOrderState($key, $state, true);
-            $this->createOrderState($key, $state, false);
-        }
-
-        $this->order_state->removeIdsUnusedByPayPlug();
-
-        $this->log_install->info('Order state creation ended.');
-        return true;
-    }
-
-    /**
-     * Delete basic configuration
-     *
-     * @return bool
-     */
-    private function deleteConfig()
-    {
-        return (Configuration::deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
-            && Configuration::deleteByName('PAYPLUG_COMPANY_ID')
-            && Configuration::deleteByName('PAYPLUG_COMPANY_ID_TEST')
-            && Configuration::deleteByName('PAYPLUG_COMPANY_STATUS')
-            && Configuration::deleteByName('PAYPLUG_CONFIGURATION_OK')
-            && Configuration::deleteByName('PAYPLUG_CURRENCIES')
-            && Configuration::deleteByName('PAYPLUG_DEBUG_MODE')
-            && Configuration::deleteByName('PAYPLUG_EMAIL')
-            && Configuration::deleteByName('PAYPLUG_EMBEDDED_MODE')
-            && Configuration::deleteByName('PAYPLUG_INST')
-            && Configuration::deleteByName('PAYPLUG_INST_MIN_AMOUNT')
-            && Configuration::deleteByName('PAYPLUG_INST_MODE')
-            && Configuration::deleteByName('PAYPLUG_KEEP_CARDS')
-            && Configuration::deleteByName('PAYPLUG_LIVE_API_KEY')
-            && Configuration::deleteByName('PAYPLUG_MAX_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_MIN_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_OFFER')
-            && Configuration::deleteByName('PAYPLUG_ONE_CLICK')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ERROR')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PAID')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PENDING')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_REFUND')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
-            && Configuration::deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
-            && Configuration::deleteByName('PAYPLUG_ONEY')
-            && Configuration::deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && Configuration::deleteByName('PAYPLUG_SANDBOX_MODE')
-            && Configuration::deleteByName('PAYPLUG_SHOW')
-            && Configuration::deleteByName('PAYPLUG_TEST_API_KEY')
-            && Configuration::deleteByName('PAYPLUG_DEFERRED')
-            && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO')
-            && Configuration::deleteByName('PAYPLUG_DEFERRED_STATE')
-        );
     }
 
     /**
@@ -1942,37 +1810,6 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * Find id_order_state by name
-     *
-     * @param array $name
-     * @param bool $test_mode
-     * @return int OR bool
-     */
-    private function findOrderState($name, $test_mode = false)
-    {
-        if (!is_array($name) || empty($name)) {
-            return false;
-        } else {
-            $req_order_state = new DbQuery();
-            $req_order_state->select('DISTINCT osl.id_order_state');
-            $req_order_state->from('order_state_lang', 'osl');
-            $req_order_state->where(
-                'osl.name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-            );
-            $res_order_state = Db::getInstance()->getValue($req_order_state);
-
-            if (!$res_order_state) {
-                return false;
-            } else {
-                return (int)$res_order_state;
-            }
-        }
-    }
-
-    /**
      * Return international formated phone number (norm E.164)
      *
      * @param $phone_number
@@ -1993,7 +1830,7 @@ class PayPlugClass extends PaymentModule
 
         try {
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!$phone_util->isValidNumber($parsed)) {
@@ -2053,12 +1890,12 @@ class PayPlugClass extends PaymentModule
      *
      * @param string $api_key
      * @param boolean $sandbox
-     * @return array OR bool
+     * @return array | bool
      */
     public function getAccount($api_key, $sandbox = true)
     {
         $this->setSecretKey($api_key);
-        $response = \Payplug\Authentication::getAccount();
+        $response = Authentication::getAccount();
         $json_answer = $response['httpResponse'];
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
@@ -2111,26 +1948,26 @@ class PayPlugClass extends PaymentModule
         ];
 
         if (!$this->active ||
-            !$this->getConfiguration('PAYPLUG_SHOW') ||
+            !Configuration::get('PAYPLUG_SHOW') ||
             !$this->checkCurrency($cart) ||
             !$this->checkAmount($cart)) {
             return $options;
         }
 
         // check if installment allowed
-        $installment = $this->getConfiguration('PAYPLUG_INST');
-        $installment_min_amount = $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT');
+        $installment = Configuration::get('PAYPLUG_INST');
+        $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
         $order_total = $cart->getOrderTotal(true);
         $installment = $installment && $order_total >= $installment_min_amount;
 
         // check if one click allowed
-        $one_click = $this->getConfiguration('PAYPLUG_ONE_CLICK');
+        $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
         $payplug_card = $this->card;
         $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
-        $oney = $this->getConfiguration('PAYPLUG_ONEY') && $this->checkVersion();
+        $oney = Configuration::get('PAYPLUG_ONEY');
 
         $options = [
             'standard' => true,
@@ -2245,15 +2082,6 @@ class PayPlugClass extends PaymentModule
         $this->html = $this->fetchTemplate('/views/templates/admin/panel/fieldset.tpl');
 
         return $this->html;
-    }
-
-    public function getConfiguration($key)
-    {
-        if (isset($this->_conf[$key])) {
-            return $this->_conf[$key]['value'];
-        } else {
-            return Configuration::get($key);
-        }
     }
 
     /**
@@ -2564,48 +2392,49 @@ class PayPlugClass extends PaymentModule
 
         $paymentOption = [];
 
+        // if (Configuration::get('PAYPLUG_STANDARD')) {
         // OneClick Payment
         if ($options['one_click'] && !empty($payplug_cards)) {
             foreach ($payplug_cards as $card) {
                 $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
                 $paymentOption['one_click_' . $card['id_payplug_card']]['name'] = 'one_click';
                 $paymentOption['one_click_' . $card['id_payplug_card']]['inputs'] = [
-                    'pc' => [
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => (int)$card['id_payplug_card'],
-                    ],
-                    'pay' => [
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ],
-                    'id_cart' => [
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int)$this->context->cart->id,
-                    ],
-                    'method' => [
-                        'name' => 'method',
-                        'type' => 'hidden',
-                        'value' => 'one_click',
-                    ],
-                ];
+                        'pc' => [
+                            'name' => 'pc',
+                            'type' => 'hidden',
+                            'value' => (int)$card['id_payplug_card'],
+                        ],
+                        'pay' => [
+                            'name' => 'pay',
+                            'type' => 'hidden',
+                            'value' => '1',
+                        ],
+                        'id_cart' => [
+                            'name' => 'id_cart',
+                            'type' => 'hidden',
+                            'value' => (int)$this->context->cart->id,
+                        ],
+                        'method' => [
+                            'name' => 'method',
+                            'type' => 'hidden',
+                            'value' => 'one_click',
+                        ],
+                    ];
                 $paymentOption['one_click_' . $card['id_payplug_card']]['tpl'] = 'one_click.tpl';
                 $paymentOption['one_click_' . $card['id_payplug_card']]['payment_controller_url'] =
-                    $this->context->link->getModuleLink(
-                        $this->name,
-                        'payment',
-                        [],
-                        true
-                    );
+                        $this->context->link->getModuleLink(
+                            $this->name,
+                            'payment',
+                            [],
+                            true
+                        );
                 $paymentOption['one_click_' . $card['id_payplug_card']]['logo'] = Media::getMediaPath(
                     _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'
                 );
                 $paymentOption['one_click_' . $card['id_payplug_card']]['callToActionText'] = $brand .
-                    ' **** **** **** ' . $card['last4'];
+                        ' **** **** **** ' . $card['last4'];
                 $paymentOption['one_click_' . $card['id_payplug_card']]['expiry_date_card'] =
-                    $this->l('Expiry date') . ': ' . $card['expiry_date'];
+                        $this->l('Expiry date') . ': ' . $card['expiry_date'];
                 $paymentOption['one_click_' . $card['id_payplug_card']]['action'] = $this->context->link->getModuleLink(
                     $this->name,
                     'dispatcher',
@@ -2616,30 +2445,30 @@ class PayPlugClass extends PaymentModule
             }
         }
 
-        // Standart Payment or new card from one-click
+        // Standard Payment or new card from one-click
         $paymentOption['standard']['name'] = 'standard';
         $paymentOption['standard']['inputs'] = [
-            'pc' => [
-                'name' => 'pc',
-                'type' => 'hidden',
-                'value' => 'new_card',
-            ],
-            'pay' => [
-                'name' => 'pay',
-                'type' => 'hidden',
-                'value' => '1',
-            ],
-            'id_cart' => [
-                'name' => 'id_cart',
-                'type' => 'hidden',
-                'value' => (int)$this->context->cart->id,
-            ],
-            'method' => [
-                'name' => 'method',
-                'type' => 'hidden',
-                'value' => 'standard',
-            ],
-        ];
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'standard',
+                ],
+            ];
         $paymentOption['standard']['tpl'] = 'standard.tpl';
         $paymentOption['standard']['extra_classes'] = 'payplug default';
         $paymentOption['standard']['payment_controller_url'] = $this->context->link->getModuleLink(
@@ -2649,7 +2478,7 @@ class PayPlugClass extends PaymentModule
         );
         $paymentOption['standard']['logo'] = Media::getMediaPath(
             _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
-                'none' : 'logos_schemes_' . $this->img_lang) . '.png'
+                    'none' : 'logos_schemes_' . $this->img_lang) . '.png'
         );
         if (count($payplug_cards) > 0) {
             $paymentOption['standard']['callToActionText'] = $this->l('Pay with a different card');
@@ -2663,13 +2492,14 @@ class PayPlugClass extends PaymentModule
             true
         );
         $paymentOption['standard']['moduleName'] = 'payplug';
+        // }
 
         // Installment Payment
         if ($options['installment']) {
             $use_taxes = (bool)Configuration::get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-            if ($cart_amount >= $this->getConfiguration('PAYPLUG_INST_MIN_AMOUNT')) {
-                $installment_mode = $this->getConfiguration('PAYPLUG_INST_MODE');
+            if ($cart_amount >= Configuration::get('PAYPLUG_INST_MIN_AMOUNT')) {
+                $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
                 $paymentOption['installment']['name'] = 'installment';
                 $paymentOption['installment']['inputs'] = [
                     'pc' => [
@@ -2869,11 +2699,11 @@ class PayPlugClass extends PaymentModule
             11 => 'abandoned',
         */
         if (!is_object($payment)) {
-            $payment = \Payplug\Payment::retrieve($payment);
+            $payment = Payment::retrieve($payment);
         }
 
         if ($payment->installment_plan_id !== null) {
-            $installment = \Payplug\InstallmentPlan::retrieve($payment->installment_plan_id);
+            $installment = InstallmentPlan::retrieve($payment->installment_plan_id);
         } else {
             $installment = null;
         }
@@ -2930,9 +2760,9 @@ class PayPlugClass extends PaymentModule
 
     /**
      * @description get cart installment backward
-     * @deprecated use for installment from PayPlug 3.1.3 or further
      * @param $id_cart
      * @return mixed
+     * @deprecated use for installment from PayPlug 3.1.3 or further
      */
     public function getPayplugInstallmentCartBackward($id_cart)
     {
@@ -3009,7 +2839,7 @@ class PayPlugClass extends PaymentModule
     public function getStoredInstallment($installment)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
         $req_installment = '
             SELECT pi.*
@@ -3032,7 +2862,7 @@ class PayPlugClass extends PaymentModule
     public function getStoredInstallmentTransaction($installment, $step)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
         $req_installment = '
             SELECT pi.*
@@ -3156,7 +2986,7 @@ class PayPlugClass extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+        if ($this->sql->checkExistingTable('payplug_cache', 1)) {
             return $this
                 ->getPlugin()
                 ->getCache()
@@ -3172,7 +3002,7 @@ class PayPlugClass extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_cache', 1)) {
+        if ($this->sql->checkExistingTable('payplug_cache', 1)) {
             return $this
                 ->getPlugin()
                 ->getCache()
@@ -3249,7 +3079,7 @@ class PayPlugClass extends PaymentModule
      * @return string
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationException
      */
     public function hookAdminOrder($params)
     {
@@ -3293,7 +3123,7 @@ class PayPlugClass extends PaymentModule
      * @return string
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationException
      * @see Module::hookAdminOrder()
      */
     public function hookDisplayAdminOrderMain($params)
@@ -3485,9 +3315,9 @@ class PayPlugClass extends PaymentModule
 
             // Update order state if is pending
             $state_addons = $payment->is_live ? '' : '_TEST';
-            $paid_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-            $oney_state = $this->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
-            $cancelled_state = $this->getConfiguration('PS_OS_CANCELED');
+            $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $oney_state = Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+            $cancelled_state = Configuration::get('PS_OS_CANCELED');
 
             if ($is_oney) {
                 // update order state from payment status
@@ -3739,11 +3569,8 @@ class PayPlugClass extends PaymentModule
 
     public function hookDisplayProductPriceBlock($param)
     {
-        if ((!$this->getConfiguration('PAYPLUG_ONEY'))
-            || (!$this->oney->isOneyAllowed())
-            || (Dispatcher::getInstance()->getController() == 'category')
-            || (Dispatcher::getInstance()->getController() == 'index')
-        ) {
+        $current_controller = Dispatcher::getInstance()->getController();
+        if (!$this->oney->isOneyAllowed() || in_array($current_controller, ['category', 'index'])) {
             return false;
         }
 
@@ -3751,8 +3578,11 @@ class PayPlugClass extends PaymentModule
         if ($action == 'quickview') {
             return false;
         }
-        if (!isset($param['product']) || !isset($param['type']) || $param['type'] != 'after_price') {
-            return;
+        if (!isset($param['product'])
+            || !isset($param['type'])
+            || !in_array($param['type'], ['after_price', 'price'])
+        ) {
+            return false;
         }
 
         if ($action == 'refresh') {
@@ -3881,7 +3711,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        $use_taxes = $this->getConfiguration('PS_TAX');
+        $use_taxes = Configuration::get('PS_TAX');
         $base_total_tax_inc = $params['cart']->getOrderTotal(true);
         $base_total_tax_exc = $params['cart']->getOrderTotal(false);
 
@@ -3893,7 +3723,7 @@ class PayPlugClass extends PaymentModule
 
         $cart = $params['cart'];
 
-        if ($this->getConfiguration('PAYPLUG_ONEY_OPTIMIZED')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3914,7 +3744,7 @@ class PayPlugClass extends PaymentModule
 
         $this->smarty->assign([
             'payplug_payment_options' => $paymentOptions,
-            'spinner_url' => PayplugBackward::getHttpHost(true) .
+            'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
             'front_ajax_url' => $this->context->link->getModuleLink($this->name, 'ajax', [], true),
             'api_url' => $this->plugin->getApiUrl(),
@@ -4054,13 +3884,14 @@ class PayPlugClass extends PaymentModule
 
     private function initializeAccessors()
     {
-        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this))->getEntity());
+        $this->setPlugin((new PluginRepository($this))->getEntity());
 
         $this->card = $this->getPlugin()->getCard();
         $this->logger = $this->getPlugin()->getLogger();
         $this->oney = $this->getPlugin()->getOney();
         $this->payment = $this->getPlugin()->getPayment();
         $this->query = $this->getPlugin()->getQuery();
+        $this->sql = $this->getPlugin()->getSql();
         $this->tools = $this->getPlugin()->getTools();
         $this->order_state = $this->getPlugin()->getOrderState();
     }
@@ -4070,11 +3901,11 @@ class PayPlugClass extends PaymentModule
         if ($sandbox === null) {
             $payplug_key = $this->current_api_key;
         } else {
-            $payplug_key = $this->getConfiguration('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
+            $payplug_key = Configuration::get('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
         }
 
         try {
-            \Payplug\Payplug::init(['secretKey' => $payplug_key, 'apiVersion' => $this->plugin->getApiVersion()]);
+            Payplug::init(['secretKey' => $payplug_key, 'apiVersion' => $this->plugin->getApiVersion()]);
 
             return $payplug_key;
         } catch (Exception $e) {
@@ -4084,296 +3915,13 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @return bool
-     * @throws Exception
-     * @see Module::install()
-     *
-     */
-    public function install()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Starting to install.');
-        $install = [
-            'flag' => true,
-            'error' => false
-        ];
-
-        $report = $this->checkRequirements();
-        if (!$report['php']['up2date'] && $install['flag']) {
-            $this->_errors[] = Tools::displayError($this->l('Your server must run PHP 5.3 or greater'));
-            $log->error('Install failed: PHP Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'Configuration PHP inf. version 5.3';
-        } else {
-            $log->info('Install success: PHP Requirement.');
-        }
-
-        if (!$report['curl']['up2date'] && $install['flag']) {
-            $this->_errors[] = Tools::displayError($this->l('PHP cURL extension must be enabled on your server'));
-            $log->error('Install failed: cURL Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'cURL Requirement';
-        } else {
-            $log->info('Install success: cURL Requirement.');
-        }
-
-        if (!$report['openssl']['up2date'] && $install['flag']) {
-            $this->_errors[] = Tools::displayError($this->l('OpenSSL 1.0.1 or later'));
-            $log->error('Install failed: OpenSSL Requirement.');
-            $install['flag'] = false;
-            $install['error'] = 'OpenSSL Requirement';
-        } else {
-            $log->info('Install success: OpenSSL Requirement.');
-        }
-
-        if (Shop::isFeatureActive()) {
-            Shop::setContext(Shop::CONTEXT_ALL);
-        }
-
-        $log->info('Starting to install parent::install().');
-        if (!parent::install() && $install['flag']) {
-            $log->error('Install failed: parent::install().');
-            $install['flag'] = false;
-            $install['error'] = 'parent::install()';
-            return false;
-        } else {
-            $log->info('Install success: parent::install().');
-        }
-
-        $log->info('----------------> Install hooks. <----------------');
-        $hooksToRegister = [
-            'paymentReturn',
-            'Header',
-            'adminOrder',
-            'displayAdminOrderMain',
-            'actionOrderStatusUpdate',
-            'customerAccount',
-            'paymentOptions',
-            'Payment',
-            'moduleRoutes',
-            'registerGDPRConsent',
-            'actionDeleteGDPRCustomer',
-            'actionExportGDPRData',
-            'actionObjectCarrierAddAfter',
-            'actionCarrierUpdate',
-            'displayProductPriceBlock',
-            'displayExpressCheckout',
-            'actionClearCompileCache',
-            'displayBeforeShoppingCartBlock',
-            'actionAdminControllerSetMedia',
-        ];
-
-        foreach ($hooksToRegister as $hookToRegister) {
-            $log->info('Try to install Hook ' . $hookToRegister . '.');
-            if (!$this->registerHook($hookToRegister) && $install['flag']) {
-                $log->error('Install failed: Hook ' . $hookToRegister . '.');
-                $install['flag'] = false;
-                $install['error'] = 'Hook ' . $hookToRegister . ' non greffé';
-                break;
-            } else {
-                $log->info('Install success: Hook ' . $hookToRegister . '.');
-            }
-        }
-
-        //install hook 1.6
-        $log->info('----------------> Install hooks 1.6. <----------------');
-        if ($install['flag']) {
-            $installHook16 = $this->installHook();
-            $install['flag'] = $installHook16['flag'];
-            $install['error'] = $installHook16['error'];
-        }
-        $log->info('----------------> Install hooks: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
-        $log->info('----------------> Install configuration. <----------------');
-        if (!$this->createConfig() && $install['flag']) {
-            $log->error('Install failed: configuration.');
-            $install['flag'] = false;
-            $install['error'] = 'Création des éléments de configuration  ($this->createConfig)';
-        }
-        $log->info('----------------> Install configuration: ' .
-            ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
-        $log->info('----------------> Install order states. <----------------');
-
-        if (!$this->createOrderStates() && $install['flag']) {
-            $log->error('Install failed: order states.');
-            $install['flag'] = false;
-        }
-        $log->info('----------------> Install order states: ' .
-            ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
-        $log->info('----------------> Install SQL. <----------------');
-        if (!(new PayPlug\src\repositories\SQLtableRepository())->installSQL() /*&& $install['flag']*/) {
-            $log->error('Install failed: SQL.');
-            $install['flag'] = false;
-            $install['error'] = 'Création des tables SQL';
-        }
-        $log->info('----------------> Install SQL: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
-        $log->info('----------------> Install tab. <----------------');
-        if (!$this->installTab() && $install['flag']) {
-            $log->error('Install failed: tab.');
-            $install['flag'] = false;
-            $install['error'] = 'Onglet comprenant les détails des échéances des Paiements Fractionnés (back office)';
-        }
-        $log->info('----------------> Install tab: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
-        $log->info('----------------> Install Oney. <----------------');
-        if (!$this->oney->installOney() && $install['flag']) {
-            $log->error('Install failed: Oney.');
-            $install['flag'] = false;
-            $install['error'] = 'Oney ($this->installOney)';
-        }
-        $log->info('----------------> Install Oney: ' . ($install['flag'] ? 'ok' : 'nok') . ' <----------------');
-
-        if ($install['flag']) {
-            $log->info('Install succeeded.');
-            return true;
-        }
-
-        $log->info('Install failed.');
-        $log->info('Install error: ' . $install['error']);
-
-        // revert installation
-        $this->uninstall();
-        $install['error'] = (isset($install['error'])) ? 'Élément en cause : ' . $install['error'] : '';
-        $this->context->controller->errors[] = $this->l('Le module PayPlug n\'a pas été installé 
-        en raison d\'une erreur. Les modifications apportées ont bien été annulées.');
-        $this->context->controller->errors[] = $install['error'];
-        return false;
-    }
-
-    /**
-     * Install the required hooks
-     * @return array
-     */
-    protected function installHook()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-
-        $hooksToRegister = [
-            'adminOrder',
-            'displayAdminOrderMain',
-            'displayBackOfficeFooter',
-            'customerAccount',
-            'header',
-            'paymentReturn',
-            'actionAdminPerformanceControllerAfter',
-            'moduleRoutes'
-        ];
-
-        $install = [
-            'flag' => true,
-            'error' => false
-        ];
-
-        foreach ($hooksToRegister as $hookToRegister) {
-            $install['flag'] = true;
-            $log->info('Try to install Hook ' . $hookToRegister . '.');
-            if (!$this->registerHook($hookToRegister)) {
-                $log->error('Install failed: Hook ' . $hookToRegister . '.');
-                $install['flag'] = false;
-                $install['error'] = $hookToRegister;
-                return $install;
-            } else {
-                $log->info('Install success: Hook ' . $hookToRegister . '.');
-                $install['flag'] = true;
-            }
-        }
-        return $install;
-    }
-
-    /**
-     * @param $tabClass
-     * @param $translations
-     * @param $idTabParent
-     * @param null $moduleName
-     * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function installModuleTab($tabClass, $translations, $idTabParent, $moduleName = null)
-    {
-        $tab = new Tab();
-
-        foreach (Language::getLanguages(false) as $language) {
-            if (isset($translations[Tools::strtolower($language['iso_code'])])) {
-                $tab->name[(int)$language['id_lang']] = $translations[Tools::strtolower($language['iso_code'])];
-            } else {
-                $tab->name[(int)$language['id_lang']] = $translations['en'];
-            }
-        }
-
-        $tab->class_name = $tabClass;
-        if (is_null($moduleName)) {
-            $moduleName = $this->name;
-        }
-
-        $tab->module = $moduleName;
-        $tab->id_parent = $idTabParent;
-
-        if (!$tab->save()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function installOneyHook($hook)
-    {
-        $this->registerHook($hook);
-        $this->context->controller->warnings[] = $this->l($hook);
-    }
-
-    /**
-     * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function installTab()
-    {
-        if ((class_exists($this->PrestashopSpecificClass))
-            && (method_exists($this->PrestashopSpecificObject, 'installTab'))) {
-            return $this->PrestashopSpecificObject->installTab();
-        }
-
-        $install = [];
-
-        $translationsAdminPayPlug = [
-            'en' => 'PayPlug',
-            'gb' => 'PayPlug',
-            'it' => 'PayPlug',
-            'fr' => 'PayPlug'
-        ];
-        $install['flag'] = $this->installModuleTab('AdminPayPlug', $translationsAdminPayPlug, 0);
-
-        $translationsAdminPayPlugInstallment = [
-            'en' => 'Installment Plans',
-            'gb' => 'Installment Plans',
-            'it' => 'Pagamenti frazionati',
-            'fr' => 'Paiements en plusieurs fois'
-        ];
-
-        $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
-        $install['flag'] = $install['flag']
-            && $this->installModuleTab(
-                'AdminPayPlugInstallment',
-                $translationsAdminPayPlugInstallment,
-                $adminPayPlugId,
-                $this->name
-            );
-
-        return $install['flag'];
-    }
-
-    /**
      * @description
      * Check if Payplug is allowed
      * @return bool
      */
     public function isAllowed()
     {
-        if (!Module::isEnabled($this->name) || !$this->getConfiguration('PAYPLUG_SHOW')) {
+        if (!Module::isEnabled($this->name) || !Configuration::get('PAYPLUG_SHOW')) {
             return false;
         }
         return true;
@@ -4429,12 +3977,12 @@ class PayPlugClass extends PaymentModule
     {
         switch ($type) {
             case 'installment':
-                $installment = \Payplug\InstallmentPlan::retrieve($payment_id);
+                $installment = InstallmentPlan::retrieve($payment_id);
                 if ($installment && $installment->is_active) {
                     $schedules = $installment->schedule;
                     foreach ($schedules as $schedule) {
                         foreach ($schedule->payment_ids as $pay_id) {
-                            $inst_payment = \Payplug\Payment::retrieve($pay_id);
+                            $inst_payment = Payment::retrieve($pay_id);
                             if ($inst_payment && $inst_payment->is_paid) {
                                 return true;
                             }
@@ -4444,7 +3992,7 @@ class PayPlugClass extends PaymentModule
                 break;
             case 'payment':
             default:
-                $payment = \Payplug\Payment::retrieve($payment_id);
+                $payment = Payment::retrieve($payment_id);
                 return $payment && $payment->is_paid;
         }
         return false;
@@ -4566,12 +4114,12 @@ class PayPlugClass extends PaymentModule
      * @param string $email
      * @param string $password
      * @return bool
-     * @throws \Payplug\Exception\BadRequestException
+     * @throws BadRequestException
      */
     private function login($email, $password)
     {
         try {
-            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+            $response = Authentication::getKeysByLogin($email, $password);
 
             $json_answer = $response['httpResponse'];
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
@@ -4597,7 +4145,7 @@ class PayPlugClass extends PaymentModule
      * @param string $pay_mode
      * @param null $inst_id
      * @return string
-     * @throws \Payplug\Exception\ConfigurationException
+     * @throws ConfigurationException
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -4609,7 +4157,7 @@ class PayPlugClass extends PaymentModule
         if ($pay_id == null) {
             if ($inst_id != null) {
                 try {
-                    $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                    $installment = InstallmentPlan::retrieve($inst_id);
                     if (isset($installment->schedule)) {
                         $total_amount = $amount;
                         $refund_to_go = [];
@@ -4617,7 +4165,7 @@ class PayPlugClass extends PaymentModule
                         foreach ($installment->schedule as $schedule) {
                             if (!empty($schedule->payment_ids)) {
                                 foreach ($schedule->payment_ids as $p_id) {
-                                    $p = \Payplug\Payment::retrieve($p_id);
+                                    $p = Payment::retrieve($p_id);
                                     if ($p->is_paid && !$p->is_refunded && $amount > 0) {
                                         $amount_refundable = (int)($p->amount - $p->amount_refunded);
                                         $truly_refundable_amount += $amount_refundable;
@@ -4647,7 +4195,7 @@ class PayPlugClass extends PaymentModule
                         if (!empty($refund_to_go)) {
                             foreach ($refund_to_go as $refnd) {
                                 try {
-                                    $refund = \Payplug\Refund::create($refnd['id'], $refnd['data']);
+                                    $refund = Refund::create($refnd['id'], $refnd['data']);
                                 } catch (Exception $e) {
                                     return ('error');
                                 }
@@ -4668,7 +4216,7 @@ class PayPlugClass extends PaymentModule
             ];
 
             try {
-                $refund = \Payplug\Refund::create($pay_id, $data);
+                $refund = Refund::create($pay_id, $data);
             } catch (Exception $e) {
                 return ('error');
             }
@@ -5094,7 +4642,7 @@ class PayPlugClass extends PaymentModule
             'authorizedAt' => null,
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
-            'isEmbedded' => $this->getConfiguration('PAYPLUG_EMBEDDED_MODE'),
+            'isEmbedded' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
             'isMobileDevice' => $this->isMobiledevice(),
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],
@@ -5283,7 +4831,7 @@ class PayPlugClass extends PaymentModule
                     foreach ($installment->schedule as $schedule) {
                         if (!empty($schedule->payment_ids)) {
                             foreach ($schedule->payment_ids as $p_id) {
-                                $p = \Payplug\Payment::retrieve($p_id);
+                                $p = Payment::retrieve($p_id);
                                 if ($p->is_paid && !$p->is_refunded) {
                                     $amount_available += (int)($p->amount - $p->amount_refunded);
                                 }
@@ -5414,12 +4962,12 @@ class PayPlugClass extends PaymentModule
      * Retrieve payment informations
      *
      * @param $inst_id
-     * @return bool|\Payplug\Resource\InstallmentPlan|null
+     * @return bool|InstallmentPlan|null
      */
     public function retrieveInstallment($inst_id)
     {
         try {
-            $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+            $installment = InstallmentPlan::retrieve($inst_id);
         } catch (Exception $e) {
             return false;
         }
@@ -5430,12 +4978,12 @@ class PayPlugClass extends PaymentModule
      * Retrieve payment informations
      *
      * @param string $pay_id
-     * @return bool|\Payplug\Resource\Payment|null
+     * @return bool|Payment|null
      */
     public function retrievePayment($pay_id)
     {
         try {
-            $payment = \Payplug\Payment::retrieve($pay_id);
+            $payment = Payment::retrieve($pay_id);
         } catch (Exception $e) {
             return false;
         }
@@ -5608,8 +5156,8 @@ class PayPlugClass extends PaymentModule
      */
     private function setLoggers()
     {
-        $this->log_general = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
-        $this->log_install = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+        $this->log_general = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/general-log.csv');
+        $this->log_install = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
 
         $this->logger->setParams(['process' => 'payplug.php']);
 
@@ -5696,8 +5244,8 @@ class PayPlugClass extends PaymentModule
      * @description Set the current secret key used to interact with PayPlug API
      *
      * @param bool $token
-     * @return bool|\Payplug\Payplug
-     * @throws \Payplug\Exception\ConfigurationException
+     * @return bool|Payplug
+     * @throws ConfigurationException
      */
     public function setSecretKey($token = false)
     {
@@ -5709,7 +5257,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        return \Payplug\Payplug::init([
+        return Payplug::init([
             'secretKey' => $token,
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
@@ -5723,7 +5271,7 @@ class PayPlugClass extends PaymentModule
     private function setUserAgent()
     {
         if ($this->current_api_key != null) {
-            \Payplug\Core\HttpClient::addDefaultUserAgentProduct(
+            HttpClient::addDefaultUserAgentProduct(
                 'PayPlug-Prestashop',
                 $this->version,
                 'Prestashop/' . _PS_VERSION_
@@ -5785,7 +5333,7 @@ class PayPlugClass extends PaymentModule
 
     /**
      * @description Process account submit
-     * @throws \Payplug\Exception\BadRequestException
+     * @throws BadRequestException
      */
     public function submitAccount()
     {
@@ -5799,7 +5347,7 @@ class PayPlugClass extends PaymentModule
         $password = $_POST['PAYPLUG_PASSWORD'];
         $email = Tools::getValue('PAYPLUG_EMAIL');
 
-        if (!Validate::isEmail($email) || !PayPlug\backward\PayPlugBackward::isPlaintextPassword($password)) {
+        if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             $this->validationErrors['username_password'] =
                 $this->l('The email and/or password was not correct.');
         } elseif ($curl_exists && $openssl_exists) {
@@ -6023,53 +5571,14 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @description Uninstall plugin
-     *
-     * @return bool
-     * @throws Exception
-     * @see Module::uninstall()
-     */
-    public function uninstall()
-    {
-        $log = new Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Starting to uninstall.');
-
-        $keep_cards = (bool)Configuration::get('PAYPLUG_KEEP_CARDS');
-        if (!$keep_cards) {
-            $log->info('Saved cards will be deleted.');
-            if (!$this->uninstallCards()) {
-                $log->error('Unable to delete saved cards.');
-            } else {
-                $log->info('Saved cards successfully deleted.');
-            }
-        } else {
-            $log->info('Cards will be kept.');
-        }
-
-        if (!parent::uninstall()) {
-            $log->error('Uninstall failed: parent.');
-        } elseif (!$this->deleteConfig()) {
-            $log->error('Uninstall failed: configuration.');
-        } elseif (!(new PayPlug\src\repositories\SQLtableRepository())->uninstallSQL($keep_cards)) {
-            $log->error('Uninstall failed: sql.');
-        } elseif (!$this->uninstallTab()) {
-            $log->error('Uninstall failed: tab.');
-        } else {
-            $log->info('Uninstall succeeded.');
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @description Delete saved cards when uninstalling module
-     *
+     * todo: move this method in CardRepository
      * @return bool
      * @throws Exception
      */
-    private function uninstallCards()
+    public function uninstallCards()
     {
-        if ((new \PayPlug\src\repositories\SQLtableRepository)->checkExistingTable('payplug_card', 1)) {
+        if ($this->sql->checkExistingTable('payplug_card', 1)) {
             $cards = $this->query
                 ->select()
                 ->fields('*')
@@ -6091,48 +5600,13 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @description Uninstall module installment tab
-     *
-     * @param $tabClass
-     * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function uninstallModuleTab($tabClass)
-    {
-        $idTab = Tab::getIdFromClassName($tabClass);
-
-        if ($idTab) {
-            $tab = new Tab($idTab);
-            return $tab->delete();
-        }
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function uninstallTab()
-    {
-        if ((class_exists($this->PrestashopSpecificClass))
-            && (method_exists($this->PrestashopSpecificObject, 'uninstallTab'))) {
-            return $this->PrestashopSpecificObject->uninstallTab();
-        }
-        return ($this->uninstallModuleTab('AdminPayPlug')
-            && $this->uninstallModuleTab('AdminPayPlugInstallment'));
-    }
-
-    /**
      * @param $installment
      * @return bool
      */
     public function updatePayplugInstallment($installment)
     {
         if (!is_object($installment)) {
-            $installment = \Payplug\InstallmentPlan::retrieve($installment);
+            $installment = InstallmentPlan::retrieve($installment);
         }
         if (isset($installment->schedule)) {
             $step_count = count($installment->schedule);
@@ -6142,7 +5616,7 @@ class PayPlugClass extends PaymentModule
                 $pay_id = '';
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
-                    $payment = \Payplug\Payment::retrieve($pay_id);
+                    $payment = Payment::retrieve($pay_id);
                     $status = $this->getPaymentStatusByPayment($payment);
                 } else {
                     if ((int)$installment->is_active == 1) {

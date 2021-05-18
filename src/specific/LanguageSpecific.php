@@ -21,20 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
+namespace PayPlug\src\specific;
 
-/**
- * @description
- * Treat notification received
- */
-class PayplugIPNModuleFrontController extends ModuleFrontController
+use PayPlug\src\interfaces\LanguageInterface;
+use Language;
+
+class LanguageSpecific implements LanguageInterface
 {
-    public function postProcess()
+    public function getLanguages($active = false)
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
-        $notification = $payplug->setNotification();
-        $notification->treat();
+        return Language::getLanguages($active);
     }
 }

@@ -21,20 +21,35 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
+namespace PayPlug\src\entities;
 
-/**
- * @description
- * Treat notification received
- */
-class PayplugIPNModuleFrontController extends ModuleFrontController
+use PayPlug\src\exceptions\BadParameterException;
+
+class OrderStateEntity
 {
-    public function postProcess()
+    /** @var array */
+    private $list;
+
+    /**
+     * @return object
+     */
+    public function getList()
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
-        $notification = $payplug->setNotification();
-        $notification->treat();
+        return $this->list;
+    }
+
+    /**
+     * @param $apiPayment
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setList($list)
+    {
+        if (!is_array($list)) {
+            throw (new BadParameterException('Invalid argument, $list must be an array'));
+        }
+
+        $this->list = $list;
+        return $this;
     }
 }

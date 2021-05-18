@@ -34,10 +34,6 @@ function upgrade_module_2_26_1($object)
 
     $flag = true;
 
-    if (!$object->checkVersion()) {
-        return $flag;
-    }
-
     // Update payplug lock table
     $sql_requests = [
         'TRUNCATE TABLE `'._DB_PREFIX_.'payplug_lock`',

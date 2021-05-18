@@ -718,13 +718,15 @@ var $document, $window, payplug = {
                 dataType: 'json',
                 data: {_ajax: 1, has_live_key: 1},
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert('An error occurred while trying to checking your verified status. ' +
-                        'Maybe you clicked too fast before scripts are fully loaded ' +
-                        'or maybe you have a different back-office url than expected.' +
-                        'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    if (errorThrown != 'abort') {
+                        alert('An error occurred while trying to checking your verified status. ' +
+                            'Maybe you clicked too fast before scripts are fully loaded ' +
+                            'or maybe you have a different back-office url than expected.' +
+                            'You will find more explanation in JS console.');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    }
                 },
                 success: function (response) {
                     if (response.result) {
