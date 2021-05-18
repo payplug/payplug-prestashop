@@ -27,6 +27,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\PaymentMock;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -71,6 +72,24 @@ final class CreatePaymentTest extends BasePaymentRepository
         );
     }
 
+    public function testCreateWithInvalidConfig()
+    {
+        $paymentDetails = [
+            'paymentTab' => mt_rand(),
+            'paymentMethod' => 'standard'
+        ];
+
+        $this->config
+            ->shouldReceive([
+                'get' => false
+            ]);
+
+        $this->assertSame(
+            $this->repo->createPayment($paymentDetails)['response'],
+            '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
+        );
+    }
+
     /**
      * Test creation payment 'standard'
      */
@@ -80,6 +99,11 @@ final class CreatePaymentTest extends BasePaymentRepository
             'paymentTab' => mt_rand(),
             'paymentMethod' => 'standard'
         ];
+
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
 
         $this->paymentApi
             ->shouldReceive([
@@ -100,6 +124,11 @@ final class CreatePaymentTest extends BasePaymentRepository
             'paymentTab' => $paymentTab,
             'paymentMethod' => 'standard'
         ];
+
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
 
         $this->paymentApi
             ->shouldReceive([
@@ -123,6 +152,11 @@ final class CreatePaymentTest extends BasePaymentRepository
             'paymentMethod' => 'standard'
         ];
 
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
+
         $this->paymentApi
             ->shouldReceive(['create' => mt_rand()])
             ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400);
@@ -143,6 +177,11 @@ final class CreatePaymentTest extends BasePaymentRepository
 
         $paymentMock = PaymentMock::getStandard();
         $paymentMock->hosted_payment->return_url = null;
+
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
 
         $this->paymentApi
             ->shouldReceive([
