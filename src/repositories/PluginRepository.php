@@ -52,7 +52,7 @@ class PluginRepository extends Repository
     // Repositories & necessary classes
     private $cache;
     private $card;
-    private $hookRepo;
+    private $hook;
     private $install;
     private $logger;
     private $myLogPhp;
