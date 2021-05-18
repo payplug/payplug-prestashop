@@ -33,7 +33,7 @@ class AdminPayplugController extends ModuleAdminController
 
     public function getContent()
     {
-        $payplug = new Payplug();
+        $payplug = new PayplugClass();
         if (Tools::getValue('_ajax') == 1) {
             $payplug->adminAjaxController();
         }
@@ -104,8 +104,8 @@ class AdminPayplugController extends ModuleAdminController
             ]);
         }
 
-        $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin-v3.1.2.js');
-        $payplug->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin-v3.1.2.css');
+        $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
+        $payplug->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = $payplug->getAdminAjaxUrl();
 

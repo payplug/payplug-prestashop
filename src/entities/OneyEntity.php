@@ -23,6 +23,33 @@
 
 namespace PayPlug\src\entities;
 
+use PayPlug\src\exceptions\BadParameterException;
+
 class OneyEntity
 {
+    /** @var array */
+    private $operations;
+
+    /**
+     * @return array
+     */
+    public function getOperations()
+    {
+        return $this->operations;
+    }
+
+    /**
+     * @param array $operations
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setOperations($operations)
+    {
+        if (!is_array($operations)) {
+            throw (new BadParameterException('Invalid argument, $operations must be an array'));
+        }
+
+        $this->operations = $operations;
+        return $this;
+    }
 }

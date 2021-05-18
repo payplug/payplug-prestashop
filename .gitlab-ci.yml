@@ -1,7 +1,21 @@
+include:
+  - project: 'payplug/releasy'
+    file: '/templates/main.gitlab-ci.yml'
+
 stages:
+  - check php
   - tests
   - translations
   - build
+  - releasy-review
+  - releasy-release
+
+php cs fixer:
+  image: composer:1.9
+  stage: check php
+  script:
+    - composer install
+    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
 
 unit tests:
   image: composer:1.9
@@ -9,6 +23,7 @@ unit tests:
   script:
     - composer install
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
+    - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
 check module translations:
   image: composer:1.9
@@ -24,6 +39,9 @@ build zip release:
   stage: build
   before_script:
     - composer install --no-dev
+    - ./assets_revision.sh
+    - find ./vendor -type d -exec cp index.php {} \;
+    - git status
     - mkdir payplug
   script:
     - shopt -s extglob

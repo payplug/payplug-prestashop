@@ -63,7 +63,7 @@ class PayPlugPaymentStandard extends PayplugPayment
         }
 
         $this->payment_tab['allow_save_card'] = Cart::isGuestCartByCartId($this->cart->id) != 1
-            && $this->module->getConfiguration('PAYPLUG_ONE_CLICK');
+            && Configuration::get('PAYPLUG_ONE_CLICK');
         $this->payment_tab['force_3ds'] = false;
     }
 

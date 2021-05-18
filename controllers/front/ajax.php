@@ -54,9 +54,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         }
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-        include_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
+        include_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
-        $this->payplug = new \Payplug();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->toolsSpecific = $this->plugin->getTools();
 
@@ -95,6 +95,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
+                $is_elligible = null;
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $group = $tools->tool('getValue', 'group');
                     // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
@@ -129,11 +130,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
-                    $delivery_address = new Address($context->cart->id_address_delivery);
-                    $delivery_country = new Country($delivery_address->id_country);
-                    $iso_code = $delivery_country->iso_code;
-                    $cart = $context->cart;
-                    $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount);
                 }
 
                 die(json_encode($is_elligible));
@@ -171,6 +168,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount);
                 } catch (Exception $e) {
                     die($tools->tool('jsonEncode', [
+                        'exception' => $e->getMessage(),
                         'result' => false,
                         'error' => $this->translate->translate(5) //('Oney is momentarily unavailable.')
                     ]));

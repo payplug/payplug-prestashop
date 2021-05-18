@@ -35,16 +35,19 @@ class CardRepository extends Repository
     private $query;
     private $toolsSpecific;
 
-    protected $payplug;
-
     public function __construct($payplug)
     {
+        $this->payplug = $payplug;
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = new ConfigurationSpecific();
-        $this->payplug = $payplug;
         $this->query = new QueryRepository();
         $this->toolsSpecific = new ToolsSpecific();
         $this->setParams();
+    }
+
+    public static function factory()
+    {
+        return new CardRepository();
     }
 
     private function setParams()
@@ -110,7 +113,6 @@ class CardRepository extends Repository
      *
      * @param int $id_customer
      * @param int $id_payplug_card
-     * @param string $api_key
      * @return bool
      * @throws ConfigurationNotSetException
      */
@@ -151,8 +153,7 @@ class CardRepository extends Repository
         $config = $this->configurationSpecific;
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
 
-        $req_card_id =
-            $this->query
+        $cards = $this->query
                 ->select()
                 ->fields('pc.id_card')
                 ->from(_DB_PREFIX_ .'payplug_card', 'pc')
@@ -160,14 +161,12 @@ class CardRepository extends Repository
                 ->where('pc.id_payplug_card = ' . (int)$id_payplug_card)
                 ->where('pc.id_company = ' . (int)$id_company)
                 ->where('pc.is_sandbox = ' . (int)$is_sandbox)
-            ;
+                ->build();
 
-        $res_card_id = $req_card_id->build()[0]['id_card'];
-
-        if (!$res_card_id) {
+        if (empty($cards)) {
             return false;
         } else {
-            return $res_card_id;
+            return $cards[0]['id_card'];
         }
     }
 
@@ -176,6 +175,7 @@ class CardRepository extends Repository
      *
      * @param int $id_customer
      * @return bool
+     * @throws ConfigurationNotSetException
      */
     public function deleteCards($id_customer)
     {
@@ -249,6 +249,7 @@ class CardRepository extends Repository
     /**
      * @param $payment
      * @return Exception|string
+     * @throws ConfigurationNotSetException
      */
     public function getCardBrandByPayment($payment)
     {
@@ -263,7 +264,7 @@ class CardRepository extends Repository
         if ($payment->card->brand != '') {
             $brand = $payment->card->brand;
         } else {
-            $brand = $this->l('Unavailable');
+            $brand = '';
         }
         return $brand;
     }
@@ -284,7 +285,7 @@ class CardRepository extends Repository
         }
 
         if ($payment->card->exp_month === null) {
-            $card_expiry_date = $this->l('Unavailable');
+            $card_expiry_date = '';
         } else {
             $card_expiry_date = date(
                 'm/y',
@@ -312,7 +313,7 @@ class CardRepository extends Repository
         if ($payment->card->last4 != '') {
             $card_mask = '**** **** **** ' . $payment->card->last4;
         } else {
-            $card_mask = $this->l('Unavailable');
+            $card_mask = '';
         }
         return $card_mask;
     }
@@ -493,7 +494,7 @@ class CardRepository extends Repository
             ->from(_DB_PREFIX_.$this->cardEntity->getTable())
             ->where('`id_customer` = '.((isset($customer->id) && !empty($customer->id)) ? $customer->id : $customer))
             ->where('`id_company` = ' . (int)$this->cardEntity->getIdCompany())
-            ->where('`is_sandbox` = ' . (int)$this->cardEntity->isSandbox())
+            ->where('`is_sandbox` = ' . (int)$this->cardEntity->getIsSandbox())
         ;
 
         $cards = $this->query->build();

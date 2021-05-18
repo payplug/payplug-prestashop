@@ -36,6 +36,11 @@ class TranslationsRepository extends Repository
         $this->payplug = $payplug;
     }
 
+    public static function factory()
+    {
+        return new TranslationsRepository();
+    }
+
     public function translate($id)
     {
         if (!is_int($id)) {

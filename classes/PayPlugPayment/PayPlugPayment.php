@@ -252,7 +252,7 @@ class PayPlugPayment
 
         $this->module = new Payplug();
 
-        $this->debug = $this->module->getConfiguration('PAYPLUG_DEBUG_MODE');
+        $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
 
         $this->setPaymentUrl();
 
@@ -416,7 +416,7 @@ class PayPlugPayment
                 }
             }
         } else {
-            if (isset($field['allowed']) && !empty($field['allowed']) && !in_array($value, $field['allowed'], true)) {
+            if (isset($field['allowed']) && !empty($field['allowed']) && !in_array($value, $field['allowed'])) {
                 $this->errors[] = 'Invalid value for field ' . $name . ': ' . $value
                     . ' / allowed: ' . implode('|', $field['allowed']);
             } elseif (!$this->isValidField($field['validate'], $value)) {
@@ -509,6 +509,8 @@ class PayPlugPayment
      */
     protected function generateAddressTab(Address $address, $fields = [])
     {
+        $address_tab = [];
+
         if (!is_object($address)) {
             $address = new Address((int)$address);
         }
@@ -522,7 +524,6 @@ class PayPlugPayment
         }
 
         unset($address->country);
-        $address_tab = [];
 
         foreach ($fields as $key => $field) {
             $value = $this->getField($address, $key);
@@ -622,10 +623,6 @@ class PayPlugPayment
     private function getAddressTitle(Address $address)
     {
         return null;
-//
-//        // todo: send later the real gender
-//        $id_lang = isset($this->customer->id_lang) ? $this->customer->id_lang : _PS_LANG_DEFAULT_;
-//        return PayplugBackward::getCustomerGender($this->customer->id_gender, $id_lang);
     }
 
     /**
@@ -721,8 +718,8 @@ class PayPlugPayment
             $this->setMetaDatasAddressIso($address);
 
             $iso_code_list = $this->getIsoCodeList();
-            $language = new Language($this->module->getConfiguration('PS_LANG_DEFAULT'));
-            if (in_array(Tools::strtoupper($language->iso_code), $iso_code_list, true)) {
+            $language = new Language(Configuration::get('PS_LANG_DEFAULT'));
+            if (in_array(Tools::strtoupper($language->iso_code), $iso_code_list)) {
                 $iso_code = $language->iso_code;
             } else {
                 $iso_code = 'FR';
@@ -766,11 +763,16 @@ class PayPlugPayment
      */
     public function getCartCurrency()
     {
-        $currency = $this->cart->id_currency;
-        $result_currency = Currency::getCurrency($currency);
-        $supported_currencies = explode(';', Tools::strtoupper($this->module->getConfiguration('PAYPLUG_CURRENCIES')));
+        $result_currency = [];
+        if (version_compare(_PS_VERSION_, '1.5', '<')) {
+            $result_currency['iso_code'] = Currency::getCurrent()->iso_code;
+        } else {
+            $currency = $this->cart->id_currency;
+            $result_currency = Currency::getCurrency($currency);
+        }
+        $supported_currencies = explode(';', Tools::strtoupper(Configuration::get('PAYPLUG_CURRENCIES')));
 
-        if (!in_array(Tools::strtoupper($result_currency['iso_code']), $supported_currencies, true)) {
+        if (!in_array(Tools::strtoupper($result_currency['iso_code']), $supported_currencies)) {
             return false;
         }
 
@@ -807,25 +809,16 @@ class PayPlugPayment
             'return' => PayplugBackward::getModuleLink(
                 'payplug',
                 'validation',
-                [
-                    'ps' => 1,
-                    'cartid' => (int)$this->cart->id],
+                ['ps' => 1, 'cartid' => (int)$this->cart->id],
                 true
             ),
             'cancel' => PayplugBackward::getModuleLink(
                 'payplug',
                 'validation',
-                [
-                    'ps' => 2,
-                    'cartid' => (int)$this->cart->id],
+                ['ps' => 2, 'cartid' => (int)$this->cart->id],
                 true
             ),
-            'notification' => PayplugBackward::getModuleLink(
-                'payplug',
-                'ipn',
-                [],
-                true
-            ),
+            'notification' => PayplugBackward::getModuleLink('payplug', 'ipn', [], true),
         ];
 
         $this->setMetaDatas('Website', Tools::getShopDomainSsl(true));
@@ -872,7 +865,7 @@ class PayPlugPayment
         if (!Validate::isLoadedObject($country)) {
             return false;
         }
-        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list, true)) {
+        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list)) {
             return false;
         } else {
             return Tools::strtoupper($country->iso_code);
@@ -889,21 +882,14 @@ class PayPlugPayment
     {
         $min_amounts = [];
         $max_amounts = [];
-        foreach (explode(';', Tools::strtoupper(
-            $this->module->getConfiguration('PAYPLUG_MIN_AMOUNTS')
-        )) as $amount_cur
-            ) {
+        $min = Configuration::get('PAYPLUG_MIN_AMOUNTS');
+        $max = Configuration::get('PAYPLUG_MAX_AMOUNTS');
+        foreach (explode(';', Tools::strtoupper($min)) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $min_amounts[$cur[1]] = (int)$cur[2];
         }
-        foreach (explode(
-            ';',
-            Tools::strtoupper(
-                $this->module->getConfiguration('PAYPLUG_MAX_AMOUNTS')
-            )
-        ) as $amount_cur
-            ) {
+        foreach (explode(';', Tools::strtoupper($max)) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $max_amounts[$cur[1]] = (int)$cur[2];
@@ -1084,11 +1070,11 @@ class PayPlugPayment
 
             // then format code
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             return $phone_util->isValidNumber($parsed) ?
-                $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164) : null;
+                $phone_util->format($parsed, \libphonenumber\PhoneNumberFormat::E164) : null;
         } catch (Exception $e) {
             // todo: add log
             return null;
@@ -1096,7 +1082,7 @@ class PayPlugPayment
     }
 
     /**
-     * @description Get iso code from language code
+     * Get iso code from language code
      * Language code is like 'fr-be', we explode it in array (0 => 'fr', 1 => 'be')
      * then we use array[0] witch is the language while array[1] is the localization.
      *
