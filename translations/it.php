@@ -406,3 +406,5 @@ $_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 
 $_MODULE['<{payplug}prestashop>php_version_6c55f8dc7a5345a058639f6e4781e5b8'] = 'Visita la nostra ';
 $_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 'pagina di supporto';
 $_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' per ottenere una versione compatibile con il tuo negozio online.';
+$_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Pagamento con carta di credito';
+$_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Proponi il pagamento con carta di credito ai tuoi clienti.';
