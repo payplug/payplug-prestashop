@@ -384,7 +384,7 @@ class InstallRepository extends Repository
             return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
         }
 
-        //
+        // Check if multishop feature is active then set the context
         if ($this->shop->isFeatureActive()) {
             $this->shop->setContext();
         }
