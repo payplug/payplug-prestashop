@@ -199,11 +199,11 @@ label.payplugSwitch_label {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
-  -webkit-transition: background 0.4s/1.5;
-  -moz-transition: background 0.4s/1.5;
-  -ms-transition: background 0.4s/1.5;
-  -o-transition: background 0.4s/1.5;
-  transition: background 0.4s/1.5;
+  -webkit-transition: background 0.26666667s;
+  -moz-transition: background 0.26666667s;
+  -ms-transition: background 0.26666667s;
+  -o-transition: background 0.26666667s;
+  transition: background 0.26666667s;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -335,15 +335,22 @@ button.payplugLink:hover {
 .payplugPanel_section.-nowrap {
   flex-wrap: nowrap;
 }
-.oneclick {
-  margin-top: 20px;
+.payplugPanel.oneclick {
+  padding: 16px 0 8px;
 }
-.oneclick_label {
-  width: 205px;
+.payplugPanel.oneclick .payplugPanel_label,
+.payplugPanel.oneclick .payplugPanel_content {
+  margin: 0;
+  padding: 0;
+  width: auto;
 }
-.oneclick_content {
-  margin-left: 0;
-  padding-left: 0;
+.payplugPanel.oneclick .payplugPanel_content {
+  padding: 0 0 0 16px;
+}
+.payplugPanel.oneclick + .payplugPanel .payplugPanel_content {
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 /* Payplug Admin Config */
 .payplugConfig {

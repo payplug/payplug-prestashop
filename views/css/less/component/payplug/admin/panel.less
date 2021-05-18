@@ -13,7 +13,7 @@
     text-align: right;
 
     // todo: rework this section, we should use modifier
-    .payplugInstallment_fieldset &{
+    .payplugInstallment_fieldset & {
       width: 185px;
     }
   }
@@ -57,17 +57,27 @@
       flex-wrap: nowrap;
     }
   }
-}
 
-.oneclick {
-  margin-top: 20px;
+  &.oneclick {
+    padding: 16px 0 8px;
 
-  &_label {
-    width: 205px; // 41%
-  }
+    .payplugPanel_label,
+    .payplugPanel_content {
+      margin: 0;
+      padding: 0;
+      width: auto;
+    }
 
-  &_content {
-    margin-left: 0;
-    padding-left: 0;
+    .payplugPanel_content {
+      padding: 0 0 0 16px;
+    }
+
+    & + .payplugPanel {
+      .payplugPanel_content {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+      }
+    }
   }
 }
