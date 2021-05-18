@@ -88,7 +88,9 @@ class PaymentRepository extends Repository
 
         if ($paymentStored['cart_hash'] === $cartHash
             &&
-            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])
+            &&
+            (!$paymentDetails['forceHash'])) {
             return [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,

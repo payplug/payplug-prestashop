@@ -3659,6 +3659,7 @@ class PayPlugClass extends PaymentModule
                 'id_card' => Tools::getValue('pc', 'new_card'),
                 'is_installment' => (bool)Tools::getValue('inst'),
                 'is_deferred' => (bool)Tools::getValue('def'),
+                'force_hash' => true
             ];
 
             $payment = $this->preparePayment($payment_options);
@@ -4647,7 +4648,7 @@ class PayPlugClass extends PaymentModule
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
-            'forceHash' => true
+            'forceHash' => $options['force_hash']
         ];
 
         /*
