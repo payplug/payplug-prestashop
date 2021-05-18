@@ -176,6 +176,9 @@ class InstallRepository extends Repository
     protected $shop;
 
     /** @var object */
+    protected $sql;
+
+    /** @var object */
     protected $tools;
 
     /** @var object */
@@ -411,8 +414,9 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Set error on module installation
+     * @description Set error on module install
      * @param $error
+     * @return bool
      */
     public function setInstallError($error = '')
     {
@@ -428,6 +432,12 @@ class InstallRepository extends Repository
         return false;
     }
 
+
+    /**
+     * @description Set error on module uninstall
+     * @param $error
+     * @return bool
+     */
     public function setUninstallError($error = '')
     {
         $this->log->error($error);

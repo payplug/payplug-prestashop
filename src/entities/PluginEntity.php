@@ -82,6 +82,9 @@ class PluginEntity
     private $query;
 
     /** @var object */
+    private $sql;
+
+    /** @var object */
     private $tools;
 
     /** @var object */
@@ -232,6 +235,14 @@ class PluginEntity
     public function getQuery()
     {
         return $this->query;
+    }
+
+    /**
+     * @return object
+     */
+    public function getSql()
+    {
+        return $this->sql;
     }
 
     /**
@@ -519,6 +530,21 @@ class PluginEntity
         }
 
         $this->query = $query;
+        return $this;
+    }
+
+    /**
+     * @param object $query
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setSql($sql)
+    {
+        if (!is_object($sql)) {
+            throw (new BadParameterException('Invalid argument, $sql must be a SQLRepository'));
+        }
+
+        $this->sql = $sql;
         return $this;
     }
 

@@ -24,10 +24,17 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
-use PayPlug\classes\PayPlugClass;
 
-class SQLtableRepository extends PayPlugClass
+class SQLtableRepository
 {
+    /** @var object */
+    private $query;
+
+    public function __construct($query)
+    {
+        $this->query = $query;
+    }
+
     /**
      * Install SQL tables used by module
      *

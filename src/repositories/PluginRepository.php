@@ -104,6 +104,7 @@ class PluginRepository extends Repository
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setQuery($this->query)
+            ->setSql($this->sql)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
@@ -124,8 +125,11 @@ class PluginRepository extends Repository
         $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
-        $this->sql = new SQLtableRepository();
         $this->translate = new TranslationsRepository($this->payplug);
+
+        $this->sql = new SQLtableRepository(
+            $this->query
+        );
 
         $this->hookRepo = new HookRepository(
             $this->payplug,
