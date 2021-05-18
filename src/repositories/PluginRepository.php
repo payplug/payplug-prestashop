@@ -56,7 +56,7 @@ class PluginRepository extends Repository
     // Repositories & necessary classes
     private $cache;
     private $card;
-    private $hookRepo;
+    private $hook;
     private $install;
     private $logger;
     private $myLogPhp;
@@ -100,7 +100,7 @@ class PluginRepository extends Repository
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)
-            ->setHook($this->hookRepo)
+            ->setHook($this->hook)
             ->setInstall($this->install)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
@@ -130,7 +130,7 @@ class PluginRepository extends Repository
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository($this->payplug);
 
-        $this->hookRepo = new HookRepository(
+        $this->hook = new HookRepository(
             $this->payplug,
             $this->constant
         );
