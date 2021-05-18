@@ -197,8 +197,10 @@ class TranslationsRepository extends Repository
         $this->trans = [];
         $array_check_duplicate = [];
         foreach ($this->files as &$file) {
-            if ((preg_match('/^(.*).tpl$/', $file['name']) || preg_match('/^(.*).php$/',
-                        $file['name'])) && file_exists($file_path = $file['path'] . $file['name'])) {
+            if ((preg_match('/^(.*).tpl$/', $file['name']) || preg_match(
+                '/^(.*).php$/',
+                $file['name']
+            )) && file_exists($file_path = $file['path'] . $file['name'])) {
                 // Get content for this file
                 $content = file_get_contents($file_path);
 
