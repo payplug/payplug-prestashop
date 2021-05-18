@@ -96,7 +96,7 @@ class PluginRepository extends Repository
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)
-            ->setHook($this->hookRepo)
+            ->setHook($this->hook)
             ->setInstall($this->install)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
