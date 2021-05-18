@@ -156,6 +156,7 @@ class PluginRepository extends Repository
         $this->payment = new PaymentRepository(
             $this->payplug,
             $this->cart,
+            $this->configuration,
             $this->logger,
             $this->paymentEntity,
             $this->query,
