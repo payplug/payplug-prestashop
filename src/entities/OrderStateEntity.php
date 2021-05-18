@@ -21,22 +21,35 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\entities;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
+use PayPlug\src\exceptions\BadParameterException;
 
-class ToolsSpecific implements ToolsInterface
+class OrderStateEntity
 {
-    public static function factory()
+    /** @var array */
+    private $list;
+
+    /**
+     * @return object
+     */
+    public function getList()
     {
-        return new ToolsSpecific();
+        return $this->list;
     }
 
-    public function tool($action, $param1 = null, $param2 = null)
+    /**
+     * @param $apiPayment
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setList($list)
     {
-        if (isset($action)) {
-            return Tools::$action($param1, $param2);
+        if (!is_array($list)) {
+            throw (new BadParameterException('Invalid argument, $list must be an array'));
         }
+
+        $this->list = $list;
+        return $this;
     }
 }
