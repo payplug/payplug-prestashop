@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\ConfigurationInterface;
-use \Configuration;
+use Configuration;
 
 class ConfigurationSpecific implements ConfigurationInterface
 {

@@ -45,14 +45,14 @@ final class IsSandboxCardTest extends TestCase
     {
         $this->assertSame(
             true,
-            $this->card->isSandbox()
+            $this->card->getIsSandbox()
         );
     }
 
     public function testSandboxIsABool()
     {
         $this->assertTrue(
-            is_bool($this->card->isSandbox())
+            is_bool($this->card->getIsSandbox())
         );
     }
 }
