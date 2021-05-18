@@ -64,6 +64,7 @@ class PluginRepository extends Repository
     private $order_state;
     private $payment;
     private $query;
+    private $sql;
     private $translate;
 
     // Specific classes
@@ -107,6 +108,7 @@ class PluginRepository extends Repository
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setQuery($this->query)
+            ->setSql($this->sql)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
@@ -129,6 +131,10 @@ class PluginRepository extends Repository
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository($this->payplug);
+
+        $this->sql = new SQLtableRepository(
+            $this->query
+        );
 
         $this->hook = new HookRepository(
             $this->payplug,
@@ -174,6 +180,7 @@ class PluginRepository extends Repository
             $this->order_state,
             $this->order_state_entity,
             $this->shop,
+            $this->sql,
             $this->tools,
             $this->payplug
         );
