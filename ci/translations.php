@@ -22,7 +22,7 @@ foreach ($translations as $key => $trans) {
 }
 
 // Open a file in write mode ('w')
-$fp = fopen('translations.xlsx', 'w');
+$fp = fopen('translations.csv', 'w');
 
 // Loop through file pointer and a line
 foreach($available_translations as $lang => $translations) {
