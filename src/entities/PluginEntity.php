@@ -64,6 +64,9 @@ class PluginEntity
     private $hook;
 
     /** @var object */
+    private $install;
+
+    /** @var object */
     private $logger;
 
     /** @var object */
@@ -80,6 +83,9 @@ class PluginEntity
 
     /** @var object */
     private $query;
+
+    /** @var object */
+    private $sql;
 
     /** @var object */
     private $tools;
@@ -187,6 +193,14 @@ class PluginEntity
     }
 
     /**
+     * @return mixed
+     */
+    public function getInstall()
+    {
+        return $this->install;
+    }
+
+    /**
      * @return object
      */
     public function getLogger()
@@ -232,6 +246,14 @@ class PluginEntity
     public function getQuery()
     {
         return $this->query;
+    }
+
+    /**
+     * @return object
+     */
+    public function getSql()
+    {
+        return $this->sql;
     }
 
     /**
@@ -442,6 +464,20 @@ class PluginEntity
     }
 
     /**
+     * @param mixed $install
+     * @return PluginEntity
+     */
+    public function setInstall($install)
+    {
+        if (!is_object($install)) {
+            throw (new BadParameterException('Invalid argument, param $install must be a InstallRepository'));
+        }
+
+        $this->install = $install;
+        return $this;
+    }
+
+    /**
      * @param object $logger
      * @return self
      * @throws BadParameterException
@@ -523,6 +559,21 @@ class PluginEntity
         }
 
         $this->query = $query;
+        return $this;
+    }
+
+    /**
+     * @param object $query
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setSql($sql)
+    {
+        if (!is_object($sql)) {
+            throw (new BadParameterException('Invalid argument, $sql must be a SQLRepository'));
+        }
+
+        $this->sql = $sql;
         return $this;
     }
 

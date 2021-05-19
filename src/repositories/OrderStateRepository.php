@@ -23,23 +23,130 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\entities\ConfigurationEntity;
+use PayPlug\classes\MyLogPHP;
 use PayPlug\src\specific\OrderStateSpecific;
 
 class OrderStateRepository extends Repository
 {
-    private $query;
     private $configuration;
+    private $language;
+    private $query;
+    private $tools;
 
-    public function __construct()
+    public function __construct($configuration, $language, $query, $tools)
     {
-        $this->query = new QueryRepository();
-        $this->configuration = new ConfigurationEntity();
+        $this->configuration = $configuration;
+        $this->language = $language;
+        $this->query = $query;
+        $this->tools = $tools;
+    }
+
+    public function create($name, $state, $sandbox = true, $force = false)
+    {
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $key_config = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $name) . ($sandbox ? '_TEST' : '');
+
+        $log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
+        $os = $this->configuration->get($key_config);
+
+        // if we can't find order state with payplug key, check with configuration key
+        if (!$os && !$sandbox && $state['cfg']) {
+            $os = $this->configuration->get($state['cfg']);
+
+            // if we don't find order state either, try with template name
+            if (!$os && !$sandbox && $state['template'] != null) {
+                $this->query
+                    ->select()
+                    ->fields('DISTINCT `id_order_state`')
+                    ->from(_DB_PREFIX_.'order_state_lang')
+                    ->where('template = \''.pSQL($state['template']).'\'')
+                    ->limit(1, 1);
+
+                $os = $this->query->build('unique_value');
+            }
+        }
+
+        if (!$os || $force) {
+            // before creating a new order state, we should check if a previous state correspond to our needs
+            $previous_order_state_id = $this->findByName($state['name'], $sandbox);
+            if ($previous_order_state_id) {
+                $log->info('Update order state with: ' . $previous_order_state_id);
+                return $this->configuration->updateValue($key_config, $previous_order_state_id);
+            }
+
+            $log->info('Creating new order state.');
+            $order_state = OrderStateSpecific::getOrderState();
+            $order_state->logable = $state['logable'];
+            $order_state->send_email = $state['send_email'];
+            $order_state->paid = $state['paid'];
+            $order_state->module_name = $state['module_name'];
+            $order_state->hidden = $state['hidden'];
+            $order_state->delivery = $state['delivery'];
+            $order_state->invoice = $state['invoice'];
+            $order_state->color = $state['color'];
+
+            $tag = $sandbox ? ' [TEST]' : ' [PayPlug]';
+            $languages = $this->language->getLanguages(false);
+            foreach ($languages as $lang) {
+                $order_state->template[$lang['id_lang']] = $state['template'];
+                if (in_array($lang['iso_code'], ['en', 'au', 'ca', 'ie', 'gb', 'uk', 'us'], true)) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['en'] . $tag;
+                } elseif (in_array($lang['iso_code'], ['fr', 'be', 'lu', 'ch'], true)) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['fr'] . $tag;
+                } elseif (in_array($lang['iso_code'], ['es', 'ar', 'cl', 'co', 'mx', 'py', 'uy', 've'], true)) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['es'] . $tag;
+                } elseif (in_array($lang['iso_code'], ['it', 'sm', 'va'], true)) {
+                    $order_state->name[$lang['id_lang']] = $state['name']['it'] . $tag;
+                } else {
+                    $order_state->name[$lang['id_lang']] = $state['name']['en'] . $tag;
+                }
+            }
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_ . $this->name . '/views/img/os/' . $name . '.gif';
+                $destination = _PS_ROOT_DIR_ . '/img/os/' . $order_state->id . '.gif';
+                @copy($source, $destination);
+                $log->info('State created');
+            }
+            $os = $order_state->id;
+            $log->info('ID: ' . $os);
+        } else {
+            $log->info('Order state already exists: ' . $os);
+        }
+
+        return $this->configuration->updateValue($key_config, $os);
     }
 
     public static function factory()
     {
         return new OrderStateRepository();
+    }
+
+    /**
+     * Find id_order_state by name
+     *
+     * @param array $name
+     * @param bool $test_mode
+     * @return int OR bool
+     */
+    private function findByName($name, $test_mode = false)
+    {
+        if (!is_array($name) || empty($name)) {
+            return false;
+        } else {
+            $this->query
+                ->select()
+                ->fields('DISTINCT `id_order_state`')
+                ->from(_DB_PREFIX_.'order_state_lang')
+                ->where(
+                    'name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
+                )
+                ->limit(1, 1);
+
+            return $this->query->build('unique_value');
+        }
     }
 
     public function getIdByName($name)
@@ -154,14 +261,16 @@ class OrderStateRepository extends Repository
 
     public function removeIdsUnusedByPayPlug()
     {
+        $deleted = true;
         $payplug_os_id_list = $this->getIdsByModuleName('payplug');
         $used_order_os_id_list = $this->isUsedByOrders('payplug');
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
                 $os = new OrderStateSpecific($payplug_os_id);
-                $os->softDelete();
+                $deleted = $deleted && $os->softDelete();
             }
         }
+        return $deleted;
     }
 }

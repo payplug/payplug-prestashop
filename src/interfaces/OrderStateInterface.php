@@ -25,6 +25,7 @@ namespace PayPlug\src\interfaces;
 
 interface OrderStateInterface
 {
-    public function softDelete();
     public function delete();
+    public static function getOrderState($id);
+    public function softDelete();
 }

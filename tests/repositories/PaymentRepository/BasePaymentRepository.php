@@ -49,6 +49,7 @@ class BasePaymentRepository extends BaseTest
         $this->repo = \Mockery::mock(PaymentRepository::class, [
             $this->payplug,
             $this->cart,
+            $this->config,
             $this->logger,
             $this->payment,
             $this->query,

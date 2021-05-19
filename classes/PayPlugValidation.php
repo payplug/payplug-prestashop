@@ -21,7 +21,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+namespace PayPlug\classes;
+
+use Db;
+use Cart;
+use Configuration;
+use Customer;
+use Exception;
+use Order;
+use Tools;
+use Validate;
 
 class PayPlugValidation
 {

@@ -335,6 +335,23 @@ button.payplugLink:hover {
 .payplugPanel_section.-nowrap {
   flex-wrap: nowrap;
 }
+.payplugPanel.oneclick {
+  padding: 16px 0 8px;
+}
+.payplugPanel.oneclick .payplugPanel_label,
+.payplugPanel.oneclick .payplugPanel_content {
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+.payplugPanel.oneclick .payplugPanel_content {
+  padding: 0 0 0 16px;
+}
+.payplugPanel.oneclick + .payplugPanel .payplugPanel_content {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
 /* Payplug Admin Config */
 .payplugConfig {
   position: relative;

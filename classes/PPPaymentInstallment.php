@@ -21,11 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\classes;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PPPayment.php');
 
 class PPPaymentInstallment extends PPPayment
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -20,21 +21,10 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+namespace PayPlug\tests\repositories\OrderStateRepository;
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
+use PayPlug\tests\repositories\BaseTest;
 
-/**
- * @description
- * Treat notification received
- */
-class PayplugIPNModuleFrontController extends ModuleFrontController
+class BaseOrderStateRepository extends BaseTest
 {
-    public function postProcess()
-    {
-        $payplug = new \PayPlug\classes\PayPlugClass();
-        $notification = $payplug->setNotification();
-        $notification->treat();
-    }
 }

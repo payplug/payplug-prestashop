@@ -21,7 +21,24 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+namespace PayPlug\classes;
+
+use Address;
+use Db;
+use Cart;
+use Configuration;
+use Context;
+use Country;
+use Currency;
+use Customer;
+use Exception;
+use Language;
+use Message;
+use Order;
+use OrderHistory;
+use Shop;
+use Tools;
+use Validate;
 
 /**
  * Class PayPlugNotifications
@@ -459,7 +476,7 @@ class PayPlugNotifications
             if ($this->payment->installment_plan_id !== null) {
                 $is_amount_correct = (bool)$this->payment->is_paid;
             } else {
-                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect(
+                $is_amount_correct = (bool)PayPlugClass::checkAmountPaidIsCorrect(
                     $this->payment->amount / 100,
                     $order
                 );
@@ -871,7 +888,7 @@ class PayPlugNotifications
         try {
             $this->payment = $this->payplug->retrievePayment($refund->payment_id);
             $this->setOrderStates();
-        } catch (ConfigurationNotSetException $exception) {
+        } catch (Exception $exception) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
             $this->exitProcess($exception->getMessage(), 500);
         }

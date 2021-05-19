@@ -21,6 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace PayPlug\classes;
+
+use Db;
+use DateInterval;
+use DateTime;
+use ObjectModel;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
