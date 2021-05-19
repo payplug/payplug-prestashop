@@ -781,33 +781,6 @@ var $document, $window, payplug = {
             });
         },
     },
-    standard: {
-        props: {
-            identifier: 'payplugPanel',
-            switcher: 'payplug_standard',
-            error: null,
-        },
-        init: function () {
-            var {standard} = payplug,
-                {identifier, switcher} = standard.props;
-            $document.on('switchSelected', 'input[name=' + switcher + ']', standard.change);
-        },
-        change: function () {
-            var $switcher = payplug.standard,
-                {standard} = payplug,
-                {identifier} = $switcher.props,
-                $oneclick_group = $('.oneclick'),
-                $oneclick_input = $('input[name=payplug_one_click]');
-
-            if (!parseInt($(this).val())) {
-                $oneclick_group.addClass('-disabled');
-                $oneclick_input.parent().addClass('-disabled');
-            } else {
-                $oneclick_group.removeClass('-disabled');
-                $oneclick_input.parent().removeClass('-disabled');
-            }
-        },
-    },
     oney: {
         props: {
             identifier: 'payplugOney',
@@ -983,11 +956,10 @@ var $document, $window, payplug = {
                 event.preventDefault();
                 event.stopPropagation();
                 var {switcher} = payplug.tools,
-                    {identifier} = switcher.props,
                     $switch = $(this),
                     is_right = $switch.is('.-right');
 
-                if ($switch.is('.-disabled')) {
+                if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
 
@@ -1008,7 +980,7 @@ var $document, $window, payplug = {
                     $switch = $label.parents('.' + identifier),
                     $tips = null;
 
-                if ($switch.is('.-disabled')) {
+                if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
 
@@ -1034,8 +1006,8 @@ var $document, $window, payplug = {
                     $tips = $('.payplugTips.-' + name);
 
                 if ($tips.length) {
-                    $('.payplugTips.-' + name + ' > .payplugTips_item').hide();
-                    $('.payplugTips.-' + name + ' > .-right').show();
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-right').removeClass('-hide');
                 }
 
                 var $selected = target.find('input[value=0]');
@@ -1054,8 +1026,8 @@ var $document, $window, payplug = {
                     $tips = $('.payplugTips.-' + name);
 
                 if ($tips.length) {
-                    $('.payplugTips.-' + name + ' > .payplugTips_item').hide();
-                    $('.payplugTips.-' + name + ' > .-left').show();
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-left').removeClass('-hide');
                 }
 
                 var $selected = target.find('input[value=1]');

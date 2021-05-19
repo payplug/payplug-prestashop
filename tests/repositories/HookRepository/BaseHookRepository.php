@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -20,23 +21,10 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+namespace PayPlug\tests\repositories\HookRepository;
 
-namespace PayPlug\src\specific;
+use PayPlug\tests\repositories\BaseTest;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
-
-class ToolsSpecific implements ToolsInterface
+class BaseHookRepository extends BaseTest
 {
-    public static function factory()
-    {
-        return new ToolsSpecific();
-    }
-
-    public function tool($action, $param1 = null, $param2 = null)
-    {
-        if (isset($action)) {
-            return Tools::$action($param1, $param2);
-        }
-    }
 }

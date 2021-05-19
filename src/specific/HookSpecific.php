@@ -27,42 +27,4 @@ use PayPlug\src\interfaces\HookInterface;
 
 class HookSpecific implements HookInterface
 {
-    public function getHooksToRegister($psVersion)
-    {
-        $hooks = [
-            '1.7' => [
-                'paymentReturn',
-                'Header',
-                'adminOrder',
-                'displayAdminOrderMain',
-                'actionOrderStatusUpdate',
-                'customerAccount',
-                'paymentOptions',
-                'Payment',
-                'moduleRoutes',
-                'registerGDPRConsent',
-                'actionDeleteGDPRCustomer',
-                'actionExportGDPRData',
-                'actionObjectCarrierAddAfter',
-                'actionCarrierUpdate',
-                'displayProductPriceBlock',
-                'displayExpressCheckout',
-                'actionClearCompileCache',
-                'displayBeforeShoppingCartBlock',
-                'actionAdminControllerSetMedia',
-            ],
-            '1.6' => [
-                'adminOrder',
-                'displayAdminOrderMain',
-                'displayBackOfficeFooter',
-                'customerAccount',
-                'header',
-                'paymentReturn',
-                'actionAdminPerformanceControllerAfter',
-                'moduleRoutes'
-            ]
-        ];
-
-        return $hooks[$psVersion];
-    }
 }

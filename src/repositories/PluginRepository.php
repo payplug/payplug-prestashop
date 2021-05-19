@@ -24,9 +24,12 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
+
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\entities\OrderStateEntity;
+
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
@@ -48,11 +51,12 @@ class PluginRepository extends Repository
     private $oneyEntity;
     private $paymentEntity;
     private $plugin;
+    private $order_state_entity;
 
     // Repositories & necessary classes
     private $cache;
     private $card;
-    private $hookRepo;
+    private $hook;
     private $install;
     private $logger;
     private $myLogPhp;
@@ -60,6 +64,7 @@ class PluginRepository extends Repository
     private $order_state;
     private $payment;
     private $query;
+    private $sql;
     private $translate;
 
     // Specific classes
@@ -96,13 +101,14 @@ class PluginRepository extends Repository
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)
-            ->setHook($this->hookRepo)
+            ->setHook($this->hook)
             ->setInstall($this->install)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setQuery($this->query)
+            ->setSql($this->sql)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
@@ -115,6 +121,7 @@ class PluginRepository extends Repository
         $this->oneyEntity = new OneyEntity();
         $this->paymentEntity = new PaymentEntity();
         $this->plugin = new PluginEntity();
+        $this->order_state_entity = new OrderStateEntity();
     }
 
     private function setRepositories()
@@ -125,7 +132,11 @@ class PluginRepository extends Repository
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository($this->payplug);
 
-        $this->hookRepo = new HookRepository(
+        $this->sql = new SQLtableRepository(
+            $this->query
+        );
+
+        $this->hook = new HookRepository(
             $this->payplug,
             $this->constant
         );
@@ -167,7 +178,9 @@ class PluginRepository extends Repository
             $this->constant,
             $this->context,
             $this->order_state,
+            $this->order_state_entity,
             $this->shop,
+            $this->sql,
             $this->tools,
             $this->payplug
         );

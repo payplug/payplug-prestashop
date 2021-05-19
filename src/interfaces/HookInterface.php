@@ -25,5 +25,4 @@ namespace PayPlug\src\interfaces;
 
 interface HookInterface
 {
-    public function getHooksToRegister($psVersion);
 }
