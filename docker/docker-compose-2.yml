@@ -13,6 +13,7 @@ services:
       - ADMIN_MAIL=admin@example.com
       - ADMIN_PASSWD=password
       - PS_FOLDER_ADMIN=admin-dev
+      - PS_FOLDER_INSTALL=install-dev
       - PS_LANGUAGE=fr
       - PS_COUNTRY=FR
     ports:
