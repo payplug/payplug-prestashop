@@ -4,16 +4,36 @@ require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 $repo = new PayPlug\src\repositories\TranslationsRepository('');
 $translations = $repo->getTranslations();
 $missing_translations = [];
+$available_translations = [];
 $available_languages = ['fr','en','gb','it'];
 $messages = [];
 
 foreach ($translations as $key => $trans) {
     foreach ($available_languages as $lang) {
+        $key = str_replace ("<{payplug}prestashop>", "", $key);
         if (!$trans[$lang]) {
             $missing_translations[$lang][$key] = $trans['default'];
+        } else {
+            $available_translations[$lang][$key]['default'] = $trans['default'];
+            $available_translations[$lang][$key]['lang'] = $trans[$lang];
         }
+
     }
 }
+
+// Open a file in write mode ('w')
+$fp = fopen('translations.xlsx', 'w');
+
+// Loop through file pointer and a line
+foreach($available_translations as $lang => $translations) {
+    foreach($translations as $key => $trans) {
+        $trans = preg_replace("/\s+/", " ", $trans);
+        $line = [ $lang , $key, $trans['default'], $trans['lang']  ];
+        fputcsv($fp, $line);
+    }
+}
+
+fclose($fp);
 
 if (!empty($missing_translations)) {
     $messages[] = '/!\ /!\ /!\ Some translations are missing /!\ /!\ /!\ ';
@@ -23,6 +43,7 @@ if (!empty($missing_translations)) {
             $trans = preg_replace("/\s+/", " ", $trans);
             $messages[] = $key . ' => ' . $trans;
         }
+        $messages[] = "\n";
     }
 }
 
