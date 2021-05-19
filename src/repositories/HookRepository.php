@@ -26,18 +26,21 @@ namespace PayPlug\src\repositories;
 class HookRepository extends Repository
 {
     protected $constant;
+    protected $payplug;
+    protected $context;
 
-    public function __construct($payplug, $constant)
+    public function __construct($payplug, $constant, $context)
     {
         $this->payplug = $payplug;
         $this->constant = $constant;
+        $this->context = $context;
     }
 
     public function actionAdminControllerSetMedia()
     {
         $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
-        if ($this->payplug->context->controller->controller_name == 'AdminOrders') {
-            $this->setMedia([
+        if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
+            $this->payplug->setMedia([
                 $module_url . 'views/css/admin_order.css',
                 $module_url . 'views/js/admin_order.js',
             ]);
@@ -49,7 +52,7 @@ class HookRepository extends Repository
         }
     }
 
-    public function exe($method = false, $params = false)
+    public function exe($method = false, $params = [])
     {
         if (!$method
             || !is_string($method)

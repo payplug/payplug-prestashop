@@ -55,6 +55,7 @@ use Language;
 use Media;
 use Module;
 use Order;
+use OrderSlip;
 use OrderState;
 use PaymentModule;
 use Product;
