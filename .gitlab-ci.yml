@@ -28,8 +28,8 @@ unit tests:
 check module translations:
   image: composer:1.9
   stage: translations
-  only:
-    - /^release-.*$/
+#  only:
+#    - /^release-.*$/
   script:
     - composer dump-autoload -o
     - php ci/translations.php
