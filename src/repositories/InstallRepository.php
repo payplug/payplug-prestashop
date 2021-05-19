@@ -245,10 +245,9 @@ class InstallRepository extends Repository
     }
 
     /**
+     * @description Install PayPlug Module
      * @param bool $soft_install
      * @return bool
-     * @todo: repatriate uninstall code
-     * @description Install PayPlug Module
      * @see Module::install()
      */
     public function install()

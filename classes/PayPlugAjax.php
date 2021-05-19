@@ -85,7 +85,8 @@ class PayPlugAjax
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
                         'is_oney' => $is_oney,
-                        '_ajax' => 1
+                        '_ajax' => 1,
+                        'force_hash' => true
                     ];
                     $payment = $this->payplug->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
