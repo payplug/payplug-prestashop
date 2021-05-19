@@ -37,9 +37,9 @@ fclose($fp);
 
 if (!empty($missing_translations)) {
     $messages[] = '/!\ /!\ /!\ Some translations are missing /!\ /!\ /!\ ';
-    foreach($missing_translations as $lang => $translations) {
+    foreach ($missing_translations as $lang => $translations) {
         $messages[] = 'There is ' . count($translations) . ' translations missing for the language "' . $lang . '":';
-        foreach($translations as $key => $trans) {
+        foreach ($translations as $key => $trans) {
             $trans = preg_replace("/\s+/", " ", $trans);
             $messages[] = $key . ' => ' . $trans;
         }

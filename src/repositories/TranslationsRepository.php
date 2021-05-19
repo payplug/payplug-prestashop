@@ -36,6 +36,11 @@ class TranslationsRepository extends Repository
         $this->payplug = $payplug;
     }
 
+    public static function factory()
+    {
+        return new TranslationsRepository();
+    }
+
     public function translate($id)
     {
         if (!is_int($id)) {
@@ -192,8 +197,10 @@ class TranslationsRepository extends Repository
         $this->trans = [];
         $array_check_duplicate = [];
         foreach ($this->files as &$file) {
-            if ((preg_match('/^(.*).tpl$/', $file['name']) || preg_match('/^(.*).php$/',
-                        $file['name'])) && file_exists($file_path = $file['path'] . $file['name'])) {
+            if ((preg_match('/^(.*).tpl$/', $file['name']) || preg_match(
+                '/^(.*).php$/',
+                $file['name']
+            )) && file_exists($file_path = $file['path'] . $file['name'])) {
                 // Get content for this file
                 $content = file_get_contents($file_path);
 

@@ -33,7 +33,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->payplug = new Payplug();
+        $this->payplug = new PayplugClass();
         $this->bootstrap = true;
         $this->table = 'payplug_installment';
         $this->id = 'id_payplug_installment';
@@ -124,7 +124,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     }
 
     // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
-    public function viewpayplug_installment()
+    public function viewPayplugInstallment()
     {
         $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
@@ -151,7 +151,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     public function postProcess()
     {
         if (Tools::isSubmit('viewpayplug_installment')) {
-            $this->viewpayplug_installment();
+            $this->viewPayplugInstallment();
         }
         return parent::postProcess();
     }

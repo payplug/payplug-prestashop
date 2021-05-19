@@ -25,7 +25,7 @@
 //require_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/payplug.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
 /**
  * @description
@@ -35,7 +35,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $payplug = new Payplug();
+        $payplug = new PayPlugClass();
         $notification = $payplug->setNotification();
         $notification->treat();
     }
