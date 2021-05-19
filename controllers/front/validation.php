@@ -24,13 +24,12 @@
 //Inclusions
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $payplug = new PayPlugClass();
+        $payplug = new \PayPlug\classes\PayPlugClass();
         $validation = $payplug->setValidation();
         $validation->treat();
     }

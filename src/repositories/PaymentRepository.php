@@ -34,6 +34,7 @@ class PaymentRepository extends Repository
     protected $payplug;
     private $apiPayment;
     private $cartSpecific;
+    private $confSpecific;
     private $logger;
     private $paymentEntity;
     private $query;
@@ -42,6 +43,7 @@ class PaymentRepository extends Repository
     public function __construct(
         $payplug,
         $cartSpecific,
+        $confSpecific,
         $logger,
         $paymentEntity,
         $query,
@@ -49,6 +51,7 @@ class PaymentRepository extends Repository
     ) {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
+        $this->confSpecific = $confSpecific;
         $this->logger = $logger;
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
@@ -88,7 +91,9 @@ class PaymentRepository extends Repository
 
         if ($paymentStored['cart_hash'] === $cartHash
             &&
-            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])
+            &&
+            (!$paymentDetails['forceHash'])) {
             return [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
@@ -212,6 +217,13 @@ class PaymentRepository extends Repository
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
+            );
+        }
+
+        if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confSpecific->get('PAYPLUG_STANDARD')) {
+            return $this->returnPaymentError(
+                ['name' => 'Configuration::get', 'value' => $this->confSpecific->get('PAYPLUG_STANDARD')],
+                '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
             );
         }
 
