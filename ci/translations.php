@@ -21,7 +21,7 @@ foreach ($translations as $key => $trans) {
 }
 
 // Open a file in write mode ('w')
-$fp = fopen('translations.csv', 'w');
+$fp = fopen(dirname(__FILE__) . '/translations.csv', 'w');
 
 // Loop through file pointer and a line
 foreach ($available_translations as $lang => $translations) {
