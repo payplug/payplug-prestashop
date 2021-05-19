@@ -50,5 +50,4 @@ if (!empty($messages)) {
     foreach ($messages as $message) {
         echo $message . "\n";
     }
-    die(1);
 }
