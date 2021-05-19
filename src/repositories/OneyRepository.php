@@ -96,7 +96,7 @@ class OneyRepository extends Repository
     {
         $js_var = [
             'loading_msg' => $this->l('Loading'),
-            'can_use_oney' => $this->payplug->getConfiguration('PAYPLUG_ONEY'),
+            'can_use_oney' => $this->configurationSpecific->get('PAYPLUG_ONEY'),
         ];
         return \Media::addJsDef($js_var);
     }
@@ -111,40 +111,8 @@ class OneyRepository extends Repository
      */
     public function assignOneyPaymentOptions($cart)
     {
-        if (!$this->payplug->getConfiguration('PAYPLUG_ONEY')) {
+        if (!$this->configurationSpecific->get('PAYPLUG_ONEY')) {
             return false;
-        }
-
-        // check if at least one carrier is available for this cart
-        // get the available carrier
-        $package_list = $cart->getPackageList();
-        $carrier_ids = [];
-        foreach ($package_list as $address) {
-            foreach ($address as $package) {
-                $carrier_ids = array_merge($carrier_ids, $package['carrier_list']);
-            }
-        }
-
-        // only if we have carrier need for this cart
-        // check the carrier type of each available carrier
-        if ($carrier_ids) {
-            $has_valid_carrier = false;
-            foreach ($carrier_ids as $carrier_id) {
-                if ($has_valid_carrier) {
-                    continue;
-                }
-
-                $pc = new \PayPlugCarrier();
-                $pc = $pc->getByIdCarrier($carrier_id);
-                if ($pc->delivery_type) {
-                    $has_valid_carrier = true;
-                }
-            }
-
-            // if no carrier available for Oney, return false
-            if (!$has_valid_carrier) {
-                return false;
-            }
         }
 
         if ($this->validateSpecific->validate('isLoadedObject', $cart)
@@ -361,7 +329,7 @@ class OneyRepository extends Repository
             )
         ]);
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/popin.tpl');
+        return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
 
     /**
@@ -381,7 +349,7 @@ class OneyRepository extends Repository
             ]
         ];
         $this->contextSpecific->getContext()->smarty->assign($vars);
-        return $this->payplug->display($this->payplug->constantFile, 'oney/schedule.tpl');
+        return $this->payplug->fetchTemplate('oney/schedule.tpl');
     }
 
     /**
@@ -404,7 +372,7 @@ class OneyRepository extends Repository
                 'oney_required_fields' => $this->getOneyRequiredFields(),
             ]);
 
-            return $this->payplug->display($this->payplug->constantFile, 'oney/payment/payment.tpl');
+            return $this->payplug->fetchTemplate('oney/payment/payment.tpl');
         }
     }
 
@@ -497,7 +465,7 @@ class OneyRepository extends Repository
             'payplug_oney_loading_msg' => $this->l('Loading')
         ]);
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/cta.tpl');
+        return $this->payplug->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -1114,7 +1082,7 @@ class OneyRepository extends Repository
             'oney_required_fields' => $fields
         ]);
 
-        return $this->payplug->display($this->payplug->constantFile, 'oney/required.tpl');
+        return $this->payplug->fetchTemplate('oney/required.tpl');
     }
 
     /**
@@ -1123,10 +1091,8 @@ class OneyRepository extends Repository
     public function installOney()
     {
         $this->log->info('Starting to install.');
-        return ($this->installOneyConfig()
-            && $this->installOneyOrderStates()
-            && (new SQLtableRepository())->installOneySql()
-            && $this->installOneyCarriers());
+        return $this->installOneyConfig()
+            && $this->installOneyOrderStates();
     }
 
     /**
@@ -1268,21 +1234,6 @@ class OneyRepository extends Repository
     }
 
     /**
-     * @description Install Oney Carriers
-     *
-     * @return boolean
-     */
-    public function installOneyCarriers()
-    {
-        $carriers = \PayPlugCarrier::getCarriers(true);
-        $flag = true;
-        foreach ($carriers as $carrier) {
-            $flag = $flag && $carrier->save();
-        }
-        return $flag;
-    }
-
-    /**
      * @description Check if Oney is allowed
      *
      * @return boolean
@@ -1336,64 +1287,6 @@ class OneyRepository extends Repository
                     $this->toolsSpecific->tool('displayPrice', $min_amount),
                     $this->toolsSpecific->tool('displayPrice', $max_amount)
                 )
-            ];
-        }
-
-        return ['result' => true, 'error' => false];
-    }
-
-    /**
-     * @description Check if carrier is valid for Oney
-     * Try the current selected then all available carrier
-     *
-     * @param $cart
-     * @return array
-     */
-    public function isValidOneyCarrier($cart)
-    {
-        if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
-            return [
-                'result' => false,
-                'error' => $this->l('The cart is unvalid'),
-                'error_type' => 'invalid_carrier',
-            ];
-        }
-
-        $invalid_carrier_type = ['storepickup', 'networkpickup'];
-
-        // check if current carrier is available
-        $payplug_carrier = new \PayPlugCarrier();
-        $payplug_carrier = $payplug_carrier->getByIdCarrier($cart->id_carrier);
-
-        if (!$payplug_carrier->delivery_type) {
-            $carrier = new \Carrier($cart->id_carrier);
-            $error = $this->l('The carrier') . ' ' . $carrier->name . ' ' .
-                $this->l('shipping is conflicting with this payment method. ');
-            $error .= $this->l('Please change the shipping method chosen at the last step.');
-            return [
-                'result' => false,
-                'error' => sprintf($error),
-                'error_type' => 'invalid_carrier',
-            ];
-        } elseif ((bool)in_array($payplug_carrier->delivery_type, $invalid_carrier_type, true)) {
-            switch ($payplug_carrier->delivery_type) {
-                case 'networkpickup':
-                    $delivery_type = $this->l('Network Pickup');
-                    break;
-                case 'storepickup':
-                default:
-                    $delivery_type = $this->l('Store Pickup');
-                    break;
-            }
-
-            $error = $this->l('The ') . $delivery_type .
-                $this->l(' shipping is conflicting with this payment method. ');
-            $error .= $this->l('Please change the shipping method chosen at the last step.');
-
-            return [
-                'result' => false,
-                'error' => $error,
-                'error_type' => 'invalid_carrier',
             ];
         }
 
@@ -1526,14 +1419,6 @@ class OneyRepository extends Repository
             'result' => $error ? false : true,
             'message' => $error,
         ];
-    }
-
-    /**
-     * @description Install Oney feature
-     */
-    public function uninstallOney()
-    {
-        return $this->deleteOneyConfig() && (new SQLtableRepository())->uninstallOneySql();
     }
 
     /**

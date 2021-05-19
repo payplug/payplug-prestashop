@@ -392,3 +392,17 @@ $_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c8
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Une erreur s\'est produite. Veuillez réessayer dans quelques secondes.';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Le paiement avec Oney n\'est pas disponible.';
 $_MODULE['<{payplug}prestashop>cardrepository_0d2d5fa0cfffc8577f948d683a82079e'] = 'Carte supprimée avec succès.';
+$_MODULE['<{payplug}prestashop>php_version_484e842f99d03422fa10151e75ab98b9'] = 'PRESENTATION';
+$_MODULE['<{payplug}prestashop>php_version_371b6a7f7531bc89aa4c813a8f98f9c6'] = 'La solution de paiement qui augmente vos ventes';
+$_MODULE['<{payplug}prestashop>php_version_11f45251bf119ff45530345f807aa965'] = 'PayPlug offre aux e-commerçants tous les avantages d’une solution complète de paiement en ligne.';
+$_MODULE['<{payplug}prestashop>php_version_48633807d82bf30dc50da6f4e0947ff4'] = 'Acceptez toutes les cartes CB, Visa, MasterCard françaises et internationales';
+$_MODULE['<{payplug}prestashop>php_version_ec36b20c94c8267c75e8522a139189bd'] = 'Affichez le formulaire de paiement directement dans votre boutique, sans redirection';
+$_MODULE['<{payplug}prestashop>php_version_1b1efef90fc217b58f77abba192ddc67'] = 'Personnalisez votre page de paiement en utilisant votre design et vos couleurs';
+$_MODULE['<{payplug}prestashop>php_version_46c402e7f69e54d4ddfdb026157195a8'] = 'Évitez la fraude en utilisant le 3D-Secure';
+$_MODULE['<{payplug}prestashop>php_version_2198405cb62d1a36f7824ad094260221'] = 'Mise à jour des commandes automatique et confirmation par email';
+$_MODULE['<{payplug}prestashop>php_version_f683d3e42054dfba0264b623e35be77f'] = 'Interface permettant la gestion des paiements et l\'export CSV des transactions';
+$_MODULE['<{payplug}prestashop>php_version_096f5099565dd56d7c8d1c76bb8197a7'] = 'Disponibilité des fonds sur le compte bancaire sous 2 à 5 jours ouvrés';
+$_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 'La version de PHP que vous utilisez n\'est pas compatible avec cette version du module PayPlug car elle est antérieure à PHP 5.6.';
+$_MODULE['<{payplug}prestashop>php_version_6c55f8dc7a5345a058639f6e4781e5b8'] = 'Rendez-vous sur notre ';
+$_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 'page support';
+$_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' pour récupérer une version compatible avec votre boutique.';

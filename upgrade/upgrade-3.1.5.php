@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -25,24 +25,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_26_0($object)
+function upgrade_module_3_1_5()
 {
-    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
-    if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-        return true;
-    }
-
     $flag = true;
 
-    // run the method who install Oney feature
-    if ($object->isValidPHPVersion()) {
-        $flag = $object->dependencies->getPlugin()->getOney()->installOney();
-    }
-
-    //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
-        $flag = false;
-    }
+    $sql = 'DROP TABLE IF EXISTS '._DB_PREFIX_.'payplug_carrier';
+    $flag = $flag && Db::getInstance()->execute($sql);
 
     return $flag;
 }

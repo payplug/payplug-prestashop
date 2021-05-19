@@ -34,11 +34,10 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      * @return bool|void
      * @throws Exception
      */
-
     public function postProcess()
     {
         if ($method = Tools::getValue('method')) {
-            $payplug = new Payplug();
+            $payplug = new PayPlugClass();
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
             $is_deferred = (bool)Tools::getValue('def');
