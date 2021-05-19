@@ -27,6 +27,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\CartMock;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group payment
@@ -50,7 +51,8 @@ final class CheckHashTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method'
+            'paymentMethod' => 'payment_method',
+            'forceHash' => true
         ];
     }
 

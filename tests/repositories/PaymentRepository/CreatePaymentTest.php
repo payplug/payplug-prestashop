@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\PaymentMock;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group payment

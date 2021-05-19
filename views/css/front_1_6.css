@@ -642,7 +642,8 @@
   font-size: 10px;
   line-height: 1.2em;
   color: #8a8a8a;
-  padding: 8px 0 0;
+  margin: 8px 0 0;
+  white-space: normal;
 }
 @media (max-width: 767px) {
   .oneyPopin_legal {
@@ -697,6 +698,7 @@
   font-size: 14px;
   font-style: italic;
   font-weight: 400;
+  white-space: normal;
 }
 /* Oney Form */
 .oneyRequired {
@@ -1303,13 +1305,6 @@
   font-style: italic;
   font-weight: 400;
 }
-.oneyPayment_error.-invalidCarrier {
-  padding: 0 15px;
-  color: #e56876;
-  font-size: 13px;
-  font-style: normal;
-  margin: 0 0 16px;
-}
 .oneyPayment_logo {
   display: block;
   background-size: 110%;
@@ -1341,8 +1336,7 @@
   -moz-border-radius: 2px;
   border-radius: 2px;
 }
-.oneyPayment_button.-disabled,
-.-invalidCarrier .oneyPayment_button {
+.oneyPayment_button.-disabled {
   background: #b2b2b2;
   cursor: default;
   outline: none;
@@ -1433,12 +1427,6 @@
 .-mobile .oneyOption_logo {
   width: 100px;
   height: 30px;
-}
-.oneyPayment-invalidCarrier .oneyOption_logo.oneyLogo-x3 {
-  background-image: url(../img/oney/3x-alt.svg);
-}
-.oneyPayment-invalidCarrier .oneyOption_logo.oneyLogo-x4 {
-  background-image: url(../img/oney/4x-alt.svg);
 }
 .oneyOption_title {
   display: flex;

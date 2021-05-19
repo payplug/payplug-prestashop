@@ -97,7 +97,6 @@ class BaseTest extends TestCase
 
     private function setRepository()
     {
-        $this->cache        = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
         $this->logger       = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->order_state  = MockHelper::createMockFactory('Payplug\src\repositories\OrderStateRepository');
         $this->query        = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
