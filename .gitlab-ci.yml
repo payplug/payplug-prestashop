@@ -33,6 +33,9 @@ check module translations:
   script:
     - composer dump-autoload -o
     - php ci/translations.php
+  artifacts:
+    paths:
+      - ci/translations.csv
 
 build zip release:
   image: composer:1.9
