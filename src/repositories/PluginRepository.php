@@ -92,10 +92,10 @@ class PluginRepository extends Repository
         $this->translate = new TranslationsRepository($payplug);
         $this->validate = new ValidateSpecific();
 
-
         $this->hook = new HookRepository(
             $payplug,
-            $this->constant
+            $this->constant,
+            $this->context
         );
 
         $this->oney = new OneyRepository(

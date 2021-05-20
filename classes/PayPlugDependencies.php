@@ -55,7 +55,6 @@ class PayPlugDependencies
     {
         $this->payplug = new PayPlugClass();
         $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this->payplug))->getEntity());
-
         $this->hook = $this->getPlugin()->getHook();
     }
 
