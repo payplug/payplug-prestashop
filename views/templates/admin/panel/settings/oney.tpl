@@ -21,7 +21,7 @@
 *}
 <div class="panel-row separate_margin_block">
     <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='Activate Oney Payments' mod='payplug'}</div>
+        <div class="payplugPanel_label">{l s='admin.panel.setting.oney.label' mod='payplug'}</div>
         <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.oney}</div>
     </div>
     <div class="payplugPanel">
