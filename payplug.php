@@ -415,6 +415,20 @@ class Payplug extends PaymentModule
         return PHP_VERSION_ID >= $php_min_version;
     }
 
+    /**
+     * Run update module
+     */
+    public function runUpgradeModule()
+    {
+        $upgrade = parent::runUpgradeModule();
+
+        if ($this->module) {
+            $this->dependencies->getDependency('install')->checkOrderStates();
+        }
+
+        return $upgrade;
+    }
+
     public function setDependencies()
     {
         $this->dependencies = new \PayPlug\classes\PayPlugDependencies();
