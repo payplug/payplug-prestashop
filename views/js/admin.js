@@ -956,11 +956,10 @@ var $document, $window, payplug = {
                 event.preventDefault();
                 event.stopPropagation();
                 var {switcher} = payplug.tools,
-                    {identifier} = switcher.props,
                     $switch = $(this),
                     is_right = $switch.is('.-right');
 
-                if ($switch.is('.-disabled')) {
+                if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
 
@@ -981,7 +980,7 @@ var $document, $window, payplug = {
                     $switch = $label.parents('.' + identifier),
                     $tips = null;
 
-                if ($switch.is('.-disabled')) {
+                if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
 
@@ -1007,8 +1006,8 @@ var $document, $window, payplug = {
                     $tips = $('.payplugTips.-' + name);
 
                 if ($tips.length) {
-                    $('.payplugTips.-' + name + ' > .payplugTips_item').hide();
-                    $('.payplugTips.-' + name + ' > .-right').show();
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-right').removeClass('-hide');
                 }
 
                 var $selected = target.find('input[value=0]');
@@ -1027,8 +1026,8 @@ var $document, $window, payplug = {
                     $tips = $('.payplugTips.-' + name);
 
                 if ($tips.length) {
-                    $('.payplugTips.-' + name + ' > .payplugTips_item').hide();
-                    $('.payplugTips.-' + name + ' > .-left').show();
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-left').removeClass('-hide');
                 }
 
                 var $selected = target.find('input[value=1]');

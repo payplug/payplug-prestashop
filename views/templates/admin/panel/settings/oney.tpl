@@ -31,7 +31,7 @@
                 <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
             <div class="payplugTips -{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item -left" {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active}style="display: none;"{/if}>
+                <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
                         <div class="payplugPanel_section">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_tos}

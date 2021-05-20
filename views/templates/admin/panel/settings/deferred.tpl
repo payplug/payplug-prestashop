@@ -31,7 +31,7 @@
                 <a class="payplugLink" href="{$faq_links.deferred|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='More information.' mod='payplug'}</a>
             </p>
             <div class="payplugTips -{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item -left" {if !$payplug_switch.deferred.checked}style="display: none;"{/if}>
+                <div class="payplugTips_item -left{if !$payplug_switch.deferred.checked} -hide{/if}">
                     <div class="payplugDeferred">
                         <label for="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}">
                             <input type="checkbox" name="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" value="1" id="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" {if $payplug_switch.deferred_auto.checked}checked="checked"{/if}>
