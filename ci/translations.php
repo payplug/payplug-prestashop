@@ -23,7 +23,7 @@ foreach ($translations as $key => $trans) {
             $missing_translations[$lang][$key] = $trans['default'];
         }
     }
-    fputcsv($fp, $line);
+    fputcsv($fp, $line, ';');
 }
 fclose($fp);
 
