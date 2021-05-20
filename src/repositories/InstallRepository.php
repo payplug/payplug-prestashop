@@ -96,7 +96,7 @@ class InstallRepository extends Repository
 
         foreach ($order_states_list as $key => $state) {
             // Check live OrderState
-            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper',$key);
+            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = $this->config->get($key_config_live);
             $order_state_live = new OrderStateSpecific((int)$id_order_state_live);
             if (!$this->validate('isLoadedObject', $order_state_live)) {
