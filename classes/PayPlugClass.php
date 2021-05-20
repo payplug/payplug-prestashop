@@ -1778,8 +1778,12 @@ class PayPlugClass extends PaymentModule
             case 'abort':
                 $title = $this->l('Suspend installment');
                 break;
+            case 'deferred':
+                $title = $this->l('payplug.displayPopin.deferred');
+                break;
             default:
                 $title = '';
+                break;
         }
 
         $this->context->smarty->assign([

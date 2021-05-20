@@ -880,6 +880,7 @@ var $document, $window, payplug = {
         props: {
             identifier: 'payplugDeferred',
             switcher: 'payplug_deferred',
+            query: null,
         },
         init: function () {
             var {deferred} = payplug,
@@ -920,12 +921,17 @@ var $document, $window, payplug = {
             $('.' + identifier).find('select').attr('disabled', true);
         },
         select: function () {
-            var {deferred} = payplug,
+            var {standard, installment, deferred} = payplug,
                 {identifier, switcher} = deferred.props,
                 $checkbox = $('.' + identifier).find('input[type=checkbox]'),
                 $select = $('.' + identifier).find('select'),
                 checked = $checkbox.prop('checked'),
                 active = parseInt($('input[name=' + switcher + ']:checked').val());
+
+            if (!parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
+                && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())) {
+                return deferred.unavailable();
+            }
 
             var $error = $('.' + identifier).find('span');
             deferred.props.error = null;
@@ -936,6 +942,42 @@ var $document, $window, payplug = {
             } else {
                 $error.hide();
             }
+        },
+        unavailable: function(){
+            var {deferred, tools} = payplug;
+
+            var data = {
+                _ajax: 1,
+                popin: 1,
+                type: 'deferred'
+            };
+
+            if (deferred.props.query != null) {
+                deferred.props.query.abort();
+                deferred.props.query = null;
+            }
+
+            deferred.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('An error occurred while trying to checking your premium status. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (result) {
+                    if (typeof result.content != 'undefined') {
+                        var {popup} = tools;
+                        popup.set(result.content, 'password');
+                    }
+                }
+            });
         }
     },
     tools: {
