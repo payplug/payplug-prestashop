@@ -5773,7 +5773,6 @@ class PayPlugClass extends PaymentModule
 
                 die(json_encode(['content' => $content]));
             } else {
-                die(dump(__LINE__));
                 $this->validationErrors['username_password'] =
                     $this->l('The email and/or password was not correct.');
             }
