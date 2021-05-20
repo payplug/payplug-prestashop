@@ -407,3 +407,5 @@ $_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 
 $_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' to obtain a version compatible with your store.';
 $_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Payment by credit card';
 $_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Offer payment by credit card to your customers.';
+$_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Enable garanteed installment Payments with Oney';
+$_MODULE['<{payplug}prestashop>installment_4f623785d72bba502487b033434853ba'] = 'Enable non garanteed payments by installments';

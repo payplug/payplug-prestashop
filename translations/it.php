@@ -408,3 +408,5 @@ $_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 
 $_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' per ottenere una versione compatibile con il tuo negozio online.';
 $_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Pagamento con carta di credito';
 $_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Proponi il pagamento con carta di credito ai tuoi clienti.';
+$_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Attiva i pagamenti rateizzati garantiti Oney';
+$_MODULE['<{payplug}prestashop>installment_4f623785d72bba502487b033434853ba'] = 'Attiva i pagamenti rateizzati non garantiti';
