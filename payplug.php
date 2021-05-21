@@ -32,7 +32,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 
 class Payplug extends PaymentModule
 {
-    public $dependencies;
+    public $payplug_dependencies;
 
     /**
      * Constructor
@@ -145,7 +145,7 @@ class Payplug extends PaymentModule
     public function hookActionAdminControllerSetMedia()
     {
         if ($this->module) {
-            return $this->dependencies->getDependency('hook')->exe('actionAdminControllerSetMedia');
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionAdminControllerSetMedia');
         }
     }
 
@@ -359,29 +359,29 @@ class Payplug extends PaymentModule
     public function install($soft_install = false)
     {
         if ($this->module) {
-            $valid_installation = true;
+            $flag = true;
 
             // Use for update module is not fully installed
             if (!$soft_install) {
-                $this->dependencies = null;
-                $valid_installation = $valid_installation && parent::install();
+                $this->payplug_dependencies = null;
+                $flag = $flag && parent::install();
                 $this->setDependencies();
             }
 
             // Install configuration
-            if ($valid_installation) {
-                $valid_installation = $valid_installation && $this->dependencies->getDependency('install')->install();
+            if ($flag) {
+                $flag = $flag && $this->payplug_dependencies->getDependency('install')->install();
             }
 
             // Install hook
-            if ($valid_installation) {
+            if ($flag) {
                 $hook_list = $this->getHookList();
                 foreach ($hook_list as $hook) {
-                    $valid_installation = $valid_installation && $this->registerHook($hook);
+                    $flag = $flag && $this->registerHook($hook);
                 }
             }
 
-            return $valid_installation;
+            return $flag;
         }
 
         return parent::install();
@@ -423,7 +423,7 @@ class Payplug extends PaymentModule
         $upgrade = parent::runUpgradeModule();
 
         if ($this->module) {
-            $this->dependencies->getDependency('install')->checkOrderStates();
+            $this->payplug_dependencies->getDependency('install')->checkOrderStates();
         }
 
         return $upgrade;
@@ -431,12 +431,12 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->dependencies = new \PayPlug\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
     private function setModule()
     {
-        $this->module = $this->dependencies->payplug;
+        $this->module = $this->payplug_dependencies->payplug;
     }
 
     /**
@@ -447,7 +447,7 @@ class Payplug extends PaymentModule
     public function uninstall()
     {
         if ($this->module) {
-            return parent::uninstall() && $this->dependencies->getDependency('install')->uninstall();
+            return parent::uninstall() && $this->payplug_dependencies->getDependency('install')->uninstall();
         }
 
         return parent::uninstall();
