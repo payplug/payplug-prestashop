@@ -4278,7 +4278,8 @@ class PayPlugClass extends PaymentModule
             'id_card' => 'new_card',
             'is_installment' => false,
             'is_deferred' => false,
-            'is_oney' => false
+            'is_oney' => false,
+            'force_hash' => false
         ];
 
         foreach ($default_options as $key => $value) {
