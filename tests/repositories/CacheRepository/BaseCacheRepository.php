@@ -27,9 +27,9 @@ namespace PayPlug\tests\repositories\CacheRepository;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BaseCacheRepository extends BaseTest
+class BaseCacheRepository extends RepositoryBase
 {
     protected $cacheEntity;
 

@@ -23,8 +23,8 @@
  */
 namespace PayPlug\tests\repositories\HookRepository;
 
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BaseHookRepository extends BaseTest
+class BaseHookRepository extends RepositoryBase
 {
 }

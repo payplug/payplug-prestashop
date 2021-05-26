@@ -25,9 +25,9 @@ namespace PayPlug\tests\repositories\InstallRepository;
 
 use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\entities\OrderStateEntity;
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BaseInstallRepository extends BaseTest
+class BaseInstallRepository extends RepositoryBase
 {
     protected $order_state_entity;
 

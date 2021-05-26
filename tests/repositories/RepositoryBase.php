@@ -28,7 +28,7 @@ use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-class BaseTest extends TestCase
+class RepositoryBase extends TestCase
 {
     use MockeryPHPUnitIntegration;
 

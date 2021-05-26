@@ -26,9 +26,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BaseOneyRepository extends BaseTest
+class BaseOneyRepository extends RepositoryBase
 {
     protected $oney;
 

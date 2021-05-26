@@ -28,9 +28,9 @@ use Payplug\Payment;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BasePaymentRepository extends BaseTest
+class BasePaymentRepository extends RepositoryBase
 {
     protected $payment;
     protected $paymentApi;
