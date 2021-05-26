@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
+use PayPlug\src\specific\OrderStateSpecific;
 
 class InstallRepository extends Repository
 {
@@ -52,6 +53,9 @@ class InstallRepository extends Repository
     protected $tools;
 
     /** @var object */
+    protected $validate;
+
+    /** @var object */
     protected $payplug;
 
     public function __construct(
@@ -63,6 +67,7 @@ class InstallRepository extends Repository
         $shop,
         $sql,
         $tools,
+        $validate,
         $payplug
     ) {
         $this->config = $config;
@@ -73,12 +78,42 @@ class InstallRepository extends Repository
         $this->shop = $shop;
         $this->sql = $sql;
         $this->tools = $tools;
+        $this->validate = $validate;
 
         $this->payplug = $payplug;
 
         $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
 
         $this->setParams();
+    }
+
+    /**
+     * @description Check if payplug order state are well installed
+     */
+    public function checkOrderStates()
+    {
+        $order_states_list = $this->order_state_entity->getList();
+
+        foreach ($order_states_list as $key => $state) {
+            // Check live OrderState
+            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
+            $id_order_state_live = $this->config->get($key_config_live);
+            $order_state_live = new OrderStateSpecific((int)$id_order_state_live);
+            if (!$this->validate('isLoadedObject', $order_state_live)) {
+                $this->order_state->create($key, $state, true, true);
+            }
+
+            // Check sandbox OrderState
+            $key_config_sandbox = $key_config_live . '_TEST';
+            $id_order_state_sandbox = $this->config->get($key_config_sandbox);
+            $order_state_sandbox = new OrderStateSpecific((int)$id_order_state_sandbox);
+
+            if (!$this->validate('isLoadedObject', $order_state_sandbox)) {
+                $this->order_state->create($key, $state, true, true);
+            }
+        }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
     }
 
     /**
@@ -448,7 +483,6 @@ class InstallRepository extends Repository
             ]
         ]);
     }
-
 
     /**
      * @description Set error on module uninstall

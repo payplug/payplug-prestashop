@@ -21,7 +21,7 @@
 *}
 <div class="payplugInstallment panel-row separate_margin_block">
     <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='Enable payments by installments' mod='payplug'}</div>
+        <div class="payplugPanel_label">{l s='admin.panel.setting.installment.label' mod='payplug'}</div>
         <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.installment}</div>
     </div>
     <div class="payplugPanel">

@@ -50,6 +50,7 @@ class BaseInstallRepository extends BaseTest
             $this->shop,
             $this->sql,
             $this->tools,
+            $this->validate,
             $this->payplug
         ])
             ->shouldAllowMockingProtectedMethods()

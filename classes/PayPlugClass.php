@@ -37,7 +37,6 @@ use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
-use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
 
 // Prestashop
@@ -55,6 +54,7 @@ use Language;
 use Media;
 use Module;
 use Order;
+use OrderSlip;
 use OrderState;
 use PaymentModule;
 use Product;
@@ -1428,35 +1428,6 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @description Check if payplug order state are well installed
-     */
-    public function checkOrderStates()
-    {
-        $order_states = array_merge($this->order_states, $this->oney_order_state);
-
-        foreach ($order_states as $key => $state) {
-            // Check live OrderState
-            $key_config_live = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
-            $id_order_state_live = Configuration::get($key_config_live);
-            $order_state_live = new OrderState((int)$id_order_state_live);
-            if (!Validate::isLoadedObject($order_state_live)) {
-                $this->createOrderState($key, $state, false, true);
-            }
-
-            // Check sandbox OrderState
-            $key_config_sandbox = $key_config_live . '_TEST';
-            $id_order_state_sandbox = Configuration::get($key_config_sandbox);
-            $order_state_sandbox = new OrderState((int)$id_order_state_sandbox);
-
-            if (!Validate::isLoadedObject($order_state_sandbox)) {
-                $this->createOrderState($key, $state, true, true);
-            }
-        }
-
-        $this->order_state->removeIdsUnusedByPayPlug();
-    }
-
-    /**
      * Format amount float to int or int to float
      *
      * @param $amount
@@ -1777,8 +1748,12 @@ class PayPlugClass extends PaymentModule
             case 'abort':
                 $title = $this->l('Suspend installment');
                 break;
+            case 'deferred':
+                $title = $this->l('payplug.displayPopin.deferred');
+                break;
             default:
                 $title = '';
+                break;
         }
 
         $this->context->smarty->assign([
@@ -2394,107 +2369,107 @@ class PayPlugClass extends PaymentModule
 
         $paymentOption = [];
 
-        // if (Configuration::get('PAYPLUG_STANDARD')) {
-        // OneClick Payment
-        if ($options['one_click'] && !empty($payplug_cards)) {
-            foreach ($payplug_cards as $card) {
-                $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
-                $paymentOption['one_click_' . $card['id_payplug_card']]['name'] = 'one_click';
-                $paymentOption['one_click_' . $card['id_payplug_card']]['inputs'] = [
-                        'pc' => [
-                            'name' => 'pc',
-                            'type' => 'hidden',
-                            'value' => (int)$card['id_payplug_card'],
-                        ],
-                        'pay' => [
-                            'name' => 'pay',
-                            'type' => 'hidden',
-                            'value' => '1',
-                        ],
-                        'id_cart' => [
-                            'name' => 'id_cart',
-                            'type' => 'hidden',
-                            'value' => (int)$this->context->cart->id,
-                        ],
-                        'method' => [
-                            'name' => 'method',
-                            'type' => 'hidden',
-                            'value' => 'one_click',
-                        ],
-                    ];
-                $paymentOption['one_click_' . $card['id_payplug_card']]['tpl'] = 'one_click.tpl';
-                $paymentOption['one_click_' . $card['id_payplug_card']]['payment_controller_url'] =
-                        $this->context->link->getModuleLink(
-                            $this->name,
-                            'payment',
-                            [],
-                            true
-                        );
-                $paymentOption['one_click_' . $card['id_payplug_card']]['logo'] = Media::getMediaPath(
-                    _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'
-                );
-                $paymentOption['one_click_' . $card['id_payplug_card']]['callToActionText'] = $brand .
-                        ' **** **** **** ' . $card['last4'];
-                $paymentOption['one_click_' . $card['id_payplug_card']]['expiry_date_card'] =
-                        $this->l('Expiry date') . ': ' . $card['expiry_date'];
-                $paymentOption['one_click_' . $card['id_payplug_card']]['action'] = $this->context->link->getModuleLink(
-                    $this->name,
-                    'dispatcher',
-                    ['def' => (int)$options['deferred']],
-                    true
-                );
-                $paymentOption['one_click_' . $card['id_payplug_card']]['moduleName'] = 'payplug';
+        if (Configuration::get('PAYPLUG_STANDARD')) {
+            // OneClick Payment
+            if ($options['one_click'] && !empty($payplug_cards)) {
+                foreach ($payplug_cards as $card) {
+                    $brand = $card['brand'] != 'none' ? Tools::ucfirst($card['brand']) : $this->l('Card');
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['name'] = 'one_click';
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['inputs'] = [
+                            'pc' => [
+                                'name' => 'pc',
+                                'type' => 'hidden',
+                                'value' => (int)$card['id_payplug_card'],
+                            ],
+                            'pay' => [
+                                'name' => 'pay',
+                                'type' => 'hidden',
+                                'value' => '1',
+                            ],
+                            'id_cart' => [
+                                'name' => 'id_cart',
+                                'type' => 'hidden',
+                                'value' => (int)$this->context->cart->id,
+                            ],
+                            'method' => [
+                                'name' => 'method',
+                                'type' => 'hidden',
+                                'value' => 'one_click',
+                            ],
+                        ];
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['tpl'] = 'one_click.tpl';
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['payment_controller_url'] =
+                            $this->context->link->getModuleLink(
+                                $this->name,
+                                'payment',
+                                [],
+                                true
+                            );
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['logo'] = Media::getMediaPath(
+                        _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'
+                    );
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['callToActionText'] = $brand .
+                            ' **** **** **** ' . $card['last4'];
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['expiry_date_card'] =
+                            $this->l('Expiry date') . ': ' . $card['expiry_date'];
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['action'] = $this->context->link->getModuleLink(
+                        $this->name,
+                        'dispatcher',
+                        ['def' => (int)$options['deferred']],
+                        true
+                    );
+                    $paymentOption['one_click_' . $card['id_payplug_card']]['moduleName'] = 'payplug';
+                }
             }
-        }
 
-        // Standard Payment or new card from one-click
-        $paymentOption['standard']['name'] = 'standard';
-        $paymentOption['standard']['inputs'] = [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int)$this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'standard',
-                ],
-            ];
-        $paymentOption['standard']['tpl'] = 'standard.tpl';
-        $paymentOption['standard']['extra_classes'] = 'payplug default';
-        $paymentOption['standard']['payment_controller_url'] = $this->context->link->getModuleLink(
-            $this->name,
-            'payment',
-            ['type' => 'standard']
-        );
-        $paymentOption['standard']['logo'] = Media::getMediaPath(
-            _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
-                    'none' : 'logos_schemes_' . $this->img_lang) . '.png'
-        );
-        if (count($payplug_cards) > 0) {
-            $paymentOption['standard']['callToActionText'] = $this->l('Pay with a different card');
-        } else {
-            $paymentOption['standard']['callToActionText'] = $this->l('Pay with a credit card');
+            // Standard Payment or new card from one-click
+            $paymentOption['standard']['name'] = 'standard';
+            $paymentOption['standard']['inputs'] = [
+                    'pc' => [
+                        'name' => 'pc',
+                        'type' => 'hidden',
+                        'value' => 'new_card',
+                    ],
+                    'pay' => [
+                        'name' => 'pay',
+                        'type' => 'hidden',
+                        'value' => '1',
+                    ],
+                    'id_cart' => [
+                        'name' => 'id_cart',
+                        'type' => 'hidden',
+                        'value' => (int)$this->context->cart->id,
+                    ],
+                    'method' => [
+                        'name' => 'method',
+                        'type' => 'hidden',
+                        'value' => 'standard',
+                    ],
+                ];
+            $paymentOption['standard']['tpl'] = 'standard.tpl';
+            $paymentOption['standard']['extra_classes'] = 'payplug default';
+            $paymentOption['standard']['payment_controller_url'] = $this->context->link->getModuleLink(
+                $this->name,
+                'payment',
+                ['type' => 'standard']
+            );
+            $paymentOption['standard']['logo'] = Media::getMediaPath(
+                _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
+                        'none' : 'logos_schemes_' . $this->img_lang) . '.png'
+            );
+            if (count($payplug_cards) > 0) {
+                $paymentOption['standard']['callToActionText'] = $this->l('Pay with a different card');
+            } else {
+                $paymentOption['standard']['callToActionText'] = $this->l('Pay with a credit card');
+            }
+            $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
+                $this->name,
+                'dispatcher',
+                ['def' => (int)$options['deferred']],
+                true
+            );
+            $paymentOption['standard']['moduleName'] = 'payplug';
         }
-        $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
-            $this->name,
-            'dispatcher',
-            ['def' => (int)$options['deferred']],
-            true
-        );
-        $paymentOption['standard']['moduleName'] = 'payplug';
-        // }
 
         // Installment Payment
         if ($options['installment']) {
@@ -4307,7 +4282,8 @@ class PayPlugClass extends PaymentModule
             'id_card' => 'new_card',
             'is_installment' => false,
             'is_deferred' => false,
-            'is_oney' => false
+            'is_oney' => false,
+            'force_hash' => false
         ];
 
         foreach ($default_options as $key => $value) {
@@ -4993,18 +4969,6 @@ class PayPlugClass extends PaymentModule
         }
 
         return $payment;
-    }
-
-    /**
-     * Run update module
-     */
-    public function runUpgradeModule()
-    {
-        $upgrade = parent::runUpgradeModule();
-
-        $this->checkOrderStates();
-
-        return $upgrade;
     }
 
     public function saveConfiguration()

@@ -47,6 +47,10 @@
     background: #colorMap[payplug];
     width: 50%;
     height: 100%;
+    .-hide & {
+      background: #colorMap[grey];
+      .border(darken(#colorMap[grey], 5%));
+    }
   }
 
   &.-right {
