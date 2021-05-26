@@ -182,6 +182,10 @@ label.payplugSwitch_label {
   width: 50%;
   height: 100%;
 }
+.-hide .payplugSwitch:before {
+  background: #b2b2b2;
+  border: 1px solid #a5a5a5;
+}
 .payplugSwitch.-right .payplugSwitch_label.-left {
   color: inherit;
 }
@@ -199,11 +203,11 @@ label.payplugSwitch_label {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
-  -webkit-transition: background 0.26666667s;
-  -moz-transition: background 0.26666667s;
-  -ms-transition: background 0.26666667s;
-  -o-transition: background 0.26666667s;
-  transition: background 0.26666667s;
+  -webkit-transition: background 0.4s/1.5;
+  -moz-transition: background 0.4s/1.5;
+  -ms-transition: background 0.4s/1.5;
+  -o-transition: background 0.4s/1.5;
+  transition: background 0.4s/1.5;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -334,6 +338,23 @@ button.payplugLink:hover {
 }
 .payplugPanel_section.-nowrap {
   flex-wrap: nowrap;
+}
+.-payplug_standard .payplugPanel {
+  padding: 16px 0 8px;
+}
+.-payplug_standard .payplugPanel .payplugPanel_label,
+.-payplug_standard .payplugPanel .payplugPanel_content {
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+.-payplug_standard .payplugPanel .payplugPanel_content {
+  padding: 0 0 0 16px;
+}
+.-payplug_standard .payplugPanel + .payplugPanel .payplugPanel_content {
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 /* Payplug Admin Config */
 .payplugConfig {
@@ -663,5 +684,12 @@ button.payplugLink:hover {
   background: #b2b2b2;
   color: #fff;
   cursor: default;
+}
+.payplugTips_item.-hide {
+  display: none;
+}
+.-payplug_standard .payplugTips_item.-hide {
+  display: block;
+  opacity: 0.6;
 }
 /*# sourceMappingURL=admin.css.map */

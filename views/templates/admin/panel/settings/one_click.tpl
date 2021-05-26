@@ -19,17 +19,21 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel-row separate_margin_block">
-    <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='Enable one-click payments' mod='payplug'}</div>
-        <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
-    </div>
-    <div class="payplugPanel">
-        <div class="payplugPanel_content">
-            <p>
-                {l s='Allow customers to save their credit card information for later purchases' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
-            </p>
+<div class="panel-row separate_margin_block payplugTips -payplug_standard">
+    <div class="payplugTips_item -left {if !$payplug_switch.standard.checked} -hide{/if}">
+        <div class="payplugPanel">
+            <div class="payplugPanel_label">{l s='admin.panel.setting.oneclick.label' mod='payplug'}</div>
+            <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
+        </div>
+        <div class="payplugPanel">
+            <div class="payplugPanel_content">
+                <p>
+                    {l s='admin.panel.setting.oneclick.content' mod='payplug'}
+                    <a class="payplugLink" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
+                        {l s='admin.panel.setting.oneclick.link' mod='payplug'}
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 </div>

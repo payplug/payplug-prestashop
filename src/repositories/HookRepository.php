@@ -55,15 +55,10 @@ class HookRepository extends Repository
 
     public function exe($method = false, $params = [])
     {
-        if (!$method || !is_string($method)) {
-            return false;
-        }
-
-        if (!is_array($params)) {
-            return false;
-        }
-
-        if (!method_exists($this, $method)) {
+        if (!$method
+            || !is_string($method)
+            || !is_array($params)
+            || !method_exists($this, $method)) {
             return false;
         }
 

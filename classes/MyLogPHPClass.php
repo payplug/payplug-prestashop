@@ -44,7 +44,7 @@ class MyLogPHP
      * @param string $logfilename Path and name of the file log.
      * @param string $separator Character used for separate the field values.
      */
-    public function __construct($logfilename = './_MyLogPHP-1.2.log.csv', $separator = ',')
+    public function __construct($logfilename = './_MyLogPHP-debug.log.csv', $separator = ',')
     {
         $this->LOGFILENAME = $logfilename;
         $this->SEPARATOR = $separator;
@@ -75,21 +75,22 @@ class MyLogPHP
         if (!file_exists($this->LOGFILENAME)) {
             $headers = $this->HEADERS . "\n";
         }
-        $fd = fopen($this->LOGFILENAME, "a");
-        if (@$headers) {
-            fwrite($fd, $headers);
+        if ($fd = @fopen($this->LOGFILENAME, "a")) {
+            if (@$headers) {
+                fwrite($fd, $headers);
+            }
+            $debugBacktrace = debug_backtrace();
+            if ($line_n === null) {
+                $line = $debugBacktrace[1]['line'];
+            } else {
+                $line = $line_n;
+            }
+            $file = $debugBacktrace[1]['file'];
+            $value = preg_replace('/\s+/', ' ', trim($value));
+            $entry = [$datetime, $errorlevel, $tag, $value, $line, $file];
+            fputcsv($fd, $entry, $this->SEPARATOR);
+            fclose($fd);
         }
-        $debugBacktrace = debug_backtrace();
-        if ($line_n === null) {
-            $line = $debugBacktrace[1]['line'];
-        } else {
-            $line = $line_n;
-        }
-        $file = $debugBacktrace[1]['file'];
-        $value = preg_replace('/\s+/', ' ', trim($value));
-        $entry = [$datetime, $errorlevel, $tag, $value, $line, $file];
-        fputcsv($fd, $entry, $this->SEPARATOR);
-        fclose($fd);
     }
 
     /**

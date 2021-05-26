@@ -21,20 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
+namespace PayPlug\src\specific;
 
-/**
- * @description
- * Treat notification received
- */
-class PayplugIPNModuleFrontController extends ModuleFrontController
+use PayPlug\src\interfaces\ShopInterface;
+use Shop;
+
+class ShopSpecific implements ShopInterface
 {
-    public function postProcess()
+    public function isFeatureActive()
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
-        $notification = $payplug->setNotification();
-        $notification->treat();
+        return Shop::isFeatureActive();
+    }
+
+    public function setContext()
+    {
+        return Shop::setContext(Shop::CONTEXT_ALL);
     }
 }
