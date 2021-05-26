@@ -48,7 +48,7 @@
 </ul>
 
 {if isset($has_payment) && !$has_payment}
-    <p class="payplugPopup_error -confirm">{l s='admin.popin.confirm.error' mod='payplug'}</p>
+    <p class="payplugPopup_error -confirm" data-e2e-type="confirm-error">{l s='admin.popin.confirm.error' mod='payplug'}</p>
 {/if}
 
 <div class="payplugPopup_footer">
