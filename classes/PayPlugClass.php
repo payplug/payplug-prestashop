@@ -3531,7 +3531,7 @@ class PayPlugClass extends PaymentModule
         }
         if (!isset($param['product'])
             || !isset($param['type'])
-            || !in_array($param['type'], ['price'])
+            || !in_array($param['type'], ['after_price'])
         ) {
             return false;
         }
