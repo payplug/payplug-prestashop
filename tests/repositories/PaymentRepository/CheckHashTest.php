@@ -107,7 +107,8 @@ final class CheckHashTest extends BasePaymentRepository
                 'checkPaymentTable' => [
                     'cart_hash' => $hash,
                     'payment_method' => $this->paymentDetails['paymentMethod'],
-                ]
+                ],
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
@@ -133,7 +134,8 @@ final class CheckHashTest extends BasePaymentRepository
                     'cart_hash' => 'different_hash',
                     'payment_method' => $this->paymentDetails['paymentMethod'],
                 ],
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->repo
@@ -165,8 +167,10 @@ final class CheckHashTest extends BasePaymentRepository
                     'result' => false,
                     'response' => $error_message
                 ],
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
+
 
         $this->assertSame(
             $expected_error,
@@ -199,7 +203,8 @@ final class CheckHashTest extends BasePaymentRepository
                     'response' => $error_message,
                     'paymentDetails' => $this->paymentDetails
                 ],
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
@@ -225,7 +230,8 @@ final class CheckHashTest extends BasePaymentRepository
                     'result' => true,
                     'response' => 'Success message',
                     'paymentDetails' => $this->paymentDetails
-                ]
+                ],
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(

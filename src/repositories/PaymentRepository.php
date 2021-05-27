@@ -65,7 +65,7 @@ class PaymentRepository extends Repository
      * @param $paymentDetails
      * @return string
      */
-    private function getHashedCart($paymentDetails)
+    public function getHashedCart($paymentDetails)
     {
         if (!$paymentDetails
             || !is_array($paymentDetails)
@@ -79,12 +79,18 @@ class PaymentRepository extends Repository
         }
         $cartToHash = [];
 
-        foreach ($paymentDetails['cart']->getProducts() as $product) {
-            $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
-            $cartToHash[] = array_map('strval', $product);
+        if (method_exists($paymentDetails['cart'], 'getProduct')) {
+            foreach ($paymentDetails['cart']->getProducts() as $product) {
+                $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
+                $cartToHash[] = array_map('strval', $product);
+            }
+            return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        } else {
+            return $this->returnPaymentError(
+                ['name' => '$paymentDetails[\'cart\']', 'value' => $paymentDetails['cart']],
+                '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) doesn\'t exist'
+            );
         }
-
-        return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
     }
 
     /**

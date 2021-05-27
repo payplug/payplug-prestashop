@@ -57,6 +57,7 @@ class BaseTest extends TestCase
     protected $cache;
     protected $logger;
     protected $order_state;
+    protected $order_state_entity;
     protected $query;
     protected $sql;
 
