@@ -543,33 +543,7 @@ class PayPlugClass extends PaymentModule
         }
 
         if (Tools::isSubmit('submitAccount')) {
-            /*
-             * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
-             * Because pwd with special chars don't work
-             */
-            $password = $_POST['PAYPLUG_PASSWORD'];
-            $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
-                die(json_encode([
-                    'content' => null,
-                    'error' => $this->l('The email and/or password was not correct.')
-                ]));
-            }
-
-            if ($this->login($email, $password)) {
-                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
-                Configuration::updateValue('PAYPLUG_SHOW', 1);
-
-                $this->assignContentVar();
-                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
-
-                die(json_encode(['content' => $content]));
-            } else {
-                die(json_encode([
-                    'content' => null,
-                    'error' => $this->l('The email and/or password was not correct.')
-                ]));
-            }
+            $this->submitAccount();
         }
 
         if (Tools::getValue('submitPwd')) {
@@ -2247,7 +2221,7 @@ class PayPlugClass extends PaymentModule
 
         $this->assignContentVar();
 
-        $this->html = $this->fetchTemplate('/views/templates/admin/login.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin/panel/login.tpl');
 
         return $this->html;
     }
@@ -3557,7 +3531,7 @@ class PayPlugClass extends PaymentModule
         }
         if (!isset($param['product'])
             || !isset($param['type'])
-            || !in_array($param['type'], ['after_price', 'price'])
+            || !in_array($param['type'], ['after_price'])
         ) {
             return false;
         }
