@@ -508,6 +508,7 @@ class PayPlugClass extends PaymentModule
                 $keys = [
                     'sandbox',
                     'embedded',
+                    'standard',
                     'one_click',
                     'oney',
                     'installment',
@@ -1744,6 +1745,7 @@ class PayPlugClass extends PaymentModule
             $this->context->smarty->assign([
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
+                'standard' => $args['standard'],
                 'one_click' => $args['one_click'],
                 'oney' => $args['oney'],
                 'installment' => $args['installment'],
