@@ -5,6 +5,7 @@ include:
 stages:
   - check php
   - tests
+  - translations
   - build
   - releasy-review
   - releasy-release
@@ -24,12 +25,24 @@ unit tests:
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
     - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
+check module translations:
+  image: composer:1.9
+  stage: translations
+#  only:
+#    - /^release-.*$/
+  script:
+    - composer dump-autoload -o
+    - php ci/translations.php
+  artifacts:
+    paths:
+      - ci/translations.csv
+
 build zip release:
   image: composer:1.9
   stage: build
   before_script:
     - composer install --no-dev
-    - ./assets_revision.sh
+    - ./ci/assets_revision.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
     - mkdir payplug
