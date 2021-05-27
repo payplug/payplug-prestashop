@@ -1686,6 +1686,13 @@ class PayPlugClass extends PaymentModule
     public function displayPopin($type, $args = null)
     {
         if ($type == 'confirm') {
+            $has_payment = false;
+            foreach ($args as $key => $arg) {
+                if (in_array($key, ['standard', 'oney', 'installment']) && !$has_payment) {
+                    $has_payment = $arg;
+                }
+            }
+
             $this->context->smarty->assign([
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
@@ -1695,6 +1702,7 @@ class PayPlugClass extends PaymentModule
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
+                'has_payment' => $has_payment,
             ]);
         }
 
