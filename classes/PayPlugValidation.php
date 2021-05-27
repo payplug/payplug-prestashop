@@ -22,6 +22,7 @@
  */
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
 
 class PayPlugValidation
 {
