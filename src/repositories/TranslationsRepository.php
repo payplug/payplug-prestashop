@@ -36,11 +36,20 @@ class TranslationsRepository extends Repository
         $this->payplug = $payplug;
     }
 
+    /**
+     * @description
+     * @return self
+     */
     public static function factory()
     {
         return new TranslationsRepository();
     }
 
+    /**
+     * @description Return trnaslation for index
+     * @param $id
+     * @return bool|mixed
+     */
     public function translate($id)
     {
         if (!is_int($id)) {
@@ -59,6 +68,13 @@ class TranslationsRepository extends Repository
         return $translation[$id];
     }
 
+    /**
+     * @description Get the only file who contain translation
+     * @param $files
+     * @param string $type_clear
+     * @param string $path
+     * @return mixed
+     */
     private function clearFiles($files, $type_clear = 'file', $path = '')
     {
         // List of directory which not must be parsed
@@ -80,6 +96,10 @@ class TranslationsRepository extends Repository
         return $files;
     }
 
+    /**
+     * @description Update translation from current files
+     *
+     */
     private function fillTranslations()
     {
         // get current file
@@ -94,6 +114,12 @@ class TranslationsRepository extends Repository
         }
     }
 
+    /**
+     * @description Get file who could countain translation
+     * @param $path
+     * @param $array_files
+     * @param $module_name
+     */
     private function getRecursiveFiles($path, &$array_files, $module_name)
     {
         $files = [];
@@ -120,6 +146,10 @@ class TranslationsRepository extends Repository
         }
     }
 
+    /**
+     * @description Return all module's translations
+     * @return array
+     */
     public function getTranslations()
     {
         $this->setMethod('l');
@@ -129,20 +159,41 @@ class TranslationsRepository extends Repository
         return $this->trans;
     }
 
-    private function hydrateFromLangFile($path, $file)
+    /**
+     * @description Hydrate translation from specific file
+     * @param bool $path
+     * @param bool $file
+     * @return bool
+     */
+    private function hydrateFromLangFile($path = false, $file = false)
     {
+        if (!$path || !$file) {
+            return false;
+        }
         $lang_file = $path . $file;
-        $lang = substr(basename($file), 0, -4);
+
+        if (!file_exists($lang_file)) {
+            return false;
+        }
 
         @include $lang_file;
 
         $translations = $GLOBALS['_MODULE'];
+        $lang = substr(basename($file), 0, -4);
 
         foreach ($this->trans as $key => &$trans) {
             $this->trans[$key][$lang] = isset($translations[$key]) ? $translations[$key] : '';
         }
+
+        return true;
     }
 
+    /**
+     * @description Get translation use in a given file
+     * @param $content
+     * @param bool $type_file
+     * @return array
+     */
     private function parseFile($content, $type_file = false)
     {
         // Parsing modules file
@@ -179,6 +230,10 @@ class TranslationsRepository extends Repository
         return array_unique($strings);
     }
 
+    /**
+     * @description Set the files
+     * @return array
+     */
     private function setFiles()
     {
         $array_files = [];
@@ -187,11 +242,19 @@ class TranslationsRepository extends Repository
         return $this->files = $array_files;
     }
 
+    /**
+     * @description Set the method
+     * @param $method
+     */
     private function setMethod($method)
     {
         $this->method = $method;
     }
 
+    /**
+     * @description Set the translations
+     *
+     */
     private function setTrans()
     {
         $this->trans = [];
