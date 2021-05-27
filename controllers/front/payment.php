@@ -55,7 +55,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $payment_data = $payplug->preparePayment($options);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
-        $page = $payplug->getConfiguration('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
+        $page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
         $error_url = $context->link->getPageLink($page, true, $context->language->id, ['error' => 1, 'step' => 3]);
 
         // Invalid payment then return error
