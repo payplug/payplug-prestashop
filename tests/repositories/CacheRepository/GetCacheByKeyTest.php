@@ -49,9 +49,9 @@ final class GetCacheByKeyTest extends BaseCacheRepository
     public function invalidDataProvider()
     {
         yield [false];
-//        yield [[]];
-//        yield [42];
-//        yield [''];
+        yield [[]];
+        yield [42];
+        yield [''];
     }
 
     /**
@@ -68,7 +68,7 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         );
     }
 
-    public function atestWithNoCacheFoundInDB()
+    public function testWithNoCacheFoundInDB()
     {
         $this->query
             ->shouldReceive([
@@ -88,7 +88,7 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         );
     }
 
-    public function atestWithOutdatedCacheReturn()
+    public function testWithOutdatedCacheReturn()
     {
         $lifetime = new \DateInterval('P2D');
         $date_limit = new \DateTime('now');
@@ -122,7 +122,7 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         );
     }
 
-    public function atestWithValidData()
+    public function testWithValidData()
     {
         $date_limit = new \DateTime('now');
         $cache = [

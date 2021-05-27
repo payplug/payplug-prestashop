@@ -166,7 +166,7 @@ class CacheRepository extends Repository
         $date_limit = new \DateTime('now');
         $date_limit->sub($lifetime);
         $date_add = new \DateTime($cache['date_add']);
-        if ($date_limit > $date_add) {
+        if ($date_limit >= $date_add) {
             $this->deleteCacheByKey($cache_key);
 
             return [
