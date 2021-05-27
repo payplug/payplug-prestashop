@@ -138,7 +138,8 @@ class PluginRepository extends Repository
 
         $this->hook = new HookRepository(
             $this->payplug,
-            $this->constant
+            $this->constant,
+            $this->context
         );
 
         $this->oney = new OneyRepository(
@@ -183,6 +184,7 @@ class PluginRepository extends Repository
             $this->shop,
             $this->sql,
             $this->tools,
+            $this->validate,
             $this->payplug
         );
     }

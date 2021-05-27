@@ -182,6 +182,10 @@ label.payplugSwitch_label {
   width: 50%;
   height: 100%;
 }
+.-hide .payplugSwitch:before {
+  background: #b2b2b2;
+  border: 1px solid #a5a5a5;
+}
 .payplugSwitch.-right .payplugSwitch_label.-left {
   color: inherit;
 }
@@ -335,19 +339,19 @@ button.payplugLink:hover {
 .payplugPanel_section.-nowrap {
   flex-wrap: nowrap;
 }
-.payplugPanel.oneclick {
+.-payplug_standard .payplugPanel {
   padding: 16px 0 8px;
 }
-.payplugPanel.oneclick .payplugPanel_label,
-.payplugPanel.oneclick .payplugPanel_content {
+.-payplug_standard .payplugPanel .payplugPanel_label,
+.-payplug_standard .payplugPanel .payplugPanel_content {
   margin: 0;
   padding: 0;
   width: auto;
 }
-.payplugPanel.oneclick .payplugPanel_content {
+.-payplug_standard .payplugPanel .payplugPanel_content {
   padding: 0 0 0 16px;
 }
-.payplugPanel.oneclick + .payplugPanel .payplugPanel_content {
+.-payplug_standard .payplugPanel + .payplugPanel .payplugPanel_content {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -628,6 +632,9 @@ button.payplugLink:hover {
   margin: 0 0 8px;
   color: #e56876;
 }
+.payplugPopup_error.-confirm {
+  margin: -8px 0 16px;
+}
 .payplugPopup_footer {
   border-top: 1px solid #e6e6e6;
   padding: 15px 0 0;
@@ -680,5 +687,12 @@ button.payplugLink:hover {
   background: #b2b2b2;
   color: #fff;
   cursor: default;
+}
+.payplugTips_item.-hide {
+  display: none;
+}
+.-payplug_standard .payplugTips_item.-hide {
+  display: block;
+  opacity: 0.6;
 }
 /*# sourceMappingURL=admin.css.map */

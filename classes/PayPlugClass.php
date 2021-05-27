@@ -37,7 +37,6 @@ use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
-use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\backward\PayPlugBackward;
 
 // Prestashop
@@ -55,6 +54,7 @@ use Language;
 use Media;
 use Module;
 use Order;
+use OrderSlip;
 use OrderState;
 use PaymentModule;
 use Product;
@@ -506,6 +506,7 @@ class PayPlugClass extends PaymentModule
                 $keys = [
                     'sandbox',
                     'embedded',
+                    'standard',
                     'one_click',
                     'oney',
                     'installment',
@@ -542,33 +543,7 @@ class PayPlugClass extends PaymentModule
         }
 
         if (Tools::isSubmit('submitAccount')) {
-            /*
-             * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
-             * Because pwd with special chars don't work
-             */
-            $password = $_POST['PAYPLUG_PASSWORD'];
-            $email = Tools::getValue('PAYPLUG_EMAIL');
-            if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
-                die(json_encode([
-                    'content' => null,
-                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect')
-                ]));
-            }
-
-            if ($this->login($email, $password)) {
-                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
-                Configuration::updateValue('PAYPLUG_SHOW', 1);
-
-                $this->assignContentVar();
-                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
-
-                die(json_encode(['content' => $content]));
-            } else {
-                die(json_encode([
-                    'content' => null,
-                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect')
-                ]));
-            }
+            $this->submitAccount();
         }
 
         if (Tools::getValue('submitPwd')) {
@@ -1432,35 +1407,6 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
-     * @description Check if payplug order state are well installed
-     */
-    public function checkOrderStates()
-    {
-        $order_states = array_merge($this->order_states, $this->oney_order_state);
-
-        foreach ($order_states as $key => $state) {
-            // Check live OrderState
-            $key_config_live = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
-            $id_order_state_live = Configuration::get($key_config_live);
-            $order_state_live = new OrderState((int)$id_order_state_live);
-            if (!Validate::isLoadedObject($order_state_live)) {
-                $this->createOrderState($key, $state, false, true);
-            }
-
-            // Check sandbox OrderState
-            $key_config_sandbox = $key_config_live . '_TEST';
-            $id_order_state_sandbox = Configuration::get($key_config_sandbox);
-            $order_state_sandbox = new OrderState((int)$id_order_state_sandbox);
-
-            if (!Validate::isLoadedObject($order_state_sandbox)) {
-                $this->createOrderState($key, $state, true, true);
-            }
-        }
-
-        $this->order_state->removeIdsUnusedByPayPlug();
-    }
-
-    /**
      * Format amount float to int or int to float
      *
      * @param $amount
@@ -1744,14 +1690,23 @@ class PayPlugClass extends PaymentModule
     public function displayPopin($type, $args = null)
     {
         if ($type == 'confirm') {
+            $has_payment = false;
+            foreach ($args as $key => $arg) {
+                if (in_array($key, ['standard', 'oney', 'installment']) && !$has_payment) {
+                    $has_payment = $arg;
+                }
+            }
+
             $this->context->smarty->assign([
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
+                'standard' => $args['standard'],
                 'one_click' => $args['one_click'],
                 'oney' => $args['oney'],
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
+                'has_payment' => $has_payment,
             ]);
         }
 
@@ -1779,8 +1734,12 @@ class PayPlugClass extends PaymentModule
             case 'abort':
                 $title = $this->l('payplug.displayPopin.suspendInstallment');
                 break;
+            case 'deferred':
+                $title = $this->l('payplug.displayPopin.deferred');
+                break;
             default:
                 $title = '';
+                break;
         }
 
         $this->context->smarty->assign([
@@ -2274,7 +2233,7 @@ class PayPlugClass extends PaymentModule
 
         $this->assignContentVar();
 
-        $this->html = $this->fetchTemplate('/views/templates/admin/login.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin/panel/login.tpl');
 
         return $this->html;
     }
@@ -3601,7 +3560,7 @@ class PayPlugClass extends PaymentModule
         }
         if (!isset($param['product'])
             || !isset($param['type'])
-            || !in_array($param['type'], ['after_price', 'price'])
+            || !in_array($param['type'], ['after_price'])
         ) {
             return false;
         }
@@ -4326,7 +4285,8 @@ class PayPlugClass extends PaymentModule
             'id_card' => 'new_card',
             'is_installment' => false,
             'is_deferred' => false,
-            'is_oney' => false
+            'is_oney' => false,
+            'force_hash' => false
         ];
 
         foreach ($default_options as $key => $value) {
@@ -5012,18 +4972,6 @@ class PayPlugClass extends PaymentModule
         }
 
         return $payment;
-    }
-
-    /**
-     * Run update module
-     */
-    public function runUpgradeModule()
-    {
-        $upgrade = parent::runUpgradeModule();
-
-        $this->checkOrderStates();
-
-        return $upgrade;
     }
 
     public function saveConfiguration()

@@ -68,6 +68,7 @@ var $document, $window, payplug = {
                 sandbox: form.props.data['payplug_sandbox'],
                 embedded: form.props.data['payplug_embedded'],
                 oney: form.props.data['payplug_oney'],
+                standard: form.props.data['payplug_standard'],
                 one_click: form.props.data['payplug_one_click'],
                 installment: form.props.data['payplug_inst'],
                 deferred: form.props.data['payplug_deferred'],
@@ -819,9 +820,20 @@ var $document, $window, payplug = {
             }
         },
     },
+    standard: {
+        props: {
+            switcher: 'payplug_standard',
+        },
+        init: function () {
+            var {standard, deferred} = payplug,
+                {switcher} = standard.props;
+            $document.on('switchSelected', 'input[name=' + switcher + ']', deferred.check);
+        }
+    },
     installment: {
         props: {
             identifier: 'payplugInstallment',
+            switcher: 'payplug_inst',
             query: null,
             error: null,
             limits: {
@@ -830,9 +842,11 @@ var $document, $window, payplug = {
             }
         },
         init: function () {
-            var {installment} = payplug;
+            var {installment, deferred} = payplug,
+                {switcher} = installment.props;
             $document.on('change', 'input[name=PAYPLUG_INST_MODE]', installment.select)
-                .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check);
+                .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check)
+                .on('switchSelected', 'input[name=' + switcher + ']', deferred.check);
         },
         select: function (event) {
             event.preventDefault();
@@ -867,6 +881,7 @@ var $document, $window, payplug = {
         props: {
             identifier: 'payplugDeferred',
             switcher: 'payplug_deferred',
+            query: null,
         },
         init: function () {
             var {deferred} = payplug,
@@ -875,6 +890,15 @@ var $document, $window, payplug = {
                 .on('switchSelected', 'input[name=' + switcher + ']', deferred.select)
                 .on('change', '.' + identifier + ' select', deferred.select);
             $('.' + identifier + ' input[type=checkbox]').trigger('change');
+        },
+        check: function () {
+            var {standard, installment, deferred} = payplug;
+
+            if (!parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
+                && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())
+                && parseInt($('input[name=' + deferred.props.switcher + ']:checked').val())) {
+                $('input[name=' + deferred.props.switcher + '][value=0]').trigger('click');
+            }
         },
         change: function (event) {
             var {deferred} = payplug,
@@ -898,12 +922,17 @@ var $document, $window, payplug = {
             $('.' + identifier).find('select').attr('disabled', true);
         },
         select: function () {
-            var {deferred} = payplug,
+            var {standard, installment, deferred} = payplug,
                 {identifier, switcher} = deferred.props,
                 $checkbox = $('.' + identifier).find('input[type=checkbox]'),
                 $select = $('.' + identifier).find('select'),
                 checked = $checkbox.prop('checked'),
                 active = parseInt($('input[name=' + switcher + ']:checked').val());
+
+            if (!parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
+                && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())) {
+                return deferred.unavailable();
+            }
 
             var $error = $('.' + identifier).find('span');
             deferred.props.error = null;
@@ -914,6 +943,42 @@ var $document, $window, payplug = {
             } else {
                 $error.hide();
             }
+        },
+        unavailable: function(){
+            var {deferred, tools} = payplug;
+
+            var data = {
+                _ajax: 1,
+                popin: 1,
+                type: 'deferred'
+            };
+
+            if (deferred.props.query != null) {
+                deferred.props.query.abort();
+                deferred.props.query = null;
+            }
+
+            deferred.props.query = $.ajax({
+                type: 'POST',
+                url: admin_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('An error occurred while trying to checking your premium status. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (result) {
+                    if (typeof result.content != 'undefined') {
+                        var {popup} = tools;
+                        popup.set(result.content, 'password');
+                    }
+                }
+            });
         }
     },
     tools: {
@@ -956,11 +1021,10 @@ var $document, $window, payplug = {
                 event.preventDefault();
                 event.stopPropagation();
                 var {switcher} = payplug.tools,
-                    {identifier} = switcher.props,
                     $switch = $(this),
                     is_right = $switch.is('.-right');
 
-                if ($switch.is('.-disabled')) {
+                if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
 
@@ -981,7 +1045,7 @@ var $document, $window, payplug = {
                     $switch = $label.parents('.' + identifier),
                     $tips = null;
 
-                if ($switch.is('.-disabled')) {
+                if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
 
@@ -1007,8 +1071,8 @@ var $document, $window, payplug = {
                     $tips = $('.payplugTips.-' + name);
 
                 if ($tips.length) {
-                    $('.payplugTips.-' + name + ' > .payplugTips_item').hide();
-                    $('.payplugTips.-' + name + ' > .-right').show();
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-right').removeClass('-hide');
                 }
 
                 var $selected = target.find('input[value=0]');
@@ -1027,8 +1091,8 @@ var $document, $window, payplug = {
                     $tips = $('.payplugTips.-' + name);
 
                 if ($tips.length) {
-                    $('.payplugTips.-' + name + ' > .payplugTips_item').hide();
-                    $('.payplugTips.-' + name + ' > .-left').show();
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-left').removeClass('-hide');
                 }
 
                 var $selected = target.find('input[value=1]');
