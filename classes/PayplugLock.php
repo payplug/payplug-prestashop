@@ -288,8 +288,7 @@ class PayplugLock extends ObjectModel
         $res_lock = Db::getInstance()->getRow($req_lock);
         if (!$res_lock) {
             return false;
-        } else {
-            return $res_lock;
         }
+        return $res_lock;
     }
 }
