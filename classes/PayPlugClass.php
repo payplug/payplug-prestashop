@@ -3636,7 +3636,6 @@ class PayPlugClass extends PaymentModule
                 'id_card' => Tools::getValue('pc', 'new_card'),
                 'is_installment' => (bool)Tools::getValue('inst'),
                 'is_deferred' => (bool)Tools::getValue('def'),
-                'force_hash' => true
             ];
 
             $payment = $this->preparePayment($payment_options);
@@ -4283,7 +4282,6 @@ class PayPlugClass extends PaymentModule
             'is_installment' => false,
             'is_deferred' => false,
             'is_oney' => false,
-            'force_hash' => false
         ];
 
         foreach ($default_options as $key => $value) {
@@ -4627,7 +4625,6 @@ class PayPlugClass extends PaymentModule
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
-            'forceHash' => $options['force_hash']
         ];
 
         /*
