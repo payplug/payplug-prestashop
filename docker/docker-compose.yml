@@ -8,7 +8,7 @@ services:
       - PS_DEV_MODE=1
       - DB_NAME=prestashop
       - DB_SERVER=database
-      - PS_DOMAIN=localhost
+      - PS_DOMAIN=localhost:8001
       - PS_INSTALL_AUTO=1
       - ADMIN_MAIL=admin@example.com
       - ADMIN_PASSWD=password
@@ -16,7 +16,7 @@ services:
       - PS_LANGUAGE=fr
       - PS_COUNTRY=FR
     ports:
-      - "80:80"
+      - "8001:80"
     depends_on:
       - database
     links:
@@ -28,7 +28,7 @@ services:
       PMA_HOST: database
       MYSQL_ROOT_PASSWORD: admin
     ports:
-      - 8000:80
+      - 8002:80
     depends_on:
       - database
   database:
