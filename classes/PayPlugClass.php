@@ -1368,7 +1368,8 @@ class PayPlugClass extends PaymentModule
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key);
             $id_order_state_live = Configuration::get($key_config_live);
             $order_state_live = new OrderState((int)$id_order_state_live);
-            if (!Validate::isLoadedObject($order_state_live)) {
+            if (!Validate::isLoadedObject($order_state_live)
+                || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
                 $this->createOrderState($key, $state, false, true);
             }
 
@@ -1377,7 +1378,8 @@ class PayPlugClass extends PaymentModule
             $id_order_state_sandbox = Configuration::get($key_config_sandbox);
             $order_state_sandbox = new OrderState((int)$id_order_state_sandbox);
 
-            if (!Validate::isLoadedObject($order_state_sandbox)) {
+            if (!Validate::isLoadedObject($order_state_sandbox)
+                || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
                 $this->createOrderState($key, $state, true, true);
             }
         }
@@ -1917,22 +1919,23 @@ class PayPlugClass extends PaymentModule
         if (!is_array($name) || empty($name)) {
             return false;
         } else {
-            $req_order_state = new DbQuery();
-            $req_order_state->select('DISTINCT osl.id_order_state');
-            $req_order_state->from('order_state_lang', 'osl');
-            $req_order_state->where(
-                'osl.name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                OR osl.name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                OR osl.name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                OR osl.name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-            );
-            $res_order_state = Db::getInstance()->getValue($req_order_state);
+            $this->query
+                ->select()
+                ->fields('DISTINCT osl.`id_order_state`')
+                ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+                ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
+                ->where(
+                    'osl.`name` LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
+                );
 
-            if (!$res_order_state) {
-                return false;
-            } else {
-                return (int)$res_order_state;
+            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+                $this->query->where('os.`deleted` = 0');
             }
+
+            return $this->query->build('unique_value');
         }
     }
 
