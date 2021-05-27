@@ -25,18 +25,21 @@ namespace PayPlug\src\repositories;
 
 use PayPlug\classes\MyLogPHP;
 
+use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\entities\OrderStateEntity;
 
 use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\AssignSpecific;
 use PayPlug\src\specific\CarrierSpecific;
 use PayPlug\src\specific\CartSpecific;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ConstantSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
+use PayPlug\src\specific\CurrencySpecific;
 use PayPlug\src\specific\LanguageSpecific;
 use PayPlug\src\specific\ProductSpecific;
 use PayPlug\src\specific\ShopSpecific;
@@ -48,6 +51,7 @@ class PluginRepository extends Repository
     protected $payplug;
 
     // Entities
+    private $cacheEntity;
     private $oneyEntity;
     private $paymentEntity;
     private $plugin;
@@ -69,12 +73,14 @@ class PluginRepository extends Repository
 
     // Specific classes
     private $address;
+    private $assign;
     private $carrier;
     private $cart;
     private $configuration;
     private $constant;
     private $context;
     private $country;
+    private $currency;
     private $language;
     private $product;
     private $shop;
@@ -101,6 +107,7 @@ class PluginRepository extends Repository
             ->setConfiguration($this->configuration)
             ->setContext($this->context)
             ->setCountry($this->country)
+            ->setCurrency($this->currency)
             ->setHook($this->hook)
             ->setInstall($this->install)
             ->setLogger($this->logger)
@@ -118,6 +125,7 @@ class PluginRepository extends Repository
 
     private function setEntities()
     {
+        $this->cacheEntity = new CacheEntity();
         $this->oneyEntity = new OneyEntity();
         $this->paymentEntity = new PaymentEntity();
         $this->plugin = new PluginEntity();
@@ -126,7 +134,6 @@ class PluginRepository extends Repository
 
     private function setRepositories()
     {
-        $this->cache = new CacheRepository();
         $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
@@ -142,6 +149,14 @@ class PluginRepository extends Repository
             $this->context
         );
 
+        $this->cache    = new CacheRepository(
+            $this->cacheEntity,
+            $this->query,
+            $this->configuration,
+            $this->logger,
+            $this->constant
+        );
+
         $this->oney = new OneyRepository(
             $this->cache,
             $this->logger,
@@ -151,11 +166,13 @@ class PluginRepository extends Repository
             $this->configuration,
             $this->context,
             $this->country,
+            $this->currency,
             $this->tools,
             $this->validate,
             $this->oneyEntity,
             $this->myLogPhp,
-            $this->payplug
+            $this->payplug,
+            $this->assign
         );
 
         $this->order_state = new OrderStateRepository(
@@ -192,12 +209,14 @@ class PluginRepository extends Repository
     private function setSpecific()
     {
         $this->address = new AddressSpecific();
+        $this->assign = new AssignSpecific();
         $this->carrier = new CarrierSpecific();
         $this->cart = new CartSpecific();
         $this->configuration = new ConfigurationSpecific();
         $this->constant = new ConstantSpecific();
         $this->context = new ContextSpecific();
         $this->country = new CountrySpecific();
+        $this->currency  = new CurrencySpecific();
         $this->language = new LanguageSpecific();
         $this->product = new ProductSpecific();
         $this->shop = new ShopSpecific();

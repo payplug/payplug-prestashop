@@ -24,11 +24,8 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\repositories\BaseTest;
 
 /**
  * @group unit
@@ -38,29 +35,8 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyDeliveryContextTest extends BaseTest
+final class GetOneyDeliveryContextTest extends BaseOneyRepository
 {
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->repo = new OneyRepository(
-            $this->cache,
-            $this->logger,
-            $this->address,
-            $this->cart,
-            $this->carrier,
-            $this->config,
-            $this->context,
-            $this->country,
-            $this->tools,
-            $this->validate,
-            new OneyEntity(),
-            $this->myLogPhp,
-            $this->payplug
-        );
-    }
-
     public function testGetContextFromVirtual()
     {
         $this->cart->shouldReceive('get')

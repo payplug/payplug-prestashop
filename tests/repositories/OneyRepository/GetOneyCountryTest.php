@@ -24,12 +24,6 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\src\specific\CarrierSpecific;
-use PayPlug\src\specific\CartSpecific;
-use PayPlug\tests\repositories\BaseTest;
-
 /**
  * @group unit
  * @group repository
@@ -38,28 +32,8 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyCountryTest extends BaseTest
+final class GetOneyCountryTest extends BaseOneyRepository
 {
-    public function setUp()
-    {
-        parent::setUp();
-        $this->repo = new OneyRepository(
-            $this->cache,
-            $this->logger,
-            $this->address,
-            new CartSpecific(),
-            new CarrierSpecific(),
-            $this->config,
-            $this->context,
-            $this->country,
-            $this->tools,
-            $this->validate,
-            new OneyEntity(),
-            $this->myLogPhp,
-            $this->payplug
-        );
-    }
-
     public function testWithEmptyIsoCode()
     {
         $this->assertSame(

@@ -21,38 +21,32 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-namespace PayPlug\tests\repositories\PaymentRepository;
 
-use Mockery;
-use Payplug\Payment;
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
+namespace PayPlug\tests\repositories\CacheRepository;
+
+use PayPlug\src\entities\CardEntity;
+use PayPlug\src\repositories\CacheRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\RepositoryBase;
 
-class BasePaymentRepository extends RepositoryBase
+class BaseCacheRepository extends RepositoryBase
 {
-    protected $payment;
-    protected $paymentApi;
+    protected $cacheEntity;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->payment = $this->payment ? $this->payment : new PaymentEntity();
-        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-
+        $this->cacheEntity = new CardEntity();
         $this->logger->shouldReceive([
             'setParams' => $this->logger,
         ]);
 
-        $this->repo = \Mockery::mock(PaymentRepository::class, [
-            $this->payplug,
-            $this->cart,
+        $this->repo = \Mockery::mock(CacheRepository::class, [
+            $this->cacheEntity,
+            $this->query,
             $this->config,
             $this->logger,
-            $this->payment,
-            $this->query,
             $this->constant
         ])->makePartial();
 
@@ -60,20 +54,5 @@ class BasePaymentRepository extends RepositoryBase
         $this->arrayLogger = [];
 
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
-
-        $this->payplug
-            ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
-
-        $this->constant
-            ->shouldReceive('get')
-            ->andReturn('constant');
-
-        $this->apiCall();
-    }
-
-    public function apiCall()
-    {
-        $this->paymentApi = Mockery::mock('alias:'.Payment::class);
     }
 }

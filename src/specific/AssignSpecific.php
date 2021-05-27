@@ -23,45 +23,18 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\CartInterface;
-use Cart;
+use PayPlug\src\interfaces\AssignInterface;
+use Context;
 
-class CartSpecific implements CartInterface
+class AssignSpecific implements AssignInterface
 {
     public static function factory()
     {
         return new self();
     }
 
-    public function get($id_cart = false)
+    public function assign($parameters = [])
     {
-        if (!is_int($id_cart)) {
-            $id_cart = false;
-        }
-        return new Cart($id_cart);
-    }
-
-    public function isVirtualCart($cart)
-    {
-        if (!is_object($cart)) {
-            return false;
-        }
-        return $cart->isVirtualCart();
-    }
-
-    public function getProducts($cart)
-    {
-        if (!is_object($cart)) {
-            return false;
-        }
-        return $cart->getProducts();
-    }
-
-    public function nbProducts($cart)
-    {
-        if (!is_object($cart)) {
-            return false;
-        }
-        return $cart->nbProducts();
+        return Context::getContext()->smarty->assign($parameters);
     }
 }

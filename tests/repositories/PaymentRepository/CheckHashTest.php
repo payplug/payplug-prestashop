@@ -50,39 +50,22 @@ final class CheckHashTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method'
+            'paymentMethod' => 'payment_method',
+            'forceHash' => false
         ];
     }
 
-    /**
-     * Parameters to test method with empty $paiementDetails
-     *
-     * @return \Generator
-     */
     public function InvalidDataProvider()
     {
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!is_array($paymentDetails))
         yield ['I am a string!', 'paymentDetails: ["I am a string!"]'];
-
-        // Test if (!isset($paymentDetails['cartId']))
         yield [['wrong_parameters'], 'paymentDetails: can\'t find cartId'];
-
-        // Test if (!$paymentDetails['cartId'])
         yield [['cartId' => null], 'paymentDetails: {"cartId":null}'];
-
-        // Test if (!$paymentDetails['cartId'])
         yield [['cartId' => false], 'paymentDetails: {"cartId":null}'];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
-     *
      * @dataProvider InvalidDataProvider
-     * @param array $parameter
-     * @param string $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)
     {

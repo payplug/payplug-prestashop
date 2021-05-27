@@ -58,6 +58,9 @@ class PluginEntity
     private $country;
 
     /** @var object */
+    private $currency;
+
+    /** @var object */
     private $hook;
 
     /** @var object */
@@ -171,6 +174,14 @@ class PluginEntity
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
     }
 
     /**
@@ -417,6 +428,24 @@ class PluginEntity
 
         $this->country = $country;
         return $this;
+    }
+
+    /**
+     * @param object $currency
+     * @return PluginEntity
+     */
+    public function setCurrency($currency)
+    {
+        if (!is_object($currency)) {
+            throw (
+            new BadParameterException(
+                'Invalid Currency object, param $currency must be a CurrencySpecific'
+            )
+            );
+        } else {
+            $this->currency = $currency;
+            return $this;
+        }
     }
 
     /**

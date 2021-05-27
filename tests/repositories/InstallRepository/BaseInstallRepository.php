@@ -24,14 +24,18 @@
 namespace PayPlug\tests\repositories\InstallRepository;
 
 use PayPlug\src\repositories\InstallRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\src\entities\OrderStateEntity;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BaseInstallRepository extends BaseTest
+class BaseInstallRepository extends RepositoryBase
 {
+    protected $order_state_entity;
+
     public function setUp()
     {
         parent::setUp();
+
+        $this->order_state_entity = $this->order_state_entity ? $this->order_state_entity : new OrderStateEntity();
 
         $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
@@ -42,6 +46,7 @@ class BaseInstallRepository extends BaseTest
             $this->constant,
             $this->context,
             $this->order_state,
+            $this->order_state_entity,
             $this->shop,
             $this->sql,
             $this->tools,

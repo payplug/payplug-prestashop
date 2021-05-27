@@ -21,10 +21,16 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-namespace PayPlug\tests\repositories\HookRepository;
 
-use PayPlug\tests\repositories\RepositoryBase;
+namespace PayPlug\tests\mock;
 
-class BaseHookRepository extends RepositoryBase
+class CurrencyMock
 {
+    public static function get()
+    {
+        $currency = new \stdClass();
+        $currency->id = 1;
+        $currency->iso_code = 'EUR';
+        return $currency;
+    }
 }

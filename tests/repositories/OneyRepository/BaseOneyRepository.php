@@ -21,59 +21,48 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-namespace PayPlug\tests\repositories\PaymentRepository;
+namespace PayPlug\tests\repositories\OneyRepository;
 
-use Mockery;
-use Payplug\Payment;
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
+use PayPlug\src\entities\OneyEntity;
+use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\RepositoryBase;
 
-class BasePaymentRepository extends RepositoryBase
+class BaseOneyRepository extends RepositoryBase
 {
-    protected $payment;
-    protected $paymentApi;
+    protected $oney;
+
+    protected $arrayCache;
+    protected $arrayLogger;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->payment = $this->payment ? $this->payment : new PaymentEntity();
+        $this->oney = $this->oney ? $this->oney : new OneyEntity();
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
-        $this->logger->shouldReceive([
-            'setParams' => $this->logger,
-        ]);
-
-        $this->repo = \Mockery::mock(PaymentRepository::class, [
-            $this->payplug,
-            $this->cart,
-            $this->config,
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->cache,
             $this->logger,
-            $this->payment,
-            $this->query,
-            $this->constant
+            $this->address,
+            $this->cart,
+            $this->carrier,
+            $this->config,
+            $this->context,
+            $this->country,
+            $this->currency,
+            $this->tools,
+            $this->validate,
+            $this->oney,
+            $this->myLogPhp,
+            $this->payplug,
+            $this->assign
         ])->makePartial();
 
         $this->arrayCache = [];
         $this->arrayLogger = [];
 
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
-
-        $this->payplug
-            ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
-
-        $this->constant
-            ->shouldReceive('get')
-            ->andReturn('constant');
-
-        $this->apiCall();
-    }
-
-    public function apiCall()
-    {
-        $this->paymentApi = Mockery::mock('alias:'.Payment::class);
     }
 }

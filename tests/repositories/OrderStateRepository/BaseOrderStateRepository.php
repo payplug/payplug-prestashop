@@ -23,8 +23,8 @@
  */
 namespace PayPlug\tests\repositories\OrderStateRepository;
 
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BaseOrderStateRepository extends BaseTest
+class BaseOrderStateRepository extends RepositoryBase
 {
 }
