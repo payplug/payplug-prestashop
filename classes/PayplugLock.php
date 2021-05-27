@@ -275,9 +275,8 @@ class PayplugLock extends ObjectModel
         $res_lock = Db::getInstance()->execute($req_lock);
         if (!$res_lock) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     public static function existsLockG2($id_cart)
