@@ -46,6 +46,11 @@
         <strong>{if $deferred}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</strong>
     </li>
 </ul>
+
+{if isset($has_payment) && !$has_payment}
+    <p class="payplugPopup_error -confirm" data-e2e-type="confirm-error">{l s='admin.popin.confirm.error' mod='payplug'}</p>
+{/if}
+
 <div class="payplugPopup_footer">
     <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
     <button type="button" class="payplugButton -green" name="confirm">{l s='SAVE SETTINGS' mod='payplug'}</button>
