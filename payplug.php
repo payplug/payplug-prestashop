@@ -31,7 +31,7 @@ if (!defined('_PS_VERSION_')) {
 
 class Payplug extends Module
 {
-    public $dependencies;
+    public $payplug_dependencies;
 
     /**
      * Constructor
@@ -112,7 +112,7 @@ class Payplug extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if ($this->module) {
-            return $this->dependencies->hook->exe('actionAdminControllerSetMedia');
+            return $this->payplug_dependencies->hook->exe('actionAdminControllerSetMedia');
         }
     }
 
@@ -355,7 +355,7 @@ class Payplug extends Module
     public function setDependencies()
     {
         require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugDependencies.php');
-        $this->dependencies = new PayPlugDependencies();
+        $this->payplug_dependencies = new PayPlugDependencies();
     }
 
     private function setModule()
