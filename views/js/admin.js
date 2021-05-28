@@ -945,7 +945,12 @@ var $document, $window, payplug = {
             }
         },
         unavailable: function(){
-            var {deferred, tools} = payplug;
+            var {deferred, tools} = payplug,
+                {identifier} = deferred.props,
+                {switcher} = tools,
+                $switch = $('input[name=' + identifier + ']').parents('.' + switcher.props.identifier);
+
+            switcher.right($switch);
 
             var data = {
                 _ajax: 1,
