@@ -5359,7 +5359,7 @@ class PayPlugClass extends PaymentModule
      */
     public function submitDisconnect()
     {
-        $this->createConfig();
+        $this->plugin->getInstall()->setConfig();
         Configuration::updateValue('PAYPLUG_SHOW', 0);
 
         // force reload configuration to be sure all config are reset

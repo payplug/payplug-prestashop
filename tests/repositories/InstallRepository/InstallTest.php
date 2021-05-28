@@ -135,11 +135,11 @@ final class InstallTest extends BaseInstallRepository
                         'up2date' => true,
                     ],
                 ],
-                'createConfig' => false
+                'setConfig' => false
             ]);
 
         $this->assertSame(
-            'Install failed: createConfig()',
+            'Install failed:setConfig()',
             $this->repo->install()
         );
     }
@@ -159,7 +159,7 @@ final class InstallTest extends BaseInstallRepository
                         'up2date' => true,
                     ],
                 ],
-                'createConfig' => true,
+                'setConfig' => true,
                 'createOrderStates' => false
             ]);
 
@@ -184,7 +184,7 @@ final class InstallTest extends BaseInstallRepository
                         'up2date' => true,
                     ],
                 ],
-                'createConfig' => true,
+                'setConfig' => true,
                 'createOrderStates' => true
             ]);
 
@@ -214,7 +214,7 @@ final class InstallTest extends BaseInstallRepository
                         'up2date' => true,
                     ],
                 ],
-                'createConfig' => true,
+                'setConfig' => true,
                 'createOrderStates' => true
             ]);
 
@@ -250,7 +250,7 @@ final class InstallTest extends BaseInstallRepository
                         'up2date' => true,
                     ],
                 ],
-                'createConfig' => true,
+                'setConfig' => true,
                 'createOrderStates' => true
             ]);
 
