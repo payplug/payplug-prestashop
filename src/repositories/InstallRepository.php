@@ -99,7 +99,7 @@ class InstallRepository extends Repository
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = $this->config->get($key_config_live);
             $order_state_live = new OrderStateSpecific((int)$id_order_state_live);
-            if (!$this->validate('isLoadedObject', $order_state_live)) {
+            if (!$this->validate->validate('isLoadedObject', $order_state_live)) {
                 $this->order_state->create($key, $state, true, true);
             }
 
@@ -108,7 +108,7 @@ class InstallRepository extends Repository
             $id_order_state_sandbox = $this->config->get($key_config_sandbox);
             $order_state_sandbox = new OrderStateSpecific((int)$id_order_state_sandbox);
 
-            if (!$this->validate('isLoadedObject', $order_state_sandbox)) {
+            if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)) {
                 $this->order_state->create($key, $state, true, true);
             }
         }
