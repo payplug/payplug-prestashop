@@ -68,6 +68,7 @@ var $document, $window, payplug = {
                 sandbox: form.props.data['payplug_sandbox'],
                 embedded: form.props.data['payplug_embedded'],
                 oney: form.props.data['payplug_oney'],
+                standard: form.props.data['payplug_standard'],
                 one_click: form.props.data['payplug_one_click'],
                 installment: form.props.data['payplug_inst'],
                 deferred: form.props.data['payplug_deferred'],

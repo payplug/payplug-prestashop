@@ -28,17 +28,19 @@ use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-class BaseTest extends TestCase
+class RepositoryBase extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     protected $myLogPhp;
     protected $payplug;
+    protected $repo;
 
     protected $arrayCache;
     protected $arrayLogger;
 
     // specific
+    protected $assign;
     protected $address;
     protected $carrier;
     protected $cart;
@@ -46,6 +48,7 @@ class BaseTest extends TestCase
     protected $constant;
     protected $context;
     protected $country;
+    protected $currency;
     protected $language;
     protected $product;
     protected $shop;
@@ -76,6 +79,7 @@ class BaseTest extends TestCase
 
     private function setSpecific()
     {
+        $this->assign = MockHelper::createAssignMock('Payplug\src\specific\AssignSpecific');
         $this->address      = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
         $this->carrier      = MockHelper::createMockFactory('Payplug\src\specific\CarrierSpecific');
         $this->cart         = MockHelper::createMockFactory('Payplug\src\specific\CartSpecific');
@@ -83,6 +87,7 @@ class BaseTest extends TestCase
         $this->constant     = MockHelper::createMockFactory('Payplug\src\specific\ConstantSpecific');
         $this->context      = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
         $this->country      = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
+        $this->currency     = MockHelper::createMockFactory('Payplug\src\specific\CurrencySpecific');
         $this->language     = MockHelper::createMockFactory('Payplug\src\specific\LanguageSpecific');
         $this->product      = MockHelper::createMockFactory('Payplug\src\specific\ProductSpecific');
         $this->shop         = MockHelper::createMockFactory('Payplug\src\specific\ShopSpecific');
@@ -93,7 +98,6 @@ class BaseTest extends TestCase
 
     private function setRepository()
     {
-        $this->cache        = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
         $this->logger       = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
         $this->order_state  = MockHelper::createMockFactory('Payplug\src\repositories\OrderStateRepository');
         $this->query        = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');

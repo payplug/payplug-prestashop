@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\InstallRepository;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group install

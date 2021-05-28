@@ -80,7 +80,8 @@ class PaymentRepository extends Repository
         $cartToHash = [];
 
         if (method_exists($paymentDetails['cart'], 'getProduct')) {
-            foreach ($paymentDetails['cart']->getProducts() as $product) {
+            $products = $paymentDetails['cart']->getProducts();
+            foreach ($products as $product) {
                 $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
                 $cartToHash[] = array_map('strval', $product);
             }

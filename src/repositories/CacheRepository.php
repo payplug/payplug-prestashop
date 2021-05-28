@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\entities\CacheEntity;
-use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\exceptions\BadParameterException;
 
 class CacheRepository extends Repository
@@ -33,61 +31,27 @@ class CacheRepository extends Repository
     private $query;
     private $config;
     private $logger;
+    private $constant;
 
-    public function __construct()
-    {
-        $this->cacheEntity = new CacheEntity();
-        $this->query = QueryRepository::factory();
-        $this->config = ConfigurationSpecific::factory();
-        $this->setStdParams();
-        $this->setLogger();
+    public function __construct(
+        $cacheEntity,
+        $query,
+        $config,
+        $logger,
+        $constant
+    ) {
+        $this->cacheEntity = $cacheEntity;
+        $this->config = $config;
+        $this->logger = $logger;
+        $this->query = $query;
+        $this->constant = $constant;
+
+        $this->logger->setParams(['process' => 'cache']);
     }
 
     public static function factory()
     {
         return new CacheRepository();
-    }
-
-    /**
-     * @description Hydrate entities standard parameters
-     *
-     * @throws BadParameterException
-     */
-    public function setStdParams()
-    {
-        $this->cacheEntity
-            ->setTable('payplug_cache')
-            ->setDefinition([
-                'table' => $this->cacheEntity->getTable(),
-                'primary' => 'id_' . $this->cacheEntity->getTable(),
-                'fields' => [
-                    /*
-                     * Different types,
-                     * according to modules/gamification/tests/mocks/ObjectModel.php :
-                     * TYPE_INT = 1;
-                     * TYPE_BOOL = 2;
-                     * TYPE_STRING = 3;
-                     * TYPE_FLOAT = 4;
-                     * TYPE_DATE = 5;
-                     * TYPE_HTML = 6;
-                     * TYPE_NOTHING = 7;
-                     * TYPE_SQL = 8;
-                     */
-                    'cache_key' => ['type' => 3, 'validate' => 'isString', 'required' => true],
-                    'cache_value' => ['type' => 3, 'validate' => 'isString', 'required' => true],
-                    'date_add' => ['type' => 5, 'validate' => 'isDate'],
-                    'date_upd' => ['type' => 5, 'validate' => 'isDate'],
-                ]
-            ]);
-    }
-
-    /**
-     * @description Set PayPlug Logger
-     */
-    private function setLogger()
-    {
-        $this->logger = new LoggerRepository();
-        $this->logger->setParams(['process' => $this->cacheEntity->getTable()]);
     }
 
     /**
@@ -103,25 +67,23 @@ class CacheRepository extends Repository
         // check if exists
         $cache = $this->getCacheByKey($cache_key);
 
-        if (!$cache) {
+        if (!$cache['result']) {
             $this->cacheEntity->setDateAdd($this->logger->udate('Y-m-d H:i:s'));
-
-            $cache = $this->cacheEntity;
 
             $this->query
                 ->insert()
-                ->into(_DB_PREFIX_ . $this->cacheEntity->getTable())
+                ->into($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
                 ->fields('cache_key')->values(pSQL($cache_key))
                 ->fields('cache_value')->values(json_encode($cache_value))
-                ->fields('date_add')->values(pSQL($cache->getDateAdd()))
-                ->fields('date_upd')->values(pSQL($cache->getDateAdd()));
+                ->fields('date_add')->values(pSQL($this->cacheEntity->getDateAdd()))
+                ->fields('date_upd')->values(pSQL($this->cacheEntity->getDateAdd()));
 
             if (!$this->query->build()) {
                 return false;
             }
-
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -134,24 +96,24 @@ class CacheRepository extends Repository
      */
     public function setCacheKey($amount, $country, $operations)
     {
-        if (!is_int($amount)) {
+        if (!is_numeric($amount)) {
             return [
                 'result' => false,
-                'message' => 'Amount is not an int'
+                'message' => 'Amount is not a valid int'
             ];
         }
 
         if (!is_string($country)) {
             return [
                 'result' => false,
-                'message' => 'Country is not a string'
+                'message' => 'Country is not a valid string'
             ];
         }
 
         if (!is_array($operations)) {
             return [
                 'result' => false,
-                'message' => 'Operations is not an array'
+                'message' => 'Operations is not a valid array'
             ];
         }
 
@@ -175,19 +137,62 @@ class CacheRepository extends Repository
      */
     public function getCacheByKey($cache_key)
     {
+        if (!is_string($cache_key) || !$cache_key) {
+            return [
+                'result' => false,
+                'message' => 'Invalid cache key format'
+            ];
+        }
+
         $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_ . $this->cacheEntity->getTable())
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
             ->where('`cache_key` = \'' . (string)$cache_key . '\'');
 
-        $cache = $this->query->build();
+        $result = $this->query->build();
 
-        if (!$cache) {
-            return false;
+        if (!$result) {
+            return [
+                'result' => false,
+                'message' => 'No cache found'
+            ];
         }
 
-        return $cache;
+        $cache = reset($result);
+
+        // if the cache is older than 48 hours, return false after delete it
+        $lifetime = new \DateInterval('P2D');
+        $date_limit = new \DateTime('now');
+        $date_limit->sub($lifetime);
+        $date_add = new \DateTime($cache['date_add']);
+        if ($date_limit >= $date_add) {
+            $this->deleteCacheByKey($cache_key);
+
+            return [
+                'result' => false,
+                'message' => 'The current cache has been deleted'
+            ];
+        }
+
+        return [
+            'result' => $cache,
+            'message' => 'Success'
+        ];
+    }
+
+    /**
+     * @description Delete cache for a given key
+     * @param $cache_key
+     */
+    public function deleteCacheByKey($cache_key)
+    {
+        $this->query
+            ->delete()
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_cache')
+            ->where('`cache_key` = \'' . (string)$cache_key . '\'')
+            ->build()
+        ;
     }
 
     /**
@@ -200,7 +205,7 @@ class CacheRepository extends Repository
     {
         $this->query
             ->truncate()
-            ->table(_DB_PREFIX_ . $this->cacheEntity->getTable());
+            ->table($this->constant->get('_DB_PREFIX_') . 'payplug_cache');
 
         if (!$this->query->build()) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';

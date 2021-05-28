@@ -632,6 +632,9 @@ button.payplugLink:hover {
   margin: 0 0 8px;
   color: #e56876;
 }
+.payplugPopup_error.-confirm {
+  margin: -8px 0 16px;
+}
 .payplugPopup_footer {
   border-top: 1px solid #e6e6e6;
   padding: 15px 0 0;

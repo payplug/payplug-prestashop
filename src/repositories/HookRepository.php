@@ -39,6 +39,7 @@ class HookRepository extends Repository
     public function actionAdminControllerSetMedia()
     {
         $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
+
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
             $this->payplug->setMedia([
                 $module_url . 'views/css/admin_order.css',

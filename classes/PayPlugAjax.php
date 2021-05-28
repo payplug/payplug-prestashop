@@ -24,8 +24,12 @@
 namespace Payplug\classes;
 
 use PayPlug\src\repositories\CardRepository;
+use Address;
 use Configuration;
+use Country;
+use Exception;
 use Product;
+use Validate;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -215,7 +219,7 @@ class PayPlugAjax
                         ]));
                     }
                 } catch (Exception $e) {
-                    throw new \Exception($e);
+                    throw new Exception($e);
                 }
 
                 $result = $this->payplug->setPaymentDataCookie($payment_data);

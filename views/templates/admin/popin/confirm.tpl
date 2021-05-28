@@ -19,34 +19,43 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<p>{l s='The following settings will be saved:' mod='payplug'}</p>
+<p>{l s='admin.popin.confirm.top' mod='payplug'}</p>
 <ul>
     <li data-e2e-type="sandbox" data-e2e-state="{if $sandbox}on{else}off{/if}">
-        {l s='Mode:' mod='payplug'}
-        <strong>{if $sandbox}{l s='TEST' mod='payplug'}{else}{l s='LIVE' mod='payplug'}{/if}</strong>
+        {l s='admin.popin.confirm.mode' mod='payplug'}
+        <strong>{if $sandbox}{l s='admin.popin.confirm.test' mod='payplug'}{else}{l s='admin.popin.confirm.live' mod='payplug'}{/if}</strong>
     </li>
-    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
-        {l s='Payment page:' mod='payplug'}
-        <strong>{if $embedded}{l s='EMBEDDED' mod='payplug'}{else}{l s='REDIRECTED' mod='payplug'}{/if}</strong>
+    <li data-e2e-type="standard" data-e2e-state="{if $standard}on{else}off{/if}">
+        {l s='admin.popin.confirm.standard' mod='payplug'}
+        <strong>{if $standard}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="one_click" data-e2e-state="{if $one_click}on{else}off{/if}">
-        {l s='One-click payments:' mod='payplug'}
-        <strong>{if $one_click}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</strong>
+        {l s='admin.popin.confirm.one_click' mod='payplug'}
+        <strong>{if $one_click}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
+    </li>
+    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
+        {l s='admin.popin.confirm.embedded' mod='payplug'}
+        <strong>{if $embedded}{l s='admin.popin.confirm.embedded' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="oney" data-e2e-state="{if $oney}on{else}off{/if}">
-        {l s='Payments 3x, 4x Oney:' mod='payplug'}
-        <strong>{if $oney}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</strong>
+        {l s='admin.popin.confirm.oney' mod='payplug'}
+        <strong>{if $oney}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="installment" data-e2e-state="{if $installment}on{else}off{/if}">
-        {l s='Installments :' mod='payplug'}
-        <strong>{if $installment}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</strong>
+        {l s='admin.popin.confirm.installment' mod='payplug'}
+        <strong>{if $installment}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="deferred" data-e2e-state="{if $deferred}on{else}off{/if}">
-        {l s='Deferred payments :' mod='payplug'}
-        <strong>{if $deferred}{l s='ENABLED' mod='payplug'}{else}{l s='DISABLED' mod='payplug'}{/if}</strong>
+        {l s='admin.popin.confirm.deferred' mod='payplug'}
+        <strong>{if $deferred}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
 </ul>
+
+{if isset($has_payment) && !$has_payment}
+    <p class="payplugPopup_error -confirm" data-e2e-type="confirm-error">{l s='admin.popin.confirm.error' mod='payplug'}</p>
+{/if}
+
 <div class="payplugPopup_footer">
-    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton -green" name="confirm">{l s='SAVE SETTINGS' mod='payplug'}</button>
+    <button type="button" class="payplugButton -close">{l s='admin.popin.confirm.cancel' mod='payplug'}</button>
+    <button type="button" class="payplugButton -green" name="confirm">{l s='admin.popin.confirm.save' mod='payplug'}</button>
 </div>
