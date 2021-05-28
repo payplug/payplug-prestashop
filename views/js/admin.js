@@ -882,6 +882,7 @@ var $document, $window, payplug = {
             identifier: 'payplugDeferred',
             switcher: 'payplug_deferred',
             query: null,
+            loaded: null,
         },
         init: function () {
             var {deferred} = payplug,
@@ -929,9 +930,12 @@ var $document, $window, payplug = {
                 checked = $checkbox.prop('checked'),
                 active = parseInt($('input[name=' + switcher + ']:checked').val());
 
-            if (!parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
+            if (deferred.props.loaded
+                && !parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
                 && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())) {
                 return deferred.unavailable();
+            } else {
+                deferred.props.loaded = true;
             }
 
             var $error = $('.' + identifier).find('span');
@@ -944,19 +948,21 @@ var $document, $window, payplug = {
                 $error.hide();
             }
         },
-        unavailable: function(){
+        unavailable: function () {
             var {deferred, tools} = payplug,
-                {identifier} = deferred.props,
                 {switcher} = tools,
-                $switch = $('input[name=' + identifier + ']').parents('.' + switcher.props.identifier);
+                data = {
+                    _ajax: 1,
+                    popin: 1,
+                    type: 'deferred'
+                },
+                $switch = $('input[name=' + deferred.props.switcher + ']').parents('.' + switcher.props.identifier);
 
-            switcher.right($switch);
+            if(!deferred.props.loaded) {
+                return;
+            }
 
-            var data = {
-                _ajax: 1,
-                popin: 1,
-                type: 'deferred'
-            };
+            switcher.right($switch, true);
 
             if (deferred.props.query != null) {
                 deferred.props.query.abort();
