@@ -1,12 +1,25 @@
 <?php
-
 global $_MODULE;
 $_MODULE = array();
+$_MODULE['<{payplug}prestashop>payplugnotifications_070045a43ffc0c954761e803bf7ec0f7'] = 'L\'importo raccolto da PayPlug è diverso';
+$_MODULE['<{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87'] = 'dal totale dell\'ordine';
+$_MODULE['<{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
+$_MODULE['<{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
 $_MODULE['<{payplug}prestashop>payplug_1249590cfb27680c6f59bd041edd812d'] = 'Impossibile interropere il pagamento frazionato.';
 $_MODULE['<{payplug}prestashop>payplug_50c92213aac3437fd7b6081ccb274cd8'] = 'Aggiornamento non riuscito';
-$_MODULE['<{payplug}prestashop>payplug_60b031efb994d5c853cfc4816fab262e'] = 'L\'indirizzo mail e/o la password sono errati.';
 $_MODULE['<{payplug}prestashop>payplug_3b13b7b1ada74ffc106c25a47078e387'] = 'La password inserita non é corretta';
+$_MODULE['<{payplug}prestashop>payplug_60b031efb994d5c853cfc4816fab262e'] = 'L\'indirizzo mail e/o la password sono errati.';
 $_MODULE['<{payplug}prestashop>payplug_9a456bd25825e3c4d0f7a85105724f88'] = 'Ordine aggiornato correttamente.';
+$_MODULE['<{payplug}prestashop>payplug_e3395d35ff1a202d63c0090d1c8772d4'] = 'Pagamento frazionato:  ';
+$_MODULE['<{payplug}prestashop>payplug_e251932c6fafc34a274b99ebb9e6f70b'] = 'Pagamento differito: ';
+$_MODULE['<{payplug}prestashop>payplug_07b724fa5d5c3eca8a51696d412acece'] = 'Oney';
+$_MODULE['<{payplug}prestashop>payplug_f40145536110051efd072d7d3c6a56ea'] = 'Mostra PayPlug ai clienti';
+$_MODULE['<{payplug}prestashop>payplug_85910e0691a4205f890425497a1fc893'] = 'test';
+$_MODULE['<{payplug}prestashop>payplug_c9e5fd656b62ace2dbbae8cceab0a860'] = 'live';
+$_MODULE['<{payplug}prestashop>payplug_be68eac79ad39a8e98bfd7c15b9fa7a3'] = 'integrata';
+$_MODULE['<{payplug}prestashop>payplug_af839f228c4f4ed3419092c5fbe8a2fa'] = 'rediretta';
+$_MODULE['<{payplug}prestashop>payplug_8deca510ddb96ce73b4b888f1ac6bf45'] = 'si';
+$_MODULE['<{payplug}prestashop>payplug_5c8c18e98173556b72b7967275b7167e'] = 'no';
 $_MODULE['<{payplug}prestashop>payplug_7faae00658a5f76ad9cc9bc9a4c1ab42'] = 'Carta';
 $_MODULE['<{payplug}prestashop>payplug_ba28730b5824d52b120458b56e5283d5'] = 'LIVE';
 $_MODULE['<{payplug}prestashop>payplug_7b7fac9977c51c0575969f611af5cec0'] = 'TEST';
@@ -23,150 +36,147 @@ $_MODULE['<{payplug}prestashop>payplug_ac98647d8ff4a9a12280d177a7320510'] = 'l\'
 $_MODULE['<{payplug}prestashop>payplug_01abf60a14b2f7a636aefbb242c981f7'] = 'Il tuo server deve essere su PHP 5.3 o maggiore';
 $_MODULE['<{payplug}prestashop>payplug_922fcab664e04e713b84bbd0d8a5c422'] = 'Il tuo server deve essere OpenSSL 1.0.1 o successivo';
 $_MODULE['<{payplug}prestashop>payplug_4e6cb8f062db9b5389f11b30b50358fc'] = 'Devi connetterti al tuo conto PayPlug';
-$_MODULE['<{payplug}prestashop>payplug_c3041f00ca79d002013f230bd5140f1a'] = 'Potresti incontrare una difficoltà usando PayPlug. Aggiorna la pagina o clicca \"Verifica\" una volta corretti';
-$_MODULE['<{payplug}prestashop>payplug_62ca9013687c9a70e370e4388572e2af'] = 'Ti preghiamo di inserire le CGV relative a Oney';
-$_MODULE['<{payplug}prestashop>payplug_79c15c5c35ff7c9de38c36c2db777a27'] = 'modalità LIVE';
-$_MODULE['<{payplug}prestashop>payplug_a7e6337e001cbd04f7626d34b35b5448'] = 'Attivare una funzionalità avanzata';
-$_MODULE['<{payplug}prestashop>payplug_a7b30c636f0247438180c36205cab603'] = 'Salva le impostazioni';
-$_MODULE['<{payplug}prestashop>payplug_1a1bbe7f08c890d9f11e03bc277b32e0'] = 'Disattiva';
-$_MODULE['<{payplug}prestashop>payplug_bd8d794d4afa7c7cb260b86355386938'] = 'Rimborsato';
-$_MODULE['<{payplug}prestashop>payplug_bb45a641e039d31a1fc6ea6823175854'] = ' Annullare la rata';
-$_MODULE['<{payplug}prestashop>payplug_e227d8247d5026ce50ba80bee9342974'] = 'Tipo di carta';
-$_MODULE['<{payplug}prestashop>payplug_6a1b87ce4886b6d6b6a242b43656841f'] = 'Paese';
-$_MODULE['<{payplug}prestashop>payplug_e1150f12ca3aa8f005a54690f521ab7b'] = 'Carta';
-$_MODULE['<{payplug}prestashop>payplug_39f046397ac91c1a81db199cbbdc2954'] = 'Data di scadenza';
-$_MODULE['<{payplug}prestashop>payplug_e3395d35ff1a202d63c0090d1c8772d4'] = 'Pagamento frazionato:  ';
-$_MODULE['<{payplug}prestashop>payplug_e251932c6fafc34a274b99ebb9e6f70b'] = 'Pagamento differito: ';
-$_MODULE['<{payplug}prestashop>payplug_07b724fa5d5c3eca8a51696d412acece'] = 'Oney';
-$_MODULE['<{payplug}prestashop>payplug_f40145536110051efd072d7d3c6a56ea'] = 'Mostra PayPlug ai clienti';
-$_MODULE['<{payplug}prestashop>payplug_85910e0691a4205f890425497a1fc893'] = 'test';
-$_MODULE['<{payplug}prestashop>payplug_c9e5fd656b62ace2dbbae8cceab0a860'] = 'live';
-$_MODULE['<{payplug}prestashop>payplug_be68eac79ad39a8e98bfd7c15b9fa7a3'] = 'integrata';
-$_MODULE['<{payplug}prestashop>payplug_af839f228c4f4ed3419092c5fbe8a2fa'] = 'rediretta';
-$_MODULE['<{payplug}prestashop>payplug_8deca510ddb96ce73b4b888f1ac6bf45'] = 'si';
-$_MODULE['<{payplug}prestashop>payplug_5c8c18e98173556b72b7967275b7167e'] = 'no';
-$_MODULE['<{payplug}prestashop>payplug_953960de2084aeb568cf3e15a1292adb'] = 'Carta';
-$_MODULE['<{payplug}prestashop>payplug_f124ae13259b9d4edece5b54993512d4'] = 'Data di scadenza';
-$_MODULE['<{payplug}prestashop>payplug_bc6b0c0263e45d9b9affd794a3f826dc'] = 'Paga con una carta diversa';
-$_MODULE['<{payplug}prestashop>payplug_83e60fba69554a5f829488f69458de48'] = 'Pagamento con carta di credito';
-$_MODULE['<{payplug}prestashop>payplug_b6db54ba27e4a2cd188915c9891bde3e'] = 'volte con carta di credito';
-$_MODULE['<{payplug}prestashop>payplug_8cbbefbbc036d56175fa34cc4ed2fdf4'] = 'Non disponibile per il paese specificato';
-$_MODULE['<{payplug}prestashop>payplug_9ea5e176a20f9f14c8a7c6d75cd9e084'] = ' Solo tra 100 € e 3000 €';
-$_MODULE['<{payplug}prestashop>payplug_4929cc1470a0d9160fc0ae0805274694'] = 'Non disponibile per questo metodo di spedizione';
-$_MODULE['<{payplug}prestashop>payplug_53f4a41ab6d3316c9da1ada62948d722'] = 'Il tuo carrello non è disponibile';
-$_MODULE['<{payplug}prestashop>payplug_078ed84f95595cd3a2d3e072e2a10d84'] = 'C\'è stato un errore';
-$_MODULE['<{payplug}prestashop>payplug_17de4c685248dc4807a28e806605f580'] = 'Paga con la carta in %sx con Oney';
-$_MODULE['<{payplug}prestashop>payplug_a432f809e2b680ea5e752e570b372393'] = 'PayPlug : Impossibile cancellare il save card del cliente.';
-$_MODULE['<{payplug}prestashop>payplug_5428457c441d4d06d6c1e689d7714348'] = 'PayPlug : Impossibile esportare il save card del cliente.';
-$_MODULE['<{payplug}prestashop>payplug_ad04da01785298dab5b07e984de48a28'] = 'live';
-$_MODULE['<{payplug}prestashop>payplug_b4eea0f6be993e2ccd15efedd22f77d7'] = 'test';
-$_MODULE['<{payplug}prestashop>payplug_aa9d53b86fba5f60f31f8f352f4ab648'] = 'in corso';
-$_MODULE['<{payplug}prestashop>payplug_845ae9f74ab3fc63d56d1482f0550fb3'] = 'sospeso';
-$_MODULE['<{payplug}prestashop>payplug_56be02fc0a037528c968cf3b02e550f0'] = 'PAGATO';
-$_MODULE['<{payplug}prestashop>payplug_f7fa27acafedc54c28de8c02c063be41'] = 'NON PAGATO';
-$_MODULE['<{payplug}prestashop>payplug_783d6e470f89ea53276dd08beea04150'] = 'RIMBORSATO';
-$_MODULE['<{payplug}prestashop>payplug_9a6e99a336a1b5a22defc2094e090b92'] = 'RIMBORSATO PARZIALMENTE';
-$_MODULE['<{payplug}prestashop>payplug_6fedad30658be643e4b71415a5c1eb27'] = 'Non disponibile in modalità Test';
-$_MODULE['<{payplug}prestashop>payplug_a7ae738098d23cf38e5e54b4d7745c6c'] = 'Carta';
-$_MODULE['<{payplug}prestashop>payplug_5d5f048eeb32b7db2d391ecd63f69a13'] = 'SI';
-$_MODULE['<{payplug}prestashop>payplug_dd937b292c4d56258c3d052b234848ea'] = 'NO';
-$_MODULE['<{payplug}prestashop>payplug_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>payplug_c103a7a8c6477682b63c04caa7ba3742'] = 'Caricamento in corso';
-$_MODULE['<{payplug}prestashop>payplug_4f0bf6b154224f9396e825390f1505c0'] = 'l\'estensione PHP cURL deve essere abilitata sul tuo server';
-$_MODULE['<{payplug}prestashop>payplug_1bc77cff14a05fb30f08d8955ed7e14a'] = 'Il tuo server deve essere su PHP 5.3 o maggiore';
-$_MODULE['<{payplug}prestashop>payplug_54f6fe59aa2a70d7c5e97d3654097900'] = 'Il tuo server deve essere OpenSSL 1.0.1 o successivo';
-$_MODULE['<{payplug}prestashop>payplug_8a2e7c47a20874fa31a77f1f49b4efb0'] = 'L\'indirizzo mail e/o la password sono errati.';
-$_MODULE['<{payplug}prestashop>payplug_8d35cab66fcaf4267ea162539ce7cec3'] = 'Aggiornamento non riuscito';
-$_MODULE['<{payplug}prestashop>payplug_d91212e96d7d90b874228f43999f7e4e'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>payplug_c791a267e7913ceb4c969b51687e7523'] = 'Almeno un campo non è stato completato correttamente.';
-$_MODULE['<{payplug}prestashop>payplug_c4371f1eb480bb9579359b8a54dee436'] = 'Importo non corretto da rimborsare.';
-$_MODULE['<{payplug}prestashop>payplug_7e781f0dc171d0cfdf9dba70bfa4f70e'] = 'L\'importo del rimborso deve essere almeno € 0,10';
-$_MODULE['<{payplug}prestashop>payplug_5c446e2cf622154c5c2adfb199e5e77a'] = 'L\'importo non può essere rimborsato.';
-$_MODULE['<{payplug}prestashop>payplug_3eaa3b62815d7a5dd90dbe998c744362'] = 'L\'importo é stato rimborsato con successo.';
-$_MODULE['<{payplug}prestashop>payplug_27ec39e9a1d6272a48c0b91b8d679443'] = 'C\'è stato un errore';
-$_MODULE['<{payplug}prestashop>payplug_e60c895a1b3f6d12dc1efa0b1636a06e'] = 'Aggiornamento non riuscito';
-$_MODULE['<{payplug}prestashop>payplug_020c93f3a1786dcd1eba5921b50c09cc'] = 'Tutte le carte di credito del tuo cliente saranno memorizzate.';
-$_MODULE['<{payplug}prestashop>payplug_72cdf590525ea64bb848c62d4c055b3a'] = 'Tutte le carte di credito del tuo cliente saranno eliminate.';
-$_MODULE['<{payplug}prestashop>payplug_f527d8dc5e1b22e3fd97ea2bb253108b'] = 'Per accettare pagamenti, devi configurare il tuo modulo collegando il tuo account PayPlug.';
-$_MODULE['<{payplug}prestashop>payplug_ebd1af8a9014068c4dd7ffdec9e7c5ab'] = 'non pagato';
-$_MODULE['<{payplug}prestashop>payplug_779a5250f73e8a7b12fcfa8e83ae0b94'] = 'pagato';
-$_MODULE['<{payplug}prestashop>payplug_e7b9c5b7a8fe259e6c12ce8239860e95'] = 'pagamento fallito';
-$_MODULE['<{payplug}prestashop>payplug_0c8d9f2cbab52f173e62830b23e2c4f0'] = 'rimborsato parzialmente';
-$_MODULE['<{payplug}prestashop>payplug_5b83778d10bdd7c3ff091a93b1286458'] = 'rimborsato';
-$_MODULE['<{payplug}prestashop>payplug_eee37319eddb9a9510e03db5b37abde9'] = 'in corso';
-$_MODULE['<{payplug}prestashop>payplug_b17f424277b3ae648edcead5333a7fca'] = 'annullato';
-$_MODULE['<{payplug}prestashop>payplug_8fa58593d06773fe158018a5eecb06d3'] = 'autorizzato';
-$_MODULE['<{payplug}prestashop>payplug_178a1778e1eae5441f2dd79bacd94900'] = 'autorizzazione scaduta';
-$_MODULE['<{payplug}prestashop>payplug_4184226d54ba4ad13a534c30e72e58f5'] = 'Oney in attesa';
-$_MODULE['<{payplug}prestashop>payplug_19157a39b29e8ca1d158d1222ca5536a'] = 'Abbandonato';
-$_MODULE['<{payplug}prestashop>payplugnotifications_070045a43ffc0c954761e803bf7ec0f7'] = 'L\'importo raccolto da PayPlug è diverso';
-$_MODULE['<{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87'] = 'dal totale dell\'ordine';
-$_MODULE['<{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
-$_MODULE['<{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
-$_MODULE['<{payplug}prestashop>payplugvalidation_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>payplugvalidation_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
-$_MODULE['<{payplug}prestashop>payplugvalidation_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'Rata ID';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_1e63d1811556fc2dad106dcbd4217a69'] = 'Pagamento ID';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_5d4710f9a8250b13164a82c94d5b00d1'] = 'Riferimento';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Cliente';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ac2e397ffc0808f909e9712ca575c121'] = 'Totale dell\'ordine';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Rata #';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_8dabefa15f1904e2e5e4f3b430ac6842'] = 'Importo della rata';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_9ffda6fe3fafd7dce4c184512c2fccb4'] = 'Status del pagamento PayPlug';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_44749712dbec183e983dcd78a7736c41'] = 'Date';
-$_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_0095a9fa74d1713e43e370a7d7846224'] = 'Export';
-$_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Importo non corretto da rimborsare.';
-$_MODULE['<{payplug}prestashop>ajax_f0516f2e40049866cf48ee09765bf881'] = 'L\'importo del rimborso deve essere almeno € 0,10';
-$_MODULE['<{payplug}prestashop>ajax_2197bc57f08292482b9ed1e905fb79cb'] = 'L\'importo non può essere rimborsato.';
-$_MODULE['<{payplug}prestashop>ajax_8db5bd2272b51b3525ad7661c10d8b2b'] = 'C\'è stato un errore';
-$_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'L\'importo é stato rimborsato con successo.';
-$_MODULE['<{payplug}prestashop>ajax_018e79acf2129521e285ad211e6b1912'] = 'Ordine aggiornato correttamente.';
-$_MODULE['<{payplug}prestashop>dispatcher_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_96f4b8e98e77cb6409c71ef3b166da19'] = 'Disinstalla la configurazione';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_39cd5fc4ef81a34cf31927fea2f9a043'] = 'Mantieni le carte';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_832033570386564995e06477d4057abf'] = 'Attiva la modalità Debug';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_7469a286259799e5b37e5db9296f00b3'] = 'SI';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976ca001437662708'] = 'Disattiva il pagamento one click';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251'] = 'NO';
-$_MODULE['<{payplug}prestashop>admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a'] = 'Aggiorna le impostazioni';
-$_MODULE['<{payplug}prestashop>admin_740819a7dc6b0b1a8a7fa0c871d9b878'] = 'PRESENTAZIONE';
-$_MODULE['<{payplug}prestashop>admin_500f0e02dead20d5160ed144ae2ba846'] = 'La soluzione di pagamento che aumenta le tue vendite';
-$_MODULE['<{payplug}prestashop>admin_21316ef9b6abdf52d0dd1ee8ef0549ba'] = 'PayPlug fornisce ai rivenditori tutti i vantaggi di una soluzione completa di pagamento on line.';
-$_MODULE['<{payplug}prestashop>admin_2c12dc7813a322ee5a9c56d1515c9c13'] = 'Puoi accettare tutte le carte di credito e debito Visa e MasterCard';
-$_MODULE['<{payplug}prestashop>admin_a280a5026f18f89359a0c62fb2036ece'] = 'Mostra il modulo di pagamento direttamente sul tuo sito, senza redirezione';
-$_MODULE['<{payplug}prestashop>admin_b230aa6048c68c81234e04a860c2cb14'] = 'Personalizza la tua pagina di pagamento con i tuoi colori e design';
-$_MODULE['<{payplug}prestashop>admin_8d002532f8aaa402d78e01b944878379'] = 'Evita la frode usando Verified by Visa and MasterCard Secure Code';
-$_MODULE['<{payplug}prestashop>admin_1d8b5ba4e8dabf85facf6e37c5dbe2e3'] = 'Aggiornamento automatico dell\'ordine e mail di conferma';
-$_MODULE['<{payplug}prestashop>admin_0da08d6f9dcebff50b6dc8cc1a7ff3b1'] = 'Interfaccia web per gestire ed esportare lo storico delle transazioni';
-$_MODULE['<{payplug}prestashop>admin_5f183c4202884334e2f48c094ea06ee2'] = 'Fondi disponibili sul tuo conto bancario entro 2 o 5 giorni lavorativi';
-$_MODULE['<{payplug}prestashop>admin_0e4fefcc7f5461ca828af1703f00c28b'] = 'Per ulteriori informazioni sull\'istallazione e configurazione del modulo, si prega di consultare';
-$_MODULE['<{payplug}prestashop>admin_b862e9f2904096707cab3be27c18aaf0'] = 'il seguente articolo del Support';
-$_MODULE['<{payplug}prestashop>details_88427ec035734b45aae9f7d8859a5008'] = 'ID Payplug del pagamento';
-$_MODULE['<{payplug}prestashop>details_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
-$_MODULE['<{payplug}prestashop>details_ec53a8c4f07baed5d8825072c89799be'] = 'Statut';
-$_MODULE['<{payplug}prestashop>details_b2f40690858b404ed10e62bdf422c704'] = 'Montante';
-$_MODULE['<{payplug}prestashop>details_be3ac0cfe96feee34b4e12ac3472494e'] = 'Autorizzato il';
-$_MODULE['<{payplug}prestashop>details_14145b0ac8fa7640b7371bcee02e45d7'] = 'Pagato il';
-$_MODULE['<{payplug}prestashop>details_e7f9e382dc50889098cbe56f2554c77b'] = 'Carta di pagamento';
-$_MODULE['<{payplug}prestashop>details_c7d4153f748ba1dd21ae002c37c00906'] = 'Le ultime 4 cifre della carta';
-$_MODULE['<{payplug}prestashop>details_217c01a08bee4c2fa33d59a6ddc69806'] = '3-D Secure';
-$_MODULE['<{payplug}prestashop>details_5abc7a3ac0ae1545cc801303727f53da'] = 'Data di scadenza';
-$_MODULE['<{payplug}prestashop>details_453e6aa38d87b28ccae545967c53004f'] = 'Non disponibile';
-$_MODULE['<{payplug}prestashop>details_650be61892bf690026089544abbd9d26'] = 'Modalità';
-$_MODULE['<{payplug}prestashop>refunded_4bf290898e0226ffb1041cd114347e4d'] = 'Rimborsa con PayPlug';
-$_MODULE['<{payplug}prestashop>refunded_7ca1373ac3a64cc5381dc5b5b5c74219'] = 'Questa transazione é stata rimborsata con PayPlug';
-$_MODULE['<{payplug}prestashop>refunded_12f740fe0fd9cdebebd2a0cb5aadfa95'] = 'Importo rimborsato:';
-$_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Dettagli di pagamento PayPlug';
-$_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'L\'avvio di questo pagamento è autorizzato prima del %s. Successivamente, non potrai più ricevere questo pagamento';
-$_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Aggiorna questo ordine';
-$_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Aggiorna';
-$_MODULE['<{payplug}prestashop>refund_4bf290898e0226ffb1041cd114347e4d'] = 'Rimborsa con PayPlug';
-$_MODULE['<{payplug}prestashop>refund_1666e5c37779e7041dd51aa3d10eff61'] = 'Importo già rimborsato con PayPlug:';
-$_MODULE['<{payplug}prestashop>refund_01ddb6831cdf22a0055a2a42a09482d6'] = 'Importo disponibile da rimborsare via PayPlug:';
-$_MODULE['<{payplug}prestashop>refund_554cd9e547629109b77e4c60ddd44da3'] = 'Totale da rimborsare';
-$_MODULE['<{payplug}prestashop>refund_de0585357d47ceb0dbbe92118bcf2a64'] = 'Cambia lo stato d\'ordine di Prestashop in \"Rimborsato\"';
+$_MODULE['<{payplug}prestashop>payplug_c3041f00ca79d002013f230bd5140f1a'] = 'Potresti incontrare una difficoltà usando PayPlug. Aggiorna la pagina o clicca \\Verifica\\\\ una volta corretti\\\\\\\\\"\\\\\"\\\"\"\"
+payplug_79c15c5c35ff7c9de38c36c2db777a27;payplug.displayPopin.liveMode;Mode LIVE;LIVE mode;LIVE mode;modalità LIVE
+payplug_a7e6337e001cbd04f7626d34b35b5448;payplug.displayPopin.enableFeature;Activer une fonctionnalité avancée;Enable advanced feature;Enable advanced feature;Attivare una funzionalità avanzata
+payplug_a7b30c636f0247438180c36205cab603;payplug.displayPopin.saveSettings;Enregistrer les paramètres;Save settings;Save settings;Salva le impostazioni
+payplug_1a1bbe7f08c890d9f11e03bc277b32e0;payplug.displayPopin.deactivate;Désactiver;Deactivate;Deactivate;Disattiva
+payplug_bd8d794d4afa7c7cb260b86355386938;payplug.displayPopin.refund;Rembourser;Refund;Refund;Rimborsato
+payplug_bb45a641e039d31a1fc6ea6823175854;payplug.displayPopin.suspendInstallment;Interrompre;Suspend installment;Suspend installment; Annullare la rata
+payplug_a00e84654c78b6234306168547e40be5;payplug.displayPopin.deferred;;;;
+payplug_e227d8247d5026ce50ba80bee9342974;payplug.gdprCardExport.brand;Marque;Brand;Brand;Tipo di carta
+payplug_6a1b87ce4886b6d6b6a242b43656841f;payplug.gdprCardExport.country;Pays;Country;Country;Paese
+payplug_e1150f12ca3aa8f005a54690f521ab7b;payplug.gdprCardExport.card;Carte;Card;Card;Carta
+payplug_39f046397ac91c1a81db199cbbdc2954;payplug.gdprCardExport.expiryDate;Date d\'expiration;Expiry date;Expiry date;Data di scadenza
+payplug_953960de2084aeb568cf3e15a1292adb;payplug.getPaymentOptions.card;Carte;Card;Card;Carta
+payplug_f124ae13259b9d4edece5b54993512d4;payplug.getPaymentOptions.expiryDate;Date d\'expiration;Expiry date;Expiry date;Data di scadenza
+payplug_bc6b0c0263e45d9b9affd794a3f826dc;payplug.getPaymentOptions.payDifferentCard;Payer avec une autre carte;Pay with a different card;Pay with a different card;Paga con una carta diversa
+payplug_83e60fba69554a5f829488f69458de48;payplug.getPaymentOptions.payCreditCard;Payer par carte bancaire;Pay with a credit card;Pay with a credit card;Pagamento con carta di credito
+payplug_b6db54ba27e4a2cd188915c9891bde3e;payplug.getPaymentOptions.payByCardInstallment;Payer en %d fois par carte bancaire;Pay by card in %d installments;Pay by card in %d installments;volte con carta di credito
+payplug_8cbbefbbc036d56175fa34cc4ed2fdf4;payplug.getPaymentOptions.invalidAddresses;Indisponible pour le pays spécifié;Unavailable for the specified country;Unavailable for the specified country;Non disponibile per il paese specificato
+payplug_9ea5e176a20f9f14c8a7c6d75cd9e084;payplug.getPaymentOptions.invalidAmount;Uniquement entre 100€ et 3000€ d’achat;Only between 100€ and 3000€ purchase;Only between 100€ and 3000€ purchase; Solo tra 100 € e 3000 €
+payplug_4929cc1470a0d9160fc0ae0805274694;payplug.getPaymentOptions.invalidCarrier;Indisponible avec ce mode de livraison;Unavailable for this shipping method;Unavailable for this shipping method;Non disponibile per questo metodo di spedizione
+payplug_53f4a41ab6d3316c9da1ada62948d722;payplug.getPaymentOptions.invalidCart;Votre panier est indisponible;Your cart is unavailable;Your cart is unavailable;Il tuo carrello non è disponibile
+payplug_078ed84f95595cd3a2d3e072e2a10d84;payplug.getPaymentOptions.errorOccurred;Une erreur est survenue;An error has occurred;An error has occurred;C\'è stato un errore
+payplug_17de4c685248dc4807a28e806605f580;payplug.getPaymentOptions.payWithOney;Payer en %sx par carte bancaire avec Oney;Pay by card in %sx with Oney;Pay by card in %sx with Oney;Paga con la carta in %sx con Oney
+payplug_a432f809e2b680ea5e752e570b372393;payplug.hookActionDeleteGDPRCustomer.unableDelete;PayPlug : Unable to delete customer saved cards.;PayPlug : Unable to delete customer saved cards.;PayPlug : Unable to delete customer saved cards.;PayPlug : Impossibile cancellare il save card del cliente.
+payplug_5428457c441d4d06d6c1e689d7714348;payplug.hookActionExportGDPRData.unableToExport;PayPlug : Unable to export customer saved cards.;PayPlug : Unable to export customer saved cards.;PayPlug : Unable to export customer saved cards.;PayPlug : Impossibile esportare il save card del cliente.
+payplug_ad04da01785298dab5b07e984de48a28;payplug.hookDisplayAdminOrderMain.live;live;live;live;live
+payplug_b4eea0f6be993e2ccd15efedd22f77d7;payplug.hookDisplayAdminOrderMain.test;test;test;test;test
+payplug_aa9d53b86fba5f60f31f8f352f4ab648;payplug.hookDisplayAdminOrderMain.ongoing;en cours;ongoing;ongoing;in corso
+payplug_56be02fc0a037528c968cf3b02e550f0;payplug.hookDisplayAdminOrderMain.paid;PAYÉ;PAID;PAID;PAGATO
+payplug_845ae9f74ab3fc63d56d1482f0550fb3;payplug.hookDisplayAdminOrderMain.suspended;interrompu;suspended;suspended;sospeso
+payplug_f7fa27acafedc54c28de8c02c063be41;payplug.hookDisplayAdminOrderMain.notPaid;NON PAYÉ;NOT PAID;NOT PAID;NON PAGATO
+payplug_783d6e470f89ea53276dd08beea04150;payplug.hookDisplayAdminOrderMain.refunded;REMBOURSÉ;REFUNDED;REFUNDED;RIMBORSATO
+payplug_9a6e99a336a1b5a22defc2094e090b92;payplug.hookDisplayAdminOrderMain.partiallyRefunded;PARTIELLEMENT REMBOURSÉ;PARTIALLY REFUNDED;PARTIALLY REFUNDED;RIMBORSATO PARZIALMENTE
+payplug_6fedad30658be643e4b71415a5c1eb27;payplug.hookDisplayAdminOrderMain.unavailable;Non disponible en mode test;Unavailable in test mode;Unavailable in test mode;Non disponibile in modalità Test
+payplug_a7ae738098d23cf38e5e54b4d7745c6c;payplug.hookDisplayAdminOrderMain.card;Carte;Card;Card;Carta
+payplug_5d5f048eeb32b7db2d391ecd63f69a13;payplug.hookDisplayAdminOrderMain.yes;OUI;YES;YES;SI
+payplug_dd937b292c4d56258c3d052b234848ea;payplug.hookDisplayAdminOrderMain.no;NON;NO;NO;NO
+payplug_278fa2865dfbf530d3d1cc803084f501;payplug.hookHeader.transactionNotCompleted;La transaction n\'a pas été effectuée et votre carte n\'a pas été débitée.;The transaction was not completed and your card was not charged.;The transaction was not completed and your card was not charged.;
+payplug_c103a7a8c6477682b63c04caa7ba3742;payplug.hookHeader.loading;Chargement;Loading;Loading;Caricamento in corso
+payplug_d91212e96d7d90b874228f43999f7e4e;payplug.preparePayment.transactionNotCompleted;La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.;The transaction was not completed and your card was not charged.;The transaction was not completed and your card was not charged.;La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.
+payplug_c791a267e7913ceb4c969b51687e7523;payplug.preparePayment.fieldsNotCompleted;Au moins un champ n\'a pas été completé correctement;At least one of the fields is not correctly completed.;At least one of the fields is not correctly completed.;Almeno un campo non è stato completato correttamente.
+payplug_c4371f1eb480bb9579359b8a54dee436;payplug.refundPayment.incorrectAmount;Le montant à rembourser est incorrect;Incorrect amount to refund;Incorrect amount to refund;Importo non corretto da rimborsare.
+payplug_7e781f0dc171d0cfdf9dba70bfa4f70e;payplug.refundPayment.amountAtLeast;Le montant à rembourser doit être d\'au moins 0.10€;The amount to be refunded must be at least 0.10€;The amount to be refunded must be at least 0.10€;L\'importo del rimborso deve essere almeno € 0,10
+payplug_5c446e2cf622154c5c2adfb199e5e77a;payplug.refundPayment.cannotRefund;Le remboursement n\'a pas été effectué. Assurez-vous que le montant est correct puis essayez à nouveau.;Cannot refund that amount.;Cannot refund that amount.;L\'importo non può essere rimborsato.
+payplug_27ec39e9a1d6272a48c0b91b8d679443;payplug.refundPayment.errorOccurred;Une erreur est survenue;An error has occurred;An error has occurred;C\'è stato un errore
+payplug_3eaa3b62815d7a5dd90dbe998c744362;payplug.refundPayment.success;Le montant à été correctement remboursé;Amount successfully refunded.;Amount successfully refunded.;L\'importo é stato rimborsato con successo.
+payplug_c3cd0891c9ad29c1d74bb4cebc0bc925;payplug.setConfigurationProperties.confirmUninstall;;Are you sure you wish to uninstall this module and delete your settings?;Are you sure you wish to uninstall this module and delete your settings?;
+payplug_020c93f3a1786dcd1eba5921b50c09cc;payplug.setConfigurationProperties.keepCards;Toutes les cartes enregistrées par vos clients seront conservées.;All the registered cards of your customer will be kept.;All the registered cards of your customer will be kept.;Tutte le carte di credito del tuo cliente saranno memorizzate.
+payplug_72cdf590525ea64bb848c62d4c055b3a;payplug.setConfigurationProperties.removeCards;Toutes les cartes enregistrées par vos clients seront supprimées.;All the registered cards of your customer will be deleted.;All the registered cards of your customer will be deleted.;Tutte le carte di credito del tuo cliente saranno eliminate.
+payplug_f527d8dc5e1b22e3fd97ea2bb253108b;payplug.setConfigurationProperties.configureModule;Afin d\'accepter les paiements, vous devez configurer votre module en connectant votre compte PayPlug.;In order to accept payments you need to configure your module by connecting your PayPlug account.;In order to accept payments you need to configure your module by connecting your PayPlug account.;Per accettare pagamenti, devi configurare il tuo modulo collegando il tuo account PayPlug.
+payplug_ebd1af8a9014068c4dd7ffdec9e7c5ab;payplug.setConfigurationProperties.notPaid;non payé;not paid;not paid;non pagato
+payplug_779a5250f73e8a7b12fcfa8e83ae0b94;payplug.setConfigurationProperties.paid;payé;paid;paid;pagato
+payplug_e7b9c5b7a8fe259e6c12ce8239860e95;payplug.setConfigurationProperties.failed;échoué;failed;failed;pagamento fallito
+payplug_0c8d9f2cbab52f173e62830b23e2c4f0;payplug.setConfigurationProperties.partiallyRefunded;remboursé partiellement;partially refunded;partially refunded;rimborsato parzialmente
+payplug_5b83778d10bdd7c3ff091a93b1286458;payplug.setConfigurationProperties.refunded;remboursé;refunded;refunded;rimborsato
+payplug_eee37319eddb9a9510e03db5b37abde9;payplug.setConfigurationProperties.onGoing;à venir;on going;on going;in corso
+payplug_b17f424277b3ae648edcead5333a7fca;payplug.setConfigurationProperties.cancelled;annulé;cancelled;cancelled;annullato
+payplug_8fa58593d06773fe158018a5eecb06d3;payplug.setConfigurationProperties.authorized;autorisé;authorized;authorized;autorizzato
+payplug_178a1778e1eae5441f2dd79bacd94900;payplug.setConfigurationProperties.authorizationExpired;autorisation expirée;authorization expired;authorization expired;autorizzazione scaduta
+payplug_4184226d54ba4ad13a534c30e72e58f5;payplug.setConfigurationProperties.oneyPending;Oney en attente;Oney pending;Oney pending;Oney in attesa
+payplug_19157a39b29e8ca1d158d1222ca5536a;payplug.setConfigurationProperties.abandoned;Abandonné;abandoned;abandoned;Abbandonato
+payplug_90fd33b1ec48694b0fbb6e28ae7d9b30;payplug.submitAccount.credentialsNotCorrect;;;;
+payplug_590106f30df9af8c52fd754d5f824411;payplug.submitSettings.settingsNotUpdated;;;;
+payplugvalidation_cef5ffe1ea30cca7818c988c27467aed;The transaction was not completed and your card was not charged.;La transaction n\'a pas été effectuée et votre carte n\'a pas été débitée.;The transaction was not completed and your card was not charged.;The transaction was not completed and your card was not charged.;La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.
+payplugvalidation_ce2d9931d650f844d0e49ba70cf68376;Oney 3x;Oney 3x;Oney 3x;Oney 3x;Oney 3x
+payplugvalidation_f9932dff56316ff55d6280cfeb91846e;Oney 4x;Oney 4x;Oney 4x;Oney 4x;Oney 4x
+adminpaypluginstallmentcontroller_b718adec73e04ce3ec720dd11a06a308;ID;ID;ID;ID;ID
+adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce;Installment ID;ID paiement fractionné;Installment ID;Installment ID;Rata ID
+adminpaypluginstallmentcontroller_1e63d1811556fc2dad106dcbd4217a69;Payment ID;ID paiement;Payment ID;Payment ID;Pagamento ID
+adminpaypluginstallmentcontroller_5d4710f9a8250b13164a82c94d5b00d1;Order reference;Référence;Order reference;Order reference;Riferimento
+adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7;Customer;Client;Customer;Customer;Cliente
+adminpaypluginstallmentcontroller_ac2e397ffc0808f909e9712ca575c121;Order total;Total commande;Order total;Order total;Totale dell\'ordine
+adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0;Installment payment #;Numéro d\'échéance;Installment payment #;Installment payment #;Rata #
+adminpaypluginstallmentcontroller_8dabefa15f1904e2e5e4f3b430ac6842;Installment amount;Montant échéance;Installment amount;Installment amount;Importo della rata
+adminpaypluginstallmentcontroller_9ffda6fe3fafd7dce4c184512c2fccb4;PayPlug payment status;Statut Paiement Payplug;PayPlug payment status;PayPlug payment status;Status del pagamento PayPlug
+adminpaypluginstallmentcontroller_44749712dbec183e983dcd78a7736c41;Date;Date;Date;Date;Date
+adminpaypluginstallmentcontroller_0095a9fa74d1713e43e370a7d7846224;Export;Export;Export;Export;Export
+ajax_f51396ebc5142204e3d187dd8097b15d;Incorrect amount to refund;Le montant à rembourser est incorrect;Incorrect amount to refund;Incorrect amount to refund;Importo non corretto da rimborsare.
+ajax_f0516f2e40049866cf48ee09765bf881;The amount to be refunded must be at least 0.10 €;Le montant à rembourser doit être d\'au moins 0.10€;The amount to be refunded must be at least 0.10 €;The amount to be refunded must be at least 0.10 €;L\'importo del rimborso deve essere almeno € 0,10
+ajax_2197bc57f08292482b9ed1e905fb79cb;Cannot refund that amount.;Le remboursement n\'a pas été effectué. Assurez-vous que le montant est correct puis essayez à nouveau.;Cannot refund that amount.;Cannot refund that amount.;L\'importo non può essere rimborsato.
+ajax_8db5bd2272b51b3525ad7661c10d8b2b;An error has occurred;Une erreur est survenue;An error has occurred;An error has occurred;C\'è stato un errore
+ajax_96fe48f26db5ef9012806cdc0605e74f;Amount successfully refunded.;Le montant à été correctement remboursé;Amount successfully refunded.;Amount successfully refunded.;L\'importo é stato rimborsato con successo.
+ajax_018e79acf2129521e285ad211e6b1912;Order successfully updated.;La commande a été mise à jour avec succès.;Order successfully updated.;Order successfully updated.;Ordine aggiornato correttamente.
+dispatcher_cef5ffe1ea30cca7818c988c27467aed;The transaction was not completed and your card was not charged.;La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.;The transaction was not completed and your card was not charged.;The transaction was not completed and your card was not charged.;La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.
+php_version_484e842f99d03422fa10151e75ab98b9;admin.phpversion.heading;PRESENTATION;PRESENTATION;PRESENTATION;PRESENTAZIONE
+php_version_371b6a7f7531bc89aa4c813a8f98f9c6;admin.phpversion.title;La solution de paiement qui augmente vos ventes;The payment solution that increases your sales;The payment solution that increases your sales;La soluzione di pagamento che aumenta le tue vendite
+php_version_11f45251bf119ff45530345f807aa965;admin.phpversion.headlist;PayPlug offre aux e-commerçants tous les avantages d’une solution complète de paiement en ligne.;PayPlug provides merchants all the benefits of a full online payment solution.;PayPlug provides merchants all the benefits of a full online payment solution.;PayPlug fornisce ai rivenditori tutti i vantaggi di una soluzione completa di pagamento on line.
+php_version_48633807d82bf30dc50da6f4e0947ff4;admin.phpversion.card;Acceptez toutes les cartes CB, Visa, MasterCard françaises et internationales;Accept all Visa and MasterCard credit and debit cards;Accept all Visa and MasterCard credit and debit cards;Puoi accettare tutte le carte di credito e debito Visa e MasterCard
+php_version_ec36b20c94c8267c75e8522a139189bd;admin.phpversion.integrated;Affichez le formulaire de paiement directement dans votre boutique, sans redirection;Display the payment form directly on your website, without redirection;Display the payment form directly on your website, without redirection;Mostra il modulo di pagamento direttamente sul tuo sito, senza redirezione
+php_version_1b1efef90fc217b58f77abba192ddc67;admin.phpversion.custom;Personnalisez votre page de paiement en utilisant votre design et vos couleurs;Customise your payment page with your own colours and design;Customise your payment page with your own colours and design;Personalizza la tua pagina di pagamento con i tuoi colori e design
+php_version_46c402e7f69e54d4ddfdb026157195a8;admin.phpversion.secure;Évitez la fraude en utilisant le 3D-Secure;Avoid fraud by using Verified by Visa and MasterCard Secure Code;Avoid fraud by using Verified by Visa and MasterCard Secure Code;Evita la frode usando Verified by Visa and MasterCard Secure Code
+php_version_2198405cb62d1a36f7824ad094260221;admin.phpversion.automatic;Mise à jour des commandes automatique et confirmation par email;Automatic order update and email confirmation;Automatic order update and email confirmation;Aggiornamento automatico dell\'ordine e mail di conferma
+php_version_f683d3e42054dfba0264b623e35be77f;admin.phpversion.history;Interface permettant la gestion des paiements et l\'export CSV des transactions;Web interface to manage and export transaction history;Web interface to manage and export transaction history;Interfaccia web per gestire ed esportare lo storico delle transazioni
+php_version_096f5099565dd56d7c8d1c76bb8197a7;admin.phpversion.fast;Disponibilité des fonds sur le compte bancaire sous 2 à 5 jours ouvrés;Funds available on your bank account within 2 to 5 business days;Funds available on your bank account within 2 to 5 business days;Fondi disponibili sul tuo conto bancario entro 2 o 5 giorni lavorativi
+php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f;admin.phpversion.wrongPhpVersion;La version de PHP que vous utilisez n\'est pas compatible avec cette version du module PayPlug car elle est antérieure à PHP 5.6.;The version of PHP you are using is not compatible with this version of the PayPlug plugin because it is prior to PHP 5.6.;The version of PHP you are using is not compatible with this version of the PayPlug plugin because it is prior to PHP 5.6.;La versione PHP che stai utilizzando non è compatibile con questa versione del modulo Payplug, in quanto precedente a PHP 5.6.
+php_version_6c55f8dc7a5345a058639f6e4781e5b8;admin.phpversion.beforeLink;Rendez-vous sur notre ;Go to our ;Go to our ;Visita la nostra 
+php_version_c98af6170031f29c3eb458d5c1436efe;admin.phpversion.link;page support;support page;support page;pagina di supporto
+php_version_57c04380845c79b92174b346a4018392;admin.phpversion.afterLink; pour récupérer une version compatible avec votre boutique.; to obtain a version compatible with your store.; to obtain a version compatible with your store.; per ottenere una versione compatibile con il tuo negozio online.
+admin_uninstall_configuration_96f4b8e98e77cb6409c71ef3b166da19;Uninstall configuration;Désinstaller  la configuration;Uninstall configuration;Uninstall configuration;Disinstalla la configurazione
+admin_uninstall_configuration_39cd5fc4ef81a34cf31927fea2f9a043;Keep cards;Garder les cartes;Keep cards;Keep cards;Mantieni le carte
+admin_uninstall_configuration_832033570386564995e06477d4057abf;Enable Debug mode;Activer le mode debug;Enable Debug mode;Enable Debug mode;Attiva la modalità Debug
+admin_uninstall_configuration_7469a286259799e5b37e5db9296f00b3;YES;OUI;YES;YES;SI
+admin_uninstall_configuration_f5b9feca9ae5347976ca001437662708;Disable one click payment;Désactiver le paiement en un clic;Disable one click payment;Disable one click payment;Disattiva il pagamento one click
+admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251;NO;NON;NO;NO;NO
+admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a;Update settings;Mettre à jour les paramètres;Update settings;Update settings;Aggiorna le impostazioni
+admin_740819a7dc6b0b1a8a7fa0c871d9b878;PRESENTATION;PRESENTATION;PRESENTATION;PRESENTATION;PRESENTAZIONE
+admin_500f0e02dead20d5160ed144ae2ba846;The payment solution that increases your sales;La solution de paiement qui augmente vos ventes;The payment solution that increases your sales;The payment solution that increases your sales;La soluzione di pagamento che aumenta le tue vendite
+admin_21316ef9b6abdf52d0dd1ee8ef0549ba;PayPlug provides merchants all the benefits of a full online payment solution.;PayPlug offre aux e-commerçants tous les avantages d’une solution complète de paiement en ligne.;PayPlug provides merchants all the benefits of a full online payment solution.;PayPlug provides merchants all the benefits of a full online payment solution.;PayPlug fornisce ai rivenditori tutti i vantaggi di una soluzione completa di pagamento on line.
+admin_2c12dc7813a322ee5a9c56d1515c9c13;Accept all Visa and MasterCard credit and debit cards;Acceptez toutes les cartes CB, Visa, MasterCard françaises et internationales;Accept all Visa and MasterCard credit and debit cards;Accept all Visa and MasterCard credit and debit cards;Puoi accettare tutte le carte di credito e debito Visa e MasterCard
+admin_a280a5026f18f89359a0c62fb2036ece;Display the payment form directly on your website, without redirection;Affichez le formulaire de paiement directement dans votre boutique, sans redirection;Display the payment form directly on your website, without redirection;Display the payment form directly on your website, without redirection;Mostra il modulo di pagamento direttamente sul tuo sito, senza redirezione
+admin_b230aa6048c68c81234e04a860c2cb14;Customise your payment page with your own colours and design;Personnalisez votre page de paiement en utilisant votre design et vos couleurs;Customise your payment page with your own colours and design;Customise your payment page with your own colours and design;Personalizza la tua pagina di pagamento con i tuoi colori e design
+admin_8d002532f8aaa402d78e01b944878379;Avoid fraud by using Verified by Visa and MasterCard Secure Code;Évitez la fraude en utilisant le 3D-Secure;Avoid fraud by using Verified by Visa and MasterCard Secure Code;Avoid fraud by using Verified by Visa and MasterCard Secure Code;Evita la frode usando Verified by Visa and MasterCard Secure Code
+admin_1d8b5ba4e8dabf85facf6e37c5dbe2e3;Automatic order update and email confirmation;Mise à jour des commandes automatique et confirmation par email;Automatic order update and email confirmation;Automatic order update and email confirmation;Aggiornamento automatico dell\'ordine e mail di conferma
+admin_0da08d6f9dcebff50b6dc8cc1a7ff3b1;Web interface to manage and export transaction history;Interface permettant la gestion des paiements et l\'export CSV des transactions;Web interface to manage and export transaction history;Web interface to manage and export transaction history;Interfaccia web per gestire ed esportare lo storico delle transazioni
+admin_5f183c4202884334e2f48c094ea06ee2;Funds available on your bank account within 2 to 5 business days;Disponibilité des fonds sur le compte bancaire sous 2 à 5 jours ouvrés;Funds available on your bank account within 2 to 5 business days;Funds available on your bank account within 2 to 5 business days;Fondi disponibili sul tuo conto bancario entro 2 o 5 giorni lavorativi
+admin_0e4fefcc7f5461ca828af1703f00c28b;For more information about installing and configuring the plugin, please consult;Pour toute question concernant l\'installation et la configuration du module, vous pouvez consulter l\'article disponible sur;For more information about installing and configuring the plugin, please consult;For more information about installing and configuring the plugin, please consult;Per ulteriori informazioni sull\'istallazione e configurazione del modulo, si prega di consultare
+admin_b862e9f2904096707cab3be27c18aaf0;this support article;la page suivante;this support article;this support article;il seguente articolo del Support
+details_88427ec035734b45aae9f7d8859a5008;Transaction ID;ID PayPlug du paiement;Transaction ID;Transaction ID;ID Payplug del pagamento
+details_a1fa27779242b4902f7ae3bdd5c6d508;Type;Type;Type;Type;Type
+details_ec53a8c4f07baed5d8825072c89799be;Status;Statut;Statut;Statut;Statut
+details_b2f40690858b404ed10e62bdf422c704;Amount;Montant;Amount;Amount;Montante
+details_be3ac0cfe96feee34b4e12ac3472494e;Authorized on;Autorisé le;Authorized on;Authorized on;Autorizzato il
+details_14145b0ac8fa7640b7371bcee02e45d7;Paid at;Payé le;Paid at;Paid at;Pagato il
+details_e7f9e382dc50889098cbe56f2554c77b;Credit card;Carte de paiement;Credit card;Credit card;Carta di pagamento
+details_453e6aa38d87b28ccae545967c53004f;Unavailable;Indisponible;Unavailable;Unavailable;Non disponibile
+details_c7d4153f748ba1dd21ae002c37c00906;Card mask;Masque de la carte;Card mask;Card mask;Le ultime 4 cifre della carta
+details_217c01a08bee4c2fa33d59a6ddc69806;3-D Secure;3-D Secure;3-D Secure;3-D Secure;3-D Secure
+details_5abc7a3ac0ae1545cc801303727f53da;Expiry Date;Date d\'expiration;Expiry Date;Expiry Date;Data di scadenza
+details_650be61892bf690026089544abbd9d26;Mode;Mode;Mode;Mode;Modalità
+refunded_4bf290898e0226ffb1041cd114347e4d;Refund your customer on his card directly with Payplug;Rembourser avec PayPlug;Refund your customer on his card directly with Payplug;Refund your customer on his card directly with Payplug;Rimborsa con PayPlug
+refunded_7ca1373ac3a64cc5381dc5b5b5c74219;This transaction was entirely refunded with Payplug;Cette transaction a été intégralement remboursée avec PayPlug;This transaction was entirely refunded with Payplug;This transaction was entirely refunded with Payplug;Questa transazione é stata rimborsata con PayPlug
+refunded_12f740fe0fd9cdebebd2a0cb5aadfa95;Amount refunded:;Montant remboursé :;Amount refunded:;Amount refunded:;Importo rimborsato:
+order_7dc6df1573a0a85fc5de252401098d0c;Payplug payment details;Détail du paiement PayPlug;Payplug payment details;Payplug payment details;Dettagli di pagamento PayPlug
+order_8d49a0528d1f5a7d4283cc00f9a08f4b;Capture of this payment is authorized before %s. After this date, you will not be able to get paid.;La capture de ce paiement est autorisée avant le %s. Après cette date, vous ne pourrez plus être payé.;Capture of this payment is authorized before %s. After this date, you will not be able to get paid.;Capture of this payment is authorized before %s. After this date, you will not be able to get paid.;L\'avvio di questo pagamento è autorizzato prima del %s. Successivamente, non potrai più ricevere questo pagamento
+update_ee19a5b4e629f12ccab7e31449826748;Update this order;Mettre à jour cette commande;Update this order;Update this order;Aggiorna questo ordine
+update_06933067aafd48425d67bcb01bba5cb6;Update;Mettre à jour;Update;Update;Aggiorna
+refund_4bf290898e0226ffb1041cd114347e4d;Refund your customer on his card directly with Payplug;Rembourser avec PayPlug;Refund your customer on his card directly with Payplug;Refund your customer on his card directly with Payplug;Rimborsa con PayPlug
+refund_1666e5c37779e7041dd51aa3d10eff61;Amount already refunded with Payplug : ;Montant déjà remboursé avec Payplug :;Amount already refunded with Payplug : ;Amount already refunded with Payplug : ;Importo già rimborsato con PayPlug:
+refund_01ddb6831cdf22a0055a2a42a09482d6;Amount still refundable with Payplug : ;Montant disponible pour effectuer un remboursement avec Payplug :;Amount still refundable with Payplug : ;Amount still refundable with Payplug : ;Importo disponibile da rimborsare via PayPlug:
+refund_554cd9e547629109b77e4c60ddd44da3;Amount to be refunded;Montant à rembourser;Amount to be refunded;Amount to be refunded;Totale da rimborsare
+refund_de0585357d47ceb0dbbe92118bcf2a64;Change Prestashop order state to \"\"Refunded\"\"\"';
 $_MODULE['<{payplug}prestashop>refund_76f0ed934de85cc7131910b32ede7714'] = 'Rimborsato';
 $_MODULE['<{payplug}prestashop>refund_3e220cc8128d7b270226d79b84ebce33'] = 'The refund will be possible 48h after the last payment or refund transaction.';
 $_MODULE['<{payplug}prestashop>installment_1717748ecd906b762e6011dde5f41884'] = 'Questo ordine è soggetto a pagamento rateale, quindi lo stato è';
@@ -198,13 +208,15 @@ $_MODULE['<{payplug}prestashop>embedded_9d271e949d80d6dc284b801c533124fe'] = 'I 
 $_MODULE['<{payplug}prestashop>embedded_e5e6e92741ab5d10e8f0f0eb35b37c5f'] = 'I clienti pagheranno senza essere rediretti.';
 $_MODULE['<{payplug}prestashop>embedded_1f1d3da2e63ec19456e33fa811c81041'] = 'Personalizza la mia pagina di pagamento.';
 $_MODULE['<{payplug}prestashop>embedded_ebfb18fdefe0647011c75dbab1412ca1'] = 'I clienti verranno rediretti verso una pagina di pagamento PayPlug per finalizzare la transazione.';
+$_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Pagamento con carta di credito';
+$_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Proponi il pagamento con carta di credito ai tuoi clienti.';
 $_MODULE['<{payplug}prestashop>deferred_40a84afbec2ddc1e86d0772888a68941'] = 'Differisci l\'acquisizione del pagamento';
 $_MODULE['<{payplug}prestashop>deferred_aac960a647e6cff88049b927f529ee2e'] = 'Finalizzate il pagamento in futuro, ad esempio alla spedizione dell\'ordine. I montanti sono bloccati entro un periodo di 7 giorni al massimo a partire dalla data d\'autorizzazione.';
 $_MODULE['<{payplug}prestashop>deferred_998b807d121a4daa046bc4ce983d34ea'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>deferred_31f6f2f140c26265e928745bc572aafe'] = 'Durante i 7 giorni d\'autorizzazione, avviare i pagamenti quando lo status diviene :';
 $_MODULE['<{payplug}prestashop>deferred_3832f23de142ded677e649f9833ce413'] = '-- Scegliere uno status --';
 $_MODULE['<{payplug}prestashop>deferred_be43c72d18421ca43a83bbd732189ac6'] = 'Voi dovete scegliere uno status';
-$_MODULE['<{payplug}prestashop>installment_ce1625aabc7130c36cd4e64e518c8615'] = 'Attivare i pagamenti frazionati';
+$_MODULE['<{payplug}prestashop>installment_4f623785d72bba502487b033434853ba'] = 'Attiva i pagamenti rateizzati non garantiti';
 $_MODULE['<{payplug}prestashop>installment_ac924ae7c6cbcfe26ea8928845727f3f'] = 'Permetti ai tuoi clienti di dilazionare i pagamenti relativi ai loro ordini in 2, 3 o 4 rate.';
 $_MODULE['<{payplug}prestashop>installment_f990e553cdc4c29c2efffba33e08a8c7'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>installment_381665869000be567e4a891084207172'] = 'I pagamenti rateizzati non sono garantiti. Uno degli addebiti futuri potrebbe non andare a buon fine.';
@@ -224,20 +236,10 @@ $_MODULE['<{payplug}prestashop>installment_d0403983b51fff6bda368ca8f66c2054'] = 
 $_MODULE['<{payplug}prestashop>installment_c65a7c39a37cfdf4e1ae63fe52cbfe71'] = 'del totale dell\'ordine dopo 30 giorni';
 $_MODULE['<{payplug}prestashop>installment_5a5148dcdf25c435d452c110e55fab4c'] = 'del totale dell\'ordine dopo 60 giorni';
 $_MODULE['<{payplug}prestashop>installment_2020b5dcab00eaaf6621fe30c8806aec'] = 'del totale dell\'ordine dopo 90 giorni';
-$_MODULE['<{payplug}prestashop>oney_7cdcd23423a3d3025ac7ccb5a3bbfe1c'] = 'Attiva i pagamenti rateizzati garantiti Oney';
+$_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Attiva i pagamenti rateizzati garantiti Oney';
 $_MODULE['<{payplug}prestashop>oney_fe6c0722a97f8fc5aed036c7f16c8339'] = 'Permetti ai tuoi clienti di scaglionare il pagamento dei loro ordini in 3x, 4x a partire da %d € e fino a %d €.';
 $_MODULE['<{payplug}prestashop>oney_f990e553cdc4c29c2efffba33e08a8c7'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>oney_bfd65bf2ef4e13b630973235f69e1bb4'] = 'Ho incluso le menzioni obbligatorie Oney alle CGV sul mio sito.';
-$_MODULE['<{payplug}prestashop>oney_f6f9ad2fe95ca5059086924e0a5afa0d'] = 'Per qualificare il pagamento ed evitare frodi, Oney deve conoscere i tuoi corrieri e i tempi medi di consegna.';
-$_MODULE['<{payplug}prestashop>oney_914419aa32f04011357d3b604a86d7eb'] = 'Consegna a domicilio';
-$_MODULE['<{payplug}prestashop>oney_cf3e7360cfed1e0c6fdd0090bee0ea05'] = 'Tipo di consegna';
-$_MODULE['<{payplug}prestashop>oney_ec69cb84c4ecf290458ce3379fa8c556'] = 'Tempo di consegna stimato';
-$_MODULE['<{payplug}prestashop>oney_2e612119abb52094f2227f38376cffa4'] = 'Scegli un tipo di livraison';
-$_MODULE['<{payplug}prestashop>oney_74824f0221993b73cf87bfe62adddab7'] = 'Area di ritiro';
-$_MODULE['<{payplug}prestashop>oney_a493a94d7a4988e65f4588a4515ada5f'] = 'Pick up al punto di ritrovo';
-$_MODULE['<{payplug}prestashop>oney_27d0e85e85c9c9a67bf7a311a0a42a91'] = 'Livraison électronique';
-$_MODULE['<{payplug}prestashop>oney_44fdec47036f482b68b748f9d786801b'] = 'giorni';
-$_MODULE['<{payplug}prestashop>oney_43fc964ff605d8bdcbfd7a855cdc5741'] = 'Devi inserire un numero di giorni in numero intero';
 $_MODULE['<{payplug}prestashop>oney_33b0504f0b776f2c13381c543bf2017c'] = 'Versare aller plus lombo:';
 $_MODULE['<{payplug}prestashop>oney_65ce6b12de05d7a1af6190b2ac9153c7'] = 'Ottimizza l\'esperienza con una dinamica dinamica degli échéanciers in 3 e 4 piedi.';
 $_MODULE['<{payplug}prestashop>one_click_cea985da4143cee6631bf7048633e935'] = 'Attivare i pagamenti in un click';
@@ -279,12 +281,11 @@ $_MODULE['<{payplug}prestashop>confirm_03d63c25f89f68af800c0f62990ac232'] = 'Il 
 $_MODULE['<{payplug}prestashop>confirm_4d0b6d054fc1ebd256e7e74f35a8166f'] = 'Modalità';
 $_MODULE['<{payplug}prestashop>confirm_9db2814db25585bef9bbc5b1ba33565d'] = 'TEST';
 $_MODULE['<{payplug}prestashop>confirm_5469a5c519bc382a13cf11af4f1ec8f4'] = 'LIVE';
-$_MODULE['<{payplug}prestashop>confirm_51294f4d69b5d0a65759018a42d54674'] = 'Pagina di pagamento:';
-$_MODULE['<{payplug}prestashop>confirm_51294f4d69b5d0a65759018a42d54674'] = 'INTEGRATO';
-$_MODULE['<{payplug}prestashop>confirm_d6b71909b1a4285e2b113d3684bb1477'] = 'REDIRETTO';
-$_MODULE['<{payplug}prestashop>confirm_d9221ad9f319acf615f618586dc168ed'] = 'Pagamenti one-click:';
 $_MODULE['<{payplug}prestashop>confirm_20077a78abf3e32a3d9fe03cf0f9fd35'] = 'ATTIVATO';
 $_MODULE['<{payplug}prestashop>confirm_5baf1765401da71243e6bdc61afa87a1'] = 'DISATTIVATO';
+$_MODULE['<{payplug}prestashop>confirm_d9221ad9f319acf615f618586dc168ed'] = 'Pagamenti one-click:';
+$_MODULE['<{payplug}prestashop>confirm_51294f4d69b5d0a65759018a42d54674'] = 'INTEGRATO';
+$_MODULE['<{payplug}prestashop>confirm_d6b71909b1a4285e2b113d3684bb1477'] = 'REDIRETTO';
 $_MODULE['<{payplug}prestashop>confirm_8c0afa6560ba2f9316aad573ad356448'] = 'Pagamenti 3x, 4x Oney:';
 $_MODULE['<{payplug}prestashop>confirm_d04a199a844296a12712bb4b1f486918'] = 'Pagamento a rate:';
 $_MODULE['<{payplug}prestashop>confirm_b7ce4651ae343650e198e27606e98952'] = 'Pagamenti differiti :';
@@ -378,49 +379,11 @@ $_MODULE['<{payplug}prestashop>oneyrepository_d14ca54db0343b2847cdfc14db5ac044']
 $_MODULE['<{payplug}prestashop>oneyrepository_0e7374c84fe9165359996cfbd2170263'] = 'Il nome della tua città è troppo lungo (massimo 32 caratteri).';
 $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56'] = 'Si prega di cambiarlo con un altro o selezionare un altro metodo di pagamento.';
 $_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Pagamento in %sx';
-$_MODULE['<{payplug}prestashop>oneyrepository_ff9df6bac3078402374e750e02d60715'] = 'Il tuo indirizzo email è troppo lungo e il carattere + non è valido,';
-$_MODULE['<{payplug}prestashop>oneyrepository_a65c018ceba95687ec307a32e4443381'] = 'sostituiscilo con un altro indirizzo (max 100 caratteri). ';
-$_MODULE['<{payplug}prestashop>oneyrepository_a3f2e0151b5896634ed88e7db254671e'] = 'Il carattere + non è valido.';
-$_MODULE['<{payplug}prestashop>oneyrepository_f49dfe70475057b2fd9c15a3839bff2c'] = 'Modifica il tuo indirizzo e-mail (massimo 100 caratteri).';
-$_MODULE['<{payplug}prestashop>oneyrepository_ab46a1167bda1c1229c641a1c61a455d'] = 'Il nome della città è troppo lungo. (32 caratteri massimo).';
 $_MODULE['<{payplug}prestashop>oneyrepository_22d545ded224c1e3f0f821e99f01ed09'] = 'L\'importo totale del tuo ordine deve essere compreso tra %s e %s per pagare tramite Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_0f3e17b27426f0c030c3a3a7f461cf7b'] = 'Il carrello non è valido';
-$_MODULE['<{payplug}prestashop>oneyrepository_e181052b07a91a4cacd05dd1a2db223f'] = 'Il metodo di spedizione';
-$_MODULE['<{payplug}prestashop>oneyrepository_14cc547f9ee50676a9c87658e812bab9'] = 'non è compatibile con il metodo di pagamento. ';
-$_MODULE['<{payplug}prestashop>oneyrepository_4055a85829a5c48b45b8ed088d8deefa'] = 'Scelga un metodo di spedizione che prevede la consegna a casa per continuare.';
-$_MODULE['<{payplug}prestashop>oneyrepository_36d6d089e7939f0e387e7ad3c914bd1c'] = 'Pick up al punto di ritrovo';
-$_MODULE['<{payplug}prestashop>oneyrepository_147720874246c41f77c71059a9e5cc80'] = 'Ritiro in negozio';
-$_MODULE['<{payplug}prestashop>oneyrepository_02edd93949f6d3c57d9822691b59f649'] = 'Il';
-$_MODULE['<{payplug}prestashop>oneyrepository_a9873968394cee55c8783a2dc0d95d67'] = 'è in conflitto con questo metodo di pagamento.';
 $_MODULE['<{payplug}prestashop>oneyrepository_7eab6a6607c367867b134afc2df95e2e'] = 'Il pagamento tramite Oney non è disponibile';
 $_MODULE['<{payplug}prestashop>oneyrepository_b286504b1d4d5ee1aeb919ad1e1255b8'] = 'Francia, Martinìca, Guadalupa, la Riunione, Maiotta o Guyana francese';
 $_MODULE['<{payplug}prestashop>oneyrepository_1007e1b7f894dfbf72a0eaa80f3bc57e'] = 'Italia';
-$_MODULE['<{payplug}prestashop>oneyrepository_5308afbb384f19d7878caf5698c5e6f3'] = 'Per un pagamento con Oney, gli indirizzi di consegna e fatturazione devono essere in ';
 $_MODULE['<{payplug}prestashop>oneyrepository_170f5e9365a8f2305fea05a99c36dfcc'] = 'L\'adresse e-mail est invalide';
-$_MODULE['<{payplug}prestashop>paymentrepository_456565e5b3bd65ac28174d2e4e39c91a'] = 'Erreur pendant la création du paiement';
-$_MODULE['<{payplug}prestashop>paymentrepository_7ffc0a7ff64a0f9185a20f3e59710631'] = 'Erreur pendant la création du paiement.';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Nessun campo è stato compilato';
-$_MODULE['<{payplug}prestashop>translationsrepository_f5146f3861c487374c38fb5ec78cda73'] = 'Almeno un campo non è stato completato correttamente.';
-$_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c84ab97f'] = 'Le tue informazioni sono state salvate';
-$_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'C\'è stato un errore. Per favore riprova tra qualche secondo.';
-$_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Il pagamento con Oney non è disponibile.';
 $_MODULE['<{payplug}prestashop>cardrepository_0d2d5fa0cfffc8577f948d683a82079e'] = 'Carta eliminata con successo.';
-$_MODULE['<{payplug}prestashop>php_version_484e842f99d03422fa10151e75ab98b9'] = 'PRESENTAZIONE';
-$_MODULE['<{payplug}prestashop>php_version_371b6a7f7531bc89aa4c813a8f98f9c6'] = 'La soluzione di pagamento che aumenta le tue vendite';
-$_MODULE['<{payplug}prestashop>php_version_11f45251bf119ff45530345f807aa965'] = 'PayPlug fornisce ai rivenditori tutti i vantaggi di una soluzione completa di pagamento on line.';
-$_MODULE['<{payplug}prestashop>php_version_48633807d82bf30dc50da6f4e0947ff4'] = 'Puoi accettare tutte le carte di credito e debito Visa e MasterCard';
-$_MODULE['<{payplug}prestashop>php_version_ec36b20c94c8267c75e8522a139189bd'] = 'Mostra il modulo di pagamento direttamente sul tuo sito, senza redirezione';
-$_MODULE['<{payplug}prestashop>php_version_1b1efef90fc217b58f77abba192ddc67'] = 'Personalizza la tua pagina di pagamento con i tuoi colori e design';
-$_MODULE['<{payplug}prestashop>php_version_46c402e7f69e54d4ddfdb026157195a8'] = 'Evita la frode usando Verified by Visa and MasterCard Secure Code';
-$_MODULE['<{payplug}prestashop>php_version_2198405cb62d1a36f7824ad094260221'] = 'Aggiornamento automatico dell\'ordine e mail di conferma';
-$_MODULE['<{payplug}prestashop>php_version_f683d3e42054dfba0264b623e35be77f'] = 'Interfaccia web per gestire ed esportare lo storico delle transazioni';
-$_MODULE['<{payplug}prestashop>php_version_096f5099565dd56d7c8d1c76bb8197a7'] = 'Fondi disponibili sul tuo conto bancario entro 2 o 5 giorni lavorativi';
-$_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 'La versione PHP che stai utilizzando non è compatibile con questa versione del modulo Payplug, in quanto precedente a PHP 5.6.';
-$_MODULE['<{payplug}prestashop>php_version_6c55f8dc7a5345a058639f6e4781e5b8'] = 'Visita la nostra ';
-$_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 'pagina di supporto';
-$_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' per ottenere una versione compatibile con il tuo negozio online.';
-$_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Pagamento con carta di credito';
-$_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Proponi il pagamento con carta di credito ai tuoi clienti.';
-$_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Attiva i pagamenti rateizzati garantiti Oney';
-$_MODULE['<{payplug}prestashop>installment_4f623785d72bba502487b033434853ba'] = 'Attiva i pagamenti rateizzati non garantiti';
