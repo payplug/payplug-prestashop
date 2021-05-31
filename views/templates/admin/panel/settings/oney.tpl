@@ -44,7 +44,7 @@
                                 <span class="payplugOneyFees_state">
                                     {l s='admin.panel.setting.oney.state' mod='payplug'}
                                 </span>
-                                <input type="radio" id="payplug_oney_fees_left" name="payplug_oney_fees" value="1"/>
+                                <input type="radio" id="{$payplug_switch.oney_fees.name}_left" name="{$payplug_switch.oney_fees.name}" value="1"{if $payplug_switch.oney_fees.checked} checked="checked"{/if}/>
                             </label>
                             <label class="payplugOneyFees_option">
                                 <span class="payplugOneyFees_title">
@@ -56,7 +56,7 @@
                                 <span class="payplugOneyFees_state">
                                     {l s='admin.panel.setting.oney.state' mod='payplug'}
                                 </span>
-                                <input type="radio" id="payplug_oney_fees_right" name="payplug_oney_fees" value="0"/>
+                                <input type="radio" id="{$payplug_switch.oney_fees.name}_right" name="{$payplug_switch.oney_fees.name}" value="0"{if !$payplug_switch.oney_fees.checked} checked="checked"{/if}/>
                             </label>
                         </div>
                         <div class="payplugPanel_section">
