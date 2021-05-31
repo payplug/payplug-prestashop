@@ -33,6 +33,32 @@
             <div class="payplugTips -{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
+                        <div class="payplugOneyFees">
+                            <label class="payplugOneyFees_option">
+                                <span class="payplugOneyFees_title">
+                                    {l s='admin.panel.setting.oney.withFees' mod='payplug'}
+                                </span>
+                                <span class="payplugOneyFees_content">
+                                    {l s='admin.panel.setting.oney.withFeesText' mod='payplug'}
+                                </span>
+                                <span class="payplugOneyFees_state">
+                                    {l s='admin.panel.setting.oney.state' mod='payplug'}
+                                </span>
+                                <input type="radio" id="payplug_oney_fees_left" name="payplug_oney_fees" value="1"/>
+                            </label>
+                            <label class="payplugOneyFees_option">
+                                <span class="payplugOneyFees_title">
+                                    {l s='admin.panel.setting.oney.withoutFees' mod='payplug'}
+                                </span>
+                                <span class="payplugOneyFees_content">
+                                    {l s='admin.panel.setting.oney.withoutFeesText' mod='payplug'}
+                                </span>
+                                <span class="payplugOneyFees_state">
+                                    {l s='admin.panel.setting.oney.state' mod='payplug'}
+                                </span>
+                                <input type="radio" id="payplug_oney_fees_right" name="payplug_oney_fees" value="0"/>
+                            </label>
+                        </div>
                         <div class="payplugPanel_section">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_tos}
                             <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}
