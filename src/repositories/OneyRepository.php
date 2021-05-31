@@ -575,9 +575,7 @@ class OneyRepository extends Repository
 
         foreach ($available_oney_payments as $key=>$oney_payment) {
             $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
-            if ($use_fees && !$with_fees) {
-                unset($available_oney_payments[$key]);
-            } elseif (!$use_fees && $with_fees) {
+            if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($available_oney_payments[$key]);
             }
         }
