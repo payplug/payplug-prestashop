@@ -3550,7 +3550,7 @@ class PayPlugClass extends PaymentModule
     public function hookDisplayProductPriceBlock($param)
     {
         $current_controller = Dispatcher::getInstance()->getController();
-        if (!$this->oney->isOneyAllowed() || in_array($current_controller, ['category', 'index'])) {
+        if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
             return false;
         }
 
@@ -3702,6 +3702,13 @@ class PayPlugClass extends PaymentModule
         }
 
         $cart = $params['cart'];
+
+        $currency = $cart->id_currency;
+        $result_currency = Currency::getCurrency($currency);
+        $supported_currencies = explode(';', Configuration::get('PAYPLUG_CURRENCIES'));
+        if (!in_array($result_currency['iso_code'], $supported_currencies, true)) {
+            return false;
+        }
 
         if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
@@ -5356,7 +5363,7 @@ class PayPlugClass extends PaymentModule
      */
     public function submitDisconnect()
     {
-        $this->createConfig();
+        $this->plugin->getInstall()->setConfig();
         Configuration::updateValue('PAYPLUG_SHOW', 0);
 
         // force reload configuration to be sure all config are reset

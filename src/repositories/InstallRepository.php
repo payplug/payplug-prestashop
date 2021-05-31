@@ -99,7 +99,7 @@ class InstallRepository extends Repository
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = $this->config->get($key_config_live);
             $order_state_live = new OrderStateSpecific((int)$id_order_state_live);
-            if (!$this->validate('isLoadedObject', $order_state_live)) {
+            if (!$this->validate->validate('isLoadedObject', $order_state_live)) {
                 $this->order_state->create($key, $state, true, true);
             }
 
@@ -108,7 +108,7 @@ class InstallRepository extends Repository
             $id_order_state_sandbox = $this->config->get($key_config_sandbox);
             $order_state_sandbox = new OrderStateSpecific((int)$id_order_state_sandbox);
 
-            if (!$this->validate('isLoadedObject', $order_state_sandbox)) {
+            if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)) {
                 $this->order_state->create($key, $state, true, true);
             }
         }
@@ -173,42 +173,6 @@ class InstallRepository extends Repository
         }
 
         return $report;
-    }
-
-    /**
-     * @description Create basic configuration
-     * @return bool
-     */
-    protected function createConfig()
-    {
-        return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
-            && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
-            && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
-            && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
-            && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
-            && $this->config->updateValue('PAYPLUG_EMAIL', null)
-            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
-            && $this->config->updateValue('PAYPLUG_INST', null)
-            && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
-            && $this->config->updateValue('PAYPLUG_INST_MODE', 3)
-            && $this->config->updateValue('PAYPLUG_KEEP_CARDS', 0)
-            && $this->config->updateValue('PAYPLUG_LIVE_API_KEY', null)
-            && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
-            && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
-            && $this->config->updateValue('PAYPLUG_OFFER', '')
-            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
-            && $this->config->updateValue('PAYPLUG_ONEY', null)
-            && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
-            && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
-            && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
-            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
-            && $this->config->updateValue('PAYPLUG_SHOW', 0)
-            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
-            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
-        );
     }
 
     /**
@@ -307,8 +271,8 @@ class InstallRepository extends Repository
         }
 
         // Set payplug config
-        if (!$this->createConfig()) {
-            return $this->setInstallError($this->l('Install failed: createConfig()'));
+        if (!$this->setConfig()) {
+            return $this->setInstallError($this->l('Install failed:setConfig()'));
         }
 
         // Install order state
@@ -328,6 +292,42 @@ class InstallRepository extends Repository
 
         $this->log->info('Install successful.');
         return true;
+    }
+
+    /**
+     * @description Create basic configuration
+     * @return bool
+     */
+    public function setConfig()
+    {
+        return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
+            && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
+            && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
+            && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
+            && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
+            && $this->config->updateValue('PAYPLUG_EMAIL', null)
+            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_INST', null)
+            && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
+            && $this->config->updateValue('PAYPLUG_INST_MODE', 3)
+            && $this->config->updateValue('PAYPLUG_KEEP_CARDS', 0)
+            && $this->config->updateValue('PAYPLUG_LIVE_API_KEY', null)
+            && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
+            && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
+            && $this->config->updateValue('PAYPLUG_OFFER', '')
+            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
+            && $this->config->updateValue('PAYPLUG_ONEY', null)
+            && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
+            && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
+            && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
+            && $this->config->updateValue('PAYPLUG_SHOW', 0)
+            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
+            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
+        );
     }
 
     /**

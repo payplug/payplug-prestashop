@@ -79,9 +79,8 @@ class PaymentRepository extends Repository
         }
         $cartToHash = [];
 
-        if (method_exists($paymentDetails['cart'], 'getProduct')) {
-            $products = $paymentDetails['cart']->getProducts();
-            foreach ($products as $product) {
+        if (method_exists($paymentDetails['cart'], 'getProducts')) {
+            foreach ($paymentDetails['cart']->getProducts() as $product) {
                 $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
                 $cartToHash[] = array_map('strval', $product);
             }
@@ -152,7 +151,7 @@ class PaymentRepository extends Repository
                 $paymentDetails = $updatePaymentTable['paymentDetails'];
             } elseif (!$updatePaymentTable['result']) {
                 return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $updatePaymentTable['paymentDetails']],
+                    ['name' => 'updatePaymentTable', 'value' => $updatePaymentTable],
                     $updatePaymentTable['response']
                 );
             }
