@@ -15,7 +15,6 @@ $header = array_merge($header, $available_languages);
 fputcsv($fp, $header);
 foreach ($translations as $key => $trans) {
     $key = str_replace("<{payplug}prestashop>", "", $key);
-    $key = str_replace("payplugclass_", "payplug_", $key);
     $line = [$key, $trans['default']];
     foreach ($available_languages as $lang) {
         $line[] = $trans[$lang];
@@ -35,7 +34,6 @@ if (!empty($missing_translations)) {
         $messages[] = 'There is ' . count($translations) . ' translations missing for the language "' . $lang . '":';
         foreach ($translations as $key => $trans) {
             $trans = preg_replace("/\s+/", " ", $trans);
-            $key = str_replace(">payplugclass_", ">payplug_", $key);
             $messages[] = $key . ' => ' . $trans;
         }
         $messages[] = "\n";
