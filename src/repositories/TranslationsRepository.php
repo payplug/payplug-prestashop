@@ -282,6 +282,7 @@ class TranslationsRepository extends Repository
                 $template_name = substr(basename($file['name']), 0, -4);
 
                 foreach ($matches as $key) {
+                    $template_name = str_replace("PayPlugClass", "payplug", $template_name);
                     $md5_key = md5($key);
                     $trans_key = '<{payplug}prestashop>' . strtolower($template_name) . '_' . $md5_key;
 
