@@ -85,6 +85,8 @@ class OneyRepository extends Repository
         $this->oneyEntity->setOperations([
             'x3_with_fees',
             'x4_with_fees',
+            'x3_without_fees',
+            'x4_without_fees',
         ]);
     }
 
