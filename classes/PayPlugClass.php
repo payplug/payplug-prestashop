@@ -2534,7 +2534,9 @@ class PayPlugClass extends PaymentModule
             $is_elligible = $this->oney->isOneyElligible($this->context->cart, $cart_amount, true);
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
-            $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && !$error;
+            $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
+                && Configuration::get('PAYPLUG_ONEY_FEES')
+                && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();
             $use_fees = (bool)Configuration::get('PAYPLUG_ONEY_FEES');
@@ -3549,6 +3551,10 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
+            return false;
+        }
+
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3565,6 +3571,10 @@ class PayPlugClass extends PaymentModule
     {
         $current_controller = Dispatcher::getInstance()->getController();
         if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
+            return false;
+        }
+
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
             return false;
         }
 
@@ -3725,7 +3735,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
