@@ -680,6 +680,7 @@ class PayPlugClass extends PaymentModule
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
             'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
+            'can_use_oney_fees' => $this->oney->isAvailableWithoutFees(Configuration::get('PAYPLUG_COMPANY_ISO')),
             'oney_fees' => Configuration::get('PAYPLUG_ONEY_FEES'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
@@ -5549,7 +5550,11 @@ class PayPlugClass extends PaymentModule
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
+        // Get company country
+        $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : 'FR';
+
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
+        Configuration::updateValue('PAYPLUG_COMPANY_ISO', $company_iso);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
         Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', $configuration['max_amounts']);
