@@ -18,7 +18,7 @@ foreach ($available_languages as $keyLang => $lang) {
         //$line is an array of the csv elements
         $key = $keyLang + 2;
         if (!array_key_exists($key, $line)) {
-            echo "ligne manquante ";
+            echo "Erreur sur cette traduction : ";
             print_r($line);
         } else {
             if ($count && ($line[$keyLang + 2] != '')) {
