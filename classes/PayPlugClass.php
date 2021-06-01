@@ -2608,9 +2608,10 @@ class PayPlugClass extends PaymentModule
 
                 $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : '') . '.svg';
-                $oneyLabel = $error
-                    ? $err_label
-                    : sprintf($this->l('payplug.getPaymentOptions.payWithOney'), $split);
+                $text = $use_fees
+                    ? $this->l('payplug.getPaymentOptions.payWithOney')
+                    : $this->l('payplug.getPaymentOptions.payWithOneyWithout');
+                $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
                 if ($optimized) {
                     $oneyTpl = 'oney.tpl';
