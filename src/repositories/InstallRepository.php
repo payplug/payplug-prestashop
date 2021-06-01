@@ -43,6 +43,9 @@ class InstallRepository extends Repository
     /** @var object OrderStateRepository */
     protected $order_state;
 
+    /** @var object OrderStateRepository */
+    protected $order_state_entity;
+
     /** @var object */
     protected $shop;
 
@@ -97,17 +100,16 @@ class InstallRepository extends Repository
         foreach ($order_states_list as $key => $state) {
             // Check live OrderState
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
-            $id_order_state_live = $this->config->get($key_config_live);
-            $order_state_live = new OrderStateSpecific((int)$id_order_state_live);
+            $id_order_state_live = (int)$this->config->get($key_config_live);
+            $order_state_live = OrderStateSpecific::getOrderState($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)) {
                 $this->order_state->create($key, $state, true, true);
             }
 
             // Check sandbox OrderState
             $key_config_sandbox = $key_config_live . '_TEST';
-            $id_order_state_sandbox = $this->config->get($key_config_sandbox);
-            $order_state_sandbox = new OrderStateSpecific((int)$id_order_state_sandbox);
-
+            $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
+            $order_state_sandbox = OrderStateSpecific::getOrderState($id_order_state_sandbox);
             if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)) {
                 $this->order_state->create($key, $state, true, true);
             }
@@ -337,7 +339,7 @@ class InstallRepository extends Repository
      */
     public function setInstallError($error = '')
     {
-        $this->myLogPHP->error($error);
+        $this->log->error($error);
         $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
 
         $this->log->info('Install failed.');
