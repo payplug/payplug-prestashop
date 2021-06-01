@@ -61,6 +61,39 @@ class PaymentRepository extends Repository
     }
 
     /**
+     * @description Return hashed cart with needed (and formatted) elements, ready to be hashed.
+     * @param $paymentDetails
+     * @return string
+     */
+    public function getHashedCart($paymentDetails)
+    {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cart'])
+            || !$paymentDetails['cart']
+        ) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[getHashedCart] $paymentDetails or cart is null, or $paymentDetails is not an array'
+            );
+        }
+        $cartToHash = [];
+
+        if (method_exists($paymentDetails['cart'], 'getProducts')) {
+            foreach ($paymentDetails['cart']->getProducts() as $product) {
+                $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
+                $cartToHash[] = array_map('strval', $product);
+            }
+            return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        } else {
+            return $this->returnPaymentError(
+                ['name' => '$paymentDetails[\'cart\']', 'value' => $paymentDetails['cart']],
+                '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) doesn\'t exist'
+            );
+        }
+    }
+
+    /**
      * @description Compare hash (sha256 on payment method + cart)
      * Create an other payment request if cart or payment method changed
      * and update payment table in consequence
@@ -82,18 +115,11 @@ class PaymentRepository extends Repository
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
-
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        $cartHash = $this->getHashedCart($paymentDetails);
 
         if ($paymentStored['cart_hash'] === $cartHash
             &&
-            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])
-            &&
-            (!$paymentDetails['forceHash'])) {
+            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
@@ -125,7 +151,7 @@ class PaymentRepository extends Repository
                 $paymentDetails = $updatePaymentTable['paymentDetails'];
             } elseif (!$updatePaymentTable['result']) {
                 return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $updatePaymentTable['paymentDetails']],
+                    ['name' => 'updatePaymentTable', 'value' => $updatePaymentTable],
                     $updatePaymentTable['response']
                 );
             }
@@ -323,12 +349,14 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+        $cartHash = $this->getHashedCart($paymentDetails);
 
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        if (!$cartHash || !is_string($cartHash)) {
+            return $this->returnPaymentError(
+                ['name' => 'cartHash', 'value' => $cartHash],
+                '[updatePaymentTable] $cartHash is null or not a string'
+            );
+        }
 
         $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
 

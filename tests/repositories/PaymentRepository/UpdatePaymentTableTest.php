@@ -107,7 +107,8 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
@@ -134,7 +135,8 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
@@ -151,7 +153,12 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
                 'table' => $this->query,
                 'set' => $this->query,
                 'where' => $this->query,
-                'build' => true
+                'build' => true,
+            ]);
+
+        $this->repo
+            ->shouldReceive([
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
