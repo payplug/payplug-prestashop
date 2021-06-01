@@ -2543,9 +2543,7 @@ class PayPlugClass extends PaymentModule
 
             foreach ($available_oney_payments as $oney_payment) {
                 $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
-                if ($use_fees && !$with_fees) {
-                    continue;
-                } elseif (!$use_fees && $with_fees) {
+                if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                     continue;
                 }
 
