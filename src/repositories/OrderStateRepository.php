@@ -261,14 +261,24 @@ class OrderStateRepository extends Repository
 
     public function removeIdsUnusedByPayPlug()
     {
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/debug-order-states-log.csv');
+
         $deleted = true;
         $payplug_os_id_list = $this->getIdsByModuleName('payplug');
+        $log->info('$payplug_os_id_list');
+        $log->info(json_encode($payplug_os_id_list));
         $used_order_os_id_list = $this->isUsedByOrders('payplug');
+        $log->info('$used_order_os_id_list');
+        $log->info(json_encode($used_order_os_id_list));
         $used_os_id_list = $this->getIdsUsedByPayPlug();
+        $log->info('$used_os_id_list');
+        $log->info(json_encode($used_os_id_list));
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
-                $os = new OrderStateSpecific($payplug_os_id);
-                $deleted = $deleted && $os->softDelete();
+                $os = OrderStateSpecific::getOrderState($payplug_os_id);
+                if (is_object($os) && method_exists($os, 'softDelete')) {
+                    $deleted = $deleted && $os->softDelete();
+                }
             }
         }
         return $deleted;
