@@ -32,7 +32,8 @@ class OrderStateSpecific implements OrderStateInterface
 
     public function __construct($id = null)
     {
-        return $this->orderState = new OrderState($id);
+        $this->orderState = new OrderState($id);
+        return $this;
     }
 
     public function delete()
