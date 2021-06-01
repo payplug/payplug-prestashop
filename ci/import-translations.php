@@ -16,10 +16,16 @@ foreach ($available_languages as $keyLang => $lang) {
     $readFile = fopen(dirname(__FILE__) . '/translations.csv', 'r');
     while (($line = fgetcsv($readFile, 1000, ';')) !== false) {
         //$line is an array of the csv elements
-        if ($count && ($line[$keyLang + 2] != '')) {
-            fwrite($writeFile, '$_MODULE[\'<{payplug}prestashop>' . $line[0] . '\'] = \'' . addslashes($line[$keyLang + 2]) . '\';' . PHP_EOL);
+        $key = $keyLang + 2;
+        if (!array_key_exists($key, $line)) {
+            echo "ligne manquante ";
+            print_r($line);
+        } else {
+            if ($count && ($line[$keyLang + 2] != '')) {
+                fwrite($writeFile, '$_MODULE[\'<{payplug}prestashop>' . $line[0] . '\'] = \'' . addslashes($line[$keyLang + 2]) . '\';' . PHP_EOL);
+            }
+            $count++;
         }
-        $count++;
     }
     $count = 0;
     fclose($readFile);
