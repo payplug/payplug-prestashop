@@ -27,7 +27,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_1_6()
 {
-    $flag = true;
-
-    return $flag;
+    // Add new conf var for Oney Only
+    return Configuration::updateValue('PAYPLUG_ONEY_FEES', 1);
 }
