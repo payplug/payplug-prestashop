@@ -85,6 +85,8 @@ class OneyRepository extends Repository
         $this->oneyEntity->setOperations([
             'x3_with_fees',
             'x4_with_fees',
+            'x3_without_fees',
+            'x4_without_fees',
         ]);
     }
 
@@ -1018,6 +1020,22 @@ class OneyRepository extends Repository
         ]);
 
         return $this->payplug->fetchTemplate('oney/required.tpl');
+    }
+
+    /**
+     * @description Return if iso country can use Oney without fees
+     * @param $iso_code
+     * return bool
+     */
+    public function isAvailableWithoutFees($iso_code)
+    {
+        $valid_iso_code = ['FR'];
+
+        if (!is_string($iso_code)) {
+            return false;
+        }
+
+        return in_array(strtoupper($iso_code), $valid_iso_code);
     }
 
     /**

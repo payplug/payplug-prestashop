@@ -76,11 +76,6 @@ class PayPlugClass extends PaymentModule
     /** @var string */
     private $api_test;
 
-    public $available_oney_payments = [
-        'x3_with_fees',
-        'x4_with_fees',
-    ];
-
     private $card;
 
     /** @var array */
@@ -791,6 +786,7 @@ class PayPlugClass extends PaymentModule
             'oney_max_amounts' => $oney_max_amounts,
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
+            'can_use_oney_fees' => $this->oney->isAvailableWithoutFees(Configuration::get('PAYPLUG_COMPANY_ISO')),
         ]);
 
         return $this->html;
@@ -1126,7 +1122,7 @@ class PayPlugClass extends PaymentModule
                         $payment_details['can_be_captured'] = true;
                         $payment_details['can_be_cancelled'] = true;
                         $payment_details['status_message'] = sprintf(
-                            '('. $this->l('payplug.buildPaymentDetails.captureAuthorizedBefore') .')',
+                            '(' . $this->l('payplug.buildPaymentDetails.captureAuthorizedBefore') . ')',
                             $expiration
                         );
                     }
@@ -2368,8 +2364,8 @@ class PayPlugClass extends PaymentModule
             if ($options['one_click'] && !empty($payplug_cards)) {
                 foreach ($payplug_cards as $card) {
                     $brand = ($card['brand'] != 'none')
-                    ? Tools::ucfirst($card['brand'])
-                    : $this->l('payplug.getPaymentOptions.card');
+                        ? Tools::ucfirst($card['brand'])
+                        : $this->l('payplug.getPaymentOptions.card');
                     $paymentOption['one_click_' . $card['id_payplug_card']]['name'] = 'one_click';
                     $paymentOption['one_click_' . $card['id_payplug_card']]['inputs'] = [
                         'pc' => [
@@ -2531,16 +2527,26 @@ class PayPlugClass extends PaymentModule
             }
         }
 
-        if ($options['oney'] && isset($this->available_oney_payments) && $this->available_oney_payments) {
+        if ($options['oney']) {
             $use_taxes = (bool)Configuration::get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
 
             $is_elligible = $this->oney->isOneyElligible($this->context->cart, $cart_amount, true);
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
-            $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && !$error;
+            $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
+                && Configuration::get('PAYPLUG_ONEY_FEES')
+                && !$error;
 
-            foreach ($this->available_oney_payments as $oney_payment) {
+            $available_oney_payments = $this->oney->oneyEntity->getOperations();
+            $use_fees = (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+
+            foreach ($available_oney_payments as $oney_payment) {
+                $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
+                if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
+                    continue;
+                }
+
                 $payment_key = 'oney_' . $oney_payment;
                 $paymentOption[$payment_key]['name'] = 'oney';
                 $paymentOption[$payment_key]['is_optimized'] = $optimized;
@@ -3543,6 +3549,10 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
+            return false;
+        }
+
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3559,6 +3569,10 @@ class PayPlugClass extends PaymentModule
     {
         $current_controller = Dispatcher::getInstance()->getController();
         if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
+            return false;
+        }
+
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
             return false;
         }
 
@@ -3718,7 +3732,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -5541,7 +5555,11 @@ class PayPlugClass extends PaymentModule
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
+        // Get company country
+        $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
+
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
+        Configuration::updateValue('PAYPLUG_COMPANY_ISO', $company_iso);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
         Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', $configuration['max_amounts']);
