@@ -58,8 +58,8 @@ class OrderStateRepository extends Repository
                 $this->query
                     ->select()
                     ->fields('DISTINCT `id_order_state`')
-                    ->from(_DB_PREFIX_.'order_state_lang')
-                    ->where('template = \''.pSQL($state['template']).'\'')
+                    ->from(_DB_PREFIX_ . 'order_state_lang')
+                    ->where('template = \'' . pSQL($state['template']) . '\'')
                     ->limit(1, 1);
 
                 $os = $this->query->build('unique_value');
@@ -110,7 +110,14 @@ class OrderStateRepository extends Repository
             $os = $order_state->id;
             $log->info('ID: ' . $os);
         } else {
-            $log->info('Order state already exists: ' . $os);
+            $order_state = OrderStateSpecific::getOrderState($os);
+            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')
+                && $order_state->deleted) {
+                $log->info('Order state already exists but is deleted: ' . $os);
+                $this->create($name, $state, $sandbox, true);
+            } else {
+                $log->info('Order state already exists: ' . $os);
+            }
         }
 
         return $this->configuration->updateValue($key_config, $os);
@@ -135,15 +142,20 @@ class OrderStateRepository extends Repository
         } else {
             $this->query
                 ->select()
-                ->fields('DISTINCT `id_order_state`')
-                ->from(_DB_PREFIX_.'order_state_lang')
+                ->fields('DISTINCT osl.`id_order_state`')
+                ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+                ->leftJoin(_DB_PREFIX_ . 'order_state_lang', 'os', 'osl.`id_order_state` = os.`id_order_state`')
                 ->where(
-                    'name LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR name LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR name LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR name LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
+                    'osl.`name` LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
                 )
                 ->limit(1, 1);
+
+            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+                $this->query->where('os.`deleted` = 0');
+            }
 
             return $this->query->build('unique_value');
         }
@@ -154,8 +166,8 @@ class OrderStateRepository extends Repository
         $this->query
             ->select()
             ->fields('osl.id_order_state')
-            ->from(_DB_PREFIX_.'order_state_lang', 'osl')
-            ->where('osl.name = \''.pSQL($name).'\'')
+            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+            ->where('osl.name = \'' . pSQL($name) . '\'')
             ->limit(1, 1);
 
         return $this->query->build('unique_value');
@@ -184,21 +196,21 @@ class OrderStateRepository extends Repository
             $this->query
                 ->select()
                 ->fields('os.id_order_state')
-                ->from(_DB_PREFIX_.'order_state', 'os')
+                ->from(_DB_PREFIX_ . 'order_state', 'os')
                 ->leftJoin(
-                    _DB_PREFIX_.'order_state_lang',
+                    _DB_PREFIX_ . 'order_state_lang',
                     'osl',
-                    'osl.id_order_state = os.id_order_state AND osl.template = \''.pSQL($definition['template']).'\''
+                    'osl.id_order_state = os.id_order_state AND osl.template = \'' . pSQL($definition['template']) . '\''
                 )
-                ->where('os.invoice = '.(int)$definition['invoice'])
-                ->where('os.send_email = '.(int)$definition['send_email'])
-                ->where('os.hidden = '.(int)$definition['hidden'])
-                ->where('os.logable = '.(int)$definition['logable'])
-                ->where('os.delivery = '.(int)$definition['delivery'])
-                ->where('os.shipped = '.(int)$definition['shipped'])
-                ->where('os.paid = '.(int)$definition['paid'])
-                ->where('os.pdf_invoice = '.(int)$definition['pdf_invoice'])
-                ->where('os.pdf_delivery = '.(int)$definition['pdf_delivery'])
+                ->where('os.invoice = ' . (int)$definition['invoice'])
+                ->where('os.send_email = ' . (int)$definition['send_email'])
+                ->where('os.hidden = ' . (int)$definition['hidden'])
+                ->where('os.logable = ' . (int)$definition['logable'])
+                ->where('os.delivery = ' . (int)$definition['delivery'])
+                ->where('os.shipped = ' . (int)$definition['shipped'])
+                ->where('os.paid = ' . (int)$definition['paid'])
+                ->where('os.pdf_invoice = ' . (int)$definition['pdf_invoice'])
+                ->where('os.pdf_delivery = ' . (int)$definition['pdf_delivery'])
                 ->limit(1, 1);
 
             return (int)$this->query->build('unique_value');
@@ -211,8 +223,8 @@ class OrderStateRepository extends Repository
         $res = $this->query
             ->select()
             ->fields('os.id_order_state')
-            ->from(_DB_PREFIX_.'order_state', 'os')
-            ->where('os.module_name = \''.pSQL($module_name).'\'')
+            ->from(_DB_PREFIX_ . 'order_state', 'os')
+            ->where('os.module_name = \'' . pSQL($module_name) . '\'')
             ->build();
 
         foreach ($res as $os) {
@@ -228,7 +240,7 @@ class OrderStateRepository extends Repository
         $res = $this->query
             ->select()
             ->fields('c.value')
-            ->from(_DB_PREFIX_.'configuration', 'c')
+            ->from(_DB_PREFIX_ . 'configuration', 'c')
             ->where('c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'')
             ->build();
 
@@ -245,8 +257,8 @@ class OrderStateRepository extends Repository
         $res = $this->query
             ->select()
             ->fields('o.current_state')
-            ->from(_DB_PREFIX_.'orders', 'o')
-            ->where('o.module = \''.pSQL($module_name).'\'')
+            ->from(_DB_PREFIX_ . 'orders', 'o')
+            ->where('o.module = \'' . pSQL($module_name) . '\'')
             ->groupBy('o.current_state')
             ->build();
 
