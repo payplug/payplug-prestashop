@@ -33,6 +33,7 @@
             <div class="payplugTips -{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
+                        {include file='./oney_fees.tpl'}
                         <div class="payplugPanel_section">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_tos}
                             <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}

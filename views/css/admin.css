@@ -438,6 +438,109 @@ button.payplugLink:hover {
   display: none;
   color: #e56876;
 }
+/* Payplug Admin Config */
+.payplugOneyFees {
+  display: flex;
+  padding: 16px 0;
+}
+.payplugOneyFees_option {
+  border: 1px solid #ccc;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  border-radius: 16px;
+  -webkit-transition: border 0.4s;
+  -moz-transition: border 0.4s;
+  -ms-transition: border 0.4s;
+  -o-transition: border 0.4s;
+  transition: border 0.4s;
+  width: 300px;
+  padding: 24px 16px 36px;
+  position: relative;
+  cursor: pointer;
+}
+.payplugOneyFees_option + .payplugOneyFees_option {
+  margin: 0 0 0 32px;
+}
+.payplugOneyFees_option.-selected {
+  border: 1px solid #00ab7a;
+}
+.payplugOneyFees_title,
+.payplugOneyFees_content,
+.payplugOneyFees_state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.payplugOneyFees_title {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+.payplugOneyFees_content {
+  height: 32px;
+  font-weight: 400;
+  font-size: 12px;
+  margin: 0 0 16px;
+}
+.payplugOneyFees_state {
+  -webkit-border-radius: 0 0 16px 16px;
+  -moz-border-radius: 0 0 16px 16px;
+  border-radius: 0 0 16px 16px;
+  -webkit-transition: background 0.4s;
+  -moz-transition: background 0.4s;
+  -ms-transition: background 0.4s;
+  -o-transition: background 0.4s;
+  transition: background 0.4s;
+  background: #fff;
+  color: #fff;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 36px;
+}
+.-selected .payplugOneyFees_state {
+  background: #00ab7a;
+}
+.payplugOneyFees_checker {
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  border-radius: 16px;
+  -webkit-transition: opacity 0.4s;
+  -moz-transition: opacity 0.4s;
+  -ms-transition: opacity 0.4s;
+  -o-transition: opacity 0.4s;
+  transition: opacity 0.4s;
+  opacity: 0;
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 18px;
+  height: 18px;
+  background: #00ab7a;
+}
+.payplugOneyFees_checker:before {
+  border: 2px solid #fff;
+  border-top: none;
+  border-right: none;
+  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+  -moz-transform: translate(-50%, -50%) rotate(-45deg);
+  -ms-transform: translate(-50%, -50%) rotate(-45deg);
+  -o-transform: translate(-50%, -50%) rotate(-45deg);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 10px;
+  height: 6px;
+  content: "";
+}
+.payplugOneyFees_checker input {
+  display: none;
+}
+.-selected .payplugOneyFees_checker {
+  opacity: 1;
+}
 /* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
