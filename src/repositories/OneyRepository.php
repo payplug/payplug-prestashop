@@ -85,6 +85,8 @@ class OneyRepository extends Repository
         $this->oneyEntity->setOperations([
             'x3_with_fees',
             'x4_with_fees',
+            'x3_without_fees',
+            'x4_without_fees',
         ]);
     }
 
@@ -568,7 +570,17 @@ class OneyRepository extends Repository
         }
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $this->oneyEntity->getOperations());
+        $available_oney_payments = $this->oneyEntity->getOperations();
+        $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
+
+        foreach ($available_oney_payments as $key=>$oney_payment) {
+            $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
+            if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
+                unset($available_oney_payments[$key]);
+            }
+        }
+
+        $oney_sims = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
         if (!$oney_sims['result']) {
             return $payment_list;
