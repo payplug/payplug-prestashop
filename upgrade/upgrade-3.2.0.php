@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_1_6()
+function upgrade_module_3_2_0()
 {
     $flag = true;
 
