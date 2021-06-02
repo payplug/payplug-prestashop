@@ -31,12 +31,12 @@ var $document, $window, payplug = {
         }
     },
     abort: {
-        init: function(){
+        init: function () {
             var {abort} = payplug;
             $document.on('click','input[name=submitPPAbort]', abort.call)
                 .on('click','button[name=confirmPayplugAbort]', abort.confirm);
         },
-        call: function(event) {
+        call: function (event) {
             event.preventDefault();
             var {popup} = payplug;
             var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -62,7 +62,7 @@ var $document, $window, payplug = {
                 }
             });
         },
-        confirm: function(event){
+        confirm: function (event) {
             event.preventDefault();
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
@@ -160,34 +160,36 @@ var $document, $window, payplug = {
         }
     }
 };
-$(document).ready(function() {
-    $('input[name=submitPPRefund]').bind('click', function(e) {
+$(document).ready(function () {
+    $('input[name=submitPPRefund]').bind('click', function (e) {
         e.preventDefault();
         callRefund();
     });
 
-    $('input[name=submitPPUpdate]').bind('click', function(e) {
+    $('input[name=submitPPUpdate]').bind('click', function (e) {
         e.preventDefault();
         callUpdate();
     });
 
-    $('input[name=submitPPCapture]').bind('click', function(e) {
+    $('input[name=submitPPCapture]').bind('click', function (e) {
         e.preventDefault();
         callCapture();
     });
 
-    $('.open_payment_information').unbind('click').click(function(e) {
-        if ($(this).parent().parent().next('tr').is(':visible'))
+    $('.open_payment_information').unbind('click').click(function (e) {
+        if ($(this).parent().parent().next('tr').is(':visible')) {
             $(this).parent().parent().next('tr').hide();
-        else
+        } else {
             $(this).parent().parent().next('tr').show();
+        }
         e.preventDefault();
     });
 
     payplug.init();
 });
 
-function callRefund() {
+function callRefund()
+{
     $('#pppanel form p.pperror').hide();
     $('#pppanel form p.ppsuccess').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -199,7 +201,7 @@ function callRefund() {
     var id_state = $('#pppanel input[name=change_order_state]').val();
     var pay_mode = $('input:hidden[name=pay_mode]').val();
     var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, inst_id: inst_id, id_order: id_order, pay_mode: pay_mode};
-    if($('#pppanel input[name=change_order_state]').is(":checked")){
+    if ($('#pppanel input[name=change_order_state]').is(":checked")) {
         var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, inst_id: inst_id, id_order: id_order, pay_mode: pay_mode, id_state: id_state};
     }
 
@@ -208,15 +210,15 @@ function callRefund() {
         url: url,
         dataType: 'json',
         data: data,
-        beforeSend: function() {
+        beforeSend: function () {
             $('#pppanel .loader').show();
             $('input[name=submitPPRefund]').prop("disabled", true);
         },
-        complete: function(){
+        complete: function () {
             $('#pppanel .loader').hide();
             $('input[name=submitPPRefund]').prop("disabled", false);
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to refund. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -226,14 +228,12 @@ function callRefund() {
             console.log(errorThrown);
             $('input[name=submitPPRefund]').prop("disabled", false);
         },
-        success: function(result)
-        {
-            if(result.status == 'error') {
+        success: function (result) {
+            if (result.status == 'error') {
                 $('#pppanel form p.pperror').html(result.data);
                 $('#pppanel form p.pperror').removeClass('hide');
                 $('#pppanel form p.pperror').show();
-            }
-            else {
+            } else {
                 $('#pppanel form p.ppsuccess').html(result.message);
                 $('#pppanel form p.ppsuccess').removeClass('hide');
                 $('#pppanel form p.ppsuccess').show();
@@ -248,7 +248,8 @@ function callRefund() {
     });
 }
 
-function callUpdate() {
+function callUpdate()
+{
     $('#pppanel form p.pperror').hide();
     $('#pppanel form p.ppsuccess').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -261,13 +262,13 @@ function callUpdate() {
         url: url,
         dataType: 'json',
         data: data,
-        beforeSend: function() {
+        beforeSend: function () {
             $('#pppanel .loader').show();
         },
-        complete: function(){
+        complete: function () {
             $('#pppanel .loader').hide();
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to update. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -276,14 +277,12 @@ function callUpdate() {
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
-            if(result.status == 'error') {
+        success: function (result) {
+            if (result.status == 'error') {
                 $('#pppanel form p.pperror').html(result.data);
                 $('#pppanel form p.pperror').removeClass('hide');
                 $('#pppanel form p.pperror').show();
-            }
-            else {
+            } else {
                 $('#pppanel form p.ppsuccess').html(result.message);
                 $('#pppanel form p.ppsuccess').removeClass('hide');
                 $('#pppanel form p.ppsuccess').show();
@@ -297,7 +296,8 @@ function callUpdate() {
     });
 }
 
-function callAbort() {
+function callAbort()
+{
     $('.ppoverlay').remove();
     $('#payplug_popin').remove();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -356,7 +356,8 @@ function callAbort() {
     });
 }
 
-function callCapture() {
+function callCapture()
+{
     $('.pp-capture .pperror').hide();
     $('.pp-capture .ppsuccess').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -368,18 +369,18 @@ function callCapture() {
         url: url,
         dataType: 'json',
         data: data,
-        beforeSend: function() {
+        beforeSend: function () {
             $('.pp-capture .loader').show();
             $('input[name=submitPPCapture]').unbind('click');
         },
-        complete: function(){
+        complete: function () {
             $('.pp-capture .loader').hide();
-            $('input[name=submitPPCapture]').bind('click', function(e) {
+            $('input[name=submitPPCapture]').bind('click', function (e) {
                 e.preventDefault();
                 callCapture();
             });
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert('An error occurred while trying to capture. ' +
                 'Maybe you clicked too fast before scripts are fully loaded ' +
                 'or maybe you have a different back-office url than expected.' +
@@ -388,14 +389,12 @@ function callCapture() {
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
-            if(result.status == 'error') {
+        success: function (result) {
+            if (result.status == 'error') {
                 $('.pp-capture .pperror').html(result.data);
                 $('.pp-capture .pperror').removeClass('hide');
                 $('.pp-capture .pperror').show();
-            }
-            else {
+            } else {
                 $('.pp-capture .ppsuccess').html(result.message);
                 $('.pp-capture .ppsuccess').removeClass('hide');
                 $('.pp-capture .ppsuccess').show();
