@@ -154,10 +154,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        /*
-         * @todo
-         * RAJOUTER LE TEST DE LA TABLE PAYPLUG CACHE AVANT D'EXECUTER CE CODE
-         */
+        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
             return $this->module->hookActionAdminPerformanceControllerAfter($params);
         }
@@ -170,10 +167,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        /*
-         * @todo
-         * RAJOUTER LE TEST DE LA TABLE PAYPLUG CACHE AVANT D'EXECUTER CE CODE
-         */
+        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
             return $this->module->hookActionClearCompileCache($params);
         }
