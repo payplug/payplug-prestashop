@@ -47,6 +47,9 @@ class InstallRepository extends Repository
     protected $order_state_entity;
 
     /** @var object */
+    protected $order_state_specific;
+
+    /** @var object */
     protected $shop;
 
     /** @var object */
@@ -67,6 +70,7 @@ class InstallRepository extends Repository
         $context,
         $order_state,
         $order_state_entity,
+        $order_state_specific,
         $shop,
         $sql,
         $tools,
@@ -78,6 +82,7 @@ class InstallRepository extends Repository
         $this->context = $context;
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
+        $this->order_state_specific = $order_state_specific;
         $this->shop = $shop;
         $this->sql = $sql;
         $this->tools = $tools;
@@ -101,19 +106,19 @@ class InstallRepository extends Repository
             // Check live OrderState
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = (int)$this->config->get($key_config_live);
-            $order_state_live = OrderStateSpecific::getOrderState($id_order_state_live);
+            $order_state_live = $this->order_state_specific->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
                 || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
-                $this->createOrderState($key, $state, false, true);
+                $this->order_state->create($key, $state, false, true);
             }
 
             // Check sandbox OrderState
             $key_config_sandbox = $key_config_live . '_TEST';
             $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
-            $order_state_sandbox = OrderStateSpecific::getOrderState($id_order_state_sandbox);
+            $order_state_sandbox = $this->order_state_specific->get($id_order_state_sandbox);
             if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
                 || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
-                $this->createOrderState($key, $state, true, true);
+                $this->order_state->create($key, $state, true, true);
             }
         }
 
