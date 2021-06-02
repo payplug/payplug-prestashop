@@ -115,7 +115,7 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Your email address is too long, please change it to a shorter one (max 100 characters).'
+                'message' => 'Your email address is too long. Please change your email address (100 characters max).'
             ],
             $response
         );

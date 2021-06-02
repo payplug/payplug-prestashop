@@ -1271,7 +1271,7 @@ class OneyRepository extends Repository
             && $tools->tool('strpos', $email, '+') !== false) {
             $error = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
-            $error = $this->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
+            $error = $this->l('Your email address is too long. Please change your email address (100 characters max).');
         } elseif (strpos($email, '+') !== false) {
             $error = $this->l('The + character is not valid. Please change your email address (100 characters max).');
         }

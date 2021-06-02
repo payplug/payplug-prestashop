@@ -18,7 +18,7 @@ if ($fp) {
         $key = str_replace("<{payplug}prestashop>", "", $key);
         $line = [$key, $trans['default']];
         foreach ($available_languages as $lang) {
-            $line[] = stripslashes($trans[$lang]);
+            $line[] = stripcslashes($trans[$lang]);
 
             if (!$trans[$lang]) {
                 $missing_translations[$lang][$key] = $trans['default'];
