@@ -144,14 +144,17 @@ class OrderStateRepository extends Repository
                 ->select()
                 ->fields('DISTINCT osl.`id_order_state`')
                 ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-                ->leftJoin(_DB_PREFIX_ . 'order_state_lang', 'os', 'osl.`id_order_state` = os.`id_order_state`')
+                ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
                 ->where(
                     'osl.`name` LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
                     OR osl.`name` LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
                     OR osl.`name` LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
                     OR osl.`name` LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-                )
-                ->limit(1, 1);
+                );
+
+            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+                $this->query->where('os.`deleted` = 0');
+            }
 
             if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
                 $this->query->where('os.`deleted` = 0');

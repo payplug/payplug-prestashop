@@ -12,20 +12,22 @@ $fp = fopen(dirname(__FILE__) . '/translations.csv', 'w');
 $header = ['key', 'default'];
 $header = array_merge($header, $available_languages);
 
-fputcsv($fp, $header);
-foreach ($translations as $key => $trans) {
-    $key = str_replace("<{payplug}prestashop>", "", $key);
-    $line = [$key, $trans['default']];
-    foreach ($available_languages as $lang) {
-        $line[] = $trans[$lang];
+if ($fp) {
+    fputcsv($fp, $header, ';');
+    foreach ($translations as $key => $trans) {
+        $key = str_replace("<{payplug}prestashop>", "", $key);
+        $line = [$key, $trans['default']];
+        foreach ($available_languages as $lang) {
+            $line[] = stripslashes($trans[$lang]);
 
-        if (!$trans[$lang]) {
-            $missing_translations[$lang][$key] = $trans['default'];
+            if (!$trans[$lang]) {
+                $missing_translations[$lang][$key] = $trans['default'];
+            }
         }
+        fputcsv($fp, $line, ';');
     }
-    fputcsv($fp, $line, ';');
+    fclose($fp);
 }
-fclose($fp);
 
 // Show missing translation
 if (!empty($missing_translations)) {

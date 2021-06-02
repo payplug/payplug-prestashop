@@ -68,8 +68,7 @@ final class IsValidOneyCartTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The payment with Oney is not available 
-                because you have more than 1000 items in your cart.'
+                'error' => 'The payment with Oney is not available because you have more than 1000 items in your cart.'
             ],
             $this->repo->isValidOneyCart($cart)
         );

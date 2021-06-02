@@ -1179,8 +1179,7 @@ class OneyRepository extends Repository
         $max = 1000;
 
         if ($nb_products >= $max) {
-            $error = $this->l('The payment with Oney is not available 
-                because you have more than 1000 items in your cart.');
+            $error = $this->l('The payment with Oney is not available because you have more than 1000 items in your cart.');
             return [
                 'result' => false,
                 'error' => $this->l($error)
@@ -1270,14 +1269,11 @@ class OneyRepository extends Repository
             $error = $this->l('Your email address is not a valid email');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
             && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->l('Your email address is too long and the + character is not valid, 
-                        please change it to another address (max 100 characters).');
+            $error = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
-            $error = $this->l('Your email address is too long, 
-                        please change it to a shorter one (max 100 characters).');
+            $error = $this->l('Your email address is too long, please change it to a shorter one (max 100 characters).');
         } elseif (strpos($email, '+') !== false) {
-            $error = $this->l('The + character is not valid. 
-                        Please change your email address (100 characters max).');
+            $error = $this->l('The + character is not valid. Please change your email address (100 characters max).');
         }
 
         return [

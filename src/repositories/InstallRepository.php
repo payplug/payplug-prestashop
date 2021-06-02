@@ -102,22 +102,18 @@ class InstallRepository extends Repository
             $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = (int)$this->config->get($key_config_live);
             $order_state_live = OrderStateSpecific::getOrderState($id_order_state_live);
-            if (!$this->validate->validate('isLoadedObject', $order_state_live)) {
-                $this->order_state->create($key, $state, false, true);
-            } elseif (version_compare(_PS_VERSION_, '1.7.7.0', '>=')
-                && $order_state_live->deleted) {
-                $this->order_state->create($key, $state, false, true);
+            if (!$this->validate->validate('isLoadedObject', $order_state_live)
+                || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
+                $this->createOrderState($key, $state, false, true);
             }
 
             // Check sandbox OrderState
             $key_config_sandbox = $key_config_live . '_TEST';
             $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
             $order_state_sandbox = OrderStateSpecific::getOrderState($id_order_state_sandbox);
-            if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)) {
-                $this->order_state->create($key, $state, true, true);
-            } elseif (version_compare(_PS_VERSION_, '1.7.7.0', '>=')
-                && $order_state_sandbox->deleted) {
-                $this->order_state->create($key, $state, true, true);
+            if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
+                || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
+                $this->createOrderState($key, $state, true, true);
             }
         }
 
