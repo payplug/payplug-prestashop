@@ -1,4 +1,5 @@
 <?php
+
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{payplug}prestashop>payplug_a24854748a79644ea78a127748b9e081'] = 'La soluzione di pagamento online che ti assiste con facilità e ti aiuta ad aumentare le vendite.';
@@ -37,7 +38,7 @@ $_MODULE['<{payplug}prestashop>payplug_ac98647d8ff4a9a12280d177a7320510'] = 'l\'
 $_MODULE['<{payplug}prestashop>payplug_01abf60a14b2f7a636aefbb242c981f7'] = 'Il tuo server deve essere su PHP 5.3 o maggiore';
 $_MODULE['<{payplug}prestashop>payplug_922fcab664e04e713b84bbd0d8a5c422'] = 'Il tuo server deve essere OpenSSL 1.0.1 o successivo';
 $_MODULE['<{payplug}prestashop>payplug_4e6cb8f062db9b5389f11b30b50358fc'] = 'Devi connetterti al tuo conto PayPlug';
-$_MODULE['<{payplug}prestashop>payplug_c3041f00ca79d002013f230bd5140f1a'] = 'Potresti incontrare una difficoltà usando PayPlug. Aggiorna la pagina o clicca \\\"Verifica\\\" una volta corretti';
+$_MODULE['<{payplug}prestashop>payplug_c3041f00ca79d002013f230bd5140f1a'] = 'Potresti incontrare una difficoltà usando PayPlug. Aggiorna la pagina o clicca "Verifica" una volta corretti';
 $_MODULE['<{payplug}prestashop>payplug_79c15c5c35ff7c9de38c36c2db777a27'] = 'modalità LIVE';
 $_MODULE['<{payplug}prestashop>payplug_a7e6337e001cbd04f7626d34b35b5448'] = 'Attivare una funzionalità avanzata';
 $_MODULE['<{payplug}prestashop>payplug_a7b30c636f0247438180c36205cab603'] = 'Salva le impostazioni';
@@ -168,13 +169,14 @@ $_MODULE['<{payplug}prestashop>confirm_51294f4d69b5d0a65759018a42d54674'] = 'INT
 $_MODULE['<{payplug}prestashop>confirm_d6b71909b1a4285e2b113d3684bb1477'] = 'REDIRETTO';
 $_MODULE['<{payplug}prestashop>confirm_8c0afa6560ba2f9316aad573ad356448'] = 'Pagamenti 3x, 4x Oney:';
 $_MODULE['<{payplug}prestashop>confirm_d04a199a844296a12712bb4b1f486918'] = 'Pagamento a rate:';
-$_MODULE['<{payplug}prestashop>confirm_b7ce4651ae343650e198e27606e98952'] = 'Pagamenti differiti :';
-$_MODULE['<{payplug}prestashop>confirm_7d924e395ce3578ffa699e3d318450a2'] = 'Attenzione: tutte le funzionalità PayPlug sono disattivate.';
+$_MODULE['<{payplug}prestashop>confirm_b7ce4651ae343650e198e27606e98952'] = 'Pagamenti differiti:';
+$_MODULE['<{payplug}prestashop>confirm_7d924e395ce3578ffa699e3d318450a2'] = 'Attenzione : tutte le funzionalità PayPlug sono disattivate.';
 $_MODULE['<{payplug}prestashop>confirm_9e6d15a9e2b0b4e66e144e6deb82e203'] = 'Cancella';
 $_MODULE['<{payplug}prestashop>confirm_c6cc0a742c32418973454e0be8307f8d'] = 'REGISTRA';
-$_MODULE['<{payplug}prestashop>premium_63a3db3db721a0f3b9552227f773c729'] = 'Non hai accesso a questa funzione. Per più informazioni contattaci tramite il nostro sito web: ';
+$_MODULE['<{payplug}prestashop>confirm_f3b1983a230908617267407749a2e40e'] = 'Pagina di pagamento:';
+$_MODULE['<{payplug}prestashop>premium_63a3db3db721a0f3b9552227f773c729'] = 'Non hai accesso a questa funzione. Per più informazioni contattaci tramite il nostro sito web :';
 $_MODULE['<{payplug}prestashop>premium_a60852f204ed8028c1c58808b746d115'] = 'Ok';
-$_MODULE['<{payplug}prestashop>deferred_72baeae7945bd8c3dd2d8eb8a451b128'] = 'Per proporre il pagamento differito ai tuoi clienti, devi utilizzare il \\\"Pagamento con carta di credito\\\" o il \\\"Pagamento frazionato non garantito\\\".';
+$_MODULE['<{payplug}prestashop>deferred_72baeae7945bd8c3dd2d8eb8a451b128'] = 'Per proporre il pagamento differito ai tuoi clienti, devi utilizzare il "Pagamento con carta di credito" o il "Pagamento frazionato non garantito".';
 $_MODULE['<{payplug}prestashop>deferred_f0e9528cdbef74b2eafcdc12f9ee1c7d'] = 'Ok';
 $_MODULE['<{payplug}prestashop>save_a6489557b8e386d5c51fb94e856981ea'] = 'La tua configurazione è stata salvata';
 $_MODULE['<{payplug}prestashop>save_a60852f204ed8028c1c58808b746d115'] = 'Ok';
@@ -195,7 +197,7 @@ $_MODULE['<{payplug}prestashop>refund_4bf290898e0226ffb1041cd114347e4d'] = 'Rimb
 $_MODULE['<{payplug}prestashop>refund_1666e5c37779e7041dd51aa3d10eff61'] = 'Importo già rimborsato con PayPlug:';
 $_MODULE['<{payplug}prestashop>refund_01ddb6831cdf22a0055a2a42a09482d6'] = 'Importo disponibile da rimborsare via PayPlug:';
 $_MODULE['<{payplug}prestashop>refund_554cd9e547629109b77e4c60ddd44da3'] = 'Totale da rimborsare';
-$_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Cambia lo stato d\'ordine di Prestashop in \"Rimborsato\"';
+$_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Cambia lo stato d\'ordine di Prestashop in "Rimborsato"';
 $_MODULE['<{payplug}prestashop>refund_76f0ed934de85cc7131910b32ede7714'] = 'Rimborsato ';
 $_MODULE['<{payplug}prestashop>refund_3e220cc8128d7b270226d79b84ebce33'] = 'The refund will be possible 48h after the last payment or refund transaction.';
 $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Dettagli di pagamento PayPlug';
@@ -387,7 +389,12 @@ $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56']
 $_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Pagamento in %sx';
 $_MODULE['<{payplug}prestashop>oneyrepository_22d545ded224c1e3f0f821e99f01ed09'] = 'L\'importo totale del tuo ordine deve essere compreso tra %s e %s per pagare tramite Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_0f3e17b27426f0c030c3a3a7f461cf7b'] = 'Il carrello non è valido';
+$_MODULE['<{payplug}prestashop>oneyrepository_ed3e1f125a1318dfeefb14ef99a5b1f0'] = 'Il tuo carrello deve contenere meno di %max_articles% articoli per poter pagare con Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_7eab6a6607c367867b134afc2df95e2e'] = 'Il pagamento tramite Oney non è disponibile';
 $_MODULE['<{payplug}prestashop>oneyrepository_b286504b1d4d5ee1aeb919ad1e1255b8'] = 'Francia, Martinìca, Guadalupa, la Riunione, Maiotta o Guyana francese';
 $_MODULE['<{payplug}prestashop>oneyrepository_1007e1b7f894dfbf72a0eaa80f3bc57e'] = 'Italia';
+$_MODULE['<{payplug}prestashop>oneyrepository_b53458989589381e9b1ed27bfbd19f99'] = 'Per un pagamento con Oney, gli indirizzi di consegna e fatturazione devono essere in';
 $_MODULE['<{payplug}prestashop>oneyrepository_170f5e9365a8f2305fea05a99c36dfcc'] = 'L\'adresse e-mail est invalide';
+$_MODULE['<{payplug}prestashop>oneyrepository_b441d533401a2d2570008757281a981e'] = 'Il tuo indirizzo e-mail è troppo lungo e il carattere + non è valido, inserisci un altro indirizzo e-mail (max 100 caratteri).';
+$_MODULE['<{payplug}prestashop>oneyrepository_0b779fa2a22ba78ba491f6e9bbdabf88'] = 'Il tuo indirizzo e-mail è troppo lungo, inserisci un altro indirizzo e-mail (max 100 caratteri).';
+$_MODULE['<{payplug}prestashop>oneyrepository_ad2063f6a03a8c2c0d94846e41154218'] = 'Il carattere + non è valido, inserisci un altro indirizzo e-mail (max 100 caratteri).';
