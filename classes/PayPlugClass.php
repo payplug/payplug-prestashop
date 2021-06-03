@@ -786,6 +786,7 @@ class PayPlugClass extends PaymentModule
             'oney_max_amounts' => $oney_max_amounts,
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
+            'can_use_oney_fees' => $this->oney->isAvailableWithoutFees(Configuration::get('PAYPLUG_COMPANY_ISO')),
         ]);
 
         return $this->html;
@@ -5545,7 +5546,11 @@ class PayPlugClass extends PaymentModule
             $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
         }
 
+        // Get company country
+        $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
+
         Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
+        Configuration::updateValue('PAYPLUG_COMPANY_ISO', $company_iso);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
         Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', $configuration['max_amounts']);
