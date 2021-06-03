@@ -24,6 +24,8 @@
 namespace PayPlug\classes;
 
 // Global
+use DateInterval;
+use DateTime;
 use Exception;
 
 // PayPlug
@@ -54,6 +56,7 @@ use Language;
 use Media;
 use Module;
 use Order;
+use OrderHistory;
 use OrderSlip;
 use OrderState;
 use PaymentModule;
@@ -4136,7 +4139,7 @@ class PayPlugClass extends PaymentModule
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
-        if ($pay_mode == 'TEST') {
+        if (strtoupper($pay_mode) == 'TEST') {
             $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
         } else {
             $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
@@ -4205,7 +4208,9 @@ class PayPlugClass extends PaymentModule
             try {
                 $refund = Refund::create($pay_id, $data);
             } catch (Exception $e) {
-                return ('error');
+                $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
+                $this->logger->addLog($error, 'error');
+                return ($error);
             }
         }
 
@@ -4791,6 +4796,7 @@ class PayPlugClass extends PaymentModule
         ];
         $pay_mode = Tools::getValue('pay_mode');
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+
         if ($refund == 'error') {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
             $this->logger->addLog(
@@ -4867,6 +4873,7 @@ class PayPlugClass extends PaymentModule
                 }
             } else {
                 $payment = $this->retrievePayment($refund->payment_id);
+
                 if ((int)Tools::getValue('id_state') != 0) {
                     $new_state = (int)Tools::getValue('id_state');
                 } elseif ($payment->is_refunded == 1) {
