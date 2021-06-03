@@ -32,7 +32,7 @@
             </p>
 
             <div class="payplugTips -{$payplug_switch.installment.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item -left"{if !$payplug_switch.installment.checked}style="display: none;"{/if}>
+                <div class="payplugTips_item -left {if !$payplug_switch.installment.checked || !$payplug_switch.installment.active} -hide{/if}">
                     <p class="payplugAlert -warning"><span>{l s='Payments by installment are not guaranteed. A default of payment may occur for the upcoming installments.' mod='payplug'}</span></p>
                     <p>
                         {l s='You can consult all your past and pending installment payments in' mod='payplug'}
