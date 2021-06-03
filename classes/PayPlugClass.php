@@ -685,6 +685,7 @@ class PayPlugClass extends PaymentModule
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
             'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
+            'oney_fees' => Configuration::get('PAYPLUG_ONEY_FEES'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
 
@@ -947,6 +948,13 @@ class PayPlugClass extends PaymentModule
             'active' => true,
             'small' => true,
             'checked' => $configurations['oney_optimized'],
+        ];
+
+        $switch['oney_fees'] = [
+            'name' => 'payplug_oney_fees',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_fees'],
         ];
 
         $switch['installment'] = [
@@ -4992,6 +5000,7 @@ class PayPlugClass extends PaymentModule
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
         Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
+        Configuration::updateValue('PAYPLUG_ONEY_FEES', Tools::getValue('payplug_oney_fees'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         Configuration::updateValue('PAYPLUG_STANDARD', Tools::getValue('payplug_standard'));
         if (Tools::getValue('PAYPLUG_SHOW')) {
