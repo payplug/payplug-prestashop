@@ -5346,8 +5346,10 @@ class PayPlugClass extends PaymentModule
         $email = Tools::getValue('PAYPLUG_EMAIL');
 
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
-            $this->validationErrors['username_password'] =
-                $this->l('payplug.submitAccount.credentialsNotCorrect');
+            die(json_encode([
+                'content' => false,
+                'error' => $this->l('payplug.submitAccount.credentialsNotCorrect')
+            ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->login($email, $password)) {
                 Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
@@ -5358,7 +5360,10 @@ class PayPlugClass extends PaymentModule
 
                 die(json_encode(['content' => $content]));
             } else {
-                $this->validationErrors['username_password'] = $this->l('payplug.submitAccount.credentialsNotCorrect');
+                die(json_encode([
+                    'content' => false,
+                    'error' => $this->l('payplug.submitAccount.credentialsNotCorrect')
+                ]));
             }
         }
     }
