@@ -498,6 +498,7 @@ button.payplugLink:hover {
   bottom: 0;
   left: 0;
   height: 36px;
+  font-size: 14px;
 }
 .-selected .payplugOneyFees_state {
   background: #00ab7a;
