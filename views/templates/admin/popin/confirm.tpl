@@ -34,7 +34,7 @@
         <strong>{if $one_click}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
-        {l s='admin.popin.confirm.embedded' mod='payplug'}
+        {l s='admin.popin.confirm.paymentpage' mod='payplug'}
         <strong>{if $embedded}{l s='admin.popin.confirm.embedded' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="oney" data-e2e-state="{if $oney}on{else}off{/if}">

@@ -41,6 +41,11 @@ class OrderStateSpecific implements OrderStateInterface
         return $this->orderState->delete();
     }
 
+    public function get($id = null)
+    {
+        return new OrderState($id);
+    }
+
     public static function getOrderState($id = null)
     {
         return new OrderState($id);
