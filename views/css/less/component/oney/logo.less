@@ -11,9 +11,15 @@
     }
 
     &x4 {
-      background-image: url(~"@{img_oney}3x4x.svg");
+      background-image: url(~"@{img_oney}3x4x_with_fees.svg");
       .-disabled & {
-        background-image: url(~"@{img_oney}3x4x-alt.svg");
+        background-image: url(~"@{img_oney}3x4x_with_fees-alt.svg");
+      }
+      &.-withoutFees {
+        background-image: url(~"@{img_oney}3x4x_without_fees.svg");
+        .-disabled & {
+          background-image: url(~"@{img_oney}3x4x_without_fees-alt.svg");
+        }
       }
     }
   }

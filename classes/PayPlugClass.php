@@ -3576,10 +3576,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $action = Tools::getValue('action');
         if ($action == 'quickview') {
             return false;
@@ -3629,7 +3625,11 @@ class PayPlugClass extends PaymentModule
             ]);
             $this->smarty->assign(['popin' => true]);
         }
-        $this->smarty->assign(['env' => 'product']);
+
+        $this->smarty->assign([
+            'env' => 'product',
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
+        ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
 
