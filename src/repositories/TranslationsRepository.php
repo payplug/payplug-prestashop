@@ -26,14 +26,16 @@ namespace PayPlug\src\repositories;
 class TranslationsRepository extends Repository
 {
     protected $payplug;
+    protected $tools;
 
     private $method;
     private $files;
     private $trans;
 
-    public function __construct($payplug)
+    public function __construct($payplug, $tools)
     {
         $this->payplug = $payplug;
+        $this->tools = $tools;
     }
 
     /**
@@ -84,11 +86,15 @@ class TranslationsRepository extends Repository
         $arr_good_ext = ['.tpl', '.php'];
 
         foreach ($files as $key => $file) {
-            if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
+            if ($file[0] === '.'
+                || $file === 'index.php'
+                || in_array($this->tools->substr($file, 0, strrpos($file, '.')), [])) {
                 unset($files[$key]);
-            } elseif ($type_clear === 'file' && !in_array(substr($file, strrpos($file, '.')), $arr_good_ext)) {
+            } elseif ($type_clear === 'file'
+                && !in_array($this->tools->substr($file, strrpos($file, '.')), $arr_good_ext)) {
                 unset($files[$key]);
-            } elseif ($type_clear === 'directory' && (!is_dir($path . $file) || in_array($file, $arr_exclude))) {
+            } elseif ($type_clear === 'directory'
+                && (!is_dir($path . $file) || in_array($file, $arr_exclude))) {
                 unset($files[$key]);
             }
         }
@@ -105,8 +111,10 @@ class TranslationsRepository extends Repository
         // get current file
         $translation_dir = dirname(__FILE__) . '/../../translations/';
         $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
-        foreach ($translation_files as $key => $file) {
-            if ($file[0] === '.' || $file === 'index.php' || in_array(substr($file, 0, strrpos($file, '.')), [])) {
+        foreach ($translation_files as $file) {
+            if ($file[0] === '.'
+                || $file === 'index.php'
+                || in_array($this->tools->substr($file, 0, strrpos($file, '.')), [])) {
                 continue;
             }
 
@@ -179,9 +187,9 @@ class TranslationsRepository extends Repository
         @include $lang_file;
 
         $translations = $GLOBALS['_MODULE'];
-        $lang = substr(basename($file), 0, -4);
+        $lang = $this->tools->substr(basename($file), 0, -4);
 
-        foreach ($this->trans as $key => &$trans) {
+        foreach (array_keys($this->trans) as $key) {
             $this->trans[$key][$lang] = isset($translations[$key]) ? $translations[$key] : '';
         }
 
@@ -265,7 +273,7 @@ class TranslationsRepository extends Repository
                 $file['name']
             )) && file_exists($file_path = $file['path'] . $file['name'])) {
                 // Get content for this file
-                $content = file_get_contents($file_path);
+                $content = $this->tools->tool('file_get_contents', $file_path);
 
                 // Module files can now be ignored by adding this string in a file
                 if (strpos($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION') !== false) {
@@ -273,18 +281,19 @@ class TranslationsRepository extends Repository
                 }
 
                 // Get file type
-                $type_file = substr($file['name'], -4) == '.tpl' ? 'tpl' : 'php';
+                $type_file = $this->tools->substr($file['name'], -4) == '.tpl' ? 'tpl' : 'php';
 
                 // Parse this content
                 $matches = $this->parseFile($content, $type_file);
 
                 // Write each translation on its module file
-                $template_name = substr(basename($file['name']), 0, -4);
+                $template_name = $this->tools->substr(basename($file['name']), 0, -4);
 
                 foreach ($matches as $key) {
                     $template_name = str_replace("PayPlugClass", "payplug", $template_name);
                     $md5_key = md5($key);
-                    $trans_key = '<{payplug}prestashop>' . strtolower($template_name) . '_' . $md5_key;
+                    $trans_key = '<{payplug}prestashop>';
+                    $trans_key .= $this->tools->tool('strtolower', $template_name) . '_' . $md5_key;
 
                     // to avoid duplicate entry
                     if (!in_array($trans_key, $array_check_duplicate)) {

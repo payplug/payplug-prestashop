@@ -39,4 +39,9 @@ class ToolsSpecific implements ToolsInterface
             return Tools::$action($param1, $param2);
         }
     }
+
+    public function substr($string, $offset = null, $length = null)
+    {
+        return Tools::substr($string, $offset, $length);
+    }
 }

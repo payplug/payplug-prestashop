@@ -802,7 +802,7 @@ class PayPlugClass extends PaymentModule
     public function assignPaymentOptions($cart)
     {
         $standard = Configuration::get('PAYPLUG_STANDARD');
-        $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
+        $one_click = $standard && Configuration::get('PAYPLUG_ONE_CLICK');
         $installment = Configuration::get('PAYPLUG_INST');
         $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
         $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
@@ -1210,7 +1210,7 @@ class PayPlugClass extends PaymentModule
                     $history->addWithemail();
                 }
 
-                if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                if (!$this->deleteLockFromCartId($order->id_cart)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'notice');
@@ -1558,6 +1558,19 @@ class PayPlugClass extends PaymentModule
         }
 
         return true;
+    }
+
+    /**
+     * @description Delete payplug lock for given id cart
+     * @param bool $id_cart
+     * @return bool
+     */
+    public function deleteLockFromCartId($id_cart = false)
+    {
+        if (!$id_cart) {
+            return false;
+        }
+        return PayplugLock::deleteLockG2($id_cart);
     }
 
     /**
@@ -2369,8 +2382,9 @@ class PayPlugClass extends PaymentModule
                     $brand = ($card['brand'] != 'none')
                         ? Tools::ucfirst($card['brand'])
                         : $this->l('payplug.getPaymentOptions.card');
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['name'] = 'one_click';
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['inputs'] = [
+                    $payment_key = 'one_click_' . $card['id_payplug_card'];
+                    $paymentOption[$payment_key]['name'] = 'one_click';
+                    $paymentOption[$payment_key]['inputs'] = [
                         'pc' => [
                             'name' => 'pc',
                             'type' => 'hidden',
@@ -2392,28 +2406,28 @@ class PayPlugClass extends PaymentModule
                             'value' => 'one_click',
                         ],
                     ];
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['tpl'] = 'one_click.tpl';
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['payment_controller_url'] =
+                    $paymentOption[$payment_key]['tpl'] = 'one_click.tpl';
+                    $paymentOption[$payment_key]['payment_controller_url'] =
                         $this->context->link->getModuleLink(
                             $this->name,
                             'payment',
                             [],
                             true
                         );
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['logo'] = Media::getMediaPath(
+                    $paymentOption[$payment_key]['logo'] = Media::getMediaPath(
                         _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'
                     );
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['callToActionText'] = $brand .
+                    $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['expiry_date_card'] =
+                    $paymentOption[$payment_key]['expiry_date_card'] =
                         $this->l('payplug.getPaymentOptions.expiryDate') . ': ' . $card['expiry_date'];
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['action'] = $this->context->link->getModuleLink(
+                    $paymentOption[$payment_key]['action'] = $this->context->link->getModuleLink(
                         $this->name,
                         'dispatcher',
                         ['def' => (int)$options['deferred']],
                         true
                     );
-                    $paymentOption['one_click_' . $card['id_payplug_card']]['moduleName'] = 'payplug';
+                    $paymentOption[$payment_key]['moduleName'] = 'payplug';
                 }
             }
 
@@ -2743,7 +2757,6 @@ class PayPlugClass extends PaymentModule
 
         return $res_cart_installment;
     }
-
 
     /**
      * @description get cart installment backward
@@ -4166,7 +4179,7 @@ class PayPlugClass extends PaymentModule
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
-        if (strtoupper($pay_mode) == 'TEST') {
+        if (Tools::strtoupper($pay_mode) == 'TEST') {
             $this->setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
         } else {
             $this->setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
@@ -4237,7 +4250,7 @@ class PayPlugClass extends PaymentModule
             } catch (Exception $e) {
                 $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
                 $this->logger->addLog($error, 'error');
-                return ($error);
+                return 'error';
             }
         }
 
@@ -4779,17 +4792,6 @@ class PayPlugClass extends PaymentModule
         }
     }
 
-    /**
-     * Redirection
-     *
-     * @param string $link
-     * @return void
-     */
-    public static function redirectForVersion($link)
-    {
-        Tools::redirect($link);
-    }
-
     public function refundPayment()
     {
         $this->logger->addLog('[Payplug] Start refund', 'notice');
@@ -4890,7 +4892,7 @@ class PayPlugClass extends PaymentModule
                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         }
 
-                        if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                        if (!$this->deleteLockFromCartId($order->id_cart)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'notice');
@@ -4932,7 +4934,7 @@ class PayPlugClass extends PaymentModule
                             $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                         }
 
-                        if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                        if (!$this->deleteLockFromCartId($order->id_cart)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'notice');

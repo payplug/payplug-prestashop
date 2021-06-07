@@ -573,7 +573,7 @@ class OneyRepository extends Repository
         $available_oney_payments = $this->oneyEntity->getOperations();
         $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
 
-        foreach ($available_oney_payments as $key=>$oney_payment) {
+        foreach ($available_oney_payments as $key => $oney_payment) {
             $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($available_oney_payments[$key]);
@@ -1045,7 +1045,7 @@ class OneyRepository extends Repository
             return false;
         }
 
-        return in_array(strtoupper($iso_code), $valid_iso_code);
+        return in_array($this->toolsSpecific->tool('strtoupper', $iso_code), $valid_iso_code);
     }
 
     /**
@@ -1207,7 +1207,7 @@ class OneyRepository extends Repository
         $max = 1000;
 
         if ($nb_products >= $max) {
-            $error = $this->l('The payment with Oney is not available because you have more than 1000 items in your cart.');
+            $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
             return [
                 'result' => false,
                 'error' => $this->l($error)
