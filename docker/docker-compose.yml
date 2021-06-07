@@ -39,6 +39,6 @@ services:
       - MYSQL_USER=ps_user
       - MYSQL_PASSWORD=admin
     expose:
-      - 3306
+      - 3307
     ports:
-      - "3306:3306"
+      - "3307:3306"
