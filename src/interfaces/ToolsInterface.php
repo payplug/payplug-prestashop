@@ -26,4 +26,5 @@ namespace PayPlug\src\interfaces;
 interface ToolsInterface
 {
     public function tool($action, $param1, $param2);
+    public function substr($string, $offset, $length);
 }

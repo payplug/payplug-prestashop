@@ -139,7 +139,10 @@ class PluginRepository extends Repository
         $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
-        $this->translate = new TranslationsRepository($this->payplug);
+        $this->translate = new TranslationsRepository(
+            $this->payplug,
+            $this->tools
+        );
 
         $this->sql = new SQLtableRepository(
             $this->query

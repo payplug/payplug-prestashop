@@ -28,6 +28,7 @@ class PayplugAjaxModuleAdminController extends ModuleAdminController
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 require_once(_PS_MODULE_DIR_.'../init.php');
 include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
+include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
 $payplug = new PayPlugClass();
 
 $logger = $payplug->getPlugin()->logger();
@@ -187,7 +188,7 @@ if (Tools::getValue('_ajax') == 1) {
                         $logger->addLog('Change order state to ' . $new_state, 'notice');
                     }
 
-                    if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                    if (!$payplug->deleteLockFromCartId($order->id_cart)) {
                         $logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $logger->addLog('Lock deleted.', 'notice');

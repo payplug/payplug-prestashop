@@ -94,7 +94,6 @@ class PrestashopSpecific17
     // todo: set Tab install process in a specific
     public function installTab()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $installed = true;
         $moduleName = $this->payplug->name;
 
@@ -116,7 +115,6 @@ class PrestashopSpecific17
             }
         }
 
-        $rand = mt_rand();
         $tab->class_name = 'AdminPayPlug';
         $tab->module = $moduleName;
 

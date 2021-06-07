@@ -1,7 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 
-$repo = new PayPlug\src\repositories\TranslationsRepository('');
+$tools = new PayPlug\src\specific\ToolsSpecific();
+$repo = new PayPlug\src\repositories\TranslationsRepository('', $tools);
 $translations = $repo->getTranslations();
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
