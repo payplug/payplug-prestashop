@@ -3531,6 +3531,10 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
+            return false;
+        }
+
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
