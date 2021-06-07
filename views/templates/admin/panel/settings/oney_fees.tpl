@@ -28,8 +28,8 @@
             <span class="payplugOneyFees_state">{l s='admin.panel.setting.oney.activate' mod='payplug'}</span>
             <span class="payplugOneyFees_checker">
                 <input type="radio"
-                        id="{$payplug_switch.oney_fees.name}_left"
-                        name="{$payplug_switch.oney_fees.name}"
+                        id="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}_left"
+                        name="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}"
                         value="1"
                         {if $payplug_switch.oney_fees.checked} checked="checked"{/if}/>
             </span>
@@ -40,8 +40,8 @@
             <span class="payplugOneyFees_state">{l s='admin.panel.setting.oney.activate' mod='payplug'}</span>
             <span class="payplugOneyFees_checker">
                 <input type="radio"
-                        id="{$payplug_switch.oney_fees.name}_right"
-                        name="{$payplug_switch.oney_fees.name}"
+                        id="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}_right"
+                        name="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}"
                         value="0"
                         {if !$payplug_switch.oney_fees.checked} checked="checked"{/if}/>
             </span>

@@ -24,19 +24,19 @@
         {foreach from=$js_def key=k item=def}
             {if !empty($k) && is_string($k)}
                 {if is_bool($def)}
-                    var {$k} = {$def|var_export:true};
+                    var {$k|escape:'htmlall':'UTF-8'} = {$def|var_export:true};
                 {elseif is_int($def)}
-                    var {$k} = {$def|intval};
+                    var {$k|escape:'htmlall':'UTF-8'} = {$def|intval};
                 {elseif is_float($def)}
-                    var {$k} = {$def|floatval|replace:',':'.'};
+                    var {$k|escape:'htmlall':'UTF-8'} = {$def|floatval|replace:',':'.'};
                 {elseif is_string($def)}
-                    var {$k} = '{$def|strval}';
+                    var {$k|escape:'htmlall':'UTF-8'} = '{$def|strval}';
                 {elseif is_array($def) || is_object($def)}
-                    var {$k} = {$def|json_encode};
+                    var {$k|escape:'htmlall':'UTF-8'} = {$def|json_encode};
                 {elseif is_null($def)}
-                    var {$k} = null;
+                    var {$k|escape:'htmlall':'UTF-8'} = null;
                 {else}
-                    var {$k} = '{$def|@addcslashes:'\''}';
+                    var {$k|escape:'htmlall':'UTF-8'} = '{$def|@addcslashes:'\''}';
                 {/if}
             {/if}
         {/foreach}

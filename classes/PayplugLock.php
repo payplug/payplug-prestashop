@@ -24,9 +24,11 @@
 namespace PayPlug\classes;
 
 use Db;
+use DbQuery;
 use DateInterval;
 use DateTime;
 use ObjectModel;
+use Validate;
 
 if (!defined('_PS_VERSION_')) {
     exit;
