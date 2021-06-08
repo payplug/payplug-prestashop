@@ -3544,10 +3544,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
@@ -3555,6 +3551,7 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -3570,10 +3567,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3582,6 +3575,7 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
