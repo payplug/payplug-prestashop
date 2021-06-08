@@ -36,6 +36,6 @@
     {/foreach}
 {else}
     <span class="oneyError">
-        {l s='Oney is momentarily unavailable.' mod='payplug'}
+        {l s='hook.oney.payment.options.unavailable' mod='payplug'}
     </span>
 {/if}
