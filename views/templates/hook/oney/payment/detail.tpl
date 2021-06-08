@@ -22,27 +22,40 @@
 {if $oney_payment_option}
     <ul>
         <li>
-            <span><b>{l s='Amount:' mod='payplug'}</b></span>
+            <span><b>{l s='hook.oney.popin.payment.detail.amount' mod='payplug'}</b></span>
             <span><b>{$payplug_oney_amount.value|escape:'htmlall':'UTF-8'}</b></span>
         </li>
         <li>
-            <span>{l s='Contribution: ' mod='payplug'}</span>
+            <span>{l s='hook.oney.popin.payment.detail.contribution' mod='payplug'}</span>
             <span><b>{$oney_payment_option.down_payment_amount.value|escape:'htmlall':'UTF-8'}</b></span>
-            <small>
-                ({l s='Financing cost:' mod='payplug'} <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
-                {l s='TAEG:' mod='payplug'} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
-            </small>
+            {if isset($use_fees) && $use_fees}
+                <small>
+                    ({l s='hook.oney.popin.payment.detail.cost' mod='payplug'}
+                    <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
+                    {l s='hook.oney.popin.payment.detail.taeg' mod='payplug'}
+                    <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
+                </small>
+            {/if}
         </li>
         {foreach $oney_payment_option.installments as $oney_inst_number => $oney_installment}
             {assign var="inst_number" value=$oney_inst_number+1}
             <li>
-                <span>{l s='Installment no%d:' mod='payplug' sprintf=[$inst_number]}</span>
+                <span>{l s='hook.oney.popin.payment.detail.installment' mod='payplug' sprintf=[$inst_number]}</span>
                 <span><b>{$oney_installment.value|escape:'htmlall':'UTF-8'}</b></span>
             </li>
         {/foreach}
-        <li>
-            <span><b>{l s='Total:' mod='payplug'}</b></span>
-            <span><b>{$oney_payment_option.total_amount.value|escape:'htmlall':'UTF-8'}</b></span>
-        </li>
+        {if isset($use_fees) && $use_fees}
+            <li>
+                <span><b>{l s='hook.oney.popin.payment.detail.total' mod='payplug'}</b></span>
+                <span><b>{$oney_payment_option.total_amount.value|escape:'htmlall':'UTF-8'}</b></span>
+            </li>
+        {else}
+            <li>
+                {l s='hook.oney.popin.payment.detail.cost' mod='payplug'}
+                {$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}
+                {l s='hook.oney.popin.payment.detail.taeg' mod='payplug'}
+                {$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%
+            </li>
+        {/if}
     </ul>
 {/if}

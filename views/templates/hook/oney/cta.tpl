@@ -25,7 +25,7 @@
             {if !isset($payplug_is_oney_elligible)
                 || (isset($payplug_is_oney_elligible) && $payplug_is_oney_elligible neq 1)} -disabled{/if}"
                 data-e2e-oney="cta">
-            <span>{l s='Or pay in' mod='payplug'}</span>
+            <span>{l s='hook.oney.cta.cta' mod='payplug'}</span>
             <span class="oneyCta_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if}"></span>
             <span class="oneyCta_tooltip oneyLogo -tooltip"></span>
         </button>
