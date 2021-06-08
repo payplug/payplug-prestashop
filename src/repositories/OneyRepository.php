@@ -171,7 +171,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('oney.assignOneyPriceAndPaymentOptions.unavailable')
         );
 
         $this->assign->assign([
@@ -201,17 +201,13 @@ class OneyRepository extends Repository
         $min_amount = $this->payplug->convertAmount($limits['min'], true);
         $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-        $legal_text = 'Offre de financement avec apport obligatoire, 
-        réservée aux particuliers et valable pour tout achat de %s à %s. ';
-        $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
-        $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
-        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
-        $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
+        $legal_text = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+            ? $this->l('oney.assignLegalNotice.legalWithFees')
+            : $this->l('oney.assignLegalNotice.legalWithoutFees');
 
         $this->assign->assign([
             'legal_notice' => sprintf(
-                $this->l($legal_text),
+                $legal_text,
                 $this->toolsSpecific->tool('displayPrice', $min_amount),
                 $this->toolsSpecific->tool('displayPrice', $max_amount)
             )
@@ -628,7 +624,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('oney.getOneyPriceAndPaymentOptions.unavailable')
         );
 
         $this->assign->assign([
