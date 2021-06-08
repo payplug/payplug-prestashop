@@ -31,6 +31,7 @@ class ContextMock
         $context = new \stdClass();
         $context->cart = CartMock::get();
         $context->customer = CustomerMock::get();
+        $context->currency = CurrencyMock::get();
         return $context;
     }
 }

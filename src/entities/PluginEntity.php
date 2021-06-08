@@ -58,7 +58,13 @@ class PluginEntity
     private $country;
 
     /** @var object */
+    private $currency;
+
+    /** @var object */
     private $hook;
+
+    /** @var object */
+    private $install;
 
     /** @var object */
     private $logger;
@@ -77,6 +83,9 @@ class PluginEntity
 
     /** @var object */
     private $query;
+
+    /** @var object */
+    private $sql;
 
     /** @var object */
     private $tools;
@@ -170,9 +179,25 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @return object
+     */
     public function getHook()
     {
         return $this->hook;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInstall()
+    {
+        return $this->install;
     }
 
     /**
@@ -226,6 +251,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getSql()
+    {
+        return $this->sql;
+    }
+
+    /**
+     * @return object
+     */
     public function getTools()
     {
         return $this->tools;
@@ -269,7 +302,8 @@ class PluginEntity
      */
     public function setApiUrl($api_url)
     {
-        if (!is_string($api_url) || !preg_match('/http(s?):\/\/api(-\w+)?.payplug.(com|test)/', $api_url)) {
+        if (!is_string($api_url)
+            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
             throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
         }
 
@@ -398,6 +432,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $currency
+     * @return PluginEntity
+     */
+    public function setCurrency($currency)
+    {
+        if (!is_object($currency)) {
+            throw (
+            new BadParameterException(
+                'Invalid Currency object, param $currency must be a CurrencySpecific'
+            )
+            );
+        } else {
+            $this->currency = $currency;
+            return $this;
+        }
+    }
+
+    /**
      * @param object $hook
      * @return self
      * @throws BadParameterException
@@ -409,6 +461,20 @@ class PluginEntity
         }
 
         $this->hook = $hook;
+        return $this;
+    }
+
+    /**
+     * @param mixed $install
+     * @return PluginEntity
+     */
+    public function setInstall($install)
+    {
+        if (!is_object($install)) {
+            throw (new BadParameterException('Invalid argument, param $install must be a InstallRepository'));
+        }
+
+        $this->install = $install;
         return $this;
     }
 
@@ -494,6 +560,21 @@ class PluginEntity
         }
 
         $this->query = $query;
+        return $this;
+    }
+
+    /**
+     * @param object $query
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setSql($sql)
+    {
+        if (!is_object($sql)) {
+            throw (new BadParameterException('Invalid argument, $sql must be a SQLRepository'));
+        }
+
+        $this->sql = $sql;
         return $this;
     }
 

@@ -21,7 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace Payplug\classes;
+
 use PayPlug\src\repositories\CardRepository;
+use Address;
+use Configuration;
+use Country;
+use Exception;
+use Product;
+use Validate;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -41,7 +49,7 @@ class PayPlugAjax
 
     public function __construct()
     {
-        $this->payplug = new \PayPlugClass();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->card = $this->plugin->getCard();
         $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
@@ -81,7 +89,7 @@ class PayPlugAjax
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
                         'is_oney' => $is_oney,
-                        '_ajax' => 1
+                        '_ajax' => 1,
                     ];
                     $payment = $this->payplug->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
@@ -211,7 +219,7 @@ class PayPlugAjax
                         ]));
                     }
                 } catch (Exception $e) {
-                    throw new \Exception($e);
+                    throw new Exception($e);
                 }
 
                 $result = $this->payplug->setPaymentDataCookie($payment_data);

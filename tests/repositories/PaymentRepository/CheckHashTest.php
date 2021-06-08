@@ -50,39 +50,22 @@ final class CheckHashTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method'
+            'paymentMethod' => 'payment_method',
+            'forceHash' => false
         ];
     }
 
-    /**
-     * Parameters to test method with empty $paiementDetails
-     *
-     * @return \Generator
-     */
     public function InvalidDataProvider()
     {
-        // Test if (!$paymentDetails)
         yield [null, 'paymentDetails: null'];
-
-        // Test if (!is_array($paymentDetails))
         yield ['I am a string!', 'paymentDetails: ["I am a string!"]'];
-
-        // Test if (!isset($paymentDetails['cartId']))
         yield [['wrong_parameters'], 'paymentDetails: can\'t find cartId'];
-
-        // Test if (!$paymentDetails['cartId'])
         yield [['cartId' => null], 'paymentDetails: {"cartId":null}'];
-
-        // Test if (!$paymentDetails['cartId'])
         yield [['cartId' => false], 'paymentDetails: {"cartId":null}'];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
-     *
      * @dataProvider InvalidDataProvider
-     * @param array $parameter
-     * @param string $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)
     {
@@ -99,22 +82,48 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWithSameHash()
     {
+        $tempPaymentDetails = [
+            'paymentTab' => mt_rand(),
+            'paymentId' => mt_rand(),
+            'paymentUrl' => 'url',
+            'paymentReturnUrl' => 'url',
+            'authorizedAt' => 'date',
+            'isPaid' => true
+        ];
+
+        $this->paymentDetails = array_merge($this->paymentDetails, $tempPaymentDetails);
+
         // same hash expected
         $hash = hash('sha256', $this->paymentDetails['paymentMethod'] . json_encode($this->paymentDetails['cart']));
+
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query,
+                'build' => true,
+            ]);
 
         $this->repo
             ->shouldReceive([
                 'checkPaymentTable' => [
                     'cart_hash' => $hash,
                     'payment_method' => $this->paymentDetails['paymentMethod'],
-                ]
+                ],
+                'createPayment' => [
+                    'result' => true,
+                    'paymentDetails' => $this->paymentDetails,
+                    'response' => '[createPayment] Payment successfully created'
+                ],
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
             [
                 'result' => true,
                 'paymentDetails' => $this->paymentDetails,
-                'response' => 'OK. Comparaison result: Same hash and same payment method.'
+                'response' => 'Payment created and updated successfully'
             ],
             $this->repo->checkHash($this->paymentDetails)
         );
@@ -133,7 +142,8 @@ final class CheckHashTest extends BasePaymentRepository
                     'cart_hash' => 'different_hash',
                     'payment_method' => $this->paymentDetails['paymentMethod'],
                 ],
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->repo
@@ -165,8 +175,10 @@ final class CheckHashTest extends BasePaymentRepository
                     'result' => false,
                     'response' => $error_message
                 ],
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
+
 
         $this->assertSame(
             $expected_error,
@@ -199,7 +211,8 @@ final class CheckHashTest extends BasePaymentRepository
                     'response' => $error_message,
                     'paymentDetails' => $this->paymentDetails
                 ],
-                'returnPaymentError' => $expected_error
+                'returnPaymentError' => $expected_error,
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(
@@ -225,7 +238,8 @@ final class CheckHashTest extends BasePaymentRepository
                     'result' => true,
                     'response' => 'Success message',
                     'paymentDetails' => $this->paymentDetails
-                ]
+                ],
+                'getHashedCart' => 'b0a30e26e83b2a'
             ]);
 
         $this->assertSame(

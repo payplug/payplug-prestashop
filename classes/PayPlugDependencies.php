@@ -21,29 +21,32 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-/**
- * Core file of PayPlug module
- */
+namespace PayPlug\classes;
 
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/src/repositories/PluginRepository.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayPlugClass.php');
-
+use PayPlug\src\entities\PluginEntity;
+use PayPlug\src\repositories\HookRepository;
+use PayPlug\src\repositories\InstallRepository;
+use PayPlug\src\repositories\PluginRepository;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-
 class PayPlugDependencies
 {
-    /** @var object HookRepository */
-    public $hook;
+    /** @var HookRepository */
+    private $hook;
+
+    /** @var InstallRepository */
+    private $install;
+
+    /** @var MyLogPHP */
+    private $mylogphp;
 
     /** @var object */
     public $payplug;
 
-    /** @var object PluginEntity */
+    /** @var PluginEntity */
     private $plugin;
 
     public function __construct()
@@ -54,17 +57,26 @@ class PayPlugDependencies
     private function initializeAccessors()
     {
         $this->payplug = new PayPlugClass();
-        $this->setPlugin((new PayPlug\src\repositories\PluginRepository($this->payplug))->getEntity());
+        $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
+
         $this->hook = $this->getPlugin()->getHook();
+        $this->install = $this->getPlugin()->getInstall();
+        $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
 
     public function getPlugin()
     {
         return $this->plugin;
     }
+
     public function setPlugin($plugin)
     {
         $this->plugin = $plugin;
         return $this;
+    }
+
+    public function getDependency($dependency)
+    {
+        return $this->$dependency;
     }
 }

@@ -23,14 +23,9 @@
  */
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\src\entities\OneyEntity;
 use PayPlug\tests\mock\AddresstMock;
 use PayPlug\tests\mock\PaymentTabMock;
-use PayPlug\src\specific\CarrierSpecific;
-use PayPlug\src\specific\CartSpecific;
 use PayPlug\tests\mock\CountryMock;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\repositories\BaseTest;
 
 /**
  * @group unit
@@ -40,7 +35,7 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class CheckOneyRequiredFieldsTest extends BaseTest
+final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 {
     public function setUp()
     {
@@ -53,23 +48,6 @@ final class CheckOneyRequiredFieldsTest extends BaseTest
             ->andReturnUsing(function ($phone_number) {
                 return (!is_null($phone_number) && $phone_number !== '');
             });
-
-        // Method setup
-        $this->repo = new OneyRepository(
-            $this->cache,
-            $this->logger,
-            $this->address,
-            new CartSpecific(),
-            new CarrierSpecific(),
-            $this->config,
-            $this->context,
-            $this->country,
-            $this->tools,
-            $this->validate,
-            new OneyEntity(),
-            $this->myLogPhp,
-            $this->payplug
-        );
 
         $paymentTab = PaymentTabMock::getStandard();
         $this->tab = $paymentTab['shipping'];

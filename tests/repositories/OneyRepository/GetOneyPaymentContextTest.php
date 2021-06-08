@@ -24,11 +24,8 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\repositories\BaseTest;
 
 /**
  * @group unit
@@ -38,7 +35,7 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetOneyPaymentContextTest extends BaseTest
+final class GetOneyPaymentContextTest extends BaseOneyRepository
 {
     public function setUp()
     {
@@ -54,7 +51,6 @@ final class GetOneyPaymentContextTest extends BaseTest
             ->with('PS_SHOP_NAME')
             ->andReturn('Payplug');
 
-        // Method Params
         $this->payplug
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
@@ -63,22 +59,6 @@ final class GetOneyPaymentContextTest extends BaseTest
                 }
                 return (int)$amount * 100;
             });
-
-        $this->repo = new OneyRepository(
-            $this->cache,
-            $this->logger,
-            $this->address,
-            $this->cart,
-            $this->carrier,
-            $this->config,
-            $this->context,
-            $this->country,
-            $this->tools,
-            $this->validate,
-            new OneyEntity(),
-            $this->myLogPhp,
-            $this->payplug
-        );
     }
 
     public function testGetContext()

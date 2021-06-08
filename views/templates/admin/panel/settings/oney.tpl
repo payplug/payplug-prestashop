@@ -21,7 +21,7 @@
 *}
 <div class="panel-row separate_margin_block">
     <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='Activate Oney Payments' mod='payplug'}</div>
+        <div class="payplugPanel_label">{l s='admin.panel.setting.oney.label' mod='payplug'}</div>
         <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.oney}</div>
     </div>
     <div class="payplugPanel">
@@ -31,8 +31,9 @@
                 <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
             </p>
             <div class="payplugTips -{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item -left" {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active}style="display: none;"{/if}>
+                <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
+                        {include file='./oney_fees.tpl'}
                         <div class="payplugPanel_section">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_tos}
                             <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}

@@ -48,7 +48,7 @@
     <div class="form-group">
         <label class="control-label" for="pp_amount2refund">{l s='Amount to be refunded' mod='payplug'} ({$currency->name|escape:'htmlall':'UTF-8'}) :</label>
         <input type="text" name="pp_amount2refund" value="{$amount_suggested|escape:'htmlall':'UTF-8'}" />
-        <label for="change_order_state">{l s='Change Prestashop order state to "Refunded"' mod='payplug'}</label>
+        <label for="change_order_state">{l s='Change Prestashop order state to Refunded' mod='payplug'}</label>
         <input class="control-label" type="checkbox" value="{$id_new_order_state|escape:'htmlall':'UTF-8'}" name="change_order_state" >
     </div>
 

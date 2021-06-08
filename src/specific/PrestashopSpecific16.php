@@ -24,8 +24,11 @@
 namespace PayPlug\src\specific;
 
 use Configuration;
+use Language;
 use Media;
 use Validate;
+use Tab;
+use Tools;
 
 class PrestashopSpecific16
 {
@@ -66,7 +69,8 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
+            && (bool)Configuration::get('PAYPLUG_ONEY_FEES');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -172,20 +176,47 @@ class PrestashopSpecific16
         ];
     }
 
+    // todo: set Tab install process in a specific
     public function installTab()
     {
-        $translationsAdminPayPlugInstallment = [
+        $translations = [
             'en' => 'Installment Plans',
             'fr' => 'Paiements en plusieurs fois'
         ];
 
-        $flag = $this->payplug->installModuleTab('AdminPayPlugInstallment', $translationsAdminPayPlugInstallment, 0);
+        $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
 
-        return $flag;
+        $tab = new Tab();
+
+        foreach (Language::getLanguages(false) as $language) {
+            $iso_code = Tools::strtolower($language['iso_code']);
+            if (isset($translations[$iso_code])) {
+                $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
+            } else {
+                $tab->name[(int)$language['id_lang']] = $translations['en'];
+            }
+        }
+
+        $tab->class_name = 'AdminPayPlugInstallment';
+
+        $tab->module = $this->payplug->name;
+        $tab->id_parent = $adminPayPlugId;
+
+        return $tab->save();
     }
 
+    // todo: set Tab uninstall process in a specific
     public function uninstallTab()
     {
-        return ($this->payplug->uninstallModuleTab('AdminPayPlugInstallment'));
+        $flag = true;
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        return $flag;
     }
 }

@@ -1,11 +1,11 @@
 #!/bin/sh
 
-source ~/.bash_profile
+# source ~/.bash_profile
 
 composer install;
 
 ## Lib Payplug
-apiRoute=vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php;
+apiRoute=./vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php;
 
 # Add tests routes if not already added
 if ! grep -q "//APIRoutes::\$API_BASE_URL = " $apiRoute; then

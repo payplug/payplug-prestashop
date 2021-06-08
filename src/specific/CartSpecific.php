@@ -56,4 +56,12 @@ class CartSpecific implements CartInterface
         }
         return $cart->getProducts();
     }
+
+    public function nbProducts($cart)
+    {
+        if (!is_object($cart)) {
+            return false;
+        }
+        return $cart->nbProducts();
+    }
 }

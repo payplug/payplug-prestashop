@@ -24,15 +24,6 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\specific\AddressSpecific;
-use PayPlug\src\specific\CarrierSpecific;
-use PayPlug\src\specific\CartSpecific;
-use PayPlug\src\specific\ContextSpecific;
-use PayPlug\src\specific\CountrySpecific;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\repositories\BaseTest;
-
 /**
  * @group unit
  * @group repository
@@ -41,34 +32,14 @@ use PayPlug\tests\repositories\BaseTest;
  *
  * @runTestsInSeparateProcesses
  */
-final class IsValidOneyEmailTest extends BaseTest
+final class IsValidOneyEmailTest extends BaseOneyRepository
 {
-    protected $translate;
-
-    // Method Params
     protected $email;
 
     public function setUp()
     {
-        $this->email = 'mock@payplug.com';
-
         parent::setUp();
-
-        $this->repo = new OneyRepository(
-            $this->cache,
-            $this->logger,
-            new AddressSpecific(),
-            new CartSpecific(),
-            new CarrierSpecific(),
-            $this->config,
-            new ContextSpecific(),
-            new CountrySpecific(),
-            $this->tools,
-            $this->validate,
-            new OneyEntity(),
-            $this->myLogPhp,
-            $this->payplug
-        );
+        $this->email = 'mock@payplug.com';
     }
 
     public function testWithValidEmail()
@@ -126,8 +97,7 @@ final class IsValidOneyEmailTest extends BaseTest
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'The + character is not valid. 
-                        Please change your email address (100 characters max).'
+                'message' => 'The + character is not valid. Please change your email address (100 characters max).'
             ],
             $response
         );
@@ -145,8 +115,7 @@ final class IsValidOneyEmailTest extends BaseTest
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Your email address is too long, 
-                        please change it to a shorter one (max 100 characters).'
+                'message' => 'Your email address is too long. Please change your email address (100 characters max).'
             ],
             $response
         );
@@ -164,8 +133,7 @@ final class IsValidOneyEmailTest extends BaseTest
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Your email address is too long and the + character is not valid, 
-                        please change it to another address (max 100 characters).'
+                'message' => 'Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).'
             ],
             $response
         );

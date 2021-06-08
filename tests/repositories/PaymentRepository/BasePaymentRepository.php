@@ -28,9 +28,9 @@ use Payplug\Payment;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\BaseTest;
+use PayPlug\tests\repositories\RepositoryBase;
 
-class BasePaymentRepository extends BaseTest
+class BasePaymentRepository extends RepositoryBase
 {
     protected $payment;
     protected $paymentApi;
@@ -40,6 +40,7 @@ class BasePaymentRepository extends BaseTest
         parent::setUp();
 
         $this->payment = $this->payment ? $this->payment : new PaymentEntity();
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->logger->shouldReceive([
             'setParams' => $this->logger,
@@ -48,6 +49,7 @@ class BasePaymentRepository extends BaseTest
         $this->repo = \Mockery::mock(PaymentRepository::class, [
             $this->payplug,
             $this->cart,
+            $this->config,
             $this->logger,
             $this->payment,
             $this->query,
