@@ -26,7 +26,9 @@
         <button class="oneyPopin_close">{l s='Close' mod='payplug'}</button>
         <span class="oneyPopin_title">
             {l s='hook.oney.popin.pay' mod='payplug'}
-            {if isset($use_fees) && !$use_fees}{l s='hook.oney.popin.withoutFees' mod='payplug'}{/if}
+            {if isset($use_fees) && !$use_fees}
+                <u>{l s='hook.oney.popin.withoutFees' mod='payplug'}</u>
+            {/if}
             <strong>{l s='hook.oney.popin.card' mod='payplug'}</strong>
         </span>
 
