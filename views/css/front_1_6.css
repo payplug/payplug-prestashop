@@ -256,6 +256,9 @@
     background: transparent;
   }
 }
+.oneyCta.-checkout {
+  margin-top: 12px;
+}
 /* Oney Error */
 .oneyError {
   font-family: 'Poppins', sans-serif;
