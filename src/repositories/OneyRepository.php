@@ -320,7 +320,7 @@ class OneyRepository extends Repository
     {
         $this->assignLegalNotice();
         $this->assign->assign([
-            'use_fees' => (bool)(bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
         ]);
         return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
