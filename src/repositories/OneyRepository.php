@@ -319,6 +319,9 @@ class OneyRepository extends Repository
     public function displayOneyPopin()
     {
         $this->assignLegalNotice();
+        $this->assign->assign([
+            'use_fees' => (bool)(bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+        ]);
         return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
 
@@ -571,23 +574,23 @@ class OneyRepository extends Repository
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
         $available_oney_payments = $this->oneyEntity->getOperations();
-        $oney_sims = $this->getOneySimulations($amount, $country, $available_oney_payments);
+        $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
         $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
-        foreach ($oney_sims['simulations'] as $key => $oney_payment) {
+        foreach ($oney_simulations['simulations'] as $key => $oney_payment) {
             $with_fees = (bool)strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
-                unset($oney_sims['simulations'][$key]);
+                unset($oney_simulations['simulations'][$key]);
             }
         }
 
-        if (!$oney_sims['result']) {
+        if (!$oney_simulations['result']) {
             return $payment_list;
         }
 
-        foreach ($oney_sims['simulations'] as $method => $oney_sim) {
-            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
+        foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
+            if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
+                $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
             }
         }
 
