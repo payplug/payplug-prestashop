@@ -790,35 +790,17 @@ var $document, $window, payplug = {
         },
         init: function () {
             var {oney} = payplug,
-                {identifier, switcher} = oney.props;
-
-            $('input[name=' + switcher + ']').trigger('switchSelected');
+                {identifier} = oney.props;
+            $document.on('change', '.' + identifier + 'Fees input', oney.selectFees);
         },
-        urlCheck: function () {
-            const url = ($(this).val());
-            const pattern = new RegExp('^(https?:\\/\\/)?' +
-                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
-                '((\\d{1,3}\\.){3}\\d{1,3}))' +
-                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
-                '(\\?[;&a-z\\d%_.~+=-]*)?' +
-                '(\\#[-a-z\\d_]*)?$', 'i');
-            const matches = url.match(pattern);
-            if (matches == null) {
-                if (!$('.payplugOneyTOS_error').hasClass('-show')) {
-                    $('.payplugOneyTOS_error').addClass('-show');
-                }
-                $("button[name=submitSettings]").prop("disabled", true);
-                $("button[name=submitSettings]").addClass('-disabled');
-            }
-            if ((matches !== null) || (url.length == 0)) {
-                if ($('.payplugOneyTOS_error').hasClass('-show')) {
-                    $('.payplugOneyTOS_error').removeClass('-show');
-                }
-                $("button[name=submitSettings]").prop("disabled", false);
-                $("button[name=submitSettings]").removeClass('-disabled');
-
-            }
-        },
+        selectFees: function(event) {
+            var {oney} = payplug,
+                {identifier} = oney.props,
+                $options = $('.' + identifier + 'Fees_option'),
+                $selected = $(this).parents('.' + identifier + 'Fees_option');
+            $options.removeClass('-selected');
+            $selected.addClass('-selected');
+        }
     },
     standard: {
         props: {

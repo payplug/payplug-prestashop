@@ -240,7 +240,8 @@ class OrderStateRepository extends Repository
                 ->leftJoin(
                     _DB_PREFIX_ . 'order_state_lang',
                     'osl',
-                    'osl.id_order_state = os.id_order_state AND osl.template = \'' . pSQL($definition['template']) . '\''
+                    'osl.id_order_state = os.id_order_state 
+                     AND osl.template = \'' . pSQL($definition['template']) . '\''
                 )
                 ->where('os.invoice = ' . (int)$definition['invoice'])
                 ->where('os.send_email = ' . (int)$definition['send_email'])

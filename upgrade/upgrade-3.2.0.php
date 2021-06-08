@@ -15,16 +15,25 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2021 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-interface ToolsInterface
+function upgrade_module_3_2_0()
 {
-    public function tool($action, $param1, $param2);
-    public function substr($string, $offset, $length);
+    $flag = true;
+
+    // Add new conf var for Oney with/without fees
+    $flag = $flag && Configuration::updateValue('PAYPLUG_ONEY_FEES', 1);
+
+    // Add new conf var for company country iso
+    $flag = $flag && Configuration::updateValue('PAYPLUG_COMPANY_ISO', 1);
+
+    return $flag;
 }

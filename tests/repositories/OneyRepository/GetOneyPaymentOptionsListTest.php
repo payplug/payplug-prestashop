@@ -29,6 +29,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
 
 /**
+ * @group dev
  * @group unit
  * @group repository
  * @group oney
@@ -53,6 +54,10 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             ->andReturn('FR');
+
+        $this->config->shouldReceive('get')
+            ->with('PAYPLUG_ONEY_FEES')
+            ->andReturn(true);
 
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 

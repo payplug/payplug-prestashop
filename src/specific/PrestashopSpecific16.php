@@ -69,7 +69,8 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
+            && (bool)Configuration::get('PAYPLUG_ONEY_FEES');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -178,7 +179,7 @@ class PrestashopSpecific16
     // todo: set Tab install process in a specific
     public function installTab()
     {
-        $translationsAdminPayPlugInstallment = [
+        $translations = [
             'en' => 'Installment Plans',
             'fr' => 'Paiements en plusieurs fois'
         ];
@@ -190,9 +191,9 @@ class PrestashopSpecific16
         foreach (Language::getLanguages(false) as $language) {
             $iso_code = Tools::strtolower($language['iso_code']);
             if (isset($translations[$iso_code])) {
-                $tab->name[(int)$language['id_lang']] = $translationsAdminPayPlugInstallment[$iso_code];
+                $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
             } else {
-                $tab->name[(int)$language['id_lang']] = $translationsAdminPayPlugInstallment['en'];
+                $tab->name[(int)$language['id_lang']] = $translations['en'];
             }
         }
 
