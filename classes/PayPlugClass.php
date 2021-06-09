@@ -4244,7 +4244,7 @@ class PayPlugClass extends PaymentModule
             } catch (Exception $e) {
                 $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
                 $this->logger->addLog($error, 'error');
-                return ($error);
+                return 'error';
             }
         }
 
