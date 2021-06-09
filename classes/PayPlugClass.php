@@ -2552,7 +2552,6 @@ class PayPlugClass extends PaymentModule
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-                && Configuration::get('PAYPLUG_ONEY_FEES')
                 && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();

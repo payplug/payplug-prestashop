@@ -331,6 +331,7 @@ class OneyRepository extends Repository
     public function displayOneySchedule($oney_payment, $amount)
     {
         $vars = [
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
