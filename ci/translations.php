@@ -1,9 +1,11 @@
 <?php
-require_once(dirname(__FILE__) . '/../vendor/autoload.php');
+ini_set('display_errors', true);
 
-$tools = new PayPlug\src\specific\ToolsSpecific();
-$repo = new PayPlug\src\repositories\TranslationsRepository('', $tools);
+require_once(dirname(__FILE__) . '/src/Translations.php');
+
+$repo = new Translations();
 $translations = $repo->getTranslations();
+
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
 $messages = [];
