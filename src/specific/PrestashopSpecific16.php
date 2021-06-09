@@ -69,8 +69,7 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-            && (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
