@@ -51,10 +51,12 @@
             </li>
         {else}
             <li>
-                {l s='hook.oney.popin.payment.detail.cost' mod='payplug'}
-                {$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}
-                {l s='hook.oney.popin.payment.detail.taeg' mod='payplug'}
-                {$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%
+                <span>
+                    {l s='hook.oney.popin.payment.detail.cost' mod='payplug'}
+                    {$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}
+                    {l s='hook.oney.popin.payment.detail.taeg' mod='payplug'}
+                    {$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%
+                </span>
             </li>
         {/if}
     </ul>

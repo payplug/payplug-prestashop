@@ -353,6 +353,7 @@ class OneyRepository extends Repository
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->assign->assign([
+                'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
                 'payplug_module_dir' => str_replace(
                     'payplug/payplug.php',
                     '',

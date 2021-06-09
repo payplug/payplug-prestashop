@@ -3746,7 +3746,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3766,6 +3766,7 @@ class PayPlugClass extends PaymentModule
         }
 
         $this->smarty->assign([
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
