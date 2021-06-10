@@ -1721,7 +1721,7 @@ class PayPlugClass extends PaymentModule
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
                 'standard' => $args['standard'],
-                'one_click' => $args['one_click'],
+                'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
