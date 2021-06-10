@@ -21,9 +21,8 @@
 *}
 <div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
-        <span class="oneyPayment_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
-                <img src="/modules/payplug/views/img/oney/3x4x_with{if isset($use_fees) && !$use_fees}out{/if}_fees.svg"
-                     alt="{l s='Pay by card in 3 or 4' mod='payplug'}" />
+        <span class="oneyPayment_logo oneyLogo -x3x4">
+                <img src="/modules/payplug/views/img/oney/3x4x.svg" alt="{l s='Pay by card in 3 or 4' mod='payplug'}" />
         </span>
         <span class="oneyPayment_label">
             {l s='Pay by card in 3 or 4' mod='payplug'}

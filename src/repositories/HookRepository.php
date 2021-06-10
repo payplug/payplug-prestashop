@@ -42,13 +42,13 @@ class HookRepository extends Repository
 
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
             $this->payplug->setMedia([
-                $module_url . 'views/css/admin_order.css',
-                $module_url . 'views/js/admin_order.js',
+                $module_url . 'views/css/admin_order-v3.2.0.css',
+                $module_url . 'views/js/admin_order-v3.2.0.js',
             ]);
         } else {
             $this->payplug->setMedia([
-                $module_url . 'views/js/admin.js',
-                $module_url . 'views/css/admin.css',
+                $module_url . 'views/js/admin-v3.2.0.js',
+                $module_url . 'views/css/admin-v3.2.0.css',
             ]);
         }
     }

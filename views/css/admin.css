@@ -441,7 +441,7 @@ button.payplugLink:hover {
 /* Payplug Admin Config */
 .payplugOneyFees {
   display: flex;
-  padding: 16px 0;
+  padding: 16px 0 0;
 }
 .payplugOneyFees_option {
   border: 1px solid #ccc;

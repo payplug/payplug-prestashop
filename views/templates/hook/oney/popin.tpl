@@ -19,34 +19,23 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
+<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}">
     {if isset($payplug_oney_error) && $payplug_oney_error}
         <p class="oneyPopin_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</p>
     {elseif isset($oney_payment_options) && $oney_payment_options}
         <button class="oneyPopin_close">{l s='Close' mod='payplug'}</button>
         <span class="oneyPopin_title">
-            {l s='hook.oney.popin.pay' mod='payplug'}
-            {if isset($use_fees) && !$use_fees}
-                <u>{l s='hook.oney.popin.withoutFees' mod='payplug'}</u>
-            {/if}
-            <strong>{l s='hook.oney.popin.card' mod='payplug'}</strong>
+            {l s='Pay' mod='payplug'}<strong>{l s='by card' mod='payplug'}</strong>
         </span>
 
         <ul class="oneyPopin_navigation">
             {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
-                <li{if $oney_payment_method == 'x3_with_fees'} class="selected"{/if}>
-                    <button type="button"
-                            data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x"
-                            data-e2e-oney-option="{$oney_payment_method|escape:'htmlall':'UTF-8'}">
-                        {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
-                    </button>
-                </li>
+                <li{if $oney_payment_method == 'x3_with_fees'} class="selected"{/if}><button type="button" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x" data-e2e-oney-option="{$oney_payment_method|escape:'htmlall':'UTF-8'}">{$oney_payment_option.title|escape:'htmlall':'UTF-8'}</button></li>
             {/foreach}
         </ul>
 
         {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
-            <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}"
-                  data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
+            <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}" data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
 			    {include file="./payment/detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
         {/foreach}
@@ -55,6 +44,6 @@
             <span class="oneyPopin_legal">{$legal_notice|escape:'htmlall':'UTF-8'}</span>
         {/if}
     {else}
-        <p class="oneyPopin_error">{l s='hook.oney.popin.oneyUnavailable' mod='payplug'}</p>
+        <p class="oneyPopin_error">{l s='Oney is momentarily unavailable.' mod='payplug'}</p>
     {/if}
 </span>

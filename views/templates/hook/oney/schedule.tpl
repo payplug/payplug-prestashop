@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="oneySchedule{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
+<div class="oneySchedule">
     {if $oney_payment_option}
         <ul>
             <li>
@@ -30,12 +30,10 @@
             <li>
                 <span>{l s='Contribution: ' mod='payplug'}</span>
                 <span>{$oney_payment_option.down_payment_amount.value|escape:'htmlall':'UTF-8'}</span>
-                {if isset($use_fees) && $use_fees}
-                    <small>
-                        ({l s='Financing cost:' mod='payplug'} <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
-                        {l s='TAEG:' mod='payplug'} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
-                    </small>
-                {/if}
+                <small>
+                    ({l s='Financing cost:' mod='payplug'} <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
+                    {l s='TAEG:' mod='payplug'} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
+                </small>
             </li>
             {foreach $oney_payment_option.installments as $oney_inst_number => $oney_installment}
                 {assign var="inst_number" value=$oney_inst_number+1}
@@ -44,21 +42,10 @@
                     <span>{$oney_installment.value|escape:'htmlall':'UTF-8'}</span>
                 </li>
             {/foreach}
-            {if isset($use_fees) && $use_fees}
-                <li>
-                    <span><b>{l s='Total:' mod='payplug'}</b></span>
-                    <span><b>{$oney_payment_option.total_amount.value|escape:'htmlall':'UTF-8'}</b></span>
-                </li>
-            {else}
-                <li>
-                    <span>
-                        {l s='Financing cost:' mod='payplug'}
-                        {$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}
-                        {l s='TAEG:' mod='payplug'}
-                        {$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%
-                    </span>
-                </li>
-            {/if}
+            <li>
+                <span><b>{l s='Total:' mod='payplug'}</b></span>
+                <span><b>{$oney_payment_option.total_amount.value|escape:'htmlall':'UTF-8'}</b></span>
+            </li>
         </ul>
     {/if}
 </div>

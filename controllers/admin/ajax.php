@@ -28,7 +28,6 @@ class PayplugAjaxModuleAdminController extends ModuleAdminController
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 require_once(_PS_MODULE_DIR_.'../init.php');
 include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
 $payplug = new PayPlugClass();
 
 $logger = $payplug->getPlugin()->logger();

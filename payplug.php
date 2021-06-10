@@ -53,7 +53,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.2.1';
+        $this->version = '3.2.0';
 
         parent::__construct();
 
@@ -101,7 +101,7 @@ class Payplug extends PaymentModule
             $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
             $this->context->smarty->assign('url_logo', $logo_url);
 
-            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css');
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }

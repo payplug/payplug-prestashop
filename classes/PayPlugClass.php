@@ -321,7 +321,7 @@ class PayPlugClass extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.2.1';
+        $this->version = '3.2.0';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -682,7 +682,6 @@ class PayPlugClass extends PaymentModule
             'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
-            'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
             'oney_fees' => Configuration::get('PAYPLUG_ONEY_FEES'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
@@ -733,8 +732,8 @@ class PayPlugClass extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.2.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -933,13 +932,6 @@ class PayPlugClass extends PaymentModule
             'checked' => $configurations['oney'],
             'label_left' => $this->l('payplug.assignSwitchConfiguration.yes'),
             'label_right' => $this->l('payplug.assignSwitchConfiguration.no'),
-        ];
-
-        $switch['oney_tos'] = [
-            'name' => 'payplug_oney_tos',
-            'active' => true,
-            'small' => true,
-            'checked' => $configurations['oney_tos'],
         ];
 
         $switch['oney_optimized'] = [
@@ -2552,6 +2544,7 @@ class PayPlugClass extends PaymentModule
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
+                && Configuration::get('PAYPLUG_ONEY_FEES')
                 && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();
@@ -2936,8 +2929,8 @@ class PayPlugClass extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.2.0.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -2966,13 +2959,13 @@ class PayPlugClass extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.2.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.2.0.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.2.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css',
             ]);
         }
     }
@@ -3509,7 +3502,7 @@ class PayPlugClass extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.2.0.js');
         }
 
         $this->html .= $this->fetchTemplate('/views/templates/admin/order/order.tpl');
@@ -3543,6 +3536,10 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
+            return false;
+        }
+
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
@@ -3550,7 +3547,6 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
-            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -3566,6 +3562,10 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
+            return false;
+        }
+
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3574,7 +3574,6 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
-            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -3583,6 +3582,10 @@ class PayPlugClass extends PaymentModule
     {
         $current_controller = Dispatcher::getInstance()->getController();
         if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
+            return false;
+        }
+
+        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
             return false;
         }
 
@@ -3635,11 +3638,7 @@ class PayPlugClass extends PaymentModule
             ]);
             $this->smarty->assign(['popin' => true]);
         }
-
-        $this->smarty->assign([
-            'env' => 'product',
-            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-        ]);
+        $this->smarty->assign(['env' => 'product']);
         return $this->fetchTemplate('oney/cta.tpl');
     }
 
@@ -3669,7 +3668,7 @@ class PayPlugClass extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.2.0.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
@@ -3746,7 +3745,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3766,7 +3765,6 @@ class PayPlugClass extends PaymentModule
         }
 
         $this->smarty->assign([
-            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
@@ -5021,7 +5019,6 @@ class PayPlugClass extends PaymentModule
         Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
-        Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_ONEY_FEES', Tools::getValue('payplug_oney_fees'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         Configuration::updateValue('PAYPLUG_STANDARD', Tools::getValue('payplug_standard'));
