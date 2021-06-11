@@ -80,16 +80,6 @@ class OneyRepository extends Repository
         $this->setParams();
     }
 
-    protected function setParams()
-    {
-        $this->oneyEntity->setOperations([
-            'x3_with_fees',
-            'x4_with_fees',
-            'x3_without_fees',
-            'x4_without_fees',
-        ]);
-    }
-
     /**
      * @description Assign Oney javascript variable
      */
@@ -312,6 +302,21 @@ class OneyRepository extends Repository
     }
 
     /**
+     * @description Delete basic configuration
+     *
+     * @return bool
+     */
+    public function deleteOneyConfig()
+    {
+        $config = $this->configurationSpecific;
+
+        return ($config->deleteByName('PAYPLUG_ONEY')
+            && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
+            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
+    }
+
+    /**
      * @description Display Oney popin template
      *
      * @return mixed
@@ -364,6 +369,29 @@ class OneyRepository extends Repository
 
             return $this->payplug->fetchTemplate('oney/payment/payment.tpl');
         }
+    }
+
+    /**
+     * ONLY PS 1.6
+     * Display Oney required fields template
+     *
+     * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function displayOneyRequiredFields()
+    {
+        $fields = $this->getOneyRequiredFields();
+
+        if (!$fields) {
+            return false;
+        }
+
+        $this->assign->assign([
+            'oney_required_fields' => $fields
+        ]);
+
+        return $this->payplug->fetchTemplate('oney/required.tpl');
     }
 
     /**
@@ -1010,29 +1038,6 @@ class OneyRepository extends Repository
     }
 
     /**
-     * ONLY PS 1.6
-     * Display Oney required fields template
-     *
-     * @return mixed
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    public function displayOneyRequiredFields()
-    {
-        $fields = $this->getOneyRequiredFields();
-
-        if (!$fields) {
-            return false;
-        }
-
-        $this->assign->assign([
-            'oney_required_fields' => $fields
-        ]);
-
-        return $this->payplug->fetchTemplate('oney/required.tpl');
-    }
-
-    /**
      * @description Return if iso country can use Oney without fees
      * @param $iso_code
      * return bool
@@ -1310,18 +1315,13 @@ class OneyRepository extends Repository
         ];
     }
 
-    /**
-     * @description Delete basic configuration
-     *
-     * @return bool
-     */
-    public function deleteOneyConfig()
+    protected function setParams()
     {
-        $config = $this->configurationSpecific;
-
-        return ($config->deleteByName('PAYPLUG_ONEY')
-            && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
+        $this->oneyEntity->setOperations([
+            'x3_with_fees',
+            'x4_with_fees',
+            'x3_without_fees',
+            'x4_without_fees',
+        ]);
     }
 }

@@ -29,7 +29,6 @@ use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group oney
