@@ -39,6 +39,7 @@ class PaymentRepository extends Repository
     private $paymentEntity;
     private $query;
     private $constant;
+    private $toolsSpecific;
 
     public function __construct(
         $payplug,
@@ -47,7 +48,8 @@ class PaymentRepository extends Repository
         $logger,
         $paymentEntity,
         $query,
-        $constant
+        $constant,
+        $toolsSpecific
     ) {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
@@ -56,44 +58,9 @@ class PaymentRepository extends Repository
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
         $this->constant = $constant;
+        $this->toolsSpecific = $toolsSpecific;
 
         $this->logger->setParams(['process' => 'payment']);
-    }
-
-    /**
-     * @description Return hashed cart with needed (and formatted) elements, ready to be hashed.
-     * @param $paymentDetails
-     * @return string
-     */
-    public function getHashedCart($paymentDetails)
-    {
-        if (!$paymentDetails
-            || !is_array($paymentDetails)
-            || !isset($paymentDetails['cart'])
-            || !$paymentDetails['cart']
-        ) {
-            return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[getHashedCart] $paymentDetails or cart is null, or $paymentDetails is not an array'
-            );
-        }
-        $cartToHash = [];
-
-        if (method_exists($paymentDetails['cart'], 'getProducts')) {
-            foreach ($paymentDetails['cart']->getProducts() as $product) {
-                $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
-                $cartToHash[] = array_map('strval', $product);
-            }
-            if (isset($paymentDetails['oneyDetails'])) {
-                $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
-            }
-            return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
-        } else {
-            return $this->returnPaymentError(
-                ['name' => '$paymentDetails[\'cart\']', 'value' => $paymentDetails['cart']],
-                '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) doesn\'t exist'
-            );
-        }
     }
 
     /**
@@ -230,6 +197,47 @@ class PaymentRepository extends Repository
             return false;
         } else {
             return end($resCheck);
+        }
+    }
+
+    /**
+     * @description Return hashed cart with needed (and formatted) elements, ready to be hashed.
+     * @param $paymentDetails
+     * @return string
+     */
+    public function getHashedCart($paymentDetails)
+    {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cart'])
+            || !$paymentDetails['cart']
+        ) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[getHashedCart] $paymentDetails or cart is null, or $paymentDetails is not an array'
+            );
+        }
+        $cartToHash = [];
+
+        if (method_exists($paymentDetails['cart'], 'getProducts')) {
+            foreach ($paymentDetails['cart']->getProducts() as $product) {
+                $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
+                $cartToHash[] = array_map('strval', $product);
+            }
+
+            $io = $this->toolsSpecific->tool('getValue', 'io', null);
+
+            ($paymentDetails['paymentMethod'] == 'oney')
+                ? (isset($io)
+                    ? $paymentDetails['paymentMethod'] .= $io . $this->confSpecific->get('PAYPLUG_ONEY_FEES')
+                    : '' . $this->confSpecific->get('PAYPLUG_ONEY_FEES'))
+                : true;
+            return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        } else {
+            return $this->returnPaymentError(
+                ['name' => '$paymentDetails[\'cart\']', 'value' => $paymentDetails['cart']],
+                '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) doesn\'t exist'
+            );
         }
     }
 
