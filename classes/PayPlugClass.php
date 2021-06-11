@@ -3310,7 +3310,13 @@ class PayPlugClass extends PaymentModule
             }
 
             // check if order is from oney payment
-            $oney_payment_method = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+            $oney_payment_method = [
+                'oney_x3_with_fees',
+                'oney_x4_with_fees',
+                'oney_x3_without_fees',
+                'oney_x4_without_fees',
+            ];
+
             $is_oney = isset($payment->payment_method)
                 && isset($payment->payment_method['type'])
                 && in_array($payment->payment_method['type'], $oney_payment_method);

@@ -223,6 +223,8 @@ class PayPlugValidation
                     switch ($payment->payment_method['type']) {
                         case 'oney_x3_with_fees':
                         case 'oney_x4_with_fees':
+                        case 'oney_x3_without_fees':
+                        case 'oney_x4_without_fees':
                             $this->isOney = true;
                             break;
                         default:
