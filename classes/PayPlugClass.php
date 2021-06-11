@@ -4680,6 +4680,7 @@ class PayPlugClass extends PaymentModule
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
+            'oneyDetails' => isset($options['is_oney']) ? $options['is_oney'] : null
         ];
 
         /*
