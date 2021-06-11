@@ -1721,7 +1721,7 @@ class PayPlugClass extends PaymentModule
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
                 'standard' => $args['standard'],
-                'one_click' => $args['one_click'],
+                'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
@@ -2552,7 +2552,6 @@ class PayPlugClass extends PaymentModule
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-                && Configuration::get('PAYPLUG_ONEY_FEES')
                 && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();
@@ -3550,10 +3549,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
@@ -3561,6 +3556,7 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -3576,10 +3572,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3588,6 +3580,7 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -3596,10 +3589,6 @@ class PayPlugClass extends PaymentModule
     {
         $current_controller = Dispatcher::getInstance()->getController();
         if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
-            return false;
-        }
-
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
             return false;
         }
 
@@ -3652,7 +3641,11 @@ class PayPlugClass extends PaymentModule
             ]);
             $this->smarty->assign(['popin' => true]);
         }
-        $this->smarty->assign(['env' => 'product']);
+
+        $this->smarty->assign([
+            'env' => 'product',
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
+        ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
 
@@ -3759,7 +3752,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3779,6 +3772,7 @@ class PayPlugClass extends PaymentModule
         }
 
         $this->smarty->assign([
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
@@ -4336,6 +4330,8 @@ class PayPlugClass extends PaymentModule
             ];
         }
 
+        $oney_details = null;
+
         $cart = $this->context->cart;
 
         $default_options = [
@@ -4686,6 +4682,7 @@ class PayPlugClass extends PaymentModule
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
+            'oneyDetails' => isset($options['is_oney']) ? $options['is_oney'] : null
         ];
 
         /*
