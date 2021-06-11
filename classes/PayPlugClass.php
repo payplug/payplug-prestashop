@@ -732,8 +732,8 @@ class PayPlugClass extends PaymentModule
             ]);
         }
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.2.0.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = $this->getAdminAjaxUrl();
 
@@ -1713,7 +1713,7 @@ class PayPlugClass extends PaymentModule
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
                 'standard' => $args['standard'],
-                'one_click' => $args['one_click'],
+                'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
@@ -2544,7 +2544,6 @@ class PayPlugClass extends PaymentModule
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-                && Configuration::get('PAYPLUG_ONEY_FEES')
                 && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();
@@ -2929,8 +2928,8 @@ class PayPlugClass extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.2.0.js');
-        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css');
+        $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -2959,13 +2958,13 @@ class PayPlugClass extends PaymentModule
     {
         if ($this->context->controller->controller_name == 'AdminOrders') {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order-v3.2.0.css',
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order-v3.2.0.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin_order.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin_order.js',
             ]);
         } else {
             $this->setMedia([
-                __PS_BASE_URI__ . 'modules/payplug/views/js/admin-v3.2.0.js',
-                __PS_BASE_URI__ . 'modules/payplug/views/css/admin-v3.2.0.css',
+                __PS_BASE_URI__ . 'modules/payplug/views/js/admin.js',
+                __PS_BASE_URI__ . 'modules/payplug/views/css/admin.css',
             ]);
         }
     }
@@ -3302,7 +3301,13 @@ class PayPlugClass extends PaymentModule
             }
 
             // check if order is from oney payment
-            $oney_payment_method = ['oney_x3_with_fees', 'oney_x4_with_fees'];
+            $oney_payment_method = [
+                'oney_x3_with_fees',
+                'oney_x4_with_fees',
+                'oney_x3_without_fees',
+                'oney_x4_without_fees',
+            ];
+
             $is_oney = isset($payment->payment_method)
                 && isset($payment->payment_method['type'])
                 && in_array($payment->payment_method['type'], $oney_payment_method);
@@ -3502,7 +3507,7 @@ class PayPlugClass extends PaymentModule
         }
 
         if ($show_popin && $display_refund) {
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin-v3.2.0.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
 
         $this->html .= $this->fetchTemplate('/views/templates/admin/order/order.tpl');
@@ -3536,10 +3541,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
@@ -3547,6 +3548,7 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -3562,10 +3564,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3574,6 +3572,7 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -3582,10 +3581,6 @@ class PayPlugClass extends PaymentModule
     {
         $current_controller = Dispatcher::getInstance()->getController();
         if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
-            return false;
-        }
-
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
             return false;
         }
 
@@ -3638,7 +3633,11 @@ class PayPlugClass extends PaymentModule
             ]);
             $this->smarty->assign(['popin' => true]);
         }
-        $this->smarty->assign(['env' => 'product']);
+
+        $this->smarty->assign([
+            'env' => 'product',
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
+        ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
 
@@ -3668,7 +3667,7 @@ class PayPlugClass extends PaymentModule
                 return;
             }
 
-            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded-v3.2.0.js');
+            $this->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
 
             $payment_options = [
                 'id_card' => Tools::getValue('pc', 'new_card'),
@@ -3745,7 +3744,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3765,6 +3764,7 @@ class PayPlugClass extends PaymentModule
         }
 
         $this->smarty->assign([
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',

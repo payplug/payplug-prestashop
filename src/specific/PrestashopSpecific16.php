@@ -46,8 +46,8 @@ class PrestashopSpecific16
 
     public function hookHeader()
     {
-        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6-v3.2.0.css');
-        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6-v3.2.0.js');
+        $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
 
         Media::addJsDef([
             'payplug_ajax_url' => $this->contextSpecific->link->getModuleLink('payplug', 'ajax', [], true),
@@ -69,8 +69,7 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-            && (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
