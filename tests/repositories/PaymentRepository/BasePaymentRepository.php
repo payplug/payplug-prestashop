@@ -53,7 +53,8 @@ class BasePaymentRepository extends RepositoryBase
             $this->logger,
             $this->payment,
             $this->query,
-            $this->constant
+            $this->constant,
+            $this->tools
         ])->makePartial();
 
         $this->arrayCache = [];
