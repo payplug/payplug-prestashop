@@ -40,9 +40,11 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $type = Tools::getValue('type', null);
         $io = Tools::getValue('io', null);
         $is_oney = null;
+        $with_fees = null;
         if ((isset($type)) && ($type == 'oney')) {
             if (isset($io)) {
-                $is_oney = 'x'.$io.'_with_fees';
+                (bool)Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
+                $is_oney = 'x'.$io.'_'.$with_fees;
             }
         }
         $options = [
