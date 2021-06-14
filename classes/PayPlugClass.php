@@ -1085,13 +1085,24 @@ class PayPlugClass extends PaymentModule
                 : $this->l('payplug.buildPaymentDetails.no');
         }
 
+        $is_oney = false;
         if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                    $payment_details['type'] = 'Oney 3x';
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithFees');
                     break;
                 case 'oney_x4_with_fees':
-                    $payment_details['type'] = 'Oney 4x';
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithFees');
+                    break;
+                case 'oney_x3_without_fees':
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithoutFees');
+                    break;
+                case 'oney_x4_without_fees':
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithoutFees');
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -1149,7 +1160,7 @@ class PayPlugClass extends PaymentModule
             $payment_details['error'] = '(' . $payment->failure->message . ')';
         }
 
-        if (isset($payment_details['type']) && in_array($payment_details['type'], ['Oney 3x', 'Oney 4x'], true)) {
+        if ($is_oney) {
             unset($payment_details['card_brand']);
             unset($payment_details['card_mask']);
             unset($payment_details['card_date']);
