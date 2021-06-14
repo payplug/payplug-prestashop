@@ -403,12 +403,16 @@ class PayPlugValidation
             if ($this->isOney) {
                 switch ($payment->payment_method['type']) {
                     case 'oney_x3_with_fees':
-                    case 'oney_x3_without_fees':
                         $module_name = $this->payplug->l('Oney 3x');
                         break;
                     case 'oney_x4_with_fees':
-                    case 'oney_x4_without_fees':
                         $module_name = $this->payplug->l('Oney 4x');
+                        break;
+                    case 'oney_x3_without_fees':
+                        $module_name = $this->payplug->l('validation.createOrder.oneyX3WithoutFees');
+                        break;
+                    case 'oney_x4_without_fees':
+                        $module_name = $this->payplug->l('validation.createOrder.oneyX4WithoutFees');
                         break;
                     default:
                         break;
