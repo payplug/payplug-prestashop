@@ -197,7 +197,7 @@ class PluginRepository extends Repository
             $this->logger,
             $this->paymentEntity,
             $this->query,
-            $this->constant
+            $this->constant,
         );
 
         $this->install = new InstallRepository(
