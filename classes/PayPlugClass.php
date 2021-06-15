@@ -4448,7 +4448,7 @@ class PayPlugClass extends PaymentModule
             $default_language = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->getIsoCodeList();
             if (in_array(Tools::strtoupper($default_language->iso_code), $iso_code_list, true)) {
-                $iso_code = $default_language->iso_code;
+                $iso_code = Tools::strtoupper($default_language->iso_code);
             } else {
                 $iso_code = 'FR';
             }
