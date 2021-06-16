@@ -44,11 +44,29 @@ if (!empty($missing_translations)) {
     }
 }
 
+// In case we use this script via the CI, check if we need a strong feed back
+$need_return = false;
+if (isset($argv) && !empty($argv)) {
+    $target_branch = $argv[1];
+    $allowed_branches = ['qa','hotfix','master','release'];
+    foreach ($allowed_branches as $branch) {
+        $pos = strpos($target_branch, $branch);
+        if ($pos !== false && !$pos && !$need_return) {
+            $need_return = true;
+        }
+    }
+}
+
+// Return error message needed
 if (!empty($messages)) {
     foreach ($messages as $message) {
         echo $message . "\n";
     }
-//    die(1);
+    if ($need_return) {
+        die(1);
+    }
 }
 
-//die(0);
+if ($need_return) {
+    die(0);
+}

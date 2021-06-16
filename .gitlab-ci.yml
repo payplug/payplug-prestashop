@@ -28,10 +28,9 @@ unit tests:
 check module translations:
   image: php:7.4
   stage: translations
-#  only:
-#    - /^release-.*$/
+  only: [merge_requests]
   script:
-    - php ci/translations.php
+    - php ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   artifacts:
     paths:
       - ci/translations.csv
