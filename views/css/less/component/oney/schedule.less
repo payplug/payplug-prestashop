@@ -6,6 +6,7 @@
     line-height: 17px;
     width: 100%;
     margin: -10px 0 20px -8px;
+    padding: 12px 0;
 
     // Oney Detail
     ul {
@@ -35,9 +36,12 @@
           }
         }
 
-        &:first-child,
         &:last-child {
-          padding: 12px 0;
+          padding: 12px 0 0;
+
+          .-withoutFees& {
+            padding: 0;
+          }
         }
 
         small {

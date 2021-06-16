@@ -26,12 +26,11 @@ unit tests:
     - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
 check module translations:
-  image: composer:1.9
+  image: php:7.4
   stage: translations
-  only:
-    - /^release-.*$/
+#  only:
+#    - /^release-.*$/
   script:
-    - composer dump-autoload -o
     - php ci/translations.php
   artifacts:
     paths:

@@ -80,16 +80,6 @@ class OneyRepository extends Repository
         $this->setParams();
     }
 
-    protected function setParams()
-    {
-        $this->oneyEntity->setOperations([
-            'x3_with_fees',
-            'x4_with_fees',
-            'x3_without_fees',
-            'x4_without_fees',
-        ]);
-    }
-
     /**
      * @description Assign Oney javascript variable
      */
@@ -171,7 +161,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('oney.assignOneyPriceAndPaymentOptions.unavailable')
         );
 
         $this->assign->assign([
@@ -201,17 +191,13 @@ class OneyRepository extends Repository
         $min_amount = $this->payplug->convertAmount($limits['min'], true);
         $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-        $legal_text = 'Offre de financement avec apport obligatoire, 
-        réservée aux particuliers et valable pour tout achat de %s à %s. ';
-        $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
-        $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
-        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
-        $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
+        $legal_text = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+            ? $this->l('oney.assignLegalNotice.legalWithFees')
+            : $this->l('oney.assignLegalNotice.legalWithoutFees');
 
         $this->assign->assign([
             'legal_notice' => sprintf(
-                $this->l($legal_text),
+                $legal_text,
                 $this->toolsSpecific->tool('displayPrice', $min_amount),
                 $this->toolsSpecific->tool('displayPrice', $max_amount)
             )
@@ -312,6 +298,21 @@ class OneyRepository extends Repository
     }
 
     /**
+     * @description Delete basic configuration
+     *
+     * @return bool
+     */
+    public function deleteOneyConfig()
+    {
+        $config = $this->configurationSpecific;
+
+        return ($config->deleteByName('PAYPLUG_ONEY')
+            && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
+            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
+    }
+
+    /**
      * @description Display Oney popin template
      *
      * @return mixed
@@ -319,6 +320,9 @@ class OneyRepository extends Repository
     public function displayOneyPopin()
     {
         $this->assignLegalNotice();
+        $this->assign->assign([
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+        ]);
         return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
 
@@ -332,6 +336,7 @@ class OneyRepository extends Repository
     public function displayOneySchedule($oney_payment, $amount)
     {
         $vars = [
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
@@ -353,6 +358,7 @@ class OneyRepository extends Repository
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->assign->assign([
+                'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
                 'payplug_module_dir' => str_replace(
                     'payplug/payplug.php',
                     '',
@@ -364,6 +370,29 @@ class OneyRepository extends Repository
 
             return $this->payplug->fetchTemplate('oney/payment/payment.tpl');
         }
+    }
+
+    /**
+     * ONLY PS 1.6
+     * Display Oney required fields template
+     *
+     * @return mixed
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     */
+    public function displayOneyRequiredFields()
+    {
+        $fields = $this->getOneyRequiredFields();
+
+        if (!$fields) {
+            return false;
+        }
+
+        $this->assign->assign([
+            'oney_required_fields' => $fields
+        ]);
+
+        return $this->payplug->fetchTemplate('oney/required.tpl');
     }
 
     /**
@@ -571,24 +600,23 @@ class OneyRepository extends Repository
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
         $available_oney_payments = $this->oneyEntity->getOperations();
-        $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
+        $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
-        foreach ($available_oney_payments as $key => $oney_payment) {
-            $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
+        $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
+        foreach ($oney_simulations['simulations'] as $key => $oney_payment) {
+            $with_fees = (bool)strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
-                unset($available_oney_payments[$key]);
+                unset($oney_simulations['simulations'][$key]);
             }
         }
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $available_oney_payments);
-
-        if (!$oney_sims['result']) {
+        if (!$oney_simulations['result']) {
             return $payment_list;
         }
 
-        foreach ($oney_sims['simulations'] as $method => $oney_sim) {
-            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
+        foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
+            if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
+                $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
             }
         }
 
@@ -626,7 +654,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('oney.getOneyPriceAndPaymentOptions.unavailable')
         );
 
         $this->assign->assign([
@@ -1010,29 +1038,6 @@ class OneyRepository extends Repository
     }
 
     /**
-     * ONLY PS 1.6
-     * Display Oney required fields template
-     *
-     * @return mixed
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    public function displayOneyRequiredFields()
-    {
-        $fields = $this->getOneyRequiredFields();
-
-        if (!$fields) {
-            return false;
-        }
-
-        $this->assign->assign([
-            'oney_required_fields' => $fields
-        ]);
-
-        return $this->payplug->fetchTemplate('oney/required.tpl');
-    }
-
-    /**
      * @description Return if iso country can use Oney without fees
      * @param $iso_code
      * return bool
@@ -1310,18 +1315,13 @@ class OneyRepository extends Repository
         ];
     }
 
-    /**
-     * @description Delete basic configuration
-     *
-     * @return bool
-     */
-    public function deleteOneyConfig()
+    protected function setParams()
     {
-        $config = $this->configurationSpecific;
-
-        return ($config->deleteByName('PAYPLUG_ONEY')
-            && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
+        $this->oneyEntity->setOperations([
+            'x3_with_fees',
+            'x4_with_fees',
+            'x3_without_fees',
+            'x4_without_fees',
+        ]);
     }
 }

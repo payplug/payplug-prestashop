@@ -1,5 +1,4 @@
 <?php
-ini_set('display_errors', true);
 
 require_once(dirname(__FILE__) . '/src/Translations.php');
 
@@ -49,4 +48,7 @@ if (!empty($messages)) {
     foreach ($messages as $message) {
         echo $message . "\n";
     }
+//    die(1);
 }
+
+//die(0);

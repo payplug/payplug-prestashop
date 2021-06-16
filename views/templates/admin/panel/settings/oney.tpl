@@ -34,12 +34,6 @@
                 <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
                         {include file='./oney_fees.tpl'}
-                        <div class="payplugPanel_section">
-                            {include file='./switch.tpl' switch=$payplug_switch.oney_tos}
-                            <p>{l s='I integrated the mandatory fields to my terms and conditions on my website.' mod='payplug'}
-                                <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_f9ffbbdb-e5f2-487f-a709-854eb852e480" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
-                            </p>
-                        </div>
                         <div class="payplugPanel_section -nowrap">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_optimized}
                             <p>

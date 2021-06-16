@@ -1,7 +1,5 @@
 <?php
 
-$available_languages = ['fr', 'en', 'gb', 'it'];
-
 $header = '<?php
 
 global $_MODULE;

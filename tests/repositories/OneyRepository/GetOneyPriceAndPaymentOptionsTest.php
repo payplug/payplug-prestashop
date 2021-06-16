@@ -135,7 +135,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'Oney is momentarily unavailable.',
+                'error' => 'oney.getOneyPriceAndPaymentOptions.unavailable',
                 'popin' => 'popin',
                 'payment' => 'payment_option'
             ],
