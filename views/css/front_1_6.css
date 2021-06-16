@@ -172,6 +172,7 @@
 /* Payplug payment option */
 .payplugPaymentOption label {
   margin: 0;
+  text-align: left;
 }
 .payplugPaymentOption img {
   margin: 0 12px 0 0;
