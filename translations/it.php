@@ -401,3 +401,9 @@ $_MODULE['<{payplug}prestashop>oneyrepository_bd4294bea3cf9c876195adccc6ebbb32']
 $_MODULE['<{payplug}prestashop>oneyrepository_37aad38a9a02f6659c12948a70b838fe'] = 'Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 www.orias.fr.  Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>cardrepository_0d2d5fa0cfffc8577f948d683a82079e'] = 'Carta eliminata con successo.';
+$_MODULE['<{payplug}prestashop>oney_fees_a7c0a9e26a7e0d2cd65c82f2977523bd'] = 'Oney con spese';
+$_MODULE['<{payplug}prestashop>oney_fees_5b1c55ed6e711b368c989cbf22182d5e'] = 'Le spese sono ripartite tra te e i tuoi clienti.';
+$_MODULE['<{payplug}prestashop>oney_fees_ff358e7aed108d9194605ef719e68500'] = 'Attivato';
+$_MODULE['<{payplug}prestashop>oney_fees_1d2f3769a8c5caec51af48721665a520'] = 'Oney senza spese';
+$_MODULE['<{payplug}prestashop>oney_fees_4abbe9e57c6b8fd0495898fc4eff3863'] = 'Le spese sono a tuo carico.';
+$_MODULE['<{payplug}prestashop>payplug_4e95b36ca864e9540cc94a3953477f43'] = 'Paga in %sx rate senza spese con carta di gradito grazie a Oney';
