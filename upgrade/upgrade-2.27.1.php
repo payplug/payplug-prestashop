@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_1($object)
+function upgrade_module_2_27_1()
 {
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
         return true;
