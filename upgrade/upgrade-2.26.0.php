@@ -34,13 +34,13 @@ function upgrade_module_2_26_0($object)
 
     $flag = true;
 
-    // run the method who install Oney feature
-    if ($object->isValidPHPVersion()) {
-        $flag = $object->dependencies->getPlugin()->getOney()->installOney();
-    }
-
     //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
+    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0) ||
+        !Configuration::updateValue('PAYPLUG_ONEY', 0) ||
+        !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
+        !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
+        !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+    ) {
         $flag = false;
     }
 
