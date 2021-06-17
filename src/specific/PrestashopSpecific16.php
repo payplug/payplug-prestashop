@@ -181,6 +181,8 @@ class PrestashopSpecific16
     {
         $translations = [
             'en' => 'Installment Plans',
+            'gb' => 'Installment Plans',
+            'it' => 'Pagamenti frazionati',
             'fr' => 'Paiements en plusieurs fois'
         ];
 
