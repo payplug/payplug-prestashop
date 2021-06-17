@@ -1070,11 +1070,11 @@ class PayPlugPayment
 
             // then format code
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
+            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             return $phone_util->isValidNumber($parsed) ?
-                $phone_util->format($parsed, \libphonenumber\PhoneNumberFormat::E164) : null;
+                $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164) : null;
         } catch (Exception $e) {
             // todo: add log
             return null;
