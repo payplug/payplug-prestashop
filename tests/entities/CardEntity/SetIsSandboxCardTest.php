@@ -47,7 +47,7 @@ final class SetIsSandboxTest extends TestCase
         $this->card->setIsSandbox(false);
         $this->assertSame(
             false,
-            $this->card->isSandbox()
+            $this->card->getIsSandbox()
         );
     }
 

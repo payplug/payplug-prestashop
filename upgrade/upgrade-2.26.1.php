@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_26_1($object)
+function upgrade_module_2_26_1()
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -33,10 +33,6 @@ function upgrade_module_2_26_1($object)
     }
 
     $flag = true;
-
-    if (!$object->checkVersion()) {
-        return $flag;
-    }
 
     // Update payplug lock table
     $sql_requests = [

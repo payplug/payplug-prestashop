@@ -23,8 +23,18 @@
 
 namespace PayPlug\src\repositories;
 
-class SQLtableRepository extends \Payplug
+use PayPlug\classes\MyLogPHP;
+
+class SQLtableRepository
 {
+    /** @var object */
+    private $query;
+
+    public function __construct($query)
+    {
+        $this->query = $query;
+    }
+
     /**
      * Install SQL tables used by module
      *
@@ -32,8 +42,7 @@ class SQLtableRepository extends \Payplug
      */
     public function installSQL()
     {
-        // Use old log system, because PayPlug Cache table doesn't exist yet.
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $log->info('Installation SQL Starting.');
 
         if (!defined('_MYSQL_ENGINE_')) {
@@ -208,47 +217,6 @@ class SQLtableRepository extends \Payplug
     }
 
     /**
-     * Install Oney SQL
-     * @return bool
-     */
-    public function installOneySql()
-    {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-
-        // Create PayPlug Carrier table for Oney
-        $this->query
-            ->create()
-            ->table(_DB_PREFIX_ . 'payplug_carrier')
-            ->fields('`id_payplug_carrier` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
-            ->fields('`id_carrier` INT(11) UNSIGNED NOT NULL')
-            ->fields('`delay` INT(11) UNSIGNED NOT NULL DEFAULT 3')
-            ->fields('`delivery_type` VARCHAR(250) NOT NULL DEFAULT \'carrier\'')
-            ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
-            ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
-            ->engine(_MYSQL_ENGINE_);
-
-        if (!$this->query->build()) {
-            $log->error('Installation SQL failed: PAYPLUG_CARRIER.');
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Uninstall Oney SQL
-     * @return bool
-     */
-    public function uninstallOneySql()
-    {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Uninstallation Oney SQL starting. (PayPlug Carrier table)');
-        $flag = true;
-        $flag = $flag && $this->query->drop()->table(_DB_PREFIX_ . 'payplug_carrier')->build();
-        return $flag;
-    }
-
-    /**
      * Remove SQL tables used by module
      *
      * @param $keep_cards
@@ -256,8 +224,8 @@ class SQLtableRepository extends \Payplug
      */
     public function uninstallSQL($keep_cards = false)
     {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-        $log->info('Uninstallation SQL starting.');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log->info('uninstallSQL() starting.');
 
         $flag = true;
 
@@ -292,7 +260,7 @@ class SQLtableRepository extends \Payplug
      */
     public function checkExistingTable($table, $canUsePayplugLogger = 1)
     {
-        $log = new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
         $logger = null;
 
         if ($canUsePayplugLogger) {

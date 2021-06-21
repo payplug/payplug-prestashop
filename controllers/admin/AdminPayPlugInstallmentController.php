@@ -33,7 +33,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->payplug = new Payplug();
+        $this->payplug = new \PayPlug\classes\PayPlugClass();
         $this->bootstrap = true;
         $this->table = 'payplug_installment';
         $this->id = 'id_payplug_installment';

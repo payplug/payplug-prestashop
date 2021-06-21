@@ -34,6 +34,7 @@ class PaymentRepository extends Repository
     protected $payplug;
     private $apiPayment;
     private $cartSpecific;
+    private $confSpecific;
     private $logger;
     private $paymentEntity;
     private $query;
@@ -42,6 +43,7 @@ class PaymentRepository extends Repository
     public function __construct(
         $payplug,
         $cartSpecific,
+        $confSpecific,
         $logger,
         $paymentEntity,
         $query,
@@ -49,12 +51,52 @@ class PaymentRepository extends Repository
     ) {
         $this->payplug = $payplug;
         $this->cartSpecific = $cartSpecific;
+        $this->confSpecific = $confSpecific;
         $this->logger = $logger;
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
         $this->constant = $constant;
 
         $this->logger->setParams(['process' => 'payment']);
+    }
+
+    /**
+     * @description Return hashed cart with needed (and formatted) elements, ready to be hashed.
+     * @param $paymentDetails
+     * @return string
+     */
+    public function getHashedCart($paymentDetails)
+    {
+        if (!$paymentDetails
+            || !is_array($paymentDetails)
+            || !isset($paymentDetails['cart'])
+            || !$paymentDetails['cart']
+        ) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[getHashedCart] $paymentDetails or cart is null, or $paymentDetails is not an array'
+            );
+        }
+        $cartToHash = [];
+
+        if (method_exists($paymentDetails['cart'], 'getProducts')) {
+            foreach ($paymentDetails['cart']->getProducts() as $product) {
+                $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
+                $cartToHash[] = array_map('strval', $product);
+            }
+
+            // For optimised / non optimised Oney + 3x / 4x to have a good hash ;-)
+            if (isset($paymentDetails['oneyDetails'])) {
+                $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
+            }
+
+            return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        } else {
+            return $this->returnPaymentError(
+                ['name' => '$paymentDetails[\'cart\']', 'value' => $paymentDetails['cart']],
+                '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) doesn\'t exist'
+            );
+        }
     }
 
     /**
@@ -79,12 +121,7 @@ class PaymentRepository extends Repository
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
-
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        $cartHash = $this->getHashedCart($paymentDetails);
 
         if ($paymentStored['cart_hash'] === $cartHash
             &&
@@ -120,7 +157,7 @@ class PaymentRepository extends Repository
                 $paymentDetails = $updatePaymentTable['paymentDetails'];
             } elseif (!$updatePaymentTable['result']) {
                 return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $updatePaymentTable['paymentDetails']],
+                    ['name' => 'updatePaymentTable', 'value' => $updatePaymentTable],
                     $updatePaymentTable['response']
                 );
             }
@@ -212,6 +249,13 @@ class PaymentRepository extends Repository
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
+            );
+        }
+
+        if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confSpecific->get('PAYPLUG_STANDARD')) {
+            return $this->returnPaymentError(
+                ['name' => 'Configuration::get', 'value' => $this->confSpecific->get('PAYPLUG_STANDARD')],
+                '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
             );
         }
 
@@ -311,12 +355,14 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+        $cartHash = $this->getHashedCart($paymentDetails);
 
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        if (!$cartHash || !is_string($cartHash)) {
+            return $this->returnPaymentError(
+                ['name' => 'cartHash', 'value' => $cartHash],
+                '[updatePaymentTable] $cartHash is null or not a string'
+            );
+        }
 
         $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
 
@@ -518,8 +564,8 @@ class PaymentRepository extends Repository
             ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
             ->fields('id_cart')->values($paymentDetails['cartId'])
             ->fields('cart_hash')->values($cartHash)
-            ->fields('authorized_at')->values($paymentDetails['authorizedAt'])
-            ->fields('is_paid')->values($paymentDetails['isPaid'])
+            ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
+            ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
             ->fields('date_upd')->values($paymentDate);
 
         try {

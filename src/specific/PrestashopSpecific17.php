@@ -23,7 +23,11 @@
 
 namespace PayPlug\src\specific;
 
+use Language;
+use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+use Tab;
+use Tools;
 
 class PrestashopSpecific17
 {
@@ -85,5 +89,82 @@ class PrestashopSpecific17
         }
 
         return $paymentOptions;
+    }
+
+    // todo: set Tab install process in a specific
+    public function installTab()
+    {
+        $installed = true;
+        $moduleName = $this->payplug->name;
+
+        // Install tab AdminPayPlug
+        $translationsAdminPayPlug = [
+            'en' => 'PayPlug',
+            'gb' => 'PayPlug',
+            'it' => 'PayPlug',
+            'fr' => 'PayPlug'
+        ];
+        $tab = new Tab();
+        foreach (Language::getLanguages(false) as $language) {
+            $id_lang = (int)$language['id_lang'];
+            $iso_code = Tools::strtolower($language['iso_code']);
+            if (isset($translationsAdminPayPlug[$iso_code])) {
+                $tab->name[$id_lang] = $translationsAdminPayPlug[$iso_code];
+            } else {
+                $tab->name[$id_lang] = $translationsAdminPayPlug['en'];
+            }
+        }
+
+        $tab->class_name = 'AdminPayPlug';
+        $tab->module = $moduleName;
+
+        $installed = $installed && $tab->save();
+
+        // Install tab AdminPayPlugInstallment
+        $translationsAdminPayPlugInstallment = [
+            'en' => 'Installment Plans',
+            'gb' => 'Installment Plans',
+            'it' => 'Pagamenti frazionati',
+            'fr' => 'Paiements en plusieurs fois'
+        ];
+        $tab = new Tab();
+        foreach (Language::getLanguages(false) as $language) {
+            $id_lang = (int)$language['id_lang'];
+            $iso_code = Tools::strtolower($language['iso_code']);
+            if (isset($translationsAdminPayPlugInstallment[$iso_code])) {
+                $tab->name[$id_lang] = $translationsAdminPayPlugInstallment[$iso_code];
+            } else {
+                $tab->name[$id_lang] = $translationsAdminPayPlugInstallment['en'];
+            }
+        }
+        $tab->class_name = 'AdminPayPlugInstallment';
+        $tab->module = $moduleName;
+        $tab->id_parent = Tab::getIdFromClassName('AdminPayPlug');
+
+        $installed = $installed && $tab->save();
+
+        return $installed;
+    }
+
+    // todo: set Tab uninstall process in a specific
+    public function uninstallTab()
+    {
+        $flag = true;
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlug');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        return $flag;
     }
 }

@@ -182,7 +182,8 @@ var $document,
                 event.stopPropagation();
 
                 var $link = $(this),
-                    is_inst = $link.is('.installment');
+                    is_inst = $link.is('.installment'),
+                    spinner_url= $('input:hidden[name=spinner_url]').val();
 
                 if (($('#form_payplug_payment').length && !is_inst)) {
                     return false;
@@ -491,6 +492,9 @@ var $document,
                     payplugModule.oney.popin.close();
                 },
                 handleProductEvent: function () {
+                    $document.on('click', '.product_quantity_down, .product_quantity_up', function () {
+                        return payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                    });
                     $document.on('change', 'input[name=qty]', function () {
                         return payplugModule.oney.load(payplugModule.oney.payment.props.open);
                     });
@@ -578,10 +582,6 @@ var $document,
                 },
                 send: function (event) {
                     event.preventDefault();
-                    // if invalid carrier return
-                    if ($('.oneyPayment').is('.-invalidCarrier')) {
-                        return false;
-                    }
 
                     if ($('.oneyRequired').length) {
                         payplugModule.oney.payment.form.open();

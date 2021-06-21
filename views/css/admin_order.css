@@ -224,6 +224,9 @@
   margin: 0 0 8px;
   color: #e56876;
 }
+.payplugPopup_error.-confirm {
+  margin: -8px 0 16px;
+}
 .payplugPopup_footer {
   border-top: 1px solid #e6e6e6;
   padding: 15px 0 0;
@@ -659,7 +662,6 @@ span.ppclose {
 }
 .payplugOrder_delay {
   float: left;
-  margin: 20px 0 0;
   line-height: 27px;
   padding: 0 0 0 16px;
 }

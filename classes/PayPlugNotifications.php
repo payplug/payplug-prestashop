@@ -21,7 +21,24 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+namespace PayPlug\classes;
+
+use Address;
+use Db;
+use Cart;
+use Configuration;
+use Context;
+use Country;
+use Currency;
+use Customer;
+use Exception;
+use Language;
+use Message;
+use Order;
+use OrderHistory;
+use Shop;
+use Tools;
+use Validate;
 
 /**
  * Class PayPlugNotifications
@@ -66,10 +83,10 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
-        $this->payplug = new Payplug();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
-        $this->debug = $this->payplug->getConfiguration('PAYPLUG_DEBUG_MODE');
-        $this->sandbox = $this->payplug->getConfiguration('PAYPLUG_SANDBOX_MODE');
+        $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
 
         $this->setLogger();
         $this->getResource();
@@ -82,15 +99,15 @@ class PayPlugNotifications
     {
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
         $this->order_states = [
-            'pending' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
-            'paid' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'error' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
-            'inst' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'auth' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
-            'exp' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
-            'oney' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
-            'cancelled' => $this->payplug->getConfiguration('PS_OS_CANCELED'),
-            'refund' => $this->payplug->getConfiguration('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
+            'pending' => Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
+            'paid' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
+            'error' => Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
+            'inst' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
+            'auth' => Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
+            'exp' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
+            'oney' => Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
+            'cancelled' => Configuration::get('PS_OS_CANCELED'),
+            'refund' => Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
         ];
     }
 
@@ -104,8 +121,8 @@ class PayPlugNotifications
         try {
             $resource = json_decode($body);
             $this->api_key = (bool)$resource->is_live ?
-                $this->payplug->getConfiguration('PAYPLUG_LIVE_API_KEY') :
-                $this->payplug->getConfiguration('PAYPLUG_TEST_API_KEY');
+                Configuration::get('PAYPLUG_LIVE_API_KEY') :
+                Configuration::get('PAYPLUG_TEST_API_KEY');
             $this->payplug->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
@@ -234,6 +251,8 @@ class PayPlugNotifications
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                 case 'oney_x4_with_fees':
+                case 'oney_x3_without_fees':
+                case 'oney_x4_without_fees':
                     $this->is_oney = true;
                     break;
                 default:
@@ -287,7 +306,6 @@ class PayPlugNotifications
             }
         }
 
-        $this->logger->addLog('Cart ID: ' . (int)$id_cart, 'debug');
         $this->logger->addLog('Is Live: ' . (int)$this->payment->is_live, 'debug');
         $this->logger->addLog('Amount: ' . (int)$this->payment->amount, 'debug');
 
@@ -301,13 +319,18 @@ class PayPlugNotifications
             $this->exitProcess($exception->getMessage(), 500);
         }
         if (!Validate::isLoadedObject($this->cart)) {
-            $this->logger->addLog('The cart cannot be loaded.', 'error');
+            $this->logger->addLog('The cart cannot be loaded with id ' . $id_cart, 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);
         }
 
-        $this->setContextFromCartID($this->cart->id);
+        $this->logger->addLog('Cart ID: ' . (int)$this->cart->id, 'debug');
+
+        // Set Context
+        $this->logger->addLog('Set context from cartId', 'debug');
+        $this->setContext();
 
         // Set lock in db then set $this->lock_key
+        $this->logger->addLog('Lock creation', 'debug');
         do {
             $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
@@ -317,18 +340,7 @@ class PayPlugNotifications
                 $this->lock_key = $this->cart->id;
             }
         } while (!$cart_lock);
-
-        try {
-            $address = new Address((int)$this->cart->id_address_invoice);
-        } catch (Exception $exception) {
-            $this->logger->addLog('The address cannot be loaded: '
-                . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), 500);
-        }
-        if (!Validate::isLoadedObject($address)) {
-            $this->logger->addLog('The address cannot be loaded.', 'error');
-            $this->exitProcess('The address cannot be loaded.', 500);
-        }
+        $this->logger->addLog('Lock created', 'debug');
 
         $id_order = Order::getOrderByCartId($this->cart->id);
 
@@ -459,7 +471,7 @@ class PayPlugNotifications
             if ($this->payment->installment_plan_id !== null) {
                 $is_amount_correct = (bool)$this->payment->is_paid;
             } else {
-                $is_amount_correct = (bool)PayPlug::checkAmountPaidIsCorrect(
+                $is_amount_correct = (bool)PayPlugClass::checkAmountPaidIsCorrect(
                     $this->payment->amount / 100,
                     $order
                 );
@@ -871,7 +883,7 @@ class PayPlugNotifications
         try {
             $this->payment = $this->payplug->retrievePayment($refund->payment_id);
             $this->setOrderStates();
-        } catch (ConfigurationNotSetException $exception) {
+        } catch (Exception $exception) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
             $this->exitProcess($exception->getMessage(), 500);
         }
@@ -977,20 +989,20 @@ class PayPlugNotifications
      * @description Set the context of the order
      * @param $id_cart
      */
-    protected function setContextFromCartID($id_cart)
+    private function setContext()
     {
         if (!isset($this->context)) {
             $this->context = Context::getContext();
         }
 
-        $this->context->cart = new Cart((int)$id_cart);
-        $address = new Address((int)$this->context->cart->id_address_invoice);
+        $this->context->cart = $this->cart;
+        $address = new Address((int)$this->cart->id_address_invoice);
         $this->context->country = new Country((int)$address->id_country);
-        $this->context->customer = new Customer((int)$this->context->cart->id_customer);
-        $this->context->language = new Language((int)$this->context->cart->id_lang);
-        $this->context->currency = new Currency((int)$this->context->cart->id_currency);
-        if (isset($this->context->cart->id_shop)) {
-            $this->context->shop = new Shop($this->context->cart->id_shop);
+        $this->context->customer = new Customer((int)$this->cart->id_customer);
+        $this->context->language = new Language((int)$this->cart->id_lang);
+        $this->context->currency = new Currency((int)$this->cart->id_currency);
+        if (isset($this->cart->id_shop)) {
+            $this->context->shop = new Shop($this->cart->id_shop);
         }
     }
 

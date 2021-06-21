@@ -21,7 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+namespace Payplug\classes;
+
 use PayPlug\src\repositories\CardRepository;
+use Address;
+use Configuration;
+use Country;
+use Exception;
+use Product;
+use Validate;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -41,7 +49,7 @@ class PayPlugAjax
 
     public function __construct()
     {
-        $this->payplug = new \Payplug();
+        $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->card = $this->plugin->getCard();
         $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
@@ -74,14 +82,14 @@ class PayPlugAjax
                 if ((int)$tools->tool('getValue', 'pay') == 1) {
                     $is_installment = $tools->tool('getValue', 'i');
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
-                    $is_deferred = $this->payplug->getConfiguration('PAYPLUG_DEFERRED') == 1;
+                    $is_deferred = Configuration::get('PAYPLUG_DEFERRED') == 1;
                     $is_oney = $tools->tool('getValue', 'io');
                     $options = [
                         'id_card' => $tools->tool('getValue', 'pc'),
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
                         'is_oney' => $is_oney,
-                        '_ajax' => 1
+                        '_ajax' => 1,
                     ];
                     $payment = $this->payplug->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
@@ -100,14 +108,14 @@ class PayPlugAjax
                     }
                 }
             } elseif ($tools->tool('getIsset', 'checkOneyAddresses')) {
-                if (!$this->payplug->getConfiguration('PAYPLUG_ONEY')) {
+                if (!Configuration::get('PAYPLUG_ONEY')) {
                     die($tools->tool('jsonEncode', ['result' => false, 'error' => false]));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');
                 $id_billing = $tools->tool('getValue', 'id_address_invoice');
                 die($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
-                $use_taxes = (bool)$this->payplug->getConfiguration('PS_TAX');
+                $use_taxes = (bool)Configuration::get('PS_TAX');
 
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
@@ -146,7 +154,7 @@ class PayPlugAjax
 
                 die($tools->tool('jsonEncode', $is_elligible));
             } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
-                $use_taxes = (bool)$this->payplug->getConfiguration('PS_TAX');
+                $use_taxes = (bool)Configuration::get('PS_TAX');
 
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
@@ -211,7 +219,7 @@ class PayPlugAjax
                         ]));
                     }
                 } catch (Exception $e) {
-                    throw new \Exception($e);
+                    throw new Exception($e);
                 }
 
                 $result = $this->payplug->setPaymentDataCookie($payment_data);

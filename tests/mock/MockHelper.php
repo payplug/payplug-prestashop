@@ -52,7 +52,7 @@ class MockHelper extends Mockery
         $loggerMock
             ->shouldReceive('addLog')
             ->andReturnUsing(function ($message, $level) use (&$arrayLog) {
-                $arrayLog = ['level' => $level, 'message' => $message];
+                $arrayLog[] = ['level' => $level, 'message' => $message];
                 return $arrayLog;
             });
     }
@@ -104,24 +104,9 @@ class MockHelper extends Mockery
                 if ($object === '' || is_null($object)) {
                     return false;
                 }
-                /*if ($action === 'isEmail') {
-                    switch ($object) {
-                        case 'wrongEmail':
-                        case '':
-                            return false;
-                        default:
-                            return true;
-                    }
+                if ($action == 'isLoadedObject' && !is_object($object)) {
+                    return false;
                 }
-                if ($action == 'isName') {
-                    switch ($object) {
-                        case null:
-                        case '':
-                            return false;
-                        default:
-                            return true;
-                    }
-                }*/
                 return true;
             });
         return $validate;
@@ -152,5 +137,14 @@ class MockHelper extends Mockery
             ->shouldReceive('getAddress')
             ->andReturn(AddressMock::get());
         return $address;
+    }
+
+    public static function createAssignMock($classPathname)
+    {
+        $assign = self::createMockFactory($classPathname);
+        $assign
+            ->shouldReceive('assign')
+            ->andReturn(true);
+        return $assign;
     }
 }

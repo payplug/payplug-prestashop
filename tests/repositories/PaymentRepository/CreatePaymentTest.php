@@ -71,6 +71,24 @@ final class CreatePaymentTest extends BasePaymentRepository
         );
     }
 
+    public function testCreateWithInvalidConfig()
+    {
+        $paymentDetails = [
+            'paymentTab' => mt_rand(),
+            'paymentMethod' => 'standard'
+        ];
+
+        $this->config
+            ->shouldReceive([
+                'get' => false
+            ]);
+
+        $this->assertSame(
+            $this->repo->createPayment($paymentDetails)['response'],
+            '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
+        );
+    }
+
     /**
      * Test creation payment 'standard'
      */
@@ -80,6 +98,11 @@ final class CreatePaymentTest extends BasePaymentRepository
             'paymentTab' => mt_rand(),
             'paymentMethod' => 'standard'
         ];
+
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
 
         $this->paymentApi
             ->shouldReceive([
@@ -95,20 +118,29 @@ final class CreatePaymentTest extends BasePaymentRepository
 
     public function testCreatePaymentWithInvalidData()
     {
+        $paymentTab = mt_rand();
         $paymentDetails = [
-            'paymentTab' => mt_rand(),
+            'paymentTab' => $paymentTab,
             'paymentMethod' => 'standard'
         ];
 
-        $this->paymentApi
+        $this->config
             ->shouldReceive([
-                'create' => mt_rand()
+                'get' => true
             ]);
 
-        $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
+        $this->paymentApi
+            ->shouldReceive([
+                'create' => $paymentTab
+            ]);
+
         $this->assertSame(
-            $this->repo->createPayment($paymentDetails)['response'],
-            '[createPayment] Exception. Unable to create payment. Error: Invalid fields validate, param $apiPayment must be an object'
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($paymentDetails),
+                'response' => '[createPayment] Exception. Unable to create payment. Error: Invalid argument, $apiPayment must be an object'
+            ],
+            $this->repo->createPayment($paymentDetails)
         );
     }
 
@@ -118,6 +150,11 @@ final class CreatePaymentTest extends BasePaymentRepository
             'paymentTab' => mt_rand(),
             'paymentMethod' => 'standard'
         ];
+
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
 
         $this->paymentApi
             ->shouldReceive(['create' => mt_rand()])
@@ -139,6 +176,11 @@ final class CreatePaymentTest extends BasePaymentRepository
 
         $paymentMock = PaymentMock::getStandard();
         $paymentMock->hosted_payment->return_url = null;
+
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
 
         $this->paymentApi
             ->shouldReceive([
