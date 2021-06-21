@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_26_0($object)
+function upgrade_module_2_26_0()
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -34,13 +34,13 @@ function upgrade_module_2_26_0($object)
 
     $flag = true;
 
-    // run the method who install Oney feature
-    if ($object->isValidPHPVersion()) {
-        $flag = $object->dependencies->getPlugin()->getOney()->installOney();
-    }
-
     //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
+    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0) ||
+        !Configuration::updateValue('PAYPLUG_ONEY', 0) ||
+        !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
+        !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
+        !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+    ) {
         $flag = false;
     }
 

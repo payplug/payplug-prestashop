@@ -457,6 +457,7 @@ button.payplugLink:hover {
   padding: 24px 16px 36px;
   position: relative;
   cursor: pointer;
+  text-align: center;
 }
 .payplugOneyFees_option + .payplugOneyFees_option {
   margin: 0 0 0 32px;

@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2021 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_27_1($object)
+function upgrade_module_2_27_1()
 {
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
         return true;
@@ -33,18 +33,19 @@ function upgrade_module_2_27_1($object)
 
     $flag = true;
 
-    // run the method who install Oney feature
-    $flag = $object->dependencies->getPlugin()->getOney()->installOney();
-
-    //adding new configurations
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)) {
+    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0) ||
+        !Configuration::updateValue('PAYPLUG_ONEY', 0) ||
+        !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
+        !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
+        !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+    ) {
         $flag = false;
     }
 
     // Update payplug lock table
     $sql_requests = [
-        'TRUNCATE TABLE `'._DB_PREFIX_.'payplug_lock`',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
+        'TRUNCATE TABLE `' . _DB_PREFIX_ . 'payplug_lock`',
+        'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
     ];
 
     try {
