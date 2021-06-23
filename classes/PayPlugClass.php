@@ -525,6 +525,18 @@ class PayPlugClass extends PaymentModule
 
                 die(json_encode(['error' => $this->l('payplug.adminAjaxController.settingsNotUpdated')]));
             } else {
+                if (Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
+                    $id_order_state = Tools::getValue('payplug_deferred_state');
+                    $order_state = new OrderState($id_order_state, $this->context->language->id);
+                    if (Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                        $this->context->smarty->assign([
+                            'updated_deferred_state' => true,
+                            'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
+                            'updated_deferred_state_name' => $order_state->name,
+                            'admin_orders_link' => $this->PrestashopSpecificObject->getOrdersByStateLink(Tools::getValue('payplug_deferred_state')),
+                        ]);
+                    }
+                }
                 $this->saveConfiguration();
 
                 $this->assignContentVar();

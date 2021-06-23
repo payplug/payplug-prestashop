@@ -32,10 +32,12 @@ use Tools;
 class PrestashopSpecific17
 {
     public $payplug;
+    private $contextSpecific;
 
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
+        $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
     public function hookHeader()
@@ -166,5 +168,17 @@ class PrestashopSpecific17
         }
 
         return $flag;
+    }
+
+    /**
+     * @description Link to order by order state
+     *
+     * @param int $order_state
+     * @return string
+     */
+    public function getOrdersByStateLink($order_state)
+    {
+        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true, [], ['order[filters][osname]' => $order_state]);
+        return $link;
     }
 }
