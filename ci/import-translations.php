@@ -15,7 +15,7 @@ $path = dirname(__FILE__) . '/translations.csv';
 if (file_exists($path)) {
     if ($csvfile = fopen($path, 'r')) {
         $count = 0;
-        while (($line = fgetcsv($csvfile, 1000, ';')) !== false) {
+        while (($line = fgetcsv($csvfile, 2000, ';')) !== false) {
             if ($count) {
                 $translation_key = reset($line);
                 $row = [];
@@ -54,6 +54,7 @@ if (!empty($translations)) {
     foreach ($translations as $translation_key => $translation) {
         foreach ($translation as $lang => $value) {
             if (in_array($lang, $available_languages) && $value) {
+                $value = str_replace("’", "'", $value);
                 $t = addcslashes($value, "'");
                 if ($t && $t != '') {
                     $row = '$_MODULE[\'<{payplug}prestashop>' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
