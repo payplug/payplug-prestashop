@@ -21,7 +21,17 @@
 *}
 
 
+
+
 <form class="payplug" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
+    {if isset($updated_deferred_state) && $updated_deferred_state}
+        <p class="alert alert-warning" style="width: 100%;">
+            <span>
+                <a href="{$admin_orders_link}"  title="{l s='admin.admin.clickhere' mod='payplug'}">{l s='admin.admin.clickhere' mod='payplug'}</a>
+                {l s='admin.admin.toaccesscontrols' sprintf=[$updated_deferred_state_name] tags=['<strong>'] mod='payplug'}
+            </span>
+        </p>
+    {/if}
     <div class="panel panel-show">
         <div class="panel-heading">{l s='PRESENTATION' mod='payplug'}</div>
         <div class="panel-row">
