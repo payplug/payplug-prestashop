@@ -200,7 +200,7 @@ $_MODULE['<{payplug}prestashop>oneyrepository_16bfbf9c462762cf1cba4134ec53c504']
 $_MODULE['<{payplug}prestashop>oneyrepository_170f5e9365a8f2305fea05a99c36dfcc'] = 'L\'adresse e-mail est invalide';
 $_MODULE['<{payplug}prestashop>oneyrepository_22d545ded224c1e3f0f821e99f01ed09'] = 'Le montant total de votre commande doit être compris entre %s et %s pour payer avec Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56'] = 'Veuillez en saisir une qui ne dépasse pas 32 caractères.';
-$_MODULE['<{payplug}prestashop>oneyrepository_37aad38a9a02f6659c12948a70b838fe'] = 'Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 www.orias.fr.  Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
+$_MODULE['<{payplug}prestashop>oneyrepository_37aad38a9a02f6659c12948a70b838fe'] = 'Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 www.orias.fr.  Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 $_MODULE['<{payplug}prestashop>oneyrepository_427d2eef786cda4bb73d9ec1429a34b9'] = 'Veuillez saisir votre nom.';
 $_MODULE['<{payplug}prestashop>oneyrepository_46170db793b9e6e143d187c02a572b7c'] = 'Veuillez saisir votre adresse de livraison.';
 $_MODULE['<{payplug}prestashop>oneyrepository_64f345381f968fbbd95f877090c2c984'] = 'Veuillez saisir votre adresse de facturation.';
@@ -352,6 +352,7 @@ $_MODULE['<{payplug}prestashop>php_version_ec36b20c94c8267c75e8522a139189bd'] = 
 $_MODULE['<{payplug}prestashop>php_version_f683d3e42054dfba0264b623e35be77f'] = 'Interface permettant la gestion des paiements et l\'export CSV des transactions';
 $_MODULE['<{payplug}prestashop>popin_19cf27400430cae294abe8c130a8d377'] = 'Paiement avec Oney indisponible.';
 $_MODULE['<{payplug}prestashop>popin_4966fa949aed9ec282f487176693330f'] = 'Payer';
+$_MODULE['<{payplug}prestashop>popin_74e747c329df0fcd765e14259821f6a4'] = 'sans frais';
 $_MODULE['<{payplug}prestashop>popin_8b70bd53d8f4322982f066ecf5655fcc'] = 'par carte bancaire';
 $_MODULE['<{payplug}prestashop>popin_d3d2e617335f08df83599665eef8a418'] = 'Fermer';
 $_MODULE['<{payplug}prestashop>premium_63a3db3db721a0f3b9552227f773c729'] = 'Vous n\'avez pas accès à cette fonctionnalité. Pour plus d\'informations, veuillez nous contacter via notre site : ';
