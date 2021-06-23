@@ -21,45 +21,63 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+use \PayPlug\classes\PayPlugClass;
+
 class PayplugPaymentModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        require_once(dirname(__FILE__) . './../../../../config/config.inc.php');
-
-        /** Call init.php to initialize context */
-        require_once(_PS_MODULE_DIR_ . '../init.php');
+        require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
         /** Call to payplug-php API */
-        require_once(_PS_MODULE_DIR_ . '/payplug/classes/PayplugBackward.php');
-        require_once(_PS_MODULE_DIR_ . '/payplug/payplug.php');
-        require_once(_PS_MODULE_DIR_ . '/payplug/lib/init.php');
+        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugBackward.php');
 
-        $payplug = Module::getInstanceByName('payplug');
+        $payplug = new PayPlugClass();
         $payplug->initializeApi();
 
         $context = Context::getContext();
 
-        $id_payplug_card = Tools::getValue('pc', null);
+        $type = Tools::getValue('type', null);
+        $io = Tools::getValue('io', null);
+        $is_oney = null;
+        $with_fees = null;
+        if ((isset($type)) && ($type == 'oney')) {
+            if (isset($io)) {
+                (bool)Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
+                $is_oney = 'x'.$io.'_'.$with_fees;
+            }
+        }
+        $options = [
+            'is_oney' => $is_oney,
+            '_ajax' => 1
+        ];
 
-
-        $payment = $payplug->preparePayment($id_payplug_card);
-        $payment_data = Tools::jsonDecode($payment, true);
+        $payment_data = $payplug->preparePayment($options);
+        $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
         $error_url = $context->link->getPageLink($page, true, $context->language->id, ['error' => 1, 'step' => 3]);
 
-
         // Invalid payment then return error
-        if ($payment_data['result'] && isset($payment_data['return_url']) && $payment_data['return_url']) {
-            Payplug::redirectForVersion($payment_data['return_url']);
+        if (($payment_data['result'] && (isset($payment_data['return_url']) && $payment_data['return_url']))) {
+            Tools::redirect($payment_data['return_url']);
+        }
+        if (($payment_data_16['result'] && (isset($payment_data_16['return_url']) && $payment_data_16['return_url']))) {
+            Tools::redirect($payment_data_16['return_url']);
         } elseif (!$payment_data['result']) {
             if (isset($payment_data['response']) && $payment_data['response']) {
                 $payplug->setPaymentErrorsCookie([$payment_data['response']]);
             }
-            Payplug::redirectForVersion($error_url);
+            Tools::redirect($error_url);
+        } elseif (!$payment_data_16['result']) {
+            if (isset($payment_data_16['response']) && $payment_data_16['response']) {
+                $payplug->setPaymentErrorsCookie([$payment_data_16['response']]);
+            }
+            Tools::redirect($error_url);
         }
 
-        die($payment_data['response']);
+        if ((isset($payment_data['response'])) || (isset($payment_data_16['response']))) {
+            die($payment_data['response']);
+        }
     }
 }

@@ -26,13 +26,11 @@ unit tests:
     - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
 check module translations:
-  image: composer:1.9
+  image: php:7.4
   stage: translations
-#  only:
-#    - /^release-.*$/
+  only: [merge_requests]
   script:
-    - composer dump-autoload -o
-    - php ci/translations.php
+    - php ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   artifacts:
     paths:
       - ci/translations.csv

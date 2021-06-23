@@ -1,27 +1,71 @@
 <?php
 
-$available_languages = ['fr','en','gb','it'];
+$header = '<?php
 
-$headerContent = '<?php
 global $_MODULE;
 $_MODULE = array();
 ';
 
+$available_languages = ['fr', 'en', 'gb', 'it'];
+$language_index = [];
+$translations = [];
 
-foreach ($available_languages as $keyLang => $lang) {
-    $writeFile = fopen(dirname(__FILE__) . '/../translations/' . $lang . '.php', 'w');
-    fwrite($writeFile, $headerContent);
-
-    $count = 0;
-    $readFile = fopen(dirname(__FILE__) . '/translations.csv', 'r');
-    while (($line = fgetcsv($readFile, 1000, ';')) !== false) {
-        //$line is an array of the csv elements
-        if ($count && ($line[$keyLang + 2] != '')) {
-            fwrite($writeFile, '$_MODULE[\'<{payplug}prestashop>' . $line[0] . '\'] = \'' . addslashes($line[$keyLang + 2]) . '\';' . PHP_EOL);
+// Hydrate $translations from CSV file
+$path = dirname(__FILE__) . '/translations.csv';
+if (file_exists($path)) {
+    if ($csvfile = fopen($path, 'r')) {
+        $count = 0;
+        while (($line = fgetcsv($csvfile, 1000, ';')) !== false) {
+            if ($count) {
+                $translation_key = reset($line);
+                $row = [];
+                foreach ($available_languages as $lang) {
+                    $index = $language_index[$lang];
+                    if (isset($line[$index]) && $line[$index]) {
+                        $row[$lang] = $line[$index];
+                    }
+                }
+                $translations[$translation_key] = $row;
+            } else {
+                foreach ($line as $k => $v) {
+                    if (in_array($v, $available_languages)) {
+                        $language_index[$v] = $k;
+                    }
+                }
+            }
+            $count++;
         }
-        $count++;
+        fclose($csvfile);
     }
-    $count = 0;
-    fclose($readFile);
-    fclose($writeFile);
+}
+
+// Open translation files from available languages
+$files = [];
+foreach ($available_languages as $lang) {
+    $path_lang = dirname(__FILE__) . '/../translations/' . $lang . '.php';
+    $files[$lang] = fopen($path_lang, 'w');
+    fwrite($files[$lang], $header);
+}
+
+// Hydrate php file from translations
+if (!empty($translations)) {
+    ksort($translations);
+
+    foreach ($translations as $translation_key => $translation) {
+        foreach ($translation as $lang => $value) {
+            if (in_array($lang, $available_languages) && $value) {
+                $t = addcslashes($value, "'");
+                if ($t && $t != '') {
+                    $row = '$_MODULE[\'<{payplug}prestashop>' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
+                    fwrite($files[$lang], $row);
+                }
+            }
+        }
+    }
+}
+
+if (!empty($files)) {
+    foreach ($files as $file) {
+        fclose($file);
+    }
 }

@@ -251,6 +251,8 @@ class PayPlugNotifications
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                 case 'oney_x4_with_fees':
+                case 'oney_x3_without_fees':
+                case 'oney_x4_without_fees':
                     $this->is_oney = true;
                     break;
                 default:
@@ -304,7 +306,6 @@ class PayPlugNotifications
             }
         }
 
-        $this->logger->addLog('Cart ID: ' . (int)$id_cart, 'debug');
         $this->logger->addLog('Is Live: ' . (int)$this->payment->is_live, 'debug');
         $this->logger->addLog('Amount: ' . (int)$this->payment->amount, 'debug');
 
@@ -318,13 +319,18 @@ class PayPlugNotifications
             $this->exitProcess($exception->getMessage(), 500);
         }
         if (!Validate::isLoadedObject($this->cart)) {
-            $this->logger->addLog('The cart cannot be loaded.', 'error');
+            $this->logger->addLog('The cart cannot be loaded with id ' . $id_cart, 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);
         }
 
-        $this->setContextFromCartID($this->cart->id);
+        $this->logger->addLog('Cart ID: ' . (int)$this->cart->id, 'debug');
+
+        // Set Context
+        $this->logger->addLog('Set context from cartId', 'debug');
+        $this->setContext();
 
         // Set lock in db then set $this->lock_key
+        $this->logger->addLog('Lock creation', 'debug');
         do {
             $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
@@ -334,18 +340,7 @@ class PayPlugNotifications
                 $this->lock_key = $this->cart->id;
             }
         } while (!$cart_lock);
-
-        try {
-            $address = new Address((int)$this->cart->id_address_invoice);
-        } catch (Exception $exception) {
-            $this->logger->addLog('The address cannot be loaded: '
-                . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), 500);
-        }
-        if (!Validate::isLoadedObject($address)) {
-            $this->logger->addLog('The address cannot be loaded.', 'error');
-            $this->exitProcess('The address cannot be loaded.', 500);
-        }
+        $this->logger->addLog('Lock created', 'debug');
 
         $id_order = Order::getOrderByCartId($this->cart->id);
 
@@ -740,12 +735,16 @@ class PayPlugNotifications
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                case 'oney_x3_without_fees':
                     $module_name = $this->payplug->l('Oney 3x');
                     break;
                 case 'oney_x4_with_fees':
-                case 'oney_x4_without_fees':
                     $module_name = $this->payplug->l('Oney 4x');
+                    break;
+                case 'oney_x3_without_fees':
+                    $module_name = $this->payplug->l('notification.createOrder.oneyX3WithoutFees');
+                    break;
+                case 'oney_x4_without_fees':
+                    $module_name = $this->payplug->l('notification.createOrder.oneyX4WithoutFees');
                     break;
                 default:
                     break;
@@ -994,20 +993,20 @@ class PayPlugNotifications
      * @description Set the context of the order
      * @param $id_cart
      */
-    protected function setContextFromCartID($id_cart)
+    private function setContext()
     {
         if (!isset($this->context)) {
             $this->context = Context::getContext();
         }
 
-        $this->context->cart = new Cart((int)$id_cart);
-        $address = new Address((int)$this->context->cart->id_address_invoice);
+        $this->context->cart = $this->cart;
+        $address = new Address((int)$this->cart->id_address_invoice);
         $this->context->country = new Country((int)$address->id_country);
-        $this->context->customer = new Customer((int)$this->context->cart->id_customer);
-        $this->context->language = new Language((int)$this->context->cart->id_lang);
-        $this->context->currency = new Currency((int)$this->context->cart->id_currency);
-        if (isset($this->context->cart->id_shop)) {
-            $this->context->shop = new Shop($this->context->cart->id_shop);
+        $this->context->customer = new Customer((int)$this->cart->id_customer);
+        $this->context->language = new Language((int)$this->cart->id_lang);
+        $this->context->currency = new Currency((int)$this->cart->id_currency);
+        if (isset($this->cart->id_shop)) {
+            $this->context->shop = new Shop($this->cart->id_shop);
         }
     }
 

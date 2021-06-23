@@ -19,6 +19,12 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+<p class="alert alert-danger" data-e2e-error="php_version">
+    {l s='admin.phpversion.wrongPhpVersion' mod='payplug'} <br>
+    {l s='admin.phpversion.beforeLink' mod='payplug'}
+    <a target="_blank" href="{$faq_url|escape:'htmlall':'UTF-8'}" class="payplugLink">{l s='admin.phpversion.link' mod='payplug'}</a>
+    {l s='admin.phpversion.afterLink' mod='payplug'}
+</p>
 <div class="panel panel-show">
     <div class="panel-heading">{l s='admin.phpversion.heading' mod='payplug'}</div>
     <div class="panel-row">
@@ -34,15 +40,5 @@
             <li>{l s='admin.phpversion.history' mod='payplug'}</li>
             <li>{l s='admin.phpversion.fast' mod='payplug'}</li>
         </ul>
-    </div>
-</div>
-<div class="panel panel-show">
-    <div class="panel-row">
-        <p>{l s='admin.phpversion.wrongPhpVersion' mod='payplug'}</p>
-        <p>
-            {l s='admin.phpversion.beforeLink' mod='payplug'}
-            <a target="_blank" href="{$faq_url|escape:'htmlall':'UTF-8'}" class="payplugLink">{l s='admin.phpversion.link' mod='payplug'}</a>
-            {l s='admin.phpversion.afterLink' mod='payplug'}
-        </p>
     </div>
 </div>

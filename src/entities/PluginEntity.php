@@ -302,7 +302,8 @@ class PluginEntity
      */
     public function setApiUrl($api_url)
     {
-        if (!is_string($api_url) || !preg_match('/http(s?):\/\/api(-\w+)?.payplug.(com|test)/', $api_url)) {
+        if (!is_string($api_url)
+            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
             throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
         }
 

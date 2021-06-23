@@ -53,7 +53,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.5';
+        $this->version = '3.2.0';
 
         parent::__construct();
 
@@ -154,10 +154,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        /*
-         * @todo
-         * RAJOUTER LE TEST DE LA TABLE PAYPLUG CACHE AVANT D'EXECUTER CE CODE
-         */
+        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
             return $this->module->hookActionAdminPerformanceControllerAfter($params);
         }
@@ -170,10 +167,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        /*
-         * @todo
-         * RAJOUTER LE TEST DE LA TABLE PAYPLUG CACHE AVANT D'EXECUTER CE CODE
-         */
+        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
             return $this->module->hookActionClearCompileCache($params);
         }

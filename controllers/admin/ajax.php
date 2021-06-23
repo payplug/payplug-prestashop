@@ -187,7 +187,7 @@ if (Tools::getValue('_ajax') == 1) {
                         $logger->addLog('Change order state to ' . $new_state, 'notice');
                     }
 
-                    if (!PayplugLock::deleteLockG2($order->id_cart)) {
+                    if (!$payplug->deleteLockFromCartId($order->id_cart)) {
                         $logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $logger->addLog('Lock deleted.', 'notice');

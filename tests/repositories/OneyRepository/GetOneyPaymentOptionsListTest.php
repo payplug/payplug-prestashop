@@ -54,6 +54,10 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             ->andReturn('FR');
 
+        $this->config->shouldReceive('get')
+            ->with('PAYPLUG_ONEY_FEES')
+            ->andReturn(true);
+
         $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
 
         $this->payplug

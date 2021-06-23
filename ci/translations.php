@@ -1,8 +1,10 @@
 <?php
-require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 
-$repo = new PayPlug\src\repositories\TranslationsRepository('');
+require_once(dirname(__FILE__) . '/src/Translations.php');
+
+$repo = new Translations();
 $translations = $repo->getTranslations();
+
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
 $messages = [];
@@ -12,20 +14,22 @@ $fp = fopen(dirname(__FILE__) . '/translations.csv', 'w');
 $header = ['key', 'default'];
 $header = array_merge($header, $available_languages);
 
-fputcsv($fp, $header);
-foreach ($translations as $key => $trans) {
-    $key = str_replace("<{payplug}prestashop>", "", $key);
-    $line = [$key, $trans['default']];
-    foreach ($available_languages as $lang) {
-        $line[] = $trans[$lang];
+if ($fp) {
+    fputcsv($fp, $header, ';');
+    foreach ($translations as $key => $trans) {
+        $key = str_replace("<{payplug}prestashop>", "", $key);
+        $line = [$key, $trans['default']];
+        foreach ($available_languages as $lang) {
+            $line[] = stripcslashes($trans[$lang]);
 
-        if (!$trans[$lang]) {
-            $missing_translations[$lang][$key] = $trans['default'];
+            if (!$trans[$lang]) {
+                $missing_translations[$lang][$key] = $trans['default'];
+            }
         }
+        fputcsv($fp, $line, ';');
     }
-    fputcsv($fp, $line, ';');
+    fclose($fp);
 }
-fclose($fp);
 
 // Show missing translation
 if (!empty($missing_translations)) {
@@ -40,8 +44,29 @@ if (!empty($missing_translations)) {
     }
 }
 
+// In case we use this script via the CI, check if we need a strong feed back
+$need_return = false;
+if (isset($argv) && !empty($argv)) {
+    $target_branch = $argv[1];
+    $allowed_branches = ['qa','hotfix','master','release'];
+    foreach ($allowed_branches as $branch) {
+        $pos = strpos($target_branch, $branch);
+        if ($pos !== false && !$pos && !$need_return) {
+            $need_return = true;
+        }
+    }
+}
+
+// Return error message needed
 if (!empty($messages)) {
     foreach ($messages as $message) {
         echo $message . "\n";
     }
+    if ($need_return) {
+        die(1);
+    }
+}
+
+if ($need_return) {
+    die(0);
 }

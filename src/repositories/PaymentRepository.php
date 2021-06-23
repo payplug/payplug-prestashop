@@ -84,6 +84,12 @@ class PaymentRepository extends Repository
                 $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
                 $cartToHash[] = array_map('strval', $product);
             }
+
+            // For optimised / non optimised Oney + 3x / 4x to have a good hash ;-)
+            if (isset($paymentDetails['oneyDetails'])) {
+                $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
+            }
+
             return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
         } else {
             return $this->returnPaymentError(

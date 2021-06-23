@@ -41,6 +41,7 @@ use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\CurrencySpecific;
 use PayPlug\src\specific\LanguageSpecific;
+use PayPlug\src\specific\OrderStateSpecific;
 use PayPlug\src\specific\ProductSpecific;
 use PayPlug\src\specific\ShopSpecific;
 use PayPlug\src\specific\ToolsSpecific;
@@ -82,6 +83,7 @@ class PluginRepository extends Repository
     private $country;
     private $currency;
     private $language;
+    private $order_state_specific;
     private $product;
     private $shop;
     private $tools;
@@ -137,7 +139,10 @@ class PluginRepository extends Repository
         $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
-        $this->translate = new TranslationsRepository($this->payplug);
+        $this->translate = new TranslationsRepository(
+            $this->payplug,
+            $this->tools
+        );
 
         $this->sql = new SQLtableRepository(
             $this->query
@@ -177,9 +182,12 @@ class PluginRepository extends Repository
 
         $this->order_state = new OrderStateRepository(
             $this->configuration,
+            $this->constant,
             $this->language,
+            $this->order_state_specific,
             $this->query,
-            $this->tools
+            $this->tools,
+            $this->validate
         );
 
         $this->payment = new PaymentRepository(
@@ -198,6 +206,7 @@ class PluginRepository extends Repository
             $this->context,
             $this->order_state,
             $this->order_state_entity,
+            $this->order_state_specific,
             $this->shop,
             $this->sql,
             $this->tools,
@@ -218,6 +227,7 @@ class PluginRepository extends Repository
         $this->country = new CountrySpecific();
         $this->currency  = new CurrencySpecific();
         $this->language = new LanguageSpecific();
+        $this->order_state_specific = new OrderStateSpecific();
         $this->product = new ProductSpecific();
         $this->shop = new ShopSpecific();
         $this->tools = new ToolsSpecific();

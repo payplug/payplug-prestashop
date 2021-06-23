@@ -178,8 +178,10 @@ class PrestashopSpecific16
     // todo: set Tab install process in a specific
     public function installTab()
     {
-        $translationsAdminPayPlugInstallment = [
+        $translations = [
             'en' => 'Installment Plans',
+            'gb' => 'Installment Plans',
+            'it' => 'Pagamenti frazionati',
             'fr' => 'Paiements en plusieurs fois'
         ];
 
@@ -190,9 +192,9 @@ class PrestashopSpecific16
         foreach (Language::getLanguages(false) as $language) {
             $iso_code = Tools::strtolower($language['iso_code']);
             if (isset($translations[$iso_code])) {
-                $tab->name[(int)$language['id_lang']] = $translationsAdminPayPlugInstallment[$iso_code];
+                $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
             } else {
-                $tab->name[(int)$language['id_lang']] = $translationsAdminPayPlugInstallment['en'];
+                $tab->name[(int)$language['id_lang']] = $translations['en'];
             }
         }
 
