@@ -42,10 +42,13 @@ class PrestashopSpecific17
     {
         $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
         $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/integrated.js');
     }
 
     public function displayPaymentOption($payment_options)
     {
+        $payment_options = $this->getIntegratedPaymentOption($payment_options);
+
         $paymentOptions = [];
         foreach ($payment_options as $payment_option) {
             $payment_method = $payment_option['name'];
@@ -89,6 +92,30 @@ class PrestashopSpecific17
         }
 
         return $paymentOptions;
+    }
+
+    public function getIntegratedPaymentOption($payment_options)
+    {
+        $integrated = $payment_options['standard'];
+        // Standard Payment or new card from one-click
+        $integrated['name'] = 'integrated';
+        $integrated['inputs']['method'] = [
+            'name' => 'method',
+            'type' => 'hidden',
+            'value' => 'integrated',
+        ];
+        $integrated['tpl'] = 'integrated.tpl';
+        $integrated['logo'] = false;
+        $integrated['extra_classes'] = 'payplug integrated';
+        $integrated['callToActionText'] = 'integrated payment';
+        $integrated['additionalInformation'] =  $this->payplug->fetchTemplate('checkout/integrated.tpl');
+
+        $payment_options['integrated'] = $integrated;
+
+
+        dump($payment_options);
+
+        return $payment_options;
     }
 
     // todo: set Tab install process in a specific
