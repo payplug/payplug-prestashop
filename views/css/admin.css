@@ -543,6 +543,10 @@ button.payplugLink:hover {
 .-selected .payplugOneyFees_checker {
   opacity: 1;
 }
+/* Payplug Admin Config */
+.payplugOneyTos {
+  display: flex;
+}
 /* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;

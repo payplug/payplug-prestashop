@@ -34,7 +34,7 @@
                 <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
                         {include file='./oney_fees.tpl'}
-                        <div class="payplugPanel_section -nowrap">
+                        <div class="payplugOneyTos">
                             {include file='./switch.tpl' switch=$payplug_switch.oney_optimized}
                             <p>
                                 <strong>{l s='Go further' mod='payplug'}</strong>
