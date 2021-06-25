@@ -61,6 +61,7 @@
   border-color: #f7a000;
   color: rgba(196, 127, 0, 0.8);
   width: max-content;
+  margin-bottom: 10px;
 }
 .payplugAlert.-warning:before {
   content: "";
