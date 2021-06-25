@@ -1,13 +1,19 @@
 $(document).ready(function(){
-        // Create an instance of Integrated Payment
-        var intPayment = new Payplug.IntegratedPayment(
-            'pk_test_abcde123',                         // Your publishable key
-            'pay_45678azerty',                          // A payment ID created server-side
-            document.querySelector('.my-payment-form')  // A reference to your form
-        );
+    var $form = $('.payplugIntegratedPayment'),
+        $cardholder = $('.payplugIntegratedPayment_input.-cardholder'),
+        $pan = $('.payplugIntegratedPayment_input.-pan'),
+        $cvv = $('.payplugIntegratedPayment_input.-cvv'),
+        $exp = $('.payplugIntegratedPayment_input.-exp');
 
-        // Add each payments fields
-        var pan = intPayment.pan(document.querySelector('.pan-input-container'));
-        var cvv = intPayment.cvv(document.querySelector('.cvv-input-container'));
-        var exp = intPayment.exp(document.querySelector('.exp-input-container'));
+    // Create an instance of Integrated Payment
+    var intPayment = new Payplug.IntegratedPayment(
+            'pk_test_abcde123',                         // Your publishable key
+            $form.get(0)
+        ),
+        cholder = intPayment.cardHolder($cardholder.get(0)),
+        pan = intPayment.cardNumber($pan.get(0)),
+        cvv = intPayment.cvv($cvv.get(0)),
+        exp = intPayment.expiration($exp.get(0));
+
+
 });

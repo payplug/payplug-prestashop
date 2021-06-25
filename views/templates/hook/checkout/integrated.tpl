@@ -20,12 +20,18 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h1>ON EST ICI </h1>
-
-<form class="my-payment-form" domain="https://secure.alpha.notpayplug.com">
-    <div class="pan-input-container"></div>
-    <div class="cvv-input-container"></div>
-    <div class="exp-input-container"></div>
+<!-- Set up a form with 5 divs -->
+<form class="payplugIntegratedPayment" domain="https://secure.alpha.notpayplug.com">
+    <div class="scheme"></div>
+    <div class="payplugIntegratedPayment_input -cardholder"></div>
+    <div class="payplugIntegratedPayment_input -pan"></div>
+    <div class="payplugIntegratedPayment_input -exp"></div>
+    <div class="payplugIntegratedPayment_input -cvv"></div>
+    <div class="payplugIntegratedPayment_check">
+        <input type="checkbox" name="save_card">
+        Je souhaite enregistrer ma carte
+    </div>
+    <button class="payplugIntegratedPayment_button -green" type="submit">Payer</button>
 </form>
 
 <script type="text/javascript" src="https://secure.alpha.notpayplug.com/integrated/js"></script>
