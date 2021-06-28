@@ -188,23 +188,17 @@
   justify-content: space-between;
   flex-wrap: wrap;
 }
-.payplugIntegratedPayment_check,
-.payplugIntegratedPayment_input {
-  height: 36px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  margin: 0 0 8px;
-}
-.payplugIntegratedPayment_check input {
-  margin: 0 8px 0 0;
-}
 .payplugIntegratedPayment_input {
   border: 1px solid #ccc;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
   padding: 0 8px;
+  height: 36px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin: 0 0 8px;
 }
 .payplugIntegratedPayment_input.-pan {
   width: 60%;
@@ -215,9 +209,19 @@
 .payplugIntegratedPayment_input.-cvv {
   width: calc(20% - 8px);
 }
+.payplugIntegratedPayment_input.-cvv {
+  width: calc(20% - 8px);
+}
+.payplugIntegratedPayment_input.-saveCard {
+  padding: 0;
+  border: none;
+}
 .payplugIntegratedPayment_input iframe {
   width: 100% !important;
   height: 100% !important;
+}
+.payplugIntegratedPayment_input input {
+  margin: 0 8px 0 0;
 }
 .payplugIntegratedPayment_button {
   border: 1px solid #cccccc;

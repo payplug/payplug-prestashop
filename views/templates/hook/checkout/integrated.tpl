@@ -23,11 +23,11 @@
 <!-- Set up a form with 5 divs -->
 <form class="payplugIntegratedPayment" domain="https://secure.alpha.notpayplug.com">
     <div class="scheme"></div>
-    <div class="payplugIntegratedPayment_input -cardholder"></div>
-    <div class="payplugIntegratedPayment_input -pan"></div>
-    <div class="payplugIntegratedPayment_input -exp"></div>
-    <div class="payplugIntegratedPayment_input -cvv"></div>
-    <div class="payplugIntegratedPayment_check">
+    <div data-integrated="cardholder" class="payplugIntegratedPayment_input -cardholder"></div>
+    <div data-integrated="pan" class="payplugIntegratedPayment_input -pan"></div>
+    <div data-integrated="exp" class="payplugIntegratedPayment_input -exp"></div>
+    <div data-integrated="cvv" class="payplugIntegratedPayment_input -cvv"></div>
+    <div class="payplugIntegratedPayment_input -saveCard">
         <input type="checkbox" name="save_card">
         Je souhaite enregistrer ma carte
     </div>

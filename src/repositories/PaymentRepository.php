@@ -513,6 +513,9 @@ class PaymentRepository extends Repository
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
+                if ($paymentDetails['isIntegrated']) {
+                    $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+                }
                 break;
             default:
                 return $this->returnPaymentError(

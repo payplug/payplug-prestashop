@@ -4,23 +4,15 @@
   justify-content: space-between;
   flex-wrap: wrap;
 
-  &_check,
   &_input {
+    .border(#colorMap[stroke]);
+    .borderRadius(5px);
+    padding: 0 8px;
     height: 36px;
     width: 100%;
     display: flex;
     align-items: center;
     margin: 0 0 8px;
-  }
-  &_check {
-    input {
-      margin: 0 8px 0 0;
-    }
-  }
-  &_input {
-    .border(#colorMap[stroke]);
-    .borderRadius(5px);
-    padding: 0 8px;
 
     &.-pan {
       width: 60%;
@@ -32,9 +24,22 @@
       width: calc(20% - 8px);
     }
 
+    &.-cvv {
+      width: calc(20% - 8px);
+    }
+
+    &.-saveCard {
+      padding: 0;
+      border: none;
+    }
+
     iframe {
       width: 100% !important;
       height: 100% !important;
+    }
+
+    input {
+      margin: 0 8px 0 0;
     }
   }
 

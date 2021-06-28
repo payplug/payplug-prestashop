@@ -112,9 +112,6 @@ class PrestashopSpecific17
 
         $payment_options['integrated'] = $integrated;
 
-
-        dump($payment_options);
-
         return $payment_options;
     }
 
