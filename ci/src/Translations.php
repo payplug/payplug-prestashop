@@ -176,8 +176,7 @@ class Translations
             }
         }
 
-        return array_unique($strings,SORT_REGULAR);
-
+        return array_unique($strings, SORT_REGULAR);
     }
 
     /**
@@ -249,7 +248,7 @@ class Translations
                         $array_check_duplicate[] = $trans_key;
                         $this->trans[$trans_key] = [
                             'default' => $key,
-                            'tags' => $tags
+                            'tags' => $tags,
                         ];
                     }
                 }
