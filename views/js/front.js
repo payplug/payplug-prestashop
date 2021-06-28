@@ -30,6 +30,7 @@ var $document, $window, payplugModule = {
         this.order.init();
         this.oney.init();
         this.popup.init();
+        this.integrated.init();
     },
     order: {
         init: function () {
@@ -75,6 +76,87 @@ var $document, $window, payplugModule = {
                 }
             });
         },
+    },
+    integrated: {
+        props: {
+            identifier: 'payplugIntegratedPayment',
+            query: null,
+            paymentId: null,
+            form: {},
+        },
+        init: function () {
+            var integrated = payplugModule.integrated,
+                $form = $('.' + integrated.props.identifier);
+
+            $document.on('submit', $form, integrated.submit);
+
+            integrated.set();
+        },
+        set: function () {
+            var integrated = payplugModule.integrated,
+                $form = $('.' + integrated.props.identifier),
+                $cardholder = $form.find('.-cardholder'),
+                $pan = $form.find('.-pan'),
+                $cvv = $form.find('.-cvv'),
+                $exp = $form.find('.-exp'),
+                intPayment = new Payplug.IntegratedPayment(payplug_publishable_key, $form.get(0))
+
+            integrated.props.form = {
+                intPayment: intPayment,
+                cholder: intPayment.cardHolder($cardholder.get(0)),
+                pan: intPayment.cardNumber($pan.get(0)),
+                cvv: intPayment.cvv($cvv.get(0)),
+                exp: intPayment.expiration($exp.get(0)),
+            };
+        },
+        submit: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var integrated = payplugModule.integrated,
+                data = {
+                    _ajax: 1,
+                    submitIntegreatedPayment: 1,
+                };
+
+            if (integrated.props.query != null) {
+                integrated.props.query.abort();
+                integrated.props.query = null;
+            }
+
+            integrated.props.query = $.ajax({
+                type: 'POST',
+                url: payplug_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('error CALL DELETE CARD');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (response) {
+                    if (response && response.payment_id) {
+                        integrated.props.paymentId = response.payment_id;
+                        integrated.pay();
+                    }
+                }
+            });
+        }, // recupération du payment ID
+        pay: function () {
+            var integrated = payplugModule.integrated,
+                props = integrated.props,
+                paymentId = props.paymentId,
+                intPayment = props.form.intPayment;
+
+            console.log(
+                'payplug PK : ' + payplug_publishable_key,
+                'pay id : ' + paymentId,
+                'Scheme : ' + Payplug.Scheme.AUTO
+            );
+
+            intPayment.pay(paymentId, Payplug.Scheme.AUTO);
+        }
     },
     card: {
         props: {
@@ -195,7 +277,7 @@ var $document, $window, payplugModule = {
                             } else {
                                 oney.cta.enable();
                             }
-                        } else if(!with_schedule) {
+                        } else if (!with_schedule) {
                             oney.cta.enable();
                         }
                     } else if (oney.cta.props.loaded) {

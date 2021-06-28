@@ -211,6 +211,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
                 ]));
+            } elseif ($tools->tool('getIsset', 'submitIntegreatedPayment')) {
+                $result = $this->payplug->preparePayment(['is_integrated' => 1]);
+                die(json_encode($result));
             }
         }
     }

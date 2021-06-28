@@ -3718,6 +3718,9 @@ class PayPlugClass extends PaymentModule
 
         $payplug_ajax_url = $this->context->link->getModuleLink($this->name, 'ajax', [], true);
         Media::addJsDef([
+            'payplug_publishable_key' => Configuration::get('PAYPLUG_SANDBOX_MODE')
+                ? 'pk_test_Q4iqbUOkykZr8be0jdYYZ'
+                : 'pk_live_7QMZGKhsS40ALCeEOdA9Tf',
             'payplug_ajax_url' => $payplug_ajax_url,
         ]);
     }
@@ -4323,7 +4326,7 @@ class PayPlugClass extends PaymentModule
      * @return mixed
      * @throws Exception
      */
-    public function preparePayment($options)
+    public function preparePayment($options = [])
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
@@ -4340,6 +4343,7 @@ class PayPlugClass extends PaymentModule
             'is_installment' => false,
             'is_deferred' => false,
             'is_oney' => false,
+            'is_integrated' => false,
         ];
 
         foreach ($default_options as $key => $value) {
@@ -4667,6 +4671,11 @@ class PayPlugClass extends PaymentModule
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
 
+        if ($options['is_integrated']) {
+            $payment_tab['integration'] = 'INTEGRATED_PAYMENT';
+            unset($payment_tab['hosted_payment']['cancel_url']);
+        }
+
         // Prepare details to create / retrieve payment
         $this->paymentDetails = [
             'paymentMethod' => $payment_method,
@@ -4676,6 +4685,7 @@ class PayPlugClass extends PaymentModule
             'paymentUrl' => null,
             'paymentDate' => null,
             'authorizedAt' => null,
+            'isIntegrated' => $options['is_integrated'],
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
             'isEmbedded' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
@@ -4783,6 +4793,9 @@ class PayPlugClass extends PaymentModule
             /*
              * If timeout < 3 min and hash OK
              */
+            $store_payment = $this->payment->checkPaymentTable($cart->id);
+            $this->paymentDetails['paymentId'] = $store_payment['id_payment'];
+
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
             if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
                 return $getpaymentReturnUrl['url'];

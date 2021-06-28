@@ -42,7 +42,6 @@ class PrestashopSpecific17
     {
         $this->payplug->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
         $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
-        $this->payplug->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/integrated.js');
     }
 
     public function displayPaymentOption($payment_options)
@@ -111,9 +110,6 @@ class PrestashopSpecific17
         $integrated['additionalInformation'] =  $this->payplug->fetchTemplate('checkout/integrated.tpl');
 
         $payment_options['integrated'] = $integrated;
-
-
-        dump($payment_options);
 
         return $payment_options;
     }
