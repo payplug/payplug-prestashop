@@ -40,6 +40,7 @@ build zip release:
   stage: build
   before_script:
     - composer install --no-dev
+    - ./ci/copy_translations.sh
     - ./ci/assets_revision.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
