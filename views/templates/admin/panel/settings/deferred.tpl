@@ -34,7 +34,7 @@
             </p>
             <div class="payplugTips -{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
                 <div class="payplugTips_item -left{if !$payplug_switch.deferred.checked} -hide{/if}">
-                    <p class="payplugDeferred">
+                    <div class="payplugDeferred">
                         <label for="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}">
                             <input type="checkbox" name="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" value="1" id="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" {if $payplug_switch.deferred_auto.checked}checked="checked"{/if}>
                             {l s='admin.panel.settings.deferred.trigger' mod='payplug'}
