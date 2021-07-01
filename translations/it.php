@@ -213,7 +213,7 @@ $_MODULE['<{payplug}prestashop>oneyrepository_b286504b1d4d5ee1aeb919ad1e1255b8']
 $_MODULE['<{payplug}prestashop>oneyrepository_b441d533401a2d2570008757281a981e'] = 'Il tuo indirizzo e-mail è troppo lungo e il carattere + non è valido, inserisci un altro indirizzo e-mail (max 100 caratteri).';
 $_MODULE['<{payplug}prestashop>oneyrepository_b53458989589381e9b1ed27bfbd19f99'] = 'Per un pagamento con Oney, gli indirizzi di consegna e fatturazione devono essere in';
 $_MODULE['<{payplug}prestashop>oneyrepository_bd4294bea3cf9c876195adccc6ebbb32'] = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
-$_MODULE['<{payplug}prestashop>oneyrepository_c0a3302554e79a564812412457b7041e'] = 'Pagamento tramite Oney non disponibile.';
+$_MODULE['<{payplug}prestashop>oneyrepository_c0a3302554e79a564812412457b7041e'] = 'La simulazione del tuo piano di finanziamento non è per il momento disponibile. Queste informazioni ti saranno fornite al momento del pagamento.';
 $_MODULE['<{payplug}prestashop>oneyrepository_c5c750b6d21be8ff4a9e1ca50d49275c'] = 'Per favore immettere il proprio Nome.';
 $_MODULE['<{payplug}prestashop>oneyrepository_ca443f17e9e3cddaee616db9d2614f00'] = 'Inserisci il tuo codice postale.';
 $_MODULE['<{payplug}prestashop>oneyrepository_d14ca54db0343b2847cdfc14db5ac044'] = 'Inserisci la tua città.';
@@ -221,7 +221,7 @@ $_MODULE['<{payplug}prestashop>oneyrepository_d7d8445f5204c570511fedfc05fb6e90']
 $_MODULE['<{payplug}prestashop>oneyrepository_dd46601b9b87688153c22df524830e8f'] = 'Per favore immettere il proprio Nome.';
 $_MODULE['<{payplug}prestashop>oneyrepository_dedb4c2f32fcb4121f25794a275d51ad'] = 'Per favore inserisci il tuo nome.';
 $_MODULE['<{payplug}prestashop>oneyrepository_f4a7d73f6739c50967bc0b40e109003f'] = 'La simulazione del tuo piano di finanziamento non è per il momento disponibile. Queste informazioni ti saranno fornite al momento del pagamento.';
-$_MODULE['<{payplug}prestashop>options_5c22f296765c2c9af50f875381067799'] = 'Pagamento tramite Oney non disponibile.';
+$_MODULE['<{payplug}prestashop>options_5c22f296765c2c9af50f875381067799'] = 'La simulazione del tuo piano di finanziamento non è per il momento disponibile. Queste informazioni ti saranno fornite al momento del pagamento.';
 $_MODULE['<{payplug}prestashop>order-confirmation_1f1c53bb4ba4365de25444cfdbace869'] = 'Una mail sarà inviata al tuo indirizzo di posta elettronica per confermare il pagamento.';
 $_MODULE['<{payplug}prestashop>order-confirmation_8ea82c5f8b4825d683f2fc0202ccdb14'] = 'Riepilogo dell\'ordine :';
 $_MODULE['<{payplug}prestashop>order-confirmation_b17ae8b5a6a2a870816126faf1a88da5'] = 'Il tuo pagamento é stato confermato !';
