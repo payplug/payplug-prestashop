@@ -352,10 +352,8 @@ $_MODULE['<{payplug}prestashop>php_version_371b6a7f7531bc89aa4c813a8f98f9c6'] = 
 $_MODULE['<{payplug}prestashop>php_version_46c402e7f69e54d4ddfdb026157195a8'] = 'Avoid fraud by using Verified by Visa and MasterCard Secure Code';
 $_MODULE['<{payplug}prestashop>php_version_484e842f99d03422fa10151e75ab98b9'] = 'PRESENTATION';
 $_MODULE['<{payplug}prestashop>php_version_48633807d82bf30dc50da6f4e0947ff4'] = 'Accept all Visa and MasterCard credit and debit cards';
-$_MODULE['<{payplug}prestashop>php_version_57c04380845c79b92174b346a4018392'] = ' to obtain a version compatible with your store.';
-$_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 'The version of PHP you are using is not compatible with this version of the PayPlug plugin because it is prior to PHP 5.6.';
-$_MODULE['<{payplug}prestashop>php_version_6c55f8dc7a5345a058639f6e4781e5b8'] = 'Go to our ';
-$_MODULE['<{payplug}prestashop>php_version_c98af6170031f29c3eb458d5c1436efe'] = 'support page';
+$_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 'The PHP version you are using is too old (prior to 5.6). It prevents the last PayPlug module you have just installed from working properly.[1]
+Please visit our [2]support page[/2] to download a version of the PayPlug module compatible with your store, and install it in a few clicks.';
 $_MODULE['<{payplug}prestashop>php_version_ec36b20c94c8267c75e8522a139189bd'] = 'Display the payment form directly on your website, without redirection';
 $_MODULE['<{payplug}prestashop>php_version_f683d3e42054dfba0264b623e35be77f'] = 'Web interface to manage and export transaction history';
 $_MODULE['<{payplug}prestashop>popin_19cf27400430cae294abe8c130a8d377'] = 'Oney is momentarily unavailable.';
