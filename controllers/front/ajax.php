@@ -86,12 +86,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
-            } elseif ($tools->tool('getIsset', 'getOneyCta')) {
+            }
+            elseif ($tools->tool('getIsset', 'getOneyCta')) {
                 die(json_encode([
                     'result' => true,
                     'tpl' => $this->oney->getOneyCTA(),
                 ]));
-            } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
+            }
+            elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
                 $is_elligible = null;
@@ -133,7 +135,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode($is_elligible));
-            } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
+            }
+            elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
@@ -174,7 +177,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode($payment_options));
-            } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
+            }
+            elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
                 $errors = $this->payplug->getPaymentErrorsCookie();
 
@@ -183,7 +187,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode(['result' => false]));
-            } elseif ($tools->tool('getIsset', 'savePaymentData')) {
+            }
+            elseif ($tools->tool('getIsset', 'savePaymentData')) {
                 $payment_data = $tools->tool('getValue', 'payment_data');
 
                 if (empty($payment_data)) {
@@ -212,6 +217,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]
                 ]));
             } elseif ($tools->tool('getIsset', 'submitIntegreatedPayment')) {
+                $result = $this->payplug->preparePayment(['is_integrated' => 1]);
+                die(json_encode($result));
+            }
+            elseif ($tools->tool('getIsset', 'submitIntegreatedPayment')) {
                 $result = $this->payplug->preparePayment(['is_integrated' => 1]);
                 die(json_encode($result));
             }
