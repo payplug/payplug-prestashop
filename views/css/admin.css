@@ -595,6 +595,12 @@ button.payplugLink:hover {
 .payplugDeferred label {
   font-weight: 400;
 }
+.payplugDeferred_warning {
+  color: #e56876;
+}
+.payplugDeferred.-example {
+  opacity: 0.6;
+}
 /* Payplug Admin Popup */
 .payplugPopup {
   -webkit-transform: translate(-50%, -50%);
