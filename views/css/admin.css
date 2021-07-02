@@ -203,11 +203,11 @@ label.payplugSwitch_label {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
-  -webkit-transition: background 0.26666667s;
-  -moz-transition: background 0.26666667s;
-  -ms-transition: background 0.26666667s;
-  -o-transition: background 0.26666667s;
-  transition: background 0.26666667s;
+  -webkit-transition: background 0.4s/1.5;
+  -moz-transition: background 0.4s/1.5;
+  -ms-transition: background 0.4s/1.5;
+  -o-transition: background 0.4s/1.5;
+  transition: background 0.4s/1.5;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -594,6 +594,12 @@ button.payplugLink:hover {
 /* Payplug Admin Config */
 .payplugDeferred label {
   font-weight: 400;
+}
+.payplugDeferred_warning {
+  color: #e56876;
+}
+.payplugDeferred.-example {
+  opacity: 0.6;
 }
 /* Payplug Admin Popup */
 .payplugPopup {
