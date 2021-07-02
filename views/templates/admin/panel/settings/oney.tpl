@@ -34,6 +34,14 @@
                 <div class="payplugTips_item -left {if !$payplug_switch.oney.checked || !$payplug_switch.oney.active} -hide{/if}">
                     <div class="payplugOney">
                         {include file='./oney_fees.tpl'}
+                        <div class="payplugOneyTos">
+                            {include file='./switch.tpl' switch=$payplug_switch.oney_optimized}
+                            <p>
+                                <strong>{l s='Go further' mod='payplug'}</strong>
+                                {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration.' mod='payplug'}
+                                <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
