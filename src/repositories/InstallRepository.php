@@ -109,6 +109,7 @@ class InstallRepository extends Repository
             $order_state_live = $this->order_state_specific->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
                 || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
+                $this->log->info('Order state should be created: ' . $key_config_live);
                 $this->order_state->create($key, $state, false, true);
             }
 
@@ -118,6 +119,7 @@ class InstallRepository extends Repository
             $order_state_sandbox = $this->order_state_specific->get($id_order_state_sandbox);
             if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
                 || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
+                $this->log->info('Order state should be created: ' . $key_config_sandbox);
                 $this->order_state->create($key, $state, true, true);
             }
         }
@@ -286,14 +288,14 @@ class InstallRepository extends Repository
             return $this->setInstallError($this->l('Install failed:setConfig()'));
         }
 
-        // Install order state
-        if (!$this->createOrderStates()) {
-            return $this->setInstallError($this->l('Install failed: Create order states.'));
-        }
-
         // Install SQL
         if (!$this->sql->installSQL()) {
             return $this->setInstallError($this->l('Install failed: Install SQL tables.'));
+        }
+
+        // Install order state
+        if (!$this->createOrderStates()) {
+            return $this->setInstallError($this->l('Install failed: Create order states.'));
         }
 
         // Install tab
@@ -385,6 +387,7 @@ class InstallRepository extends Repository
                     'es' => 'Pago efectuado',
                     'it' => 'Pagamento effettuato',
                 ],
+                'type' => 'paid',
             ],
             'refund' => [
                 'cfg' => 'PS_OS_REFUND',
@@ -403,6 +406,7 @@ class InstallRepository extends Repository
                     'es' => 'Reembolsado',
                     'it' => 'Rimborsato',
                 ],
+                'type' => 'refund',
             ],
             'pending' => [
                 'cfg' => 'PS_OS_PENDING',
@@ -421,6 +425,7 @@ class InstallRepository extends Repository
                     'es' => 'Pago en curso',
                     'it' => 'Pagamento in corso',
                 ],
+                'type' => 'pending',
             ],
             'error' => [
                 'cfg' => 'PS_OS_ERROR',
@@ -439,6 +444,26 @@ class InstallRepository extends Repository
                     'es' => 'Payment failed',
                     'it' => 'Payment failed',
                 ],
+                'type' => 'error',
+            ],
+            'cancel' => [
+                'cfg' => 'PS_OS_CANCELED',
+                'template' => 'order_canceled',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#2C3E50',
+                'name' => [
+                    'en' => 'Payment cancelled',
+                    'fr' => 'Paiement annulé',
+                    'es' => 'Payment cancelled',
+                    'it' => 'Payment cancelled',
+                ],
+                'type' => 'cancel',
             ],
             'auth' => [
                 'cfg' => null,
@@ -457,6 +482,7 @@ class InstallRepository extends Repository
                     'es' => 'Pago',
                     'it' => 'Pagamento',
                 ],
+                'type' => 'pending',
             ],
             'exp' => [
                 'cfg' => null,
@@ -475,6 +501,7 @@ class InstallRepository extends Repository
                     'fr' => 'Autorisation expirée',
                     'it' => 'Autorizzazione scaduta',
                 ],
+                'type' => 'exp',
             ],
             'oney_pg' => [
                 'cfg' => null,
@@ -493,6 +520,7 @@ class InstallRepository extends Repository
                     'es' => 'Oney - Pending',
                     'it' => 'Oney - Pending',
                 ],
+                'type' => 'pending',
             ]
         ]);
     }

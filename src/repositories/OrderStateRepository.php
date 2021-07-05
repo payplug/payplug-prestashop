@@ -127,6 +127,12 @@ class OrderStateRepository extends Repository
         // Get order state id with given configuration key
         if (!$id_order_state && !$sandbox && isset($state['cfg']) && $state['cfg']) {
             $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
+            $os = $this->order_state_specific->get($id_order_state);
+
+            // Valide order state
+            if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
+                return $this->configuration->updateValue($key_config, $os->id);
+            }
         }
 
         // Get order state id with given template
@@ -150,6 +156,8 @@ class OrderStateRepository extends Repository
             || (isset($order_state->deleted) && $order_state->deleted)) {
             $id_order_state = $this->add($name, $state, $sandbox);
         }
+
+        $this->setType($id_order_state, $state['type']);
 
         return $this->configuration->updateValue($key_config, $id_order_state);
     }
@@ -335,6 +343,20 @@ class OrderStateRepository extends Repository
         }
 
         return $ids;
+    }
+
+    public function setType($id_order_state, $type) {
+        $date = date('Y-m-d');
+        $this->query
+            ->insert()
+            ->into(_DB_PREFIX_.'payplug_order_state')
+            ->fields('id_order_state')  ->values(pSQL($id_order_state))
+            ->fields('type')            ->values(pSQL($type))
+            ->fields('date_add')        ->values($date)
+            ->fields('date_upd')        ->values($date)
+        ;
+
+        return $this->query->build();
     }
 
     public function removeIdsUnusedByPayPlug()
