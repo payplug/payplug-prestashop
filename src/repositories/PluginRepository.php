@@ -151,7 +151,8 @@ class PluginRepository extends Repository
         $this->hook = new HookRepository(
             $this->payplug,
             $this->constant,
-            $this->context
+            $this->context,
+            $this->tools
         );
 
         $this->cache    = new CacheRepository(

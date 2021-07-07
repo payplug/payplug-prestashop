@@ -28,12 +28,14 @@ class HookRepository extends Repository
     protected $constant;
     protected $payplug;
     protected $context;
+    protected $tools;
 
-    public function __construct($payplug, $constant, $context)
+    public function __construct($payplug, $constant, $context, $tools)
     {
         $this->payplug = $payplug;
         $this->constant = $constant;
         $this->context = $context;
+        $this->tools = $tools;
     }
 
     public function actionAdminControllerSetMedia()
