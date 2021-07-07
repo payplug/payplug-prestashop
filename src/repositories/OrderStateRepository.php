@@ -325,6 +325,18 @@ class OrderStateRepository extends Repository
         return $this->query->build('unique_value');
     }
 
+    public function getType($id_order_state)
+    {
+        $this->query
+            ->select()
+            ->fields('type')
+            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->where('id_order_state = ' . (int)$id_order_state)
+            ->limit(1, 1);
+
+        return $this->query->build('unique_value');
+    }
+
     public function isUsedByOrders($module_name)
     {
         $ids = [];
@@ -345,20 +357,6 @@ class OrderStateRepository extends Repository
         return $ids;
     }
 
-    public function setType($id_order_state, $type) {
-        $date = date('Y-m-d');
-        $this->query
-            ->insert()
-            ->into(_DB_PREFIX_.'payplug_order_state')
-            ->fields('id_order_state')  ->values(pSQL($id_order_state))
-            ->fields('type')            ->values(pSQL($type))
-            ->fields('date_add')        ->values($date)
-            ->fields('date_upd')        ->values($date)
-        ;
-
-        return $this->query->build();
-    }
-
     public function removeIdsUnusedByPayPlug()
     {
         $deleted = true;
@@ -372,5 +370,19 @@ class OrderStateRepository extends Repository
             }
         }
         return $deleted;
+    }
+
+    public function setType($id_order_state, $type)
+    {
+        $date = date('Y-m-d');
+        $this->query
+            ->insert()
+            ->into(_DB_PREFIX_ . 'payplug_order_state')
+            ->fields('id_order_state')->values(pSQL($id_order_state))
+            ->fields('type')->values(pSQL($type))
+            ->fields('date_add')->values($date)
+            ->fields('date_upd')->values($date);
+
+        return $this->query->build();
     }
 }
