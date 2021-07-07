@@ -372,6 +372,15 @@ class OrderStateRepository extends Repository
         return $deleted;
     }
 
+    public function saveType($id_order_state, $type)
+    {
+        if ($this->getType($id_order_state)) {
+            return $this->updateType($id_order_state, $type);
+        }
+
+        return $this->setType($id_order_state, $type);
+    }
+
     public function setType($id_order_state, $type)
     {
         $date = date('Y-m-d');
@@ -382,6 +391,19 @@ class OrderStateRepository extends Repository
             ->fields('type')->values(pSQL($type))
             ->fields('date_add')->values($date)
             ->fields('date_upd')->values($date);
+
+        return $this->query->build();
+    }
+
+    public function updateType($id_order_state, $type)
+    {
+        $date = date('Y-m-d');
+        $this->query
+            ->update()
+            ->table(_DB_PREFIX_ . 'payplug_order_state')
+            ->set('type = \'' . $type . '\'')
+            ->set('date_upd = \'' . $date . '\'')
+            ->where('id_order_state = ' . (int)$id_order_state);
 
         return $this->query->build();
     }
