@@ -35,7 +35,8 @@ function upgrade_module_3_3_0()
                 `id_order_state` INT(11) UNSIGNED NOT NULL,
                 `type` VARCHAR(64) NOT NULL,
                 `date_add` DATETIME NULL,
-                `date_upd` DATETIME NULL
+                `date_upd` DATETIME NULL,
+                CONSTRAINT order_state_unique UNIQUE (id_order_state)
             ) ENGINE=' . _MYSQL_ENGINE_;
 
     $flag = $flag && Db::getInstance()->execute($sql);

@@ -221,6 +221,7 @@ class SQLtableRepository
             ->fields('`type` VARCHAR(64) NOT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
+            ->condition('CONSTRAINT order_state_unique UNIQUE (id_order_state)')
             ->engine(_MYSQL_ENGINE_);
 
         if (!$this->query->build()) {
