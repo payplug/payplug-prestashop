@@ -80,12 +80,12 @@ class PayPlugNotifications
         $can_save_card = $this->is_installment ? false : true;
 
         return $can_save_card && (
-                $this->payment->save_card
+            $this->payment->save_card
                 || (
                     $this->payment->card->id
                     && $this->payment->hosted_payment
                 )
-            );
+        );
     }
 
     /**

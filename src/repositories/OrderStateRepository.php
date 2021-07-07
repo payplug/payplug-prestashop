@@ -127,11 +127,12 @@ class OrderStateRepository extends Repository
         // Get order state id with given configuration key
         if (!$id_order_state && !$sandbox && isset($state['cfg']) && $state['cfg']) {
             $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
-            $os = $this->order_state_specific->get($id_order_state);
-
-            // Valide order state
-            if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
-                return $this->configuration->updateValue($key_config, $os->id);
+            if ($id_order_state) {
+                // Valide order state
+                $os = $this->order_state_specific->get($id_order_state);
+                if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
+                    return $this->configuration->updateValue($key_config, $os->id);
+                }
             }
         }
 
@@ -372,8 +373,16 @@ class OrderStateRepository extends Repository
         return $deleted;
     }
 
-    public function saveType($id_order_state, $type)
+    public function saveType($id_order_state = false, $type = '')
     {
+        if (!$id_order_state || !is_int($id_order_state)) {
+            return false;
+        }
+
+        if (!$type || !is_string($type)) {
+            return false;
+        }
+
         if ($this->getType($id_order_state)) {
             return $this->updateType($id_order_state, $type);
         }
