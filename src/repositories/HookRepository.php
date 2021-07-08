@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
+
 class HookRepository extends Repository
 {
     protected $constant;
@@ -53,6 +54,55 @@ class HookRepository extends Repository
                 $module_url . 'views/css/admin.css',
             ]);
         }
+    }
+
+    /**
+     * This is a hook function that allows
+     * creating a new type of the order state
+     * @param $param
+     */
+    public function actionObjectOrderStateAddAfter($param)
+    {
+        $order_state = $param['object'];
+        $type = $this->tools->tool('getValue', 'order_state_type');
+        $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id,$type);
+
+    }
+
+    /**
+     * This is a hook function that allows
+     * to update the type of the order state
+     * @param $param
+     */
+    public  function actionObjectOrderStateUpdateAfter($param)
+    {
+        $order_state = $param['object'];
+        $type = $this->tools->tool('getValue', 'order_state_type');
+        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id,$type);
+    }
+
+    /**
+     * This hook is used to display
+     * a select box in the order state page (BO)
+     * in order to create/update a type
+     * @param $param
+     * @return mixed
+     */
+    public function displayAdminStatusesForm($param)
+    {
+        $types = [
+            'cancel' => $this->l('order_state.type.cancelled'),
+            'error' => $this->l('order_state.type.error'),
+            'expired' => $this->l('order_state.type.expired'),
+            'nothing' => $this->l('order_state.type.nothing'),
+            'paid' => $this->l('order_state.type.paid'),
+            'pending' => $this->l('order_state.type.pending'),
+            'refund' => $this->l('order_state.type.refund'),
+        ];
+
+        $this->context->getContext()->smarty->assign('myOptions',$types);
+        $this->context->getContext()->smarty->assign('mySelect', 'nothing');
+        return $this->payplug->fetchTemplate('order/order_state.tpl');
     }
 
     public function exe($method = false, $params = [])
