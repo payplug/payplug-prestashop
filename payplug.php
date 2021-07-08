@@ -121,6 +121,9 @@ class Payplug extends PaymentModule
             'actionExportGDPRData',
             'actionObjectCarrierAddAfter',
             'actionOrderStatusUpdate',
+            'actionObjectOrderStateAddAfter',
+            'actionObjectOrderStateUpdateAfter',
+            'actionObjectOrderStateDeleteAfter',
             'adminOrder',
             'customerAccount',
             'displayAdminOrderMain',
@@ -128,6 +131,7 @@ class Payplug extends PaymentModule
             'displayBeforeShoppingCartBlock',
             'displayExpressCheckout',
             'displayProductPriceBlock',
+            'displayAdminStatusesForm',
             'header',
             'moduleRoutes',
             'payment',
@@ -207,6 +211,30 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionObjectOrderStateAddAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateAddAfter', $params);
+        }
+    }
+
+    public  function hookActionObjectOrderStateUpdateAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateUpdateAfter', $params);
+        }
+    }
+    public  function hookActionObjectOrderStateDeleteAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateDeleteAfter', $params);
+        }
+    }
+
+    /**
      * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
      * @param $params
      * @return mixed
@@ -237,6 +265,16 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             return $this->module->hookDisplayAdminOrderMain($params);
+        }
+    }
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function  hookDisplayAdminStatusesForm($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm', $params);
         }
     }
 
