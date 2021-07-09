@@ -326,14 +326,14 @@ class OrderStateRepository extends Repository
 
     public function getType($id_order_state)
     {
-        $this->query
+        $type = $this->query
             ->select()
             ->fields('type')
             ->from(_DB_PREFIX_ . 'payplug_order_state')
             ->where('id_order_state = ' . (int)$id_order_state)
-            ->limit(1, 1);
+            ->build('unique_value');
 
-        return $this->query->build('unique_value');
+        return $type;
     }
 
     public function isUsedByOrders($module_name)
@@ -381,8 +381,7 @@ class OrderStateRepository extends Repository
             return false;
         }
 
-        $type = $this->getType($id_order_state);
-        if (!empty($type)) {
+        if ($old_type = $this->getType($id_order_state)) {
             return $this->updateType($id_order_state, $type);
         }
 

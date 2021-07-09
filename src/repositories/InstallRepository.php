@@ -214,18 +214,18 @@ class InstallRepository extends Repository
             // live status
             $live_key = $this->order_state->getConfigKey($key, false);
             $id_order_state_live = $this->config->get($live_key);
-            $this->log->info('Live key : ' . $live_key . ' / Id Order State' . $id_order_state_live);
+            $this->log->info('Live key : ' . $live_key . ' / Id Order State: ' . $id_order_state_live);
             if ($id_order_state_live) {
-                $res = $this->order_state->saveType($id_order_state_live, $state['type']);
+                $res = $this->order_state->saveType((int)$id_order_state_live, $state['type']);
                 $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
             }
 
             // sandbox status
-            $sandbox_key = $this->order_state->getConfigKey($key, false);
+            $sandbox_key = $this->order_state->getConfigKey($key, true);
             $id_order_state_sandbox = $this->config->get($sandbox_key);
             $this->log->info('Sandbox key : ' . $sandbox_key . ' / Id Order State: ' . $id_order_state_sandbox);
             if ($id_order_state_sandbox) {
-                $res = $this->order_state->saveType($id_order_state_sandbox, $state['type']);
+                $res = $this->order_state->setType((int)$id_order_state_sandbox, $state['type']);
                 $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
             }
         }
@@ -330,9 +330,9 @@ class InstallRepository extends Repository
         }
 
         // Install order state type
-        if (!$this->createOrderStatesType()) {
-            return $this->setInstallError($this->l('Install failed: Create order states type.'));
-        }
+//        if (!$this->createOrderStatesType()) {
+//            return $this->setInstallError($this->l('Install failed: Create order states type.'));
+//        }
 
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab()) {

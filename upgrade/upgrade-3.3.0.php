@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_3_0()
+function upgrade_module_3_3_0($object)
 {
     $flag = true;
 
@@ -81,6 +81,18 @@ function upgrade_module_3_3_0()
             unset($sql);
         }
     }
+
+    // plug module on the hook actionObjectOrderStateAddAfter
+    $flag = $flag && $object->registerHook('actionObjectOrderStateAddAfter');
+
+    // plug module on the hook actionObjectOrderStateUpdateAfter
+    $flag = $flag && $object->registerHook('actionObjectOrderStateUpdateAfter');
+
+    // plug module on the hook actionObjectOrderStateDeleteAfter
+    $flag = $flag && $object->registerHook('actionObjectOrderStateDeleteAfter');
+
+    // plug module on the hook displayAdminStatusesForm
+    $flag = $flag && $object->registerHook('displayAdminStatusesForm');
 
     return $flag;
 }
