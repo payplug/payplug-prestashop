@@ -56,7 +56,7 @@ class HookRepository extends Repository
     }
 
     /**
-     * This is a hook function that allows
+     * @description This is a hook function that allows
      * creating a new type of the order state
      * @param $param
      */
@@ -68,32 +68,31 @@ class HookRepository extends Repository
     }
 
     /**
-     * This is a hook function that allows
+     * @description This is a hook function that allows
      * to update the type of the order state
      * and make a soft delete for prestashop-version >= 1.7
      * @param $param
+     * @return void
      */
     public function actionObjectOrderStateUpdateAfter($param)
     {
         $order_state = $param['object'];
-        if (isset($order_state->delele) && $order_state->delete)
-        {
-            return $this->actionObjectOrderStateDeleteAfter($param);
+        if (isset($order_state->delele) && $order_state->delete) {
+            $this->actionObjectOrderStateDeleteAfter($param);
         }
         $type = $this->tools->tool('getValue', 'order_state_type');
-        return $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id, $type);
+        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id, $type);
     }
 
     /**
-     * This is a hook function that deletes
+     * @description This is a hook function that deletes
      * an order state
      * @param $param
-     * @return mixed
      */
-    public  function actionObjectOrderStateDeleteAfter($param)
+    public function actionObjectOrderStateDeleteAfter($param)
     {
         $order_state = $param['object'];
-        return $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
+        $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
     }
 
     /**
@@ -101,7 +100,6 @@ class HookRepository extends Repository
      * a select box in the order state page (BO)
      * in order to create/update a type
      * @param $param
-     * @return mixed
      */
     public function displayAdminStatusesForm($param)
     {

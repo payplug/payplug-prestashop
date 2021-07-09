@@ -417,18 +417,23 @@ class OrderStateRepository extends Repository
         return $this->query->build();
     }
 
-    public function deleteType($id_order_state)
+    /**
+     * @param int $id_order_state
+     * @return bool
+     */
+    public function deleteType(int $id_order_state)
     {
+        // FIXME: from php7, psr12 requires return type
+
         if (!$id_order_state || !is_int($id_order_state)) {
             return false;
-        }
-        if ($this->getType($id_order_state)) {
+        } else {
             $this->query
                 ->delete()
-                ->table(_DB_PREFIX_ . 'payplug_order_state')
-                ->where('id_order_state = ' . (int)$id_order_state);
-
-            return $this->query->build();
+                ->from(_DB_PREFIX_ . 'payplug_order_state')
+                ->where('id_order_state = ' . pSQL((int)$id_order_state))
+                -> build();
         }
+        return  true;
     }
 }
