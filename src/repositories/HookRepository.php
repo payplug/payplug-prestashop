@@ -56,7 +56,7 @@ class HookRepository extends Repository
     }
 
     /**
-     * This is a hook function that allows
+     * @description This is a hook function that allows
      * creating a new type of the order state
      * @param $param
      */
@@ -68,19 +68,32 @@ class HookRepository extends Repository
     }
 
     /**
-     * This is a hook function that allows
+     * @description This is a hook function that allows
      * to update the type of the order state
      * @param $param
      */
     public function actionObjectOrderStateUpdateAfter($param)
     {
         $order_state = $param['object'];
-        $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id, $type);
+        if (isset($order_state->delele) && $order_state->delete) {
+            $this->actionObjectOrderStateDeleteAfter($param);
+        }
+        $this->actionObjectOrderStateAddAfter($param);
     }
 
     /**
-     * This hook is used to display
+     * @description This is a hook function that deletes
+     * an order state
+     * @param $param
+     */
+    public function actionObjectOrderStateDeleteAfter($param)
+    {
+        $order_state = $param['object'];
+        $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
+    }
+
+    /**
+     * @description This hook is used to display
      * a select box in the order state page (BO)
      * in order to create/update a type
      * @param $param

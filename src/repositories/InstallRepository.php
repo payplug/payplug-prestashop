@@ -330,9 +330,9 @@ class InstallRepository extends Repository
         }
 
         // Install order state type
-//        if (!$this->createOrderStatesType()) {
-//            return $this->setInstallError($this->l('Install failed: Create order states type.'));
-//        }
+        if (!$this->createOrderStatesType()) {
+            return $this->setInstallError($this->l('Install failed: Create order states type.'));
+        }
 
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab()) {

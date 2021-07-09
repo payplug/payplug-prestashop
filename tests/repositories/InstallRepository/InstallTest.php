@@ -144,6 +144,35 @@ final class InstallTest extends BaseInstallRepository
         );
     }
 
+    public function testWithInvalidSqlInstall()
+    {
+        $this->repo
+            ->shouldReceive([
+                'checkRequirements' => [
+                    'php' => [
+                        'up2date' => true,
+                    ],
+                    'curl' => [
+                        'up2date' => true,
+                    ],
+                    'openssl' => [
+                        'up2date' => true,
+                    ],
+                ],
+                'setConfig' => true
+            ]);
+
+        $this->sql
+            ->shouldReceive([
+                'installSQL' => false
+            ]);
+
+        $this->assertSame(
+            'Install failed: Install SQL tables.',
+            $this->repo->install()
+        );
+    }
+
     public function testWithInvalidOrderStateInstall()
     {
         $this->repo
@@ -163,13 +192,18 @@ final class InstallTest extends BaseInstallRepository
                 'createOrderStates' => false
             ]);
 
+        $this->sql
+            ->shouldReceive([
+                'installSQL' => true
+            ]);
+
         $this->assertSame(
             'Install failed: Create order states.',
             $this->repo->install()
         );
     }
 
-    public function testWithInvalidSqlInstall()
+    public function testWithInvalidOrderStateTypeInstall()
     {
         $this->repo
             ->shouldReceive([
@@ -185,16 +219,17 @@ final class InstallTest extends BaseInstallRepository
                     ],
                 ],
                 'setConfig' => true,
-                'createOrderStates' => true
+                'createOrderStates' => true,
+                'createOrderStatesType' => false
             ]);
 
         $this->sql
             ->shouldReceive([
-                'installSQL' => false
+                'installSQL' => true
             ]);
 
         $this->assertSame(
-            'Install failed: Install SQL tables.',
+            'Install failed: Create order states type.',
             $this->repo->install()
         );
     }
@@ -215,7 +250,8 @@ final class InstallTest extends BaseInstallRepository
                     ],
                 ],
                 'setConfig' => true,
-                'createOrderStates' => true
+                'createOrderStates' => true,
+                'createOrderStatesType' => true
             ]);
 
         $this->sql
@@ -251,7 +287,8 @@ final class InstallTest extends BaseInstallRepository
                     ],
                 ],
                 'setConfig' => true,
-                'createOrderStates' => true
+                'createOrderStates' => true,
+                'createOrderStatesType' => true
             ]);
 
         $this->sql
