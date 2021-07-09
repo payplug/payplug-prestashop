@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-
 class HookRepository extends Repository
 {
     protected $constant;
@@ -65,20 +64,36 @@ class HookRepository extends Repository
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id,$type);
-
+        $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
     }
 
     /**
      * This is a hook function that allows
      * to update the type of the order state
+     * and make a soft delete for prestashop-version >= 1.7
      * @param $param
      */
-    public  function actionObjectOrderStateUpdateAfter($param)
+    public function actionObjectOrderStateUpdateAfter($param)
     {
         $order_state = $param['object'];
+        if (isset($order_state->delele) && $order_state->delete)
+        {
+            return $this->actionObjectOrderStateDeleteAfter($param);
+        }
         $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id,$type);
+        return $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id, $type);
+    }
+
+    /**
+     * This is a hook function that deletes
+     * an order state
+     * @param $param
+     * @return mixed
+     */
+    public  function actionObjectOrderStateDeleteAfter($param)
+    {
+        $order_state = $param['object'];
+        return $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
     }
 
     /**
@@ -100,7 +115,7 @@ class HookRepository extends Repository
             'refund' => $this->l('order_state.type.refund'),
         ];
 
-        $this->context->getContext()->smarty->assign('myOptions',$types);
+        $this->context->getContext()->smarty->assign('myOptions', $types);
         $this->context->getContext()->smarty->assign('mySelect', 'nothing');
         return $this->payplug->fetchTemplate('order/order_state.tpl');
     }

@@ -416,4 +416,19 @@ class OrderStateRepository extends Repository
 
         return $this->query->build();
     }
+
+    public function deleteType($id_order_state)
+    {
+        if (!$id_order_state || !is_int($id_order_state)) {
+            return false;
+        }
+        if ($this->getType($id_order_state)) {
+            $this->query
+                ->delete()
+                ->table(_DB_PREFIX_ . 'payplug_order_state')
+                ->where('id_order_state = ' . (int)$id_order_state);
+
+            return $this->query->build();
+        }
+    }
 }
