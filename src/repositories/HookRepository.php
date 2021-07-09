@@ -70,9 +70,7 @@ class HookRepository extends Repository
     /**
      * @description This is a hook function that allows
      * to update the type of the order state
-     * and make a soft delete for prestashop-version >= 1.7
      * @param $param
-     * @return void
      */
     public function actionObjectOrderStateUpdateAfter($param)
     {
@@ -80,8 +78,7 @@ class HookRepository extends Repository
         if (isset($order_state->delele) && $order_state->delete) {
             $this->actionObjectOrderStateDeleteAfter($param);
         }
-        $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id, $type);
+        $this->actionObjectOrderStateAddAfter($param);
     }
 
     /**
@@ -96,26 +93,34 @@ class HookRepository extends Repository
     }
 
     /**
-     * This hook is used to display
+     * @description This hook is used to display
      * a select box in the order state page (BO)
      * in order to create/update a type
      * @param $param
+     * @return mixed
      */
     public function displayAdminStatusesForm($param)
     {
         $types = [
-            'cancel' => $this->l('order_state.type.cancelled'),
-            'error' => $this->l('order_state.type.error'),
-            'expired' => $this->l('order_state.type.expired'),
-            'nothing' => $this->l('order_state.type.nothing'),
-            'paid' => $this->l('order_state.type.paid'),
-            'pending' => $this->l('order_state.type.pending'),
-            'refund' => $this->l('order_state.type.refund'),
+            '' => $this->l('hook.displayAdminStatusesForm.undefined'),
+            'cancel' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
+            'error' => $this->l('hook.displayAdminStatusesForm.orderStateTypeError'),
+            'expired' => $this->l('hook.displayAdminStatusesForm.orderStateTypeExpired'),
+            'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
+            'paid' => $this->l('hook.displayAdminStatusesForm.orderStateTypePaid'),
+            'pending' => $this->l('hook.displayAdminStatusesForm.orderStateTypePending'),
+            'refund' => $this->l('hook.displayAdminStatusesForm.orderStateTypeRefund'),
         ];
 
-        $this->context->getContext()->smarty->assign('myOptions', $types);
-        $this->context->getContext()->smarty->assign('mySelect', 'nothing');
-        return $this->payplug->fetchTemplate('order/order_state.tpl');
+        $id_order_state = $this->tools->tool('getValue', 'id_order_state');
+        $current_order_state_type = $this->payplug->getPlugin()->getOrderState()->getType((int)$id_order_state);
+
+        $this->context->getContext()->smarty->assign([
+            'current_order_state_type' => $current_order_state_type,
+            'order_state_types' => $types
+        ]);
+
+        return $this->payplug->fetchTemplate('order_state/type.tpl');
     }
 
     public function exe($method = false, $params = [])

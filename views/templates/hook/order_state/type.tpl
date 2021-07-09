@@ -25,17 +25,15 @@
     <div id="tpl" style="display:block">
 
         <label class="control-label col-lg-3">
-            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="ORDER STATE TOOLTIPS">
-                Phrase
+            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='hook.order_state.type.tooltips' mod='payplug'}">
+                {l s='hook.order_state.type.label' mod='payplug'}
             </span>
         </label>
-
         <div class="col-lg-9">
-
             <div class="col-lg-9">
                 <div class="row">
                     <div class="col-lg-9">
-                        {html_options name=order_state_type options=$myOptions selected=$mySelect}
+                        {html_options name=order_state_type options=$order_state_types selected=$current_order_state_type}
                     </div>
                 </div>
             </div>

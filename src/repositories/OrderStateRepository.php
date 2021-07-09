@@ -158,8 +158,6 @@ class OrderStateRepository extends Repository
             $id_order_state = $this->add($name, $state, $sandbox);
         }
 
-        $this->setType($id_order_state, $state['type']);
-
         return $this->configuration->updateValue($key_config, $id_order_state);
     }
 
@@ -421,19 +419,19 @@ class OrderStateRepository extends Repository
      * @param int $id_order_state
      * @return bool
      */
-    public function deleteType(int $id_order_state)
+    public function deleteType($id_order_state)
     {
         // FIXME: from php7, psr12 requires return type
 
         if (!$id_order_state || !is_int($id_order_state)) {
             return false;
-        } else {
-            $this->query
-                ->delete()
-                ->from(_DB_PREFIX_ . 'payplug_order_state')
-                ->where('id_order_state = ' . pSQL((int)$id_order_state))
-                -> build();
         }
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->where('id_order_state = ' . (int)$id_order_state)
+            -> build();
+
         return  true;
     }
 }

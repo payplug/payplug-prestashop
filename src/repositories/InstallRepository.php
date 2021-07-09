@@ -203,6 +203,37 @@ class InstallRepository extends Repository
     }
 
     /**
+     * @description Create usual status
+     * @return bool
+     */
+    public function createOrderStatesType()
+    {
+        $this->log->info('Execute createOrderStatesType');
+        $order_states_list = $this->order_state_entity->getList();
+        foreach ($order_states_list as $key => $state) {
+            // live status
+            $live_key = $this->order_state->getConfigKey($key, false);
+            $id_order_state_live = $this->config->get($live_key);
+            $this->log->info('Live key : ' . $live_key . ' / Id Order State' . $id_order_state_live);
+            if ($id_order_state_live) {
+                $this->log->info('Save type: ' . $state['type']);
+                $this->order_state->saveType($id_order_state_live, $state['type']);
+            }
+
+            // sandbox status
+            $sandbox_key = $this->order_state->getConfigKey($key, false);
+            $id_order_state_sandbox = $this->config->get($sandbox_key);
+            $this->log->info('Sandbox key : ' . $sandbox_key . ' / Id Order State' . $id_order_state_sandbox);
+            if ($id_order_state_sandbox) {
+                $this->log->info('Save type: ' . $state['type']);
+                $this->order_state->saveType($id_order_state_sandbox, $state['type']);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @description Delete basic configuration
      * @return bool
      */
@@ -296,6 +327,11 @@ class InstallRepository extends Repository
         // Install order state
         if (!$this->createOrderStates()) {
             return $this->setInstallError($this->l('Install failed: Create order states.'));
+        }
+
+        // Install order state type
+        if (!$this->createOrderStatesType()) {
+            return $this->setInstallError($this->l('Install failed: Create order states type.'));
         }
 
         // Install tab
