@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-
 class HookRepository extends Repository
 {
     protected $constant;
@@ -65,8 +64,7 @@ class HookRepository extends Repository
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id,$type);
-
+        $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
     }
 
     /**
@@ -74,11 +72,11 @@ class HookRepository extends Repository
      * to update the type of the order state
      * @param $param
      */
-    public  function actionObjectOrderStateUpdateAfter($param)
+    public function actionObjectOrderStateUpdateAfter($param)
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id,$type);
+        $this->payplug->getPlugin()->getOrderState()->updateType((int)$order_state->id, $type);
     }
 
     /**
@@ -91,18 +89,25 @@ class HookRepository extends Repository
     public function displayAdminStatusesForm($param)
     {
         $types = [
-            'cancel' => $this->l('order_state.type.cancelled'),
-            'error' => $this->l('order_state.type.error'),
-            'expired' => $this->l('order_state.type.expired'),
-            'nothing' => $this->l('order_state.type.nothing'),
-            'paid' => $this->l('order_state.type.paid'),
-            'pending' => $this->l('order_state.type.pending'),
-            'refund' => $this->l('order_state.type.refund'),
+            '' => $this->l('hook.displayAdminStatusesForm.undefined'),
+            'cancel' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
+            'error' => $this->l('hook.displayAdminStatusesForm.orderStateTypeError'),
+            'expired' => $this->l('hook.displayAdminStatusesForm.orderStateTypeExpired'),
+            'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
+            'paid' => $this->l('hook.displayAdminStatusesForm.orderStateTypePaid'),
+            'pending' => $this->l('hook.displayAdminStatusesForm.orderStateTypePending'),
+            'refund' => $this->l('hook.displayAdminStatusesForm.orderStateTypeRefund'),
         ];
 
-        $this->context->getContext()->smarty->assign('myOptions',$types);
-        $this->context->getContext()->smarty->assign('mySelect', 'nothing');
-        return $this->payplug->fetchTemplate('order/order_state.tpl');
+        $id_order_state = $this->tools->tool('getValue', 'id_order_state');
+        $current_order_state_type = $this->payplug->getPlugin()->getOrderState()->getType((int)$id_order_state);
+
+        $this->context->getContext()->smarty->assign([
+            'current_order_state_type' => $current_order_state_type,
+            'order_state_types' => $types
+        ]);
+
+        return $this->payplug->fetchTemplate('order_state/type.tpl');
     }
 
     public function exe($method = false, $params = [])

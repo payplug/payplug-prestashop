@@ -158,8 +158,6 @@ class OrderStateRepository extends Repository
             $id_order_state = $this->add($name, $state, $sandbox);
         }
 
-        $this->setType($id_order_state, $state['type']);
-
         return $this->configuration->updateValue($key_config, $id_order_state);
     }
 

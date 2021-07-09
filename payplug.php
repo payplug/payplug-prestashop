@@ -221,13 +221,13 @@ class Payplug extends PaymentModule
         }
     }
 
-    public  function hookActionObjectOrderStateUpdateAfter($params)
+    public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
             return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateUpdateAfter', $params);
         }
     }
-    public  function hookActionObjectOrderStateDeleteAfter($params)
+    public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
             return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateDeleteAfter', $params);
@@ -271,7 +271,7 @@ class Payplug extends PaymentModule
      * @param $params
      * @return mixed
      */
-    public function  hookDisplayAdminStatusesForm($params)
+    public function hookDisplayAdminStatusesForm($params)
     {
         if ($this->module) {
             return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm', $params);
