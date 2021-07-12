@@ -548,12 +548,7 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
-
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        $cartHash = $this->getHashedCart($paymentDetails);
 
         $this->query
             ->insert()
