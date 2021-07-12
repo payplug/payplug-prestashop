@@ -543,6 +543,10 @@ button.payplugLink:hover {
 .-selected .payplugOneyFees_checker {
   opacity: 1;
 }
+/* Payplug Admin Config */
+.payplugOneyOptimized {
+  display: flex;
+}
 /* Payplug Admin Installment */
 .payplugInstallment_fieldset .payplugPanel_label {
   align-items: flex-start;
@@ -590,6 +594,12 @@ button.payplugLink:hover {
 /* Payplug Admin Config */
 .payplugDeferred label {
   font-weight: 400;
+}
+.payplugDeferred_warning {
+  color: #e56876;
+}
+.payplugDeferred.-example {
+  opacity: 0.6;
 }
 /* Payplug Admin Popup */
 .payplugPopup {

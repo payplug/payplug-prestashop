@@ -175,8 +175,11 @@ var $document, $window, payplug = {
                         var {popup} = payplug.tools;
                         popup.set(result.popin, 'confirm');
                         $('form.payplug').replaceWith(result.content);
-                        var {oney} = payplug;
+                        var {oney, deferred} = payplug;
                         $window.trigger('load');
+                        if (deferred.props.stateChanged != null && deferred.props.active == true && $('input[name=' + deferred.props.switcher + ']:checked').val() == 1) {
+                            $('html,body').stop(true).animate({'scrollTop': 0});
+                        }
                     }
                 }
             });
@@ -864,15 +867,24 @@ var $document, $window, payplug = {
             identifier: 'payplugDeferred',
             switcher: 'payplug_deferred',
             query: null,
+            originalText: null,
+            currentStateName: null,
+            currentStateValue: null,
+            stateChanged: null,
             loaded: null,
+            active: false,
         },
         init: function () {
             var {deferred} = payplug,
-                {identifier, switcher} = deferred.props;
+                {identifier, switcher} = deferred.props,
+                $selected = $('.' + identifier + ' select option:selected');
             $document.on('change', '.' + identifier + ' input[type=checkbox]', deferred.change)
                 .on('switchSelected', 'input[name=' + switcher + ']', deferred.select)
                 .on('change', '.' + identifier + ' select', deferred.select);
             $('.' + identifier + ' input[type=checkbox]').trigger('change');
+            deferred.props.originalText = $('.' + identifier + '_warning').text();
+            deferred.props.currentStateName = $selected.text();
+            deferred.props.currentStateVal = $selected.val();
         },
         check: function () {
             var {standard, installment, deferred} = payplug;
@@ -898,11 +910,14 @@ var $document, $window, payplug = {
             var {deferred} = payplug,
                 {identifier} = deferred.props;
             $('.' + identifier).find('select').attr('disabled', false);
+            deferred.props.active = true;
         },
         deactive: function () {
             var {deferred} = payplug,
                 {identifier} = deferred.props;
             $('.' + identifier).find('select').attr('disabled', true);
+            $('.' + identifier).find('.payplugDeferred_warning').hide();
+            deferred.props.active = false;
         },
         select: function () {
             var {standard, installment, deferred} = payplug,
@@ -910,7 +925,24 @@ var $document, $window, payplug = {
                 $checkbox = $('.' + identifier).find('input[type=checkbox]'),
                 $select = $('.' + identifier).find('select'),
                 checked = $checkbox.prop('checked'),
-                active = parseInt($('input[name=' + switcher + ']:checked').val());
+                active = parseInt($('input[name=' + switcher + ']:checked').val()),
+                $selectedItem = $('select[name=' + switcher + '_state] option:selected'),
+                $warning = $('.' + identifier + '_warning'),
+                recordedStateId = $select.data('id_state');
+
+            if ($selectedItem.val() == 0 || $selectedItem.val() == recordedStateId) {
+                $warning.hide();
+                deferred.props.stateChanged = null;
+            } else if ($selectedItem.val() != recordedStateId) {
+                var textToReplace = ( deferred.props.currentStateValue == null || !$warning.text().includes(deferred.props.currentStateName) )? '%state%' : deferred.props.currentStateName;
+                $warning.html($warning.text().replace(textToReplace, $selectedItem.text()));
+
+                $warning.show();
+
+                deferred.props.currentStateName = $selectedItem.text();
+                deferred.props.currentStateValue = $selectedItem.val();
+                deferred.props.stateChanged = 1;
+            }
 
             if (deferred.props.loaded
                 && !parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
@@ -920,7 +952,7 @@ var $document, $window, payplug = {
                 deferred.props.loaded = true;
             }
 
-            var $error = $('.' + identifier).find('span');
+            var $error = $('.' + identifier).find('span.' + identifier + '_error');
             deferred.props.error = null;
 
             if (checked && !parseInt($select.val()) && active) {
