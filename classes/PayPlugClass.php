@@ -525,6 +525,18 @@ class PayPlugClass extends PaymentModule
 
                 die(json_encode(['error' => $this->l('payplug.adminAjaxController.settingsNotUpdated')]));
             } else {
+                if (Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
+                    $id_order_state = Tools::getValue('payplug_deferred_state');
+                    $order_state = new OrderState($id_order_state, $this->context->language->id);
+                    if (Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                        $this->context->smarty->assign([
+                            'updated_deferred_state' => true,
+                            'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
+                            'updated_deferred_state_name' => $order_state->name,
+                            'admin_orders_link' => $this->PrestashopSpecificObject->getOrdersByStateLink(Tools::getValue('payplug_deferred_state')),
+                        ]);
+                    }
+                }
                 $this->saveConfiguration();
 
                 $this->assignContentVar();
@@ -682,7 +694,6 @@ class PayPlugClass extends PaymentModule
             'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
             'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
             'oney' => Configuration::get('PAYPLUG_ONEY'),
-            'oney_tos' => Configuration::get('PAYPLUG_ONEY_TOS'),
             'oney_fees' => Configuration::get('PAYPLUG_ONEY_FEES'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
         ];
@@ -935,13 +946,6 @@ class PayPlugClass extends PaymentModule
             'label_right' => $this->l('payplug.assignSwitchConfiguration.no'),
         ];
 
-        $switch['oney_tos'] = [
-            'name' => 'payplug_oney_tos',
-            'active' => true,
-            'small' => true,
-            'checked' => $configurations['oney_tos'],
-        ];
-
         $switch['oney_optimized'] = [
             'name' => 'payplug_oney_optimized',
             'active' => true,
@@ -1093,13 +1097,24 @@ class PayPlugClass extends PaymentModule
                 : $this->l('payplug.buildPaymentDetails.no');
         }
 
+        $is_oney = false;
         if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                    $payment_details['type'] = 'Oney 3x';
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithFees');
                     break;
                 case 'oney_x4_with_fees':
-                    $payment_details['type'] = 'Oney 4x';
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithFees');
+                    break;
+                case 'oney_x3_without_fees':
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithoutFees');
+                    break;
+                case 'oney_x4_without_fees':
+                    $is_oney = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithoutFees');
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -1157,7 +1172,7 @@ class PayPlugClass extends PaymentModule
             $payment_details['error'] = '(' . $payment->failure->message . ')';
         }
 
-        if (isset($payment_details['type']) && in_array($payment_details['type'], ['Oney 3x', 'Oney 4x'], true)) {
+        if ($is_oney) {
             unset($payment_details['card_brand']);
             unset($payment_details['card_mask']);
             unset($payment_details['card_date']);
@@ -1721,7 +1736,7 @@ class PayPlugClass extends PaymentModule
                 'sandbox' => $args['sandbox'],
                 'embedded' => $args['embedded'],
                 'standard' => $args['standard'],
-                'one_click' => $args['one_click'],
+                'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
@@ -2552,7 +2567,6 @@ class PayPlugClass extends PaymentModule
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
             $optimized = Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-                && Configuration::get('PAYPLUG_ONEY_FEES')
                 && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();
@@ -3550,10 +3564,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
@@ -3561,6 +3571,7 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -3576,10 +3587,6 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
-            return false;
-        }
-
         $use_taxes = (bool)Configuration::get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -3588,6 +3595,7 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -3596,10 +3604,6 @@ class PayPlugClass extends PaymentModule
     {
         $current_controller = Dispatcher::getInstance()->getController();
         if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
-            return false;
-        }
-
-        if (!Configuration::get('PAYPLUG_ONEY_FEES')) {
             return false;
         }
 
@@ -3652,7 +3656,11 @@ class PayPlugClass extends PaymentModule
             ]);
             $this->smarty->assign(['popin' => true]);
         }
-        $this->smarty->assign(['env' => 'product']);
+
+        $this->smarty->assign([
+            'env' => 'product',
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
+        ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
 
@@ -3759,7 +3767,7 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED') && Configuration::get('PAYPLUG_ONEY_FEES')) {
+        if (Configuration::get('PAYPLUG_ONEY_OPTIMIZED')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -3779,6 +3787,7 @@ class PayPlugClass extends PaymentModule
         }
 
         $this->smarty->assign([
+            'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
@@ -4451,7 +4460,7 @@ class PayPlugClass extends PaymentModule
             $default_language = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->getIsoCodeList();
             if (in_array(Tools::strtoupper($default_language->iso_code), $iso_code_list, true)) {
-                $iso_code = $default_language->iso_code;
+                $iso_code = Tools::strtoupper($default_language->iso_code);
             } else {
                 $iso_code = 'FR';
             }
@@ -5034,7 +5043,6 @@ class PayPlugClass extends PaymentModule
         Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
         Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
         Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
-        Configuration::updateValue('PAYPLUG_ONEY_TOS', Tools::getValue('payplug_oney_tos'));
         Configuration::updateValue('PAYPLUG_ONEY_FEES', Tools::getValue('payplug_oney_fees'));
         Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
         Configuration::updateValue('PAYPLUG_STANDARD', Tools::getValue('payplug_standard'));

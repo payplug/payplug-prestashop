@@ -69,8 +69,7 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-            && (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -220,5 +219,33 @@ class PrestashopSpecific16
         }
 
         return $flag;
+    }
+    /**
+     * @description Link to order by order state
+     *
+     * @param int $order_state
+     * @return string
+     */
+    public function getOrdersByStateLink($order_state)
+    {
+        if ($this->contextSpecific->cookie->__get('submitFilterorder')) {
+            $this->contextSpecific->cookie->__unset('submitFilterorder');
+        }
+        $this->contextSpecific->cookie->__set('submitFilterorder', 1);
+
+        if ($this->contextSpecific->cookie->__get('ordersorderFilter_os!id_order_state')) {
+            $this->contextSpecific->cookie->__unset('ordersorderFilter_os!id_order_state');
+        }
+        $this->contextSpecific->cookie->__set('ordersorderFilter_os!id_order_state', $order_state);
+
+        if ($this->contextSpecific->cookie->__get('ordersorderFilter_a!date_add')) {
+            $this->contextSpecific->cookie->__unset('ordersorderFilter_a!date_add');
+        }
+        $this->contextSpecific->cookie->__set('ordersorderFilter_a!date_add', '["",""]');
+
+        $this->contextSpecific->cookie->write();
+
+        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true);
+        return $link;
     }
 }

@@ -180,7 +180,7 @@ class PaymentRepository extends Repository
     public function returnPaymentError($element = [], $errorMessage = null, $level = 'error')
     {
         if (!$errorMessage || !is_string($errorMessage)) {
-            $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
+            $errorMessage = '[PaymentRepository] Error during payment creation process.';
         }
 
         $this->payplug->setPaymentErrorsCookie([

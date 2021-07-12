@@ -1070,7 +1070,7 @@ class PayPlugPayment
 
             // then format code
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             return $phone_util->isValidNumber($parsed) ?
