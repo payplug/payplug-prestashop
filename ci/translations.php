@@ -11,14 +11,14 @@ $messages = [];
 
 // Open a file in write mode ('w')
 $fp = fopen(dirname(__FILE__) . '/translations.csv', 'w');
-$header = ['key', 'default'];
+$header = ['key', 'default', 'tags'];
 $header = array_merge($header, $available_languages);
 
 if ($fp) {
     fputcsv($fp, $header, ';');
     foreach ($translations as $key => $trans) {
         $key = str_replace("<{payplug}prestashop>", "", $key);
-        $line = [$key, $trans['default']];
+        $line = [$key, $trans['default'], $trans['tags']];
         foreach ($available_languages as $lang) {
             $line[] = stripcslashes($trans[$lang]);
 

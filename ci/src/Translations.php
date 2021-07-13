@@ -145,7 +145,7 @@ class Translations
             $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
         } else {
             // In tpl file look for something that should contain mod='module_name' according to the documentation
-            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+mod=\'payplug\'.*\}/U';
+            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\'payplug\'.*\}/U';
         }
 
         if (!is_array($regex)) {
@@ -159,6 +159,11 @@ class Translations
             for ($i = 0; $i < $n; ++$i) {
                 $quote = $matches[1][$i];
                 $string = $matches[2][$i];
+                $tags = str_replace('\'', '', $matches[3][$i]);
+
+                if ($tags) {
+                    $string = ['string' => $string, 'tags' => $tags];
+                }
 
                 if ($quote === '"') {
                     // Escape single quotes because the core will do it when looking for the translation of this string
@@ -171,7 +176,7 @@ class Translations
             }
         }
 
-        return array_unique($strings);
+        return array_unique($strings, SORT_REGULAR);
     }
 
     /**
@@ -226,6 +231,13 @@ class Translations
                 $template_name = substr(basename($file['name']), 0, -4);
 
                 foreach ($matches as $key) {
+                    if (is_array($key)) {
+                        $tags = $key['tags'];
+                        $key = $key['string'];
+                    } else {
+                        $tags = '';
+                    }
+
                     $template_name = str_replace("PayPlugClass", "payplug", $template_name);
                     $md5_key = md5($key);
                     $trans_key = '<{payplug}prestashop>';
@@ -235,7 +247,8 @@ class Translations
                     if (!in_array($trans_key, $array_check_duplicate)) {
                         $array_check_duplicate[] = $trans_key;
                         $this->trans[$trans_key] = [
-                            'default' => $key
+                            'default' => $key,
+                            'tags' => $tags,
                         ];
                     }
                 }
