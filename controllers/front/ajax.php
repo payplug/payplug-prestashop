@@ -31,6 +31,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $configurationSpecific;
     private $contextSpecific;
     private $oney;
+    private $payment;
     private $payplug;
     private $plugin;
     private $productSpecific;
@@ -64,6 +65,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->configurationSpecific = $this->plugin->getConfiguration();
             $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
             $this->oney = $this->plugin->getOney();
+            $this->payment = $this->plugin->getPayment();
             $this->productSpecific = $this->plugin->getProduct();
             $this->translate = $this->plugin->getTranslate();
 
@@ -86,14 +88,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                 }
-            }
-            elseif ($tools->tool('getIsset', 'getOneyCta')) {
+            } elseif ($tools->tool('getIsset', 'getOneyCta')) {
                 die(json_encode([
                     'result' => true,
                     'tpl' => $this->oney->getOneyCTA(),
                 ]));
-            }
-            elseif ($tools->tool('getIsset', 'isOneyElligible')) {
+            } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
                 $is_elligible = null;
@@ -135,8 +135,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode($is_elligible));
-            }
-            elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
+            } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)$config->get('PS_TAX');
 
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
@@ -177,8 +176,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode($payment_options));
-            }
-            elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
+            } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
                 $errors = $this->payplug->getPaymentErrorsCookie();
 
@@ -187,8 +185,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 die(json_encode(['result' => false]));
-            }
-            elseif ($tools->tool('getIsset', 'savePaymentData')) {
+            } elseif ($tools->tool('getIsset', 'savePaymentData')) {
                 $payment_data = $tools->tool('getValue', 'payment_data');
 
                 if (empty($payment_data)) {
@@ -216,13 +213,46 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
                 ]));
-            } elseif ($tools->tool('getIsset', 'submitIntegreatedPayment')) {
-                $result = $this->payplug->preparePayment(['is_integrated' => 1]);
-                die(json_encode($result));
-            }
-            elseif ($tools->tool('getIsset', 'submitIntegreatedPayment')) {
-                $result = $this->payplug->preparePayment(['is_integrated' => 1]);
-                die(json_encode($result));
+            } elseif ($tools->tool('getIsset', 'submitIntPayment')) {
+
+                // check if payment id token is given
+                // then check if valid && compare with existing
+                $token = $tools->tool('getValue', 'token');
+                if ($token) {
+                    // Set the payment id
+                    $pay_id = reset($token);
+
+                    // Then compare it to the current payment id in database
+                    $secure = $this->payplug->getPaymentByCart($context->cart->id);
+
+                    // If different, return error message
+                    if ($pay_id != $secure) {
+                        die(json_encode([
+                            'result' => false,
+                            'message' => $this->l('ajax.postProcess.wrongTokenGiven')
+                        ]));
+                    }
+
+                    // Get the payment resource
+                    $payment = $this->payplug->retrievePayment($pay_id);
+                    if ($payment->is_paid && !$payment->failure) {
+                        $return_url = $context->link->getModuleLink(
+                            $this->payplug->name,
+                            'validation',
+                            ['ps' => 1, 'cartid' => (int)$context->cart->id],
+                            true
+                        );
+                        die(json_encode([
+                            'result' => true,
+                            'return_url' => $return_url,
+                            'message' => $this->l('ajax.postProcess.paymentValidated')
+                        ]));
+                    }
+                }
+
+                $payment = $this->payplug->preparePayment(['is_integrated' => 1]);
+
+                die(json_encode($payment));
             }
         }
     }

@@ -255,11 +255,7 @@ class PayPlugValidation
                 Tools::redirect($redirect_url_error);
             }
 
-            if (((isset($payment->save_card) && (int)$payment->save_card == 1))
-                ||
-                ((isset($payment->card->id) && $payment->card->id != '')
-                    && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
-            ) {
+            if (isset($payment->card->id) && $payment->card->id) {
                 $this->logger->addLog('[Save Card] Saving card...');
                 $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
 

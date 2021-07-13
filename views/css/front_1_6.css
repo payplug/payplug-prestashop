@@ -266,6 +266,14 @@
   color: #fff;
   cursor: default;
 }
+.payplugIntegratedPayment_error {
+  color: #e56876;
+  margin: 0 15px 0 0;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 400;
+  white-space: normal;
+}
 /* Oney cta */
 .oneyCta {
   position: relative;

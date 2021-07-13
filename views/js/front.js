@@ -83,23 +83,56 @@ var $document, $window, payplugModule = {
             query: null,
             paymentId: null,
             form: {},
+            api: null,
         },
         init: function () {
             var integrated = payplugModule.integrated,
-                $form = $('.' + integrated.props.identifier);
+                $form = $('.' + integrated.props.identifier),
+                $submitButton = $form.find('.' + integrated.props.identifier + '_button');
 
-            $document.on('submit', $form, integrated.submit);
+            if (!$form.length) {
+                return false;
+            }
 
-            integrated.set();
+            $window.on('load', integrated.set);
+            $submitButton.on('click', integrated.submit);
+
+            $('.checkout-step form').submit(function(event){
+                var $container = $form.parents('.additional-information'),
+                    payment_option_id = $container.attr('id').replace('payment-option-','').replace('-additional-information',''),
+                    $payment_option = $('#payment-option-' + payment_option_id);
+
+                if($payment_option.is(':checked')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    integrated.submit();
+                }
+            });
         },
         set: function () {
-            var integrated = payplugModule.integrated,
+            if (typeof Payplug == 'undefined') {
+                console.log('Payplug api is ' + typeof Payplug);
+                return;
+            }
+
+            var integrated = payplugModule.integrated;
+
+            integrated.props.api = Payplug;
+
+            var api = integrated.props.api,
                 $form = $('.' + integrated.props.identifier),
                 $cardholder = $form.find('.-cardholder'),
                 $pan = $form.find('.-pan'),
                 $cvv = $form.find('.-cvv'),
                 $exp = $form.find('.-exp'),
-                intPayment = new Payplug.IntegratedPayment(payplug_publishable_key, $form.get(0))
+                intPayment = new api.IntegratedPayment(payplug_publishable_key, $form.get(0));
+
+            intPayment.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX);
+
+            // Implement your own retrieve function from back end
+            intPayment.onCompleted(function(payment_id){
+                integrated.confirm(payment_id);
+            });
 
             integrated.props.form = {
                 intPayment: intPayment,
@@ -109,14 +142,66 @@ var $document, $window, payplugModule = {
                 exp: intPayment.expiration($exp.get(0)),
             };
         },
-        submit: function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-
+        submit: function () {
             var integrated = payplugModule.integrated,
                 data = {
                     _ajax: 1,
-                    submitIntegreatedPayment: 1,
+                    submitIntPayment: 1,
+                };
+
+            if (integrated.props.query != null) {
+                integrated.props.query.abort();
+                integrated.props.query = null;
+            }
+
+            integrated.props.query = $.ajax({
+                type: 'POST',
+                url: payplug_ajax_url,
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('error CALL DELETE CARD');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (data) {
+                    if (data.result && data.payment_id) {
+                        integrated.props.paymentId = data.payment_id;
+                        integrated.pay();
+                    }
+                    else if(data.response) {
+                        var popin_error = '<p class="' + integrated.props.identifier + '_error">' + data.response + '</p>';
+                        payplugModule.popup.set(popin_error);
+                    }
+                    else {
+                        console.log('An error occured');
+                        console.log(data);
+                    }
+                }
+            });
+        }, // recupération du payment ID
+        pay: function () {
+            var integrated = payplugModule.integrated,
+                props = integrated.props,
+                api = props.api,
+                paymentId = props.paymentId,
+                intPayment = props.form.intPayment,
+                $input = $('.' + props.identifier + '_input.-saveCard').find('input'),
+                save_card = $input.is(':checked');
+
+            if (!api) {
+                return;
+            }
+
+            intPayment.pay(paymentId, Payplug.Scheme.AUTO, {save_card: save_card});
+        },
+        confirm: function(token) {
+            var integrated = payplugModule.integrated,
+                data = {
+                    _ajax: 1,
+                    submitIntPayment: 1,
+                    token: token,
                 };
 
             if (integrated.props.query != null) {
@@ -136,26 +221,17 @@ var $document, $window, payplugModule = {
                     console.log(errorThrown);
                 },
                 success: function (response) {
-                    if (response && response.payment_id) {
-                        integrated.props.paymentId = response.payment_id;
-                        integrated.pay();
+                    console.log(response);
+                    if (response.result) {
+                        if (typeof response.message != 'undefined' && response.message) {
+                            payplugModule.popup.set(response.message);
+                        }
+                        if (typeof response.return_url != 'undefined' && response.return_url) {
+                            window.location.href = response.return_url;
+                        }
                     }
                 }
             });
-        }, // recupération du payment ID
-        pay: function () {
-            var integrated = payplugModule.integrated,
-                props = integrated.props,
-                paymentId = props.paymentId,
-                intPayment = props.form.intPayment;
-
-            console.log(
-                'payplug PK : ' + payplug_publishable_key,
-                'pay id : ' + paymentId,
-                'Scheme : ' + Payplug.Scheme.AUTO
-            );
-
-            intPayment.pay(paymentId, Payplug.Scheme.AUTO);
         }
     },
     card: {

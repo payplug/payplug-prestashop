@@ -29,9 +29,8 @@
     <div data-integrated="cvv" class="payplugIntegratedPayment_input -cvv"></div>
     <div class="payplugIntegratedPayment_input -saveCard">
         <input type="checkbox" name="save_card">
-        Je souhaite enregistrer ma carte
+        {l s='hook.checkout.integrated.saveCardLabel' mod='payplug'}
     </div>
-    <button class="payplugIntegratedPayment_button -green" type="submit">Payer</button>
 </form>
 
 <script type="text/javascript" src="https://secure.alpha.notpayplug.com/integrated/js"></script>
