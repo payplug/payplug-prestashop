@@ -9,13 +9,11 @@ use PHPUnit\Framework\TestCase;
  * @group recommended
  * @group ignore
  */
-class PayPlugPaymentOneClickTest extends TestCase
-{
+class PayPlugPaymentOneClickTest extends TestCase {
     /**
      * @test
      */
-    public function emptyMethod()
-    {
+    public function emptyMethod(){
         $this->assertTrue(true);
     }
 }

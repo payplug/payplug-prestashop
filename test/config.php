@@ -6,3 +6,4 @@ define('PAYPLUG_TEST_ONEY_MAX', '3000');
 define('PAYPLUG_TEST_EURO_ID', '1');
 define('PAYPLUG_TEST_EURO_ISO', 'EUR');
 define('PAYPLUG_TEST_DEFAULT_COUNTRY', 'FR');
+

@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\classes\MyLogPHP;
 
 use PayPlug\src\entities\CacheEntity;
@@ -60,8 +59,6 @@ class PluginRepository extends Repository
     private $order_state_entity;
 
     // Repositories & necessary classes
-    private $amountCurrencyClass;
-    private $apiClass;
     private $cache;
     private $card;
     private $hook;
@@ -70,7 +67,6 @@ class PluginRepository extends Repository
     private $myLogPhp;
     private $oney;
     private $order_state;
-    private $orderClass;
     private $payment;
     private $query;
     private $sql;
@@ -96,17 +92,16 @@ class PluginRepository extends Repository
     public function __construct($payplug = null)
     {
         $this->payplug = $payplug;
-        $this->myLogPhp = new MyLogPHP();
 
         $this->setEntities();
         $this->setSpecific();
         $this->setRepositories();
 
+        $this->myLogPhp = new MyLogPHP();
+
         $this->plugin
-            ->setApiClass($this->apiClass)
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
-            ->setAmountCurrencyClass($this->amountCurrencyClass)
             ->setCache($this->cache)
             ->setCard($this->card)
             ->setCarrier($this->carrier)
@@ -121,7 +116,6 @@ class PluginRepository extends Repository
             ->setPayment($this->payment)
             ->setProduct($this->product)
             ->setOney($this->oney)
-            ->setOrderClass($this->orderClass)
             ->setQuery($this->query)
             ->setSql($this->sql)
             ->setTools($this->tools)
@@ -142,14 +136,9 @@ class PluginRepository extends Repository
 
     private function setRepositories()
     {
-        $this->amountCurrencyClass = new AmountCurrencyClass(
-            $this->tools
-        );
-
         $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
-
         $this->translate = new TranslationsRepository(
             $this->payplug,
             $this->tools
@@ -188,8 +177,7 @@ class PluginRepository extends Repository
             $this->oneyEntity,
             $this->myLogPhp,
             $this->payplug,
-            $this->assign,
-            $this->amountCurrencyClass
+            $this->assign
         );
 
         $this->order_state = new OrderStateRepository(
@@ -199,8 +187,7 @@ class PluginRepository extends Repository
             $this->order_state_specific,
             $this->query,
             $this->tools,
-            $this->validate,
-            $this->myLogPhp
+            $this->validate
         );
 
         $this->payment = new PaymentRepository(
@@ -224,8 +211,7 @@ class PluginRepository extends Repository
             $this->sql,
             $this->tools,
             $this->validate,
-            $this->payplug,
-            $this->myLogPhp
+            $this->payplug
         );
     }
 

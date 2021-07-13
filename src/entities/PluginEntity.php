@@ -30,14 +30,8 @@ class PluginEntity
     /** @var object */
     private $address;
 
-    /** @var object */
-    private $admin;
-
-    /** @var object */
-    private $amountCurrencyClass;
-
-    /** @var object */
-    private $apiClass;
+    /** @var string */
+    private $api_url;
 
     /** @var string */
     private $api_version;
@@ -53,9 +47,6 @@ class PluginEntity
 
     /** @var object */
     private $carrier;
-
-    /** @var object */
-    private $configClass;
 
     /** @var object */
     private $configuration;
@@ -79,9 +70,6 @@ class PluginEntity
     private $logger;
 
     /** @var object */
-    private $myLogPHP;
-
-    /** @var object */
     private $oney;
 
     /** @var object */
@@ -89,9 +77,6 @@ class PluginEntity
 
     /** @var object */
     private $payment;
-
-    /** @var object */
-    private $orderClass;
 
     /** @var object */
     private $product;
@@ -114,109 +99,18 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getApiClass()
-    {
-        return $this->apiClass;
-    }
-
-    /**
-     * @param object $apiClass
-     * @return PluginEntity
-     */
-    public function setApiClass($apiClass)
-    {
-        $this->apiClass = $apiClass;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getMyLogPHP()
-    {
-        return $this->myLogPHP;
-    }
-
-    /**
-     * @param object $myLogPHP
-     * @return PluginEntity
-     */
-    public function setMyLogPHP($myLogPHP)
-    {
-        $this->myLogPHP = $myLogPHP;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getAmountCurrencyClass()
-    {
-        return $this->amountCurrencyClass;
-    }
-
-    /**
-     * @param object $amountCurrencyClass
-     * @return PluginEntity
-     */
-    public function setAmountCurrencyClass($amountCurrencyClass)
-    {
-        $this->amountCurrencyClass = $amountCurrencyClass;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getOrderClass()
-    {
-        return $this->orderClass;
-    }
-
-    /**
-     * @param object $orderClass
-     * @return PluginEntity
-     */
-    public function setOrderClass($orderClass)
-    {
-        $this->orderClass = $orderClass;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getConfigClass()
-    {
-        return $this->configClass;
-    }
-
-    /**
-     * @param object $configClass
-     * @return PluginEntity
-     */
-    public function setConfigClass($configClass)
-    {
-        $this->configClass = $configClass;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getAdmin()
-    {
-        return $this->admin;
-    }
-
-    /**
-     * @return object
-     */
     public function getAddress()
     {
         return $this->address;
     }
 
+    /**
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return $this->api_url;
+    }
 
     /**
      * @return string
@@ -387,20 +281,6 @@ class PluginEntity
     }
 
     /**
-     * @param object $admin
-     * @return PluginEntity
-     * @throws BadParameterException
-     */
-    public function setAdmin($admin)
-    {
-        if (!is_object($admin)) {
-            throw (new BadParameterException('Invalid argument, $admin must be an AdminClass object'));
-        }
-        $this->admin = $admin;
-        return $this;
-    }
-
-    /**
      * @param object $address
      * @return self
      * @throws BadParameterException
@@ -412,6 +292,22 @@ class PluginEntity
         }
 
         $this->address = $address;
+        return $this;
+    }
+
+    /**
+     * @param string $api_url
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setApiUrl($api_url)
+    {
+        if (!is_string($api_url)
+            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
+            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
+        }
+
+        $this->api_url = $api_url;
         return $this;
     }
 

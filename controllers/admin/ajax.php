@@ -26,11 +26,10 @@ class PayplugAjaxModuleAdminController extends ModuleAdminController
 }
 
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/AdminClass.php');
+require_once(_PS_MODULE_DIR_.'../init.php');
 include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
-
 $payplug = new PayPlugClass();
-$adminClass = new AdminClass();
+
 $logger = $payplug->getPlugin()->logger();
 
 if (Tools::getValue('_ajax') == 1) {
@@ -82,10 +81,10 @@ if (Tools::getValue('_ajax') == 1) {
          * and in particular escapes backslashes,
          * so the password is no longer the one entered by the user
          */
-        $adminClass->submitPopinPwd($_POST['pwd']);
+        $payplug->submitPopinPwd($_POST['pwd']);
     }
     if (Tools::getValue('has_live_key')) {
-        die(Tools::jsonEncode(['result' => \PayPlug\classes\ApiClass::hasLiveKey()]));
+        die(Tools::jsonEncode(['result' => $payplug->hasLiveKey()]));
     }
     if (Tools::getValue('submit') == 'submitPopin_confirm') {
         die(json_encode(['content' => 'confirm_ok']));
@@ -100,16 +99,16 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode(['content' => '']));
     }
     if ((int)Tools::getValue('check') == 1) {
-        $content = $payplug->configClass->getCheckFieldset();
+        $content = $payplug->getCheckFieldset();
         die(json_encode(['content' => $content]));
     }
     if ((int)Tools::getValue('log') == 1) {
-        $content = $adminClass->getLogin();
+        $content = $payplug->getLogin();
         die(json_encode(['content' => $content]));
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
         $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        die(json_encode(\PayPlug\classes\ApiClass::getAccountPermissions($api_key)));
+        die(json_encode($payplug->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
         $logger->addLog('[Ajax] Start refund', 'notice');
@@ -178,7 +177,7 @@ if (Tools::getValue('_ajax') == 1) {
                         ]));
                     }
 
-                    $current_state = (int)$payplug->orderClass->getCurrentOrderState($order->id);
+                    $current_state = (int)$payplug->getCurrentOrderState($order->id);
                     $logger->addLog('Current order state: ' . $current_state, 'notice');
                     if ($current_state != 0 && $current_state != $new_state) {
                         $history = new OrderHistory();

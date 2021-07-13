@@ -49,12 +49,20 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ->shouldReceive([
                 'getOneyPriceLimit' => $this->limits
             ]);
+
+        $this->payplug
+            ->shouldReceive('convertAmount')
+            ->andReturnUsing(function ($amount, $cent = false) {
+                if ($cent) {
+                    return round($amount / 100, 2);
+                }
+                return (int)$amount * 100;
+            });
     }
 
     public function testWithTooLowAmount()
     {
         $amount = 99;
-
         $this->assertSame(
             [
                 'result' => false,
@@ -67,7 +75,6 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
     public function testWithTooHightAmount()
     {
         $amount = 3001;
-
         $this->assertSame(
             [
                 'result' => false,
@@ -77,13 +84,9 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         );
     }
 
-    /**
-     * @group testmee
-     */
     public function testWithValidAmount()
     {
         $amount = 150;
-
         $this->assertSame(
             [
                 'result' => true,

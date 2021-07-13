@@ -23,7 +23,6 @@
  */
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\src\entities\OneyEntity;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\tests\mock\MockHelper;
@@ -35,7 +34,6 @@ class BaseOneyRepository extends RepositoryBase
 
     protected $arrayCache;
     protected $arrayLogger;
-    protected $amountCurrencyClass;
 
     public function setUp()
     {
@@ -59,8 +57,7 @@ class BaseOneyRepository extends RepositoryBase
             $this->oney,
             $this->myLogPhp,
             $this->payplug,
-            $this->assign,
-            $this->amountCurrencyClass
+            $this->assign
         ])->makePartial();
 
         $this->arrayCache = [];

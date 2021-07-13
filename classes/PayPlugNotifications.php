@@ -47,8 +47,6 @@ use Validate;
 class PayPlugNotifications
 {
     private $can_save_card = true;
-    private $amountCurrencyClass;
-    private $orderClass;
     private $plugin;
     public $resource;
     public $flag;
@@ -76,6 +74,7 @@ class PayPlugNotifications
 
     /**
      * @description Set the notification's global configuration
+     *
      * @throws Exception
      */
     private function setConfig()
@@ -84,8 +83,6 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
-        $this->amountCurrencyClass = new AmountCurrencyClass();
-        $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
@@ -126,7 +123,7 @@ class PayPlugNotifications
             $this->api_key = (bool)$resource->is_live ?
                 Configuration::get('PAYPLUG_LIVE_API_KEY') :
                 Configuration::get('PAYPLUG_TEST_API_KEY');
-            ApiClass::setSecretKey($this->api_key);
+            $this->payplug->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
@@ -182,19 +179,19 @@ class PayPlugNotifications
             if ($this->sandbox) {
                 $this->logger->addLog('This was test mode.', 'debug');
                 $this->logger->addLog('Trying live mode.', 'debug');
-                $this->payplug->apiClass->initializeApi(false);
+                $this->payplug->initializeApi(false);
                 if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with LIVE API Key.', 'debug');
-                    $this->payplug->apiClass->initializeApi(true);
+                    $this->payplug->initializeApi(true);
                     $this->payment = null;
                 }
             } else {
                 $this->logger->addLog('This was live mode.', 'debug');
                 $this->logger->addLog('Trying test mode.', 'debug');
-                $this->payplug->apiClass->initializeApi(true);
+                $this->payplug->initializeApi(true);
                 if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with the TEST API Key.', 'debug');
-                    $this->payplug->apiClass->initializeApi(false);
+                    $this->payplug->initializeApi(false);
                     $this->payment = null;
                 }
             }
@@ -474,7 +471,7 @@ class PayPlugNotifications
             if ($this->payment->installment_plan_id !== null) {
                 $is_amount_correct = (bool)$this->payment->is_paid;
             } else {
-                $is_amount_correct = (bool)AmountCurrencyClass::checkAmountPaidIsCorrect(
+                $is_amount_correct = (bool)PayPlugClass::checkAmountPaidIsCorrect(
                     $this->payment->amount / 100,
                     $order
                 );
@@ -487,7 +484,7 @@ class PayPlugNotifications
 
             // Check if the payment is related to the order with payplug order payment
             // Use prestashop order payment for pre-updated module order
-            $payplug_order_payments = $this->orderClass->getPayplugOrderPayments((int)$order->id);
+            $payplug_order_payments = $this->payplug->getPayplugOrderPayments((int)$order->id);
             $order_payments = $order->getOrderPayments();
             $related = false;
             if ($payplug_order_payments) {
@@ -695,7 +692,7 @@ class PayPlugNotifications
             'transaction_id' => $transaction_id
         ];
 
-        $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $amount = $this->payplug->convertAmount($amount, true);
 
         $currency = (int)$this->cart->id_currency;
         try {
@@ -811,7 +808,7 @@ class PayPlugNotifications
                 $this->exitProcess($exception->getMessage(), 500);
             }
 
-            if (!$this->orderClass->addPayplugOrderPayment($order->id, $this->payment->id)) {
+            if (!$this->payplug->addPayplugOrderPayment($order->id, $this->payment->id)) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
                     'error'
@@ -949,7 +946,7 @@ class PayPlugNotifications
             } while (!$cart_lock);
 
             $new_order_state = $this->order_states['refund'];
-            $current_state = $this->orderClass->getCurrentOrderState($order->id);
+            $current_state = $this->payplug->getCurrentOrderState($order->id);
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {

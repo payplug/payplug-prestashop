@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\tests\mock\AddressMock;
-use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
@@ -48,9 +47,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithValidPaymentData()
     {
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturn([]);
         $this->assertSame(
@@ -61,9 +57,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingEmail()
     {
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('shipping-email', $arr)) {
@@ -93,9 +86,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingMobilePhone()
     {
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('shipping-mobile_phone_number', $arr)) {
@@ -125,9 +115,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingCity()
     {
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('shipping-city', $arr)) {
@@ -177,9 +164,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidBillingMobilePhone()
     {
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('billing-mobile_phone_number', $arr)) {
@@ -209,9 +193,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidBillingCity()
     {
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('billing-city', $arr)) {
@@ -257,19 +238,5 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
         ];
 
         $this->assertSame($expected, $response);
-    }
-
-    public function testWithoutCustomer()
-    {
-
-//        $contextWithoutCustomer = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
-        $contextWithoutCustomer = ContextMock::get();
-        $contextWithoutCustomer->customer = null;
-
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn($contextWithoutCustomer);
-
-        $this->assertSame([], $this->repo->getOneyRequiredFields());
     }
 }

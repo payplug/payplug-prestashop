@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\ConfigClass;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
@@ -34,16 +33,13 @@ use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 class OneyRepository extends Repository
 {
     private $addressSpecific;
-    private $amountCurrencyClass;
     private $cache;
-    private $configClass;
     private $log;
     private $logger;
     private $configurationSpecific;
     private $contextSpecific;
     private $countrySpecific;
     private $currencySpecific;
-    private $media;
     private $toolsSpecific;
     private $validateSpecific;
     private $assign;
@@ -63,8 +59,7 @@ class OneyRepository extends Repository
         $oneyEntity,
         $myLogPHP,
         $payplug,
-        $assign,
-        $amountCurrencyClass
+        $assign
     ) {
         $this->cache = $cache;
         $this->logger = $logger;
@@ -79,10 +74,8 @@ class OneyRepository extends Repository
         $this->validateSpecific = $validateSpecific;
         $this->oneyEntity = $oneyEntity;
         $this->log = $myLogPHP;
-        $this->media = $payplug;
         $this->payplug = $payplug;
         $this->assign = $assign;
-        $this->amountCurrencyClass = $amountCurrencyClass;
 
         $this->setParams();
     }
@@ -195,8 +188,8 @@ class OneyRepository extends Repository
     public function assignLegalNotice()
     {
         $limits = $this->getOneyPriceLimit();
-        $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-        $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
+        $min_amount = $this->payplug->convertAmount($limits['min'], true);
+        $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
         $legal_text = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
             ? $this->l('oney.assignLegalNotice.legalWithFees')
@@ -247,7 +240,7 @@ class OneyRepository extends Repository
                         $this->contextSpecific->getContext()->cart->id_address_invoice;
                     $address = $this->addressSpecific->getAddress($id_address);
                     $country = $this->countrySpecific->getCountry($address->id_country);
-                    $valid = ConfigClass::isValidMobilePhoneNumber($data, $country->iso_code);
+                    $valid = $this->payplug->isValidMobilePhoneNumber($data, $country->iso_code);
                     if (!$valid) {
                         $errors[] = $this->l('Please enter your mobile phone number.');
                     }
@@ -330,7 +323,7 @@ class OneyRepository extends Repository
         $this->assign->assign([
             'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
         ]);
-        return $this->media->fetchTemplate('oney/popin.tpl');
+        return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
 
     /**
@@ -351,7 +344,7 @@ class OneyRepository extends Repository
             ]
         ];
         $this->assign->assign($vars);
-        return $this->media->fetchTemplate('oney/schedule.tpl');
+        return $this->payplug->fetchTemplate('oney/schedule.tpl');
     }
 
     /**
@@ -375,7 +368,7 @@ class OneyRepository extends Repository
                 'oney_required_fields' => $this->getOneyRequiredFields(),
             ]);
 
-            return $this->media->fetchTemplate('oney/payment/payment.tpl');
+            return $this->payplug->fetchTemplate('oney/payment/payment.tpl');
         }
     }
 
@@ -399,7 +392,7 @@ class OneyRepository extends Repository
             'oney_required_fields' => $fields
         ]);
 
-        return $this->media->fetchTemplate('oney/required.tpl');
+        return $this->payplug->fetchTemplate('oney/required.tpl');
     }
 
     /**
@@ -434,23 +427,23 @@ class OneyRepository extends Repository
         $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
 
         // format price
-        $total_cost = $this->amountCurrencyClass->convertAmount($resource['total_cost'], true);
+        $total_cost = $this->payplug->convertAmount($resource['total_cost'], true);
         $resource['total_cost'] = [
             'amount' => number_format($total_cost, 2),
             'value' => $tools->tool('displayPrice', $total_cost),
         ];
-        $down_payment_amount = $this->amountCurrencyClass->convertAmount($resource['down_payment_amount'], true);
+        $down_payment_amount = $this->payplug->convertAmount($resource['down_payment_amount'], true);
         $resource['down_payment_amount'] = [
             'amount' => number_format($down_payment_amount, 2),
             'value' => $tools->tool('displayPrice', $down_payment_amount),
         ];
         foreach ($resource['installments'] as &$installment) {
-            $amount = $this->amountCurrencyClass->convertAmount($installment['amount'], true);
+            $amount = $this->payplug->convertAmount($installment['amount'], true);
             $installment['amount'] = number_format($amount, 2);
             $installment['value'] = $tools->tool('displayPrice', $amount);
         }
 
-        $total_amount = $this->amountCurrencyClass->convertAmount($total_amount, true);
+        $total_amount = $this->payplug->convertAmount($total_amount, true);
         $total_amount += $total_cost;
         $resource['total_amount'] = [
             'amount' => number_format($total_amount, 2),
@@ -494,7 +487,7 @@ class OneyRepository extends Repository
             'payplug_oney_loading_msg' => $this->l('Loading')
         ]);
 
-        return $this->media->fetchTemplate('oney/cta.tpl');
+        return $this->payplug->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -551,7 +544,7 @@ class OneyRepository extends Repository
         $delivery_context = $this->getOneyDeliveryContext();
 
         foreach ($products as $product) {
-            $unit_price = $this->amountCurrencyClass->convertAmount($product['price_wt']);
+            $unit_price = $this->payplug->convertAmount($product['price_wt']);
             $item = [
                 'merchant_item_id' => $product['id_product'],
                 'name' => (string)$product['name'] . (isset($product['attributes']) ?
@@ -591,7 +584,7 @@ class OneyRepository extends Repository
             return $payment_list;
         }
 
-        $amount = $this->amountCurrencyClass->convertAmount($amount);
+        $amount = $this->payplug->convertAmount($amount);
 
         if (!$country) {
             $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
@@ -665,7 +658,7 @@ class OneyRepository extends Repository
         );
 
         $this->assign->assign([
-            'payplug_oney_required_field' => $cart ? $this->displayOneyRequiredFields() : false,
+            'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
@@ -762,21 +755,14 @@ class OneyRepository extends Repository
      */
     public function getOneyRequiredFields()
     {
-        $fields = [];
-        $customer = $this->contextSpecific->getContext()->customer;
-        if (!$this->validateSpecific->validate("isLoadedObject", $customer)) {
-            return $fields;
-        }
         $id_address_delivery = $this->contextSpecific->getContext()->cart->id_address_delivery;
         $id_address_invoice = $this->contextSpecific->getContext()->cart->id_address_invoice;
         $is_same = $id_address_delivery == $id_address_invoice;
+        $fields = [];
 
         $shipping_fields = [];
         $shipping_address = $this->addressSpecific->getAddress($id_address_delivery);
 
-        if (!$this->validateSpecific->validate("isLoadedObject", $shipping_address)) {
-            return $fields;
-        }
         $shipping_data = [
             'email' => $this->contextSpecific->getContext()->customer->email,
             'mobile_phone_number' => $shipping_address->phone_mobile,
@@ -847,10 +833,6 @@ class OneyRepository extends Repository
 
             $billing_fields = [];
             $billing_address = $this->addressSpecific->getAddress($id_address_invoice);
-
-            if (!$this->validateSpecific->validate("isLoadedObject", $billing_address)) {
-                return $fields;
-            }
 
             $billing_data = [
                 'mobile_phone_number' => $billing_address->phone_mobile,
@@ -976,8 +958,8 @@ class OneyRepository extends Repository
                 // $cache_id = cache_key in db
                 // $to_cache = cache_value in db
                 if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
-                    $this->logger->setParams(['process' => '[Oney Repository] getOneySimulations']);
-                    $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
+                    $this->logger->setParams(['process' => '[Oney Repository] setCache']);
+                    $error_message = 'Error during setting Oney Simulation in DB cache [payplug.php]';
                     $error_level = 'error';
                     $this->logger->addLog($error_message, $error_level);
                 }
@@ -1022,7 +1004,7 @@ class OneyRepository extends Repository
         }
 
         // Validate phone number
-        $valid_shipping_mobile = ConfigClass::isValidMobilePhoneNumber(
+        $valid_shipping_mobile = $this->payplug->isValidMobilePhoneNumber(
             $shipping['mobile_phone_number'],
             $shipping['country']
         );
@@ -1039,7 +1021,7 @@ class OneyRepository extends Repository
         $billing = $payment_data['billing'];
 
         // Validate phone number
-        $valid_billing_mobile = ConfigClass::isValidMobilePhoneNumber(
+        $valid_billing_mobile = $this->payplug->isValidMobilePhoneNumber(
             $billing['mobile_phone_number'],
             $billing['country']
         );
@@ -1140,7 +1122,7 @@ class OneyRepository extends Repository
         $is_valid_amount = $this->isValidOneyAmount($amount, $cart->id_currency);
         if (!$is_valid_amount['result']) {
             $limits = $this->getOneyPriceLimit($cart->id_currency);
-            $converted_amount = $this->amountCurrencyClass->convertAmount($amount);
+            $converted_amount = $this->payplug->convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
             return ['result' => false, 'error_type' => $error_type, 'error' => $is_valid_amount['error']];
@@ -1156,7 +1138,7 @@ class OneyRepository extends Repository
      */
     public function isOneyAllowed()
     {
-        return ConfigClass::isAllowed()
+        return $this->payplug->isAllowed()
             && $this->configurationSpecific->get('PAYPLUG_ONEY')
             && $this->isOneyAllowedCurrency($this->contextSpecific->getContext()->currency);
     }
@@ -1191,10 +1173,10 @@ class OneyRepository extends Repository
     public function isValidOneyAmount($amount, $id_currency = false)
     {
         $limits = $this->getOneyPriceLimit($id_currency);
-        $convert_amount = $this->amountCurrencyClass->convertAmount($amount);
+        $convert_amount = $this->payplug->convertAmount($amount);
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
-            $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-            $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
+            $min_amount = $this->payplug->convertAmount($limits['min'], true);
+            $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
             return [
                 'result' => false,
