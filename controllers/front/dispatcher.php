@@ -52,7 +52,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 return false;
             }
 
-            $options = $payplug->getAvailableOptions($cart);
+            $options = \PayPlug\classes\ConfigClass::getAvailableOptions($cart);
 
             $error_url = 'index.php?controller=order&step=3&error=1';
 

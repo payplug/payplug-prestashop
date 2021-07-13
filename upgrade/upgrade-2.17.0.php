@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHPClass.php');
+require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.php');
 
 function upgrade_module_2_17_0($object)
 {
