@@ -38,7 +38,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->payplug
+        $this->configClass
             ->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($phone, $country) {
                 if (!$phone) {
@@ -91,6 +91,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingMobilePhone()
     {
+        $this->configClass
+            ->shouldReceive([
+                'isValidMobilePhoneNumber' => 3500
+            ]);
+
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
@@ -120,7 +125,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->payplug
+        $this->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -148,7 +153,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->payplug
+        $this->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -181,7 +186,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->payplug
+        $this->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -214,7 +219,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->payplug
+        $this->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
