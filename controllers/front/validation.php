@@ -29,8 +29,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
-        $validation = $payplug->setValidation();
+        $validation = \PayPlug\classes\ConfigClass::setValidation();
         $validation->treat();
     }
 }

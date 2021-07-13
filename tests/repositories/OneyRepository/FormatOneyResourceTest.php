@@ -30,7 +30,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
  * @group unit
  * @group repository
  * @group oney
- * @group oney_repository
+ * @group format_oney_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -45,15 +45,6 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function setUp()
     {
         parent::setUp();
-
-        $this->payplug
-            ->shouldReceive('convertAmount')
-            ->andReturnUsing(function ($amount, $cent = false) {
-                if ($cent) {
-                    return round($amount / 100, 2);
-                }
-                return (int)$amount * 100;
-            });
 
         $this->repo
             ->shouldAllowMockingProtectedMethods()

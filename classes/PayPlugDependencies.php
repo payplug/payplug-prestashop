@@ -26,6 +26,7 @@ namespace PayPlug\classes;
 use PayPlug\src\entities\PluginEntity;
 use PayPlug\src\repositories\HookRepository;
 use PayPlug\src\repositories\InstallRepository;
+use PayPlug\src\repositories\OneyRepository;
 use PayPlug\src\repositories\PluginRepository;
 
 if (!defined('_PS_VERSION_')) {
@@ -34,6 +35,9 @@ if (!defined('_PS_VERSION_')) {
 
 class PayPlugDependencies
 {
+    /** @var AdminClass */
+    private $adminClass;
+
     /** @var HookRepository */
     private $hook;
 
@@ -43,8 +47,14 @@ class PayPlugDependencies
     /** @var MyLogPHP */
     private $mylogphp;
 
+    /** @var OneyRepository */
+    public $oney;
+
     /** @var object */
     public $payplug;
+
+    /** @var object */
+    public $payment;
 
     /** @var PluginEntity */
     private $plugin;
@@ -61,6 +71,8 @@ class PayPlugDependencies
 
         $this->hook = $this->getPlugin()->getHook();
         $this->install = $this->getPlugin()->getInstall();
+        $this->oney = $this->getPlugin()->getOney();
+        $this->payment = $this->getPlugin()->getPayment();
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
 

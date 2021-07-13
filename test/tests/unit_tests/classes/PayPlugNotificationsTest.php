@@ -16,7 +16,8 @@ class PayPlugNotificationsTest extends TestCase
     /**
      * @test
      */
-    public function isStandardPayment() {
+    public function isStandardPayment()
+    {
         $payment = PaymentMock::getStandardPayment();
         $this->assertTrue($payment instanceof \Payplug\Resource\Payment, 'is Payment resource');
         $this->assertFalse($payment instanceof \Payplug\Resource\Refund, 'is not Refund resource');
@@ -26,7 +27,8 @@ class PayPlugNotificationsTest extends TestCase
     /**
      * @test
      */
-    public function isInstallmentPlanPayment() {
+    public function isInstallmentPlanPayment()
+    {
         $payment = PaymentMock::getStandardPayment();
         $this->assertNotNull($payment->installment_plan_id, 'The payment is not first schedule of installment plan');
     }
@@ -34,7 +36,8 @@ class PayPlugNotificationsTest extends TestCase
     /**
      * @test
      */
-    public function isDeferredPayment() {
+    public function isDeferredPayment()
+    {
         $payment = PaymentMock::getStandardPayment();
         $this->assertNotNull($payment->authorization);
     }

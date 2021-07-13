@@ -24,6 +24,7 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
+use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\CountryMock;
 use PayPlug\tests\mock\CartMock;
 
@@ -43,6 +44,9 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
     {
         parent::setUp();
 
+        $this->context
+            ->shouldReceive('getContext')
+            ->andReturn(ContextMock::get());
         $this->country->shouldReceive('getCountry')
             ->andReturn(CountryMock::get());
 
