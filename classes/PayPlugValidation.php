@@ -39,16 +39,12 @@ class PayPlugValidation
     public $debug;
     public $type;
     public $api_key;
-    private $amountCurrencyClass;
     private $isDeferred;
     private $isOney;
-    private $orderClass;
     private $plugin;
 
     public function __construct()
     {
-        $this->amountCurrencyClass = new AmountCurrencyClass();
-        $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
@@ -86,10 +82,7 @@ class PayPlugValidation
         if (!($cart_id = Tools::getValue('cartid'))) {
             $this->logger->addLog('No Cart ID.', 'error');
             $this->payplug->setPaymentErrorsCookie([
-                $this->payplug->l(
-                    'The transaction was not completed and your card was not charged.',
-                    'payplugvalidation'
-                )
+                $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
             Tools::redirect($redirect_url_error);
         } elseif (!($ps = Tools::getValue('ps')) || $ps != 1) {
@@ -301,7 +294,7 @@ class PayPlugValidation
                 }
             }
         }
-        $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $amount = $this->payplug->convertAmount($amount, true);
 
         // Check if valid customer
         $customer = new Customer((int)$cart->id_customer);
@@ -490,7 +483,7 @@ class PayPlugValidation
                 $data['metadata']['Order'] = $id_order;
                 $this->payplug->patchPayment($payment->id, $data);
 
-                if (!$this->orderClass->addPayplugOrderPayment($id_order, $payment->id)) {
+                if (!$this->payplug->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');
                 }
             } elseif ($this->type == 'installment') {

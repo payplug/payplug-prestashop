@@ -182,7 +182,7 @@ class PayPlugPaymentOney extends PayplugPayment
      */
     private function formatCartItem($product)
     {
-        $unit_price = $this->module->payplug_dependencies->payplug->amountCurrencyClass->convertAmount($product['price_wt']);
+        $unit_price = $this->module->convertAmount($product['price_wt']);
         $item = [
             'merchant_item_id' => $product['id_product'],
             'name' => (string)$product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : ''),
@@ -252,14 +252,14 @@ class PayPlugPaymentOney extends PayplugPayment
                         case 'billing':
                             $id_country = Country::getByIso($this->payment_tab['billing']['country']);
                             $country = new Country($id_country);
-                            $field = \PayPlug\classes\ConfigClass::formatPhoneNumber($field, $country);
+                            $field = $this->formatPhoneNumber($field, $country);
                             break;
                         case 'same':
                         case 'shipping':
                         default:
                             $id_country = Country::getByIso($this->payment_tab['shipping']['country']);
                             $country = new Country($id_country);
-                            $field = \PayPlug\classes\ConfigClass::formatPhoneNumber($field, $country);
+                            $field = $this->formatPhoneNumber($field, $country);
                             break;
                     }
                 }

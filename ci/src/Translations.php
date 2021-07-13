@@ -239,11 +239,6 @@ class Translations
                     }
 
                     $template_name = str_replace("PayPlugClass", "payplug", $template_name);
-                    $template_name = str_replace("MediaClass", "payplug", $template_name);
-                    $template_name = str_replace("ConfigClass", "payplug", $template_name);
-                    $template_name = str_replace("AdminClass", "payplug", $template_name);
-                    $template_name = str_replace("ApiClass", "payplug", $template_name);
-                    $template_name = str_replace("OrderClass", "payplug", $template_name);
                     $md5_key = md5($key);
                     $trans_key = '<{payplug}prestashop>';
                     $trans_key .= strtolower($template_name) . '_' . $md5_key;

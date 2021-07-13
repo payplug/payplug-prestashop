@@ -75,10 +75,7 @@ class MockHelper extends Mockery
                     case 'displayPrice':
                         $value = number_format($value, 2) . ' €';
                         return str_replace('.', ',', $value);
-                    case 'ps_round':
-                        return round($value, $params2);
                     default:
-                        throw new Mockery\Exception('ERROR : Missing method "'. $action . '" in createToolsMock (MockHelper.php)');
                         break;
                 }
 
@@ -118,9 +115,9 @@ class MockHelper extends Mockery
     public static function createContextMock($classPathname)
     {
         $context = \Mockery::mock($classPathname);
-//        $context
-//            ->shouldReceive('getContext')
-//            ->andReturn(ContextMock::get());
+        $context
+            ->shouldReceive('getContext')
+            ->andReturn(ContextMock::get());
         return $context;
     }
 

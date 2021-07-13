@@ -26,7 +26,6 @@ namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
@@ -42,9 +41,6 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
         $this->carrier->shouldReceive([
             'get' => CarrierMock::get(),
             'getDefaultDelay' => 0,
@@ -79,9 +75,9 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
                     [
                         'merchant_item_id' => 1,
                         'name' => 'Pull imprimé colibri - Size : S',
-                        'price' => 3446,
+                        'price' => 3400,
                         'quantity' => 1,
-                        'total_amount' => 3446,
+                        'total_amount' => 3400,
                         'brand' => 'Studio Design',
                         'delivery_label' => 'Carrier name',
                         'expected_delivery_date' => date('Y-m-d'),

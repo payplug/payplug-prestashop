@@ -26,7 +26,6 @@ namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
@@ -38,14 +37,6 @@ use PayPlug\tests\mock\ContextMock;
  */
 final class GetOneyDeliveryContextTest extends BaseOneyRepository
 {
-    public function setUp()
-    {
-        parent::setUp();
-        $this->context
-            ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
-    }
-
     public function testGetContextFromVirtual()
     {
         $this->cart->shouldReceive('get')

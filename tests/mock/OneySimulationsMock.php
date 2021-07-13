@@ -28,7 +28,7 @@ class OneySimulationsMock
 {
     public static function get()
     {
-        return [
+        $simulations = [
             'x3_with_fees' => [
                 'installments' => [
                     [
@@ -66,11 +66,13 @@ class OneySimulationsMock
                 'down_payment_amount' => 6562,
             ],
         ];
+
+        return $simulations;
     }
 
     public static function getFormated()
     {
-        return [
+        $simulations = [
             'x3_with_fees' => [
                 'installments' => [
                     [
@@ -137,20 +139,26 @@ class OneySimulationsMock
                 ],
             ]
         ];
+
+        return $simulations;
     }
 
     public static function getNotAvailable()
     {
-        return [
+        $simulations = [
             'details' => 'Access to this feature is not available.'
         ];
+
+        return $simulations;
     }
 
     public static function getIsError()
     {
-        return [
+        $simulations = [
             'object' => 'error'
         ];
+
+        return $simulations;
     }
 
     public static function getFromCache()
@@ -159,11 +167,12 @@ class OneySimulationsMock
             'result' => true,
             'simulations' => self::get()
         ];
-        return [
+        $cache = [
             'cache_key' => 'cache_key',
             'cache_value' => json_encode($cache_value),
             'date_add' => '2021-01-01 00:00:00',
             'date_upd' => '2021-01-01 00:00:00',
         ];
+        return $cache;
     }
 }

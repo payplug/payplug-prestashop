@@ -35,7 +35,7 @@ class AdminPayplugController extends ModuleAdminController
     {
         $payplug = new \PayPlug\classes\PayPlugClass();
         if (Tools::getValue('_ajax') == 1) {
-            (new \PayPlug\classes\AdminClass())->adminAjaxController();
+            $payplug->adminAjaxController();
         }
 
         $this->postProcess();
@@ -46,7 +46,7 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->html = '';
 
-        $payplug->configClass->checkConfiguration();
+        $payplug->checkConfiguration();
 
         $PAYPLUG_EMAIL = Configuration::get('PAYPLUG_EMAIL');
         $PAYPLUG_TEST_API_KEY = Configuration::get('PAYPLUG_TEST_API_KEY');
@@ -83,12 +83,12 @@ class AdminPayplugController extends ModuleAdminController
             ]);
         }
 
-        $payplug->mediaClass->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
-        $payplug->mediaClass->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
+        $payplug->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
+        $payplug->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
 
-        $payplug->configClass->assignContentVar();
+        $payplug->assignContentVar();
 
-        $this->html .= $payplug->mediaClass->fetchTemplateRC('/views/templates/admin/admin.tpl');
+        $this->html .= $payplug->fetchTemplateRC('/views/templates/admin/admin.tpl');
 
         return $this->html;
     }

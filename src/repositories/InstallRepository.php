@@ -23,18 +23,23 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\ConfigClass;
+use PayPlug\classes\MyLogPHP;
+use PayPlug\src\specific\OrderStateSpecific;
 
 class InstallRepository extends Repository
 {
     /** @var object */
-    public $log;
-    /** @var object */
     protected $config;
+
     /** @var object */
     protected $constant;
+
     /** @var object */
     protected $context;
+
+    /** @var object */
+    public $log;
+
     /** @var object OrderStateRepository */
     protected $order_state;
 
@@ -70,8 +75,7 @@ class InstallRepository extends Repository
         $sql,
         $tools,
         $validate,
-        $payplug,
-        $mylogphp
+        $payplug
     ) {
         $this->config = $config;
         $this->constant = $constant;
@@ -83,10 +87,279 @@ class InstallRepository extends Repository
         $this->sql = $sql;
         $this->tools = $tools;
         $this->validate = $validate;
+
         $this->payplug = $payplug;
-        $this->log = $mylogphp;
+
+        $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
 
         $this->setParams();
+    }
+
+    /**
+     * @description Check if payplug order state are well installed
+     */
+    public function checkOrderStates()
+    {
+        $order_states_list = $this->order_state_entity->getList();
+
+        foreach ($order_states_list as $key => $state) {
+            // Check live OrderState
+            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
+            $id_order_state_live = (int)$this->config->get($key_config_live);
+            $order_state_live = $this->order_state_specific->get($id_order_state_live);
+            if (!$this->validate->validate('isLoadedObject', $order_state_live)
+                || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
+                $this->order_state->create($key, $state, false, true);
+            }
+
+            // Check sandbox OrderState
+            $key_config_sandbox = $key_config_live . '_TEST';
+            $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
+            $order_state_sandbox = $this->order_state_specific->get($id_order_state_sandbox);
+            if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
+                || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
+                $this->order_state->create($key, $state, true, true);
+            }
+        }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
+    }
+
+    /**
+     * @description Check if current configuration requirements are respected
+     * @return array
+     */
+    public function checkRequirements()
+    {
+        $php_min_version = 50600;
+        $curl_min_version = '7.21';
+        $openssl_min_version = 0x1000100f;
+        $report = [
+            'php' => [
+                'version' => 0,
+                'installed' => true,
+                'up2date' => false,
+            ],
+            'curl' => [
+                'version' => 0,
+                'installed' => false,
+                'up2date' => false,
+            ],
+            'openssl' => [
+                'version' => 0,
+                'installed' => false,
+                'up2date' => false,
+            ],
+        ];
+
+        //PHP
+        if (!defined('PHP_VERSION_ID')) {
+            $report['php']['version'] = PHP_VERSION;
+            $php_version = explode('.', PHP_VERSION);
+            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+        }
+        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
+
+        //cURL
+        $curl_exists = extension_loaded('curl');
+        if ($curl_exists) {
+            $curl_version = curl_version();
+            $report['curl']['version'] = $curl_version['version'];
+            $report['curl']['installed'] = true;
+            $report['curl']['up2date'] = version_compare(
+                $curl_version['version'],
+                $curl_min_version,
+                '>='
+            ) ? true : false;
+        }
+
+        //OpenSSl
+        $openssl_exists = extension_loaded('openssl');
+        if ($openssl_exists) {
+            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
+            $report['openssl']['installed'] = true;
+            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
+        }
+
+        return $report;
+    }
+
+    /**
+     * @description Create usual status
+     * @return bool
+     */
+    public function createOrderStates()
+    {
+        $order_states_list = $this->order_state_entity->getList();
+        foreach ($order_states_list as $key => $state) {
+            $this->order_state->create($key, $state, true);
+            $this->order_state->create($key, $state, false);
+        }
+
+        $this->order_state->removeIdsUnusedByPayPlug();
+        return true;
+    }
+
+    /**
+     * @description Delete basic configuration
+     * @return bool
+     */
+    private function deleteConfig()
+    {
+        return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
+            && $this->config->deleteByName('PAYPLUG_COMPANY_ISO')
+            && $this->config->deleteByName('PAYPLUG_CONFIGURATION_OK')
+            && $this->config->deleteByName('PAYPLUG_CURRENCIES')
+            && $this->config->deleteByName('PAYPLUG_DEBUG_MODE')
+            && $this->config->deleteByName('PAYPLUG_DEFERRED')
+            && $this->config->deleteByName('PAYPLUG_DEFERRED_AUTO')
+            && $this->config->deleteByName('PAYPLUG_DEFERRED_STATE')
+            && $this->config->deleteByName('PAYPLUG_EMAIL')
+            && $this->config->deleteByName('PAYPLUG_EMBEDDED_MODE')
+            && $this->config->deleteByName('PAYPLUG_INST')
+            && $this->config->deleteByName('PAYPLUG_INST_MIN_AMOUNT')
+            && $this->config->deleteByName('PAYPLUG_INST_MODE')
+            && $this->config->deleteByName('PAYPLUG_KEEP_CARDS')
+            && $this->config->deleteByName('PAYPLUG_LIVE_API_KEY')
+            && $this->config->deleteByName('PAYPLUG_MAX_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_MIN_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_OFFER')
+            && $this->config->deleteByName('PAYPLUG_ONE_CLICK')
+            && $this->config->deleteByName('PAYPLUG_ONEY')
+            && $this->config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            && $this->config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_ONEY_FEES')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
+            && $this->config->deleteByName('PAYPLUG_SANDBOX_MODE')
+            && $this->config->deleteByName('PAYPLUG_SHOW')
+            && $this->config->deleteByName('PAYPLUG_STANDARD')
+            && $this->config->deleteByName('PAYPLUG_TEST_API_KEY')
+        );
+    }
+
+    /**
+     * @description Install PayPlug Module
+     * @param bool $soft_install
+     * @return bool
+     * @see Module::install()
+     */
+    public function install()
+    {
+        $this->log->info('Starting to install again.');
+
+        // check requirement
+        $report = $this->checkRequirements();
+        if (!$report['php']['up2date']) {
+            return $this->setInstallError('Install failed: PHP Requirement.');
+        }
+        if (!$report['curl']['up2date']) {
+            return $this->setInstallError('Install failed: cURL Requirement.');
+        }
+        if (!$report['openssl']['up2date']) {
+            return $this->setInstallError('Install failed: OpenSSL Requirement.');
+        }
+
+        // Check if multishop feature is active then set the context
+        if ($this->shop->isFeatureActive()) {
+            $this->shop->setContext();
+        }
+
+        // Set payplug config
+        if (!$this->setConfig()) {
+            return $this->setInstallError('Install failed:setConfig()');
+        }
+
+        // Install order state
+        if (!$this->createOrderStates()) {
+            return $this->setInstallError('Install failed: Create order states.');
+        }
+
+        // Install SQL
+        if (!$this->sql->installSQL()) {
+            return $this->setInstallError('Install failed: Install SQL tables.');
+        }
+
+        // Install tab
+        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
+            return $this->setInstallError('Install failed: Install Tab');
+        }
+
+        $this->log->info('Install successful.');
+        return true;
+    }
+
+    /**
+     * @description Create basic configuration
+     * @return bool
+     */
+    public function setConfig()
+    {
+        return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
+            && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
+            && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
+            && $this->config->updateValue('PAYPLUG_COMPANY_ISO', '')
+            && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
+            && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
+            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
+            && $this->config->updateValue('PAYPLUG_EMAIL', null)
+            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_INST', null)
+            && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
+            && $this->config->updateValue('PAYPLUG_INST_MODE', 3)
+            && $this->config->updateValue('PAYPLUG_KEEP_CARDS', 0)
+            && $this->config->updateValue('PAYPLUG_LIVE_API_KEY', null)
+            && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
+            && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
+            && $this->config->updateValue('PAYPLUG_OFFER', '')
+            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
+            && $this->config->updateValue('PAYPLUG_ONEY', null)
+            && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
+            && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
+            && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+            && $this->config->updateValue('PAYPLUG_ONEY_FEES', 1)
+            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
+            && $this->config->updateValue('PAYPLUG_SHOW', 0)
+            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
+            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
+        );
+    }
+
+    /**
+     * @description Set error on module install
+     * @param $error
+     * @return bool
+     */
+    public function setInstallError($error = '')
+    {
+        $this->log->error($error);
+        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
+
+        $this->log->info('Install failed.');
+        $this->log->info('Install error: ' . $error);
+
+        // revert installation
+        $this->uninstall();
+
+        return false;
     }
 
     /**
@@ -225,102 +498,13 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Check if payplug order state are well installed
-     */
-    public function checkOrderStates()
-    {
-        $order_states_list = $this->order_state_entity->getList();
-
-        foreach ($order_states_list as $key => $state) {
-            // Check live OrderState
-            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
-            $id_order_state_live = (int)$this->config->get($key_config_live);
-            $order_state_live = $this->order_state_specific->get($id_order_state_live);
-            if (!$this->validate->validate('isLoadedObject', $order_state_live)
-                || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
-                $this->order_state->create($key, $state, false, true);
-            }
-
-            // Check sandbox OrderState
-            $key_config_sandbox = $key_config_live . '_TEST';
-            $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
-            $order_state_sandbox = $this->order_state_specific->get($id_order_state_sandbox);
-            if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
-                || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
-                $this->order_state->create($key, $state, true, true);
-            }
-        }
-
-        $this->order_state->removeIdsUnusedByPayPlug();
-    }
-
-    /**
-     * @description Install PayPlug Module
-     * @param bool $soft_install
-     * @return bool
-     * @see Module::install()
-     */
-    public function install()
-    {
-        $this->log->info('Starting to install again.');
-
-        // check requirement
-        $report = ConfigClass::checkRequirements();
-        if (!$report['php']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
-        }
-        if (!$report['curl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
-        }
-        if (!$report['openssl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
-        }
-
-        // Check if multishop feature is active then set the context
-        if ($this->shop->isFeatureActive()) {
-            $this->shop->setContext();
-        }
-
-        // Set payplug config
-        if (!$this->setConfig()) {
-            return $this->setInstallError($this->l('Install failed:setConfig()'));
-        }
-
-        // Install order state
-        if (!$this->createOrderStates()) {
-            return $this->setInstallError($this->l('Install failed: Create order states.'));
-        }
-
-        // Install SQL
-        if (!$this->sql->installSQL()) {
-            return $this->setInstallError($this->l('Install failed: Install SQL tables.'));
-        }
-
-        // Install tab
-        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
-            return $this->setInstallError($this->l('Install failed: Install Tab'));
-        }
-
-        $this->log->info('Install successful.');
-        return true;
-    }
-
-    /**
-     * @description Set error on module install
+     * @description Set error on module uninstall
      * @param $error
      * @return bool
      */
-    public function setInstallError($error = '')
+    public function setUninstallError($error = '')
     {
         $this->log->error($error);
-        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
-
-        $this->log->info('Install failed.');
-        $this->log->info('Install error: ' . $error);
-
-        // revert installation
-        $this->uninstall();
-
         return false;
     }
 
@@ -358,125 +542,6 @@ class InstallRepository extends Repository
         }
 
         $this->log->info('Uninstall succeeded.');
-        return true;
-    }
-
-    /**
-     * @description Set error on module uninstall
-     * @param $error
-     * @return bool
-     */
-    public function setUninstallError($error = '')
-    {
-        $this->log->error($error);
-        return false;
-    }
-
-    /**
-     * @description Delete basic configuration
-     * @return bool
-     */
-    private function deleteConfig()
-    {
-        return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ISO')
-            && $this->config->deleteByName('PAYPLUG_CONFIGURATION_OK')
-            && $this->config->deleteByName('PAYPLUG_CURRENCIES')
-            && $this->config->deleteByName('PAYPLUG_DEBUG_MODE')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED_AUTO')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED_STATE')
-            && $this->config->deleteByName('PAYPLUG_EMAIL')
-            && $this->config->deleteByName('PAYPLUG_EMBEDDED_MODE')
-            && $this->config->deleteByName('PAYPLUG_INST')
-            && $this->config->deleteByName('PAYPLUG_INST_MIN_AMOUNT')
-            && $this->config->deleteByName('PAYPLUG_INST_MODE')
-            && $this->config->deleteByName('PAYPLUG_KEEP_CARDS')
-            && $this->config->deleteByName('PAYPLUG_LIVE_API_KEY')
-            && $this->config->deleteByName('PAYPLUG_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_OFFER')
-            && $this->config->deleteByName('PAYPLUG_ONE_CLICK')
-            && $this->config->deleteByName('PAYPLUG_ONEY')
-            && $this->config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && $this->config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_FEES')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
-            && $this->config->deleteByName('PAYPLUG_SANDBOX_MODE')
-            && $this->config->deleteByName('PAYPLUG_SHOW')
-            && $this->config->deleteByName('PAYPLUG_STANDARD')
-            && $this->config->deleteByName('PAYPLUG_TEST_API_KEY')
-        );
-    }
-
-    /**
-     * @description Create basic configuration
-     * @return bool
-     */
-    public function setConfig()
-    {
-        return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
-            && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
-            && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
-            && $this->config->updateValue('PAYPLUG_COMPANY_ISO', '')
-            && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
-            && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
-            && $this->config->updateValue('PAYPLUG_EMAIL', null)
-            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
-            && $this->config->updateValue('PAYPLUG_INST', null)
-            && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
-            && $this->config->updateValue('PAYPLUG_INST_MODE', 3)
-            && $this->config->updateValue('PAYPLUG_KEEP_CARDS', 0)
-            && $this->config->updateValue('PAYPLUG_LIVE_API_KEY', null)
-            && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
-            && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
-            && $this->config->updateValue('PAYPLUG_OFFER', '')
-            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
-            && $this->config->updateValue('PAYPLUG_ONEY', null)
-            && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
-            && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
-            && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
-            && $this->config->updateValue('PAYPLUG_ONEY_FEES', 1)
-            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
-            && $this->config->updateValue('PAYPLUG_SHOW', 0)
-            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
-            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
-        );
-    }
-
-    /**
-     * @description Create usual status
-     * @return bool
-     */
-    public function createOrderStates()
-    {
-        $order_states_list = $this->order_state_entity->getList();
-        foreach ($order_states_list as $key => $state) {
-            $this->order_state->create($key, $state, true);
-            $this->order_state->create($key, $state, false);
-        }
-
-        $this->order_state->removeIdsUnusedByPayPlug();
         return true;
     }
 }

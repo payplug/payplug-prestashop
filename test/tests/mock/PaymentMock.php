@@ -9,7 +9,7 @@ class PaymentMock
 {
     public static function getStandardPayment()
     {
-        $payment = \Payplug\Resource\Payment::fromAttributes([
+        $payment = \Payplug\Resource\Payment::fromAttributes(array(
             'id' => 'pay_7BMOc4IlKpypGc3zUmvr5C',
             'failure' => [],
             'amount_refunded' => '0',
@@ -82,7 +82,7 @@ class PaymentMock
                 'Client' => '2',
             ],
             'currency' => 'EUR',
-        ]);
+        ));
 
         return $payment;
     }
