@@ -573,7 +573,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process the card saving for one click use
      */
     private function processSaveCard()
     {
@@ -615,7 +615,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Cancelled
      */
     private function processTypeCancelled()
     {
@@ -624,7 +624,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Error
      */
     private function processTypeError()
     {
@@ -633,7 +633,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Expired
      */
     private function processTypeExpired()
     {
@@ -642,7 +642,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Nothing
      */
     private function processTypeNothing()
     {
@@ -651,7 +651,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Paid
      */
     private function processTypePaid()
     {
@@ -660,7 +660,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Pending
      */
     private function processTypePending()
     {
@@ -716,7 +716,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Process Payment Ressource when related Order is with a status Refund
      */
     private function processTypeRefund()
     {
@@ -738,7 +738,7 @@ class PayPlugNotifications
     }
 
     /**
-     *
+     * @description Set $this->>cart in the DB from the resource id
      */
     private function setCartFromResource()
     {
