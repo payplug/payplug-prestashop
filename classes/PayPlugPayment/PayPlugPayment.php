@@ -678,7 +678,7 @@ class PayPlugPayment
     private function getAddressLandlinePhoneNumber(Address $address)
     {
         $address_country = new Country($address->id_country);
-        return $address->phone ? $this->formatPhoneNumber($address->phone, $address_country) : null;
+        return $address->phone ? \PayPlug\classes\ConfigClass::formatPhoneNumber($address->phone, $address_country) : null;
     }
 
     /**
@@ -690,7 +690,7 @@ class PayPlugPayment
     private function getAddressMobilePhoneNumber(Address $address)
     {
         $address_country = new Country($address->id_country);
-        return $address->phone_mobile ? $this->formatPhoneNumber($address->phone_mobile, $address_country) : null;
+        return $address->phone_mobile ? \PayPlug\classes\ConfigClass::formatPhoneNumber($address->phone_mobile, $address_country) : null;
     }
 
     /**
@@ -712,12 +712,12 @@ class PayPlugPayment
      */
     private function getAddressCountry(Address $address)
     {
-        $iso_code = $this->getIsoCodeByCountryId((int)$address->id_country);
+        $iso_code = \PayPlug\classes\ConfigClass::getIsoCodeByCountryId((int)$address->id_country);
 
         if (!$iso_code) {
             $this->setMetaDatasAddressIso($address);
 
-            $iso_code_list = $this->getIsoCodeList();
+            $iso_code_list = \PayPlug\classes\ConfigClass::getIsoCodeList();
             $language = new Language(Configuration::get('PS_LANG_DEFAULT'));
             if (in_array(Tools::strtoupper($language->iso_code), $iso_code_list)) {
                 $iso_code = $language->iso_code;
@@ -736,7 +736,7 @@ class PayPlugPayment
      */
     private function getAddressLanguage(Address $address)
     {
-        return $this->getIsoFromLanguageCode($this->context->language);
+        return \PayPlug\classes\ConfigClass::getIsoFromLanguageCode($this->context->language);
     }
 
     /**
@@ -788,8 +788,8 @@ class PayPlugPayment
     public function getCartAmount($currency)
     {
         $amount = $this->cart->getOrderTotal(true, Cart::BOTH);
-        $amount = $this->module->convertAmount($amount);
-        $current_amounts = $this->getAmountsByCurrency($currency);
+        $amount = $this->module->payplug_dependencies->payplug->amountCurrencyClass->convertAmount($amount);
+        $current_amounts = $this->module->payplug_dependencies->payplug->amountCurrencyClass->getAmountsByCurrency($currency);
         $current_min_amount = $current_amounts['min_amount'];
         $current_max_amount = $current_amounts['max_amount'];
 
@@ -853,7 +853,7 @@ class PayPlugPayment
      */
     public function getIsoCodeByCountryId($country_id)
     {
-        $iso_code_list = $this->getIsoCodeList();
+        $iso_code_list = \PayPlug\classes\ConfigClass::getIsoCodeList();
 
         if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
             return false;
@@ -870,34 +870,6 @@ class PayPlugPayment
         } else {
             return Tools::strtoupper($country->iso_code);
         }
-    }
-
-    /**
-     * Get amounts with the right currency
-     *
-     * @param string $iso_code
-     * @return array
-     */
-    public function getAmountsByCurrency($iso_code)
-    {
-        $min_amounts = [];
-        $max_amounts = [];
-        $min = Configuration::get('PAYPLUG_MIN_AMOUNTS');
-        $max = Configuration::get('PAYPLUG_MAX_AMOUNTS');
-        foreach (explode(';', Tools::strtoupper($min)) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $min_amounts[$cur[1]] = (int)$cur[2];
-        }
-        foreach (explode(';', Tools::strtoupper($max)) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $max_amounts[$cur[1]] = (int)$cur[2];
-        }
-        $current_min_amount = $min_amounts[Tools::strtoupper($iso_code)];
-        $current_max_amount = $max_amounts[Tools::strtoupper($iso_code)];
-
-        return ['min_amount' => $current_min_amount, 'max_amount' => $current_max_amount];
     }
 
     /**
@@ -1069,7 +1041,7 @@ class PayPlugPayment
             }
 
             // then format code
-            $iso_code = $this->getIsoCodeByCountryId($country->id);
+            $iso_code = \PayPlug\classes\ConfigClass::getIsoCodeByCountryId($country->id);
             $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
@@ -1079,22 +1051,5 @@ class PayPlugPayment
             // todo: add log
             return null;
         }
-    }
-
-    /**
-     * Get iso code from language code
-     * Language code is like 'fr-be', we explode it in array (0 => 'fr', 1 => 'be')
-     * then we use array[0] witch is the language while array[1] is the localization.
-     *
-     * @param Language $language
-     * @return string
-     */
-    public function getIsoFromLanguageCode(Language $language)
-    {
-        if (!Validate::isLoadedObject($language)) {
-            return false;
-        }
-        $parse = explode('-', $language->language_code);
-        return Tools::strtolower($parse[0]);
     }
 }

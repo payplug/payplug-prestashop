@@ -33,8 +33,7 @@ class PayplugIPNModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
-        $notification = $payplug->setNotification();
+        $notification = \PayPlug\classes\ConfigClass::setNotification();
         $notification->treat();
     }
 }

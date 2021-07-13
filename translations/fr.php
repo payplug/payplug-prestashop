@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Interrompre';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Votre client ne sera pas prélevé aux échéances prévues.';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Annuler';
@@ -312,7 +312,7 @@ $_MODULE['<{payplug}prestashop>payplug_bd8d794d4afa7c7cb260b86355386938'] = 'Rem
 $_MODULE['<{payplug}prestashop>payplug_be68eac79ad39a8e98bfd7c15b9fa7a3'] = 'intégrée';
 $_MODULE['<{payplug}prestashop>payplug_c103a7a8c6477682b63c04caa7ba3742'] = 'Chargement';
 $_MODULE['<{payplug}prestashop>payplug_c3041f00ca79d002013f230bd5140f1a'] = 'La configuration requise pour utiliser le module PayPlug n\'est pas satisfaite. Une fois les problèmes corrigés, actualisez la page ou cliquez sur Vérifier.';
-$_MODULE['<{payplug}prestashop>payplug_c3cd0891c9ad29c1d74bb4cebc0bc925'] = 'Are you sure you wish to uninstall this module and delete your settings?';
+$_MODULE['<{payplug}prestashop>payplug_c3cd0891c9ad29c1d74bb4cebc0bc925'] = 'Attention, en poursuivant la désinstallation vous perdrez vos configurations. Souhaitez-vous vraiment continuer ?';
 $_MODULE['<{payplug}prestashop>payplug_c4371f1eb480bb9579359b8a54dee436'] = 'Le montant à rembourser est incorrect';
 $_MODULE['<{payplug}prestashop>payplug_c791a267e7913ceb4c969b51687e7523'] = 'Au moins un champ n\'a pas été complété correctement';
 $_MODULE['<{payplug}prestashop>payplug_c932bec7b606a04b1278308bec3dfcbe'] = 'OUI';
