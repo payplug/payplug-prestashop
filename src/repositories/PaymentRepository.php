@@ -180,7 +180,7 @@ class PaymentRepository extends Repository
     public function returnPaymentError($element = [], $errorMessage = null, $level = 'error')
     {
         if (!$errorMessage || !is_string($errorMessage)) {
-            $errorMessage = '[PaymentRepository] Error during payment creation process.';
+            $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
         }
 
         $this->payplug->setPaymentErrorsCookie([
@@ -361,6 +361,13 @@ class PaymentRepository extends Repository
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[updatePaymentTable] Problem with the getHashedCart method.'
+            );
+        }
+
+        if (!$cartHash || !is_string($cartHash)) {
+            return $this->returnPaymentError(
+                ['name' => 'cartHash', 'value' => $cartHash],
+                '[updatePaymentTable] $cartHash is null or not a string'
             );
         }
 
@@ -547,7 +554,6 @@ class PaymentRepository extends Repository
         }
 
         $paymentDate = date('Y-m-d H:i:s');
-
         $cartHash = $this->getHashedCart($paymentDetails);
 
         if (isset($cartHash['result']) && !$cartHash['result']) {
