@@ -357,10 +357,10 @@ class PaymentRepository extends Repository
 
         $cartHash = $this->getHashedCart($paymentDetails);
 
-        if (!$cartHash || !is_string($cartHash)) {
+        if (isset($cartHash['result']) && !$cartHash['result']) {
             return $this->returnPaymentError(
-                ['name' => 'cartHash', 'value' => $cartHash],
-                '[updatePaymentTable] $cartHash is null or not a string'
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[updatePaymentTable] Problem with the getHashedCart method.'
             );
         }
 
@@ -549,6 +549,13 @@ class PaymentRepository extends Repository
         $paymentDate = date('Y-m-d H:i:s');
 
         $cartHash = $this->getHashedCart($paymentDetails);
+
+        if (isset($cartHash['result']) && !$cartHash['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] Problem with the getHashedCart method.'
+            );
+        }
 
         $this->query
             ->insert()

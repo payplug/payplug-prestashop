@@ -170,4 +170,18 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
             $this->repo->updatePaymentTable($this->paymentDetails)
         );
     }
+
+    public function testUpdatePaymentTableWithInvalidHashedCart()
+    {
+        $this->paymentDetails['cart'] = 'Invalid Cart';
+
+        $this->assertFalse(
+            $this->repo->updatePaymentTable($this->paymentDetails)['result']
+        );
+
+        $this->assertSame(
+            $this->repo->updatePaymentTable($this->paymentDetails)['response'],
+            '[updatePaymentTable] Problem with the getHashedCart method.'
+        );
+    }
 }
