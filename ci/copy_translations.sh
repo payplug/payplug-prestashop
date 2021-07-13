@@ -2,9 +2,17 @@
 
 export languageCodes="es de pt nl"
 
+currDir=${PWD##*/}
+
+if [ $currDir = "ci" ]; then
+    racine=".."
+  else
+    racine="."
+fi
+
 for lang in $languageCodes
   do
-    cp ../translations/en.php ../translations/${lang}.php
+    cp $racine/translations/en.php $racine/translations/${lang}.php
   done
 
 echo "Created fake translations"
