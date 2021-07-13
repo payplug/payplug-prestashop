@@ -89,7 +89,7 @@ class Payplug extends PaymentModule
                 $this->install(true);
             }
 
-            return $this->module->getContent();
+            return (new \PayPlug\classes\AdminClass())->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {

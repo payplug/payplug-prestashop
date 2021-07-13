@@ -23,8 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\MyLogPHP;
-use PayPlug\src\specific\OrderStateSpecific;
+use PayPlug\classes\ConfigClass;
 
 class InstallRepository extends Repository
 {
@@ -75,7 +74,8 @@ class InstallRepository extends Repository
         $sql,
         $tools,
         $validate,
-        $payplug
+        $payplug,
+        $mylogphp
     ) {
         $this->config = $config;
         $this->constant = $constant;
@@ -87,10 +87,8 @@ class InstallRepository extends Repository
         $this->sql = $sql;
         $this->tools = $tools;
         $this->validate = $validate;
-
         $this->payplug = $payplug;
-
-        $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
+        $this->log = $mylogphp;
 
         $this->setParams();
     }
@@ -109,7 +107,6 @@ class InstallRepository extends Repository
             $order_state_live = $this->order_state_specific->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
                 || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
-                $this->log->info('Order state should be created: ' . $key_config_live);
                 $this->order_state->create($key, $state, false, true);
             }
 
@@ -119,71 +116,11 @@ class InstallRepository extends Repository
             $order_state_sandbox = $this->order_state_specific->get($id_order_state_sandbox);
             if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
                 || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
-                $this->log->info('Order state should be created: ' . $key_config_sandbox);
                 $this->order_state->create($key, $state, true, true);
             }
         }
 
         $this->order_state->removeIdsUnusedByPayPlug();
-    }
-
-    /**
-     * @description Check if current configuration requirements are respected
-     * @return array
-     */
-    public function checkRequirements()
-    {
-        $php_min_version = 50600;
-        $curl_min_version = '7.21';
-        $openssl_min_version = 0x1000100f;
-        $report = [
-            'php' => [
-                'version' => 0,
-                'installed' => true,
-                'up2date' => false,
-            ],
-            'curl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-            'openssl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-        ];
-
-        //PHP
-        if (!defined('PHP_VERSION_ID')) {
-            $report['php']['version'] = PHP_VERSION;
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
-
-        //cURL
-        $curl_exists = extension_loaded('curl');
-        if ($curl_exists) {
-            $curl_version = curl_version();
-            $report['curl']['version'] = $curl_version['version'];
-            $report['curl']['installed'] = true;
-            $report['curl']['up2date'] = version_compare(
-                $curl_version['version'],
-                $curl_min_version,
-                '>='
-            ) ? true : false;
-        }
-
-        //OpenSSl
-        $openssl_exists = extension_loaded('openssl');
-        if ($openssl_exists) {
-            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
-            $report['openssl']['installed'] = true;
-            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
-        }
-
-        return $report;
     }
 
     /**
@@ -298,15 +235,15 @@ class InstallRepository extends Repository
         $this->log->info('Starting to install again.');
 
         // check requirement
-        $report = $this->checkRequirements();
+        $report = ConfigClass::checkRequirements();
         if (!$report['php']['up2date']) {
-            return $this->setInstallError('Install failed: PHP Requirement.');
+            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
         }
         if (!$report['curl']['up2date']) {
-            return $this->setInstallError('Install failed: cURL Requirement.');
+            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
         }
         if (!$report['openssl']['up2date']) {
-            return $this->setInstallError('Install failed: OpenSSL Requirement.');
+            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
         }
 
         // Check if multishop feature is active then set the context
@@ -336,7 +273,7 @@ class InstallRepository extends Repository
 
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab()) {
-            return $this->setInstallError('Install failed: Install Tab');
+            return $this->setInstallError($this->l('Install failed: Install Tab'));
         }
 
         $this->log->info('Install successful.');

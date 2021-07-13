@@ -46,6 +46,7 @@ use Validate;
  */
 class PayPlugNotifications
 {
+    private $amountCurrencyClass;
     public $api_key;
     public $cart = null;
     public $except;
@@ -57,6 +58,7 @@ class PayPlugNotifications
     public $lock_key = null;
     public $logger;
     public $order = null;
+    private $orderClass;
     public $order_states = [];
     public $payment = null;
     public $payplug;
@@ -185,7 +187,7 @@ class PayPlugNotifications
             $this->api_key = (bool)$resource->is_live ?
                 Configuration::get('PAYPLUG_LIVE_API_KEY') :
                 Configuration::get('PAYPLUG_TEST_API_KEY');
-            $this->payplug->setSecretKey($this->api_key);
+            ApiClass::setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
@@ -241,7 +243,7 @@ class PayPlugNotifications
             'transaction_id' => $transaction_id
         ];
 
-        $amount = $this->payplug->convertAmount($amount, true);
+        $amount = $this->amountCurrencyClass->convertAmount($amount, true);
 
         $currency = (int)$this->cart->id_currency;
         try {
@@ -357,7 +359,7 @@ class PayPlugNotifications
                 $this->exitProcess($exception->getMessage(), 500);
             }
 
-            if (!$this->payplug->addPayplugOrderPayment($this->order->id, $this->payment->id)) {
+            if (!$this->orderClass->addPayplugOrderPayment($this->order->id->id, $this->payment->id)) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
                     'error'
@@ -540,7 +542,7 @@ class PayPlugNotifications
             } while (!$cart_lock);
 
             $new_order_state = $this->order_states['refund'];
-            $current_state = $this->payplug->getCurrentOrderState($this->order->id);
+            $current_state = $this->orderClass->getCurrentOrderState($this->order->id);
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
@@ -673,8 +675,35 @@ class PayPlugNotifications
             $this->updateOrderState($new_order_state_id);
         }
 
+        // Check if order amount is valid
+        $is_valid_amount = (bool)$this->payment->is_paid;
+        if ($this->is_installment) {
+            $is_valid_amount = (bool)AmountCurrencyClass::checkAmountPaidIsCorrect(
+                $this->payment->amount / 100,
+                $this->order
+            );
+        }
+
+        if (!$is_valid_amount) {
+            $message = new Message();
+            $message->message = $this->payplug->l('The amount collected by PayPlug is not the same');
+            $message->message .= $this->payplug->l(' as the total value of the order');
+            $message->id_order = $this->order->id;
+            $message->id_cart = $this->order->id_cart;
+            $message->private = true;
+            try {
+                $message->save();
+            } catch (Exception $exception) {
+                $this->logger->addLog('The message cannot be saved: ' . $exception->getMessage(), 'error');
+                $this->exitProcess($exception->getMessage(), 500);
+            }
+
+            $new_order_state_id = $this->order_states['error'];
+            $this->updateOrderState($new_order_state_id);
+        }
+
         // Get associated transaction
-        $payplug_order_payments = $this->payplug->getPayplugOrderPayments((int)$this->order->id);
+        $payplug_order_payments = $this->orderClass->getPayplugOrderPayments((int)$this->order->id);
         $order_payments = $this->order->getOrderPayments();
 
         // Check if the payment is related to the order with payplug order payment
@@ -782,6 +811,8 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
+        $this->amountCurrencyClass = new AmountCurrencyClass();
+        $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
@@ -863,17 +894,17 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setPayment');
         if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
             if ($this->sandbox) {
-                $this->payplug->initializeApi(false);
+                $this->payplug->api->initializeApi(false);
                 if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with LIVE API Key.', 'debug');
-                    $this->payplug->initializeApi(true);
+                    $this->payplug->apiClass->initializeApi(true);
                     $this->payment = null;
                 }
             } else {
-                $this->payplug->initializeApi(true);
+                $this->payplug->apiClass->initializeApi(true);
                 if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with the TEST API Key.', 'debug');
-                    $this->payplug->initializeApi(false);
+                    $this->payplug->apiClass->initializeApi(false);
                     $this->payment = null;
                 }
             }

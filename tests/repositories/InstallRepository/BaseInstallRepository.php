@@ -52,7 +52,8 @@ class BaseInstallRepository extends RepositoryBase
             $this->sql,
             $this->tools,
             $this->validate,
-            $this->payplug
+            $this->payplug,
+            $this->myLogPhp
         ])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();

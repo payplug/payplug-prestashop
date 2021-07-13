@@ -43,12 +43,12 @@ class HookRepository extends Repository
         $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
 
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
-            $this->payplug->setMedia([
+            $this->payplug->mediaClass->setMedia([
                 $module_url . 'views/css/admin_order.css',
                 $module_url . 'views/js/admin_order.js',
             ]);
         } else {
-            $this->payplug->setMedia([
+            $this->payplug->mediaClass->setMedia([
                 $module_url . 'views/js/admin.js',
                 $module_url . 'views/css/admin.css',
             ]);

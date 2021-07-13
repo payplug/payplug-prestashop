@@ -23,16 +23,15 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\MyLogPHP;
 use PayPlug\src\specific\OrderStateSpecific;
 
 class OrderStateRepository extends Repository
 {
     /** @var object */
-    private $configuration;
+    protected $constant;
 
     /** @var object */
-    protected $constant;
+    private $configuration;
 
     /** @var object */
     private $language;
@@ -49,8 +48,16 @@ class OrderStateRepository extends Repository
     /** @var object */
     private $validate;
 
-    public function __construct($configuration, $constant, $language, $order_state_specific, $query, $tools, $validate)
-    {
+    public function __construct(
+        $configuration,
+        $constant,
+        $language,
+        $order_state_specific,
+        $query,
+        $tools,
+        $validate,
+        $myLogPHP
+    ) {
         $this->configuration = $configuration;
         $this->constant = $constant;
         $this->language = $language;
@@ -58,10 +65,8 @@ class OrderStateRepository extends Repository
         $this->query = $query;
         $this->tools = $tools;
         $this->validate = $validate;
-
-        $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
+        $this->log = $myLogPHP;
     }
-
 
     public function add($name, $state = [], $sandbox = true)
     {
@@ -161,6 +166,26 @@ class OrderStateRepository extends Repository
         return $this->configuration->updateValue($key_config, $id_order_state);
     }
 
+    /**
+     * @param int $id_order_state
+     * @return bool
+     */
+    public function deleteType($id_order_state)
+    {
+        // FIXME: from php7, psr12 requires return type
+
+        if (!$id_order_state || !is_int($id_order_state)) {
+            return false;
+        }
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->where('id_order_state = ' . (int)$id_order_state)
+            -> build();
+
+        return  true;
+    }
+
     public static function factory()
     {
         return new OrderStateRepository();
@@ -208,23 +233,6 @@ class OrderStateRepository extends Repository
         return 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $name) . ($sandbox ? '_TEST' : '');
     }
 
-    public function getIdByName($name)
-    {
-        $this->query
-            ->select()
-            ->fields('osl.id_order_state')
-            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-            ->where('osl.name = \'' . pSQL($name) . '\'')
-            ->limit(1, 1);
-
-        return $this->query->build('unique_value');
-    }
-
-    public function getIdByKey($key)
-    {
-        return (int)$this->configuration->get($key);
-    }
-
     public function getIdByDefinition($definition)
     {
         if (!isset($definition['template'])
@@ -263,6 +271,23 @@ class OrderStateRepository extends Repository
 
             return (int)$this->query->build('unique_value');
         }
+    }
+
+    public function getIdByKey($key)
+    {
+        return (int)$this->configuration->get($key);
+    }
+
+    public function getIdByName($name)
+    {
+        $this->query
+            ->select()
+            ->fields('osl.id_order_state')
+            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+            ->where('osl.name = \'' . pSQL($name) . '\'')
+            ->limit(1, 1);
+
+        return $this->query->build('unique_value');
     }
 
     public function getIdsByModuleName($module_name)
@@ -413,25 +438,5 @@ class OrderStateRepository extends Repository
             ->where('id_order_state = ' . (int)$id_order_state);
 
         return $this->query->build();
-    }
-
-    /**
-     * @param int $id_order_state
-     * @return bool
-     */
-    public function deleteType($id_order_state)
-    {
-        // FIXME: from php7, psr12 requires return type
-
-        if (!$id_order_state || !is_int($id_order_state)) {
-            return false;
-        }
-        $this->query
-            ->delete()
-            ->from(_DB_PREFIX_ . 'payplug_order_state')
-            ->where('id_order_state = ' . (int)$id_order_state)
-            -> build();
-
-        return  true;
     }
 }
