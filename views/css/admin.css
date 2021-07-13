@@ -395,6 +395,7 @@ button.payplugLink:hover {
 .payplugLogin_email {
   color: #00ab7a;
   font-weight: 700;
+  padding-top: 7px;
 }
 .payplugLogin_login {
   width: 200px;
