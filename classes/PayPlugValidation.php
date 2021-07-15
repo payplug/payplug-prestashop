@@ -47,7 +47,6 @@ class PayPlugValidation
 
     public function __construct()
     {
-        $this->amountCurrencyClass = new AmountCurrencyClass();
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
@@ -57,6 +56,7 @@ class PayPlugValidation
 
     public function setConfig()
     {
+        $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
         $this->isDeferred = false;
         $this->isOney = false;
         $this->type = 'payment';

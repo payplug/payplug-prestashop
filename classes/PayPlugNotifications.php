@@ -811,10 +811,10 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
-        $this->amountCurrencyClass = new AmountCurrencyClass();
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
+        $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
         $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
 
         $this->setLogger();
