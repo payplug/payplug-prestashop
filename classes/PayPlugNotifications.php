@@ -862,6 +862,7 @@ class PayPlugNotifications
      */
     public function setLogger()
     {
+        $this->logger = $this->plugin->getLogger();
         $this->logger->addLog('Notification: setLogger');
         $this->logger = $this->plugin->getLogger();
         $this->logger->setParams(['process' => 'notification']);
