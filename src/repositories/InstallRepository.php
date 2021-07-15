@@ -28,13 +28,17 @@ use PayPlug\classes\ConfigClass;
 class InstallRepository extends Repository
 {
     /** @var object */
-    public $log;
-    /** @var object */
     protected $config;
+
     /** @var object */
     protected $constant;
+
     /** @var object */
     protected $context;
+
+    /** @var object */
+    public $log;
+
     /** @var object OrderStateRepository */
     protected $order_state;
 
@@ -90,141 +94,6 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Set module order state
-     */
-    protected function setParams()
-    {
-        $this->order_state_entity->setList([
-            'paid' => [
-                'cfg' => 'PS_OS_PAYMENT',
-                'template' => 'payment',
-                'logable' => true,
-                'send_email' => true,
-                'paid' => true,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#04b404',
-                'name' => [
-                    'en' => 'Payment accepted',
-                    'fr' => 'Paiement effectué',
-                    'es' => 'Pago efectuado',
-                    'it' => 'Pagamento effettuato',
-                ],
-            ],
-            'refund' => [
-                'cfg' => 'PS_OS_REFUND',
-                'template' => 'refund',
-                'logable' => false,
-                'send_email' => true,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#ea3737',
-                'name' => [
-                    'en' => 'Refunded',
-                    'fr' => 'Remboursé',
-                    'es' => 'Reembolsado',
-                    'it' => 'Rimborsato',
-                ],
-            ],
-            'pending' => [
-                'cfg' => 'PS_OS_PENDING',
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => true,
-                'color' => '#a1f8a1',
-                'name' => [
-                    'en' => 'Payment in progress',
-                    'fr' => 'Paiement en cours',
-                    'es' => 'Pago en curso',
-                    'it' => 'Pagamento in corso',
-                ],
-            ],
-            'error' => [
-                'cfg' => 'PS_OS_ERROR',
-                'template' => 'payment_error',
-                'logable' => false,
-                'send_email' => true,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#8f0621',
-                'name' => [
-                    'en' => 'Payment failed',
-                    'fr' => 'Paiement échoué',
-                    'es' => 'Payment failed',
-                    'it' => 'Payment failed',
-                ],
-            ],
-            'auth' => [
-                'cfg' => null,
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => true,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#04b404',
-                'name' => [
-                    'en' => 'Payment authorized',
-                    'fr' => 'Paiement autorisé',
-                    'es' => 'Pago',
-                    'it' => 'Pagamento',
-                ],
-            ],
-            'exp' => [
-                'cfg' => null,
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#8f0621',
-                'name' => [
-                    'en' => 'Authoriation expired',
-                    'es' => 'Autorización vencida',
-                    'fr' => 'Autorisation expirée',
-                    'it' => 'Autorizzazione scaduta',
-                ],
-            ],
-            'oney_pg' => [
-                'cfg' => null,
-                'template' => null,
-                'logable' => false,
-                'send_email' => false,
-                'paid' => false,
-                'module_name' => 'payplug',
-                'hidden' => false,
-                'delivery' => false,
-                'invoice' => false,
-                'color' => '#a1f8a1',
-                'name' => [
-                    'en' => 'Oney - Pending',
-                    'fr' => 'Oney - En attente',
-                    'es' => 'Oney - Pending',
-                    'it' => 'Oney - Pending',
-                ],
-            ]
-        ]);
-    }
-
-    /**
      * @description Check if payplug order state are well installed
      */
     public function checkOrderStates()
@@ -255,121 +124,50 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Install PayPlug Module
-     * @param bool $soft_install
+     * @description Create usual status
      * @return bool
-     * @see Module::install()
      */
-    public function install()
+    public function createOrderStates()
     {
-        $this->log->info('Starting to install again.');
-
-        // check requirement
-        $report = ConfigClass::checkRequirements();
-        if (!$report['php']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
-        }
-        if (!$report['curl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
-        }
-        if (!$report['openssl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
+        $order_states_list = $this->order_state_entity->getList();
+        foreach ($order_states_list as $key => $state) {
+            $this->order_state->create($key, $state, true);
+            $this->order_state->create($key, $state, false);
         }
 
-        // Check if multishop feature is active then set the context
-        if ($this->shop->isFeatureActive()) {
-            $this->shop->setContext();
-        }
-
-        // Set payplug config
-        if (!$this->setConfig()) {
-            return $this->setInstallError($this->l('Install failed:setConfig()'));
-        }
-
-        // Install order state
-        if (!$this->createOrderStates()) {
-            return $this->setInstallError($this->l('Install failed: Create order states.'));
-        }
-
-        // Install SQL
-        if (!$this->sql->installSQL()) {
-            return $this->setInstallError($this->l('Install failed: Install SQL tables.'));
-        }
-
-        // Install tab
-        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
-            return $this->setInstallError($this->l('Install failed: Install Tab'));
-        }
-
-        $this->log->info('Install successful.');
+        $this->order_state->removeIdsUnusedByPayPlug();
         return true;
     }
 
     /**
-     * @description Set error on module install
-     * @param $error
+     * @description Create usual status
      * @return bool
      */
-    public function setInstallError($error = '')
+    public function createOrderStatesType()
     {
-        $this->log->error($error);
-        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
-
-        $this->log->info('Install failed.');
-        $this->log->info('Install error: ' . $error);
-
-        // revert installation
-        $this->uninstall();
-
-        return false;
-    }
-
-    /**
-     * @description Uninstall PayPlug Module
-     * @return bool
-     */
-    public function uninstall()
-    {
-        $this->log->info('Starting to uninstall.');
-
-        $keep_cards = (bool)$this->config->get('PAYPLUG_KEEP_CARDS');
-        if (!$keep_cards) {
-            $this->log->info('Saved cards will be deleted.');
-
-            if (!$this->payplug->uninstallCards()) {
-                return $this->setUninstallError('Unable to delete saved cards.');
+        $this->log->info('Execute createOrderStatesType');
+        $order_states_list = $this->order_state_entity->getList();
+        foreach ($order_states_list as $key => $state) {
+            // live status
+            $live_key = $this->order_state->getConfigKey($key, false);
+            $id_order_state_live = $this->config->get($live_key);
+            $this->log->info('Live key : ' . $live_key . ' / Id Order State: ' . $id_order_state_live);
+            if ($id_order_state_live) {
+                $res = $this->order_state->saveType((int)$id_order_state_live, $state['type']);
+                $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
             }
 
-            $this->log->info('Saved cards successfully deleted.');
-        } else {
-            $this->log->info('Cards will be kept.');
+            // sandbox status
+            $sandbox_key = $this->order_state->getConfigKey($key, true);
+            $id_order_state_sandbox = $this->config->get($sandbox_key);
+            $this->log->info('Sandbox key : ' . $sandbox_key . ' / Id Order State: ' . $id_order_state_sandbox);
+            if ($id_order_state_sandbox) {
+                $res = $this->order_state->setType((int)$id_order_state_sandbox, $state['type']);
+                $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
+            }
         }
 
-        if (!$this->deleteConfig()) {
-            return $this->setUninstallError('Uninstall failed: configuration.');
-        }
-
-        if (!$this->sql->uninstallSQL($keep_cards)) {
-            return $this->setUninstallError('Uninstall failed: sql.');
-        }
-
-        if (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
-            return $this->setUninstallError('Uninstall failed: tab.');
-        }
-
-        $this->log->info('Uninstall succeeded.');
         return true;
-    }
-
-    /**
-     * @description Set error on module uninstall
-     * @param $error
-     * @return bool
-     */
-    public function setUninstallError($error = '')
-    {
-        $this->log->error($error);
-        return false;
     }
 
     /**
@@ -427,6 +225,62 @@ class InstallRepository extends Repository
     }
 
     /**
+     * @description Install PayPlug Module
+     * @param bool $soft_install
+     * @return bool
+     * @see Module::install()
+     */
+    public function install()
+    {
+        $this->log->info('Starting to install again.');
+
+        // check requirement
+        $report = ConfigClass::checkRequirements();
+        if (!$report['php']['up2date']) {
+            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
+        }
+        if (!$report['curl']['up2date']) {
+            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
+        }
+        if (!$report['openssl']['up2date']) {
+            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
+        }
+
+        // Check if multishop feature is active then set the context
+        if ($this->shop->isFeatureActive()) {
+            $this->shop->setContext();
+        }
+
+        // Set payplug config
+        if (!$this->setConfig()) {
+            return $this->setInstallError('Install failed:setConfig()');
+        }
+
+        // Install SQL
+        if (!$this->sql->installSQL()) {
+            return $this->setInstallError('Install failed: Install SQL tables.');
+        }
+
+        // Install order state
+        if (!$this->createOrderStates()) {
+            return $this->setInstallError('Install failed: Create order states.');
+        }
+
+        // Install order state type
+        if (!$this->createOrderStatesType()) {
+            return $this->setInstallError('Install failed: Create order states type.');
+        }
+
+        // Install tab
+        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
+            return $this->setInstallError($this->l('Install failed: Install Tab'));
+        }
+
+        $this->log->info('Install successful.');
+        return true;
+    }
+
+    /**
      * @description Create basic configuration
      * @return bool
      */
@@ -465,18 +319,230 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Create usual status
+     * @description Set error on module install
+     * @param $error
      * @return bool
      */
-    public function createOrderStates()
+    public function setInstallError($error = '')
     {
-        $order_states_list = $this->order_state_entity->getList();
-        foreach ($order_states_list as $key => $state) {
-            $this->order_state->create($key, $state, true);
-            $this->order_state->create($key, $state, false);
+        $this->log->error($error);
+        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
+
+        $this->log->info('Install failed.');
+        $this->log->info('Install error: ' . $error);
+
+        // revert installation
+        $this->uninstall();
+
+        return false;
+    }
+
+    /**
+     * @description Set module order state
+     */
+    protected function setParams()
+    {
+        $this->order_state_entity->setList([
+            'paid' => [
+                'cfg' => 'PS_OS_PAYMENT',
+                'template' => 'payment',
+                'logable' => true,
+                'send_email' => true,
+                'paid' => true,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#04b404',
+                'name' => [
+                    'en' => 'Payment accepted',
+                    'fr' => 'Paiement effectué',
+                    'es' => 'Pago efectuado',
+                    'it' => 'Pagamento effettuato',
+                ],
+                'type' => 'paid',
+            ],
+            'refund' => [
+                'cfg' => 'PS_OS_REFUND',
+                'template' => 'refund',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#ea3737',
+                'name' => [
+                    'en' => 'Refunded',
+                    'fr' => 'Remboursé',
+                    'es' => 'Reembolsado',
+                    'it' => 'Rimborsato',
+                ],
+                'type' => 'refund',
+            ],
+            'pending' => [
+                'cfg' => 'PS_OS_PENDING',
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => true,
+                'color' => '#a1f8a1',
+                'name' => [
+                    'en' => 'Payment in progress',
+                    'fr' => 'Paiement en cours',
+                    'es' => 'Pago en curso',
+                    'it' => 'Pagamento in corso',
+                ],
+                'type' => 'pending',
+            ],
+            'error' => [
+                'cfg' => 'PS_OS_ERROR',
+                'template' => 'payment_error',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#8f0621',
+                'name' => [
+                    'en' => 'Payment failed',
+                    'fr' => 'Paiement échoué',
+                    'es' => 'Payment failed',
+                    'it' => 'Payment failed',
+                ],
+                'type' => 'error',
+            ],
+            'cancel' => [
+                'cfg' => 'PS_OS_CANCELED',
+                'template' => 'order_canceled',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#2C3E50',
+                'name' => [
+                    'en' => 'Payment cancelled',
+                    'fr' => 'Paiement annulé',
+                    'es' => 'Payment cancelled',
+                    'it' => 'Payment cancelled',
+                ],
+                'type' => 'cancel',
+            ],
+            'auth' => [
+                'cfg' => null,
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => true,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#04b404',
+                'name' => [
+                    'en' => 'Payment authorized',
+                    'fr' => 'Paiement autorisé',
+                    'es' => 'Pago',
+                    'it' => 'Pagamento',
+                ],
+                'type' => 'pending',
+            ],
+            'exp' => [
+                'cfg' => null,
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#8f0621',
+                'name' => [
+                    'en' => 'Authoriation expired',
+                    'es' => 'Autorización vencida',
+                    'fr' => 'Autorisation expirée',
+                    'it' => 'Autorizzazione scaduta',
+                ],
+                'type' => 'exp',
+            ],
+            'oney_pg' => [
+                'cfg' => null,
+                'template' => null,
+                'logable' => false,
+                'send_email' => false,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#a1f8a1',
+                'name' => [
+                    'en' => 'Oney - Pending',
+                    'fr' => 'Oney - En attente',
+                    'es' => 'Oney - Pending',
+                    'it' => 'Oney - Pending',
+                ],
+                'type' => 'pending',
+            ]
+        ]);
+    }
+
+    /**
+     * @description Set error on module uninstall
+     * @param $error
+     * @return bool
+     */
+    public function setUninstallError($error = '')
+    {
+        $this->log->error($error);
+        return false;
+    }
+
+    /**
+     * @description Uninstall PayPlug Module
+     * @return bool
+     */
+    public function uninstall()
+    {
+        $this->log->info('Starting to uninstall.');
+
+        $keep_cards = (bool)$this->config->get('PAYPLUG_KEEP_CARDS');
+        if (!$keep_cards) {
+            $this->log->info('Saved cards will be deleted.');
+
+            if (!$this->payplug->uninstallCards()) {
+                return $this->setUninstallError('Unable to delete saved cards.');
+            }
+
+            $this->log->info('Saved cards successfully deleted.');
+        } else {
+            $this->log->info('Cards will be kept.');
         }
 
-        $this->order_state->removeIdsUnusedByPayPlug();
+        if (!$this->deleteConfig()) {
+            return $this->setUninstallError('Uninstall failed: configuration.');
+        }
+
+        if (!$this->sql->uninstallSQL($keep_cards)) {
+            return $this->setUninstallError('Uninstall failed: sql.');
+        }
+
+        if (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
+            return $this->setUninstallError('Uninstall failed: tab.');
+        }
+
+        $this->log->info('Uninstall succeeded.');
         return true;
     }
 }

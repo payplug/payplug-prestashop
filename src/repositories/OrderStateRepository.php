@@ -29,8 +29,10 @@ class OrderStateRepository extends Repository
 {
     /** @var object */
     protected $constant;
+
     /** @var object */
     private $configuration;
+
     /** @var object */
     private $language;
 
@@ -64,122 +66,6 @@ class OrderStateRepository extends Repository
         $this->tools = $tools;
         $this->validate = $validate;
         $this->log = $myLogPHP;
-    }
-
-    public static function factory()
-    {
-        return new OrderStateRepository();
-    }
-
-    public function create($name = false, $state = [], $sandbox = true, $force = false)
-    {
-        if (!is_string($name)
-            || !$name
-            || !is_array($state)
-            || empty($state)) {
-            return false;
-        }
-
-        $this->log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
-
-        $key_config = $this->getConfigKey($name, $sandbox);
-        $id_order_state = $this->configuration->get($key_config);
-
-        // Get order state id with given configuration key
-        if (!$id_order_state && !$sandbox && isset($state['cfg']) && $state['cfg']) {
-            $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
-        }
-
-        // Get order state id with given template
-        if (!$id_order_state && !$sandbox && isset($state['template']) && $state['template']) {
-            $id_order_state = $this->getOrderStateByTemplate($state['template']);
-        }
-
-        // Get order state id with given name
-        if (!$id_order_state && isset($state['name']) && $state['name']) {
-            $id_order_state = $this->findByName($state['name'], $sandbox);
-        }
-
-        // Create order state if no id order state found
-        if (!$id_order_state || $force) {
-            $id_order_state = $this->add($name, $state, $sandbox);
-        }
-
-        // Check if order state is valid
-        $order_state = $this->order_state_specific->get($id_order_state);
-        if (!$this->validate->validate('isLoadedObject', $order_state)
-            || (isset($order_state->deleted) && $order_state->deleted)) {
-            $id_order_state = $this->add($name, $state, $sandbox);
-        }
-
-        return $this->configuration->updateValue($key_config, $id_order_state);
-    }
-
-    public function getConfigKey($name = false, $sandbox = false)
-    {
-        if (!is_string($name)
-            || !$name) {
-            return false;
-        }
-
-        return 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $name) . ($sandbox ? '_TEST' : '');
-    }
-
-    public function getOrderStateByConfiguration($key = false)
-    {
-        if (!is_string($key) || !$key) {
-            return false;
-        }
-
-        return $this->configuration->get($key);
-    }
-
-    public function getOrderStateByTemplate($template = false)
-    {
-        if (!is_string($template) || !$template) {
-            return false;
-        }
-
-        $this->query
-            ->select()
-            ->fields('DISTINCT `id_order_state`')
-            ->from($this->constant->get('_DB_PREFIX_') . 'order_state_lang')
-            ->where('template = \'' . $template . '\'')
-            ->limit(1, 1);
-
-        return $this->query->build('unique_value');
-    }
-
-    /**
-     * Find id_order_state by name
-     *
-     * @param array $name
-     * @param bool $test_mode
-     * @return int OR bool
-     */
-    public function findByName($name, $test_mode = false)
-    {
-        if (!is_array($name) || empty($name)) {
-            return false;
-        } else {
-            $this->query
-                ->select()
-                ->fields('DISTINCT osl.`id_order_state`')
-                ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-                ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
-                ->where(
-                    'osl.`name` LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-                );
-
-            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
-                $this->query->where('os.`deleted` = 0');
-            }
-
-            return $this->query->build('unique_value');
-        }
     }
 
     public function add($name, $state = [], $sandbox = true)
@@ -229,21 +115,122 @@ class OrderStateRepository extends Repository
         return false;
     }
 
-    public function getIdByName($name)
+    public function create($name = false, $state = [], $sandbox = true, $force = false)
     {
-        $this->query
-            ->select()
-            ->fields('osl.id_order_state')
-            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-            ->where('osl.name = \'' . pSQL($name) . '\'')
-            ->limit(1, 1);
+        if (!is_string($name)
+            || !$name
+            || !is_array($state)
+            || empty($state)) {
+            return false;
+        }
 
-        return $this->query->build('unique_value');
+        $this->log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
+
+        $key_config = $this->getConfigKey($name, $sandbox);
+        $id_order_state = $this->configuration->get($key_config);
+
+        // Get order state id with given configuration key
+        if (!$id_order_state && !$sandbox && isset($state['cfg']) && $state['cfg']) {
+            $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
+            if ($id_order_state) {
+                // Valide order state
+                $os = $this->order_state_specific->get($id_order_state);
+                if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
+                    return $this->configuration->updateValue($key_config, $os->id);
+                }
+            }
+        }
+
+        // Get order state id with given template
+        if (!$id_order_state && !$sandbox && isset($state['template']) && $state['template']) {
+            $id_order_state = $this->getOrderStateByTemplate($state['template']);
+        }
+
+        // Get order state id with given name
+        if (!$id_order_state && isset($state['name']) && $state['name']) {
+            $id_order_state = $this->findByName($state['name'], $sandbox);
+        }
+
+        // Create order state if no id order state found
+        if (!$id_order_state || $force) {
+            $id_order_state = $this->add($name, $state, $sandbox);
+        }
+
+        // Check if order state is valid
+        $order_state = $this->order_state_specific->get($id_order_state);
+        if (!$this->validate->validate('isLoadedObject', $order_state)
+            || (isset($order_state->deleted) && $order_state->deleted)) {
+            $id_order_state = $this->add($name, $state, $sandbox);
+        }
+
+        return $this->configuration->updateValue($key_config, $id_order_state);
     }
 
-    public function getIdByKey($key)
+    /**
+     * @param int $id_order_state
+     * @return bool
+     */
+    public function deleteType($id_order_state)
     {
-        return (int)$this->configuration->get($key);
+        // FIXME: from php7, psr12 requires return type
+
+        if (!$id_order_state || !is_int($id_order_state)) {
+            return false;
+        }
+        $this->query
+            ->delete()
+            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->where('id_order_state = ' . (int)$id_order_state)
+            -> build();
+
+        return  true;
+    }
+
+    public static function factory()
+    {
+        return new OrderStateRepository();
+    }
+
+    /**
+     * Find id_order_state by name
+     *
+     * @param array $name
+     * @param bool $test_mode
+     * @return int OR bool
+     */
+    public function findByName($name, $test_mode = false)
+    {
+        if (!is_array($name) || empty($name)) {
+            return false;
+        } else {
+            $this->query
+                ->select()
+                ->fields('DISTINCT osl.`id_order_state`')
+                ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+                ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
+                ->where(
+                    'osl.`name` LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
+                );
+
+            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+                $this->query->where('os.`deleted` = 0');
+            }
+
+            return $this->query->build('unique_value');
+        }
+    }
+
+    public function getConfigKey($name = false, $sandbox = false)
+    {
+        if (!is_string($name)
+            || !$name) {
+            return false;
+        }
+
+        return 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $name) . ($sandbox ? '_TEST' : '');
     }
 
     public function getIdByDefinition($definition)
@@ -286,19 +273,21 @@ class OrderStateRepository extends Repository
         }
     }
 
-    public function removeIdsUnusedByPayPlug()
+    public function getIdByKey($key)
     {
-        $deleted = true;
-        $payplug_os_id_list = $this->getIdsByModuleName('payplug');
-        $used_order_os_id_list = $this->isUsedByOrders('payplug');
-        $used_os_id_list = $this->getIdsUsedByPayPlug();
-        foreach ($payplug_os_id_list as $payplug_os_id) {
-            if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
-                $os = new OrderStateSpecific($payplug_os_id);
-                $deleted = $deleted && $os->softDelete();
-            }
-        }
-        return $deleted;
+        return (int)$this->configuration->get($key);
+    }
+
+    public function getIdByName($name)
+    {
+        $this->query
+            ->select()
+            ->fields('osl.id_order_state')
+            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+            ->where('osl.name = \'' . pSQL($name) . '\'')
+            ->limit(1, 1);
+
+        return $this->query->build('unique_value');
     }
 
     public function getIdsByModuleName($module_name)
@@ -316,6 +305,60 @@ class OrderStateRepository extends Repository
         }
 
         return $ids;
+    }
+
+    public function getIdsUsedByPayPlug()
+    {
+        $ids = [];
+        $res = $this->query
+            ->select()
+            ->fields('c.value')
+            ->from(_DB_PREFIX_ . 'configuration', 'c')
+            ->where('c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'')
+            ->build();
+
+        foreach ($res as $os) {
+            array_push($ids, (int)$os['value']);
+        }
+
+        return $ids;
+    }
+
+    public function getOrderStateByConfiguration($key = false)
+    {
+        if (!is_string($key) || !$key) {
+            return false;
+        }
+
+        return $this->configuration->get($key);
+    }
+
+    public function getOrderStateByTemplate($template = false)
+    {
+        if (!is_string($template) || !$template) {
+            return false;
+        }
+
+        $this->query
+            ->select()
+            ->fields('DISTINCT `id_order_state`')
+            ->from($this->constant->get('_DB_PREFIX_') . 'order_state_lang')
+            ->where('template = \'' . $template . '\'')
+            ->limit(1, 1);
+
+        return $this->query->build('unique_value');
+    }
+
+    public function getType($id_order_state)
+    {
+        $type = $this->query
+            ->select()
+            ->fields('type')
+            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->where('id_order_state = ' . (int)$id_order_state)
+            ->build('unique_value');
+
+        return $type;
     }
 
     public function isUsedByOrders($module_name)
@@ -338,20 +381,62 @@ class OrderStateRepository extends Repository
         return $ids;
     }
 
-    public function getIdsUsedByPayPlug()
+    public function removeIdsUnusedByPayPlug()
     {
-        $ids = [];
-        $res = $this->query
-            ->select()
-            ->fields('c.value')
-            ->from(_DB_PREFIX_ . 'configuration', 'c')
-            ->where('c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'')
-            ->build();
+        $deleted = true;
+        $payplug_os_id_list = $this->getIdsByModuleName('payplug');
+        $used_order_os_id_list = $this->isUsedByOrders('payplug');
+        $used_os_id_list = $this->getIdsUsedByPayPlug();
+        foreach ($payplug_os_id_list as $payplug_os_id) {
+            if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
+                $os = new OrderStateSpecific($payplug_os_id);
+                $deleted = $deleted && $os->softDelete();
+            }
+        }
+        return $deleted;
+    }
 
-        foreach ($res as $os) {
-            array_push($ids, (int)$os['value']);
+    public function saveType($id_order_state = false, $type = '')
+    {
+        if (!$id_order_state || !is_int($id_order_state)) {
+            return false;
         }
 
-        return $ids;
+        if (!$type || !is_string($type)) {
+            return false;
+        }
+
+        if ($old_type = $this->getType($id_order_state)) {
+            return $this->updateType($id_order_state, $type);
+        }
+
+        return $this->setType($id_order_state, $type);
+    }
+
+    public function setType($id_order_state, $type)
+    {
+        $date = date('Y-m-d');
+        $this->query
+            ->insert()
+            ->into(_DB_PREFIX_ . 'payplug_order_state')
+            ->fields('id_order_state')->values(pSQL($id_order_state))
+            ->fields('type')->values(pSQL($type))
+            ->fields('date_add')->values($date)
+            ->fields('date_upd')->values($date);
+
+        return $this->query->build();
+    }
+
+    public function updateType($id_order_state, $type)
+    {
+        $date = date('Y-m-d');
+        $this->query
+            ->update()
+            ->table(_DB_PREFIX_ . 'payplug_order_state')
+            ->set('type = \'' . $type . '\'')
+            ->set('date_upd = \'' . $date . '\'')
+            ->where('id_order_state = ' . (int)$id_order_state);
+
+        return $this->query->build();
     }
 }

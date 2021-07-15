@@ -50,11 +50,13 @@ final class CreateTest extends BaseOrderStateRepository
             'cfg' => 'CONFIG_KEY',
             'template' => 'order_state_template',
             'name' => 'order_state',
+            'type' => 'nothing',
         ];
 
         $this->repo
             ->shouldReceive([
-                'getConfigKey' => $this->configKey
+                'getConfigKey' => $this->configKey,
+                'setType' => true
             ]);
 
         $this->config
@@ -190,9 +192,11 @@ final class CreateTest extends BaseOrderStateRepository
                 'get' => $this->orderStateMock
             ]);
 
+        $response = $this->repo->create($this->state['name'], $this->state, false, true);
+
         $this->assertSame(
             $this->configKey . '-' . $new_order_state,
-            $this->repo->create($this->state['name'], $this->state, false, true)
+            $response
         );
     }
 
