@@ -623,6 +623,10 @@ class PayPlugClass extends PaymentModule
             $pay_brand .= ' ' . $this->l('payplug.adminAjaxController.card') . ' (' . $payment->card->country . ')';
         }
 
+        // PHP 5.x : Can only pass variable in end()
+        $id_client = $this->card->getCardsByCustomer($payment->metadata['ID Client']);
+        $card_details = end($id_client);
+
         $payment_details = [
             'id' => $payment->id,
             'status' => $pay_status,
@@ -631,8 +635,8 @@ class PayPlugClass extends PaymentModule
             'amount' => (int)$payment->amount / 100,
             'refunded' => (int)$payment->amount_refunded / 100,
             'card_brand' => $pay_brand,
-            'card_mask' => $this->card->getCardMaskByPayment($payment),
-            'card_date' => $this->card->getCardExpiryDateByPayment($payment),
+            'card_mask' => $card_details['last4'],
+            'card_date' => $card_details['exp_month'] . '/' . $card_details['exp_year'],
             'mode' => ($payment->is_live)
                 ? $this->l('payplug.buildPaymentDetails.live')
                 : $this->l('payplug.buildPaymentDetails.test'),
