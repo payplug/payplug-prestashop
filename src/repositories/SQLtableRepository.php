@@ -212,6 +212,23 @@ class SQLtableRepository
             return false;
         }
 
+        // Create PayPlug Order state type
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_ . 'payplug_order_state')
+            ->fields('`id_payplug_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_order_state` INT(11) UNSIGNED NOT NULL')
+            ->fields('`type` VARCHAR(64) NOT NULL')
+            ->fields('`date_add` DATETIME NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->condition('CONSTRAINT order_state_unique UNIQUE (id_order_state)')
+            ->engine(_MYSQL_ENGINE_);
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: PAYPLUG_ORDER_STATE.');
+            return false;
+        }
+
         $log->info('Installation SQL ended.');
         return true;
     }
@@ -238,6 +255,7 @@ class SQLtableRepository
             _DB_PREFIX_.'payplug_logger',
             _DB_PREFIX_.'payplug_cache',
             _DB_PREFIX_.'payplug_order_payment',
+            _DB_PREFIX_.'payplug_order_state',
         ];
 
         if (!$keep_cards) {

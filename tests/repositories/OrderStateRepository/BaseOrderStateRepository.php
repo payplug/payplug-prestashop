@@ -48,7 +48,8 @@ class BaseOrderStateRepository extends RepositoryBase
             $this->order_state_specific,
             $this->query,
             $this->tools,
-            $this->validate
+            $this->validate,
+            $this->myLogPhp
         ])->makePartial();
     }
 }

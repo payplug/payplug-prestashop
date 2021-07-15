@@ -23,8 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\MyLogPHP;
-use PayPlug\src\specific\OrderStateSpecific;
+use PayPlug\classes\ConfigClass;
 
 class InstallRepository extends Repository
 {
@@ -75,7 +74,8 @@ class InstallRepository extends Repository
         $sql,
         $tools,
         $validate,
-        $payplug
+        $payplug,
+        $mylogphp
     ) {
         $this->config = $config;
         $this->constant = $constant;
@@ -87,10 +87,8 @@ class InstallRepository extends Repository
         $this->sql = $sql;
         $this->tools = $tools;
         $this->validate = $validate;
-
         $this->payplug = $payplug;
-
-        $this->log = new MyLogPHP($this->constant->get('_PS_MODULE_DIR_') . 'payplug/log/install-log.csv');
+        $this->log = $mylogphp;
 
         $this->setParams();
     }
@@ -126,65 +124,6 @@ class InstallRepository extends Repository
     }
 
     /**
-     * @description Check if current configuration requirements are respected
-     * @return array
-     */
-    public function checkRequirements()
-    {
-        $php_min_version = 50600;
-        $curl_min_version = '7.21';
-        $openssl_min_version = 0x1000100f;
-        $report = [
-            'php' => [
-                'version' => 0,
-                'installed' => true,
-                'up2date' => false,
-            ],
-            'curl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-            'openssl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-        ];
-
-        //PHP
-        if (!defined('PHP_VERSION_ID')) {
-            $report['php']['version'] = PHP_VERSION;
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
-
-        //cURL
-        $curl_exists = extension_loaded('curl');
-        if ($curl_exists) {
-            $curl_version = curl_version();
-            $report['curl']['version'] = $curl_version['version'];
-            $report['curl']['installed'] = true;
-            $report['curl']['up2date'] = version_compare(
-                $curl_version['version'],
-                $curl_min_version,
-                '>='
-            ) ? true : false;
-        }
-
-        //OpenSSl
-        $openssl_exists = extension_loaded('openssl');
-        if ($openssl_exists) {
-            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
-            $report['openssl']['installed'] = true;
-            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
-        }
-
-        return $report;
-    }
-
-    /**
      * @description Create usual status
      * @return bool
      */
@@ -197,6 +136,37 @@ class InstallRepository extends Repository
         }
 
         $this->order_state->removeIdsUnusedByPayPlug();
+        return true;
+    }
+
+    /**
+     * @description Create usual status
+     * @return bool
+     */
+    public function createOrderStatesType()
+    {
+        $this->log->info('Execute createOrderStatesType');
+        $order_states_list = $this->order_state_entity->getList();
+        foreach ($order_states_list as $key => $state) {
+            // live status
+            $live_key = $this->order_state->getConfigKey($key, false);
+            $id_order_state_live = $this->config->get($live_key);
+            $this->log->info('Live key : ' . $live_key . ' / Id Order State: ' . $id_order_state_live);
+            if ($id_order_state_live) {
+                $res = $this->order_state->saveType((int)$id_order_state_live, $state['type']);
+                $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
+            }
+
+            // sandbox status
+            $sandbox_key = $this->order_state->getConfigKey($key, true);
+            $id_order_state_sandbox = $this->config->get($sandbox_key);
+            $this->log->info('Sandbox key : ' . $sandbox_key . ' / Id Order State: ' . $id_order_state_sandbox);
+            if ($id_order_state_sandbox) {
+                $res = $this->order_state->setType((int)$id_order_state_sandbox, $state['type']);
+                $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
+            }
+        }
+
         return true;
     }
 
@@ -265,15 +235,15 @@ class InstallRepository extends Repository
         $this->log->info('Starting to install again.');
 
         // check requirement
-        $report = $this->checkRequirements();
+        $report = ConfigClass::checkRequirements();
         if (!$report['php']['up2date']) {
-            return $this->setInstallError('Install failed: PHP Requirement.');
+            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
         }
         if (!$report['curl']['up2date']) {
-            return $this->setInstallError('Install failed: cURL Requirement.');
+            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
         }
         if (!$report['openssl']['up2date']) {
-            return $this->setInstallError('Install failed: OpenSSL Requirement.');
+            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
         }
 
         // Check if multishop feature is active then set the context
@@ -286,19 +256,24 @@ class InstallRepository extends Repository
             return $this->setInstallError('Install failed:setConfig()');
         }
 
-        // Install order state
-        if (!$this->createOrderStates()) {
-            return $this->setInstallError('Install failed: Create order states.');
-        }
-
         // Install SQL
         if (!$this->sql->installSQL()) {
             return $this->setInstallError('Install failed: Install SQL tables.');
         }
 
+        // Install order state
+        if (!$this->createOrderStates()) {
+            return $this->setInstallError('Install failed: Create order states.');
+        }
+
+        // Install order state type
+        if (!$this->createOrderStatesType()) {
+            return $this->setInstallError('Install failed: Create order states type.');
+        }
+
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab()) {
-            return $this->setInstallError('Install failed: Install Tab');
+            return $this->setInstallError($this->l('Install failed: Install Tab'));
         }
 
         $this->log->info('Install successful.');
@@ -385,6 +360,7 @@ class InstallRepository extends Repository
                     'es' => 'Pago efectuado',
                     'it' => 'Pagamento effettuato',
                 ],
+                'type' => 'paid',
             ],
             'refund' => [
                 'cfg' => 'PS_OS_REFUND',
@@ -403,6 +379,7 @@ class InstallRepository extends Repository
                     'es' => 'Reembolsado',
                     'it' => 'Rimborsato',
                 ],
+                'type' => 'refund',
             ],
             'pending' => [
                 'cfg' => 'PS_OS_PENDING',
@@ -421,6 +398,7 @@ class InstallRepository extends Repository
                     'es' => 'Pago en curso',
                     'it' => 'Pagamento in corso',
                 ],
+                'type' => 'pending',
             ],
             'error' => [
                 'cfg' => 'PS_OS_ERROR',
@@ -439,6 +417,26 @@ class InstallRepository extends Repository
                     'es' => 'Payment failed',
                     'it' => 'Payment failed',
                 ],
+                'type' => 'error',
+            ],
+            'cancel' => [
+                'cfg' => 'PS_OS_CANCELED',
+                'template' => 'order_canceled',
+                'logable' => false,
+                'send_email' => true,
+                'paid' => false,
+                'module_name' => 'payplug',
+                'hidden' => false,
+                'delivery' => false,
+                'invoice' => false,
+                'color' => '#2C3E50',
+                'name' => [
+                    'en' => 'Payment cancelled',
+                    'fr' => 'Paiement annulé',
+                    'es' => 'Payment cancelled',
+                    'it' => 'Payment cancelled',
+                ],
+                'type' => 'cancel',
             ],
             'auth' => [
                 'cfg' => null,
@@ -457,6 +455,7 @@ class InstallRepository extends Repository
                     'es' => 'Pago',
                     'it' => 'Pagamento',
                 ],
+                'type' => 'pending',
             ],
             'exp' => [
                 'cfg' => null,
@@ -475,6 +474,7 @@ class InstallRepository extends Repository
                     'fr' => 'Autorisation expirée',
                     'it' => 'Autorizzazione scaduta',
                 ],
+                'type' => 'exp',
             ],
             'oney_pg' => [
                 'cfg' => null,
@@ -493,6 +493,7 @@ class InstallRepository extends Repository
                     'es' => 'Oney - Pending',
                     'it' => 'Oney - Pending',
                 ],
+                'type' => 'pending',
             ]
         ]);
     }
