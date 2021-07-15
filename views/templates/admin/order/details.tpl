@@ -76,7 +76,7 @@
         <li>
             <span class="pp_col1">{l s='Card mask' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="card_mask">
-                {$payment.card_mask|escape:'htmlall':'UTF-8'}
+                **** **** **** {$payment.card_mask|escape:'htmlall':'UTF-8'}
             </span>
         </li>
     {/if}
@@ -86,7 +86,7 @@
             <span class="pp_col2" data-e2e-payment-details="tds">{$payment.tds|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
-    {if isset($payment.card_date) && ($payment.card_date)}
+    {if isset($payment.card_date) && ($payment.card_date) && ($payment.card_date != '/')}
         <li>
             <span class="pp_col1">{l s='Expiry Date' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="card_date">
