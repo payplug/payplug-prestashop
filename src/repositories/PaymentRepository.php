@@ -180,7 +180,7 @@ class PaymentRepository extends Repository
     public function returnPaymentError($element = [], $errorMessage = null, $level = 'error')
     {
         if (!$errorMessage || !is_string($errorMessage)) {
-            $errorMessage = '[PaymentRepository] Error during payment creation process.';
+            $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
         }
 
         $this->payplug->setPaymentErrorsCookie([
@@ -356,6 +356,13 @@ class PaymentRepository extends Repository
         $paymentDate = date('Y-m-d H:i:s');
 
         $cartHash = $this->getHashedCart($paymentDetails);
+
+        if (isset($cartHash['result']) && !$cartHash['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[updatePaymentTable] Problem with the getHashedCart method.'
+            );
+        }
 
         if (!$cartHash || !is_string($cartHash)) {
             return $this->returnPaymentError(
@@ -547,13 +554,14 @@ class PaymentRepository extends Repository
         }
 
         $paymentDate = date('Y-m-d H:i:s');
+        $cartHash = $this->getHashedCart($paymentDetails);
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
-
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        if (isset($cartHash['result']) && !$cartHash['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] Problem with the getHashedCart method.'
+            );
+        }
 
         $this->query
             ->insert()
