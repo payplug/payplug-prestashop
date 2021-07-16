@@ -1856,14 +1856,15 @@ class PayPlugClass extends PaymentModule
         $id_client = $this->card->getCardsByCustomer($payment->metadata['ID Client']);
         $card_details = end($id_client);
 
-        // Card brand + country
+        // Card brand
         $card_brand = null;
-        if (isset($card_details['brand']) && !empty($card_details['brand'])) {
-            $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
-        }
+        if (isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
+            $card_brand = $this->l('payplug.adminAjaxController.card').' '.$card_details['brand'];
 
-        if (isset($card_details['country']) && !empty($card_details['country'])) {
-            $card_brand .= ' (' . $card_details['country'] . ')';
+            // Country
+            if ($card_brand && isset($card_details['country']) && !empty($card_details['country'])) {
+                $card_brand .= ' (' . $card_details['country'] . ')';
+            }
         }
 
         // Card mask
