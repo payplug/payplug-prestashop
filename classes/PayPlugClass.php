@@ -71,7 +71,7 @@ class PayPlugClass extends PaymentModule
     public $orderClass;
     /** @var PayPlugConfiguration */
     public $configuration;
-/** @var array */
+    /** @var array */
     public $errors = [];
     public $logger;
     public $oney;
@@ -1859,27 +1859,24 @@ class PayPlugClass extends PaymentModule
         // Card brand + country
         $card_brand = null;
         if (isset($card_details['brand']) && !empty($card_details['brand'])) {
-            $card_brand = $card_details['brand'];
+            $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
         }
 
         if (isset($card_details['country']) && !empty($card_details['country'])) {
-            $card_brand .= ' ('.$card_details['country'].')';
+            $card_brand .= ' (' . $card_details['country'] . ')';
         }
 
         // Card mask
         $card_mask = null;
         if (isset($card_details['last4']) && !empty($card_details['last4'])) {
-            $card_mask = $card_details['last4'];
+            $card_mask = '**** **** **** ' . $card_details['last4'];
         }
 
         // Card exp. date
         $card_date = null;
-        if (isset($card_details['exp_month']) && !empty($card_details['exp_month'])) {
-            $card_date = $card_details['exp_month'];
-        }
-
-        if (isset($card_details['exp_year']) && !empty($card_details['exp_year']) && $card_date) {
-            $card_date .= '/' . $card_details['exp_year'];
+        if ((isset($card_details['exp_month']) && !empty($card_details['exp_month']))
+            && (isset($card_details['exp_year']) && !empty($card_details['exp_year']))) {
+            $card_date = $card_details['exp_month'] . '/' . $card_details['exp_year'];
         }
 
         $payment_details = [
