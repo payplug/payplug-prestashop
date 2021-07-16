@@ -1411,7 +1411,7 @@ class PayPlugClass extends PaymentModule
             $inst_status = $installment->is_active ?
                 $this->l('payplug.hookDisplayAdminOrderMain.ongoing') :
                 (
-                $installment->is_fully_paid ?
+                    $installment->is_fully_paid ?
                     $this->l('payplug.hookDisplayAdminOrderMain.paid') :
                     $this->l('payplug.hookDisplayAdminOrderMain.suspended')
                 );
@@ -2517,9 +2517,9 @@ class PayPlugClass extends PaymentModule
 
             // check billing phonenumber
             if (!$payment_tab['billing']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
-                    $payment_tab['billing']['mobile_phone_number'],
-                    $payment_tab['billing']['country']
-                )) {
+                $payment_tab['billing']['mobile_phone_number'],
+                $payment_tab['billing']['country']
+            )) {
                 if (ConfigClass::isValidMobilePhoneNumber(
                     $payment_tab['billing']['landline_phone_number'],
                     $payment_tab['billing']['country']
@@ -2530,9 +2530,9 @@ class PayPlugClass extends PaymentModule
 
             // check shipping phonenumber
             if (!$payment_tab['shipping']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
-                    $payment_tab['shipping']['mobile_phone_number'],
-                    $payment_tab['shipping']['country']
-                )) {
+                $payment_tab['shipping']['mobile_phone_number'],
+                $payment_tab['shipping']['country']
+            )) {
                 if (ConfigClass::isValidMobilePhoneNumber(
                     $payment_tab['shipping']['landline_phone_number'],
                     $payment_tab['shipping']['country']
