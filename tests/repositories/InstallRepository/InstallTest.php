@@ -47,7 +47,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidPHPRequirement()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -76,7 +76,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidCurlRequirement()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -99,7 +99,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidOpenSSLRequirement()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -122,7 +122,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidConfigInstall()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -134,7 +134,11 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ],
+                ]
+            ]);
+
+        $this->repo
+            ->shouldReceive([
                 'setConfig' => false
             ]);
 
@@ -144,34 +148,9 @@ final class InstallTest extends BaseInstallRepository
         );
     }
 
-    public function testWithInvalidOrderStateInstall()
-    {
-        $this->repo
-            ->shouldReceive([
-                'checkRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
-                ],
-                'setConfig' => true,
-                'createOrderStates' => false
-            ]);
-
-        $this->assertSame(
-            'Install failed: Create order states.',
-            $this->repo->install()
-        );
-    }
-
     public function testWithInvalidSqlInstall()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -183,9 +162,12 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ],
-                'setConfig' => true,
-                'createOrderStates' => true
+                ]
+            ]);
+
+        $this->repo
+            ->shouldReceive([
+                'setConfig' => true
             ]);
 
         $this->sql
@@ -199,9 +181,9 @@ final class InstallTest extends BaseInstallRepository
         );
     }
 
-    public function testWithInvalidTableInstall()
+    public function testWithInvalidOrderStateInstall()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -213,9 +195,83 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ],
+                ]
+            ]);
+
+        $this->repo
+        ->shouldReceive([
+            'setConfig' => true,
+            'createOrderStates' => false
+        ]);
+
+        $this->sql
+            ->shouldReceive([
+                'installSQL' => true
+            ]);
+
+        $this->assertSame(
+            'Install failed: Create order states.',
+            $this->repo->install()
+        );
+    }
+
+    public function testWithInvalidOrderStateTypeInstall()
+    {
+        $this->configClass
+            ->shouldReceive([
+                'checkRequirements' => [
+                    'php' => [
+                        'up2date' => true,
+                    ],
+                    'curl' => [
+                        'up2date' => true,
+                    ],
+                    'openssl' => [
+                        'up2date' => true,
+                    ],
+                ]
+            ]);
+
+        $this->repo
+            ->shouldReceive([
                 'setConfig' => true,
-                'createOrderStates' => true
+                'createOrderStates' => true,
+                'createOrderStatesType' => false
+            ]);
+
+        $this->sql
+            ->shouldReceive([
+                'installSQL' => true
+            ]);
+
+        $this->assertSame(
+            'Install failed: Create order states type.',
+            $this->repo->install()
+        );
+    }
+
+    public function testWithInvalidTableInstall()
+    {
+        $this->configClass
+            ->shouldReceive([
+                'checkRequirements' => [
+                    'php' => [
+                        'up2date' => true,
+                    ],
+                    'curl' => [
+                        'up2date' => true,
+                    ],
+                    'openssl' => [
+                        'up2date' => true,
+                    ],
+                ]
+            ]);
+
+        $this->repo
+            ->shouldReceive([
+                'setConfig' => true,
+                'createOrderStates' => true,
+                'createOrderStatesType' => true
             ]);
 
         $this->sql
@@ -237,7 +293,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testValidInstallation()
     {
-        $this->repo
+        $this->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -249,9 +305,14 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ],
+                ]
+            ]);
+
+        $this->repo
+            ->shouldReceive([
                 'setConfig' => true,
-                'createOrderStates' => true
+                'createOrderStates' => true,
+                'createOrderStatesType' => true
             ]);
 
         $this->sql

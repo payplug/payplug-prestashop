@@ -24,6 +24,7 @@
 namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\tests\mock\AddresstMock;
+use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\PaymentTabMock;
 use PayPlug\tests\mock\CountryMock;
 
@@ -41,6 +42,9 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     {
         parent::setUp();
 
+        $this->context
+            ->shouldReceive('getContext')
+            ->andReturn(ContextMock::get());
         $this->country->shouldReceive('getCountry')
             ->andReturn(CountryMock::get());
 
@@ -97,6 +101,10 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithValidDataProvider($parameter)
     {
         $field = ['shipping-' . $parameter => $this->tab[$parameter]];
+        $this->configClass
+            ->shouldReceive([
+                'isValidMobilePhoneNumber' => true
+            ]);
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(
@@ -129,6 +137,10 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidDataProvider($parameter, $expected)
     {
         $field = ['shipping-' . $parameter => null];
+        $this->configClass
+            ->shouldReceive([
+                'isValidMobilePhoneNumber' => false
+            ]);
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(

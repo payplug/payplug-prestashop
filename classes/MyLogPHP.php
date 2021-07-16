@@ -44,7 +44,7 @@ class MyLogPHP
      * @param string $logfilename Path and name of the file log.
      * @param string $separator Character used for separate the field values.
      */
-    public function __construct($logfilename = './_MyLogPHP-debug.log.csv', $separator = ',')
+    public function __construct($logfilename = './install-log.csv', $separator = ',')
     {
         $this->LOGFILENAME = $logfilename;
         $this->SEPARATOR = $separator;
