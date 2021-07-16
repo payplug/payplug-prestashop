@@ -1,0 +1,320 @@
+<?php
+/**
+ * 2013 - 2021 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+namespace PayPlug\classes;
+
+use Configuration;
+use OrderHistory;
+use OrderState;
+use PayPlug\backward\PayPlugBackward;
+use PayPlug\src\specific\ContextSpecific;
+use Tools;
+use Validate;
+
+class AdminClass extends \Payplug
+{
+    private $apiClass;
+    private $configClass;
+    private $contextSpecific;
+    private $html = '';
+    private $mediaClass;
+    private $paymentRepository;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->apiClass = $this->module->apiClass;
+        $this->configClass = $this->module->configClass;
+        $this->mediaClass = new MediaClass($this->module);
+        $this->paymentRepository = $this->module;
+        $this->contextSpecific = (new ContextSpecific())->getContext();
+    }
+
+    /**
+     * @param string $controller_name
+     * @param int $id_order
+     * @param string $name
+     * @return string
+     */
+    public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0, $name = 'payplug')
+    {
+        if ($controller_name == 'AdminModules') {
+            $admin_ajax_url = 'index.php?controller=' . $controller_name . '&configure=' . $name
+                . '&tab_module=payments_gateways&module_name=payplug&token=' .
+                Tools::getAdminTokenLite($controller_name);
+        } elseif ($controller_name == 'AdminOrders') {
+            $admin_ajax_url = 'index.php?controller=' . $controller_name . '&id_order=' . $id_order
+                . '&vieworder&token=' . Tools::getAdminTokenLite($controller_name);
+        }
+        return $admin_ajax_url;
+    }
+
+    /**
+     * @return string
+     * @see Module::getContent()
+     *
+     */
+    public function getContent()
+    {
+        if (Tools::getValue('_ajax')) {
+            $this->adminAjaxController();
+        }
+
+        $this->configClass->postProcess();
+
+        $this->configClass->assignContentVar();
+
+        $this->html .= $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        return $this->html;
+    }
+
+    /**
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public function adminAjaxController()
+    {
+        if (!Tools::getValue('_ajax', false)) {
+            return;
+        }
+
+        if (Tools::getValue('popin')) {
+            $args = null;
+            if (Tools::getValue('type') == 'confirm') {
+                $keys = [
+                    'sandbox',
+                    'embedded',
+                    'standard',
+                    'one_click',
+                    'oney',
+                    'installment',
+                    'activate',
+                    'deferred',
+                ];
+                $args = [];
+                foreach ($keys as $key) {
+                    $args[$key] = Tools::getValue($key);
+                }
+            }
+            $this->mediaClass->displayPopin(Tools::getValue('type'), $args);
+        }
+
+        if (Tools::getValue('submitSettings')) {
+            if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
+                $this->displayError($this->l('payplug.adminAjaxController.settingsNotUpdated'));
+
+                die(json_encode(['error' => $this->l('payplug.adminAjaxController.settingsNotUpdated')]));
+            } else {
+                if (Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
+                    $id_order_state = Tools::getValue('payplug_deferred_state');
+                    $order_state = new OrderState($id_order_state, $this->contextSpecific->language->id);
+                    if (Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                        $this->contextSpecific->smarty->assign([
+                            'updated_deferred_state' => true,
+                            'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
+                            'updated_deferred_state_name' => $order_state->name,
+                            'admin_orders_link' => $this->configClass
+                                ->getSpecificPrestaClasse()
+                                ->getOrdersByStateLink(
+                                    Tools::getValue('payplug_deferred_state')
+                                ),
+                        ]);
+                    }
+                }
+                $this->configClass->saveConfiguration();
+
+                $this->configClass->assignContentVar();
+                $content = $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+
+                $this->contextSpecific->smarty->assign([
+                    'title' => '',
+                    'type' => 'save',
+                ]);
+                $popin = $this->module->fetchTemplate('/views/templates/admin/popin.tpl');
+
+                die(json_encode(['popin' => $popin, 'content' => $content]));
+            }
+        }
+
+        if (Tools::isSubmit('submitAccount')) {
+            $this->configClass->submitAccount();
+        }
+
+        if (Tools::getValue('submitPwd')) {
+            $password = Tools::getValue('password');
+            if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
+                die(json_encode([
+                    'content' => null,
+                    'error' => $this->l('payplug.adminAjaxController.passwordInvalid')
+                ]));
+            }
+
+            $email = Configuration::get('PAYPLUG_EMAIL');
+
+            if ($this->apiClass->login($email, $password)) {
+                $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+                if ((bool)$api_key) {
+                    Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 0);
+                    $this->configClass->assignContentVar();
+                    $content = $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+                    die(json_encode(['content' => $content]));
+                } else {
+                    $this->contextSpecific->smarty->assign([
+                        'title' => '',
+                        'type' => 'activate',
+                    ]);
+                    $popin = $this->module->fetchTemplate('/views/templates/admin/popin.tpl');
+                    die(json_encode(['popin' => $popin]));
+                }
+            } else {
+                die(json_encode([
+                    'content' => null,
+                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect')
+                ]));
+            }
+
+            $this->submitPopinPwd($password);
+        }
+
+        if (Tools::getValue('submit') == 'submitPopin_abort') {
+            $this->paymentRepository->abortPayment();
+        }
+        if ((int)Tools::getValue('check') == 1) {
+            $content = $this->configClass->getCheckFieldset();
+            die(json_encode(['content' => $content]));
+        }
+        if ((int)Tools::getValue('log') == 1) {
+            $content = $this->getLogin();
+            die(json_encode(['content' => $content]));
+        }
+        if ((int)Tools::getValue('checkPremium') == 1) {
+            $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+            $permissions = $this->apiClass->getAccountPermissions($api_key);
+            $return = [
+                'payplug_sandbox' => $permissions['use_live_mode'],
+                'payplug_one_click' => $permissions['can_save_cards'],
+                'payplug_oney' => $permissions['can_use_oney'],
+                'payplug_inst' => $permissions['can_create_installment_plan'],
+                'payplug_deferred' => $permissions['can_create_deferred_payment'],
+            ];
+            die(json_encode($return));
+        }
+        if (Tools::getValue('has_live_key')) {
+            die(json_encode(['result' => ApiClass::hasLiveKey()]));
+        }
+        if ((int)Tools::getValue('refund') == 1) {
+            $this->paymentRepository->refundPayment();
+        }
+        if ((int)Tools::getValue('capture') == 1) {
+            $this->paymentRepository->capturePayment();
+        }
+        if ((int)Tools::getValue('popinRefund') == 1) {
+            $popin = $this->mediaClass->displayPopin('refund');
+            die(json_encode(['content' => $popin]));
+        }
+        if ((int)Tools::getValue('update') == 1) {
+            $pay_id = Tools::getValue('pay_id');
+            $payment = $this->apiClass->retrievePayment($pay_id);
+            $id_order = Tools::getValue('id_order');
+
+            if ((int)$payment->is_paid == 1) {
+                if ($payment->is_live == 1) {
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
+                } else {
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST');
+                }
+            } elseif ((int)$payment->is_paid == 0) {
+                if ($payment->is_live == 1) {
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR');
+                } else {
+                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR_TEST');
+                }
+            }
+
+            $order = new Order((int)$id_order);
+            if (Validate::isLoadedObject($order)) {
+                $current_state = (int)$order->getCurrentState();
+                if ($current_state != 0 && $current_state != $new_state) {
+                    $history = new OrderHistory();
+                    $history->id_order = (int)$order->id;
+                    $history->changeIdOrderState($new_state, (int)$order->id);
+                    $history->addWithemail();
+                }
+            }
+
+            die(json_encode([
+                'message' => $this->l('payplug.adminAjaxController.orderUpdated'),
+                'reload' => true
+            ]));
+        }
+    }
+
+    /**
+     * @description submit password
+     *
+     * @param string $pwd
+     * @return string
+     */
+    public function submitPopinPwd($pwd)
+    {
+        $email = Configuration::get('PAYPLUG_EMAIL');
+        $connected = $this->apiClass->login($email, $pwd);
+        $use_live_mode = false;
+
+        if ($connected) {
+            if (Configuration::get('PAYPLUG_LIVE_API_KEY') != '') {
+                $use_live_mode = true;
+
+                $valid_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+                $permissions = $this->apiClass->getAccount($valid_key);
+                $can_save_cards = $permissions['can_save_cards'];
+                $can_create_installment_plan = $permissions['can_create_installment_plan'];
+            }
+        } else {
+            die(json_encode(['content' => 'wrong_pwd']));
+        }
+        if (!$use_live_mode) {
+            die(json_encode(['content' => 'activate']));
+        } elseif ($can_save_cards && $can_create_installment_plan) {
+            die(json_encode(['content' => 'live_ok']));
+        } elseif ($can_save_cards && !$can_create_installment_plan) {
+            die(json_encode(['content' => 'live_ok_no_inst']));
+        } elseif (!$can_save_cards && $can_create_installment_plan) {
+            die(json_encode(['content' => 'live_ok_no_oneclick']));
+        } else {
+            die(json_encode(['content' => 'live_ok_not_premium']));
+        }
+    }
+
+    public function getLogin()
+    {
+        $this->configClass->postProcess();
+
+        $this->configClass->assignContentVar();
+
+        $this->html = $this->module->fetchTemplate('/views/templates/admin/panel/login.tpl');
+
+        return $this->html;
+    }
+}

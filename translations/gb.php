@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Suspend';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Your customer won\'t be charged on the due dates.';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Cancel';
@@ -413,5 +413,10 @@ $_MODULE['<{payplug}prestashop>show_c0a284b3959d1e187e9a7560c76161a5'] = 'Show P
 $_MODULE['<{payplug}prestashop>show_e205336b3b23c2fa65284333c5f0956f'] = 'Display to customers';
 $_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Payment by credit card';
 $_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Offer payment by credit card to your customers.';
+$_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.';
+$_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Empty payment data.';
+$_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'An error occurred. Please retry in few seconds.';
+$_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c84ab97f'] = 'Your information has been saved';
+$_MODULE['<{payplug}prestashop>translationsrepository_f5146f3861c487374c38fb5ec78cda73'] = 'At least one of the fields is not correctly completed.';
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Update';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Update this order';

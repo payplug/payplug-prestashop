@@ -57,7 +57,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     public function renderCardList()
     {
         \Payplug\Payplug::init([
-            'secretKey' => $this->payplug->current_api_key,
+            'secretKey' => $this->payplug->apiClass->current_api_key,
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
 
@@ -80,7 +80,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         ]);
 
         $msg = $this->card->deleteCardMessage();
-        $card_deleted_msg = $this->payplug->displayMessages([$msg], true);
+        $card_deleted_msg = $this->payplug->mediaClass->displayMessages([$msg], true);
 
         Media::addJsDef(['card_deleted_msg' => $card_deleted_msg]);
 
