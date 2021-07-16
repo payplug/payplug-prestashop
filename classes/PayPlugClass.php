@@ -79,7 +79,7 @@ class PayPlugClass extends PaymentModule
     public $constantFile;
     /** @var string */
     public $current_api_key;
-/** @var array */
+    /** @var array */
     public $errors = [];
     public $oney;
     public $oney_order_state = [
@@ -3360,7 +3360,7 @@ class PayPlugClass extends PaymentModule
             $inst_status = $installment->is_active ?
                 $this->l('payplug.hookDisplayAdminOrderMain.ongoing') :
                 (
-                $installment->is_fully_paid ?
+                    $installment->is_fully_paid ?
                     $this->l('payplug.hookDisplayAdminOrderMain.paid') :
                     $this->l('payplug.hookDisplayAdminOrderMain.suspended')
                 );

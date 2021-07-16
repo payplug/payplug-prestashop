@@ -3,7 +3,6 @@
 //namespace Tests;
 use PHPUnit\Framework\TestCase;
 
-
 /**
  * @group unit
  * @group ci
@@ -32,5 +31,4 @@ class PayPlugCacheTest extends TestCase
         $payplug_cache = \PayPlugMock\PayPlugCacheMock::getMock();
         $this->assertEquals(1234, $payplug_cache->id, 'wrong payplug cache id');
     }
-
 }
