@@ -60,7 +60,7 @@
   background: rgba(247, 160, 0, 0.15);
   border-color: #f7a000;
   color: rgba(196, 127, 0, 0.8);
-  /*width: max-content;*/
+  width: max-content;
   margin-bottom: 10px;
 }
 .payplugAlert.-warning:before {
@@ -331,14 +331,13 @@
 }
 #pppanel img.loader {
   display: none;
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   border-radius: 11px;
   opacity: 1;
   z-index: 9999;
   left: 50%;
-  /*margin: -30px;*/
-  margin-top: -5px;
+  margin: -30px;
   position: absolute;
   top: 50%;
   background: none;
@@ -657,22 +656,15 @@ span.ppclose {
   margin: 10px 0 0;
 }
 .payplugOrder {
-  /*display: flex;*/
-  /*flex-wrap: wrap;*/
+  display: flex;
+  flex-wrap: wrap;
   width: 100%;
   flex-direction: column;
 }
 .payplugOrder_delay {
-  /*float: left;*/
-  /*line-height: 27px;*/
-  /*padding: 0 0 0 16px;*/
-  margin-left: 100px;
-  padding-top: 5px;
-}
-@media (max-width: 800px) {
-  .payplugOrder_delay {
-  padding: 0;
-  }
+  float: left;
+  line-height: 27px;
+  padding: 0 0 0 16px;
 }
 .payplugButton {
   font-size: 13px;
