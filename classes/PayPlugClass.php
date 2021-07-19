@@ -3785,8 +3785,8 @@ class PayPlugClass extends PaymentModule
          *
          * PHP 5.x : Can only pass variable in end()
          */
-        $id_client = $this->card->getCardsByCustomer($payment->metadata['ID Client']);
-        $card_details = end($id_client);
+        $card_details = $this->card->getCards($payment);
+        $card_details = end($card_details);
 
         // Card brand
         $card_brand = null;
@@ -4999,7 +4999,7 @@ class PayPlugClass extends PaymentModule
 
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
-        $payplug_cards = $options['one_click'] ? $this->card->getCardsByCustomer((int)$id_customer, true) : [];
+        $payplug_cards = $options['one_click'] ? $this->card->getCards((int)$id_customer, true) : [];
 
         $paymentOption = [];
 
