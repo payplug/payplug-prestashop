@@ -64,7 +64,7 @@ class HookRepository extends Repository
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
+        return $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
     }
 
     /**
@@ -75,10 +75,10 @@ class HookRepository extends Repository
     public function actionObjectOrderStateUpdateAfter($param)
     {
         $order_state = $param['object'];
-        if (isset($order_state->delele) && $order_state->delete) {
-            $this->actionObjectOrderStateDeleteAfter($param);
+        if (isset($order_state->deleted) && $order_state->deleted) {
+            return $this->actionObjectOrderStateDeleteAfter($param);
         }
-        $this->actionObjectOrderStateAddAfter($param);
+        return $this->actionObjectOrderStateAddAfter($param);
     }
 
     /**
@@ -89,7 +89,7 @@ class HookRepository extends Repository
     public function actionObjectOrderStateDeleteAfter($param)
     {
         $order_state = $param['object'];
-        $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
+        return $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
     }
 
     /**
