@@ -41,7 +41,6 @@
                         <i> {l s='Payment with PayPlug' mod='payplug'}</i> {l s='bloc.' mod='payplug'}
                     </p>
                     <p>
-{*                        {l s='Allow customers to spread out payments over 2, 3 or 4 installments.' mod='payplug'}*}
                         <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                     </p>
 
