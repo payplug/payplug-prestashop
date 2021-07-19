@@ -108,7 +108,7 @@ class PrestashopSpecific17
         $integrated['tpl'] = 'integrated.tpl';
         $integrated['logo'] = false;
         $integrated['extra_classes'] = 'payplug integrated';
-        $integrated['callToActionText'] = $this->l('specific17.getIntegratedPaymentOption.label');
+        $integrated['callToActionText'] = $this->payplug->l('specific17.getIntegratedPaymentOption.label', 'prestashopspecific17');
         $integrated['additionalInformation'] =  $this->payplug->fetchTemplate('checkout/integrated.tpl');
 
         $payment_options['integrated'] = $integrated;

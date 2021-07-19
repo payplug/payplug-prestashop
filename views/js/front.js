@@ -110,7 +110,7 @@ var $document, $window, payplugModule = {
             });
         },
         set: function () {
-            if (typeof Payplug == 'undefined') {
+            if (typeof Payplug == 'undefined' || typeof payplug_publishable_key == 'undefined') {
                 console.log('Payplug api is ' + typeof Payplug);
                 return;
             }
