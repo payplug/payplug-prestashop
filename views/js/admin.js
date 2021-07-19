@@ -406,7 +406,7 @@ var $document, $window, payplug = {
             var {login} = payplug,
                 {identifier} = login.props;
 
-            if (typeof event.keyCode == 'undefined') {
+            if (typeof event.keyCode != 'undefined' && parseInt(event.keyCode) == 13) {
                 var {tools} = payplug,
                     email = $('input[name=PAYPLUG_EMAIL]').val(),
                     pwd = $('input[name=PAYPLUG_PASSWORD]').val();
@@ -414,11 +414,10 @@ var $document, $window, payplug = {
                 if (!tools.validate.isEmail(email) || !pwd.length) {
                     return;
                 }
-            } else if (parseInt(event.keyCode) != 13) {
-                return;
+
+                $('.' + identifier + '_login').trigger('click');
             }
 
-            $('.' + identifier + '_login').trigger('click');
         },
         login: function (event) {
             event.preventDefault();

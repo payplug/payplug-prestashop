@@ -84,30 +84,42 @@ var $document, $window, payplugModule = {
             paymentId: null,
             form: {},
             api: null,
+            initialized : false,
+            setted : false,
         },
         init: function () {
             var integrated = payplugModule.integrated,
-                $form = $('.' + integrated.props.identifier),
-                $submitButton = $form.find('.' + integrated.props.identifier + '_button');
+                $intForm = $('.' + integrated.props.identifier),
+                $submitButton = $('.' + integrated.props.identifier + '_button'),
+                $checkoutform = $('.checkout-step form');
 
-            if (!$form.length) {
+            if (!$intForm.length) {
                 return false;
             }
 
-            $window.on('load', integrated.set);
-            $submitButton.on('click', integrated.submit);
+            if (integrated.props.initialized) {
+                return false;
+            }
+            integrated.props.initialized = true;
 
-            $('.checkout-step form').submit(function(event){
-                var $container = $form.parents('.additional-information'),
-                    payment_option_id = $container.attr('id').replace('payment-option-','').replace('-additional-information',''),
-                    $payment_option = $('#payment-option-' + payment_option_id);
+            if ($checkoutform.length) {
+                $submitButton.hide();
+            }
 
+            var $optionContainer = $intForm.parents('.additional-information'),
+                payment_option_id = $optionContainer.attr('id').replace('payment-option-','').replace('-additional-information',''),
+                $payment_option = $('#payment-option-' + payment_option_id);
+
+            $checkoutform.on('submit', function(event){
                 if($payment_option.is(':checked')) {
                     event.preventDefault();
                     event.stopPropagation();
                     integrated.submit();
                 }
             });
+            $submitButton.on('click', integrated.submit);
+            $payment_option.on('click', integrated.set);
+            $window.on('load', integrated.set);
         },
         set: function () {
             if (typeof Payplug == 'undefined' || typeof payplug_publishable_key == 'undefined') {
@@ -117,6 +129,11 @@ var $document, $window, payplugModule = {
 
             var integrated = payplugModule.integrated;
 
+            if (integrated.props.setted) {
+                return;
+            }
+
+            integrated.props.setted = true;
             integrated.props.api = Payplug;
 
             var api = integrated.props.api,
@@ -125,24 +142,58 @@ var $document, $window, payplugModule = {
                 $pan = $form.find('.-pan'),
                 $cvv = $form.find('.-cvv'),
                 $exp = $form.find('.-exp'),
-                intPayment = new api.IntegratedPayment(payplug_publishable_key, $form.get(0));
+                intPayment = new api.IntegratedPayment(payplug_publishable_key, $form.get(0)),
+                form = {
+                    intPayment: intPayment,
+                    cholder: intPayment.cardHolder($cardholder.get(0)),
+                    pan: intPayment.cardNumber($pan.get(0)),
+                    cvv: intPayment.cvv($cvv.get(0)),
+                    exp: intPayment.expiration($exp.get(0)),
+                };
 
-            intPayment.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX);
+            form.intPayment.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX);
+            form.cholder.onChange((event) => {
+                console.log('test');
+                if (event.valid) {
+                    $cardholder.removeClass('-error');
+                } else {
+                    $cardholder.addClass('-error');
+                }
+            });
+            form.pan.onChange((event) => {
+                if (event.valid) {
+                    $pan.removeClass('-error');
+                } else {
+                    $pan.addClass('-error');
+                }
+            });
+            form.cvv.onChange((event) => {
+                if (event.valid) {
+                    $cvv.removeClass('-error');
+                } else {
+                    $cvv.addClass('-error');
+                }
+            });
+            form.exp.onChange((event) => {
+                if (event.valid) {
+                    $exp.removeClass('-error');
+                } else {
+                    $exp.addClass('-error');
+                }
+            });
+
+            integrated.props.form = form;
 
             // Implement your own retrieve function from back end
             intPayment.onCompleted(function(payment_id){
                 integrated.confirm(payment_id);
             });
-
-            integrated.props.form = {
-                intPayment: intPayment,
-                cholder: intPayment.cardHolder($cardholder.get(0)),
-                pan: intPayment.cardNumber($pan.get(0)),
-                cvv: intPayment.cvv($cvv.get(0)),
-                exp: intPayment.expiration($exp.get(0)),
-            };
         },
-        submit: function () {
+        submit: function (event) {
+            if (typeof event != 'undefined') {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             var integrated = payplugModule.integrated,
                 data = {
                     _ajax: 1,
@@ -185,6 +236,7 @@ var $document, $window, payplugModule = {
             var integrated = payplugModule.integrated,
                 props = integrated.props,
                 api = props.api,
+                form = props.form,
                 paymentId = props.paymentId,
                 intPayment = props.form.intPayment,
                 $input = $('.' + props.identifier + '_input.-saveCard').find('input'),
@@ -221,13 +273,16 @@ var $document, $window, payplugModule = {
                     console.log(errorThrown);
                 },
                 success: function (response) {
-                    console.log(response);
                     if (response.result) {
                         if (typeof response.message != 'undefined' && response.message) {
                             payplugModule.popup.set(response.message);
                         }
                         if (typeof response.return_url != 'undefined' && response.return_url) {
                             window.location.href = response.return_url;
+                        }
+                    } else {
+                        if (typeof response.message != 'undefined' && response.message) {
+                            payplugModule.popup.set(response.message);
                         }
                     }
                 }

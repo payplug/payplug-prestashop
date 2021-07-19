@@ -248,6 +248,11 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             'message' => $this->l('ajax.postProcess.paymentValidated')
                         ]));
                     }
+
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $this->l('ajax.postProcess.errorOccured')
+                    ]));
                 }
 
                 $payment = $this->payplug->preparePayment(['is_integrated' => 1]);

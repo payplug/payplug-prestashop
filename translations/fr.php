@@ -367,8 +367,8 @@ $_MODULE['<{payplug}prestashop>prestashopspecific16_16bfbf9c462762cf1cba4134ec53
 $_MODULE['<{payplug}prestashop>pwd_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>pwd_d698469a293eb8d935d4e9496c53caed'] = 'Veuillez saisir votre mot de passe de votre compte PayPlug';
 $_MODULE['<{payplug}prestashop>pwd_ea4788705e6873b424c65e91c2846b19'] = 'Annuler';
-$_MODULE['<{payplug}prestashop>refund_01ddb6831cdf22a0055a2a42a09482d6'] = 'Montant disponible pour effectuer un remboursement avec Payplug :';
-$_MODULE['<{payplug}prestashop>refund_1666e5c37779e7041dd51aa3d10eff61'] = 'Montant déjà remboursé avec Payplug :';
+$_MODULE['<{payplug}prestashop>refund_01ddb6831cdf22a0055a2a42a09482d6'] = 'Montant disponible pour effectuer un remboursement avec PayPlug :';
+$_MODULE['<{payplug}prestashop>refund_1666e5c37779e7041dd51aa3d10eff61'] = 'Montant déjà remboursé avec PayPlug :';
 $_MODULE['<{payplug}prestashop>refund_3e220cc8128d7b270226d79b84ebce33'] = 'Le remboursement sera possible 48h après la dernière transaction de paiement ou de remboursement.';
 $_MODULE['<{payplug}prestashop>refund_4bf290898e0226ffb1041cd114347e4d'] = 'Rembourser avec PayPlug';
 $_MODULE['<{payplug}prestashop>refund_554cd9e547629109b77e4c60ddd44da3'] = 'Montant à rembourser';

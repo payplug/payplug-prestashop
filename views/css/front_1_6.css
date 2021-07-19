@@ -223,6 +223,9 @@
 .payplugIntegratedPayment_input input {
   margin: 0 8px 0 0;
 }
+.payplugIntegratedPayment_input.-error {
+  border-color: #e56876;
+}
 .payplugIntegratedPayment_button {
   border: 1px solid #cccccc;
   -webkit-border-radius: 0.25em;
@@ -768,7 +771,7 @@
 }
 @media (max-width: 767px) {
   .oneyPopin_legal {
-    padding: 0 0 15px;
+    padding: 10px 0 15px;
   }
 }
 .oneyPopin_close {
