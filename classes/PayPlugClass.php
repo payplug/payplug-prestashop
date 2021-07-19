@@ -1851,9 +1851,17 @@ class PayPlugClass extends PaymentModule
         /*
          * Get card details to order details (views/templates/admin/order/details.tpl)
          *
-         * PHP 5.x : Can only pass variable in end()
+         * Ternaire :
+         *  - Si on a bien last4 de renseigné => on passe $payment dans getCards()
+         *  - Si on a pas last4 => on passe l'ID client
+         *  - Si on n'a ni last4, ni ID Client => on passe null. CardRepository retournera false avec un log.
          */
-        $card_details = $this->card->getCards($payment);
+        $getCards_param = (isset($payment->card->last4) && (!empty($payment->card->last4)))
+            ? $payment
+            : (isset($payment->metadata['ID Client']) && (int)$payment->metadata['ID Client'] > 0)
+                ? $payment->metadata['ID Client']
+                : null;
+        $card_details = $this->card->getCards($getCards_param);
         $card_details = end($card_details);
 
         // Card brand
