@@ -3785,7 +3785,10 @@ class PayPlugClass extends PaymentModule
          *
          * PHP 5.x : Can only pass variable in end()
          */
-        $card_details = $this->card->getCards($payment);
+        $get_card_param = (isset($payment->metadata['ID Client']) && (int)$payment->metadata['ID Client'] > 0)
+            ? $payment->metadata['ID Client']
+            : $payment;
+        $card_details = $this->card->getCards($get_card_param);
         $card_details = end($card_details);
 
         // Card brand
