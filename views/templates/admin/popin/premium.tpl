@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {$payplug_contact_url = 'https://portal-qa.payplug.com/#/configuration/oney'}
- <p>
+ <p class="payplugPopup_text">
      {assign "link_to_payplug_contact_url" "<a href='{$payplug_contact_url|escape:'htmlall':'UTF-8'}'>"}
      {l s='admin.popin.premium.redirectOneyActivation' tags=['<br>',$link_to_payplug_contact_url] mod='payplug'}
  </p>
