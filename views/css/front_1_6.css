@@ -1346,6 +1346,9 @@
   min-height: 40px;
   width: 190px;
 }
+.oneyPayment_logo.-withoutFees {
+  width: 300px;
+}
 .-disabled .oneyPayment_logo {
   background-image: url(../img/oney/3x4x_with_fees-alt.svg);
 }
