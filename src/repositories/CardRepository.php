@@ -224,7 +224,6 @@ class CardRepository extends Repository
      * @param int $id_customer
      * @param int $id_payplug_card
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function deleteCard($id_customer, $id_payplug_card)
     {
@@ -241,7 +240,7 @@ class CardRepository extends Repository
              * Disconnected merchant account (in config plugin page):
              * Exception -> Can't connect to API
              *
-             * @todo : Urgent : AddLog
+             * @todo : Urgent => AddLog instead of temporary var_dump!
              * (return true, to continue uninstalling)
              */
             var_dump($exception->getMessage());
@@ -251,7 +250,7 @@ class CardRepository extends Repository
              * Exception-> Card not found in API
              * Not "return false", but exception returned :-/
              *
-             * @todo : Urgent : AddLog
+             * @todo : Urgent => AddLog instead of temporary var_dump!
              * (return true, to continue uninstalling)
              */
             var_dump($exception->getMessage());
