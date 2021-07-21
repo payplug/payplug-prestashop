@@ -235,6 +235,7 @@ class CardRepository extends Repository
         if (!$id_card) {
             /*
              * To prevent Exceptions from API if no card found.
+             * No log needed, because we are uninstalling
              * (return true, to continue uninstalling)
              */
             return true;
@@ -247,6 +248,7 @@ class CardRepository extends Repository
             /*
              * Disconnected merchant account (in config plugin page):
              * Exception -> Can't connect to API
+             * No log needed, because we are uninstalling
              * (return true, to continue uninstalling)
              */
             return true;
@@ -254,6 +256,7 @@ class CardRepository extends Repository
             /*
              * Exception-> Card not found in API
              * Not "return false", but exception returned :-/
+             * No log needed, because we are uninstalling
              * (return true, to continue uninstalling)
              */
             return true;
