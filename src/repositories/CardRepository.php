@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\NotFoundException;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
@@ -232,8 +233,30 @@ class CardRepository extends Repository
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
 
-        $response = \Payplug\Card::delete($id_card);
-        $json_answer = $response['httpResponse'];
+        try {
+            $response = \Payplug\Card::delete($id_card);
+            $json_answer = $response['httpResponse'];
+        } catch (ConfigurationNotSetException $exception) {
+            /*
+             * Disconnected merchant account (in config plugin page):
+             * Exception -> Can't connect to API
+             *
+             * @todo : Urgent : AddLog
+             * (return true, to continue uninstalling)
+             */
+            var_dump($exception->getMessage());
+            return true;
+        } catch (NotFoundException $exception) {
+            /*
+             * Exception-> Card not found in API
+             * Not "return false", but exception returned :-/
+             *
+             * @todo : Urgent : AddLog
+             * (return true, to continue uninstalling)
+             */
+            var_dump($exception->getMessage());
+            return true;
+        }
 
         if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
             return false;
