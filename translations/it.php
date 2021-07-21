@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Annullare';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Il tuo cliente non verrà prelevato alle prossime scadenze';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Cancella';
@@ -162,11 +162,10 @@ $_MODULE['<{payplug}prestashop>installment_c4dc62df9762904a3e07cbb67806bca3'] = 
 $_MODULE['<{payplug}prestashop>installment_c65a7c39a37cfdf4e1ae63fe52cbfe71'] = 'del totale dell\'ordine dopo 30 giorni';
 $_MODULE['<{payplug}prestashop>installment_ca516cb9160343cca4ea8136d4acc427'] = 'Paga';
 $_MODULE['<{payplug}prestashop>installment_ceca88a557f1cc1e6834f5e939558c18'] = 'in 4 rate';
-$_MODULE['<{payplug}prestashop>installment_d030d20db32a7f06a399e16f2e291e23'] = 'pagamento PayPlug';
+$_MODULE['<{payplug}prestashop>installment_d030d20db32a7f06a399e16f2e291e23'] = 'pagamento PayPlug.';
 $_MODULE['<{payplug}prestashop>installment_d0403983b51fff6bda368ca8f66c2054'] = 'del totale dell\'ordine il giorno del pagamento';
 $_MODULE['<{payplug}prestashop>installment_e66ee8fbda58a23ade6612addd735eb7'] = 'Numero di programma';
 $_MODULE['<{payplug}prestashop>installment_ec53a8c4f07baed5d8825072c89799be'] = 'Stato';
-$_MODULE['<{payplug}prestashop>installment_eef6401ad9d929e60aba0dc460ff3ba8'] = '.';
 $_MODULE['<{payplug}prestashop>installment_f990e553cdc4c29c2efffba33e08a8c7'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>installment_fe69dce0f3230790ca7ef0341dc9d4bf'] = 'Il totale deve essere superiore a 4€ ed inferiore a 20000€.';
 $_MODULE['<{payplug}prestashop>login_b57e2519e26151feacdbe52076bc39ec'] = 'CONNETTITI';
