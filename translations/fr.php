@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Interrompre';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Votre client ne sera pas prélevé aux échéances prévues.';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Annuler';
@@ -101,7 +101,7 @@ $_MODULE['<{payplug}prestashop>deferred_5f3d2ad928aeffcedd464164d766e67d'] = 'Vo
 $_MODULE['<{payplug}prestashop>deferred_72baeae7945bd8c3dd2d8eb8a451b128'] = 'Pour proposer le paiement différé à vos clients, vous devez utiliser le [1]"Paiement par carte"[/1] ou le  [1]"Paiement fractionné non garanti"[/1].';
 $_MODULE['<{payplug}prestashop>deferred_7c438c71eeebfff63fa604bf2866b0ca'] = 'Attention : les commandes en différé qui sont actuellement au statut "%state%" devront être capturées manuellement.';
 $_MODULE['<{payplug}prestashop>deferred_ad7c20b3bb03499c12ad565ddf4c6384'] = '(Ex : à l\'expédition de la commande)';
-$_MODULE['<{payplug}prestashop>deferred_b885440128cef7fb146582dd293f1118'] = '-- Choisissez un status --';
+$_MODULE['<{payplug}prestashop>deferred_b885440128cef7fb146582dd293f1118'] = '-- Choisissez un statut --';
 $_MODULE['<{payplug}prestashop>deferred_c0a31a29ae3795479c755bea7de57d87'] = 'Vous devez choisir un status.';
 $_MODULE['<{payplug}prestashop>deferred_f0e9528cdbef74b2eafcdc12f9ee1c7d'] = 'Ok';
 $_MODULE['<{payplug}prestashop>detail_1751f25e086816ff3f16ece383bf6748'] = 'Coût du financement :';
