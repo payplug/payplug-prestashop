@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\NotFoundException;
 use PayPlug\src\entities\CardEntity;
 use PayPlug\src\specific\ConfigurationSpecific;
 use PayPlug\src\specific\ToolsSpecific;
@@ -223,7 +224,6 @@ class CardRepository extends Repository
      * @param int $id_customer
      * @param int $id_payplug_card
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function deleteCard($id_customer, $id_payplug_card)
     {
@@ -232,8 +232,38 @@ class CardRepository extends Repository
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
 
-        $response = \Payplug\Card::delete($id_card);
-        $json_answer = $response['httpResponse'];
+        if (!$id_card) {
+            /*
+             * To prevent Exceptions from API if no card found.
+             *
+             * No log needed, because we are uninstalling
+             * (return true, to continue uninstalling)
+             */
+            return true;
+        }
+
+        try {
+            $response = \Payplug\Card::delete($id_card);
+            $json_answer = $response['httpResponse'];
+        } catch (ConfigurationNotSetException $exception) {
+            /*
+             * Disconnected merchant account (in config plugin page):
+             * Exception -> Can't connect to API
+             *
+             * No log needed, because we are uninstalling
+             * (return true, to continue uninstalling)
+             */
+            return true;
+        } catch (NotFoundException $exception) {
+            /*
+             * Exception-> Card not found in API
+             * Not "return false", but exception returned :-/
+             *
+             * No log needed, because we are uninstalling
+             * (return true, to continue uninstalling)
+             */
+            return true;
+        }
 
         if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
             return false;
