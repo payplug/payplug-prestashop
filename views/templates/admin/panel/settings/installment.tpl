@@ -38,7 +38,7 @@
                         {l s='You can consult all your past and pending installment payments in' mod='payplug'}
                         <a class="payplugLink" href="{$installments_panel_url|escape:'htmlall':'UTF-8'}" data-e2e-link="installment"> {l s='a dedicated menu' mod='payplug'}</a>
                         {l s='made accessible from the navigation bar, and in the details of each order within the' mod='payplug'}
-                        <i> {l s='Payment with PayPlug' mod='payplug'}</i> {l s='bloc.' mod='payplug'}
+                        <i> {l s='Payment with PayPlug' mod='payplug'}</i>
                     </p>
                     <p>
                         <a class="payplugLink" href="{$faq_links.installments|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
