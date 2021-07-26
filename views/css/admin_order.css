@@ -190,7 +190,7 @@
 }
 .payplugPopup_row {
   text-align: center;
-  padding: 20px 20px 15px;
+  padding: 15px 20px 15px;
 }
 .payplugPopup_row ul {
   padding: 20px 0;
@@ -235,6 +235,9 @@
 }
 .payplugPopup_footer.-center {
   justify-content: center;
+}
+.payplugPopup_text {
+  padding-bottom: 15px;
 }
 /* Payplug button */
 .payplugButton {
