@@ -161,7 +161,7 @@ class CardRepository extends Repository
             ->fields('pc.brand')
             ->fields('pc.country')
             ->fields('pc.metadata')
-            ->from(_DB_PREFIX_ . 'payplug_card', 'pc')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card', 'pc')
             ->where('pc.id_customer = ' . (int)$id_customer)
             ->where('pc.id_company = ' . (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')))
             ->where('pc.is_sandbox = ' . (int)$is_sandbox);
@@ -245,8 +245,11 @@ class CardRepository extends Repository
         } else {
             $this->query
                 ->delete()
-                ->from(_DB_PREFIX_ . $this->cardEntity->getTable())
-                ->where(_DB_PREFIX_ . $this->cardEntity->getTable() . '.id_card = \'' . pSQL($id_card) . '\'')
+                ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
+                ->where(
+                    $this->constant->get('_DB_PREFIX_')
+                        . $this->cardEntity->getTable() . '.id_card = \'' . pSQL($id_card) . '\''
+                )
                 ->build();
         }
 
@@ -269,7 +272,7 @@ class CardRepository extends Repository
         $cards = $this->query
             ->select()
             ->fields('pc.id_card')
-            ->from(_DB_PREFIX_ . 'payplug_card', 'pc')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card', 'pc')
             ->where('pc.id_customer = ' . (int)$id_customer)
             ->where('pc.id_payplug_card = ' . (int)$id_payplug_card)
             ->where('pc.id_company = ' . (int)$id_company)
@@ -385,7 +388,7 @@ class CardRepository extends Repository
             $this->query
                 ->select()
                 ->fields('id_card')
-                ->from(_DB_PREFIX_ . $this->cardEntity->getTable())
+                ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
                 ->where('id_card = "' . $payment->card->id . '"')
                 ->where('id_company = ' . (int)$company_id)
                 ->where('is_sandbox = ' . (int)$is_sandbox)
@@ -398,7 +401,7 @@ class CardRepository extends Repository
         // insert the new card in database
         $this->query
             ->insert()
-            ->into(_DB_PREFIX_ . $this->cardEntity->getTable())
+            ->into($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
             ->fields('id_customer')->values((int)$customer_id)
             ->fields('id_company')->values((int)$company_id)
             ->fields('is_sandbox')->values((int)$is_sandbox)
@@ -433,8 +436,8 @@ class CardRepository extends Repository
             $this->query
                 ->select()
                 ->fields('id_card')
-                ->from(_DB_PREFIX_ . $table)
-                ->where(_DB_PREFIX_ . $table . '.id_' . $table . ' = ' . $idPayplugCard);
+                ->from($this->constant->get('_DB_PREFIX_') . $table)
+                ->where($this->constant->get('_DB_PREFIX_') . $table . '.id_' . $table . ' = ' . $idPayplugCard);
 
             $idCard = $this->query->build()[0]['id_card'];
 
@@ -444,8 +447,8 @@ class CardRepository extends Repository
             // Delete from our DB
             $this->query
                 ->delete()
-                ->from(_DB_PREFIX_ . $table)
-                ->where(_DB_PREFIX_ . $table . '.id_card = \'' . pSQL($idCard) . '\'')
+                ->from($this->constant->get('_DB_PREFIX_') . $table)
+                ->where($this->constant->get('_DB_PREFIX_') . $table . '.id_card = \'' . pSQL($idCard) . '\'')
                 ->build();
 
 //            $this->tools->tool('redirect',$_SERVER['HTTP_REFERER']); exit;
@@ -503,7 +506,7 @@ class CardRepository extends Repository
         $this->query
             ->select()
             ->fields('*')
-            ->from(_DB_PREFIX_ . $this->cardEntity->getTable())
+            ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
             ->where('`id_customer` = ' . ((isset($customer->id) && !empty($customer->id)) ? $customer->id : $customer))
             ->where('`id_company` = ' . (int)$this->cardEntity->getIdCompany())
             ->where('`is_sandbox` = ' . (int)$this->cardEntity->getIsSandbox());
