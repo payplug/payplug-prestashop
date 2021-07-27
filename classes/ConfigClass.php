@@ -57,7 +57,6 @@ class ConfigClass
     private $install;
     private $api_live;
     private $api_test;
-    public $confirmUninstall;
     public $email;
     private $img_lang;
     private $ssl_enable;
@@ -137,14 +136,6 @@ class ConfigClass
     {
         $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
         $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
-
-        // Set the uninstall notice according to the "keep_cards" configuration
-        $this->confirmUninstall = $this->payplugClass->l('payplug.setConfigurationProperties.confirmUninstall') . ' ';
-        if ((int)Configuration::get('PAYPLUG_KEEP_CARDS') == 1) {
-            $this->confirmUninstall .= $this->payplugClass->l('payplug.setConfigurationProperties.keepCards');
-        } else {
-            $this->confirmUninstall .= $this->payplugClass->l('payplug.setConfigurationProperties.removeCards');
-        }
 
         $this->email = Configuration::get('PAYPLUG_EMAIL');
         $available_img_lang = [
