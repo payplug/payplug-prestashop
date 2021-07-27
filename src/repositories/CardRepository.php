@@ -33,15 +33,25 @@ class CardRepository extends Repository
 {
     private $cardEntity;
     private $configurationSpecific;
+    private $constant;
     private $query;
+    private $logger;
     private $toolsSpecific;
 
-    public function __construct($payplug)
-    {
-        $this->payplug = $payplug;
+    public function __construct(
+        $configurationSpecific,
+        $constant,
+        $logger,
+        $payplug,
+        $query
+    ) {
+
         $this->cardEntity = new CardEntity();
-        $this->configurationSpecific = new ConfigurationSpecific();
-        $this->query = new QueryRepository();
+        $this->configurationSpecific = $configurationSpecific;
+        $this->constant = $constant;
+        $this->logger = $logger;
+        $this->query = $query;
+        $this->payplug = $payplug;
         $this->toolsSpecific = new ToolsSpecific();
         $this->setParams();
     }
@@ -54,47 +64,11 @@ class CardRepository extends Repository
 
         $this->cardEntity
             ->setAllowedBrand(['mastercard', 'visa'])
-            ->setDefinition([])
             ->setFieldsRequired([])
             ->setFieldsSize([])
             ->setFieldsValidate([])
             ->setTable('payplug_card')
-            ->setIdentifier('')
-            ->setDefinition([
-                'table' => $this->cardEntity->getTable(),
-                'primary' => 'id_' . $this->cardEntity->getTable(),
-                'fields' => [
-                    /*
-                     List of field types
-                    ((int) instead of (string) since PS 1.5+)
-                    (source : /classes/ObjectModel.php)
-                        const TYPE_INT     = 1;
-                        const TYPE_BOOL    = 2;
-                        const TYPE_STRING  = 3;
-                        const TYPE_FLOAT   = 4;
-                        const TYPE_DATE    = 5;
-                        const TYPE_HTML    = 6;
-                        const TYPE_NOTHING = 7;
-                        const TYPE_SQL     = 8;
-                     */
-                    'id_customer' => ['type' => 1, 'validate' => 'isUnsignedId', 'required' => true],
-                    'id_company' => ['type' => 1, 'validate' => 'isUnsignedId', 'required' => true],
-                    'is_sandbox' => ['type' => 2, 'validate' => 'isBool'],
-                    'id_card' => ['type' => 3, 'validate' => 'isCleanHtml', 'required' => true],
-                    'last4' => ['type' => 3, 'validate' => 'isCleanHtml', 'size' => 4, 'required' => true],
-                    'exp_month' => ['type' => 3, 'validate' => 'isCleanHtml', 'size' => 4, 'required' => true],
-                    'exp_year' => ['type' => 3, 'validate' => 'isCleanHtml', 'size' => 4, 'required' => true],
-                    'brand' => ['type' => 3, 'validate' => 'isCleanHtml'],
-                    'country' => [
-                        'type' => 3,
-                        'validate' => 'isLanguageIsoCode',
-                        'size' => 3,
-                        'required' => false
-                    ],
-                    'metadata' => ['type' => 3, 'validate' => 'isCleanHtml'],
-                ]
-            ]);
-
+            ->setIdentifier('');
         if ($idCompany && (!empty($idCompany))) {
             $this->cardEntity->setIdCompany((int)$idCompany);
         }
