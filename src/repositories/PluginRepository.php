@@ -92,6 +92,7 @@ class PluginRepository extends Repository
     private $shop;
     private $tools;
     private $validate;
+    private $constantSpecific;
 
     public function __construct($payplug = null)
     {
@@ -145,11 +146,16 @@ class PluginRepository extends Repository
         $this->amountCurrencyClass = new AmountCurrencyClass(
             $this->tools
         );
-
-        $this->card = new CardRepository($this->payplug);
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
 
+        $this->card = new CardRepository(
+            $this->configuration,
+            $this->constant,
+            $this->logger,
+            $this->payplug,
+            $this->query
+        );
         $this->translate = new TranslationsRepository(
             $this->payplug,
             $this->tools
