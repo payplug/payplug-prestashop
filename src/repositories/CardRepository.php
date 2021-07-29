@@ -275,7 +275,7 @@ class CardRepository extends Repository
                 ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
                 ->where(
                     $this->constant->get('_DB_PREFIX_')
-                        . $this->cardEntity->getTable() . '.id_card = \'' . pSQL($id_card) . '\''
+                        . $this->cardEntity->getTable() . '.id_card = \'' . (string)$id_card . '\''
                 )
                 ->build();
         }
@@ -332,6 +332,7 @@ class CardRepository extends Repository
     }
 
     /**
+     * @description get Card Brand
      * @param $payment
      * @return bool |string
      */
@@ -356,6 +357,7 @@ class CardRepository extends Repository
     }
 
     /**
+     * @description get Card Expiry date
      * @param $payment
      * @return bool |string
      */
@@ -460,13 +462,13 @@ class CardRepository extends Repository
             ->fields('id_customer')->values((int)$customer_id)
             ->fields('id_company')->values((int)$company_id)
             ->fields('is_sandbox')->values((int)$is_sandbox)
-            ->fields('id_card')->values(pSQL($payment->card->id))
-            ->fields('last4')->values(pSQL($payment->card->last4))
-            ->fields('exp_month')->values(pSQL($payment->card->exp_month))
-            ->fields('exp_year')->values(pSQL($payment->card->exp_year))
-            ->fields('brand')->values(pSQL($brand))
-            ->fields('country')->values(pSQL($payment->card->country))
-            ->fields('metadata')->values(pSQL(serialize($payment->card->metadata)));
+            ->fields('id_card')->values((string)$payment->card->id)
+            ->fields('last4')->values((string)$payment->card->last4)
+            ->fields('exp_month')->values((string)$payment->card->exp_month)
+            ->fields('exp_year')->values((string)$payment->card->exp_year)
+            ->fields('brand')->values((string)$brand)
+            ->fields('country')->values((string)$payment->card->country)
+            ->fields('metadata')->values((string)serialize($payment->card->metadata));
         try {
             if (!$this->query->build()) {
                 $this->logger->addLog(
@@ -524,7 +526,7 @@ class CardRepository extends Repository
             $this->query
                 ->delete()
                 ->from($this->constant->get('_DB_PREFIX_') . $table)
-                ->where($this->constant->get('_DB_PREFIX_') . $table . '.id_card = \'' . pSQL($idCard) . '\'')
+                ->where($this->constant->get('_DB_PREFIX_') . $table . '.id_card = \'' . (string)$idCard . '\'')
                 ->build();
 
 //            $this->tools->tool('redirect',$_SERVER['HTTP_REFERER']); exit;
@@ -554,13 +556,13 @@ class CardRepository extends Repository
         $fields['id_customer'] = is_null($card->getIdCustomer()) ? 0 : (int)($card->getIdCustomer());
         $fields['id_company'] = is_null($card->getIdCompany()) ? 0 : (int)($card->getIdCompany());
         $fields['is_sandbox'] = (int)$card->getIsSandbox();
-        $fields['id_card'] = pSQL($card->getIdCard());
-        $fields['last4'] = pSQL($card->getLast4());
-        $fields['exp_month'] = pSQL($card->getExpMonth());
-        $fields['exp_year'] = pSQL($card->getExpYear());
-        $fields['brand'] = pSQL($card->getBrand());
-        $fields['country'] = pSQL($card->getCountry());
-        $fields['metadata'] = pSQL($card->getMetadata());
+        $fields['id_card'] = (string)$card->getIdCard();
+        $fields['last4'] = (string)$card->getLast4();
+        $fields['exp_month'] = (string)$card->getExpMonth();
+        $fields['exp_year'] = (string)$card->getExpYear();
+        $fields['brand'] = (string)$card->getBrand();
+        $fields['country'] = (string)$card->getCountry();
+        $fields['metadata'] = (string)$card->getMetadata();
 
         return $fields;
     }
