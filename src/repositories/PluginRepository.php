@@ -154,7 +154,8 @@ class PluginRepository extends Repository
             $this->constant,
             $this->logger,
             $this->payplug,
-            $this->query
+            $this->query,
+            $this->tools
         );
         $this->translate = new TranslationsRepository(
             $this->payplug,

@@ -43,17 +43,16 @@ class CardRepository extends Repository
         $constant,
         $logger,
         $payplug,
-        $query
+        $query,
+        $tools
     ) {
-
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = $configurationSpecific;
         $this->constant = $constant;
         $this->logger = $logger;
         $this->query = $query;
         $this->payplug = $payplug;
-        $this->toolsSpecific = new ToolsSpecific();
-        $this->logger->setParams(['process' => 'cardRepository']);
+        $this->toolsSpecific = $tools;
         $this->setParams();
     }
 
@@ -62,6 +61,7 @@ class CardRepository extends Repository
         $config = $this->configurationSpecific;
         $idCompany = $config->get('PAYPLUG_COMPANY_ID');
         $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
+        $this->logger->setParams(['process' => 'cardRepository']);
 
         $this->cardEntity
             ->setAllowedBrand(['mastercard', 'visa'])
@@ -85,7 +85,7 @@ class CardRepository extends Repository
     }
 
     /**
-     * Delete all cards for a given customer
+     * @description Delete all cards for a given customer
      *
      * @param int $id_customer
      * @return bool
@@ -93,13 +93,17 @@ class CardRepository extends Repository
      */
     public function deleteCards($id_customer)
     {
+        if (!is_int($id_customer) || empty($id_customer)) {
+            $this->logger->addLog('Error: parameter $id_customer is empty or not integer [deleteCards]');
+            return false;
+        }
         $cardsToDelete = $this->getCards($id_customer, false);
         if (isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
             foreach ($cardsToDelete as $card) {
                 if (!$this->deleteCard($id_customer, $card['id_payplug_card'])) {
-                    $this->logger->addLog('Error : card can not be deleted');
+                    $this->logger->addLog('Error : card can not be deleted [deleteCards]');
                     $this->logger->addLog('id_payplug_card : ' . $card['id_payplug_card']);
-
+                    $this->logger->addLog('$id_customer: ' . $id_customer);
                     return false;
                 }
             }
@@ -108,11 +112,11 @@ class CardRepository extends Repository
     }
 
     /**
-     * Get collection of cards. Param : ID Customer (int) or payment (object)
+     * @description  Get collection of cards. Param : ID Customer (int) or payment (object)
      *
      * @param int | object $payment_or_id_customer
      * @param bool $active_only
-     * @return array OR bool
+     * @return array | bool
      */
     public function getCards($payment_or_id_customer, $active_only = false)
     {
@@ -147,9 +151,8 @@ class CardRepository extends Repository
                 ]
             ];
         } else {
-            // Add log
-            $this->logger->addLog('Error: Bad parameter while retrieving cards');
-            $this->logger->addLog($payment_or_id_customer
+            $this->logger->addLog('Error: Bad parameter detected while retrieving cards [getCards]');
+            $this->logger->addLog('$payment_or_id_customer: ' . $payment_or_id_customer
                                   . ' is not a  customer_id or a payment object passed as parameter');
             return false;
         }
@@ -179,9 +182,11 @@ class CardRepository extends Repository
             return [];
         } else {
             foreach ($res_payplug_card as $key => &$value) {
-                if ((int)$value['exp_year'] < (int)date('Y')
+                if (
+                    (int)$value['exp_year'] < (int)date('Y')
                     || ((int)$value['exp_year'] == (int)date('Y')
-                        && (int)$value['exp_month'] < (int)date('m'))) {
+                        && (int)$value['exp_month'] < (int)date('m'))
+                ) {
                     $value['expired'] = true;
                     if ($active_only) {
                         unset($res_payplug_card[$key]);
@@ -200,19 +205,30 @@ class CardRepository extends Repository
     }
 
     /**
-     * Delete card
+     * @description Delete card
      *
      * @param int $id_customer
      * @param int $id_payplug_card
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function deleteCard($id_customer, $id_payplug_card)
     {
+        if (
+            !is_int($id_customer) ||
+            empty($id_customer) ||
+            !is_int($id_payplug_card) ||
+            empty($id_payplug_card)
+        ) {
+            $this->logger->addLog('Error:  Bad parameters were passed to [deleteCard] '
+             . '$id_customer: ' . $id_customer
+             . '$id_payplug_card ' . $id_payplug_card);
+            return false;
+        }
         $config = $this->configurationSpecific;
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
         $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
         $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
+        //TODO : addLog avec $id_customer, $id_payplug_card, $id_company, $id_card if uninstall = true
 
         if (!$id_card) {
             /*
@@ -248,7 +264,10 @@ class CardRepository extends Repository
         }
 
         if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
-            $this->logger->addLog('Error occured while deleting the card' . $id_card . 'from the API', 'error');
+            //addLog(encode_json($json_answer['object']));
+            $this->logger->addLog('Error occured while deleting the card'
+                                  . $id_card . 'from the API [deleteCard]', 'error');
+            $this->logger->addLog('API ERROR ' . json_encode($json_answer['object']));
             return false;
         } else {
             $this->query
@@ -265,15 +284,29 @@ class CardRepository extends Repository
     }
 
     /**
-     * get card id
+     * @description  get card id
      *
      * @param int $id_customer
      * @param int $id_payplug_card
      * @param int $id_company
-     * @return string
+     * @return string | bool
      */
     public function getCardId($id_customer, $id_payplug_card, $id_company)
     {
+        if (
+            !is_int($id_customer) ||
+            empty($id_customer) ||
+            !is_int($id_payplug_card) ||
+            empty($id_payplug_card) ||
+            !is_int($id_company) ||
+            empty($id_company)
+        ) {
+            $this->logger->addLog('Error:  Bad parameters were passed to [getCardId]'
+                                  . '$id_customer: ' . $id_customer
+                                  . '$id_payplug_card: ' . $id_payplug_card
+                                  . '$id_company: ' . $id_company);
+            return false;
+        }
         $config = $this->configurationSpecific;
         $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
 
@@ -288,8 +321,10 @@ class CardRepository extends Repository
             ->build();
 
         if (empty($cards)) {
-            $this->logger->addLog('Error : No card found for this id_customer '
-                                  . $id_customer . 'with id_payplug_card  = ' . $id_payplug_card);
+            $this->logger->addLog('Error : No card found for these parameters [getCardId]. $id_customer: '
+                                  . $id_customer
+                                  . 'id_payplug_card : ' . $id_payplug_card
+                                  . '$id_company: ' . $id_company);
             return false;
         } else {
             return $cards[0]['id_card'];
@@ -298,8 +333,7 @@ class CardRepository extends Repository
 
     /**
      * @param $payment
-     * @return Exception|string
-     * @throws ConfigurationNotSetException
+     * @return bool |string
      */
     public function getCardBrandByPayment($payment)
     {
@@ -307,9 +341,9 @@ class CardRepository extends Repository
             try {
                 $payment = \Payplug\Payment::retrieve($payment);
             } catch (Exception $exception) {
-                $this->logger->addLog('Error while occured while retrieving  card brand bypayment '
-                                      . $exception->getMessage(), 'error');
-                return $exception;
+                $this->logger->addLog('Error occured while retrieving  card brand by payment [getCardBrandPayment] '
+                                      . 'API Exception: ' . $exception->getMessage(), 'error');
+                return false;
             }
         }
 
@@ -323,8 +357,7 @@ class CardRepository extends Repository
 
     /**
      * @param $payment
-     * @return Exception|false|string
-     * @throws ConfigurationNotSetException
+     * @return bool |string
      */
     public function getCardExpiryDateByPayment($payment)
     {
@@ -332,9 +365,10 @@ class CardRepository extends Repository
             try {
                 $payment = \Payplug\Payment::retrieve($payment);
             } catch (Exception $exception) {
-                $this->logger->addLog('Error occured while trying to get card expiry date by payment '
-                                     . $exception->getMessage(), 'error');
-                return $exception;
+                $this->logger->addLog('Error occured while trying to get card expiry date by payment.
+                                        [getCardExpiryDateByPayment]'
+                                     .  'API Exception: ' . $exception->getMessage(), 'error');
+                return false;
             }
         }
 
@@ -350,9 +384,9 @@ class CardRepository extends Repository
     }
 
     /**
+     * @description  get the Card Mask
      * @param $payment
-     * @return Exception|string
-     * @throws ConfigurationNotSetException
+     * @return bool|string
      */
     public function getCardMaskByPayment($payment)
     {
@@ -360,9 +394,10 @@ class CardRepository extends Repository
             try {
                 $payment = \Payplug\Payment::retrieve($payment);
             } catch (Exception $exception) {
-                $this->logger->addLog('Error occured while trying to retrieve card mask by payment'
+                $this->logger->addLog('Error occured while trying to retrieve card mask by payment 
+                                        [getCardMaskByPayment]. API Exception: '
                                       . $exception->getMessage(), 'error');
-                return $exception;
+                return false;
             }
         }
 
@@ -376,9 +411,9 @@ class CardRepository extends Repository
 
     /**
      * @description
-     * Determine witch environnement is used
+     * Determine which environnement is used
      *
-     * @param PayplugPayment $payment
+     * @param $payment
      * @return bool
      */
     public function saveCard($payment)
@@ -386,8 +421,10 @@ class CardRepository extends Repository
         $config = $this->configurationSpecific;
 
         $brand = $payment->card->brand;
-        if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
-            && $this->toolsSpecific->tool('strtolower', $brand) != 'visa') {
+        if (
+            $this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
+            && $this->toolsSpecific->tool('strtolower', $brand) != 'visa'
+        ) {
             $brand = 'none';
         }
 
@@ -412,7 +449,7 @@ class CardRepository extends Repository
 
         if ((isset($dbCard) && (!empty($dbCard)))) {
             $this->logger->addLog('Error: this card with id_card = '
-                                        . $payment->card->id . 'already exists');
+                                        . $payment->card->id . 'already exists [saveCard]');
             return false;
         }
 
@@ -433,13 +470,18 @@ class CardRepository extends Repository
         try {
             if (!$this->query->build()) {
                 $this->logger->addLog(
-                    'The card with id_card =' . $payment->card->id
-                    . 'can not be inserted in the dabase, but there is no throw'
+                    'The card with id_card: ' . $payment->card->id .
+                    ' $customer_id: ' . $customer_id .
+                    ' $company_id: ' . $company_id .
+                    ' $payment->card->last4: ' . $payment->card->last4 .
+                    ' $payment->card->exp_month: ' . $payment->card->exp_month .
+                    ' $payment->card->exp_year: ' . $payment->card->exp_year .
+                    ' can not be inserted in the database, but there is no throw [saveCard]'
                 );
                 return false;
             }
         } catch (Exception $e) {
-            $this->logger->addLog('Error : Unable to insert the card' . $e->getMessage());
+            $this->logger->addLog('Error : Unable to insert the card [saveCard]' . $e->getMessage());
             return false;
         }
 
@@ -447,15 +489,15 @@ class CardRepository extends Repository
     }
 
     /**
+     * @description  delete card from API and shop 's database
      * ## From classes/__PayPlugCard.php ##
      * @param $idPayplugCard
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function delete($idPayplugCard)
     {
         if (!$idPayplugCard) {
-            $this->logger->addLog(' Can not process deleting card because of empty idPayplugCard', 'error');
+            $this->logger->addLog('Can not process deleting card because of empty idPayplugCard [delete]', 'error');
             return false;
         }
 
@@ -470,7 +512,13 @@ class CardRepository extends Repository
             $idCard = $this->query->build()[0]['id_card'];
 
             // Delete from API
-            \Payplug\Card::delete($idCard);
+            try {
+                \Payplug\Card::delete($idCard);
+            } catch (Exception $e) {
+                $this->logger->addLog('API exception: Error while deleting the card with $idcard: '
+                                      . $idCard . $e->getMessage() . '[delete]');
+            }
+
 
             // Delete from our DB
             $this->query
@@ -485,14 +533,14 @@ class CardRepository extends Repository
             if ($e->getCode() == '404') { // resource cant be found
                 return parent::delete();
             }
-            $this->logger->addLog('Can not delete card ' . $e->getMessage(), 'error');
+            $this->logger->addLog('Can not delete card [delete]' . $e->getMessage(), 'error');
             return false;
         }
     }
 
     /**
      * ## From classes/__PayPlugCard.php ##
-     * Get database fields for compatibility 1.4
+     * @description Get database fields for compatibility 1.4
      * @return mixed
      */
     public function getFields()
@@ -505,7 +553,7 @@ class CardRepository extends Repository
         }
         $fields['id_customer'] = is_null($card->getIdCustomer()) ? 0 : (int)($card->getIdCustomer());
         $fields['id_company'] = is_null($card->getIdCompany()) ? 0 : (int)($card->getIdCompany());
-        $fields['is_sandbox'] = (int)$card->isIsSandbox();
+        $fields['is_sandbox'] = (int)$card->getIsSandbox();
         $fields['id_card'] = pSQL($card->getIdCard());
         $fields['last4'] = pSQL($card->getLast4());
         $fields['exp_month'] = pSQL($card->getExpMonth());
@@ -519,18 +567,14 @@ class CardRepository extends Repository
 
     /**
      * ## From classes/__PayPlugCard.php ##
-     * Get collection of cards fort a given customer
+     * @description Get collection of cards for a given customer
      *
-     * @param Customer $customer
+     * @param $customer
      * @param bool $active_only
      * @return array OR bool
      */
     public function getByCustomer($customer, $active_only = false)
     {
-//        if (!is_object($customer)) {
-//            $customer = new \Payplug\Customer((int)$customer);
-//        }
-
         $this->query
             ->select()
             ->fields('*')
@@ -543,7 +587,7 @@ class CardRepository extends Repository
 
         // unset secret datas
         foreach ($cards as $key => &$card) {
-            if (!$this::isValidExpiration((int)$card['exp_month'], (int)$card['exp_year'], $this->logger)) {
+            if (!$this::isValidExpiration((int)$card['exp_month'], (int)$card['exp_year'])) {
                 $card['expired'] = true;
                 if ($active_only) {
                     unset($cards[$key]);
@@ -565,21 +609,22 @@ class CardRepository extends Repository
 
     /**
      * ## From classes/__PayPlugCard.php ##
-     * Check if a card can be used
+     * @description Check if a card can be used
      *
      * @param int $month
      * @param int $year
-     * @return array OR bool
+     * @return bool
      */
-    public static function isValidExpiration($month, $year, $logger)
+    public function isValidExpiration($month, $year)
     {
         if ($month == null || $year == null) {
-            $logger->addLog('Month or/and date is not specified', 'error');
+            $this->logger->addLog('Month or/and year is not specified. Month: ' .
+                $month . 'Year: ' . $year . '[isValidExpiration]', 'error');
             return false;
         }
 
         if ($year < (int)date('Y') || ($year == (int)date('Y') && $month < (int)date('m'))) {
-            $logger->addLog('Card is expired', 'Error');
+            $this->logger->addLog('Card is expired [isValidExpiration]', 'Error');
             return false;
         }
 
@@ -592,6 +637,6 @@ class CardRepository extends Repository
      */
     public function deleteCardMessage()
     {
-        return $this->l('Card sucessfully deleted.');
+        return $this->l('Card sucessfully deleted. [deleteCardMessage]');
     }
 }
