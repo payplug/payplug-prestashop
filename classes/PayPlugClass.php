@@ -1850,17 +1850,16 @@ class PayPlugClass extends PaymentModule
 
         /*
          * Get card details to order details (views/templates/admin/order/details.tpl)
-         *
-         * Ternaire :
-         *  - Si on a bien last4 de renseigné => on passe $payment dans getCards()
-         *  - Si on a pas last4 => on passe l'ID client
-         *  - Si on n'a ni last4, ni ID Client => on passe null. CardRepository retournera false avec un log.
+         * Mask (last4), exp date...
          */
-        $getCards_param = (isset($payment->card->last4) && (!empty($payment->card->last4)))
-            ? $payment
-            : (isset($payment->metadata['ID Client']) && (int)$payment->metadata['ID Client'] > 0)
-                ? $payment->metadata['ID Client']
-                : null;
+        $getCards_param = null;
+        if (isset($payment->card->last4) && (!empty($payment->card->last4))) {
+            $getCards_param = $payment;
+        } elseif (!isset($payment->card->last4)
+            && isset($payment->metadata['ID Client'])
+            && (int)$payment->metadata['ID Client'] > 0) {
+            $getCards_param = $payment->metadata['ID Client'];
+        }
         $card_details = $this->card->getCards($getCards_param);
         $card_details = end($card_details);
 
