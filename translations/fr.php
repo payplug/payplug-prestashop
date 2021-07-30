@@ -231,6 +231,7 @@ $_MODULE['<{payplug}prestashop>order-confirmation_eae9c553a9ba6b913ec08183247bd5
 $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Détail du paiement PayPlug';
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'La capture de ce paiement est autorisée avant le %s. Après cette date, vous ne pourrez plus être payé.';
 $_MODULE['<{payplug}prestashop>payment_857c6756c12ade188400a6c60384191e'] = 'Payer en 3x ou 4x par carte bancaire';
+$_MODULE['<{payplug}prestashop>paymentrepository_8a0a4b4c9dbdb470b2efc50d0d38eb4e'] = '[PaymentRepository] Error during payment creation process.';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transaction a échoué, votre carte de paiement ne sera pas débitée.';
 $_MODULE['<{payplug}prestashop>payplug_01abf60a14b2f7a636aefbb242c981f7'] = 'La version PHP de votre serveur doit être la version 5.3 au minimum';
 $_MODULE['<{payplug}prestashop>payplug_020c93f3a1786dcd1eba5921b50c09cc'] = 'Toutes les cartes enregistrées par vos clients seront conservées.';
