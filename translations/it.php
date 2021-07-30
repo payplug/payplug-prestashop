@@ -231,6 +231,7 @@ $_MODULE['<{payplug}prestashop>order-confirmation_eae9c553a9ba6b913ec08183247bd5
 $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Dettagli di pagamento PayPlug';
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'L\'avvio di questo pagamento è autorizzato prima del %s. Successivamente, non potrai più ricevere questo pagamento';
 $_MODULE['<{payplug}prestashop>payment_857c6756c12ade188400a6c60384191e'] = 'Pagare in 3x o 4x tramite carta';
+$_MODULE['<{payplug}prestashop>paymentrepository_8a0a4b4c9dbdb470b2efc50d0d38eb4e'] = '[PaymentRepository] Error during payment creation process.';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>payplug_01abf60a14b2f7a636aefbb242c981f7'] = 'Il tuo server deve essere su PHP 5.3 o maggiore';
 $_MODULE['<{payplug}prestashop>payplug_020c93f3a1786dcd1eba5921b50c09cc'] = 'Tutte le carte di credito del tuo cliente saranno memorizzate.';
