@@ -44,8 +44,7 @@ class CardRepository extends Repository
         $payplug,
         $query,
         $tools
-    )
-    {
+    ) {
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = $configurationSpecific;
         $this->constant = $constant;
@@ -215,14 +214,16 @@ class CardRepository extends Repository
     public function deleteCard($id_customer, $id_payplug_card)
     {
         if (
-            !$id_customer ||
-            !is_int($id_customer) ||
-            !$id_payplug_card ||
-            !is_int($id_payplug_card)
+            !isset($id_customer) ||
+            !($id_customer) ||
+            !isset($id_payplug_card) ||
+            !($id_payplug_card)
         ) {
-            $this->logger->addLog('Error:  Bad parameters were passed to [deleteCard] '
-                . '$id_customer: ' . isset($id_customer) ? $id_customer : ''
-                . '$id_payplug_card ' . isset ($id_payplug_card) ? $id_payplug_card : '');
+            $this->logger->addLog(
+                'Error:  Bad parameters were passed to [deleteCard] '
+                . '$id_customer: ' . isset($id_customer) ? $id_customer : (''
+                . '$id_payplug_card ' . isset($id_payplug_card) ? $id_payplug_card : '')
+            );
             return false;
         }
         $config = $this->configurationSpecific;
@@ -294,12 +295,12 @@ class CardRepository extends Repository
     public function getCardId($id_customer, $id_payplug_card, $id_company)
     {
         if (
-            !$id_customer ||
-            !is_int($id_customer) ||
-            !$id_payplug_card ||
-            !is_int($id_payplug_card) ||
-            !$id_company ||
-            !is_int($id_company)
+            !isset($id_customer) ||
+            !($id_customer) ||
+            !isset($id_payplug_card) ||
+            !($id_payplug_card) ||
+            !isset($id_company) ||
+            !($id_company)
         ) {
             $this->logger->addLog('Error:  Bad parameters were passed to [getCardId]'
                 . '$id_customer: ' . $id_customer
