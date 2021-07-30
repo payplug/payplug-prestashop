@@ -523,8 +523,10 @@ class CardRepository extends Repository
     public function delete($idPayplugCard)
     {
         if (!$idPayplugCard) {
-            $this->logger->addLog('Can not process deleting card because of empty idPayplugCard parameter [delete]',
-                'error');
+            $this->logger->addLog(
+                'Can not process deleting card because of empty idPayplugCard parameter [delete]',
+                'error'
+            );
             return false;
         }
 
