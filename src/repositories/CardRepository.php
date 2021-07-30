@@ -663,8 +663,8 @@ class CardRepository extends Repository
         if (!isset($month) || !isset($year)) {
             $this->logger->addLog('Month or/and year is not specified [isValidExpiration]');
             $this->logger->addLog(
-                'Month: ' . isset($month) ? $month : '' .
-                'Year: ' . isset($year) ? $year : '',
+                'Month: ' . isset($month) ? $month : ('' .
+                'Year: ' . isset($year) ? $year : ''),
                 'debug'
             );
             return false;
