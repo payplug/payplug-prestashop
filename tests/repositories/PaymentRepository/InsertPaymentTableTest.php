@@ -90,6 +90,11 @@ final class InsertPaymentTableTest extends BasePaymentRepository
 
     public function testInsertPaymentTableWithValidData()
     {
+        $this->repo
+            ->shouldReceive([
+                'getHashedCart' => true
+            ]);
+
         $this->query
             ->shouldReceive([
                 'insert' => $this->query,
@@ -130,6 +135,11 @@ final class InsertPaymentTableTest extends BasePaymentRepository
 
     public function testInsertPaymentTableThrowException()
     {
+        $this->repo
+            ->shouldReceive([
+                'getHashedCart' => true
+            ]);
+
         $this->query
             ->shouldReceive([
                 'insert' => $this->query,
@@ -147,6 +157,20 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         $this->assertSame(
             $this->repo->insertPaymentTable($this->paymentDetails)['response'],
             '[insertPaymentTable] Error: Bad Request'
+        );
+    }
+
+    public function testInsertPaymentTableWithInvalidHashedCart()
+    {
+        $this->paymentDetails['cart'] = null;
+
+        $this->assertFalse(
+            $this->repo->insertPaymentTable($this->paymentDetails)['result']
+        );
+
+        $this->assertSame(
+            $this->repo->insertPaymentTable($this->paymentDetails)['response'],
+            '[insertPaymentTable] Problem with the getHashedCart method.'
         );
     }
 }
