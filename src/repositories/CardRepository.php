@@ -86,7 +86,7 @@ class CardRepository extends Repository
      */
     public function deleteCards($id_customer)
     {
-        if (!is_int($id_customer) || !($id_customer)) {
+        if (!is_int($id_customer) || !isset($id_customer)) {
             $this->logger->addLog('Error: parameter $id_customer is empty or not integer [deleteCards]');
             return false;
         }
@@ -115,7 +115,7 @@ class CardRepository extends Repository
      */
     public function getCards($payment_or_id_customer, $active_only = false)
     {
-        if (!$payment_or_id_customer) {
+        if (!isset($payment_or_id_customer)) {
             $this->logger->addLog('[getCards] Param $payment_or_id_customer is null: ', 'error');
             return false;
         }
@@ -339,7 +339,7 @@ class CardRepository extends Repository
      */
     public function getCardBrandByPayment($payment)
     {
-        if (!$payment) {
+        if (!isset($payment)) {
             $this->logger->addLog('Parameter $payment is null [getCardBrandByPayment]', 'error');
             return false;
         }
@@ -369,7 +369,7 @@ class CardRepository extends Repository
      */
     public function getCardExpiryDateByPayment($payment)
     {
-        if (!$payment) {
+        if (!isset($payment)) {
             $this->logger->addLog('Parameter $payment is null [getCardExpiryDateByPayment]', 'error');
             return false;
         }
@@ -403,7 +403,7 @@ class CardRepository extends Repository
      */
     public function getCardMaskByPayment($payment)
     {
-        if (!$payment) {
+        if (!isset($payment)) {
             $this->logger->addLog('Parameter $payment is null [getCardMaskByPayment]', 'error');
             return false;
         }
@@ -436,7 +436,7 @@ class CardRepository extends Repository
      */
     public function saveCard($payment)
     {
-        if (!$payment) {
+        if (!isset($payment)) {
             $this->logger->addLog('Parameter $payment is null [saveCard]', 'error');
             return false;
         }
@@ -522,9 +522,11 @@ class CardRepository extends Repository
      */
     public function delete($idPayplugCard)
     {
-        if (!$idPayplugCard) {
-            $this->logger->addLog('Can not process deleting card because of empty idPayplugCard parameter [delete]',
-                'error');
+        if (!isset($idPayplugCard)) {
+            $this->logger->addLog(
+                'Can not process deleting card because of empty idPayplugCard parameter [delete]',
+                'error'
+            );
             return false;
         }
 
@@ -574,7 +576,7 @@ class CardRepository extends Repository
         $card = $this->cardEntity;
         $id = $this->cardEntity->getId();
 
-        if (!$card || $id) {
+        if (!isset($card) || !isset($id)) {
             $this->logger->addLog('$card or $id is null [getFields]');
             $this->logger->addLog('$this->cardEntity : ' . json_encode($this->cardEntity), 'debug');
             return false;
@@ -608,7 +610,7 @@ class CardRepository extends Repository
      */
     public function getByCustomer($customer, $active_only = false)
     {
-        if (!$customer) {
+        if (!isset($customer)) {
             $this->logger->addLog('Parameter $customer is null [getByCustomer]');
         }
 
@@ -658,7 +660,7 @@ class CardRepository extends Repository
      */
     public function isValidExpiration($month, $year)
     {
-        if (!$month || !$year) {
+        if (!isset($month) || !isset($year)) {
             $this->logger->addLog('Month or/and year is not specified [isValidExpiration]');
             $this->logger->addLog(
                 'Month: ' . isset($month) ? $month : '' .
