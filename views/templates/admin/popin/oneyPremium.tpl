@@ -19,11 +19,11 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-{$payplug_contact_url = 'https://www.payplug.com/contact'}
+{$payplug_contact_url = 'https://portal.payplug.com/#/configuration/oney'}
  <p class="payplugPopup_text">
      {assign "link_to_payplug_contact_url" "<a href='{$payplug_contact_url|escape:'htmlall':'UTF-8'}'>"}
-     {l s='admin.popin.premium.redirectActivation' tags=['<br>',$link_to_payplug_contact_url] mod='payplug'}
+     {l s='admin.popin.oneyPremium.redirectOneyActivation' tags=['<br>',$link_to_payplug_contact_url] mod='payplug'}
  </p>
 <div class="payplugPopup_footer -center">
-    <button type="button" class="payplugButton -green -close">{l s='admin.popin.premium.ok' mod='payplug'}</button>
+    <button type="button" class="payplugButton -green -close">{l s='admin.popin.oneyPremium.ok' mod='payplug'}</button>
 </div>

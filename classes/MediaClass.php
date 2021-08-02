@@ -128,6 +128,9 @@ class MediaClass extends \Payplug
             case 'premium':
                 $title = $this->payplug->l('payplug.displayPopin.enableFeature');
                 break;
+            case 'oneyPremium':
+                $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+                break;
             case 'confirm':
                 $title = $this->payplug->l('payplug.displayPopin.saveSettings');
                 break;
