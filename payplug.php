@@ -49,7 +49,7 @@ class Payplug extends PaymentModule
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('payplug.construct.description');
         $this->displayName = 'PayPlug';
-        $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
+        $this->module_key = '2dcb0c3dcd92670db043a59a1cf22907';
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
