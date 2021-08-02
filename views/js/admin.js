@@ -750,10 +750,16 @@ var $document, $window, payplug = {
             var {switcher} = payplug.tools;
             var {settings} = payplug;
 
+
+            var checkpremium = 'premium';
+            if ($switcher.prevObject[0].name == 'payplug_oney') {
+                checkpremium = 'oneyPremium';
+            }
+
             var data = {
                 _ajax: 1,
                 popin: 1,
-                type: 'premium'
+                type: checkpremium
             };
 
             switcher.right($switcher);
