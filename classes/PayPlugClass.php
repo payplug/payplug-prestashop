@@ -1474,7 +1474,7 @@ class PayPlugClass extends PaymentModule
                 $title = $this->l('payplug.displayPopin.enableFeature');
                 break;
             case 'oneyPremium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+                $title = $this->l('payplug.displayPopin.enableFeature');
                 break;
             case 'confirm':
                 $title = $this->l('payplug.displayPopin.saveSettings');
