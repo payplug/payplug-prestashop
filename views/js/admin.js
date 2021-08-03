@@ -176,7 +176,8 @@ var $document, $window, payplug = {
                         var {popup} = payplug.tools;
                         popup.set(result.popin, 'confirm');
                         $('form.payplug').replaceWith(result.content);
-                        var {oney, deferred} = payplug;
+                        var {oney, deferred,settings} = payplug;
+                        settings.load();
                         $window.trigger('load');
                         if (deferred.props.stateChanged != null && deferred.props.active == true && $('input[name=' + deferred.props.switcher + ']:checked').val() == 1) {
                             $('html,body').stop(true).animate({'scrollTop': 0});
@@ -751,10 +752,16 @@ var $document, $window, payplug = {
             var {switcher} = payplug.tools;
             var {settings} = payplug;
 
+
+            var checkpremium = 'premium';
+            if ($switcher.prevObject[0].name == 'payplug_oney') {
+                checkpremium = 'oneyPremium';
+            }
+
             var data = {
                 _ajax: 1,
                 popin: 1,
-                type: 'premium'
+                type: checkpremium
             };
 
             switcher.right($switcher);
