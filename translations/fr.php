@@ -47,6 +47,7 @@ $_MODULE['<{payplug}prestashop>ajax_96fe48f26db5ef9012806cdc0605e74f'] = 'Le mon
 $_MODULE['<{payplug}prestashop>ajax_f0516f2e40049866cf48ee09765bf881'] = 'Le montant à rembourser doit être d\'au moins 0.10€';
 $_MODULE['<{payplug}prestashop>ajax_f51396ebc5142204e3d187dd8097b15d'] = 'Le montant à rembourser est incorrect';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Déclencher';
+$_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Carte supprimée avec succès.';
 $_MODULE['<{payplug}prestashop>cards_1_6_0b3db27bc15f682e92ff250ebb167d4b'] = 'Retour à Mon Compte';
 $_MODULE['<{payplug}prestashop>cards_1_6_0d2d5fa0cfffc8577f948d683a82079e'] = 'Carte supprimée avec succès.';
 $_MODULE['<{payplug}prestashop>cards_1_6_1069362eee49306ddabce2fbe4411835'] = 'Aucune carte n\'est enregistrée pour le moment.';
