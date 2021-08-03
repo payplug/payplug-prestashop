@@ -426,7 +426,7 @@ var $document, $window, payplug = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {login} = payplug,
+            var {login, settings} = payplug,
                 {identifier} = login.props,
                 data = {
                     _ajax: 1,
@@ -465,6 +465,7 @@ var $document, $window, payplug = {
                     if (typeof result.content != 'undefined' && result.content) {
                         $('form.payplug').replaceWith(result.content);
                         login.props.logged = true;
+                        settings.load();
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
                         payplug.tools.popup.error(result.error);
