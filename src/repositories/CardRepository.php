@@ -684,6 +684,6 @@ class CardRepository extends Repository
      */
     public function deleteCardMessage()
     {
-        return $this->l('Card sucessfully deleted. [deleteCardMessage]');
+        return $this->l('card.CardRepository.deleteCardMessage');
     }
 }
