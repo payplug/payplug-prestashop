@@ -21,7 +21,7 @@
 *}
 {$payplug_contact_url = 'https://portal.payplug.com/#/configuration/oney'}
  <p class="payplugPopup_text">
-     {assign "link_to_payplug_contact_url" "<a href='{$payplug_contact_url|escape:'htmlall':'UTF-8'}'>"}
+     {assign "link_to_payplug_contact_url" "<a href='{$payplug_contact_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
      {l s='admin.popin.oneyPremium.redirectOneyActivation' tags=['<br>',$link_to_payplug_contact_url] mod='payplug'}
  </p>
 <div class="payplugPopup_footer -center">
