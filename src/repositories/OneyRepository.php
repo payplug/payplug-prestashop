@@ -624,6 +624,9 @@ class OneyRepository extends Repository
         foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
             if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
                 $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
+                if (isset($use_fees) && !$use_fees) {
+                    $payment_list[$method]['effective_annual_percentage_rate'] = 0;
+                }
             }
         }
 
