@@ -662,8 +662,7 @@ span.ppclose {
   flex-direction: column;
 }
 .payplugOrder_delay {
-  margin-left: 100px;
-  padding-top: 5px;
+  margin-left: 140px;
 }
 @media (max-width: 767px) {
   .payplugOrder_delay {
