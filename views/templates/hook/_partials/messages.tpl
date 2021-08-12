@@ -28,9 +28,13 @@
                 {include file="../"|cat:$message.value}
             {/if}
         {/foreach}
-
         {if isset($with_msg_button) && $with_msg_button}
             <button type="button" class="payplugMsg_button">{l s='Ok' mod='payplug'}</button>
+        {/if}
+
+        {if isset($with_yesno_buttons) && $with_yesno_buttons}
+            <button type="button" class="payplugMsg_button" name="confirm_delete">{l s='Yes' mod='payplug'}</button>
+            <button type="button" class="payplugMsg_button">{l s='No' mod='payplug'}</button>
         {/if}
     </div>
 {/if}
