@@ -454,7 +454,7 @@ button.payplugLink:hover {
   -ms-transition: border 0.4s;
   -o-transition: border 0.4s;
   transition: border 0.4s;
-  width: 300px;
+  width: 223px;
   padding: 24px 16px 36px;
   position: relative;
   cursor: pointer;
@@ -475,11 +475,10 @@ button.payplugLink:hover {
 }
 .payplugOneyFees_title {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 12px;
   margin: 0 0 8px;
 }
 .payplugOneyFees_content {
-  height: 32px;
   font-weight: 400;
   font-size: 12px;
   margin: 0 0 16px;
