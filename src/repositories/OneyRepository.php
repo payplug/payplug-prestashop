@@ -782,7 +782,9 @@ class OneyRepository extends Repository
         }
         $shipping_data = [
             'email' => $this->contextSpecific->getContext()->customer->email,
-            'mobile_phone_number' => $shipping_address->phone_mobile,
+            'mobile_phone_number' => $shipping_address->phone_mobile
+                ? $shipping_address->phone_mobile
+                : $shipping_address->phone,
             'city' => $shipping_address->city,
         ];
 
@@ -856,7 +858,9 @@ class OneyRepository extends Repository
             }
 
             $billing_data = [
-                'mobile_phone_number' => $billing_address->phone_mobile,
+                'mobile_phone_number' => $billing_address->phone_mobile
+                    ? $billing_address->phone_mobile
+                    : $billing_address->phone,
                 'city' => $billing_address->city,
             ];
 
