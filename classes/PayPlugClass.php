@@ -3506,6 +3506,7 @@ class PayPlugClass extends PaymentModule
             die(json_encode([
                 'status' => 'ok',
                 'data' => $data,
+                'template' => $this->hookDisplayAdminOrderMain(['id_order' => $id_order]),
                 'message' => $this->l('payplug.refundPayment.success'),
                 'reload' => $reload
             ]));

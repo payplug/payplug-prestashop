@@ -57,11 +57,12 @@ class AdminClass extends \Payplug
      */
     public function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
+        $context = (new ContextSpecific())->getContext();
         if ($controller_name == 'AdminModules') {
-            $admin_ajax_url = $this->context->link->getAdminLink($controller_name)
-                . '&configure=' . $this->name . '&tab_module=payments_gateways&module_name=payplug';
+            $admin_ajax_url = $context->link->getAdminLink($controller_name)
+                . '&configure=payplug&tab_module=payments_gateways&module_name=payplug';
         } elseif ($controller_name == 'AdminOrders') {
-            $admin_ajax_url = $this->context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
+            $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
         }
         return $admin_ajax_url;
