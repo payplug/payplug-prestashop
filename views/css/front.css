@@ -172,6 +172,7 @@
 /* Payplug payment option */
 .payplugPaymentOption label {
   margin: 0;
+  text-align: left;
 }
 .payplugPaymentOption img {
   margin: 0 12px 0 0;
@@ -186,6 +187,7 @@
   position: relative;
   z-index: 3;
   display: inline-block;
+  max-width: 100%;
 }
 .oneyCta_button {
   font-family: 'Poppins', sans-serif;
@@ -206,6 +208,7 @@
   color: #2F2930;
   cursor: pointer;
   font-size: 11px;
+  max-width: 100%;
 }
 .oneyCta_button:hover {
   color: #7ebd00;
@@ -238,7 +241,12 @@
   width: 106px;
   height: 25px;
   background-size: 110%;
-  margin: 0 0 0 0.25em;
+  margin: 0 0 0 0.45em;
+}
+.oneyCta_logo.-withoutFees {
+  width: 190px;
+  height: 25px;
+  margin: 0 0.25em 0 0.45em;
 }
 .oneyCta_tooltip {
   width: 14px;
@@ -255,6 +263,9 @@
     height: auto;
     background: transparent;
   }
+}
+.oneyCta.-checkout {
+  margin-top: 12px;
 }
 /* Oney Error */
 .oneyError {
@@ -344,17 +355,35 @@
 .-disabled .oneyLogo.-x3 {
   background-image: url(../img/oney/x3_with_fees-alt.svg);
 }
+.oneyLogo.-x3.-withoutFees {
+  background-image: url(../img/oney/x3_without_fees.svg);
+}
+.-disabled .oneyLogo.-x3.-withoutFees {
+  background-image: url(../img/oney/x3_without_fees-alt.svg);
+}
 .oneyLogo.-x3x4 {
-  background-image: url(../img/oney/3x4x.svg);
+  background-image: url(../img/oney/x3x4_with_fees.svg);
 }
 .-disabled .oneyLogo.-x3x4 {
-  background-image: url(../img/oney/3x4x-alt.svg);
+  background-image: url(../img/oney/x3x4_with_fees-alt.svg);
+}
+.oneyLogo.-x3x4.-withoutFees {
+  background-image: url(../img/oney/x3x4_without_fees.svg);
+}
+.-disabled .oneyLogo.-x3x4.-withoutFees {
+  background-image: url(../img/oney/x3x4_without_fees-alt.svg);
 }
 .oneyLogo.-x4 {
   background-image: url(../img/oney/x4_with_fees.svg);
 }
 .-disabled .oneyLogo.-x4 {
   background-image: url(../img/oney/x4_with_fees-alt.svg);
+}
+.oneyLogo.-x4.-withoutFees {
+  background-image: url(../img/oney/x4_without_fees.svg);
+}
+.-disabled .oneyLogo.-x4.-withoutFees {
+  background-image: url(../img/oney/x4_without_fees-alt.svg);
 }
 .oneyLogo.-tooltip {
   background-image: url(../img/oney/tooltip.svg);
@@ -642,12 +671,12 @@
   font-size: 10px;
   line-height: 1.2em;
   color: #8a8a8a;
-  margin: 8px 0 0;
+  padding: 8px 0 0;
   white-space: normal;
 }
 @media (max-width: 767px) {
   .oneyPopin_legal {
-    padding: 0 0 15px;
+    padding: 10px 0 15px;
   }
 }
 .oneyPopin_close {
@@ -973,6 +1002,7 @@
   line-height: 17px;
   width: 100%;
   margin: -10px 0 20px -8px;
+  padding: 12px 0;
 }
 .oneySchedule ul {
   display: flex;
@@ -999,9 +1029,11 @@
 .oneySchedule ul li span:first-child {
   font-weight: 500;
 }
-.oneySchedule ul li:first-child,
 .oneySchedule ul li:last-child {
-  padding: 12px 0;
+  padding: 12px 0 0;
+}
+.-withoutFees.oneySchedule ul li:last-child {
+  padding: 0;
 }
 .oneySchedule ul li small {
   display: block;

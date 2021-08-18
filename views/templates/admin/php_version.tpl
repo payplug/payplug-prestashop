@@ -20,10 +20,8 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <p class="alert alert-danger" data-e2e-error="php_version">
-    {l s='admin.phpversion.wrongPhpVersion' mod='payplug'} <br>
-    {l s='admin.phpversion.beforeLink' mod='payplug'}
-    <a target="_blank" href="{$faq_url|escape:'htmlall':'UTF-8'}" class="payplugLink">{l s='admin.phpversion.link' mod='payplug'}</a>
-    {l s='admin.phpversion.afterLink' mod='payplug'}
+    {assign "link_to_php_version_support_page" "<a href ='$faq_url'>"}
+    {l s='admin.phpversion.wrongPhpVersion' tags=['<br>',$link_to_php_version_support_page] mod='payplug'} <br>
 </p>
 <div class="panel panel-show">
     <div class="panel-heading">{l s='admin.phpversion.heading' mod='payplug'}</div>

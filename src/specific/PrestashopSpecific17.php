@@ -32,10 +32,12 @@ use Tools;
 class PrestashopSpecific17
 {
     public $payplug;
+    private $contextSpecific;
 
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
+        $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
     public function hookHeader()
@@ -98,50 +100,54 @@ class PrestashopSpecific17
         $moduleName = $this->payplug->name;
 
         // Install tab AdminPayPlug
-        $translationsAdminPayPlug = [
-            'en' => 'PayPlug',
-            'gb' => 'PayPlug',
-            'it' => 'PayPlug',
-            'fr' => 'PayPlug'
-        ];
-        $tab = new Tab();
-        foreach (Language::getLanguages(false) as $language) {
-            $id_lang = (int)$language['id_lang'];
-            $iso_code = Tools::strtolower($language['iso_code']);
-            if (isset($translationsAdminPayPlug[$iso_code])) {
-                $tab->name[$id_lang] = $translationsAdminPayPlug[$iso_code];
-            } else {
-                $tab->name[$id_lang] = $translationsAdminPayPlug['en'];
+        if (!Tab::getIdFromClassName('AdminPayPlug')) {
+            $translationsAdminPayPlug = [
+                'en' => 'PayPlug',
+                'gb' => 'PayPlug',
+                'it' => 'PayPlug',
+                'fr' => 'PayPlug'
+            ];
+            $tab = new Tab();
+            foreach (Language::getLanguages(false) as $language) {
+                $id_lang = (int)$language['id_lang'];
+                $iso_code = Tools::strtolower($language['iso_code']);
+                if (isset($translationsAdminPayPlug[$iso_code])) {
+                    $tab->name[$id_lang] = $translationsAdminPayPlug[$iso_code];
+                } else {
+                    $tab->name[$id_lang] = $translationsAdminPayPlug['en'];
+                }
             }
+
+            $tab->class_name = 'AdminPayPlug';
+            $tab->module = $moduleName;
+
+            $installed = $installed && $tab->save();
         }
-
-        $tab->class_name = 'AdminPayPlug';
-        $tab->module = $moduleName;
-
-        $installed = $installed && $tab->save();
 
         // Install tab AdminPayPlugInstallment
-        $translationsAdminPayPlugInstallment = [
-            'en' => 'Installment Plans',
-            'gb' => 'Installment Plans',
-            'it' => 'Pagamenti frazionati',
-            'fr' => 'Paiements en plusieurs fois'
-        ];
-        $tab = new Tab();
-        foreach (Language::getLanguages(false) as $language) {
-            $id_lang = (int)$language['id_lang'];
-            $iso_code = Tools::strtolower($language['iso_code']);
-            if (isset($translationsAdminPayPlugInstallment[$iso_code])) {
-                $tab->name[$id_lang] = $translationsAdminPayPlugInstallment[$iso_code];
-            } else {
-                $tab->name[$id_lang] = $translationsAdminPayPlugInstallment['en'];
+        if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
+            $translationsAdminPayPlugInstallment = [
+                'en' => 'Installment Plans',
+                'gb' => 'Installment Plans',
+                'it' => 'Pagamenti frazionati',
+                'fr' => 'Paiements en plusieurs fois'
+            ];
+            $tab = new Tab();
+            foreach (Language::getLanguages(false) as $language) {
+                $id_lang = (int)$language['id_lang'];
+                $iso_code = Tools::strtolower($language['iso_code']);
+                if (isset($translationsAdminPayPlugInstallment[$iso_code])) {
+                    $tab->name[$id_lang] = $translationsAdminPayPlugInstallment[$iso_code];
+                } else {
+                    $tab->name[$id_lang] = $translationsAdminPayPlugInstallment['en'];
+                }
             }
-        }
-        $tab->class_name = 'AdminPayPlugInstallment';
-        $tab->module = $moduleName;
-        $tab->id_parent = Tab::getIdFromClassName('AdminPayPlug');
+            $tab->class_name = 'AdminPayPlugInstallment';
+            $tab->module = $moduleName;
+            $tab->id_parent = Tab::getIdFromClassName('AdminPayPlug');
 
-        $installed = $installed && $tab->save();
+            $installed = $installed && $tab->save();
+        }
 
         return $installed;
     }
@@ -166,5 +172,21 @@ class PrestashopSpecific17
         }
 
         return $flag;
+    }
+
+    /**
+     * @description Link to order by order state
+     *
+     * @param int $order_state
+     * @return string
+     */
+    public function getOrdersByStateLink($order_state)
+    {
+        return $this->contextSpecific->link->getAdminLink(
+            'AdminOrders',
+            true,
+            [],
+            ['order[filters][osname]' => $order_state]
+        );
     }
 }
