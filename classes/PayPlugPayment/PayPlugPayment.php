@@ -525,7 +525,7 @@ class PayPlugPayment
 
         unset($address->country);
 
-        foreach ($fields as $key => $field) {
+        foreach (array_keys($fields) as $key) {
             $value = $this->getField($address, $key);
             if ($value === null) {
                 $method = $this->getFieldMethod($key, 'address');
@@ -617,10 +617,9 @@ class PayPlugPayment
     /**
      * Get Address title form Customer gender
      *
-     * @param Address $address
      * @return string
      */
-    private function getAddressTitle(Address $address)
+    private function getAddressTitle()
     {
         return null;
     }
@@ -650,10 +649,9 @@ class PayPlugPayment
     /**
      * Get Address email from customer
      *
-     * @param Address $address
      * @return string
      */
-    private function getAddressEmail(Address $address)
+    private function getAddressEmail()
     {
         return $this->customer->email;
     }
@@ -734,7 +732,7 @@ class PayPlugPayment
      *
      * @return string
      */
-    private function getAddressLanguage(Address $address)
+    private function getAddressLanguage()
     {
         return $this->getIsoFromLanguageCode($this->context->language);
     }
@@ -1070,7 +1068,7 @@ class PayPlugPayment
 
             // then format code
             $iso_code = $this->getIsoCodeByCountryId($country->id);
-            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             return $phone_util->isValidNumber($parsed) ?

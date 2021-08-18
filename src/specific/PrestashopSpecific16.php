@@ -69,8 +69,7 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED')
-            && (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -179,32 +178,35 @@ class PrestashopSpecific16
     // todo: set Tab install process in a specific
     public function installTab()
     {
-        $translations = [
-            'en' => 'Installment Plans',
-            'gb' => 'Installment Plans',
-            'it' => 'Pagamenti frazionati',
-            'fr' => 'Paiements en plusieurs fois'
-        ];
+        $installed = true;
 
-        $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
+        if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
+            $translations = [
+                'en' => 'Installment Plans',
+                'gb' => 'Installment Plans',
+                'it' => 'Pagamenti frazionati',
+                'fr' => 'Paiements en plusieurs fois'
+            ];
 
-        $tab = new Tab();
+            $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
 
-        foreach (Language::getLanguages(false) as $language) {
-            $iso_code = Tools::strtolower($language['iso_code']);
-            if (isset($translations[$iso_code])) {
-                $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
-            } else {
-                $tab->name[(int)$language['id_lang']] = $translations['en'];
+            $tab = new Tab();
+            foreach (Language::getLanguages(false) as $language) {
+                $iso_code = Tools::strtolower($language['iso_code']);
+                if (isset($translations[$iso_code])) {
+                    $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
+                } else {
+                    $tab->name[(int)$language['id_lang']] = $translations['en'];
+                }
             }
+
+            $tab->class_name = 'AdminPayPlugInstallment';
+            $tab->module = $this->payplug->name;
+            $tab->id_parent = $adminPayPlugId;
+            $installed = $installed && $tab->save();
         }
 
-        $tab->class_name = 'AdminPayPlugInstallment';
-
-        $tab->module = $this->payplug->name;
-        $tab->id_parent = $adminPayPlugId;
-
-        return $tab->save();
+        return $installed;
     }
 
     // todo: set Tab uninstall process in a specific
@@ -220,5 +222,33 @@ class PrestashopSpecific16
         }
 
         return $flag;
+    }
+    /**
+     * @description Link to order by order state
+     *
+     * @param int $order_state
+     * @return string
+     */
+    public function getOrdersByStateLink($order_state)
+    {
+        if ($this->contextSpecific->cookie->__get('submitFilterorder')) {
+            $this->contextSpecific->cookie->__unset('submitFilterorder');
+        }
+        $this->contextSpecific->cookie->__set('submitFilterorder', 1);
+
+        if ($this->contextSpecific->cookie->__get('ordersorderFilter_os!id_order_state')) {
+            $this->contextSpecific->cookie->__unset('ordersorderFilter_os!id_order_state');
+        }
+        $this->contextSpecific->cookie->__set('ordersorderFilter_os!id_order_state', $order_state);
+
+        if ($this->contextSpecific->cookie->__get('ordersorderFilter_a!date_add')) {
+            $this->contextSpecific->cookie->__unset('ordersorderFilter_a!date_add');
+        }
+        $this->contextSpecific->cookie->__set('ordersorderFilter_a!date_add', '["",""]');
+
+        $this->contextSpecific->cookie->write();
+
+        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true);
+        return $link;
     }
 }

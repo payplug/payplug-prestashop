@@ -357,10 +357,10 @@ class PaymentRepository extends Repository
 
         $cartHash = $this->getHashedCart($paymentDetails);
 
-        if (!$cartHash || !is_string($cartHash)) {
+        if (isset($cartHash['result']) && !$cartHash['result']) {
             return $this->returnPaymentError(
-                ['name' => 'cartHash', 'value' => $cartHash],
-                '[updatePaymentTable] $cartHash is null or not a string'
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[updatePaymentTable] Problem with the getHashedCart method.'
             );
         }
 
@@ -548,12 +548,14 @@ class PaymentRepository extends Repository
 
         $paymentDate = date('Y-m-d H:i:s');
 
-        $cartToHash = $paymentDetails['cart'];
-        $cartToHash->date_add = $cartToHash->date_upd = null;
-        $cartToHash->id_address_delivery = (string)$cartToHash->id_address_delivery;
-        $cartToHash->id_address_invoice = (string)$cartToHash->id_address_invoice;
+        $cartHash = $this->getHashedCart($paymentDetails);
 
-        $cartHash = hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        if (isset($cartHash['result']) && !$cartHash['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] Problem with the getHashedCart method.'
+            );
+        }
 
         $this->query
             ->insert()

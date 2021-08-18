@@ -33,8 +33,8 @@ var $document, $window, payplug = {
     abort: {
         init: function () {
             var {abort} = payplug;
-            $document.on('click','input[name=submitPPAbort]', abort.call)
-                .on('click','button[name=confirmPayplugAbort]', abort.confirm);
+            $document.on('click', 'input[name=submitPPAbort]', abort.call)
+                .on('click', 'button[name=confirmPayplugAbort]', abort.confirm);
         },
         call: function (event) {
             event.preventDefault();
@@ -87,6 +87,73 @@ var $document, $window, payplug = {
                 success: function (response) {
                     if (response.reload) {
                         location.reload();
+                    }
+                }
+            });
+        }
+    },
+    refund: {
+        init: function () {
+            var {refund} = payplug;
+            $document.on('click', 'input[name=submitPPRefund]', refund.call);
+        },
+        call: function () {
+            var url = $('input:hidden[name=admin_ajax_url]').val(),
+                data = {
+                _ajax: 1,
+                refund: 1,
+                amount: $('input[name=pp_amount2refund]').val(),
+                id_customer: $('input:hidden[name=id_customer]').val(),
+                pay_id: $('input:hidden[name=pay_id]').val(),
+                inst_id: $('input:hidden[name=inst_id]').val(),
+                id_order: $('input:hidden[name=id_order]').val(),
+                pay_mode: $('input:hidden[name=pay_mode]').val()
+            };
+
+            $('#pppanel form p.pperror').hide();
+            $('#pppanel form p.ppsuccess').hide();
+
+            if ($('#pppanel input[name=change_order_state]').is(":checked")) {
+                data['id_state'] = $('#pppanel input[name=change_order_state]').val();
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: data,
+                beforeSend: function () {
+                    $('#pppanel .loader').show();
+                    $('input[name=submitPPRefund]').prop("disabled", true);
+                },
+                complete: function () {
+                    $('#pppanel .loader').hide();
+                    $('input[name=submitPPRefund]').prop("disabled", false);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('An error occurred while trying to refund. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    $('input[name=submitPPRefund]').prop("disabled", false);
+                },
+                success: function (result) {
+                    if (result.status == 'error') {
+                        $('#pppanel form p.pperror').html(result.data)
+                            .removeClass('hide')
+                            .show();
+                    } else {
+                        $('.payplugOrder').replaceWith(result.template);
+                        $('#pppanel form p.ppsuccess').html(result.message)
+                            .removeClass('hide')
+                            .show();
+                        if (result.reload) {
+                            location.reload();
+                        }
+                        $('input[name=pp_amount2refund]').val('');
                     }
                 }
             });
@@ -161,11 +228,6 @@ var $document, $window, payplug = {
     }
 };
 $(document).ready(function () {
-    $('input[name=submitPPRefund]').bind('click', function (e) {
-        e.preventDefault();
-        callRefund();
-    });
-
     $('input[name=submitPPUpdate]').bind('click', function (e) {
         e.preventDefault();
         callUpdate();
@@ -188,8 +250,7 @@ $(document).ready(function () {
     payplug.init();
 });
 
-function callRefund()
-{
+function callRefund() {
     $('#pppanel form p.pperror').hide();
     $('#pppanel form p.ppsuccess').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -200,9 +261,28 @@ function callRefund()
     var id_order = $('input:hidden[name=id_order]').val();
     var id_state = $('#pppanel input[name=change_order_state]').val();
     var pay_mode = $('input:hidden[name=pay_mode]').val();
-    var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, inst_id: inst_id, id_order: id_order, pay_mode: pay_mode};
+    var data = {
+        _ajax: 1,
+        refund: 1,
+        amount: amount,
+        id_customer: id_customer,
+        pay_id: pay_id,
+        inst_id: inst_id,
+        id_order: id_order,
+        pay_mode: pay_mode
+    };
     if ($('#pppanel input[name=change_order_state]').is(":checked")) {
-        var data = {_ajax: 1, refund: 1, amount: amount, id_customer: id_customer, pay_id: pay_id, inst_id: inst_id, id_order: id_order, pay_mode: pay_mode, id_state: id_state};
+        var data = {
+            _ajax: 1,
+            refund: 1,
+            amount: amount,
+            id_customer: id_customer,
+            pay_id: pay_id,
+            inst_id: inst_id,
+            id_order: id_order,
+            pay_mode: pay_mode,
+            id_state: id_state
+        };
     }
 
     $.ajax({
@@ -248,8 +328,7 @@ function callRefund()
     });
 }
 
-function callUpdate()
-{
+function callUpdate() {
     $('#pppanel form p.pperror').hide();
     $('#pppanel form p.ppsuccess').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -296,8 +375,7 @@ function callUpdate()
     });
 }
 
-function callAbort()
-{
+function callAbort() {
     $('.ppoverlay').remove();
     $('#payplug_popin').remove();
     var url = $('input:hidden[name=admin_ajax_url]').val();
@@ -356,8 +434,7 @@ function callAbort()
     });
 }
 
-function callCapture()
-{
+function callCapture() {
     $('.pp-capture .pperror').hide();
     $('.pp-capture .ppsuccess').hide();
     var url = $('input:hidden[name=admin_ajax_url]').val();

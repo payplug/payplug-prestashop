@@ -161,7 +161,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('oney.assignOneyPriceAndPaymentOptions.unavailable')
         );
 
         $this->assign->assign([
@@ -191,17 +191,13 @@ class OneyRepository extends Repository
         $min_amount = $this->payplug->convertAmount($limits['min'], true);
         $max_amount = $this->payplug->convertAmount($limits['max'], true);
 
-        $legal_text = 'Offre de financement avec apport obligatoire, 
-        réservée aux particuliers et valable pour tout achat de %s à %s. ';
-        $legal_text .= 'Sous réserve d\'acceptation par Oney Bank. ';
-        $legal_text .= 'Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. ';
-        $legal_text .= 'Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 
-        546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr ';
-        $legal_text .= 'Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
+        $legal_text = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+            ? $this->l('oney.assignLegalNotice.legalWithFees')
+            : $this->l('oney.assignLegalNotice.legalWithoutFees');
 
         $this->assign->assign([
             'legal_notice' => sprintf(
-                $this->l($legal_text),
+                $legal_text,
                 $this->toolsSpecific->tool('displayPrice', $min_amount),
                 $this->toolsSpecific->tool('displayPrice', $max_amount)
             )
@@ -324,6 +320,9 @@ class OneyRepository extends Repository
     public function displayOneyPopin()
     {
         $this->assignLegalNotice();
+        $this->assign->assign([
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+        ]);
         return $this->payplug->fetchTemplate('oney/popin.tpl');
     }
 
@@ -337,6 +336,7 @@ class OneyRepository extends Repository
     public function displayOneySchedule($oney_payment, $amount)
     {
         $vars = [
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
@@ -358,6 +358,7 @@ class OneyRepository extends Repository
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->assign->assign([
+                'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
                 'payplug_module_dir' => str_replace(
                     'payplug/payplug.php',
                     '',
@@ -599,24 +600,26 @@ class OneyRepository extends Repository
         $country = $this->toolsSpecific->tool('strtoupper', $country);
 
         $available_oney_payments = $this->oneyEntity->getOperations();
-        $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
+        $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
-        foreach ($available_oney_payments as $key => $oney_payment) {
-            $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
+        $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
+        foreach (array_keys($oney_simulations['simulations']) as $key) {
+            $with_fees = (bool)strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
-                unset($available_oney_payments[$key]);
+                unset($oney_simulations['simulations'][$key]);
             }
         }
 
-        $oney_sims = $this->getOneySimulations($amount, $country, $available_oney_payments);
-
-        if (!$oney_sims['result']) {
+        if (!$oney_simulations['result']) {
             return $payment_list;
         }
 
-        foreach ($oney_sims['simulations'] as $method => $oney_sim) {
-            if (isset($oney_sim['installments']) && $oney_sim['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_sim, $amount);
+        foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
+            if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
+                $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
+                if (isset($use_fees) && !$use_fees) {
+                    $payment_list[$method]['effective_annual_percentage_rate'] = 0;
+                }
             }
         }
 
@@ -654,7 +657,7 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('Oney is momentarily unavailable.')
+            $oney_payment_options ? false : $this->l('oney.getOneyPriceAndPaymentOptions.unavailable')
         );
 
         $this->assign->assign([
@@ -1300,9 +1303,13 @@ class OneyRepository extends Repository
 
         if (!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
             $error = $this->l('Your email address is not a valid email');
-        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
-            && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
+        } elseif (
+            $tools->tool('strlen', $email, 'UTF-8') > 100
+            && $tools->tool('strpos', $email, '+') !== false
+        ) {
+            $error = $this->l(
+                'Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).'
+            );
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
             $error = $this->l('Your email address is too long. Please change your email address (100 characters max).');
         } elseif (strpos($email, '+') !== false) {
