@@ -200,7 +200,6 @@ $_MODULE['<{payplug}prestashop>oneyrepository_16bfbf9c462762cf1cba4134ec53c504']
 $_MODULE['<{payplug}prestashop>oneyrepository_170f5e9365a8f2305fea05a99c36dfcc'] = 'L\'adresse e-mail est invalide';
 $_MODULE['<{payplug}prestashop>oneyrepository_22d545ded224c1e3f0f821e99f01ed09'] = 'Le montant total de votre commande doit être compris entre %s et %s pour payer avec Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56'] = 'Veuillez en saisir une qui ne dépasse pas 32 caractères.';
-$_MODULE['<{payplug}prestashop>oneyrepository_37aad38a9a02f6659c12948a70b838fe'] = 'Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 www.orias.fr.  Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 $_MODULE['<{payplug}prestashop>oneyrepository_427d2eef786cda4bb73d9ec1429a34b9'] = 'Veuillez saisir votre nom.';
 $_MODULE['<{payplug}prestashop>oneyrepository_46170db793b9e6e143d187c02a572b7c'] = 'Veuillez saisir votre adresse de livraison.';
 $_MODULE['<{payplug}prestashop>oneyrepository_64f345381f968fbbd95f877090c2c984'] = 'Veuillez saisir votre adresse de facturation.';
@@ -213,7 +212,6 @@ $_MODULE['<{payplug}prestashop>oneyrepository_ad2063f6a03a8c2c0d94846e41154218']
 $_MODULE['<{payplug}prestashop>oneyrepository_b286504b1d4d5ee1aeb919ad1e1255b8'] = 'France, Martinique, Guadeloupe, La Reunion, Mayotte ou Guyane';
 $_MODULE['<{payplug}prestashop>oneyrepository_b441d533401a2d2570008757281a981e'] = 'Votre adresse e-mail est trop longue et le caractère + n\'est pas autorisé, veuillez en saisir une autre qui ne dépasse pas 100 caractères.';
 $_MODULE['<{payplug}prestashop>oneyrepository_b53458989589381e9b1ed27bfbd19f99'] = 'Pour un paiement avec Oney, les adresses de livraison et de facturation doivent être en';
-$_MODULE['<{payplug}prestashop>oneyrepository_bd4294bea3cf9c876195adccc6ebbb32'] = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 $_MODULE['<{payplug}prestashop>oneyrepository_c0a3302554e79a564812412457b7041e'] = 'La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à l\'étape du paiement.';
 $_MODULE['<{payplug}prestashop>oneyrepository_c5c750b6d21be8ff4a9e1ca50d49275c'] = 'Veuillez saisir votre prénom.';
 $_MODULE['<{payplug}prestashop>oneyrepository_ca443f17e9e3cddaee616db9d2614f00'] = 'Veuillez saisir votre code postal.';
@@ -358,6 +356,8 @@ $_MODULE['<{payplug}prestashop>popin_19cf27400430cae294abe8c130a8d377'] = 'Paiem
 $_MODULE['<{payplug}prestashop>popin_4966fa949aed9ec282f487176693330f'] = 'Payer';
 $_MODULE['<{payplug}prestashop>popin_74e747c329df0fcd765e14259821f6a4'] = 'sans frais';
 $_MODULE['<{payplug}prestashop>popin_8b70bd53d8f4322982f066ecf5655fcc'] = 'par carte bancaire';
+$_MODULE['<{payplug}prestashop>popin_8def3e33e7dfa02cf19538095121ef81'] = 'Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 www.orias.fr.  Correspondance : CS 60 006 - 59895 Lille Cedex - [1]www.oney.fr[/1]';
+$_MODULE['<{payplug}prestashop>popin_cd73f52a61ee7f26a6d37a69c045c84f'] = 'Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr Correspondance : CS 60 006 - 59895 Lille Cedex - [1]www.oney.fr[/1]';
 $_MODULE['<{payplug}prestashop>popin_d3d2e617335f08df83599665eef8a418'] = 'Fermer';
 $_MODULE['<{payplug}prestashop>premium_b2e272184549c5d806805623cd0abfea'] = 'Vous n\'avez pas accès à cette fonctionnalité.[1]Pour plus d\'informations, veuillez nous contacter via [2]notre site[/2].[/1]';
 $_MODULE['<{payplug}prestashop>premium_bfce2c334962e4675fa1d6e311a9a975'] = 'Ok';

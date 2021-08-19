@@ -674,6 +674,9 @@
   padding: 8px 0 0;
   white-space: normal;
 }
+.oneyPopin_legal a {
+  color: #7ebd00;
+}
 @media (max-width: 767px) {
   .oneyPopin_legal {
     padding: 10px 0 15px;
