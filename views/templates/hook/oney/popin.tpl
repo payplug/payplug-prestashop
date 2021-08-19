@@ -51,9 +51,14 @@
             </span>
         {/foreach}
 
-        {if $legal_notice}
-            <span class="oneyPopin_legal">{$legal_notice|escape:'htmlall':'UTF-8'}</span>
-        {/if}
+        {assign "link_to_oney" "<a href='{$oney_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
+        <span class="oneyPopin_legal">
+            {if $oney_with_fees}
+                {l s='hook.oney.popin.legalNoticeWithFees' tags=[$link_to_oney] sprintf=[$oney_min_amounts, $oney_max_amounts] mod='payplug'}
+            {else}
+                {l s='hook.oney.popin.legalNoticeWithoutFees' tags=[$link_to_oney] sprintf=[$oney_min_amounts, $oney_max_amounts] mod='payplug'}
+            {/if}
+        </span>
     {else}
         <p class="oneyPopin_error">{l s='hook.oney.popin.oneyUnavailable' mod='payplug'}</p>
     {/if}

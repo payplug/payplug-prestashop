@@ -198,16 +198,11 @@ class OneyRepository extends Repository
         $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
         $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
 
-        $legal_text = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
-            ? $this->l('oney.assignLegalNotice.legalWithFees')
-            : $this->l('oney.assignLegalNotice.legalWithoutFees');
-
         $this->assign->assign([
-            'legal_notice' => sprintf(
-                $legal_text,
-                $this->toolsSpecific->tool('displayPrice', $min_amount),
-                $this->toolsSpecific->tool('displayPrice', $max_amount)
-            )
+            'oney_with_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
+            'oney_min_amounts' => $this->toolsSpecific->tool('displayPrice', $min_amount),
+            'oney_max_amounts' => $this->toolsSpecific->tool('displayPrice', $max_amount),
+            'oney_url' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
         ]);
     }
 
