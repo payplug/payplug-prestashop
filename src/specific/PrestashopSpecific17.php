@@ -106,6 +106,7 @@ class PrestashopSpecific17
             'value' => 'integrated',
         ];
         $integrated['tpl'] = 'integrated.tpl';
+        $integrated['action'] = 'javascript:alert(\'Integrated payment validation\');';
         $integrated['logo'] = false;
         $integrated['extra_classes'] = 'payplug integrated';
         $integrated['callToActionText'] = $this->payplug->l('specific17.getIntegratedPaymentOption.label', 'prestashopspecific17');

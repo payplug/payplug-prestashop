@@ -36,8 +36,9 @@
 <script type="text/javascript">
     if (typeof payplugModule != 'undefined') {
         payplugModule.tools.loadScript('https://secure.alpha.notpayplug.com/integrated/js', function() {
-            console.log('`https://secure.alpha.notpayplug.com/integrated/js` loaded');
             payplugModule.integrated.init();
         });
+    } else {
+        console.log('Type of payplugModule : ' + typeof payplugModule);
     }
 </script>
