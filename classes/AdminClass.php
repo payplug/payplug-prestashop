@@ -55,7 +55,7 @@ class AdminClass extends \Payplug
      * @param int $id_order
      * @return string
      */
-    public function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
+    public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
         $context = (new ContextSpecific())->getContext();
         if ($controller_name == 'AdminModules') {
