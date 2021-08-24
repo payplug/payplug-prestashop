@@ -33,10 +33,11 @@
     </div>
     <button class="payplugIntegratedPayment_button -green" type="submit">{l s='hook.checkout.integrated.button' mod='payplug'}</button>
 </form>
-
-<script type="text/javascript" src="https://secure.alpha.notpayplug.com/integrated/js"></script>
 <script type="text/javascript">
     if (typeof payplugModule != 'undefined') {
-        payplugModule.integrated.init();
+        payplugModule.tools.loadScript('https://secure.alpha.notpayplug.com/integrated/js', function() {
+            console.log('`https://secure.alpha.notpayplug.com/integrated/js` loaded');
+            payplugModule.integrated.init();
+        });
     }
 </script>

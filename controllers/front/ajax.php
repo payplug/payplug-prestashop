@@ -220,7 +220,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $token = $tools->tool('getValue', 'token');
                 if ($token) {
                     // Set the payment id
-                    $pay_id = reset($token);
+                    $pay_id = $token['token'];
 
                     // Then compare it to the current payment id in database
                     $secure = $this->payplug->getPaymentByCart($context->cart->id);

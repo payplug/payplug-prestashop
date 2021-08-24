@@ -26,11 +26,11 @@ var allow_debug = true, debug = function (str) {
 };
 var $document, $window, payplugModule = {
     init: function () {
-        this.card.init();
-        this.order.init();
-        this.oney.init();
-        this.popup.init();
-        this.integrated.init();
+        for (const section in this) {
+            if (section != 'init') {
+                payplug[section]['init']();
+            }
+        }
     },
     order: {
         init: function () {
@@ -82,58 +82,64 @@ var $document, $window, payplugModule = {
             identifier: 'payplugIntegratedPayment',
             query: null,
             paymentId: null,
+            paymentOptionId: null,
             form: {},
             api: null,
-            initialized : false,
-            setted : false,
         },
         init: function () {
+            console.log('start init')
             var integrated = payplugModule.integrated,
                 $intForm = $('.' + integrated.props.identifier),
-                $submitButton = $('.' + integrated.props.identifier + '_button'),
-                $checkoutform = $('.checkout-step form');
+                $submitButton = $('.' + integrated.props.identifier + '_button');
 
             if (!$intForm.length) {
+                console.log('!$intForm');
                 return false;
             }
 
-            if (integrated.props.initialized) {
+            $('form').submit(function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log(event);
                 return false;
+            })
+
+            var $methodInput = $('input[name=method][value=integrated]').eq(0),
+                $checkoutForm = $methodInput.parents('form').eq(0),
+                payment_option_id = $checkoutForm.find('button').attr('id').replace('pay-with-payment-option-','');
+
+            integrated.props.paymentOptionId = payment_option_id;
+
+            $methodInput.on('submit', integrated.submitForm);
+            $intForm.on('submit', integrated.submitForm);
+            $intForm.get(0).on('submit', function(event){
+                alert('yess!!!!')
+            })
+
+            $submitButton.on('click', integrated.validate);
+            $('#payment-option-' + payment_option_id).on('click', integrated.set);
+            integrated.set();
+            console.log('end init')
+        },
+        submitForm: function (event){
+            var integrated = payplugModule.integrated,
+                payment_option_id = integrated.props.paymentOptionId;
+
+            if($('#payment-option-' + payment_option_id).is(':checked')) {
+                event.preventDefault();
+                event.stopPropagation();
+                integrated.validate();
             }
-            integrated.props.initialized = true;
-
-            if ($checkoutform.length) {
-                $submitButton.hide();
-            }
-
-            var $optionContainer = $intForm.parents('.additional-information'),
-                payment_option_id = $optionContainer.attr('id').replace('payment-option-','').replace('-additional-information',''),
-                $payment_option = $('#payment-option-' + payment_option_id);
-
-            $checkoutform.on('submit', function(event){
-                if($payment_option.is(':checked')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    integrated.submit();
-                }
-            });
-            $submitButton.on('click', integrated.submit);
-            $payment_option.on('click', integrated.set);
-            $window.on('load', integrated.set);
         },
         set: function () {
             if (typeof Payplug == 'undefined' || typeof payplug_publishable_key == 'undefined') {
                 console.log('Payplug api is ' + typeof Payplug);
+                console.log('payplug_publishable_key api is ' + typeof payplug_publishable_key);
                 return;
             }
 
             var integrated = payplugModule.integrated;
 
-            if (integrated.props.setted) {
-                return;
-            }
-
-            integrated.props.setted = true;
             integrated.props.api = Payplug;
 
             var api = integrated.props.api,
@@ -141,8 +147,15 @@ var $document, $window, payplugModule = {
                 $cardholder = $form.find('.-cardholder'),
                 $pan = $form.find('.-pan'),
                 $cvv = $form.find('.-cvv'),
-                $exp = $form.find('.-exp'),
-                intPayment = new api.IntegratedPayment(payplug_publishable_key, $form.get(0)),
+                $exp = $form.find('.-exp');
+
+            // check if form already exists
+            if($pan.find('iframe').length) {
+                return;
+            }
+
+            // initialize intPayment
+            var intPayment = new api.IntegratedPayment(payplug_publishable_key, $form.get(0)),
                 form = {
                     intPayment: intPayment,
                     cholder: intPayment.cardHolder($cardholder.get(0)),
@@ -151,6 +164,7 @@ var $document, $window, payplugModule = {
                     exp: intPayment.expiration($exp.get(0)),
                 };
 
+            // Add event listener
             form.intPayment.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX);
             form.cholder.onChange((event) => {
                 console.log('test');
@@ -189,7 +203,7 @@ var $document, $window, payplugModule = {
                 integrated.confirm(payment_id);
             });
         },
-        submit: function (event) {
+        validate: function (event) {
             if (typeof event != 'undefined') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -792,6 +806,27 @@ var $document, $window, payplugModule = {
         hydrate: function (content) {
             var props = payplugModule.popup.props;
             $('.' + props.identifier + '_content').html(content);
+        }
+    },
+    tools: {
+        loadScript: function(url, callback){
+            var script = document.createElement( "script" )
+            script.type = "text/javascript";
+            if(script.readyState) {  // only required for IE <9
+                script.onreadystatechange = function() {
+                    if ( script.readyState === "loaded" || script.readyState === "complete" ) {
+                        script.onreadystatechange = null;
+                        callback();
+                    }
+                };
+            } else {  //Others
+                script.onload = function() {
+                    callback();
+                };
+            }
+
+            script.src = url;
+            document.getElementsByTagName( "head" )[0].appendChild( script );
         }
     }
 };
