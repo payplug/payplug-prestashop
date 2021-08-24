@@ -112,9 +112,6 @@ var $document, $window, payplugModule = {
 
             $methodInput.on('submit', integrated.submitForm);
             $intForm.on('submit', integrated.submitForm);
-            $intForm.get(0).on('submit', function(event){
-                alert('yess!!!!')
-            })
 
             $submitButton.on('click', integrated.validate);
             $('#payment-option-' + payment_option_id).on('click', integrated.set);
