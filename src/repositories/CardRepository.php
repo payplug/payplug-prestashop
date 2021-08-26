@@ -111,7 +111,7 @@ class CardRepository extends Repository
      *
      * @param int | object $payment_or_id_customer
      * @param bool $active_only
-     * @return array
+     * @return array | bool
      */
     public function getCards($payment_or_id_customer, $active_only = false)
     {
@@ -154,7 +154,7 @@ class CardRepository extends Repository
             $this->logger->addLog('Error: Bad parameter detected while retrieving cards [getCards]');
             $this->logger->addLog('$payment_or_id_customer: ' . $payment_or_id_customer
                 . ' is not a  customer_id or a payment object passed as parameter');
-            return [];
+            return false;
         }
 
         $config = $this->configurationSpecific;

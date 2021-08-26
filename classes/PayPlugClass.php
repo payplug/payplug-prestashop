@@ -1861,11 +1861,11 @@ class PayPlugClass extends PaymentModule
             $getCards_param = $payment->metadata['ID Client'];
         }
         $card_details = $this->card->getCards($getCards_param);
-        $card_details = end($card_details);
+        $card_details = is_array($card_details) ? end($card_details) : false;
 
         // Card brand
         $card_brand = null;
-        if (isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
+        if ($card_details && isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
             $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
 
             // Country
@@ -1876,13 +1876,13 @@ class PayPlugClass extends PaymentModule
 
         // Card mask
         $card_mask = null;
-        if (isset($card_details['last4']) && !empty($card_details['last4'])) {
+        if ($card_details && isset($card_details['last4']) && !empty($card_details['last4'])) {
             $card_mask = '**** **** **** ' . $card_details['last4'];
         }
 
         // Card exp. date
         $card_date = null;
-        if ((isset($card_details['exp_month']) && !empty($card_details['exp_month']))
+        if ($card_details && (isset($card_details['exp_month']) && !empty($card_details['exp_month']))
             && (isset($card_details['exp_year']) && !empty($card_details['exp_year']))) {
             $card_date = $card_details['exp_month'] . '/' . $card_details['exp_year'];
         }
