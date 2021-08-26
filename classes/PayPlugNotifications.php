@@ -120,7 +120,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: exitProcess');
         if ($str) {
-            $this->logger->addLog('Notification: exitProcess');
+            $this->logger->addLog('Message given: ' . $str);
         }
         if ($this->lock_key) {
             if (!PayplugLock::deleteLockG2($this->lock_key)) {
@@ -449,6 +449,7 @@ class PayPlugNotifications
             $this->logger->addLog('Can\'t retrieve payment with the TEST and LIVE API Key');
             $this->exitProcess('Can\'t retrieve payment with the TEST and LIVE API Key', 500);
         }
+        $this->logger->addLog('Current payment ID: ' . $this->payment->id);
 
         // Set the order state
         $this->setOrderStates();
@@ -759,9 +760,11 @@ class PayPlugNotifications
      */
     private function processUpdateOrder()
     {
-        $this->logger->addLog('UPDATE MODE');
+        $this->logger->addLog('Notification: processUpdateOrder');
         $type = $this->plugin->getOrderState()->getType((int)$this->order->current_state);
-        $this->type = $type ?: 'nothing';
+        $this->type = $type ? $type : 'nothing';
+        $this->logger->addLog('Current order state: ' . $this->order->current_state);
+        $this->logger->addLog('Type getted: ' . $this->type);
         $method = 'processType' . ucfirst($this->type);
         $this->$method();
     }
@@ -931,7 +934,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok':'nok'));
 
         // Define if payment is deferred resource
-        if (isset($this->payment->authorization)) {
+        if (isset($this->payment->authorization) && $this->is_oney) {
             $this->is_deferred = isset($this->payment->authorization->authorized_at)
                 && $this->payment->authorization->authorized_at;
         }
@@ -968,6 +971,8 @@ class PayPlugNotifications
      */
     private function updateOrderState($new_order_state = false)
     {
+        $this->logger->addLog('Notification: updateOrderState');
+        $this->logger->addLog('new_order_state given: ' . $new_order_state);
         if (!is_int($new_order_state) && !$new_order_state) {
             $this->exitProcess('Try to update order without valid order state id', 500);
         } elseif ($new_order_state == $this->order->current_state) {
