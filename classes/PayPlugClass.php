@@ -1866,7 +1866,7 @@ class PayPlugClass extends PaymentModule
         // Card brand
         $card_brand = null;
         if (isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
-            $card_brand = $this->l('payplug.adminAjaxController.card').' '.$card_details['brand'];
+            $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
 
             // Country
             if ($card_brand && isset($card_details['country']) && !empty($card_details['country'])) {
@@ -2415,6 +2415,9 @@ class PayPlugClass extends PaymentModule
             'country' => $billing_iso,
             'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
         ];
+        $billing['mobile_phone_number'] = $billing['mobile_phone_number']
+            ? $billing['mobile_phone_number']
+            : $billing['landline_phone_number'];
 
         // Shipping
         $delivery_type = 'NEW';
@@ -2447,6 +2450,9 @@ class PayPlugClass extends PaymentModule
             'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
             'delivery_type' => $delivery_type,
         ];
+        $shipping['mobile_phone_number'] = $shipping['mobile_phone_number']
+            ? $shipping['mobile_phone_number']
+            : $shipping['landline_phone_number'];
 
         // 3ds
         $force_3ds = false;
@@ -3506,6 +3512,7 @@ class PayPlugClass extends PaymentModule
             die(json_encode([
                 'status' => 'ok',
                 'data' => $data,
+                'template' => $this->hookDisplayAdminOrderMain(['id_order' => $id_order]),
                 'message' => $this->l('payplug.refundPayment.success'),
                 'reload' => $reload
             ]));
