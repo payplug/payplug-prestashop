@@ -69,6 +69,7 @@ class PayPlugClass extends PaymentModule
     public $configClass;
     public $mediaClass;
     public $orderClass;
+    public $installmentClass;
     /** @var PayPlugConfiguration */
     public $configuration;
     /** @var array */
@@ -373,7 +374,7 @@ class PayPlugClass extends PaymentModule
                 'data' => $this->l('payplug.abortPayment.cannotAbort')
             ]));
         } else {
-            $installment = $this->retrieveInstallment($inst_id);
+            $installment = InstallmentClass::retrieveInstallment($inst_id);
 
             if ($installment->is_live == 1) {
                 $new_state = (int)Configuration::get('PS_OS_CANCELED');
@@ -392,80 +393,80 @@ class PayPlugClass extends PaymentModule
                     $history->addWithemail();
                 }
             }
-            $this->updatePayplugInstallment($installment);
+            InstallmentClass::updatePayplugInstallment($installment);
             $reload = true;
 
             die(json_encode(['reload' => $reload]));
         }
     }
 
-    /**
-     * Retrieve payment informations
-     *
-     * @param $inst_id
-     * @return bool|InstallmentPlan|null
-     */
-    public function retrieveInstallment($inst_id)
-    {
-        try {
-            $installment = InstallmentPlan::retrieve($inst_id);
-        } catch (Exception $e) {
-            return false;
-        }
-        return $installment;
-    }
-
-    /**
-     * @param $installment
-     * @return bool
-     */
-    public function updatePayplugInstallment($installment)
-    {
-        if (!is_object($installment)) {
-            $installment = InstallmentPlan::retrieve($installment);
-        }
-        if (isset($installment->schedule)) {
-            $step_count = count($installment->schedule);
-            $index = 0;
-            foreach ($installment->schedule as $schedule) {
-                $index++;
-                $pay_id = '';
-                if (count($schedule->payment_ids) > 0) {
-                    $pay_id = $schedule->payment_ids[0];
-                    $payment = Payment::retrieve($pay_id);
-                    $status = $this->getPaymentStatusByPayment($payment);
-                } else {
-                    if ((int)$installment->is_active == 1) {
-                        $status = 6; //ongoing
-                    } else {
-                        $status = 7; //cancelled
-                    }
-                }
-                $step = $index . '/' . $step_count;
-
-                if ($step2update = $this->getStoredInstallmentTransaction($installment, $step)) {
-                    $req_insert_installment = '
-                        UPDATE `' . _DB_PREFIX_ . 'payplug_installment` 
-                        SET `id_payment` = \'' . pSQL($pay_id) . '\', 
-                        `status` = \'' . (int)$status . '\' 
-                        WHERE `id_payplug_installment` = ' . (int)$step2update['id_payplug_installment'];
-                    $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
-
-                    if (!$res_insert_installment) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
+//    /**
+//     * Retrieve payment informations
+//     *
+//     * @param $inst_id
+//     * @return bool|InstallmentPlan|null
+//     */
+//    public function retrieveInstallment($inst_id)
+//    {
+//        try {
+//            $installment = InstallmentPlan::retrieve($inst_id);
+//        } catch (Exception $e) {
+//            return false;
+//        }
+//        return $installment;
+//    }
+//
+//    /**
+//     * @param $installment
+//     * @return bool
+//     */
+//    public function updatePayplugInstallment($installment)
+//    {
+//        if (!is_object($installment)) {
+//            $installment = InstallmentPlan::retrieve($installment);
+//        }
+//        if (isset($installment->schedule)) {
+//            $step_count = count($installment->schedule);
+//            $index = 0;
+//            foreach ($installment->schedule as $schedule) {
+//                $index++;
+//                $pay_id = '';
+//                if (count($schedule->payment_ids) > 0) {
+//                    $pay_id = $schedule->payment_ids[0];
+//                    $payment = Payment::retrieve($pay_id);
+//                    $status = $this->getPaymentStatusByPayment($payment);
+//                } else {
+//                    if ((int)$installment->is_active == 1) {
+//                        $status = 6; //ongoing
+//                    } else {
+//                        $status = 7; //cancelled
+//                    }
+//                }
+//                $step = $index . '/' . $step_count;
+//
+//                if ($step2update = $this->getStoredInstallmentTransaction($installment, $step)) {
+//                    $req_insert_installment = '
+//                        UPDATE `' . _DB_PREFIX_ . 'payplug_installment`
+//                        SET `id_payment` = \'' . pSQL($pay_id) . '\',
+//                        `status` = \'' . (int)$status . '\'
+//                        WHERE `id_payplug_installment` = ' . (int)$step2update['id_payplug_installment'];
+//                    $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
+//
+//                    if (!$res_insert_installment) {
+//                        return false;
+//                    }
+//                } else {
+//                    return false;
+//                }
+//            }
+//        }
+//    }
 
     /**
      * @param $payment
      * @return int
      */
-    private function getPaymentStatusByPayment($payment)
+    public static function getPaymentStatusByPayment($payment)
     {
 
         /*
@@ -523,115 +524,115 @@ class PayPlugClass extends PaymentModule
         return $pay_status;
     }
 
-    /**
-     * @param $installment
-     * @param $step
-     * @return array|bool|object|null
-     */
-    public function getStoredInstallmentTransaction($installment, $step)
-    {
-        if (!is_object($installment)) {
-            $installment = InstallmentPlan::retrieve($installment);
-        }
-        $req_installment = '
-            SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
-            WHERE pi.id_installment = \'' . $installment->id . '\' 
-            AND pi.step = ' . (int)$step;
-        $res_installment = DB::getInstance()->getRow($req_installment);
-
-        if (!$res_installment) {
-            return false;
-        } else {
-            return $res_installment;
-        }
-    }
-
-    /**
-     * @param $installment
-     * @param $order
-     * @return bool
-     * @throws ConfigurationNotSetException
-     */
-    public function addPayplugInstallment($installment, $order)
-    {
-        if (!is_object($installment)) {
-            $installment = InstallmentPlan::retrieve($installment);
-        }
-
-        if ($this->getStoredInstallment($installment)) {
-            $this->updatePayplugInstallment($installment);
-        } else {
-            if (isset($installment->schedule)) {
-                $step_count = count($installment->schedule);
-                $index = 0;
-                foreach ($installment->schedule as $schedule) {
-                    $index++;
-                    $pay_id = '';
-                    if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
-                        $pay_id = $schedule->payment_ids[0];
-                        $status = $this->getPaymentStatusByPayment($pay_id);
-                    } else {
-                        $status = 6;
-                    }
-                    $amount = (int)$schedule->amount;
-                    $step = $index . '/' . $step_count;
-                    $date = $schedule->date;
-                    $req_insert_installment = '
-                INSERT INTO `' . _DB_PREFIX_ . 'payplug_installment` (
-                    `id_installment`, 
-                    `id_payment`, 
-                    `id_order`, 
-                    `id_customer`, 
-                    `order_total`, 
-                    `step`, 
-                    `amount`, 
-                    `status`, 
-                    `scheduled_date`
-                ) VALUES (
-                    \'' . $installment->id . '\', 
-                    \'' . $pay_id . '\', 
-                    \'' . $order->id . '\', 
-                    \'' . $order->id_customer . '\', 
-                    \'' . (int)(($order->total_paid * 1000) / 10) . '\', 
-                    \'' . $step . '\', 
-                    \'' . $amount . '\', 
-                    \'' . $status . '\', 
-                    \'' . $date . '\'
-                )';
-
-                    $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
-
-                    if (!$res_insert_installment) {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param $installment
-     * @return array|bool|false|mysqli_result|PDOStatement|resource|null
-     * @throws PrestaShopDatabaseException
-     */
-    public function getStoredInstallment($installment)
-    {
-        if (!is_object($installment)) {
-            $installment = InstallmentPlan::retrieve($installment);
-        }
-        $req_installment = '
-            SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
-            WHERE pi.id_payment = \'' . $installment->id . '\'';
-        $res_installment = DB::getInstance()->executeS($req_installment);
-
-        if (!$res_installment) {
-            return false;
-        } else {
-            return $res_installment;
-        }
-    }
+//    /**
+//     * @param $installment
+//     * @param $step
+//     * @return array|bool|object|null
+//     */
+//    public function getStoredInstallmentTransaction($installment, $step)
+//    {
+//        if (!is_object($installment)) {
+//            $installment = InstallmentPlan::retrieve($installment);
+//        }
+//        $req_installment = '
+//            SELECT pi.*
+//            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
+//            WHERE pi.id_installment = \'' . $installment->id . '\'
+//            AND pi.step = ' . (int)$step;
+//        $res_installment = DB::getInstance()->getRow($req_installment);
+//
+//        if (!$res_installment) {
+//            return false;
+//        } else {
+//            return $res_installment;
+//        }
+//    }
+//
+//    /**
+//     * @param $installment
+//     * @param $order
+//     * @return bool
+//     * @throws ConfigurationNotSetException
+//     */
+//    public function addPayplugInstallment($installment, $order)
+//    {
+//        if (!is_object($installment)) {
+//            $installment = InstallmentPlan::retrieve($installment);
+//        }
+//
+//        if ($this->getStoredInstallment($installment)) {
+//            $this->updatePayplugInstallment($installment);
+//        } else {
+//            if (isset($installment->schedule)) {
+//                $step_count = count($installment->schedule);
+//                $index = 0;
+//                foreach ($installment->schedule as $schedule) {
+//                    $index++;
+//                    $pay_id = '';
+//                    if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
+//                        $pay_id = $schedule->payment_ids[0];
+//                        $status = $this->getPaymentStatusByPayment($pay_id);
+//                    } else {
+//                        $status = 6;
+//                    }
+//                    $amount = (int)$schedule->amount;
+//                    $step = $index . '/' . $step_count;
+//                    $date = $schedule->date;
+//                    $req_insert_installment = '
+//                INSERT INTO `' . _DB_PREFIX_ . 'payplug_installment` (
+//                    `id_installment`,
+//                    `id_payment`,
+//                    `id_order`,
+//                    `id_customer`,
+//                    `order_total`,
+//                    `step`,
+//                    `amount`,
+//                    `status`,
+//                    `scheduled_date`
+//                ) VALUES (
+//                    \'' . $installment->id . '\',
+//                    \'' . $pay_id . '\',
+//                    \'' . $order->id . '\',
+//                    \'' . $order->id_customer . '\',
+//                    \'' . (int)(($order->total_paid * 1000) / 10) . '\',
+//                    \'' . $step . '\',
+//                    \'' . $amount . '\',
+//                    \'' . $status . '\',
+//                    \'' . $date . '\'
+//                )';
+//
+//                    $res_insert_installment = DB::getInstance()->Execute($req_insert_installment);
+//
+//                    if (!$res_insert_installment) {
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    /**
+//     * @param $installment
+//     * @return array|bool|false|mysqli_result|PDOStatement|resource|null
+//     * @throws PrestaShopDatabaseException
+//     */
+//    public function getStoredInstallment($installment)
+//    {
+//        if (!is_object($installment)) {
+//            $installment = InstallmentPlan::retrieve($installment);
+//        }
+//        $req_installment = '
+//            SELECT pi.*
+//            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
+//            WHERE pi.id_payment = \'' . $installment->id . '\'';
+//        $res_installment = DB::getInstance()->executeS($req_installment);
+//
+//        if (!$res_installment) {
+//            return false;
+//        } else {
+//            return $res_installment;
+//        }
+//    }
 
     /**
      * @param $cart
@@ -869,26 +870,26 @@ class PayPlugClass extends PaymentModule
         return $errors;
     }
 
-    /**
-     * Delete stored installment
-     *
-     * @param string $inst_id
-     * @param array $cart_id
-     * @return bool
-     */
-    public function deleteInstallment($inst_id, $cart_id)
-    {
-        $req_installment_cart = '
-            DELETE FROM ' . _DB_PREFIX_ . 'payplug_payment  
-            WHERE id_cart = ' . (int)$cart_id . ' 
-            AND id_payment = \'' . pSQL($inst_id) . '\'';
-        $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
-        if (!$res_installment_cart) {
-            return false;
-        }
-
-        return true;
-    }
+//    /**
+//     * Delete stored installment
+//     *
+//     * @param string $inst_id
+//     * @param array $cart_id
+//     * @return bool
+//     */
+//    public function deleteInstallment($inst_id, $cart_id)
+//    {
+//        $req_installment_cart = '
+//            DELETE FROM ' . _DB_PREFIX_ . 'payplug_payment
+//            WHERE id_cart = ' . (int)$cart_id . '
+//            AND id_payment = \'' . pSQL($inst_id) . '\'';
+//        $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
+//        if (!$res_installment_cart) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     /**
      * Display payment errors messages template
@@ -1208,12 +1209,12 @@ class PayPlugClass extends PaymentModule
             return false;
         }
 
-        $inst_id = $this->getInstallmentByCart($cart->id);
+        $inst_id = InstallmentClass::getInstallmentByCart($cart->id);
         if ($inst_id) {
             return ['id' => $inst_id, 'type' => 'installment'];
         }
 
-        $pay_id = $this->getPaymentByCart($cart->id);
+        $pay_id = self::getPaymentByCart($cart->id);
         if ($pay_id) {
             return ['id' => $pay_id, 'type' => 'payment'];
         }
@@ -1221,26 +1222,26 @@ class PayPlugClass extends PaymentModule
         return false;
     }
 
-    /**
-     * @description ONLY FOR VALIDATION
-     * Retrieve installment stored
-     *
-     * @param int $id_cart
-     * @return int OR bool
-     */
-    public function getInstallmentByCart($id_cart)
-    {
-        $req_installment_cart = '
-            SELECT pic.id_payment 
-            FROM ' . _DB_PREFIX_ . 'payplug_payment pic 
-            WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
-        $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
-        if (!$res_installment_cart) {
-            return false;
-        }
-
-        return $res_installment_cart;
-    }
+//    /**
+//     * @description ONLY FOR VALIDATION
+//     * Retrieve installment stored
+//     *
+//     * @param int $id_cart
+//     * @return int OR bool
+//     */
+//    public function getInstallmentByCart($id_cart)
+//    {
+//        $req_installment_cart = '
+//            SELECT pic.id_payment
+//            FROM ' . _DB_PREFIX_ . 'payplug_payment pic
+//            WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
+//        $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
+//        if (!$res_installment_cart) {
+//            return false;
+//        }
+//
+//        return $res_installment_cart;
+//    }
 
     /**
      * @description ONLY FOR VALIDATION
@@ -1249,7 +1250,7 @@ class PayPlugClass extends PaymentModule
      * @param int $cart_id
      * @return int|bool
      */
-    public function getPaymentByCart($cart_id)
+    public static function getPaymentByCart($cart_id)
     {
         $req_payment_cart = new DbQuery();
         $req_payment_cart->select('ppc.id_payment');
@@ -1331,16 +1332,16 @@ class PayPlugClass extends PaymentModule
         }
         if ($inst_id) {
             $payment_list = [];
-            if (!$inst_id || empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
+            if (!$inst_id || empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
                 if (Configuration::get('PAYPLUG_SANDBOX_MODE') == 1) {
                     ApiClass::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-                    if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
+                    if (empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
                         ApiClass::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } elseif (Configuration::get('PAYPLUG_SANDBOX_MODE') == 0) {
                     ApiClass::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-                    if (empty($inst_id) || !$installment = $this->retrieveInstallment($inst_id)) {
+                    if (empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
                         ApiClass::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
@@ -1438,7 +1439,8 @@ class PayPlugClass extends PaymentModule
             $state_addons = ($sandbox ? '_TEST' : '');
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
-            $this->updatePayplugInstallment($installment);
+            InstallmentClass::updatePayplugInstallment($installment);
+
         } else {
             if (!$pay_id = $this->isTransactionPending($order->id_cart)) {
                 $pay_id = $this->orderClass->getPayplugOrderPayment($order->id);
@@ -1781,7 +1783,7 @@ class PayPlugClass extends PaymentModule
                 return $exception;
             }
         }
-        $pay_status = $this->getPaymentStatusByPayment($payment);
+        $pay_status = self::getPaymentStatusByPayment($payment);
         $status_class = null;
         switch ($pay_status) {
             case 1: // not paid
@@ -3403,7 +3405,7 @@ class PayPlugClass extends PaymentModule
             $reload = false;
 
             if ($inst_id != null) {
-                $installment = $this->retrieveInstallment($inst_id);
+                $installment = InstallmentClass::retrieveInstallment($inst_id);
                 $amount_available = 0;
                 $amount_refunded_payplug = 0;
                 if (isset($installment->schedule)) {
@@ -3588,7 +3590,7 @@ class PayPlugClass extends PaymentModule
                 } catch (Exception $e) {
                     return ('error');
                 }
-                $this->updatePayplugInstallment($installment);
+                InstallmentClass::updatePayplugInstallment($installment);
             } else {
                 return ('error');
             }
@@ -3672,52 +3674,52 @@ class PayPlugClass extends PaymentModule
         return (bool)$this->context->cookie->__get('payplug_data');
     }
 
-    /**
-     * @description Register installment for later use
-     *
-     * @param string $installment_id
-     * @param int $id_cart
-     * @return bool
-     */
-    public function storeInstallment($installment_id, $id_cart)
-    {
-        if ($pay_id = $this->getPaymentByCart($id_cart)) {
-            $this->deletePayment($pay_id, $id_cart);
-        }
-
-        $req_installment_cart_exists = '
-            SELECT * 
-            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic  
-            WHERE pic.id_cart = ' . (int)$id_cart;
-        $res_installment_cart_exists = Db::getInstance()->getRow($req_installment_cart_exists);
-        $date_upd = date('Y-m-d H:i:s');
-        $is_pending = 0;
-        if (!$res_installment_cart_exists) {
-            //insert
-            $req_installment_cart = '
-                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
-                VALUES (\'' . pSQL($installment_id) . '\', 
-                ' . (int)$id_cart . ', 
-                ' . (int)$is_pending . ', 
-                \'' . pSQL($date_upd) . '\')';
-            $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
-            if (!$res_installment_cart) {
-                return false;
-            }
-        } else {
-            //update
-            $req_installment_cart = '
-                UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic  
-                SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
-                WHERE pic.id_cart = ' . (int)$id_cart;
-            $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
-            if (!$res_installment_cart) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+//    /**
+//     * @description Register installment for later use
+//     *
+//     * @param string $installment_id
+//     * @param int $id_cart
+//     * @return bool
+//     */
+//    public function storeInstallment($installment_id, $id_cart)
+//    {
+//        if ($pay_id = $this->getPaymentByCart($id_cart)) {
+//            $this->deletePayment($pay_id, $id_cart);
+//        }
+//
+//        $req_installment_cart_exists = '
+//            SELECT *
+//            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
+//            WHERE pic.id_cart = ' . (int)$id_cart;
+//        $res_installment_cart_exists = Db::getInstance()->getRow($req_installment_cart_exists);
+//        $date_upd = date('Y-m-d H:i:s');
+//        $is_pending = 0;
+//        if (!$res_installment_cart_exists) {
+//            //insert
+//            $req_installment_cart = '
+//                INSERT INTO ' . _DB_PREFIX_ . 'payplug_payment (id_payment, id_cart, is_pending, date_upd)
+//                VALUES (\'' . pSQL($installment_id) . '\',
+//                ' . (int)$id_cart . ',
+//                ' . (int)$is_pending . ',
+//                \'' . pSQL($date_upd) . '\')';
+//            $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
+//            if (!$res_installment_cart) {
+//                return false;
+//            }
+//        } else {
+//            //update
+//            $req_installment_cart = '
+//                UPDATE ' . _DB_PREFIX_ . 'payplug_payment pic
+//                SET pic.id_payment = \'' . pSQL($installment_id) . '\', pic.date_upd = \'' . pSQL($date_upd) . '\'
+//                WHERE pic.id_cart = ' . (int)$id_cart;
+//            $res_installment_cart = Db::getInstance()->execute($req_installment_cart);
+//            if (!$res_installment_cart) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
 
     /**
      * Delete stored payment
@@ -3726,7 +3728,7 @@ class PayPlugClass extends PaymentModule
      * @param array $cart_id
      * @return bool
      */
-    public function deletePayment($pay_id, $cart_id)
+    public static function deletePayment($pay_id, $cart_id)
     {
         $req_payment_cart = '
             DELETE FROM ' . _DB_PREFIX_ . 'payplug_payment  
