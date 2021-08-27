@@ -219,7 +219,7 @@ class PayPlugNotifications
             }
 
             $amount = 0;
-            $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
+            $installment = InstallmentClass::retrieveInstallment($this->resource->installment_plan_id);
             foreach ($installment->schedule as $schedule) {
                 $amount += (int)$schedule->amount;
             }
@@ -343,7 +343,7 @@ class PayPlugNotifications
 
         // Add payplug OrderPayment && Installment
         if ($this->is_installment) {
-            $this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $this->order);
+            InstallmentClass::addPayplugInstallment($this->resource->installment_plan_id, $this->order);
         } else {
             $data = [];
             $data['metadata'] = $this->payment->metadata;
@@ -489,7 +489,7 @@ class PayPlugNotifications
         }
 
         if ($this->payment->installment_plan_id) {
-            $installment = $this->payplug->retrieveInstallment($this->payment->installment_plan_id);
+            $installment = InstallmentClass::retrieveInstallment($this->payment->installment_plan_id);
             $meta = $installment->metadata;
         } else {
             $meta = $this->payment->metadata;

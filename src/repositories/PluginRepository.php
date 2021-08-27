@@ -66,6 +66,7 @@ class PluginRepository extends Repository
     private $card;
     private $hook;
     private $install;
+//    private $installment;
     private $logger;
     private $myLogPhp;
     private $oney;
@@ -118,6 +119,7 @@ class PluginRepository extends Repository
             ->setCurrency($this->currency)
             ->setHook($this->hook)
             ->setInstall($this->install)
+//            ->setInstallment($this->installment)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
             ->setProduct($this->product)
@@ -148,6 +150,7 @@ class PluginRepository extends Repository
         );
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
+//        $this->installment = new InstallmentRepository();
 
         $this->card = new CardRepository(
             $this->configuration,
