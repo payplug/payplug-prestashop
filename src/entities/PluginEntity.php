@@ -75,6 +75,9 @@ class PluginEntity
     /** @var object */
     private $install;
 
+//    /** @var object */
+//    private $installment;
+    
     /** @var object */
     private $logger;
 
@@ -306,6 +309,24 @@ class PluginEntity
         return $this->install;
     }
 
+//    /**
+//     * @return object
+//     */
+//    public function getInstallment()
+//    {
+//        return $this->installment;
+//    }
+//
+//    /**
+//     * @param object $installment
+//     * @return PluginEntity
+//     */
+//    public function setInstallment($installment)
+//    {
+//        $this->installment = $installment;
+//        return $this;
+//    }
+    
     /**
      * @return object
      */

@@ -26,11 +26,11 @@ var allow_debug = true, debug = function (str) {
 };
 var $document, $window, payplugModule = {
     init: function () {
-        for (const section in this) {
-            if (section != 'init') {
-                payplugModule[section]['init']();
-            }
-        }
+        this.order.init();
+        this.integrated.init();
+        this.card.init();
+        this.oney.init();
+        this.popup.init();
     },
     order: {
         init: function () {

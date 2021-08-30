@@ -99,7 +99,7 @@ class PayPlugAjax
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $payplug_card = new CardRepository($this->payplug);
+                    $payplug_card = $this->card;
 
                     if ($payplug_card->delete((int)$tools->tool('getValue', 'pc'))) {
                         die(true);

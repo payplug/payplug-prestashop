@@ -65,7 +65,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             $payplug_cards = $this->card->getByCustomer($this->contextSpecific->getContext()->customer);
         } else {
             $customer = $this->contextSpecific->getContext()->customer;
-            $payplug_cards = $this->card->getCardsByCustomer($customer->id);
+            $payplug_cards = $this->card->getCards($customer->id);
         }
 
         $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink(

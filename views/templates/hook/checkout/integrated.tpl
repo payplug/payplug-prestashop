@@ -21,7 +21,7 @@
 *}
 
 <!-- Set up a form with 5 divs -->
-<form class="payplugIntegratedPayment" domain="https://secure.alpha.notpayplug.com">
+<form class="payplugIntegratedPayment" domain="https://secure-qa.payplug.com">
     <div class="scheme"></div>
     <div data-integrated="cardholder" class="payplugIntegratedPayment_input -cardholder"></div>
     <div data-integrated="pan" class="payplugIntegratedPayment_input -pan"></div>
@@ -31,11 +31,10 @@
         <input type="checkbox" name="save_card">
         {l s='hook.checkout.integrated.saveCardLabel' mod='payplug'}
     </div>
-    <button class="payplugIntegratedPayment_button -green" type="submit">{l s='hook.checkout.integrated.button' mod='payplug'}</button>
 </form>
 <script type="text/javascript">
     if (typeof payplugModule != 'undefined') {
-        payplugModule.tools.loadScript('https://secure.alpha.notpayplug.com/integrated/js', function() {
+        payplugModule.tools.loadScript('https://secure-qa.payplug.com/integrated/js', function() {
             payplugModule.integrated.init();
         });
     } else {

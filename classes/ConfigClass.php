@@ -57,7 +57,6 @@ class ConfigClass
     private $install;
     private $api_live;
     private $api_test;
-    public $confirmUninstall;
     public $email;
     private $img_lang;
     private $ssl_enable;
@@ -137,14 +136,6 @@ class ConfigClass
     {
         $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
         $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
-
-        // Set the uninstall notice according to the "keep_cards" configuration
-        $this->confirmUninstall = $this->payplugClass->l('payplug.setConfigurationProperties.confirmUninstall') . ' ';
-        if ((int)Configuration::get('PAYPLUG_KEEP_CARDS') == 1) {
-            $this->confirmUninstall .= $this->payplugClass->l('payplug.setConfigurationProperties.keepCards');
-        } else {
-            $this->confirmUninstall .= $this->payplugClass->l('payplug.setConfigurationProperties.removeCards');
-        }
 
         $this->email = Configuration::get('PAYPLUG_EMAIL');
         $available_img_lang = [
@@ -391,22 +382,31 @@ class ConfigClass
      */
     public function saveConfiguration()
     {
-        Configuration::updateValue('PAYPLUG_DEFERRED', Tools::getValue('payplug_deferred'));
-        Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', (int)Tools::getValue('payplug_deferred_auto'));
-        Configuration::updateValue('PAYPLUG_DEFERRED_STATE', (int)Tools::getValue('payplug_deferred_state'));
-        Configuration::updateValue('PAYPLUG_SHOW', Tools::getValue('PAYPLUG_SHOW'));
-        Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', Tools::getValue('payplug_embedded'));
-        Configuration::updateValue('PAYPLUG_INST', Tools::getValue('payplug_inst'));
-        Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', Tools::getValue('PAYPLUG_INST_MIN_AMOUNT'));
-        Configuration::updateValue('PAYPLUG_INST_MODE', Tools::getValue('PAYPLUG_INST_MODE'));
-        Configuration::updateValue('PAYPLUG_ONE_CLICK', Tools::getValue('payplug_one_click'));
-        Configuration::updateValue('PAYPLUG_ONEY', Tools::getValue('payplug_oney'));
-        Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', Tools::getValue('payplug_oney_optimized'));
-        Configuration::updateValue('PAYPLUG_ONEY_FEES', Tools::getValue('payplug_oney_fees'));
-        Configuration::updateValue('PAYPLUG_SANDBOX_MODE', Tools::getValue('payplug_sandbox'));
-        Configuration::updateValue('PAYPLUG_STANDARD', Tools::getValue('payplug_standard'));
-        if (Tools::getValue('PAYPLUG_SHOW')) {
-            $this->payplugClass->enable();
+        $configurationKeys = [
+            'PAYPLUG_DEFERRED' => 'payplug_deferred',
+            'PAYPLUG_DEFERRED_AUTO' => 'payplug_deferred_auto',
+            'PAYPLUG_DEFERRED_STATE' => 'payplug_deferred_state',
+            'PAYPLUG_SHOW' => 'PAYPLUG_SHOW',
+            'PAYPLUG_EMBEDDED_MODE' => 'payplug_embedded',
+            'PAYPLUG_INST' => 'payplug_inst',
+            'PAYPLUG_INST_MIN_AMOUNT' => 'PAYPLUG_INST_MIN_AMOUNT',
+            'PAYPLUG_INST_MODE' => 'PAYPLUG_INST_MODE',
+            'PAYPLUG_ONE_CLICK' => 'payplug_one_click',
+            'PAYPLUG_ONEY' => 'payplug_oney',
+            'PAYPLUG_ONEY_OPTIMIZED' => 'payplug_oney_optimized',
+            'PAYPLUG_ONEY_FEES' => 'payplug_oney_fees',
+            'PAYPLUG_SANDBOX_MODE' => 'payplug_sandbox',
+            'PAYPLUG_STANDARD' => 'payplug_standard',
+        ];
+
+        foreach ($configurationKeys as $key => $config) {
+            $value = Tools::getValue($config);
+            if ($value != null) {
+                Configuration::updateValue($key, $value);
+            }
+            if ($key == 'PAYPLUG_SHOW' && $value) {
+                $this->payplugClass->enable();
+            }
         }
     }
 

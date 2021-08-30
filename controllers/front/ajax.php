@@ -229,7 +229,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     if ($pay_id != $secure) {
                         die(json_encode([
                             'result' => false,
-                            'message' => $this->l('ajax.postProcess.wrongTokenGiven')
+                            'message' => $this->payplug->l('ajax.postProcess.wrongTokenGiven', 'ajax')
                         ]));
                     }
 
@@ -245,13 +245,13 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(json_encode([
                             'result' => true,
                             'return_url' => $return_url,
-                            'message' => $this->l('ajax.postProcess.paymentValidated')
+                            'message' => $this->payplug->l('ajax.postProcess.paymentValidated', 'ajax')
                         ]));
                     }
 
                     die(json_encode([
                         'result' => false,
-                        'message' => $this->l('ajax.postProcess.errorOccured')
+                        'message' => $this->payplug->l('ajax.postProcess.errorOccured', 'ajax')
                     ]));
                 }
 

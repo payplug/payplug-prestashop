@@ -144,8 +144,8 @@ class PayPlugValidation
         } while (!$cart_lock);
 
         $amount = 0;
-        if (!$pay_id = $this->payplug->getPaymentByCart((int)$cart_id)) {
-            if (!$inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
+        if (!$pay_id = PayPlugClass::getPaymentByCart((int)$cart_id)) {
+            if (!$inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Payment is not stored or is already consumed.');
                 $id_order = Order::getOrderByCartId($cart->id);
                 $customer = new Customer((int)$cart->id_customer);
@@ -157,7 +157,7 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 Tools::redirect($link_redirect);
-            } elseif ($inst_id = $this->payplug->getInstallmentByCart((int)$cart_id)) {
+            } elseif ($inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Installment is not consumed yet.');
                 $amount = 0;
                 $pay_id = false;
@@ -490,7 +490,7 @@ class PayPlugValidation
                     $this->logger->addLog('Unable to create order payment.', 'error');
                 }
             } elseif ($this->type == 'installment') {
-                $this->payplug->addPayplugInstallment($installment->resource, $order);
+                InstallmentClass::addPayplugInstallment($installment->resource, $order);
             }
 
             // Add payment line
