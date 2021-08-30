@@ -176,6 +176,7 @@
 }
 .payplugPaymentOption img {
   margin: 0 12px 0 0;
+  height: 33px;
 }
 @media (max-width: 1023px) {
   .payplugPaymentOption img {
@@ -1138,6 +1139,10 @@
   width: auto;
   height: 22px;
   margin: 0 8px;
+}
+.payplugOneClick form label .noimg {
+  position: relative;
+  left: 8px;
 }
 .payplugOneClick form label span {
   display: flex;

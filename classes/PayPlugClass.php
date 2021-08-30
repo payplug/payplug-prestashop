@@ -2938,9 +2938,9 @@ class PayPlugClass extends PaymentModule
                             [],
                             true
                         );
-                    $paymentOption[$payment_key]['logo'] = Media::getMediaPath(
+                    $paymentOption[$payment_key]['logo'] = $card['brand'] != 'none' ? Media::getMediaPath(
                         _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.svg'
-                    );
+                    ) : '';
                     $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
                     $paymentOption[$payment_key]['expiry_date_card'] =
@@ -2988,8 +2988,7 @@ class PayPlugClass extends PaymentModule
             );
 
             $paymentOption['standard']['logo'] = Media::getMediaPath(
-                _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
-                    'none' : 'logos_schemes_' . $this->configClass->getImgLang()) . '.svg'
+                _PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
                 $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payDifferentCard');
