@@ -198,16 +198,11 @@ class OneyRepository extends Repository
         $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
         $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
 
-        $legal_text = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
-            ? $this->l('oney.assignLegalNotice.legalWithFees')
-            : $this->l('oney.assignLegalNotice.legalWithoutFees');
-
         $this->assign->assign([
-            'legal_notice' => sprintf(
-                $legal_text,
-                $this->toolsSpecific->tool('displayPrice', $min_amount),
-                $this->toolsSpecific->tool('displayPrice', $max_amount)
-            )
+            'oney_with_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
+            'oney_min_amounts' => $this->toolsSpecific->tool('displayPrice', $min_amount),
+            'oney_max_amounts' => $this->toolsSpecific->tool('displayPrice', $max_amount),
+            'oney_url' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
         ]);
     }
 
@@ -624,6 +619,9 @@ class OneyRepository extends Repository
         foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
             if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
                 $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
+                if (isset($use_fees) && !$use_fees) {
+                    $payment_list[$method]['effective_annual_percentage_rate'] = 0;
+                }
             }
         }
 
@@ -779,7 +777,9 @@ class OneyRepository extends Repository
         }
         $shipping_data = [
             'email' => $this->contextSpecific->getContext()->customer->email,
-            'mobile_phone_number' => $shipping_address->phone_mobile,
+            'mobile_phone_number' => $shipping_address->phone_mobile
+                ? $shipping_address->phone_mobile
+                : $shipping_address->phone,
             'city' => $shipping_address->city,
         ];
 
@@ -853,7 +853,9 @@ class OneyRepository extends Repository
             }
 
             $billing_data = [
-                'mobile_phone_number' => $billing_address->phone_mobile,
+                'mobile_phone_number' => $billing_address->phone_mobile
+                    ? $billing_address->phone_mobile
+                    : $billing_address->phone,
                 'city' => $billing_address->city,
             ];
 

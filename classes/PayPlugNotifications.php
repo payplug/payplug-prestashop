@@ -219,7 +219,7 @@ class PayPlugNotifications
             }
 
             $amount = 0;
-            $installment = $this->payplug->retrieveInstallment($this->resource->installment_plan_id);
+            $installment = InstallmentClass::retrieveInstallment($this->resource->installment_plan_id);
             foreach ($installment->schedule as $schedule) {
                 $amount += (int)$schedule->amount;
             }
@@ -334,8 +334,8 @@ class PayPlugNotifications
         $this->logger->addLog('Order validated.');
 
         // Then load it
-        $order = new Order($this->payplug->currentOrder);
-        if (!Validate::isLoadedObject($order)) {
+        $this->order = new Order($this->payplug->currentOrder);
+        if (!Validate::isLoadedObject($this->order)) {
             $this->logger->addLog('Order cannot be loaded.', 'error');
             $this->exitProcess('Order cannot be loaded.', 500);
         }
@@ -343,7 +343,7 @@ class PayPlugNotifications
 
         // Add payplug OrderPayment && Installment
         if ($this->is_installment) {
-            $this->payplug->addPayplugInstallment($this->resource->installment_plan_id, $order);
+            InstallmentClass::addPayplugInstallment($this->resource->installment_plan_id, $this->order);
         } else {
             $data = [];
             $data['metadata'] = $this->payment->metadata;
@@ -359,7 +359,7 @@ class PayPlugNotifications
                 $this->exitProcess($exception->getMessage(), 500);
             }
 
-            if (!$this->orderClass->addPayplugOrderPayment($this->order->id->id, $this->payment->id)) {
+            if (!$this->orderClass->addPayplugOrderPayment($this->order->id, $this->payment->id)) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
                     'error'
@@ -489,7 +489,7 @@ class PayPlugNotifications
         }
 
         if ($this->payment->installment_plan_id) {
-            $installment = $this->payplug->retrieveInstallment($this->payment->installment_plan_id);
+            $installment = InstallmentClass::retrieveInstallment($this->payment->installment_plan_id);
             $meta = $installment->metadata;
         } else {
             $meta = $this->payment->metadata;
@@ -523,9 +523,9 @@ class PayPlugNotifications
             }
 
             $id_order = (int)Order::getOrderByCartId($cart_id);
-            $order = new Order($id_order);
-            $this->logger->addLog('Order ID : ' . $id_order);
-            if (!Validate::isLoadedObject($order)) {
+            $this->order = new Order($id_order);
+            $this->logger->addLog('Order ID : ' . $this->order->id);
+            if (!Validate::isLoadedObject($this->order)) {
                 $this->logger->addLog('Order cannot be loaded.', 'error');
                 $this->exitProcess('Order cannot be loaded.', 500);
             }
@@ -550,7 +550,7 @@ class PayPlugNotifications
                 $order_history = new OrderHistory();
                 $order_history->id_order = $id_order;
                 try {
-                    $order_history->changeIdOrderState((int)$new_order_state, $id_order);
+                    $order_history->changeIdOrderState((int)$new_order_state, $this->order->id);
                     $order_history->save();
                     $this->exitProcess('Order state has been updated.');
                 } catch (Exception $exception) {

@@ -31,7 +31,6 @@
         <input type="checkbox" name="save_card">
         {l s='hook.checkout.integrated.saveCardLabel' mod='payplug'}
     </div>
-    <button class="payplugIntegratedPayment_button -green" type="submit">{l s='hook.checkout.integrated.button' mod='payplug'}</button>
 </form>
 <script type="text/javascript">
     if (typeof payplugModule != 'undefined') {

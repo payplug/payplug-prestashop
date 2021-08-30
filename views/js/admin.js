@@ -23,7 +23,6 @@ var $document, $window, payplug = {
     init: function () {
         $document = $(document);
         $window = $(window);
-
         for (const section in payplug) {
             if (section != 'init') {
                 payplug[section]['init']();
@@ -176,7 +175,8 @@ var $document, $window, payplug = {
                         var {popup} = payplug.tools;
                         popup.set(result.popin, 'confirm');
                         $('form.payplug').replaceWith(result.content);
-                        var {oney, deferred} = payplug;
+                        var {oney, deferred,settings} = payplug;
+                        settings.load();
                         $window.trigger('load');
                         if (deferred.props.stateChanged != null && deferred.props.active == true && $('input[name=' + deferred.props.switcher + ']:checked').val() == 1) {
                             $('html,body').stop(true).animate({'scrollTop': 0});
@@ -397,6 +397,8 @@ var $document, $window, payplug = {
         init: function () {
             var {login} = payplug,
                 {identifier} = login.props;
+            // check if user is logged
+            login.props.logged = $('.' + identifier).is('.-logged');
             $document.on('click', '.' + identifier + '_login', login.login)
                 .on('click', '.' + identifier + '_logout', login.logout)
                 .on('click', 'button[name=password]', login.password)
@@ -423,7 +425,7 @@ var $document, $window, payplug = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {login} = payplug,
+            var {login, settings} = payplug,
                 {identifier} = login.props,
                 data = {
                     _ajax: 1,
@@ -462,6 +464,7 @@ var $document, $window, payplug = {
                     if (typeof result.content != 'undefined' && result.content) {
                         $('form.payplug').replaceWith(result.content);
                         login.props.logged = true;
+                        settings.load();
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
                         payplug.tools.popup.error(result.error);
@@ -621,12 +624,11 @@ var $document, $window, payplug = {
         init: function () {
             var {settings, login} = payplug,
                 {identifier} = settings.props;
+            // call load in order to get permission's information when reloading the page
+            this.load();
             $document.on('switchSelected', '.' + identifier + ' input', settings.change);
-            $window.on('load', settings.load);
         },
-        load: function (event) {
-            event.preventDefault();
-            event.stopPropagation();
+        load: function () {
 
             var {settings, login} = payplug;
 
@@ -749,10 +751,16 @@ var $document, $window, payplug = {
             var {switcher} = payplug.tools;
             var {settings} = payplug;
 
+
+            var checkpremium = 'premium';
+            if ($switcher.prevObject[0].name == 'payplug_oney') {
+                checkpremium = 'oneyPremium';
+            }
+
             var data = {
                 _ajax: 1,
                 popin: 1,
-                type: 'premium'
+                type: checkpremium
             };
 
             switcher.right($switcher);

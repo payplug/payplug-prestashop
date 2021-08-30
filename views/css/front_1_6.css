@@ -333,15 +333,15 @@
   height: auto;
 }
 .oneyCta_logo {
-  width: 106px;
+  width: 140px;
   height: 25px;
   background-size: 110%;
-  margin: 0 0 0 0.45em;
+  margin: 0;
 }
 .oneyCta_logo.-withoutFees {
   width: 190px;
   height: 25px;
-  margin: 0 0.25em 0 0.45em;
+  margin: 0 0.25em 0 0.75em;
 }
 .oneyCta_tooltip {
   width: 14px;
@@ -768,6 +768,9 @@
   color: #8a8a8a;
   padding: 8px 0 0;
   white-space: normal;
+}
+.oneyPopin_legal a {
+  color: #7ebd00;
 }
 @media (max-width: 767px) {
   .oneyPopin_legal {
@@ -1227,7 +1230,7 @@
 }
 .payplugOneClick form label img {
   display: block;
-  widht: auto;
+  width: auto;
   height: 22px;
   margin: 0 8px;
 }
@@ -1440,6 +1443,9 @@
   min-width: 190px;
   min-height: 40px;
   width: 190px;
+}
+.oneyPayment_logo.-withoutFees {
+  width: 300px;
 }
 .-disabled .oneyPayment_logo {
   background-image: url(../img/oney/3x4x_with_fees-alt.svg);
