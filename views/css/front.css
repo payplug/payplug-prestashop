@@ -169,6 +169,15 @@
   margin: 5px 0 0;
   cursor: pointer;
 }
+.payplugMsg_declineButton {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  background: #696969;
+}
+.payplugMsg_text {
+  margin-top: 10px;
+}
 /* Payplug payment option */
 .payplugPaymentOption label {
   margin: 0;

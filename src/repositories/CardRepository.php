@@ -679,6 +679,14 @@ class CardRepository extends Repository
     }
 
     /**
+     * @description confirm delete card message, called in front/cards.php
+     * @return mixed
+     */
+    public function confirmDeleteCardMessage()
+    {
+        return $this->l('card.CardRepository.confirmDeleteCardMessage');
+    }
+    /**
      * @description Return successflull deleted card, called in front/cards.php
      * @return mixed
      */
