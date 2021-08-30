@@ -1440,7 +1440,6 @@ class PayPlugClass extends PaymentModule
             $id_new_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons);
 
             InstallmentClass::updatePayplugInstallment($installment);
-
         } else {
             if (!$pay_id = $this->isTransactionPending($order->id_cart)) {
                 $pay_id = $this->orderClass->getPayplugOrderPayment($order->id);
