@@ -13,6 +13,7 @@ stages:
 php cs fixer:
   image: composer:1.9
   stage: check php
+  only: [merge_requests]
   script:
     - composer install
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
@@ -20,6 +21,7 @@ php cs fixer:
 unit tests:
   image: composer:1.9
   stage: tests
+  only: [merge_requests]
   script:
     - composer install
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
@@ -38,6 +40,7 @@ check module translations:
 build zip release:
   image: composer:1.9
   stage: build
+  only: [merge_requests]
   before_script:
     - composer install --no-dev
     - ./ci/copy_translations.sh
