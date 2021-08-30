@@ -2939,7 +2939,7 @@ class PayPlugClass extends PaymentModule
                             true
                         );
                     $paymentOption[$payment_key]['logo'] = Media::getMediaPath(
-                        _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'
+                        _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.svg'
                     );
                     $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
@@ -2986,9 +2986,10 @@ class PayPlugClass extends PaymentModule
                 'payment',
                 ['type' => 'standard']
             );
+
             $paymentOption['standard']['logo'] = Media::getMediaPath(
                 _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
-                    'none' : 'logos_schemes_' . $this->configClass->getImgLang()) . '.png'
+                    'none' : 'logos_schemes_' . $this->configClass->getImgLang()) . '.svg'
             );
             if (count($payplug_cards) > 0) {
                 $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payDifferentCard');
