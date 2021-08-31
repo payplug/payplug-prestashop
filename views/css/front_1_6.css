@@ -742,6 +742,11 @@
   font-weight: 400;
   white-space: normal;
 }
+.oneyPopin_external {
+  display: block;
+  font-weight: 700;
+  text-decoration: underline;
+}
 /* Oney Form */
 .oneyRequired {
   display: flex;
