@@ -120,7 +120,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: exitProcess');
         if ($str) {
-            $this->logger->addLog('Notification: exitProcess');
+            $this->logger->addLog($str);
         }
         if ($this->lock_key) {
             if (!PayplugLock::deleteLockG2($this->lock_key)) {
@@ -931,7 +931,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok':'nok'));
 
         // Define if payment is deferred resource
-        if (isset($this->payment->authorization)) {
+        if (isset($this->payment->authorization) && !$this->is_oney) {
             $this->is_deferred = isset($this->payment->authorization->authorized_at)
                 && $this->payment->authorization->authorized_at;
         }

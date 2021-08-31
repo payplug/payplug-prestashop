@@ -1935,7 +1935,8 @@ class PayPlugClass extends PaymentModule
             }
             $payment_details['type_code'] = $payment->payment_method['type'];
         }
-        if ($payment->authorization !== null) {
+
+        if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
                 $payment_details['date'] = date('d/m/Y', $payment->paid_at);
