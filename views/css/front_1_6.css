@@ -184,7 +184,7 @@
   text-align: left;
 }
 .payplugPaymentOption img {
-  margin: 0 12px 0 0;
+  margin: 0 12px 0 5px;
   height: 33px;
 }
 @media (max-width: 1023px) {
@@ -1133,6 +1133,9 @@
   height: 22px;
   width: 14px;
   color: #777;
+}
+.payplugOneClick > button img {
+  margin-right: 20px;
 }
 .payplugOneClick form {
   display: flex;
