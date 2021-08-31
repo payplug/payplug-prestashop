@@ -741,8 +741,12 @@ class ConfigClass
      * @return bool
      * @throws libphonenumberlight\NumberParseException
      */
-    public static function isValidMobilePhoneNumber($phone_number, $iso_code)
+    public static function isValidMobilePhoneNumber($phone_number = false, $iso_code)
     {
+        if (empty($phone_number)) {
+            return false;
+        }
+
         try {
             $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
