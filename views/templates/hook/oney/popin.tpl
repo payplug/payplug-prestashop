@@ -51,12 +51,15 @@
             </span>
         {/foreach}
 
-        {assign "link_to_oney" "<a href='{$oney_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
+        {assign "linkToOney" "<a href='{$oneyUrl|escape:'htmlall':'UTF-8'}' target='_blank'>"}
         <span class="oneyPopin_legal">
-            {if $oney_with_fees}
-                {l s='hook.oney.popin.legalNoticeWithFees' tags=[$link_to_oney] sprintf=[$oney_min_amounts, $oney_max_amounts] mod='payplug'}
+            {if $oneyWithFees}
+                {l s='hook.oney.popin.legalNoticeWithFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod='payplug'}
             {else}
-                {l s='hook.oney.popin.legalNoticeWithoutFees' tags=[$link_to_oney] sprintf=[$oney_min_amounts, $oney_max_amounts] mod='payplug'}
+                {l s='hook.oney.popin.legalNoticeWithoutFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod='payplug'}
+            {/if}
+            {if isset($learnMoreLink) && $learnMoreLink}
+                <a class="oneyPopin_external" href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf"  target="_blank">{l s='hook.oney.popin.learnMore' mod='payplug'}</a>
             {/if}
         </span>
     {else}

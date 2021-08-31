@@ -355,6 +355,7 @@ $_MODULE['<{payplug}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f'] = 
 Please visit our [2]support page[/2] to download a version of the PayPlug module compatible with your store, and install it in a few clicks.';
 $_MODULE['<{payplug}prestashop>php_version_ec36b20c94c8267c75e8522a139189bd'] = 'Display the payment form directly on your website, without redirection';
 $_MODULE['<{payplug}prestashop>php_version_f683d3e42054dfba0264b623e35be77f'] = 'Web interface to manage and export transaction history';
+$_MODULE['<{payplug}prestashop>popin_01021e92af16741835ccf5729290d0d4'] = 'Learn more';
 $_MODULE['<{payplug}prestashop>popin_19cf27400430cae294abe8c130a8d377'] = 'Oney is momentarily unavailable.';
 $_MODULE['<{payplug}prestashop>popin_4966fa949aed9ec282f487176693330f'] = 'Pay';
 $_MODULE['<{payplug}prestashop>popin_74e747c329df0fcd765e14259821f6a4'] = 'without fees';
