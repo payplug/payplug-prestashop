@@ -895,7 +895,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setPayment');
         if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
             if ($this->sandbox) {
-                $this->payplug->api->initializeApi(false);
+                $this->payplug->apiClass->initializeApi(false);
                 if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with LIVE API Key.', 'debug');
                     $this->payplug->apiClass->initializeApi(true);

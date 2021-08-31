@@ -408,15 +408,16 @@ var $document, $window, payplug = {
             var {login} = payplug,
                 {identifier} = login.props;
 
-            if (typeof event.keyCode == 'undefined') {
-                var {tools} = payplug,
-                    email = $('input[name=PAYPLUG_EMAIL]').val(),
-                    pwd = $('input[name=PAYPLUG_PASSWORD]').val();
+            // Only validate the login form if key "Enter" press
+            if (parseInt(event.keyCode) != 13) {
+                return;
+            }
 
-                if (!tools.validate.isEmail(email) || !pwd.length) {
-                    return;
-                }
-            } else if (parseInt(event.keyCode) != 13) {
+            var {tools} = payplug,
+                email = $('input[name=PAYPLUG_EMAIL]').val(),
+                pwd = $('input[name=PAYPLUG_PASSWORD]').val();
+
+            if (!tools.validate.isEmail(email) || !pwd.length) {
                 return;
             }
 

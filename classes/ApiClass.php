@@ -364,7 +364,7 @@ class ApiClass extends \PaymentModule
         try {
             \Payplug\Payplug::init([
                 'secretKey' => $payplug_key,
-                'apiVersion' => $this->plugin->getApiVersion()
+                'apiVersion' => (new PluginRepository())->getEntity()->getApiVersion()
             ]);
 
             return $payplug_key;
