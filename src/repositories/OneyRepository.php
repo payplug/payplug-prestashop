@@ -340,13 +340,15 @@ class OneyRepository extends Repository
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
+        $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
         $vars = [
             'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
-            ]
+            ],
+            'withFirstSchedule' => $withFirstSchedule,
         ];
         $this->assign->assign($vars);
         return $this->media->fetchTemplate('oney/schedule.tpl');
@@ -665,6 +667,8 @@ class OneyRepository extends Repository
             $oney_payment_options ? false : $this->l('oney.getOneyPriceAndPaymentOptions.unavailable')
         );
 
+        $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
+
         $this->assign->assign([
             'payplug_oney_required_field' => $cart ? $this->displayOneyRequiredFields() : false,
             'payplug_oney_amount' => [
@@ -672,7 +676,8 @@ class OneyRepository extends Repository
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
-            'payplug_oney_error' => $error
+            'payplug_oney_error' => $error,
+            'withFirstSchedule' => $withFirstSchedule,
         ]);
 
         if ($oney_payment_options) {
