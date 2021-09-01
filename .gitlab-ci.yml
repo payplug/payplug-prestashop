@@ -3,84 +3,83 @@ include:
     file: '/templates/main.gitlab-ci.yml'
 
 stages:
-  - coverage
-  - check php
-  - tests
+#  - coverage
+#  - check php
+#  - tests
   - translations
-  - build
+#  - build
   - releasy-review
   - releasy-release
-
-coverage test:
-  image: php:7.2.1
-  stage: coverage
-  cache:
-    paths:
-      - vendor/
-  before_script:
-    # Install git, the php image doesn't have installed
-    - apt-get update -yqq
-    - apt-get install git -yqq
-
-    # Install Xdebug
-    - pecl install xdebug
-    - docker-php-ext-enable xdebug
-
-    # Install composer version 1
-    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=1.10.16
-
-    # Install all project dependencies
-    - composer install
-  script:
-    - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
-    - vendor/bin/phpunit --coverage-text --colors=never
-
-
-php cs fixer:
-  image: composer:1.9
-  stage: check php
-  only: [merge_requests]
-  script:
-    - composer install
-    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
-
-unit tests:
-  image: composer:1.9
-  stage: tests
-  only: [merge_requests]
-  script:
-    - composer install
-    - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
-    - vendor/phpunit/phpunit/phpunit --exclude dev tests
+#
+#coverage test:
+#  image: php:7.2.1
+#  stage: coverage
+#  cache:
+#    paths:
+#      - vendor/
+#  before_script:
+#    # Install git, the php image doesn't have installed
+#    - apt-get update -yqq
+#    - apt-get install git -yqq
+#
+#    # Install Xdebug
+#    - pecl install xdebug
+#    - docker-php-ext-enable xdebug
+#
+#    # Install composer version 1
+#    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=1.10.16
+#
+#    # Install all project dependencies
+#    - composer install
+#  script:
+#    - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
+#    - vendor/bin/phpunit --coverage-text --colors=never
+#
+#
+#php cs fixer:
+#  image: composer:1.9
+#  stage: check php
+#  only: [main, merge_requests]
+#  script:
+#    - composer install
+#    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
+#
+#unit tests:
+#  image: composer:1.9
+#  stage: tests
+#  only: [main, merge_requests]
+#  script:
+#    - composer install
+#    - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
+#    - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
 check module translations:
   image: php:7.4
   stage: translations
-  only: [merge_requests]
   script:
     - php ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   artifacts:
     paths:
       - ci/translations.csv
 
-build zip release:
-  image: composer:1.9
-  stage: build
-  only: [merge_requests]
-  before_script:
-    - composer install --no-dev
-    - ./ci/copy_translations.sh
-    - ./ci/assets_revision.sh
-    - find ./vendor -type d -exec cp index.php {} \;
-    - git status
-    - mkdir payplug
-  script:
-    - shopt -s extglob
-    - mv !(payplug|composer.json) payplug
-    - composer archive --file payplug_$CI_COMMIT_REF_NAME --format zip
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file payplug_qa_$CI_COMMIT_REF_NAME --format zip
-  artifacts:
-    paths:
-      - payplug_$CI_COMMIT_REF_NAME.zip
-      - payplug_qa_$CI_COMMIT_REF_NAME.zip
+#build zip release:
+#  image: composer:1.9
+#  stage: build
+#  only: [main, merge_requests]
+#  before_script:
+#    - composer install --no-dev
+#    - ./ci/copy_translations.sh
+#    - ./ci/assets_revision.sh
+#    - find ./vendor -type d -exec cp index.php {} \;
+#    - git status
+#    - mkdir payplug
+#  script:
+#    - shopt -s extglob
+#    - mv !(payplug|composer.json) payplug
+#    - composer archive --file payplug_$CI_COMMIT_REF_NAME --format zip
+#    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+#    - composer archive --file payplug_qa_$CI_COMMIT_REF_NAME --format zip
+#  artifacts:
+#    paths:
+#      - payplug_$CI_COMMIT_REF_NAME.zip
+#      - payplug_qa_$CI_COMMIT_REF_NAME.zip
