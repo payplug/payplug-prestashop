@@ -54,6 +54,7 @@ class ApiClass extends \PaymentModule
 
     public function __construct()
     {
+        parent::__construct();
         $this->plugin = new PluginRepository();
         $this->setEnvironment();
         self::setSecretKey();
@@ -444,7 +445,7 @@ class ApiClass extends \PaymentModule
             } else {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (BadRequestException $e) {
             json_encode([
                 'content' => null,
                 'error' => $e->getMessage()
