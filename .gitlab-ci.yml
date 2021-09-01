@@ -39,7 +39,6 @@ coverage test:
 php cs fixer:
   image: composer:1.9
   stage: check php
-  only: [merge_requests]
   script:
     - composer install
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
@@ -47,7 +46,6 @@ php cs fixer:
 unit tests:
   image: composer:1.9
   stage: tests
-  only: [merge_requests]
   script:
     - composer install
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
@@ -56,7 +54,6 @@ unit tests:
 check module translations:
   image: php:7.4
   stage: translations
-  only: [merge_requests]
   script:
     - php ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   artifacts:
@@ -66,7 +63,6 @@ check module translations:
 build zip release:
   image: composer:1.9
   stage: build
-  only: [merge_requests]
   before_script:
     - composer install --no-dev
     - ./ci/copy_translations.sh
