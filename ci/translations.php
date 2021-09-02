@@ -47,12 +47,14 @@ if (!empty($missing_translations)) {
 // In case we use this script via the CI, check if we need a strong feed back
 $need_return = false;
 if (isset($argv) && !empty($argv)) {
-    $target_branch = $argv[1];
-    $allowed_branches = ['qa','hotfix','master','release'];
-    foreach ($allowed_branches as $branch) {
-        $pos = strpos($target_branch, $branch);
-        if ($pos !== false && !$pos && !$need_return) {
-            $need_return = true;
+    $target_branch = isset($argv[1]) ? $argv[1] : false;
+    if ($target_branch) {
+        $restricted_branches = ['qa','hotfix','master','release'];
+        foreach ($restricted_branches as $branch) {
+            $pos = strpos($target_branch, $branch);
+            if ($pos !== false && !$pos && !$need_return) {
+                $need_return = true;
+            }
         }
     }
 }
@@ -63,10 +65,9 @@ if (!empty($messages)) {
         echo $message . "\n";
     }
     if ($need_return) {
-        die(1);
+        exit(1);
+    } else {
+        exit(137);
     }
 }
-
-if ($need_return) {
-    die(0);
-}
+exit(0);
