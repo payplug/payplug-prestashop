@@ -3,12 +3,12 @@ include:
     file: '/templates/main.gitlab-ci.yml'
 
 stages:
+  - releasy-review
   - coverage
   - check php
   - tests
   - translations
   - build
-  - releasy-review
   - releasy-release
 
 coverage test:
