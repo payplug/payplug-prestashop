@@ -1,4 +1,7 @@
 <?php
+
+use PayPlug\classes\RefundClass;
+
 /**
  * 2013 - 2021 PayPlug SAS
  *
@@ -31,6 +34,7 @@ include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
 
 $payplug = new PayPlugClass();
 $adminClass = new AdminClass();
+$refundClass = new RefundClass($payplug);
 $logger = $payplug->getPlugin()->logger();
 
 if (Tools::getValue('_ajax') == 1) {
@@ -139,7 +143,7 @@ if (Tools::getValue('_ajax') == 1) {
             'reason' => 'Refunded with Prestashop'
         ];
         $pay_mode = Tools::getValue('pay_mode');
-        $refund = $payplug->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+        $refund = RefundClass::makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
             $logger->addLog('Cannot refund that amount.', 'notice');
             $logger->addLog(
@@ -200,7 +204,7 @@ if (Tools::getValue('_ajax') == 1) {
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
 
-            $data = $payplug->getRefundData(
+            $data = $refundClass->getRefundData(
                 $amount_refunded_payplug,
                 $amount_available
             );

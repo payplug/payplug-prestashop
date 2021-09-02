@@ -39,6 +39,7 @@ class AdminClass extends \Payplug
     private $html = '';
     private $mediaClass;
     private $paymentRepository;
+    private $refundClass;
 
     public function __construct()
     {
@@ -47,6 +48,7 @@ class AdminClass extends \Payplug
         $this->configClass = $this->module->configClass;
         $this->mediaClass = new MediaClass($this->module);
         $this->paymentRepository = $this->module;
+        $this->refundClass = $this->module->refundClass;
         $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
@@ -223,7 +225,7 @@ class AdminClass extends \Payplug
             die(json_encode(['result' => ApiClass::hasLiveKey()]));
         }
         if ((int)Tools::getValue('refund') == 1) {
-            $this->paymentRepository->refundPayment();
+            $this->refundClass->refundPayment();
         }
         if ((int)Tools::getValue('capture') == 1) {
             $this->paymentRepository->capturePayment();
