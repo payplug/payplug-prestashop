@@ -89,8 +89,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             [
                 'card_confirm_deleted_msg' => $popup_confirm_delete_message,
                 'card_deleted_msg' => $card_deleted_msg,
-                'payplug_delete_card_url' => $payplug_delete_card_url,
-                'payplug_cards' => $payplug_cards
+                'payplug_delete_card_url' => $payplug_delete_card_url
             ]
         );
 

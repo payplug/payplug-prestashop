@@ -32,9 +32,9 @@
             <button type="button" class="payplugMsg_button" name="card_deleted">{l s='hook.partials.message.ok' mod='payplug'}</button>
         {/if}
 
-        {if isset($with_yesno_buttons) && $with_yesno_buttons}
+        {if isset($with_yes_no_buttons) && $with_yes_no_buttons}
         <div class="payplugPopup_footer">
-            <button type="button" class="payplugMsg_button" name="confirm_delete">{l s='hook.partials.message.yes' mod='payplug'}</button>
+            <button type="button" class="payplugMsg_button payplugMsg_confirmButton" name="confirm_delete">{l s='hook.partials.message.yes' mod='payplug'}</button>
             <button type="button" class="payplugMsg_button payplugMsg_declineButton">{l s='hook.partials.message.no' mod='payplug'}</button>
         </div>
         {/if}

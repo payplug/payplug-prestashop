@@ -81,10 +81,12 @@ var $document, $window, payplugModule = {
         props: {
             identifier: 'payplugCard',
             query: null,
+            id_card : 0,
         },
         init: function () {
             var card = payplugModule.card,
                 identifier = card.props.identifier;
+
             $document.on('click', '.' + identifier + '_delete', payplugModule.card.delete)
                 .on('click', 'button[name="confirm_delete"]', payplugModule.card.confirm);
 
@@ -93,6 +95,8 @@ var $document, $window, payplugModule = {
         delete: function (event) {
             event.preventDefault();
             event.stopPropagation();
+            var $elem = $(this);
+            payplugModule.card.props.id_card = $elem.data('id_card');
             payplugModule.popup.set(card_confirm_deleted_msg);
         },
         //display second popup to announce the card's deletion success
@@ -100,12 +104,10 @@ var $document, $window, payplugModule = {
 
             event.preventDefault();
             event.stopPropagation();
-            var id_card = payplug_cards[0]['id_payplug_card'],
+            var id_card = payplugModule.card.props.id_card,
                 url = payplug_delete_card_url + '&pc=' + id_card,
                 card = payplugModule.card,
                 identifier = card.props.identifier;
-
-                console.log(id_card);
 
                 $.ajax({
                     type: 'POST',
@@ -123,11 +125,9 @@ var $document, $window, payplugModule = {
                     },
                     success: function (result) {
                         if (result) {
-                            $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
-                            payplugModule.popup.set(card_deleted_msg);
-                            location.reload();
+                                $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                                payplugModule.popup.setDeleteCardPopup(card_deleted_msg);
                         }
-
                     }
                 });
         },
@@ -566,6 +566,14 @@ var $document, $window, payplugModule = {
             }
             popup.hydrate(content);
             popup.open();
+        },
+        setDeleteCardPopup:  function (content) {
+            var popup = payplugModule.popup,
+                props = popup.props;
+            popup.create();
+            popup.hydrate(content);
+            popup.open();
+            $document.on('click', 'button[name="card_deleted"]', payplugModule.popup.close);
         },
         open: function () {
             var props = payplugModule.popup.props;
