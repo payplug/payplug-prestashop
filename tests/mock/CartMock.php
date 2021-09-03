@@ -77,6 +77,18 @@ class CartMock
                 'manufacturer_name' => 'Studio Design',
                 'price_wt' => 22.68,
                 'attributes' => 'Color : White',
+            ],
+            [
+                'id_product' => 5,
+                'cart_quantity' => 1,
+                'name' => 'Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun
+                Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours 
+                brun Coussin ours brun Coussin ours brun',
+                'manufacturer_name' => 'Studio Design Studio DesignStudio DesignStudio Design Studio Design Studio Design
+                 Studio Design Studio Design Studio Design Studio Design Studio Design Studio Design Studio Design Studio 
+                 Design Studio Design Studio Design Studio Design Studio Design Studio Design',
+                'price_wt' => 22.68,
+                'attributes' => 'Color : White',
             ]
         ];
     }

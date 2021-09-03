@@ -123,4 +123,36 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             $this->repo->getOneyPaymentContext()
         );
     }
+
+    public function testGetContextWithTooLongName()
+    {
+        $this->cart->shouldReceive([
+            'get' => CartMock::get(),
+            'getProducts' => [CartMock::getProducts()[4]],
+            'isVirtualCart' => false
+        ]);
+
+        $this->assertSame(
+            [
+                'cart' => [
+                    [
+                        'merchant_item_id' => 5,
+                        'name' => 'Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun
+                Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours 
+                brun Coussin ours brun Coussin',
+                        'price' => 2268,
+                        'quantity' => 1,
+                        'total_amount' => 2268,
+                        'brand' => 'Studio Design Studio DesignStudio DesignStudio Design Studio Design Studio Design
+                 Studio Design Studio Design Studio Design Studio Design Studio Design Studio Design Studio Design Studio 
+                 Design Studio Design Studio Design',
+                        'delivery_label' => 'Carrier name',
+                        'expected_delivery_date' => date('Y-m-d'),
+                        'delivery_type' => 'storepickup',
+                    ]
+                ]
+            ],
+            $this->repo->getOneyPaymentContext()
+        );
+    }
 }
