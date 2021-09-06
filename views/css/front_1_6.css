@@ -584,11 +584,11 @@
   color: #7ebd00;
   font-size: 18px;
   line-height: 20px;
-  text-transform: uppercase;
   margin: 0 0 18px;
 }
 .oneyPopin_title strong {
   display: block;
+  text-transform: uppercase;
 }
 @media (max-width: 767px) {
   .oneyPopin_title {
