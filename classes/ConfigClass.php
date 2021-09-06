@@ -996,7 +996,7 @@ class ConfigClass
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             die(json_encode([
                 'content' => false,
-                'error' => $this->l('payplug.submitAccount.credentialsNotCorrect')
+                'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect')
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->apiClass->login($email, $password)) {
@@ -1010,7 +1010,7 @@ class ConfigClass
             } else {
                 die(json_encode([
                     'content' => false,
-                    'error' => $this->l('payplug.submitAccount.credentialsNotCorrect')
+                    'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect')
                 ]));
             }
         }
