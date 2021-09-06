@@ -194,11 +194,19 @@
 }
 .payplugPaymentOption img {
   margin: 0 12px 0 5px;
-  height: 33px;
+  height: 30px;
 }
 @media (max-width: 1023px) {
   .payplugPaymentOption img {
     display: none;
+  }
+}
+.payplugPaymentOption .custom-radio {
+  margin-top: 0.25rem;
+}
+@media (max-width: 1023px) {
+  .payplugPaymentOption .custom-radio {
+    margin-top: 0;
   }
 }
 /* Oney cta */
