@@ -138,6 +138,14 @@ class PrestashopSpecific16
                      * oney.tpl (Oney optimisé)
                      * unified.tpl (Oney non optimisé)
                      */
+
+                    // Check if Oney is on error
+                    if ($oneyOptimized && $payment_method == 'oney'
+                        && $payment_method == 'oney'
+                        && (isset($payment_option['err_label']) && $payment_option['err_label'])) {
+                        $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
+                    }
+
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
                             ($error ? '-alt' : ''),
@@ -159,11 +167,12 @@ class PrestashopSpecific16
                 }
 
                 // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
-                if ($oneyOptimized && ($payment_method == 'oney')) {
+                if ($oneyOptimized && $payment_method == 'oney') {
                     break;
                 }
             }
         }
+
         return $paymentOptions;
     }
 
