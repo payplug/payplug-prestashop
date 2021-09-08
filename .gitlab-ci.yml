@@ -22,7 +22,7 @@ coverage test:
     - apt-get update -yqq
     - apt-get install git -yqq
 
-    # Install Xdebug
+    # Install and enable Xdebug
     - pecl install xdebug
     - docker-php-ext-enable xdebug
 
