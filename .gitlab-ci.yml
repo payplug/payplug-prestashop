@@ -47,6 +47,7 @@ unit tests:
   stage: tests
   script:
     - composer install
+    - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
     - vendor/phpunit/phpunit/phpunit --bootstrap test/init.php test/tests
     - vendor/phpunit/phpunit/phpunit --exclude dev tests
 
