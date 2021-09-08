@@ -18,20 +18,18 @@ coverage test:
     paths:
       - vendor/
   before_script:
-    # Install git, the php image doesn't have installed
-    - apt-get update -yqq
-    - apt-get install git -yqq
 
-    # Install and enable Xdebug
+    # Install Xdebug
     - pecl install xdebug
     - docker-php-ext-enable xdebug
 
     # Install composer version 1
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=1.10.16
-
     # Install all project dependencies
     - composer install
+
   script:
+
     - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
     - vendor/bin/phpunit --coverage-text --colors=never
 
