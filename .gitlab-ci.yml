@@ -8,6 +8,7 @@ stages:
   - check php
   - tests
   - translations
+  - assets
   - build
   - releasy-release
 
@@ -68,15 +69,31 @@ check module translations:
     paths:
       - ci/translations.csv
 
+assets compile and revision:
+  image: node:16
+  stage: assets
+  before_script:
+    - npm --version
+    - npm install less -g
+    - lessc --version
+  script:
+    - chmod 777 ./ci/assets.sh && ./ci/assets.sh
+  artifacts:
+    paths:
+      - views/build/*
+    expire_in: 1 day
+
 build zip release:
   image: composer:1.9
   stage: build
   before_script:
     - composer install --no-dev
     - ./ci/copy_translations.sh
-    - ./ci/assets_revision.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
+    - rm -rf ./views/js ./views/css
+    - cp -r ./views/build/css ./views/
+    - cp -r ./views/build/js ./views/
     - mkdir payplug
   script:
     - shopt -s extglob
