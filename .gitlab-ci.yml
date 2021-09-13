@@ -77,7 +77,15 @@ assets compile and revision:
     - npm install less -g
     - lessc --version
   script:
-    - chmod 777 ./ci/assets.sh && ./ci/assets.sh
+    - chmod 777 ./ci/assets_compil.sh && ./ci/assets_compil.sh
+    - echo "Moving file in build dir"
+    - mkdir ./views/build
+    - mkdir ./views/build/css
+    - mkdir ./views/build/js
+    - mv ./views/css/*.css ./views/build/css
+    - mv ./views/js/* ./views/build/js
+    - ls -l ./views/build/css/*.css
+    - ls -l ./views/build/js/*.js
   artifacts:
     paths:
       - views/build/*
@@ -91,9 +99,7 @@ build zip release:
     - ./ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - rm -rf ./views/js ./views/css
-    - cp -r ./views/build/css ./views/
-    - cp -r ./views/build/js ./views/
+    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
     - mkdir payplug
   script:
     - shopt -s extglob
