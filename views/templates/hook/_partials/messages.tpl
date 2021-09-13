@@ -23,7 +23,7 @@
     <div class="payplugMsg_wrapper">
         {foreach $messages as $message}
             {if $message.type == 'string'}
-                <p class="payplugMsg_text"{if isset($is_error_message) && $is_error_message} class="payplugMsg_error"{/if}>{$message.value|escape:'htmlall':'UTF-8'}</p>
+                <p {if isset($is_error_message) && $is_error_message} class="payplugMsg_error" {else} class="payplugMsg_text" {/if}>{$message.value|escape:'htmlall':'UTF-8'}</p>
             {elseif $message.type == 'template'}
                 {include file="../"|cat:$message.value}
             {/if}
