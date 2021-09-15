@@ -175,9 +175,15 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     {
         $this->paymentDetails['cart'] = 'Invalid Cart';
 
-        $this->assertFalse(
-            $this->repo->updatePaymentTable($this->paymentDetails)['result']
-        );
+        $this->query
+            ->shouldReceive([
+                'update' => $this->query,
+                'table' => $this->query,
+                'set' => $this->query,
+                'where' => $this->query,
+                'build' => true
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->updatePaymentTable($this->paymentDetails)['response'],

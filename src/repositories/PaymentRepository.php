@@ -63,7 +63,7 @@ class PaymentRepository extends Repository
     /**
      * @description Return hashed cart with needed (and formatted) elements, ready to be hashed.
      * @param $paymentDetails
-     * @return string
+     * @return string | array
      */
     public function getHashedCart($paymentDetails)
     {
@@ -71,6 +71,7 @@ class PaymentRepository extends Repository
             || !is_array($paymentDetails)
             || !isset($paymentDetails['cart'])
             || !$paymentDetails['cart']
+            || !is_object($paymentDetails['cart'])
         ) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
@@ -78,25 +79,29 @@ class PaymentRepository extends Repository
             );
         }
         $cartToHash = [];
+        $products = $paymentDetails['cart']->getProducts();
 
-        if (method_exists($paymentDetails['cart'], 'getProducts')) {
-            foreach ($paymentDetails['cart']->getProducts() as $product) {
-                $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
-                $cartToHash[] = array_map('strval', $product);
-            }
-
-            // For optimised / non optimised Oney + 3x / 4x to have a good hash ;-)
-            if (isset($paymentDetails['oneyDetails'])) {
-                $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
-            }
-
-            return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
-        } else {
+        if (!$products) {
             return $this->returnPaymentError(
                 ['name' => '$paymentDetails[\'cart\']', 'value' => $paymentDetails['cart']],
-                '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) doesn\'t exist'
+                '[getHashedCart] no product found'
             );
         }
+
+        foreach ($products as $product) {
+            $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
+            $cartToHash[] = array_map('strval', $product);
+        }
+        // For optimised / non optimised Oney + 3x / 4x to have a good hash ;-)
+        if (isset($paymentDetails['oneyDetails'])) {
+            $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
+        }
+        // Adding cart update to secure hash
+        if (isset($paymentDetails['cart']->date_upd)) {
+            $cartToHash[] = $paymentDetails['cart']->date_upd;
+        }
+
+        return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
     }
 
     /**
