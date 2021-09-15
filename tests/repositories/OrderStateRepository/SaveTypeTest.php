@@ -27,7 +27,6 @@ namespace PayPlug\tests\repositories\OrderStateRepository;
 use PayPlug\tests\mock\OrderStateMock;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group order_state

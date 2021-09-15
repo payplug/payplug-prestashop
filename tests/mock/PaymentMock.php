@@ -25,6 +25,11 @@ class PaymentMock
             ],
             'refundable_after' => 1614949567,
             'refundable_until' => 1630501567,
+            'metadata' => [
+                'ID Client' => 4,
+                'ID Cart' => 17,
+                'Website' => 'http://localhost'
+            ],
         ]
     ];
 

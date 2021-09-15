@@ -117,7 +117,7 @@ class PrestashopSpecific16
             }
         }
 
-        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer($cart->id_customer, true);
+        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer((int)$cart->id_customer, true);
 
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 

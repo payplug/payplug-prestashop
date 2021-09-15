@@ -99,9 +99,10 @@ class PayPlugAjax
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $payplug_card = $this->card;
+                    $id_payplug_card = $tools->tool('getValue', 'pc');
+                    $deleted = $this->card->deleteCard($id_customer, $id_payplug_card);
 
-                    if ($payplug_card->delete((int)$tools->tool('getValue', 'pc'))) {
+                    if ($deleted) {
                         die(true);
                     } else {
                         die(false);
