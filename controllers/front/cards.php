@@ -61,12 +61,8 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
 
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_cards = $this->card->getByCustomer($this->contextSpecific->getContext()->customer);
-        } else {
-            $customer = $this->contextSpecific->getContext()->customer;
-            $payplug_cards = $this->card->getCards($customer->id);
-        }
+        $customer = $this->contextSpecific->getContext()->customer;
+        $payplug_cards = $this->card->getByCustomer((int)$customer->id);
         $payplug_delete_card_url  = $this->contextSpecific->getContext()->link->getModuleLink(
             'payplug',
             'ajax',

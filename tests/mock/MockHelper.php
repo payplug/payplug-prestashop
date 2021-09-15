@@ -24,19 +24,10 @@
 
 namespace PayPlug\tests\mock;
 
-use \Mockery;
+use Mockery;
 
 class MockHelper extends Mockery
 {
-    public static function createMockFactory($classPathname)
-    {
-        $mock = \Mockery::mock('alias:'. $classPathname);
-        $mock->shouldReceive('factory')
-            ->andReturnSelf();
-
-        return $mock;
-    }
-
     public static function createSetCacheMock($cacheMock, &$arrayCache)
     {
         $cacheMock
@@ -51,10 +42,19 @@ class MockHelper extends Mockery
     {
         $loggerMock
             ->shouldReceive('addLog')
-            ->andReturnUsing(function ($message, $level) use (&$arrayLog) {
+            ->andReturnUsing(function ($message, $level = 'info') use (&$arrayLog) {
                 $arrayLog[] = ['level' => $level, 'message' => $message];
                 return $arrayLog;
             });
+    }
+
+    public static function createMockFactory($classPathname)
+    {
+        $mock = \Mockery::mock('alias:' . $classPathname);
+        $mock->shouldReceive('factory')
+            ->andReturnSelf();
+
+        return $mock;
     }
 
     public static function createToolsMock($classPathname)
@@ -72,13 +72,15 @@ class MockHelper extends Mockery
                         return strpos($value, $params2);
                     case 'strtoupper':
                         return strtoupper($value);
+                    case 'strtolower':
+                        return strtolower($value);
                     case 'displayPrice':
                         $value = number_format($value, 2) . ' €';
                         return str_replace('.', ',', $value);
                     case 'ps_round':
                         return round($value, $params2);
                     default:
-                        throw new Mockery\Exception('ERROR : Missing method "'. $action . '" in createToolsMock (MockHelper.php)');
+                        throw new Mockery\Exception('ERROR : Missing method "' . $action . '" in createToolsMock (MockHelper.php)');
                         break;
                 }
 

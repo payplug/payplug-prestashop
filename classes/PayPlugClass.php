@@ -657,7 +657,7 @@ class PayPlugClass extends PaymentModule
 
         $payplug_card = $this->card;
 
-        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = $payplug_card->getByCustomer((int)$cart->id_customer, true);
 
         $use_taxes = Configuration::get('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
@@ -969,7 +969,7 @@ class PayPlugClass extends PaymentModule
         // check if one click allowed
         $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
         $payplug_card = $this->card;
-        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = $payplug_card->getByCustomer((int)$cart->id_customer, true);
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
@@ -1855,16 +1855,10 @@ class PayPlugClass extends PaymentModule
          * Get card details to order details (views/templates/admin/order/details.tpl)
          * Mask (last4), exp date...
          */
-        $getCards_param = null;
+        $card_details = false;
         if (isset($payment->card->last4) && (!empty($payment->card->last4))) {
-            $getCards_param = $payment;
-        } elseif (!isset($payment->card->last4)
-            && isset($payment->metadata['ID Client'])
-            && (int)$payment->metadata['ID Client'] > 0) {
-            $getCards_param = $payment->metadata['ID Client'];
+            $card_details = $this->card->getCardDetailFromPayment($payment);
         }
-        $card_details = $this->card->getCards($getCards_param);
-        $card_details = is_array($card_details) ? end($card_details) : false;
 
         // Card brand
         $card_brand = null;
@@ -2898,7 +2892,7 @@ class PayPlugClass extends PaymentModule
 
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
-        $payplug_cards = $options['one_click'] ? $this->card->getCards((int)$id_customer, true) : [];
+        $payplug_cards = $options['one_click'] ? $this->card->getByCustomer((int)$id_customer, true) : [];
 
         $paymentOption = [];
 
