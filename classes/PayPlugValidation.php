@@ -400,8 +400,6 @@ class PayPlugValidation
                 ) {
                     $secure_key = $cart->secure_key;
                     $this->logger->addLog('Secure keys do not match.', 'error');
-                    $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key, 'error');
-                    $this->logger->addLog('Cart Secure Key: ' . $cart->secure_key, 'error');
                 } else {
                     $secure_key = $customer->secure_key;
                 }
