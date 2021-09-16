@@ -121,6 +121,7 @@ class PayPlugAjax
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
                     $quantity = (int)$tools->tool('getValue', 'quantity', 1);
+                    $quantity = $quantity ? $quantity : 1;
                     $product_price = Product::getPriceStatic(
                         $id_product,
                         $use_taxes,
@@ -160,6 +161,7 @@ class PayPlugAjax
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
                     $quantity = (int)$tools->tool('getValue', 'quantity', 1);
+                    $quantity = $quantity ? $quantity : 1;
                     $product_price = Product::getPriceStatic(
                         $id_product,
                         $use_taxes,
