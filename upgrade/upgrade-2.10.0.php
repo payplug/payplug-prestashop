@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -37,6 +36,7 @@ function upgrade_module_2_10_0()
         ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
         ADD COLUMN `is_pending` TINYINT(1) NOT NULL DEFAULT 0
         AFTER `id_cart`';
+
     try {
         $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
     } catch (PrestaShopDatabaseException $e) {

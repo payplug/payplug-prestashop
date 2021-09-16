@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\ValidateInterface;
-use \Validate;
+use Validate;
 
 class ValidateSpecific implements ValidateInterface
 {

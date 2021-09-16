@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -40,17 +40,17 @@ class HookRepository extends Repository
 
     public function actionAdminControllerSetMedia()
     {
-        $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
+        $module_url = $this->constant->get('__PS_BASE_URI__').'modules/payplug/';
 
-        if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
+        if ('AdminOrders' == $this->context->getContext()->controller->controller_name) {
             $this->payplug->mediaClass->setMedia([
-                $module_url . 'views/css/admin_order.css',
-                $module_url . 'views/js/admin_order.js',
+                $module_url.'views/css/admin_order.css',
+                $module_url.'views/js/admin_order.js',
             ]);
         } else {
             $this->payplug->mediaClass->setMedia([
-                $module_url . 'views/js/admin.js',
-                $module_url . 'views/css/admin.css',
+                $module_url.'views/js/admin.js',
+                $module_url.'views/css/admin.css',
             ]);
         }
     }
@@ -58,18 +58,21 @@ class HookRepository extends Repository
     /**
      * @description This is a hook function that allows
      * creating a new type of the order state
+     *
      * @param $param
      */
     public function actionObjectOrderStateAddAfter($param)
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        return $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
+
+        return $this->payplug->getPlugin()->getOrderState()->saveType((int) $order_state->id, $type);
     }
 
     /**
      * @description This is a hook function that allows
      * to update the type of the order state
+     *
      * @param $param
      */
     public function actionObjectOrderStateUpdateAfter($param)
@@ -78,25 +81,30 @@ class HookRepository extends Repository
         if (isset($order_state->deleted) && $order_state->deleted) {
             return $this->actionObjectOrderStateDeleteAfter($param);
         }
+
         return $this->actionObjectOrderStateAddAfter($param);
     }
 
     /**
      * @description This is a hook function that deletes
      * an order state
+     *
      * @param $param
      */
     public function actionObjectOrderStateDeleteAfter($param)
     {
         $order_state = $param['object'];
-        return $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
+
+        return $this->payplug->getPlugin()->getOrderState()->deleteType((int) $order_state->id);
     }
 
     /**
      * @description This hook is used to display
      * a select box in the order state page (BO)
      * in order to create/update a type
+     *
      * @param $param
+     *
      * @return mixed
      */
     public function displayAdminStatusesForm($param)
@@ -113,11 +121,11 @@ class HookRepository extends Repository
         ];
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
-        $current_order_state_type = $this->payplug->getPlugin()->getOrderState()->getType((int)$id_order_state);
+        $current_order_state_type = $this->payplug->getPlugin()->getOrderState()->getType((int) $id_order_state);
 
         $this->context->getContext()->smarty->assign([
             'current_order_state_type' => $current_order_state_type,
-            'order_state_types' => $types
+            'order_state_types' => $types,
         ]);
 
         return $this->payplug->fetchTemplate('order_state/type.tpl');

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -77,7 +77,7 @@ class PluginEntity
 
 //    /** @var object */
 //    private $installment;
-    
+
     /** @var object */
     private $logger;
 
@@ -124,11 +124,13 @@ class PluginEntity
 
     /**
      * @param object $apiClass
+     *
      * @return PluginEntity
      */
     public function setApiClass($apiClass)
     {
         $this->apiClass = $apiClass;
+
         return $this;
     }
 
@@ -142,11 +144,13 @@ class PluginEntity
 
     /**
      * @param object $myLogPHP
+     *
      * @return PluginEntity
      */
     public function setMyLogPHP($myLogPHP)
     {
         $this->myLogPHP = $myLogPHP;
+
         return $this;
     }
 
@@ -160,11 +164,13 @@ class PluginEntity
 
     /**
      * @param object $amountCurrencyClass
+     *
      * @return PluginEntity
      */
     public function setAmountCurrencyClass($amountCurrencyClass)
     {
         $this->amountCurrencyClass = $amountCurrencyClass;
+
         return $this;
     }
 
@@ -178,11 +184,13 @@ class PluginEntity
 
     /**
      * @param object $orderClass
+     *
      * @return PluginEntity
      */
     public function setOrderClass($orderClass)
     {
         $this->orderClass = $orderClass;
+
         return $this;
     }
 
@@ -196,11 +204,13 @@ class PluginEntity
 
     /**
      * @param object $configClass
+     *
      * @return PluginEntity
      */
     public function setConfigClass($configClass)
     {
         $this->configClass = $configClass;
+
         return $this;
     }
 
@@ -219,7 +229,6 @@ class PluginEntity
     {
         return $this->address;
     }
-
 
     /**
      * @return string
@@ -326,7 +335,7 @@ class PluginEntity
 //        $this->installment = $installment;
 //        return $this;
 //    }
-    
+
     /**
      * @return object
      */
@@ -409,8 +418,10 @@ class PluginEntity
 
     /**
      * @param object $admin
-     * @return PluginEntity
+     *
      * @throws BadParameterException
+     *
+     * @return PluginEntity
      */
     public function setAdmin($admin)
     {
@@ -418,13 +429,16 @@ class PluginEntity
             throw (new BadParameterException('Invalid argument, $admin must be an AdminClass object'));
         }
         $this->admin = $admin;
+
         return $this;
     }
 
     /**
      * @param object $address
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setAddress($address)
     {
@@ -433,13 +447,16 @@ class PluginEntity
         }
 
         $this->address = $address;
+
         return $this;
     }
 
     /**
      * @param string $api_version
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setApiVersion($api_version)
     {
@@ -448,13 +465,16 @@ class PluginEntity
         }
 
         $this->api_version = $api_version;
+
         return $this;
     }
 
     /**
      * @param object $cache
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCache($cache)
     {
@@ -463,13 +483,16 @@ class PluginEntity
         }
 
         $this->cache = $cache;
+
         return $this;
     }
 
     /**
      * @param object $card
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCard($card)
     {
@@ -478,13 +501,16 @@ class PluginEntity
         }
 
         $this->card = $card;
+
         return $this;
     }
 
     /**
      * @param object $carrier
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCarrier($carrier)
     {
@@ -493,13 +519,16 @@ class PluginEntity
         }
 
         $this->carrier = $carrier;
+
         return $this;
     }
 
     /**
      * @param object $cart
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCart($cart)
     {
@@ -508,13 +537,16 @@ class PluginEntity
         }
 
         $this->cart = $cart;
+
         return $this;
     }
 
     /**
      * @param object $configuration
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setConfiguration($configuration)
     {
@@ -523,13 +555,16 @@ class PluginEntity
         }
 
         $this->configuration = $configuration;
+
         return $this;
     }
 
     /**
      * @param object $context
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setContext($context)
     {
@@ -538,13 +573,16 @@ class PluginEntity
         }
 
         $this->context = $context;
+
         return $this;
     }
 
     /**
      * @param object $country
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCountry($country)
     {
@@ -553,11 +591,13 @@ class PluginEntity
         }
 
         $this->country = $country;
+
         return $this;
     }
 
     /**
      * @param object $currency
+     *
      * @return PluginEntity
      */
     public function setCurrency($currency)
@@ -568,16 +608,18 @@ class PluginEntity
                 'Invalid Currency object, param $currency must be a CurrencySpecific'
             )
             );
-        } else {
-            $this->currency = $currency;
-            return $this;
         }
+        $this->currency = $currency;
+
+        return $this;
     }
 
     /**
      * @param object $hook
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setHook($hook)
     {
@@ -586,11 +628,13 @@ class PluginEntity
         }
 
         $this->hook = $hook;
+
         return $this;
     }
 
     /**
      * @param mixed $install
+     *
      * @return PluginEntity
      */
     public function setInstall($install)
@@ -600,13 +644,16 @@ class PluginEntity
         }
 
         $this->install = $install;
+
         return $this;
     }
 
     /**
      * @param object $logger
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setLogger($logger)
     {
@@ -615,13 +662,16 @@ class PluginEntity
         }
 
         $this->logger = $logger;
+
         return $this;
     }
 
     /**
      * @param object $oney
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setOney($oney)
     {
@@ -630,13 +680,16 @@ class PluginEntity
         }
 
         $this->oney = $oney;
+
         return $this;
     }
 
     /**
      * @param object $order_state
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setOrderState($order_state)
     {
@@ -645,23 +698,28 @@ class PluginEntity
         }
 
         $this->order_state = $order_state;
+
         return $this;
     }
 
     /**
      * @param object $payment
+     *
      * @return self
      */
     public function setPayment($payment)
     {
         $this->payment = $payment;
+
         return $this;
     }
 
     /**
      * @param object $product
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setProduct($product)
     {
@@ -670,13 +728,16 @@ class PluginEntity
         }
 
         $this->product = $product;
+
         return $this;
     }
 
     /**
      * @param object $query
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setQuery($query)
     {
@@ -685,13 +746,17 @@ class PluginEntity
         }
 
         $this->query = $query;
+
         return $this;
     }
 
     /**
      * @param object $query
-     * @return self
+     * @param mixed  $sql
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setSql($sql)
     {
@@ -700,13 +765,16 @@ class PluginEntity
         }
 
         $this->sql = $sql;
+
         return $this;
     }
 
     /**
      * @param object $tools
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setTools($tools)
     {
@@ -715,13 +783,16 @@ class PluginEntity
         }
 
         $this->tools = $tools;
+
         return $this;
     }
 
     /**
      * @param object $translate
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setTranslate($translate)
     {
@@ -730,13 +801,16 @@ class PluginEntity
         }
 
         $this->translate = $translate;
+
         return $this;
     }
 
     /**
      * @param object $validate
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setValidate($validate)
     {
@@ -745,6 +819,7 @@ class PluginEntity
         }
 
         $this->validate = $validate;
+
         return $this;
     }
 }

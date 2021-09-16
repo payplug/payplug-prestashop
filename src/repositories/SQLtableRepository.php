@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -36,13 +36,13 @@ class SQLtableRepository
     }
 
     /**
-     * Install SQL tables used by module
+     * Install SQL tables used by module.
      *
      * @return bool
      */
     public function installSQL()
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
         $log->info('Installation SQL Starting.');
 
         if (!defined('_MYSQL_ENGINE_')) {
@@ -52,24 +52,26 @@ class SQLtableRepository
         // Create PayPlug Lock table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_lock')
+            ->table(_DB_PREFIX_.'payplug_lock')
             ->fields('`id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`id_order` VARCHAR(100)')
             ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
             ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
             ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_LOCK.');
+
             return false;
         }
 
         // Create PayPlug Card table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_card')
+            ->table(_DB_PREFIX_.'payplug_card')
             ->fields('`id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_customer` int(11) UNSIGNED NOT NULL')
             ->fields('`id_company` int(11) UNSIGNED NOT NULL')
@@ -81,27 +83,31 @@ class SQLtableRepository
             ->fields('`brand` varchar(255) DEFAULT NULL')
             ->fields('`country` varchar(3) NOT NULL')
             ->fields('`metadata` varchar(255) DEFAULT NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_CARD.');
+
             return false;
         }
 
         // Create PayPlug Payment Cart table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_payment_cart')
+            ->table(_DB_PREFIX_.'payplug_payment_cart')
             ->fields('`id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_payment` VARCHAR(255) NOT NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`cart_hash` VARCHAR(64) NOT NULL')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_PAYMENT_CART.');
+
             return false;
         }
 
@@ -126,29 +132,32 @@ class SQLtableRepository
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_PAYMENT.');
+
             return false;
         }
 
         // Create PayPlug Installment Cart table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_installment_cart')
+            ->table(_DB_PREFIX_.'payplug_installment_cart')
             ->fields('`id_payplug_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_installment` VARCHAR(255) NOT NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_INSTALLMENT_CART.');
+
             return false;
         }
 
         // Create PayPlug Installment table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_installment')
+            ->table(_DB_PREFIX_.'payplug_installment')
             ->fields('`id_payplug_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_installment` VARCHAR(255) NOT NULL')
             ->fields('`id_payment` VARCHAR(255) NULL')
@@ -159,89 +168,101 @@ class SQLtableRepository
             ->fields('`amount` INT(11) UNSIGNED NOT NULL')
             ->fields('`status` INT(11) UNSIGNED NOT NULL')
             ->fields('`scheduled_date` DATETIME NOT NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_INSTALLMENT.');
+
             return false;
         }
 
         // Create PayPlug Logger table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_logger')
+            ->table(_DB_PREFIX_.'payplug_logger')
             ->fields('`id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`process` VARCHAR(255) NOT NULL')
             ->fields('`content` TEXT NOT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_LOGGER.');
+
             return false;
         }
 
         // Create PayPlug Logger table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_cache')
+            ->table(_DB_PREFIX_.'payplug_cache')
             ->fields('`id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`cache_key` VARCHAR(255) NOT NULL')
             ->fields('`cache_value` TEXT NOT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_CACHE.');
+
             return false;
         }
 
         // Create PayPlug Order Payment table
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_order_payment')
+            ->table(_DB_PREFIX_.'payplug_order_payment')
             ->fields('`id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
             ->fields('`id_payment` VARCHAR(255) NOT NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_ORDER_PAYMENT.');
+
             return false;
         }
 
         // Create PayPlug Order state type
         $this->query
             ->create()
-            ->table(_DB_PREFIX_ . 'payplug_order_state')
+            ->table(_DB_PREFIX_.'payplug_order_state')
             ->fields('`id_payplug_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_order_state` INT(11) UNSIGNED NOT NULL')
             ->fields('`type` VARCHAR(64) NOT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
             ->condition('CONSTRAINT order_state_unique UNIQUE (id_order_state)')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: PAYPLUG_ORDER_STATE.');
+
             return false;
         }
 
         $log->info('Installation SQL ended.');
+
         return true;
     }
 
     /**
-     * Remove SQL tables used by module
+     * Remove SQL tables used by module.
      *
      * @param $keep_cards
+     *
      * @return bool
      */
     public function uninstallSQL($keep_cards = false)
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
         $log->info('uninstallSQL() starting.');
 
         $flag = true;
@@ -259,7 +280,7 @@ class SQLtableRepository
         ];
 
         if (!$keep_cards) {
-            array_push($tables, _DB_PREFIX_ . 'payplug_card');
+            array_push($tables, _DB_PREFIX_.'payplug_card');
         }
 
         foreach ($tables as $table) {
@@ -267,18 +288,21 @@ class SQLtableRepository
         }
 
         $log->info('Uninstallation SQL ended.');
+
         return $flag;
     }
 
     /**
-     * Check if existing table
-     * @param string $table
-     * @param int|bool $canUsePayplugLogger
+     * Check if existing table.
+     *
+     * @param string   $table
+     * @param bool|int $canUsePayplugLogger
+     *
      * @return bool
      */
     public function checkExistingTable($table, $canUsePayplugLogger = 1)
     {
-        $log = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
+        $log = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
         $logger = null;
 
         if ($canUsePayplugLogger) {
@@ -289,7 +313,7 @@ class SQLtableRepository
         if (!$table || !is_string($table)) {
             if ($canUsePayplugLogger) {
                 $logger->addLog('checkExistingTable() : parameter $table is not a string', 'error');
-                $logger->addLog('$table value : ' . json_encode($table), 'error');
+                $logger->addLog('$table value : '.json_encode($table), 'error');
             }
 
             if ($log) {
@@ -301,7 +325,8 @@ class SQLtableRepository
 
         $this->query
             ->ifExists()
-            ->table($table);
+            ->table($table)
+        ;
         if (!$this->query->build()) {
             if ($log) {
                 $log->error('[SQLtableRepository] checkExistingTable() : Error during send request in DB');

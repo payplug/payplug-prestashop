@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,11 +23,11 @@
 
 namespace PayPlug\backward;
 
-use Tools;
-use ValidateCore as Validate;
-use ShopCore as Shop;
 use DbCore as Db;
 use OrderCore as Order;
+use ShopCore as Shop;
+use Tools;
+use ValidateCore as Validate;
 
 class PayPlugBackward
 {
@@ -38,7 +38,7 @@ class PayPlugBackward
      * Size is limited by `password_hash()` (72 chars).
      *
      * @param string $plaintextPasswd Password to validate
-     * @param int $size
+     * @param int    $size
      *
      * @return bool Indicates whether the given string is a valid plaintext password
      *
@@ -49,9 +49,9 @@ class PayPlugBackward
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             // The password lenght is limited by `password_hash()`
             return Tools::strlen($plaintextPasswd) >= $size && Tools::strlen($plaintextPasswd) <= 72;
-        } else {
-            return Validate::isPlaintextPassword($plaintextPasswd);
         }
+
+        return Validate::isPlaintextPassword($plaintextPasswd);
     }
 
     /**
@@ -65,15 +65,15 @@ class PayPlugBackward
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $sql = 'SELECT `id_order` 
-            FROM `' . _DB_PREFIX_ . 'orders`
-            WHERE `id_cart` = ' . (int) $id_cart .
+            FROM `'._DB_PREFIX_.'orders`
+            WHERE `id_cart` = '.(int) $id_cart.
                 Shop::addSqlRestriction();
 
             $result = Db::getInstance()->getValue($sql);
 
             return !empty($result) ? (int) $result : false;
-        } else {
-            return Order::getByCartId($id_cart);
         }
+
+        return Order::getByCartId($id_cart);
     }
 }

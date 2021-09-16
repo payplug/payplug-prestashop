@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,21 +31,21 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      * Method that is executed after init() and checkAccess().
      * Used to process user input.
      *
-     * @return bool|void
      * @throws Exception
+     *
+     * @return bool|void
      */
     public function postProcess()
     {
         if ($method = Tools::getValue('method')) {
             $payplug = new \PayPlug\classes\PayPlugClass();
-            $id_cart = (int)Tools::getValue('id_cart');
+            $id_cart = (int) Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
-            $is_deferred = (bool)Tools::getValue('def');
-            $is_one_click = (bool)($method === 'one_click');
-            $is_installment = (bool)($method === 'installment');
+            $is_deferred = (bool) Tools::getValue('def');
+            $is_one_click = (bool) ('one_click' === $method);
+            $is_installment = (bool) ('installment' === $method);
             $oney_type = Tools::getValue('oney_type');
-            $is_oney = (bool)($method === 'oney' && $oney_type);
-
+            $is_oney = (bool) ('oney' === $method && $oney_type);
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -73,7 +73,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 $payment = $payplug->preparePayment($payment_options);
                 if (!$payment['result']) {
                     $payplug->setPaymentErrorsCookie([
-                        $payplug->l('The transaction was not completed and your card was not charged.')
+                        $payplug->l('The transaction was not completed and your card was not charged.'),
                     ]);
                     Tools::redirect($error_url);
                 } else {
@@ -82,9 +82,9 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             } else {
                 // else reload the page with lightbox arg
                 $return_url = 'index.php?controller=order&step=3&lightbox=1'
-                    . ($is_installment ? '&inst=1' : '')
-                    . ($is_one_click ? '&pc=' . $id_card : '')
-                    . '&def=' . (int)Tools::getValue('def');
+                    .($is_installment ? '&inst=1' : '')
+                    .($is_one_click ? '&pc='.$id_card : '')
+                    .'&def='.(int) Tools::getValue('def');
 
                 Tools::redirect($return_url);
             }

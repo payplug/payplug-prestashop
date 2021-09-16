@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,9 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
-
-use PayPlug\src\entities\CardEntity;
 use PayPlug\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
@@ -31,6 +28,9 @@ use PHPUnit\Framework\TestCase;
  * @group entity
  * @group plugin
  * @group plugin_entity
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetApiUrlTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -28,6 +28,9 @@ use PHPUnit\Framework\TestCase;
  * @group entity
  * @group card
  * @group card_entity
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetTableTest extends TestCase
 {

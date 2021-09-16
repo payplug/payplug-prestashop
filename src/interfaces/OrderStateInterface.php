@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,6 +26,8 @@ namespace PayPlug\src\interfaces;
 interface OrderStateInterface
 {
     public function delete();
+
     public static function getOrderState($id);
+
     public function softDelete();
 }

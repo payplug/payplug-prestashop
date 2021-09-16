@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -33,7 +33,7 @@ class PPPayment
 
     public function __construct($id = null)
     {
-        if ($id != null) {
+        if (null != $id) {
             $payment = $this->retrieve($id);
             $this->populateFromPayment($payment);
         } else {
@@ -47,18 +47,13 @@ class PPPayment
         try {
             $payment = \Payplug\Payment::retrieve($id);
         } catch (\Payplug\Exception $e) {
-            $data = [
+            return [
                 'result' => false,
                 'response' => $e->__toString(),
             ];
-            return $data;
         }
-        return $payment;
-    }
 
-    private function populateFromPayment($payment)
-    {
-        $this->resource = $payment;
+        return $payment;
     }
 
     public function capture()
@@ -73,25 +68,26 @@ class PPPayment
         } catch (Payplug\Exception\NotAllowedException $e) {
             $httpResponse = json_decode($e->getHttpResponse());
             $response = [
-                'code' => (int)$e->getCode(),
+                'code' => (int) $e->getCode(),
                 'message' => $httpResponse->message,
                 'resource' => $this,
             ];
         } catch (Payplug\Exception\ForbiddenException $e) {
             $httpResponse = json_decode($e->getHttpResponse());
             $response = [
-                'code' => (int)$e->getCode(),
+                'code' => (int) $e->getCode(),
                 'message' => $httpResponse->message,
                 'resource' => $this,
             ];
         } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
             $httpResponse = json_decode($e->getHttpResponse());
             $response = [
-                'code' => (int)$e->getCode(),
+                'code' => (int) $e->getCode(),
                 'message' => $httpResponse->message,
                 'resource' => $this,
             ];
         }
+
         return $response;
     }
 
@@ -102,13 +98,19 @@ class PPPayment
 
     public function isDeferred()
     {
-        return ($this->resource->authorization !== null);
+        return null !== $this->resource->authorization;
     }
 
     public function refresh()
     {
         $payment = $this->retrieve($this->resource->id);
         $this->populateFromPayment($payment);
+
         return $this;
+    }
+
+    private function populateFromPayment($payment)
+    {
+        $this->resource = $payment;
     }
 }

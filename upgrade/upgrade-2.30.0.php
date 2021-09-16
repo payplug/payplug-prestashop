@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -36,12 +35,12 @@ function upgrade_module_2_30_0()
 
     try {
         // check if lock exists on id_cart
-        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+        $req_describe = 'DESCRIBE '._DB_PREFIX_.'payplug_lock;';
         $res_describe = Db::getInstance()->executeS($req_describe);
         $lock_exists = false;
         if ($res_describe) {
             foreach ($res_describe as $field) {
-                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
                     $lock_exists = true;
                 }
             }
@@ -49,13 +48,13 @@ function upgrade_module_2_30_0()
 
         // check doesn't exist then add it
         if (!$lock_exists) {
-            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
+            $req_truncate = 'TRUNCATE `'._DB_PREFIX_.'payplug_lock`;';
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
             }
             if ($flag) {
-                $req_alter = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
+                $req_alter = 'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` 
                 ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
                 $res_alter = Db::getInstance()->execute($req_alter);
                 if (!$res_alter) {
@@ -63,11 +62,11 @@ function upgrade_module_2_30_0()
                 }
             }
             if ($flag) {
-                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+                $req_describe = 'DESCRIBE '._DB_PREFIX_.'payplug_lock;';
                 $res_describe = Db::getInstance()->executeS($req_describe);
                 if ($res_describe) {
                     foreach ($res_describe as $field) {
-                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                        if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
                             $flag = $flag && true;
                         }
                     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,13 +20,12 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 class AdminPayplugController extends ModuleAdminController
 {
     public function initProcess()
     {
         parent::initProcess();
-        if ($this->display == null) {
+        if (null == $this->display) {
             $this->display = 'edit';
         }
     }
@@ -34,13 +33,13 @@ class AdminPayplugController extends ModuleAdminController
     public function getContent()
     {
         $payplug = new \PayPlug\classes\PayPlugClass();
-        if (Tools::getValue('_ajax') == 1) {
+        if (1 == Tools::getValue('_ajax')) {
             (new \PayPlug\classes\AdminClass())->adminAjaxController();
         }
 
         $this->postProcess();
 
-        if (Tools::getValue('uninstall_config') == 1) {
+        if (1 == Tools::getValue('uninstall_config')) {
             return $this->getUninstallContent();
         }
 

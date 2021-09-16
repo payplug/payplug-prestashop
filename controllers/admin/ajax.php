@@ -3,7 +3,7 @@
 use PayPlug\classes\RefundClass;
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,51 +23,55 @@ use PayPlug\classes\RefundClass;
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 class PayplugAjaxModuleAdminController extends ModuleAdminController
 {
 }
 
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/AdminClass.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
+require_once _PS_ROOT_DIR_.'/config/config.inc.php';
+
+include_once _PS_MODULE_DIR_.'payplug/classes/AdminClass.php';
+
+include_once _PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php';
 
 $payplug = new PayPlugClass();
 $adminClass = new AdminClass();
 $refundClass = new RefundClass($payplug);
 $logger = $payplug->getPlugin()->logger();
 
-if (Tools::getValue('_ajax') == 1) {
-    if ((int)Tools::getValue('en') == 1 && (int)Configuration::get('PAYPLUG_SHOW') == 0) {
+if (1 == Tools::getValue('_ajax')) {
+    if (1 == (int) Tools::getValue('en') && 0 == (int) Configuration::get('PAYPLUG_SHOW')) {
         Configuration::updateValue('PAYPLUG_SHOW', 1);
         $payplug->enable();
-        die(true);
+
+        exit(true);
     }
     if (Tools::getIsset('en')
-        && (int)Tools::getValue('en') == 0
-        && (int)Configuration::get('PAYPLUG_SHOW') == 1
+        && 0 == (int) Tools::getValue('en')
+        && 1 == (int) Configuration::get('PAYPLUG_SHOW')
     ) {
         Configuration::updateValue('PAYPLUG_SHOW', 0);
-        die(true);
+
+        exit(true);
     }
     if (Tools::getIsset('db')) {
-        if (Tools::getValue('db') == 'on') {
+        if ('on' == Tools::getValue('db')) {
             Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1);
-        } elseif (Tools::getValue('db') == 'off') {
+        } elseif ('off' == Tools::getValue('db')) {
             Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
         }
-        die(true);
+
+        exit(true);
     }
-    if ((int)Tools::getValue('popin') == 1) {
+    if (1 == (int) Tools::getValue('popin')) {
         $logger->addLog('Popin OK', 'notice');
         $args = null;
-        if (Tools::getValue('type') == 'confirm') {
-            $sandbox = (int)Tools::getValue('sandbox');
-            $embedded = (int)Tools::getValue('embedded');
-            $one_click = (int)Tools::getValue('one_click');
-            $installment = (int)Tools::getValue('installment');
-            $deferred = (int)Tools::getValue('deferred');
-            $activate = (int)Tools::getValue('activate');
+        if ('confirm' == Tools::getValue('type')) {
+            $sandbox = (int) Tools::getValue('sandbox');
+            $embedded = (int) Tools::getValue('embedded');
+            $one_click = (int) Tools::getValue('one_click');
+            $installment = (int) Tools::getValue('installment');
+            $deferred = (int) Tools::getValue('deferred');
+            $activate = (int) Tools::getValue('activate');
             $args = [
                 'sandbox' => $sandbox,
                 'embedded' => $embedded,
@@ -79,7 +83,7 @@ if (Tools::getValue('_ajax') == 1) {
         }
         $payplug->displayPopin(Tools::getValue('type'), $args);
     }
-    if (Tools::getValue('submit') == 'submitPopin_pwd') {
+    if ('submitPopin_pwd' == Tools::getValue('submit')) {
         /*
          * We have to have $_POST on PrestaShop 1.6 and 1.7,
          * otherwise Tools::getValue() transforms the password,
@@ -89,62 +93,65 @@ if (Tools::getValue('_ajax') == 1) {
         $adminClass->submitPopinPwd($_POST['pwd']);
     }
     if (Tools::getValue('has_live_key')) {
-        die(Tools::jsonEncode(['result' => \PayPlug\classes\ApiClass::hasLiveKey()]));
+        exit(Tools::jsonEncode(['result' => \PayPlug\classes\ApiClass::hasLiveKey()]));
     }
-    if (Tools::getValue('submit') == 'submitPopin_confirm') {
-        die(json_encode(['content' => 'confirm_ok']));
+    if ('submitPopin_confirm' == Tools::getValue('submit')) {
+        exit(json_encode(['content' => 'confirm_ok']));
     }
-    if (Tools::getValue('submit') == 'submitPopin_confirm_a') {
-        die(json_encode(['content' => 'confirm_ok_activate']));
+    if ('submitPopin_confirm_a' == Tools::getValue('submit')) {
+        exit(json_encode(['content' => 'confirm_ok_activate']));
     }
-    if (Tools::getValue('submit') == 'submitPopin_deactivate') {
-        die(json_encode(['content' => 'confirm_ok_deactivate']));
+    if ('submitPopin_deactivate' == Tools::getValue('submit')) {
+        exit(json_encode(['content' => 'confirm_ok_deactivate']));
     }
-    if (Tools::getValue('submit') == 'submitPopin_abort') {
-        die(json_encode(['content' => '']));
+    if ('submitPopin_abort' == Tools::getValue('submit')) {
+        exit(json_encode(['content' => '']));
     }
-    if ((int)Tools::getValue('check') == 1) {
+    if (1 == (int) Tools::getValue('check')) {
         $content = $payplug->configClass->getCheckFieldset();
-        die(json_encode(['content' => $content]));
+
+        exit(json_encode(['content' => $content]));
     }
-    if ((int)Tools::getValue('log') == 1) {
+    if (1 == (int) Tools::getValue('log')) {
         $content = $adminClass->getLogin();
-        die(json_encode(['content' => $content]));
+
+        exit(json_encode(['content' => $content]));
     }
-    if ((int)Tools::getValue('checkPremium') == 1) {
+    if (1 == (int) Tools::getValue('checkPremium')) {
         $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        die(json_encode(\PayPlug\classes\ApiClass::getAccountPermissions($api_key)));
+
+        exit(json_encode(\PayPlug\classes\ApiClass::getAccountPermissions($api_key)));
     }
-    if ((int)Tools::getValue('refund') == 1) {
+    if (1 == (int) Tools::getValue('refund')) {
         $logger->addLog('[Ajax] Start refund', 'notice');
         $amount = Tools::getValue('amount');
         if (!$payplug->checkAmountToRefund($amount)) {
-            die(json_encode([
+            exit(json_encode([
                 'status' => 'error',
-                'data' => $payplug->l('Incorrect amount to refund')
+                'data' => $payplug->l('Incorrect amount to refund'),
             ]));
-        } elseif ($payplug->checkAmountToRefund($amount) && ($amount < 0.10)) {
-            die(json_encode([
-                'status' => 'error',
-                'data' => $payplug->l('The amount to be refunded must be at least 0.10 €')
-            ]));
-        } else {
-            $amount = str_replace(',', '.', Tools::getValue('amount'));
-            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float)($amount / 10); // unless sometimes 17.90 become 17.89
-            $amount = (int)$amount;
         }
+        if ($payplug->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            exit(json_encode([
+                'status' => 'error',
+                'data' => $payplug->l('The amount to be refunded must be at least 0.10 €'),
+            ]));
+        }
+        $amount = str_replace(',', '.', Tools::getValue('amount'));
+        $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
+            $amount = (float) ($amount / 10); // unless sometimes 17.90 become 17.89
+            $amount = (int) $amount;
 
         $id_order = Tools::getValue('id_order');
         $pay_id = Tools::getValue('pay_id');
         $inst_id = Tools::getValue('inst_id');
         $metadata = [
-            'ID Client' => (int)Tools::getValue('id_customer'),
-            'reason' => 'Refunded with Prestashop'
+            'ID Client' => (int) Tools::getValue('id_customer'),
+            'reason' => 'Refunded with Prestashop',
         ];
         $pay_mode = Tools::getValue('pay_mode');
         $refund = RefundClass::makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-        if ($refund == 'error') {
+        if ('error' == $refund) {
             $logger->addLog('Cannot refund that amount.', 'notice');
             $logger->addLog(
                 '$pay_id : '.$pay_id.
@@ -154,108 +161,110 @@ if (Tools::getValue('_ajax') == 1) {
                 ' - $inst_id : '.$inst_id,
                 'debug'
             );
-            die(json_encode([
+
+            exit(json_encode([
                 'status' => 'error',
-                'data' => $payplug->l('Cannot refund that amount.')
-            ]));
-        } else {
-            $payment = $payplug->retrievePayment($pay_id);
-            $new_state = 7;
-            if ((int)Tools::getValue('id_state') != 0) {
-                $new_state = (int)Tools::getValue('id_state');
-            } elseif ($payment->is_refunded == 1) {
-                if ($payment->is_live == 1) {
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                } else {
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                }
-            }
-
-            $reload = false;
-            if ((int)Tools::getValue('id_state') != 0 || $payment->is_refunded == 1) {
-                $order = new Order((int)$id_order);
-                if (Validate::isLoadedObject($order)) {
-                    if (!$payplug->createLockFromCartId($order->id_cart)) {
-                        die(json_encode([
-                            'status' => 'error',
-                            'data' => $payplug->l('An error has occurred')
-                        ]));
-                    }
-
-                    $current_state = (int)$payplug->orderClass->getCurrentOrderState($order->id);
-                    $logger->addLog('Current order state: ' . $current_state, 'notice');
-                    if ($current_state != 0 && $current_state != $new_state) {
-                        $history = new OrderHistory();
-                        $history->id_order = (int)$order->id;
-                        $history->changeIdOrderState($new_state, (int)$order->id);
-                        $history->addWithemail();
-                        $logger->addLog('Change order state to ' . $new_state, 'notice');
-                    }
-
-                    if (!$payplug->deleteLockFromCartId($order->id_cart)) {
-                        $logger->addLog('Lock cannot be deleted.', 'error');
-                    } else {
-                        $logger->addLog('Lock deleted.', 'notice');
-                    }
-                }
-                $reload = true;
-            }
-
-            $amount_refunded_payplug = ($payment->amount_refunded) / 100;
-            $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
-
-            $data = $refundClass->getRefundData(
-                $amount_refunded_payplug,
-                $amount_available
-            );
-            $logger->addLog('Amount successfully refunded.', 'notice');
-            die(json_encode([
-                'status' => 'ok',
-                'data' => $data,
-                'message' => $payplug->l('Amount successfully refunded.'),
-                'reload' => $reload
+                'data' => $payplug->l('Cannot refund that amount.'),
             ]));
         }
+        $payment = $payplug->retrievePayment($pay_id);
+        $new_state = 7;
+        if (0 != (int) Tools::getValue('id_state')) {
+            $new_state = (int) Tools::getValue('id_state');
+        } elseif (1 == $payment->is_refunded) {
+            if (1 == $payment->is_live) {
+                $new_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+            } else {
+                $new_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+            }
+        }
+
+        $reload = false;
+        if (0 != (int) Tools::getValue('id_state') || 1 == $payment->is_refunded) {
+            $order = new Order((int) $id_order);
+            if (Validate::isLoadedObject($order)) {
+                if (!$payplug->createLockFromCartId($order->id_cart)) {
+                    exit(json_encode([
+                        'status' => 'error',
+                        'data' => $payplug->l('An error has occurred'),
+                    ]));
+                }
+
+                $current_state = (int) $payplug->orderClass->getCurrentOrderState($order->id);
+                $logger->addLog('Current order state: '.$current_state, 'notice');
+                if (0 != $current_state && $current_state != $new_state) {
+                    $history = new OrderHistory();
+                    $history->id_order = (int) $order->id;
+                    $history->changeIdOrderState($new_state, (int) $order->id);
+                    $history->addWithemail();
+                    $logger->addLog('Change order state to '.$new_state, 'notice');
+                }
+
+                if (!$payplug->deleteLockFromCartId($order->id_cart)) {
+                    $logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $logger->addLog('Lock deleted.', 'notice');
+                }
+            }
+            $reload = true;
+        }
+
+        $amount_refunded_payplug = ($payment->amount_refunded) / 100;
+        $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
+
+        $data = $refundClass->getRefundData(
+            $amount_refunded_payplug,
+            $amount_available
+        );
+        $logger->addLog('Amount successfully refunded.', 'notice');
+
+        exit(json_encode([
+            'status' => 'ok',
+            'data' => $data,
+            'message' => $payplug->l('Amount successfully refunded.'),
+            'reload' => $reload,
+        ]));
     }
-    if ((int)Tools::getValue('popinRefund') == 1) {
+    if (1 == (int) Tools::getValue('popinRefund')) {
         $popin = $payplug->displayPopin('refund');
-        die(json_encode(['content' => $popin]));
+
+        exit(json_encode(['content' => $popin]));
     }
-    if ((int)Tools::getValue('update') == 1) {
+    if (1 == (int) Tools::getValue('update')) {
         $pay_id = Tools::getValue('pay_id');
         $payment = $payplug->retrievePayment($pay_id);
         $id_order = Tools::getValue('id_order');
 
-        if ((int)$payment->is_paid == 1) {
-            if ($payment->is_live == 1) {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
+        if (1 == (int) $payment->is_paid) {
+            if (1 == $payment->is_live) {
+                $new_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_PAID');
             } else {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST');
+                $new_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST');
             }
-        } elseif ((int)$payment->is_paid == 0) {
-            if ($payment->is_live == 1) {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR');
+        } elseif (0 == (int) $payment->is_paid) {
+            if (1 == $payment->is_live) {
+                $new_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_ERROR');
             } else {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR_TEST');
+                $new_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_ERROR_TEST');
             }
         }
 
-        $order = new Order((int)$id_order);
+        $order = new Order((int) $id_order);
         if (Validate::isLoadedObject($order)) {
-            $current_state = (int)$order->getCurrentState();
-            if ($current_state != 0 && $current_state != $new_state) {
+            $current_state = (int) $order->getCurrentState();
+            if (0 != $current_state && $current_state != $new_state) {
                 $history = new OrderHistory();
-                $history->id_order = (int)$order->id;
-                $history->changeIdOrderState($new_state, (int)$order->id);
+                $history->id_order = (int) $order->id;
+                $history->changeIdOrderState($new_state, (int) $order->id);
                 $history->addWithemail();
             }
         }
 
         //$this->deletePayment($pay_id, $order->id_cart);
 
-        die(json_encode([
+        exit(json_encode([
             'message' => $payplug->l('Order successfully updated.'),
-            'reload' => true
+            'reload' => true,
         ]));
     }
 } else {

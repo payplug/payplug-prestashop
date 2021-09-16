@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -34,7 +33,5 @@ function upgrade_module_3_1_5()
     $flag = $flag && Db::getInstance()->execute($sql);
 
     // Add new conf var for Oney Only
-    $flag = $flag && Configuration::updateValue('PAYPLUG_STANDARD', 1);
-
-    return $flag;
+    return $flag && Configuration::updateValue('PAYPLUG_STANDARD', 1);
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -35,6 +35,14 @@ if (!defined('_PS_VERSION_')) {
 
 class PayPlugDependencies
 {
+    /** @var OneyRepository */
+    public $oney;
+
+    /** @var object */
+    public $payplug;
+
+    /** @var object */
+    public $payment;
     /** @var AdminClass */
     private $adminClass;
 
@@ -47,21 +55,29 @@ class PayPlugDependencies
     /** @var MyLogPHP */
     private $mylogphp;
 
-    /** @var OneyRepository */
-    public $oney;
-
-    /** @var object */
-    public $payplug;
-
-    /** @var object */
-    public $payment;
-
     /** @var PluginEntity */
     private $plugin;
 
     public function __construct()
     {
         $this->initializeAccessors();
+    }
+
+    public function getPlugin()
+    {
+        return $this->plugin;
+    }
+
+    public function setPlugin($plugin)
+    {
+        $this->plugin = $plugin;
+
+        return $this;
+    }
+
+    public function getDependency($dependency)
+    {
+        return $this->$dependency;
     }
 
     private function initializeAccessors()
@@ -73,22 +89,6 @@ class PayPlugDependencies
         $this->install = $this->getPlugin()->getInstall();
         $this->oney = $this->getPlugin()->getOney();
         $this->payment = $this->getPlugin()->getPayment();
-        $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-    }
-
-    public function getPlugin()
-    {
-        return $this->plugin;
-    }
-
-    public function setPlugin($plugin)
-    {
-        $this->plugin = $plugin;
-        return $this;
-    }
-
-    public function getDependency($dependency)
-    {
-        return $this->$dependency;
+        $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_.'payplug/log/install-log.csv');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -62,8 +62,10 @@ class PaymentRepository extends Repository
 
     /**
      * @description Return hashed cart with needed (and formatted) elements, ready to be hashed.
+     *
      * @param $paymentDetails
-     * @return string | array
+     *
+     * @return array|string
      */
     public function getHashedCart($paymentDetails)
     {
@@ -101,14 +103,16 @@ class PaymentRepository extends Repository
             $cartToHash[] = $paymentDetails['cart']->date_upd;
         }
 
-        return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        return hash('sha256', $paymentDetails['paymentMethod'].json_encode($cartToHash));
     }
 
     /**
      * @description Compare hash (sha256 on payment method + cart)
      * Create an other payment request if cart or payment method changed
      * and update payment table in consequence
+     *
      * @param array $paymentDetails
+     *
      * @return array
      */
     public function checkHash($paymentDetails)
@@ -129,57 +133,57 @@ class PaymentRepository extends Repository
         $cartHash = $this->getHashedCart($paymentDetails);
 
         if ($paymentStored['cart_hash'] === $cartHash
-            &&
-            ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+            && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
             return [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
-                'response' => 'OK. Comparaison result: Same hash and same payment method.'
-            ];
-        } else {
-            // Create payment or installment
-            try {
-                $createPayment = $this->createPayment($paymentDetails);
-            } catch (Payplug\Exception\ConfigurationNotSetException $e) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[checkHash -> createPayment] Error: ' . $e->getMessage()
-                );
-            }
-
-            if ($createPayment['result'] && $createPayment['paymentDetails']) {
-                $paymentDetails = $createPayment['paymentDetails'];
-            } elseif (!$createPayment['result']) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    $createPayment['response']
-                );
-            }
-
-            // Update payment table
-            $updatePaymentTable = $this->updatePaymentTable($paymentDetails);
-            if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
-                $paymentDetails = $updatePaymentTable['paymentDetails'];
-            } elseif (!$updatePaymentTable['result']) {
-                return $this->returnPaymentError(
-                    ['name' => 'updatePaymentTable', 'value' => $updatePaymentTable],
-                    $updatePaymentTable['response']
-                );
-            }
-
-            return [
-                'result' => true,
-                'paymentDetails' => $paymentDetails,
-                'response' => 'Payment created and updated successfully'
+                'response' => 'OK. Comparaison result: Same hash and same payment method.',
             ];
         }
+        // Create payment or installment
+        try {
+            $createPayment = $this->createPayment($paymentDetails);
+        } catch (Payplug\Exception\ConfigurationNotSetException $e) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[checkHash -> createPayment] Error: '.$e->getMessage()
+            );
+        }
+
+        if ($createPayment['result'] && $createPayment['paymentDetails']) {
+            $paymentDetails = $createPayment['paymentDetails'];
+        } elseif (!$createPayment['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                $createPayment['response']
+            );
+        }
+
+        // Update payment table
+        $updatePaymentTable = $this->updatePaymentTable($paymentDetails);
+        if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
+            $paymentDetails = $updatePaymentTable['paymentDetails'];
+        } elseif (!$updatePaymentTable['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'updatePaymentTable', 'value' => $updatePaymentTable],
+                $updatePaymentTable['response']
+            );
+        }
+
+        return [
+            'result' => true,
+            'paymentDetails' => $paymentDetails,
+            'response' => 'Payment created and updated successfully',
+        ];
     }
 
     /**
      * @description Return an error with some details in logger
-     * @param array $element
-     * @param null $errorMessage
+     *
+     * @param array  $element
+     * @param null   $errorMessage
      * @param string $level
+     *
      * @return array
      */
     public function returnPaymentError($element = [], $errorMessage = null, $level = 'error')
@@ -189,7 +193,7 @@ class PaymentRepository extends Repository
         }
 
         $this->payplug->setPaymentErrorsCookie([
-            $this->l('The transaction was not completed and your card was not charged.')
+            $this->l('The transaction was not completed and your card was not charged.'),
         ]);
 
         $this->logger->setParams(['process' => 'paymentRepository']);
@@ -203,7 +207,7 @@ class PaymentRepository extends Repository
         }
 
         $element['value'] = json_encode($element['value']);
-        $this->logger->addLog($element['name'] . ': ' . $element['value'], 'debug');
+        $this->logger->addLog($element['name'].': '.$element['value'], 'debug');
 
         return [
             'result' => false,
@@ -214,8 +218,10 @@ class PaymentRepository extends Repository
 
     /**
      * @description Check if existing payment / installment in payment table
-     * @param integer $idCart
-     * @return bool|array
+     *
+     * @param int $idCart
+     *
+     * @return array|bool
      */
     public function checkPaymentTable($idCart)
     {
@@ -229,21 +235,24 @@ class PaymentRepository extends Repository
         $reqCheck = $this->query
             ->select()
             ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
-            ->where('id_cart = ' . (int)$idCart);
+            ->from($this->constant->get('_DB_PREFIX_').'payplug_payment')
+            ->where('id_cart = '.(int) $idCart)
+        ;
 
         $resCheck = $reqCheck->build();
 
         if (!$resCheck) {
             return false;
-        } else {
-            return end($resCheck);
         }
+
+        return end($resCheck);
     }
 
     /**
      * @description Create payment / installment
+     *
      * @param array $paymentDetails
+     *
      * @return array
      */
     public function createPayment($paymentDetails)
@@ -257,14 +266,14 @@ class PaymentRepository extends Repository
             );
         }
 
-        if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confSpecific->get('PAYPLUG_STANDARD')) {
+        if ('standard' == $paymentDetails['paymentMethod'] && !$this->confSpecific->get('PAYPLUG_STANDARD')) {
             return $this->returnPaymentError(
                 ['name' => 'Configuration::get', 'value' => $this->confSpecific->get('PAYPLUG_STANDARD')],
                 '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
             );
         }
 
-        if ($paymentDetails['paymentMethod'] !== 'installment') {
+        if ('installment' !== $paymentDetails['paymentMethod']) {
             try {
                 if ($apiPayment = Payment::create($paymentDetails['paymentTab'])) {
                     $this->paymentEntity->setApiPayment($apiPayment);
@@ -272,7 +281,7 @@ class PaymentRepository extends Repository
             } catch (Exception $e) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to create payment. Error: ' . $e->getMessage()
+                    '[createPayment] Exception. Unable to create payment. Error: '.$e->getMessage()
                 );
             }
         } else {
@@ -282,17 +291,17 @@ class PaymentRepository extends Repository
             } catch (Exception $e) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to installment plan. Error: ' . $e->getMessage()
+                    '[createPayment] Exception. Unable to installment plan. Error: '.$e->getMessage()
                 );
             }
         }
 
         $this->apiPayment = $this->paymentEntity->getApiPayment();
 
-        if ($this->apiPayment->failure == true && !empty($this->apiPayment->failure->message)) {
+        if (true == $this->apiPayment->failure && !empty($this->apiPayment->failure->message)) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $this->apiPayment],
-                (string)$this->apiPayment->failure->message
+                (string) $this->apiPayment->failure->message
             );
         }
 
@@ -304,7 +313,7 @@ class PaymentRepository extends Repository
         if (!$paymentDetails['paymentId']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment ' . (string)$paymentDetails['paymentMethod'] . '] The payment id is null.'
+                '[createPayment '.(string) $paymentDetails['paymentMethod'].'] The payment id is null.'
             );
         }
 
@@ -319,8 +328,8 @@ class PaymentRepository extends Repository
             );
         }
 
-        if (($paymentDetails['paymentMethod'] !== 'installment') && ($this->apiPayment->authorization !== null)) {
-            if ($this->apiPayment->authorization->authorized_at !== null) {
+        if (('installment' !== $paymentDetails['paymentMethod']) && (null !== $this->apiPayment->authorization)) {
+            if (null !== $this->apiPayment->authorization->authorized_at) {
                 $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
             }
         }
@@ -336,13 +345,15 @@ class PaymentRepository extends Repository
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
-            'response' => '[createPayment] Payment successfully created'
+            'response' => '[createPayment] Payment successfully created',
         ];
     }
 
     /**
      * @description Update hash and payment id in Payplug Payment Cart table
+     *
      * @param array $paymentDetails
+     *
      * @return array
      */
     public function updatePaymentTable($paymentDetails)
@@ -376,20 +387,21 @@ class PaymentRepository extends Repository
             );
         }
 
-        $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
+        $table = $this->constant->get('_DB_PREFIX_').'payplug_payment';
 
         $this->query
             ->update()
             ->table($table)
-            ->set('id_payment =         \'' . $paymentDetails['paymentId'] . '\'')
-            ->set('payment_method =     \'' . $paymentDetails['paymentMethod'] . '\'')
-            ->set('payment_url =        \'' . $paymentDetails['paymentUrl'] . '\'')
-            ->set('payment_return_url = \'' . $paymentDetails['paymentReturnUrl'] . '\'')
-            ->set('cart_hash =          \'' . $cartHash . '\'')
-            ->set('authorized_at =      \'' . $paymentDetails['authorizedAt'] . '\'')
-            ->set('is_paid =            \'' . $paymentDetails['isPaid'] . '\'')
-            ->set('date_upd =           \'' . $paymentDate . '\'')
-            ->where('id_cart =          ' . (int)$paymentDetails['cartId']);
+            ->set('id_payment =         \''.$paymentDetails['paymentId'].'\'')
+            ->set('payment_method =     \''.$paymentDetails['paymentMethod'].'\'')
+            ->set('payment_url =        \''.$paymentDetails['paymentUrl'].'\'')
+            ->set('payment_return_url = \''.$paymentDetails['paymentReturnUrl'].'\'')
+            ->set('cart_hash =          \''.$cartHash.'\'')
+            ->set('authorized_at =      \''.$paymentDetails['authorizedAt'].'\'')
+            ->set('is_paid =            \''.$paymentDetails['isPaid'].'\'')
+            ->set('date_upd =           \''.$paymentDate.'\'')
+            ->where('id_cart =          '.(int) $paymentDetails['cartId'])
+        ;
 
         try {
             if (!$this->query->build()) {
@@ -401,22 +413,25 @@ class PaymentRepository extends Repository
         } catch (Exception $e) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updatePaymentTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
+                '[updatePaymentTable] Unable to fetch the query on DB. Error: '.$e->getMessage()
             );
         }
 
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
-            'response' => 'Update DB with new payment creation successfully'
+            'response' => 'Update DB with new payment creation successfully',
         ];
     }
 
     /**
      * @description Check if payment created < 3 min in DB
+     *
      * @param $idCart
-     * @return array|bool
+     *
      * @throws Exception
+     *
+     * @return array|bool
      */
     public function checkTimeoutPayment($idCart)
     {
@@ -432,21 +447,22 @@ class PaymentRepository extends Repository
         $date = new DateTime($dateStored);
         $date2 = new DateTime('now');
 
-        if ($date->diff($date2)->y !== 0 ||
-            $date->diff($date2)->d !== 0 ||
-            $date->diff($date2)->h !== 0 ||
-            $date->diff($date2)->i > 3) {
+        if (0 !== $date->diff($date2)->y
+            || 0 !== $date->diff($date2)->d
+            || 0 !== $date->diff($date2)->h
+            || $date->diff($date2)->i > 3) {
             // Plus de 3 minutes
             return false;
-        } else {
-            // Moins de 3 minutes
-            return true;
         }
+        // Moins de 3 minutes
+        return true;
     }
 
     /**
      * @description Generate and return correct payment return url
+     *
      * @param array $paymentDetails
+     *
      * @return array
      */
     public function getPaymentReturnUrl($paymentDetails)
@@ -486,6 +502,7 @@ class PaymentRepository extends Repository
         if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
             $err = '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] ';
             $err .= '&& $paymentDetails[\'paymentReturnUrl\'] are null';
+
             return $this->returnPaymentError(
                 ['name' => 'paymentUrl', 'value' => false],
                 $err
@@ -496,7 +513,7 @@ class PaymentRepository extends Repository
             case 'oneclick':
                 $redirect = $paymentDetails['isPaid'];
                 if (!$redirect && $paymentDetails['isDeferred']) {
-                    $redirect = (bool)$paymentDetails['authorizedAt'];
+                    $redirect = (bool) $paymentDetails['authorizedAt'];
                 }
 
                 $paymentReturnUrl = [
@@ -506,7 +523,9 @@ class PaymentRepository extends Repository
                     'return_url' => $redirect ?
                         $paymentDetails['paymentReturnUrl'] : $paymentDetails['paymentUrl'],
                 ];
+
                 break;
+
             case 'oney':
                 $paymentReturnUrl = [
                     'result' => 'new_card',
@@ -514,7 +533,9 @@ class PaymentRepository extends Repository
                     'redirect' => true,
                     'return_url' => $paymentDetails['paymentUrl'],
                 ];
+
                 break;
+
             case 'standard':
             case 'installment':
                 $returnUrl = $paymentDetails['paymentUrl'] ? $paymentDetails['paymentUrl'] :
@@ -525,7 +546,9 @@ class PaymentRepository extends Repository
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
+
                 break;
+
             default:
                 return $this->returnPaymentError(
                     ['name' => 'paymentStored', 'value' => false],
@@ -536,13 +559,15 @@ class PaymentRepository extends Repository
         return [
             'result' => true,
             'url' => $paymentReturnUrl,
-            'response' => 'Return URL successfully generated'
+            'response' => 'Return URL successfully generated',
         ];
     }
 
     /**
      * @description Insert payment with all details in table
+     *
      * @param array $paymentDetails
+     *
      * @return array|bool
      */
     public function insertPaymentTable($paymentDetails)
@@ -570,15 +595,15 @@ class PaymentRepository extends Repository
 
         $this->query
             ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
+            ->into($this->constant->get('_DB_PREFIX_').'payplug_payment')
             ->fields('id_payment')->values($paymentDetails['paymentId'])
             ->fields('payment_method')->values($paymentDetails['paymentMethod'])
             ->fields('payment_url')->values($paymentDetails['paymentUrl'])
             ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
             ->fields('id_cart')->values($paymentDetails['cartId'])
             ->fields('cart_hash')->values($cartHash)
-            ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
-            ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
+            ->fields('authorized_at')->values((int) $paymentDetails['authorizedAt'])
+            ->fields('is_paid')->values((int) $paymentDetails['isPaid'])
             ->fields('date_upd')->values($paymentDate);
 
         try {
@@ -591,23 +616,26 @@ class PaymentRepository extends Repository
         } catch (Exception $e) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] Error: ' . $e->getMessage()
+                '[insertPaymentTable] Error: '.$e->getMessage()
             );
         }
 
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
-            'response' => 'Insert data in DB successfully'
+            'response' => 'Insert data in DB successfully',
         ];
     }
 
     /**
      * @description Check if the payment is valid in API,
      * bc if cancelled, to recreate another one
+     *
      * @param array $paymentDetails
-     * @return array
+     *
      * @throws Payplug\Exception\ConfigurationNotSetException
+     *
+     * @return array
      */
     public function isValidApiPayment($paymentDetails)
     {
@@ -628,7 +656,7 @@ class PaymentRepository extends Repository
         } catch (Exception $e) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[isValidApiPayment] Error: ' . $e->getMessage()
+                '[isValidApiPayment] Error: '.$e->getMessage()
             );
         }
 
@@ -639,12 +667,10 @@ class PaymentRepository extends Repository
             );
         }
 
-        if ($storedPayment['payment_method'] == 'installment') {
+        if ('installment' == $storedPayment['payment_method']) {
             $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
             $firstSchedule = $retrievedInstallment->schedule[0]->payment_ids;
-            /*
-             * Try to see if the first schedule was cancelled
-             */
+            // Try to see if the first schedule was cancelled
             $storedPayment['id_payment'] = end($firstSchedule);
         }
 
@@ -659,13 +685,14 @@ class PaymentRepository extends Repository
 
         if ($retrievedPayment->failure) {
             $payment = $this->createPayment($paymentDetails);
+
             return $this->updatePaymentTable($payment['paymentDetails']);
         }
 
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
-            'response' => 'Valid API payment/installment'
+            'response' => 'Valid API payment/installment',
         ];
     }
 }

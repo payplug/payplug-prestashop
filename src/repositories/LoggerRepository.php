@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -49,7 +49,7 @@ class LoggerRepository extends Repository
     {
         $this->loggerEntity
             ->setTable('payplug_logger')
-            ->setLimitNumber((int)4000)
+            ->setLimitNumber((int) 4000)
             ->setLimitDate('P1M')
             ->setDefinition([
                 'table' => $this->loggerEntity->getTable(),
@@ -70,9 +70,10 @@ class LoggerRepository extends Repository
                     'process' => ['type' => 3, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128],
                     'content' => ['type' => 6, 'validate' => 'isCleanHtml', 'required' => true],
                     'date_add' => ['type' => 5, 'validate' => 'isDate'],
-                    'date_upd' => ['type' => 5, 'validate' => 'isDate']
-                ]
-            ]);
+                    'date_upd' => ['type' => 5, 'validate' => 'isDate'],
+                ],
+            ])
+        ;
     }
 
     /**
@@ -102,6 +103,7 @@ class LoggerRepository extends Repository
      *
      * @param $message
      * @param string $level
+     *
      * @return $this
      */
     public function addLog($message, $level = 'info')
@@ -123,7 +125,7 @@ class LoggerRepository extends Repository
             'date' => $this->udate('Y-m-d H:i:s.u T'),
             'line' => $debug['line'],
             'message' => $message,
-            'level' => $level
+            'level' => $level,
         ];
         array_push($content, $entry);
 
@@ -141,8 +143,9 @@ class LoggerRepository extends Repository
      */
     public function save()
     {
-        if ((int)$this->loggerEntity->getId() > 0) {
+        if ((int) $this->loggerEntity->getId() > 0) {
             $this->loggerEntity->setDateUpd($this->udate('Y-m-d H:i:s'));
+
             return $this->updateLog();
         }
 
@@ -160,10 +163,10 @@ class LoggerRepository extends Repository
         $this->query
             ->insert()
             ->into(_DB_PREFIX_.$logger->getTable())
-            ->fields('process')     ->values(pSQL($logger->getProcess()))
-            ->fields('content')     ->values(pSQL($logger->getContent()))
-            ->fields('date_add')    ->values(pSQL($logger->getDateAdd()))
-            ->fields('date_upd')    ->values(pSQL($logger->getDateAdd()))
+            ->fields('process')->values(pSQL($logger->getProcess()))
+            ->fields('content')->values(pSQL($logger->getContent()))
+            ->fields('date_add')->values(pSQL($logger->getDateAdd()))
+            ->fields('date_upd')->values(pSQL($logger->getDateAdd()))
         ;
 
         if (!$this->query->build()) {
@@ -189,7 +192,7 @@ class LoggerRepository extends Repository
             ->set($table.'.process =  \''.pSQL($logger->getProcess()).'\'')
             ->set($table.'.content =  \''.pSQL($logger->getContent()).'\'')
             ->set($table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'')
-            ->where($table.'.id_'.$logger->getTable().' = '.(int)$logger->getId())
+            ->where($table.'.id_'.$logger->getTable().' = '.(int) $logger->getId())
             ;
 
         if (!$this->query->build()) {
@@ -203,7 +206,8 @@ class LoggerRepository extends Repository
      * @description Format date to help for more precisions
      *
      * @param string $format
-     * @param null $utimestamp
+     * @param null   $utimestamp
+     *
      * @return false|string
      */
     public function udate($format = 'u', $utimestamp = null)
@@ -219,22 +223,10 @@ class LoggerRepository extends Repository
     }
 
     /**
-     * @description Return the defined date and max elements limits
-     *
-     * @return array
-     */
-    protected function getLimit()
-    {
-        return [
-            'number' => $this->limit_number,
-            'date' => $this->limit_date,
-        ];
-    }
-
-    /**
      * @description Flush PayPlug Logger
      *
      * @param bool $all
+     *
      * @return bool
      */
     public function flush($all = false)
@@ -259,6 +251,7 @@ class LoggerRepository extends Repository
             if (!$this->query->build()) {
                 return false;
             }
+
             return true;
         }
 
@@ -297,7 +290,7 @@ class LoggerRepository extends Repository
         $this->query
             ->delete()
             ->from(_DB_PREFIX_.$logger->getTable())
-            ->where('`id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'])
+            ->where('`id_payplug_logger` < '.$last_logs_valid[0]['id_payplug_logger'])
         ;
 
         if (!$this->query->build()) {
@@ -305,5 +298,18 @@ class LoggerRepository extends Repository
         }
 
         return $flag;
+    }
+
+    /**
+     * @description Return the defined date and max elements limits
+     *
+     * @return array
+     */
+    protected function getLimit()
+    {
+        return [
+            'number' => $this->limit_number,
+            'date' => $this->limit_date,
+        ];
     }
 }

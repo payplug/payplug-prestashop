@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -27,7 +27,6 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class LoggerEntity
 {
-
     /** @var string */
     private $content;
 
@@ -140,8 +139,10 @@ class LoggerEntity
 
     /**
      * @param string $content
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setContent($content)
     {
@@ -150,13 +151,16 @@ class LoggerEntity
         }
 
         $this->content = $content;
+
         return $this;
     }
 
     /**
      * @param string $date_add
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDateAdd($date_add)
     {
@@ -169,13 +173,16 @@ class LoggerEntity
         }
 
         $this->date_add = $date_add;
+
         return $this;
     }
 
     /**
      * @param $date_upd
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDateUpd($date_upd)
     {
@@ -188,13 +195,16 @@ class LoggerEntity
         }
 
         $this->date_upd = $date_upd;
+
         return $this;
     }
 
     /**
      * @param array $definition
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDefinition($definition)
     {
@@ -203,13 +213,16 @@ class LoggerEntity
         }
 
         $this->definition = $definition;
+
         return $this;
     }
 
     /**
      * @param string $id
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setId($id)
     {
@@ -218,13 +231,16 @@ class LoggerEntity
         }
 
         $this->id = $id;
+
         return $this;
     }
 
     /**
      * @param string $limitDate
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setLimitDate($limitDate)
     {
@@ -233,13 +249,16 @@ class LoggerEntity
         }
 
         $this->limitDate = $limitDate;
+
         return $this;
     }
 
     /**
      * @param int $limit_number
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setLimitNumber($limit_number)
     {
@@ -248,13 +267,16 @@ class LoggerEntity
         }
 
         $this->limit_number = $limit_number;
+
         return $this;
     }
 
     /**
      * @param string $process
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setProcess($process)
     {
@@ -263,13 +285,16 @@ class LoggerEntity
         }
 
         $this->process = $process;
+
         return $this;
     }
 
     /**
      * @param string $table
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setTable($table)
     {
@@ -278,13 +303,16 @@ class LoggerEntity
         }
 
         $this->table = $table;
+
         return $this;
     }
 
     /**
      * @param string $type
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setType($type)
     {
@@ -293,6 +321,7 @@ class LoggerEntity
         }
 
         $this->type = $type;
+
         return $this;
     }
 }

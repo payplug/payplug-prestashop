@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -33,6 +33,7 @@ class ContextMock
         $context->customer = CustomerMock::get();
         $context->currency = CurrencyMock::get();
         $context->language = LanguageMock::get();
+
         return $context;
     }
 }

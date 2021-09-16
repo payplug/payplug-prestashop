@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\CarrierInterface;
 use Carrier;
+use PayPlug\src\interfaces\CarrierInterface;
 
 class CarrierSpecific implements CarrierInterface
 {
@@ -44,6 +44,7 @@ class CarrierSpecific implements CarrierInterface
         if (!is_int($id_carrier)) {
             $id_carrier = false;
         }
+
         return new Carrier($id_carrier);
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -24,8 +24,7 @@
 /**
  * @since 1.6.0
  */
-
-require_once(_PS_MODULE_DIR_.'payplug/payplug.php');
+require_once _PS_MODULE_DIR_.'payplug/payplug.php';
 
 class AdminPayPlugInstallmentController extends ModuleAdminController
 {
@@ -67,12 +66,12 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
             'id_installment' => [
                 'title' => $this->l('Installment ID'),
                 'align' => 'text-center',
-                'class' => 'fixed-width-xs'
+                'class' => 'fixed-width-xs',
             ],
             'id_payment' => [
                 'title' => $this->l('Payment ID'),
                 'align' => 'text-center',
-                'class' => 'fixed-width-xs'
+                'class' => 'fixed-width-xs',
             ],
             'reference' => [
                 'title' => $this->l('Order reference'),
@@ -114,19 +113,21 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     public function getPaymentStatusById($id_status)
     {
         $id_lang = $this->context->language->id;
+
         return $this->payplug->getPaymentStatusById($id_status, $id_lang);
     }
 
     public static function setOrderCurrency($amount, $tr)
     {
         $order = new Order($tr['id_order']);
-        return Tools::displayPrice(($amount / 100), (int)$order->id_currency);
+
+        return Tools::displayPrice(($amount / 100), (int) $order->id_currency);
     }
 
     // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
     public function viewPayplugInstallment()
     {
-        $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
+        $id_payplug_installment = (int) (Tools::getValue('id_payplug_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
         Tools::redirectAdmin(
             'index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.
@@ -144,15 +145,17 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
         if (!$res_order) {
             return false;
-        } else {
-            return (int)$res_order;
         }
+
+        return (int) $res_order;
     }
+
     public function postProcess()
     {
         if (Tools::isSubmit('viewpayplug_installment')) {
             $this->viewPayplugInstallment();
         }
+
         return parent::postProcess();
     }
 
@@ -161,7 +164,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         if ($this->allow_export) {
             $this->toolbar_btn['export'] = [
                 'href' => self::$currentIndex.'&export'.$this->table.'&token='.$this->token,
-                'desc' => $this->l('Export')
+                'desc' => $this->l('Export'),
             ];
         }
         parent::initToolbar();

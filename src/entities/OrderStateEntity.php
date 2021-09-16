@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -40,8 +40,11 @@ class OrderStateEntity
 
     /**
      * @param $apiPayment
-     * @return self
+     * @param mixed $list
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setList($list)
     {
@@ -50,6 +53,7 @@ class OrderStateEntity
         }
 
         $this->list = $list;
+
         return $this;
     }
 }

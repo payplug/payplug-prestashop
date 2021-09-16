@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,5 +26,6 @@ namespace PayPlug\src\interfaces;
 interface ToolsInterface
 {
     public function tool($action, $param1, $param2);
+
     public function substr($string, $offset, $length);
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -27,9 +27,9 @@ use PayPlug\src\specific\TranslationSpecific;
 
 class Repository
 {
-    private $entity;
     protected $name;
     protected $payplug;
+    private $entity;
 
     public static function factory()
     {
@@ -39,6 +39,7 @@ class Repository
     public function setName()
     {
         $this->name = (new \ReflectionClass($this))->getShortName();
+
         return $this;
     }
 
@@ -50,8 +51,10 @@ class Repository
     public function setEntity($entity)
     {
         $this->entity = $entity;
+
         return $this;
     }
+
     public function getEntity()
     {
         return $this->entity;
@@ -60,6 +63,7 @@ class Repository
     public function l($string)
     {
         $this->setName();
+
         return TranslationSpecific::translate($this->payplug, $string, $this->getName());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
-
 use PayPlug\src\entities\LoggerEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +29,9 @@ use PHPUnit\Framework\TestCase;
  * @group entity
  * @group logger
  * @group logger_entity
+ *
+ * @internal
+ * @coversNothing
  */
 final class SetDateAddLoggerTest extends TestCase
 {

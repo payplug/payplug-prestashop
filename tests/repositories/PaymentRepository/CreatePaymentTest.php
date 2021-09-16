@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -33,11 +33,14 @@ use PayPlug\tests\mock\PaymentMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CreatePaymentTest extends BasePaymentRepository
 {
     /**
-     * Parameters to test method with empty $paiementDetails
+     * Parameters to test method with empty $paiementDetails.
      *
      * @return \Generator
      */
@@ -47,23 +50,25 @@ final class CreatePaymentTest extends BasePaymentRepository
         yield [['paymentTab' => null], 'paymentDetails: {"paymentTab":null}'];
         yield [
             ['paymentTab' => ['field' => 'value'], 'paymentMethod' => null],
-            'paymentDetails: {"paymentTab":{"field":"value"},"paymentMethod":null}'
+            'paymentDetails: {"paymentTab":{"field":"value"},"paymentMethod":null}',
         ];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
+     * Test methods with nulled $paiementDetails.
      *
      * @dataProvider paymentDetailsParameters
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->createPayment($parameter),
@@ -75,13 +80,14 @@ final class CreatePaymentTest extends BasePaymentRepository
     {
         $paymentDetails = [
             'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard'
+            'paymentMethod' => 'standard',
         ];
 
         $this->config
             ->shouldReceive([
-                'get' => false
-            ]);
+                'get' => false,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->createPayment($paymentDetails)['response'],
@@ -90,24 +96,26 @@ final class CreatePaymentTest extends BasePaymentRepository
     }
 
     /**
-     * Test creation payment 'standard'
+     * Test creation payment 'standard'.
      */
     public function testCreatePaymentWithValidData()
     {
         $paymentDetails = [
             'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard'
+            'paymentMethod' => 'standard',
         ];
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->paymentApi
             ->shouldReceive([
-                'create' => PaymentMock::getStandard()
-            ]);
+                'create' => PaymentMock::getStandard(),
+            ])
+        ;
 
         $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
         $this->assertSame(
@@ -121,24 +129,26 @@ final class CreatePaymentTest extends BasePaymentRepository
         $paymentTab = mt_rand();
         $paymentDetails = [
             'paymentTab' => $paymentTab,
-            'paymentMethod' => 'standard'
+            'paymentMethod' => 'standard',
         ];
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->paymentApi
             ->shouldReceive([
-                'create' => $paymentTab
-            ]);
+                'create' => $paymentTab,
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => false,
                 'paymentDetails' => json_encode($paymentDetails),
-                'response' => '[createPayment] Exception. Unable to create payment. Error: Invalid argument, $apiPayment must be an object'
+                'response' => '[createPayment] Exception. Unable to create payment. Error: Invalid argument, $apiPayment must be an object',
             ],
             $this->repo->createPayment($paymentDetails)
         );
@@ -148,17 +158,19 @@ final class CreatePaymentTest extends BasePaymentRepository
     {
         $paymentDetails = [
             'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard'
+            'paymentMethod' => 'standard',
         ];
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->paymentApi
             ->shouldReceive(['create' => mt_rand()])
-            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400);
+            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400)
+        ;
 
         $this->assertSame(
             $this->repo->createPayment($paymentDetails)['response'],
@@ -171,7 +183,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $paymentDetails = [
             'paymentTab' => mt_rand(),
             'paymentMethod' => 'standard',
-            'paymentReturnUrl' => null
+            'paymentReturnUrl' => null,
         ];
 
         $paymentMock = PaymentMock::getStandard();
@@ -179,13 +191,15 @@ final class CreatePaymentTest extends BasePaymentRepository
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->paymentApi
             ->shouldReceive([
                 'create' => $paymentMock,
-            ]);
+            ])
+        ;
 
         $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
         $this->assertSame(

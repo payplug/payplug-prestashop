@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -25,13 +25,11 @@ namespace PayPlug\src\repositories;
 
 use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\classes\MyLogPHP;
-
 use PayPlug\src\entities\CacheEntity;
 use PayPlug\src\entities\OneyEntity;
+use PayPlug\src\entities\OrderStateEntity;
 use PayPlug\src\entities\PaymentEntity;
 use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\entities\OrderStateEntity;
-
 use PayPlug\src\specific\AddressSpecific;
 use PayPlug\src\specific\AssignSpecific;
 use PayPlug\src\specific\CarrierSpecific;
@@ -130,7 +128,8 @@ class PluginRepository extends Repository
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
-            ->setOrderState($this->order_state);
+            ->setOrderState($this->order_state)
+        ;
         $this->setEntity($this->plugin);
     }
 
@@ -176,7 +175,7 @@ class PluginRepository extends Repository
             $this->tools
         );
 
-        $this->cache    = new CacheRepository(
+        $this->cache = new CacheRepository(
             $this->cacheEntity,
             $this->query,
             $this->configuration,
@@ -250,7 +249,7 @@ class PluginRepository extends Repository
         $this->constant = new ConstantSpecific();
         $this->context = new ContextSpecific();
         $this->country = new CountrySpecific();
-        $this->currency  = new CurrencySpecific();
+        $this->currency = new CurrencySpecific();
         $this->language = new LanguageSpecific();
         $this->order_state_specific = new OrderStateSpecific();
         $this->product = new ProductSpecific();

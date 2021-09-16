@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,6 +31,7 @@ class LanguageMock
         $language = new \stdClass();
         $language->id = 1;
         $language->iso_code = 'fr';
+
         return $language;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\ConfigurationInterface;
 use Configuration;
+use PayPlug\src\interfaces\ConfigurationInterface;
 
 class ConfigurationSpecific implements ConfigurationInterface
 {
@@ -40,24 +40,26 @@ class ConfigurationSpecific implements ConfigurationInterface
         return new ConfigurationSpecific();
     }
 
-
     public function get($configuration_name)
     {
         // Old PHP configs can't accept $this->classVar::staticMethod()
         // But only $var::staticMethod()
         $config = $this->psConfiguration;
+
         return $config::get($configuration_name);
     }
 
     public function updateValue($key, $value)
     {
         $config = $this->psConfiguration;
+
         return $config::updateValue($key, $value);
     }
 
     public function deleteByName($key)
     {
         $config = $this->psConfiguration;
+
         return $config::deleteByName($key);
     }
 }

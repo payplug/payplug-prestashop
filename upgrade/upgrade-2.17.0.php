@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,12 +20,11 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.php');
+require_once _PS_MODULE_DIR_.'payplug/classes/MyLogPHP.php';
 
 function upgrade_module_2_17_0($object)
 {
@@ -56,6 +55,7 @@ function upgrade_module_2_17_0($object)
             `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
             `date_upd` DATETIME NULL
             ) ENGINE='._MYSQL_ENGINE_;
+
     try {
         $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
         if (!$res_payplug_installment_cart) {

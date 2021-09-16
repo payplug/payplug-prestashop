@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,6 +31,7 @@ class CurrencyMock
         $currency = new \stdClass();
         $currency->id = 1;
         $currency->iso_code = 'EUR';
+
         return $currency;
     }
 }

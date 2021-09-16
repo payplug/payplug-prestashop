@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,7 +31,7 @@ class PPPaymentInstallment extends PPPayment
 {
     public function __construct($id = null)
     {
-        if ($id != null) {
+        if (null != $id) {
             $payment = $this->retrieve($id);
             $this->populateFromInstallment($payment);
         } else {
@@ -48,18 +48,13 @@ class PPPaymentInstallment extends PPPayment
         try {
             $payment = \Payplug\InstallmentPlan::retrieve($id);
         } catch (\Payplug\Exception $e) {
-            $data = [
+            return [
                 'result' => false,
                 'response' => $e->__toString(),
             ];
-            return $data;
         }
-        return $payment;
-    }
 
-    private function populateFromInstallment($installment)
-    {
-        $this->resource = $installment;
+        return $payment;
     }
 
     public function getPaymentList()
@@ -72,12 +67,13 @@ class PPPaymentInstallment extends PPPayment
                     $list[$index] = [
                         'pay_id' => $pay_id,
                         'date' => $schedule->date,
-                        'amount' => $schedule->amount
+                        'amount' => $schedule->amount,
                     ];
-                    $index ++;
+                    ++$index;
                 }
             }
         }
+
         return $list;
     }
 
@@ -85,8 +81,7 @@ class PPPaymentInstallment extends PPPayment
     {
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
-            $payment = new PPPayment($payment_list[0]['pay_id']);
-            return $payment;
+            return new PPPayment($payment_list[0]['pay_id']);
         }
     }
 
@@ -95,8 +90,15 @@ class PPPaymentInstallment extends PPPayment
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
             $payment = new PPPayment($payment_list[0]['pay_id']);
+
             return $payment->isDeferred();
         }
+
         return false;
+    }
+
+    private function populateFromInstallment($installment)
+    {
+        $this->resource = $installment;
     }
 }

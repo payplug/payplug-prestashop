@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,10 +21,11 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 namespace PayPlug\tests\repositories\InstallRepository;
 
-use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\entities\OrderStateEntity;
+use PayPlug\src\repositories\InstallRepository;
 use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseInstallRepository extends RepositoryBase
@@ -39,7 +40,8 @@ class BaseInstallRepository extends RepositoryBase
 
         $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
-            ->andReturn('');
+            ->andReturn('')
+        ;
 
         $this->repo = \Mockery::mock(InstallRepository::class, [
             $this->config,
@@ -53,13 +55,15 @@ class BaseInstallRepository extends RepositoryBase
             $this->tools,
             $this->validate,
             $this->payplug,
-            $this->myLogPhp
+            $this->myLogPhp,
         ])
             ->shouldAllowMockingProtectedMethods()
-            ->makePartial();
+            ->makePartial()
+        ;
 
         $this->shop
             ->shouldReceive('isFeatureActive')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
     }
 }

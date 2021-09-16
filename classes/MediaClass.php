@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -35,11 +35,10 @@ class MediaClass extends \Payplug
     }
 
     /**
-     * Include css in template
+     * Include css in template.
      *
      * @param string $css_uri
      * @param string $css_media_type
-     * @return void
      */
     public function addCSSRC($css_uri, $css_media_type = 'all')
     {
@@ -47,10 +46,9 @@ class MediaClass extends \Payplug
     }
 
     /**
-     * Include js script in template
+     * Include js script in template.
      *
      * @param string $js_uri
-     * @return void
      */
     public function addJsRC($js_uri)
     {
@@ -58,11 +56,13 @@ class MediaClass extends \Payplug
     }
 
     /**
-     * Display messages template
+     * Display messages template.
      *
      * @param array $messages
-     * @param bool $with_msg_button
-     * @param bool $with_yesno_buttons
+     * @param bool  $with_msg_button
+     * @param bool  $with_yesno_buttons
+     * @param mixed $with_yes_no_buttons
+     *
      * @return bool|string
      */
     public function displayMessages($messages = [], $with_msg_button = false, $with_yes_no_buttons = false)
@@ -75,29 +75,30 @@ class MediaClass extends \Payplug
         foreach ($messages as $message) {
             $formated[] = [
                 'type' => 'string',
-                'value' => $message
+                'value' => $message,
             ];
         }
 
         $this->context->smarty->assign([
             'messages' => $formated,
             'with_msg_button' => $with_msg_button,
-            'with_yes_no_buttons' => $with_yes_no_buttons
+            'with_yes_no_buttons' => $with_yes_no_buttons,
         ]);
 
         return $this->payplug->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
-     * Display the right pop-in
+     * Display the right pop-in.
      *
      * @param string $type
-     * @param array $args
+     * @param array  $args
+     *
      * @return string
      */
     public function displayPopin($type, $args = null)
     {
-        if ($type == 'confirm') {
+        if ('confirm' == $type) {
             $has_payment = false;
             foreach ($args as $key => $arg) {
                 if (in_array($key, ['standard', 'oney', 'installment']) && !$has_payment) {
@@ -126,30 +127,47 @@ class MediaClass extends \Payplug
             case 'pwd':
             case 'activate':
                 $title = $this->payplug->l('payplug.displayPopin.liveMode');
+
                 break;
+
             case 'premium':
                 $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+
                 break;
+
             case 'oneyPremium':
                 $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+
                 break;
+
             case 'confirm':
                 $title = $this->payplug->l('payplug.displayPopin.saveSettings');
+
                 break;
+
             case 'deactivate':
                 $title = $this->payplug->l('payplug.displayPopin.deactivate');
+
                 break;
+
             case 'refund':
                 $title = $this->payplug->l('payplug.displayPopin.refund');
+
                 break;
+
             case 'abort':
                 $title = $this->payplug->l('payplug.displayPopin.suspendInstallment');
+
                 break;
+
             case 'deferred':
                 $title = $this->payplug->l('payplug.displayPopin.deferred');
+
                 break;
+
             default:
                 $title = '';
+
                 break;
         }
 
@@ -162,25 +180,26 @@ class MediaClass extends \Payplug
         ]);
         $this->html = $this->payplug->fetchTemplate('/views/templates/admin/popin.tpl');
 
-        die(json_encode(['content' => $this->html]));
+        exit(json_encode(['content' => $this->html]));
     }
 
     /**
-     * Fetch smarty template
+     * Fetch smarty template.
      *
      * @param string $file
+     *
      * @return string
      */
     public function fetchTemplateRC($file)
     {
-        $output = $this->payplug->fetchTemplate($file);
-        return $output;
+        return $this->payplug->fetchTemplate($file);
     }
 
     /**
      * @description To load JS and CSS medias
      *
      * @param array|string $medias
+     *
      * @return bool
      */
     public function setMedia($medias)
@@ -194,7 +213,7 @@ class MediaClass extends \Payplug
         }
 
         foreach ($medias as $media) {
-            if (strpos($media, 'css') === false) {
+            if (false === strpos($media, 'css')) {
                 $this->context->controller->addJS($media);
             } else {
                 $this->context->controller->addCSS($media);

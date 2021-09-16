@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -33,13 +32,14 @@ function upgrade_module_2_25_0()
     }
 
     // Blank every CSV file if we don't have permission to "rm *"
-    $csv_files = _PS_MODULE_DIR_ . 'payplug/log/*.csv';
+    $csv_files = _PS_MODULE_DIR_.'payplug/log/*.csv';
     foreach (glob($csv_files) as $path) {
-        $file = fopen($path, "w");
+        $file = fopen($path, 'w');
         ftruncate($file, 0);
         fclose($file);
     }
 
     Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
+
     return true;
 }

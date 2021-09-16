@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class IsAvailableWithoutFeesTest extends BaseOneyRepository
 {
@@ -41,8 +44,11 @@ final class IsAvailableWithoutFeesTest extends BaseOneyRepository
         yield [null];
         yield [['array', 'array', 'array', 'array']];
     }
+
     /**
      * @dataProvider invalidIsoDataProvider
+     *
+     * @param mixed $iso_code
      */
     public function testWithInvalidIsoCode($iso_code)
     {

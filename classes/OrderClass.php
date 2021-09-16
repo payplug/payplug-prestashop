@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,27 +31,30 @@ class OrderClass extends \PaymentModule
     /**
      * @description Add Order Payment
      *
-     * @param int $id_order
+     * @param int    $id_order
      * @param string $id_payment
+     *
      * @return bool
      */
     public function addPayplugOrderPayment($id_order, $id_payment)
     {
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_order_payment (id_order, id_payment) 
-                VALUE (' . (int)$id_order . ',\'' . pSQL($id_payment) . '\')';
+        $sql = 'INSERT INTO '._DB_PREFIX_.'payplug_order_payment (id_order, id_payment) 
+                VALUE ('.(int) $id_order.',\''.pSQL($id_payment).'\')';
 
         return Db::getInstance()->execute($sql);
     }
 
     /**
      * @param null $id_lang
+     *
      * @return array
      */
     public function getOrderStates($id_lang = null)
     {
-        if ($id_lang === null) {
+        if (null === $id_lang) {
             $id_lang = $this->context->language->id;
         }
+
         return OrderState::getOrderStates($id_lang);
     }
 
@@ -60,13 +63,14 @@ class OrderClass extends \PaymentModule
      * get order payment
      *
      * @param int $id_order
-     * @return integer
+     *
+     * @return int
      */
     public function getPayplugOrderPayment($id_order)
     {
         $sql = 'SELECT id_payment 
-                FROM ' . _DB_PREFIX_ . 'payplug_order_payment   
-                WHERE id_order = ' . (int)$id_order;
+                FROM '._DB_PREFIX_.'payplug_order_payment   
+                WHERE id_order = '.(int) $id_order;
 
         return Db::getInstance()->getValue($sql);
     }
@@ -76,13 +80,14 @@ class OrderClass extends \PaymentModule
      * get all order payment for given id order
      *
      * @param int $id_order
+     *
      * @return array
      */
     public function getPayplugOrderPayments($id_order)
     {
         $sql = 'SELECT * 
-                FROM ' . _DB_PREFIX_ . 'payplug_order_payment 
-                WHERE id_order = ' . (int)$id_order;
+                FROM '._DB_PREFIX_.'payplug_order_payment 
+                WHERE id_order = '.(int) $id_order;
 
         return Db::getInstance()->executeS($sql);
     }
@@ -91,7 +96,8 @@ class OrderClass extends \PaymentModule
      * @description Get the current Order State Id for a given Order ID
      *
      * @param bool $id_order
-     * @return integer|false
+     *
+     * @return false|int
      */
     public function getCurrentOrderState($id_order = false)
     {
@@ -99,7 +105,8 @@ class OrderClass extends \PaymentModule
             return false;
         }
 
-        $sql = 'SELECT `current_state` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . (int)$id_order;
+        $sql = 'SELECT `current_state` FROM `'._DB_PREFIX_.'orders` WHERE `id_order` = '.(int) $id_order;
+
         return Db::getInstance()->getValue($sql);
     }
 }

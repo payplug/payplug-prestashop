@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,9 +26,9 @@ namespace PayPlug\src\specific;
 use Configuration;
 use Language;
 use Media;
-use Validate;
 use Tab;
 use Tools;
+use Validate;
 
 class PrestashopSpecific16
 {
@@ -43,11 +43,10 @@ class PrestashopSpecific16
         $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
-
     public function hookHeader()
     {
-        $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
-        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
+        $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/front_1_6.css');
+        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/front_1_6.js');
 
         Media::addJsDef([
             'payplug_ajax_url' => $this->contextSpecific->link->getModuleLink('payplug', 'ajax', [], true),
@@ -60,7 +59,7 @@ class PrestashopSpecific16
         $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
 
         $this->contextSpecific->smarty->assign([
-            'payplug_icon_url' => $payplug_icon_url
+            'payplug_icon_url' => $payplug_icon_url,
         ]);
     }
 
@@ -69,7 +68,7 @@ class PrestashopSpecific16
         $paymentOptions = [];
         $payment_class = 'payplug';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
+        $oneyOptimized = (bool) Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
         $current_lang = explode('-', $this->contextSpecific->language->language_code);
@@ -109,15 +108,16 @@ class PrestashopSpecific16
                     'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
-                    'payplug_oney_loading_msg' => $this->payplug->l('Loading')
+                    'payplug_oney_loading_msg' => $this->payplug->l('Loading'),
                 ]);
             } catch (\Exception $e) {
                 var_dump($e);
+
                 exit;
             }
         }
 
-        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer((int)$cart->id_customer, true);
+        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer((int) $cart->id_customer, true);
 
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
@@ -125,39 +125,38 @@ class PrestashopSpecific16
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
-                if ((bool)Configuration::get('PAYPLUG_ONE_CLICK')
+                if ((bool) Configuration::get('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
-                    && ($payment_method == 'standard')) {
+                    && ('standard' == $payment_method)) {
                     continue;
-                } else {
-                    /*
-                     * var_dump($payment_option['tpl']); :
-                     * one_click.tpl (oneClick activé)
-                     * standard.tpl (oneClick désactivé)
-                     * installment.tpl
-                     * oney.tpl (Oney optimisé)
-                     * unified.tpl (Oney non optimisé)
-                     */
-
-                    // Check if Oney is on error
-                    if ($oneyOptimized && $payment_method == 'oney'
-                        && $payment_method == 'oney'
-                        && (isset($payment_option['err_label']) && $payment_option['err_label'])) {
-                        $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
-                    }
-
-                    $paymentOptions[$payment_method.'-'.$extraClass] = [
-                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
-                            ($error ? '-alt' : ''),
-                        'label' => $payment_option['callToActionText'],
-                        'logo_url' => $payment_method == 'one_click' ?
-                            $payment_options['standard']['logo'] :
-                            $payment_option['logo'],
-                        'payment_url' => $payment_option['payment_controller_url'],
-                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
-                            $payment_option['tpl'],
-                    ];
                 }
+                /*
+                 * var_dump($payment_option['tpl']); :
+                 * one_click.tpl (oneClick activé)
+                 * standard.tpl (oneClick désactivé)
+                 * installment.tpl
+                 * oney.tpl (Oney optimisé)
+                 * unified.tpl (Oney non optimisé)
+                 */
+
+                // Check if Oney is on error
+                if ($oneyOptimized && 'oney' == $payment_method
+                        && 'oney' == $payment_method
+                        && (isset($payment_option['err_label']) && $payment_option['err_label'])) {
+                    $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
+                }
+
+                $paymentOptions[$payment_method.'-'.$extraClass] = [
+                    'extra_classes' => $payment_class.' '.$logo_class.' '.$logo_class.'-'.$extraClass.
+                        ($error ? '-alt' : ''),
+                    'label' => $payment_option['callToActionText'],
+                    'logo_url' => 'one_click' == $payment_method ?
+                        $payment_options['standard']['logo'] :
+                        $payment_option['logo'],
+                    'payment_url' => $payment_option['payment_controller_url'],
+                    'tpl' => _PS_MODULE_DIR_.'payplug/views/templates/hook/checkout/payment/'.
+                        $payment_option['tpl'],
+                ];
 
                 if (isset($payment_option['payment_controller_url'])) {
                     $this->contextSpecific->smarty->assign([
@@ -167,7 +166,7 @@ class PrestashopSpecific16
                 }
 
                 // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
-                if ($oneyOptimized && $payment_method == 'oney') {
+                if ($oneyOptimized && 'oney' == $payment_method) {
                     break;
                 }
             }
@@ -180,7 +179,7 @@ class PrestashopSpecific16
     {
         return [
             'oneyLogo' => '3x4x.svg',
-            'oneyCallToActionText' => 'Pay by card in 3 or 4'
+            'oneyCallToActionText' => 'Pay by card in 3 or 4',
         ];
     }
 
@@ -194,7 +193,7 @@ class PrestashopSpecific16
                 'en' => 'Installment Plans',
                 'gb' => 'Installment Plans',
                 'it' => 'Pagamenti frazionati',
-                'fr' => 'Paiements en plusieurs fois'
+                'fr' => 'Paiements en plusieurs fois',
             ];
 
             $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
@@ -203,9 +202,9 @@ class PrestashopSpecific16
             foreach (Language::getLanguages(false) as $language) {
                 $iso_code = Tools::strtolower($language['iso_code']);
                 if (isset($translations[$iso_code])) {
-                    $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
+                    $tab->name[(int) $language['id_lang']] = $translations[$iso_code];
                 } else {
-                    $tab->name[(int)$language['id_lang']] = $translations['en'];
+                    $tab->name[(int) $language['id_lang']] = $translations['en'];
                 }
             }
 
@@ -232,10 +231,12 @@ class PrestashopSpecific16
 
         return $flag;
     }
+
     /**
      * @description Link to order by order state
      *
      * @param int $order_state
+     *
      * @return string
      */
     public function getOrdersByStateLink($order_state)
@@ -257,7 +258,6 @@ class PrestashopSpecific16
 
         $this->contextSpecific->cookie->write();
 
-        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true);
-        return $link;
+        return $this->contextSpecific->link->getAdminLink('AdminOrders', true);
     }
 }

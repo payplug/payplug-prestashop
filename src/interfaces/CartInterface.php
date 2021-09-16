@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,7 +26,10 @@ namespace PayPlug\src\interfaces;
 interface CartInterface
 {
     public function get($idCart);
+
     public function isVirtualCart($cart);
+
     public function getProducts($cart);
+
     public function nbProducts($cart);
 }

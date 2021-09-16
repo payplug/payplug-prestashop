@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
     private $card;
@@ -38,7 +37,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->card = $this->plugin->getCard();
         $this->contextSpecific = $this->plugin->getContext();
 
-        include_once($this->module->getLocalPath() . 'payplug.php');
+        include_once $this->module->getLocalPath().'payplug.php';
     }
 
     /**
@@ -49,7 +48,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->display_column_left = false;
         parent::initContent();
 
-        if (Tools::getValue('process') == 'cardlist') {
+        if ('cardlist' == Tools::getValue('process')) {
             $this->renderCardList();
         }
     }
@@ -58,12 +57,12 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     {
         \Payplug\Payplug::init([
             'secretKey' => $this->payplug->apiClass->current_api_key,
-            'apiVersion' => $this->plugin->getApiVersion()
+            'apiVersion' => $this->plugin->getApiVersion(),
         ]);
 
         $customer = $this->contextSpecific->getContext()->customer;
-        $payplug_cards = $this->card->getByCustomer((int)$customer->id);
-        $payplug_delete_card_url  = $this->contextSpecific->getContext()->link->getModuleLink(
+        $payplug_cards = $this->card->getByCustomer((int) $customer->id);
+        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink(
             'payplug',
             'ajax',
             ['_ajax' => 1],
@@ -85,7 +84,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             [
                 'card_confirm_deleted_msg' => $popup_confirm_delete_message,
                 'card_deleted_msg' => $card_deleted_msg,
-                'payplug_delete_card_url' => $payplug_delete_card_url
+                'payplug_delete_card_url' => $payplug_delete_card_url,
             ]
         );
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,12 +21,12 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\tests\mock\AddresstMock;
 use PayPlug\tests\mock\ContextMock;
-use PayPlug\tests\mock\PaymentTabMock;
 use PayPlug\tests\mock\CountryMock;
+use PayPlug\tests\mock\PaymentTabMock;
 
 /**
  * @group unit
@@ -35,6 +35,9 @@ use PayPlug\tests\mock\CountryMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 {
@@ -44,14 +47,17 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->country->shouldReceive('getCountry')
-            ->andReturn(CountryMock::get());
+            ->andReturn(CountryMock::get())
+        ;
 
         $this->payplug->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($phone_number) {
-                return (!is_null($phone_number) && $phone_number !== '');
-            });
+                return !is_null($phone_number) && '' !== $phone_number;
+            })
+        ;
 
         $paymentTab = PaymentTabMock::getStandard();
         $this->tab = $paymentTab['shipping'];
@@ -97,14 +103,17 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 
     /**
      * @dataProvider validPaymentDataProvider
+     *
+     * @param mixed $parameter
      */
     public function testWithValidDataProvider($parameter)
     {
-        $field = ['shipping-' . $parameter => $this->tab[$parameter]];
+        $field = ['shipping-'.$parameter => $this->tab[$parameter]];
         $this->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => true
-            ]);
+                'isValidMobilePhoneNumber' => true,
+            ])
+        ;
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(
@@ -112,7 +121,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
             $response
         );
 
-        $field = ['billing-' . $parameter => $this->tab[$parameter]];
+        $field = ['billing-'.$parameter => $this->tab[$parameter]];
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(
@@ -133,14 +142,18 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 
     /**
      * @dataProvider invalidPaymentDataProvider
+     *
+     * @param mixed $parameter
+     * @param mixed $expected
      */
     public function testWithInvalidDataProvider($parameter, $expected)
     {
-        $field = ['shipping-' . $parameter => null];
+        $field = ['shipping-'.$parameter => null];
         $this->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => false
-            ]);
+                'isValidMobilePhoneNumber' => false,
+            ])
+        ;
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(
@@ -148,7 +161,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
             $response
         );
 
-        $field = ['billing-' . $parameter => ''];
+        $field = ['billing-'.$parameter => ''];
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(

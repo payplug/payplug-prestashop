@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -22,8 +22,9 @@
  */
 
 //Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
+require_once _PS_ROOT_DIR_.'/config/config.inc.php';
+
+require_once _PS_MODULE_DIR_.'../init.php';
 
 /**
  * @description

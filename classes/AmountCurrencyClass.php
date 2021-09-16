@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -27,7 +27,6 @@ use Cart;
 use Configuration;
 use Currency;
 use Order;
-use PayPlug\src\specific\ToolsSpecific;
 use Tools;
 
 class AmountCurrencyClass
@@ -40,9 +39,10 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check if amount is correct
+     * Check if amount is correct.
      *
      * @param Cart $cart
+     *
      * @return bool
      */
     public static function checkAmount($cart)
@@ -52,78 +52,114 @@ class AmountCurrencyClass
         $amount = $cart->getOrderTotal(true, Cart::BOTH) * 100;
         if ($amount < $amounts_by_currency['min_amount'] || $amount > $amounts_by_currency['max_amount']) {
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     /**
-     * Check if amount is correct
+     * Check if amount is correct.
      *
-     * @param int $amount
+     * @param int   $amount
      * @param Order $order
+     *
      * @return bool
      */
     public static function checkAmountPaidIsCorrect($amount, $order)
     {
         $order_amount = $order->total_paid;
 
-        if ($amount != 0) {
+        if (0 != $amount) {
             return abs($order_amount - $amount) / $amount < 0.00001;
-        } elseif ($order_amount != 0) {
-            return abs($amount - $order_amount) / $order_amount < 0.00001;
-        } else {
-            return true;
         }
+        if (0 != $order_amount) {
+            return abs($amount - $order_amount) / $order_amount < 0.00001;
+        }
+
+        return true;
     }
 
     /**
-     * Check amount to refund
+     * Check amount to refund.
      *
      * @param int $amount
+     *
      * @return string
      */
     public function checkAmountToRefund($amount)
     {
         $amount = str_replace(',', '.', $amount);
+
         return is_numeric($amount);
     }
 
     /**
-     * check if currency is allowed
+     * check if currency is allowed.
      *
      * @param Cart $cart
+     *
      * @return bool
      */
     public static function checkCurrency($cart)
     {
-        $currency_order = new Currency((int)($cart->id_currency));
+        $currency_order = new Currency((int) ($cart->id_currency));
         if (!in_array(\Tools::strtoupper($currency_order->iso_code), self::getSupportedCurrencies())) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * Format amount float to int or int to float
+     * Format amount float to int or int to float.
      *
      * @param $amount
      * @param bool $to_cents
+     *
      * @return float|int
      */
     public function convertAmount($amount, $to_cents = false)
     {
         if ($to_cents) {
-            return (float)($amount / 100);
-        } else {
-            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
-            return (int)($this->toolsSpecific->tool('ps_round', $amount));
+            return (float) ($amount / 100);
         }
+        $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
+            $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
+
+            return (int) ($this->toolsSpecific->tool('ps_round', $amount));
     }
 
     /**
-     * Get supported currencies
+     * Get amounts with the right currency.
+     *
+     * @param string $iso_code
+     *
+     * @return array
+     */
+    public static function getAmountsByCurrency($iso_code)
+    {
+        $min_amounts = [];
+        $max_amounts = [];
+        $min = Configuration::get('PAYPLUG_MIN_AMOUNTS');
+        $max = Configuration::get('PAYPLUG_MAX_AMOUNTS');
+        foreach (explode(';', Tools::strtoupper($min)) as $amount_cur) {
+            $cur = [];
+            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+            $min_amounts[$cur[1]] = (int) $cur[2];
+        }
+        foreach (explode(';', Tools::strtoupper($max)) as $amount_cur) {
+            $cur = [];
+            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+            $max_amounts[$cur[1]] = (int) $cur[2];
+        }
+        $current_min_amount = $min_amounts[Tools::strtoupper($iso_code)];
+        $current_max_amount = $max_amounts[Tools::strtoupper($iso_code)];
+
+        return ['min_amount' => $current_min_amount, 'max_amount' => $current_max_amount];
+    }
+
+    /**
+     * Get supported currencies.
      *
      * @return array
      */
@@ -137,33 +173,5 @@ class AmountCurrencyClass
         }
 
         return $currencies;
-    }
-
-    /**
-     * Get amounts with the right currency
-     *
-     * @param string $iso_code
-     * @return array
-     */
-    public static function getAmountsByCurrency($iso_code)
-    {
-        $min_amounts = [];
-        $max_amounts = [];
-        $min = Configuration::get('PAYPLUG_MIN_AMOUNTS');
-        $max = Configuration::get('PAYPLUG_MAX_AMOUNTS');
-        foreach (explode(';', Tools::strtoupper($min)) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $min_amounts[$cur[1]] = (int)$cur[2];
-        }
-        foreach (explode(';', Tools::strtoupper($max)) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $max_amounts[$cur[1]] = (int)$cur[2];
-        }
-        $current_min_amount = $min_amounts[Tools::strtoupper($iso_code)];
-        $current_max_amount = $max_amounts[Tools::strtoupper($iso_code)];
-
-        return ['min_amount' => $current_min_amount, 'max_amount' => $current_max_amount];
     }
 }

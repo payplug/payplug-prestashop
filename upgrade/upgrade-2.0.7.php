@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -65,7 +64,7 @@ function upgrade_module_2_0_7()
         dirname(__FILE__).'/../views/templates/hook/payment.tpl',
         dirname(__FILE__).'/../views/templates/hook/payment_16.tpl',
         dirname(__FILE__).'/../installPayplug.php',
-        dirname(__FILE__).'/../ipn.php'
+        dirname(__FILE__).'/../ipn.php',
     ];
 
     $old_dirs = [

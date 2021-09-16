@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneyPriceLimitTest extends BaseOneyRepository
 {
@@ -50,28 +53,35 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
                 switch ($key) {
                     case 'PS_CURRENCY_DEFAULT':
                         return 1;
+
                         break;
+
                     case 'PAYPLUG_ONEY_MIN_AMOUNTS':
                         return 'EUR:10000';
+
                     case 'PAYPLUG_ONEY_MAX_AMOUNTS':
                         return 'EUR:300000';
+
                         break;
                 }
-            });
+            })
+        ;
 
         $this->country->shouldReceive('getByIso')
-            ->andReturn(1);
+            ->andReturn(1)
+        ;
 
         $this->amounts = [
             'min' => 10000,
-            'max' => 300000
+            'max' => 300000,
         ];
     }
 
     public function testWithCurrencyObject()
     {
         $this->currency->shouldReceive('getCurrency')
-            ->andReturn($this->currencyMock);
+            ->andReturn($this->currencyMock)
+        ;
 
         $this->assertSame(
             $this->amounts,
@@ -90,11 +100,14 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
 
     /**
      * @dataProvider validDataProvider
+     *
+     * @param mixed $data
      */
     public function testWithValidDataProvider($data)
     {
         $this->currency->shouldReceive('getCurrency')
-            ->andReturn($this->currencyMock);
+            ->andReturn($this->currencyMock)
+        ;
 
         $this->assertSame(
             $this->amounts,
@@ -105,12 +118,13 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
     public function testWithNoCurrencyFound()
     {
         $this->currency->shouldReceive('getCurrency')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
 
         $this->assertSame(
             [
                 'min' => false,
-                'max' => false
+                'max' => false,
             ],
             $this->repo->getOneyPriceLimit(null)
         );

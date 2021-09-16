@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,23 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-/**
- * Check if prestashop Context
- */
+// Check if prestashop Context
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
+require_once _PS_MODULE_DIR_.'payplug/vendor/autoload.php';
 
 class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @return void
      * @throws Exception
      */
     public function __construct()
@@ -67,9 +64,10 @@ class Payplug extends PaymentModule
 
     /**
      * @param bool $force_all
-     * @return bool
-     * @see Module::disable()
      *
+     * @return bool
+     *
+     * @see Module::disable()
      */
     public function disable($force_all = false)
     {
@@ -80,6 +78,7 @@ class Payplug extends PaymentModule
 
     /**
      * @return string
+     *
      * @see Module::getContent()
      */
     public function getContent()
@@ -90,21 +89,390 @@ class Payplug extends PaymentModule
             }
 
             return (new \PayPlug\classes\AdminClass())->getContent();
-        } else {
-            $iso_code = Context::getContext()->language->iso_code;
-            if ($iso_code == 'en' || $iso_code == 'gb') {
-                $iso_code = 'en-gb';
-            }
-            $faq_url = 'https://support.payplug.com/hc/' . $iso_code.'/articles/360021267140';
-            $this->context->smarty->assign('faq_url', $faq_url);
-
-            $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
-            $this->context->smarty->assign('url_logo', $logo_url);
-
-            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
-
-            return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
+        $iso_code = Context::getContext()->language->iso_code;
+        if ('en' == $iso_code || 'gb' == $iso_code) {
+            $iso_code = 'en-gb';
+        }
+        $faq_url = 'https://support.payplug.com/hc/'.$iso_code.'/articles/360021267140';
+        $this->context->smarty->assign('faq_url', $faq_url);
+
+        $logo_url = __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png';
+        $this->context->smarty->assign('url_logo', $logo_url);
+
+        $this->context->controller->addCSS(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
+
+        return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
+    }
+
+    /**
+     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
+     */
+    public function hookActionAdminControllerSetMedia()
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionAdminControllerSetMedia');
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookActionAdminPerformanceControllerAfter($params)
+    {
+        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
+        if ($this->module) {
+            return $this->module->hookActionAdminPerformanceControllerAfter($params);
+        }
+    }
+
+    /**
+     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookActionClearCompileCache($params)
+    {
+        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
+        if ($this->module) {
+            return $this->module->hookActionClearCompileCache($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookActionDeleteGDPRCustomer($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionDeleteGDPRCustomer($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookActionExportGDPRData($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionExportGDPRData($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookActionOrderStatusUpdate($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionOrderStatusUpdate($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookActionObjectOrderStateAddAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateAddAfter', $params);
+        }
+    }
+
+    public function hookActionObjectOrderStateUpdateAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateUpdateAfter', $params);
+        }
+    }
+
+    public function hookActionObjectOrderStateDeleteAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateDeleteAfter', $params);
+        }
+    }
+
+    /**
+     * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookAdminOrder($params)
+    {
+        if ($this->module) {
+            return $this->module->hookAdminOrder($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookCustomerAccount($params)
+    {
+        if ($this->module) {
+            return $this->module->hookCustomerAccount($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookDisplayAdminOrderMain($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayAdminOrderMain($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookDisplayAdminStatusesForm($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm', $params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookDisplayBackOfficeFooter($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayBackOfficeFooter($params);
+        }
+    }
+
+    /**
+     * @description Display Oney CTA on Shopping cart page
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookDisplayBeforeShoppingCartBlock($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayBeforeShoppingCartBlock($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookDisplayExpressCheckout($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayExpressCheckout($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookDisplayProductPriceBlock($params)
+    {
+        if ($this->module) {
+            return $this->module->hookDisplayProductPriceBlock($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookHeader($params)
+    {
+        if ($this->module) {
+            return $this->module->hookHeader($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     *
+     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
+     */
+    public function hookPayment($params)
+    {
+        if ($this->module) {
+            return $this->module->hookPayment($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookPaymentOptions($params)
+    {
+        if ($this->module) {
+            return $this->module->hookPaymentOptions($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookPaymentReturn($params)
+    {
+        if ($this->module) {
+            return $this->module->hookPaymentReturn($params);
+        }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function hookRegisterGDPRConsent($params)
+    {
+        if ($this->module) {
+            return $this->module->hookRegisterGDPRConsent($params);
+        }
+    }
+
+    /**
+     * @description Install plugin
+     *
+     * @param bool $soft_install
+     *
+     * @return bool
+     *
+     * @see Module::install()
+     */
+    public function install($soft_install = false)
+    {
+        if ($this->module) {
+            $flag = true;
+
+            // Use for update module is not fully installed
+            if (!$soft_install) {
+                $this->payplug_dependencies = null;
+                $flag = $flag && parent::install();
+                $this->setDependencies();
+            }
+
+            // Install configuration
+            if ($flag) {
+                $flag = $flag && $this->payplug_dependencies->getDependency('install')->install();
+            }
+
+            // Install hook
+            if ($flag) {
+                $hook_list = $this->getHookList();
+                foreach ($hook_list as $hook) {
+                    $flag = $flag && $this->registerHook($hook);
+                }
+            }
+
+            return $flag;
+        }
+
+        return parent::install();
+    }
+
+    /**
+     * @description Check if mobile is validated installation
+     *
+     * @return bool
+     */
+    public function isValidInstallation()
+    {
+        if (Validate::isLoadedObject($this)) {
+            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
+        }
+
+        return true;
+    }
+
+    /**
+     * @description test if php requiremnt is valid
+     *
+     * @return array
+     */
+    public function isValidPHPVersion()
+    {
+        $php_min_version = 50600;
+
+        if (!defined('PHP_VERSION_ID')) {
+            $php_version = explode('.', PHP_VERSION);
+            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+        }
+
+        return PHP_VERSION_ID >= $php_min_version;
+    }
+
+    /**
+     * Run update module.
+     */
+    public function runUpgradeModule()
+    {
+        $upgrade = parent::runUpgradeModule();
+
+        if ($this->module) {
+            $this->payplug_dependencies->getDependency('install')->checkOrderStates();
+        }
+
+        return $upgrade;
+    }
+
+    public function setDependencies()
+    {
+        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
+    }
+
+    /**
+     * @description Uninstall plugin
+     *
+     * @return bool|mixed
+     *
+     * @see Module::uninstall()
+     */
+    public function uninstall()
+    {
+        if ($this->module) {
+            return parent::uninstall() && $this->payplug_dependencies->getDependency('install')->uninstall();
+        }
+
+        return parent::uninstall();
     }
 
     /**
@@ -141,345 +509,8 @@ class Payplug extends PaymentModule
         ];
     }
 
-    /**
-     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
-     */
-    public function hookActionAdminControllerSetMedia()
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionAdminControllerSetMedia');
-        }
-    }
-
-    /**
-     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionAdminPerformanceControllerAfter($params)
-    {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
-        if ($this->module) {
-            return $this->module->hookActionAdminPerformanceControllerAfter($params);
-        }
-    }
-
-    /**
-     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionClearCompileCache($params)
-    {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
-        if ($this->module) {
-            return $this->module->hookActionClearCompileCache($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionDeleteGDPRCustomer($params)
-    {
-        if ($this->module) {
-            return $this->module->hookActionDeleteGDPRCustomer($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionExportGDPRData($params)
-    {
-        if ($this->module) {
-            return $this->module->hookActionExportGDPRData($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionOrderStatusUpdate($params)
-    {
-        if ($this->module) {
-            return $this->module->hookActionOrderStatusUpdate($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookActionObjectOrderStateAddAfter($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateAddAfter', $params);
-        }
-    }
-
-    public function hookActionObjectOrderStateUpdateAfter($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateUpdateAfter', $params);
-        }
-    }
-    public function hookActionObjectOrderStateDeleteAfter($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateDeleteAfter', $params);
-        }
-    }
-
-    /**
-     * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
-     * @param $params
-     * @return mixed
-     */
-    public function hookAdminOrder($params)
-    {
-        if ($this->module) {
-            return $this->module->hookAdminOrder($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookCustomerAccount($params)
-    {
-        if ($this->module) {
-            return $this->module->hookCustomerAccount($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookDisplayAdminOrderMain($params)
-    {
-        if ($this->module) {
-            return $this->module->hookDisplayAdminOrderMain($params);
-        }
-    }
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookDisplayAdminStatusesForm($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm', $params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookDisplayBackOfficeFooter($params)
-    {
-        if ($this->module) {
-            return $this->module->hookDisplayBackOfficeFooter($params);
-        }
-    }
-
-    /**
-     * @description Display Oney CTA on Shopping cart page
-     * @param $params
-     * @return mixed
-     */
-    public function hookDisplayBeforeShoppingCartBlock($params)
-    {
-        if ($this->module) {
-            return $this->module->hookDisplayBeforeShoppingCartBlock($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookDisplayExpressCheckout($params)
-    {
-        if ($this->module) {
-            return $this->module->hookDisplayExpressCheckout($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookDisplayProductPriceBlock($params)
-    {
-        if ($this->module) {
-            return $this->module->hookDisplayProductPriceBlock($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookHeader($params)
-    {
-        if ($this->module) {
-            return $this->module->hookHeader($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     *
-     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
-     */
-    public function hookPayment($params)
-    {
-        if ($this->module) {
-            return $this->module->hookPayment($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookPaymentOptions($params)
-    {
-        if ($this->module) {
-            return $this->module->hookPaymentOptions($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookPaymentReturn($params)
-    {
-        if ($this->module) {
-            return $this->module->hookPaymentReturn($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookRegisterGDPRConsent($params)
-    {
-        if ($this->module) {
-            return $this->module->hookRegisterGDPRConsent($params);
-        }
-    }
-
-    /**
-     * @description Install plugin
-     * @param bool $soft_install
-     * @return bool
-     * @see Module::install()
-     */
-    public function install($soft_install = false)
-    {
-        if ($this->module) {
-            $flag = true;
-
-            // Use for update module is not fully installed
-            if (!$soft_install) {
-                $this->payplug_dependencies = null;
-                $flag = $flag && parent::install();
-                $this->setDependencies();
-            }
-
-            // Install configuration
-            if ($flag) {
-                $flag = $flag && $this->payplug_dependencies->getDependency('install')->install();
-            }
-
-            // Install hook
-            if ($flag) {
-                $hook_list = $this->getHookList();
-                foreach ($hook_list as $hook) {
-                    $flag = $flag && $this->registerHook($hook);
-                }
-            }
-
-            return $flag;
-        }
-
-        return parent::install();
-    }
-
-    /**
-     * @description Check if mobile is validated installation
-     * @return bool
-     */
-    public function isValidInstallation()
-    {
-        if (Validate::isLoadedObject($this)) {
-            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
-        }
-        return true;
-    }
-
-    /**
-     * @description test if php requiremnt is valid
-     * @return array
-     */
-    public function isValidPHPVersion()
-    {
-        $php_min_version = 50600;
-
-        if (!defined('PHP_VERSION_ID')) {
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-
-        return PHP_VERSION_ID >= $php_min_version;
-    }
-
-    /**
-     * Run update module
-     */
-    public function runUpgradeModule()
-    {
-        $upgrade = parent::runUpgradeModule();
-
-        if ($this->module) {
-            $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-        }
-
-        return $upgrade;
-    }
-
-    public function setDependencies()
-    {
-        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
-    }
-
     private function setModule()
     {
         $this->module = $this->payplug_dependencies->payplug;
-    }
-
-    /**
-     * @description Uninstall plugin
-     * @return bool|mixed
-     * @see Module::uninstall()
-     */
-    public function uninstall()
-    {
-        if ($this->module) {
-            return parent::uninstall() && $this->payplug_dependencies->getDependency('install')->uninstall();
-        }
-
-        return parent::uninstall();
     }
 }

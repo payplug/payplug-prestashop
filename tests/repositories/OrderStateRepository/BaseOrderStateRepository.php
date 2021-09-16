@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,10 +21,10 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 namespace PayPlug\tests\repositories\OrderStateRepository;
 
 use PayPlug\src\repositories\OrderStateRepository;
-use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseOrderStateRepository extends RepositoryBase
@@ -35,11 +35,13 @@ class BaseOrderStateRepository extends RepositoryBase
 
         $this->constant->shouldReceive('get')
             ->with('_DB_PREFIX_')
-            ->andReturn('');
+            ->andReturn('')
+        ;
 
         $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
-            ->andReturn('');
+            ->andReturn('')
+        ;
 
         $this->repo = \Mockery::mock(OrderStateRepository::class, [
             $this->config,
@@ -49,7 +51,7 @@ class BaseOrderStateRepository extends RepositoryBase
             $this->query,
             $this->tools,
             $this->validate,
-            $this->myLogPhp
+            $this->myLogPhp,
         ])->makePartial();
     }
 }

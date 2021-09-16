@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\CurrencyInterface;
 use Currency;
+use PayPlug\src\interfaces\CurrencyInterface;
 
 class CurrencySpecific implements CurrencyInterface
 {

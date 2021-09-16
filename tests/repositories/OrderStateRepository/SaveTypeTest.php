@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -24,8 +24,6 @@
 
 namespace PayPlug\tests\repositories\OrderStateRepository;
 
-use PayPlug\tests\mock\OrderStateMock;
-
 /**
  * @group unit
  * @group repository
@@ -33,6 +31,9 @@ use PayPlug\tests\mock\OrderStateMock;
  * @group order_state_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class SaveTypeTest extends BaseOrderStateRepository
 {
@@ -67,6 +68,9 @@ final class SaveTypeTest extends BaseOrderStateRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
+     * @param mixed $id_order_state
+     * @param mixed $type
      */
     public function testWithInvalidDataProvider($id_order_state, $type)
     {
@@ -83,8 +87,9 @@ final class SaveTypeTest extends BaseOrderStateRepository
         $this->repo
             ->shouldReceive([
                 'getType' => $this->type,
-                'updateType' => $success_return
-            ]);
+                'updateType' => $success_return,
+            ])
+        ;
 
         $this->assertSame(
             $success_return,
@@ -99,8 +104,9 @@ final class SaveTypeTest extends BaseOrderStateRepository
         $this->repo
             ->shouldReceive([
                 'getType' => false,
-                'setType' => $success_return
-            ]);
+                'setType' => $success_return,
+            ])
+        ;
 
         $this->assertSame(
             $success_return,

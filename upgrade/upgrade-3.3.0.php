@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,14 +29,14 @@ function upgrade_module_3_3_0($object)
     $flag = true;
 
     // Create new table to qualify order state
-    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_state` (
+    $sql = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'payplug_order_state` (
                 `id_payplug_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `id_order_state` INT(11) UNSIGNED NOT NULL,
                 `type` VARCHAR(64) NOT NULL,
                 `date_add` DATETIME NULL,
                 `date_upd` DATETIME NULL,
                 CONSTRAINT order_state_unique UNIQUE (id_order_state)
-            ) ENGINE=' . _MYSQL_ENGINE_;
+            ) ENGINE='._MYSQL_ENGINE_;
 
     $flag = $flag && Db::getInstance()->execute($sql);
     unset($sql);
@@ -63,16 +62,16 @@ function upgrade_module_3_3_0($object)
     $payplug_order_states_sql = [];
     foreach ($payplug_order_states as $key => $type) {
         // update live status
-        $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . strtoupper($key));
+        $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_'.strtoupper($key));
         $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
-            VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
+            INSERT INTO `'._DB_PREFIX_.'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
+            VALUES ('.$id_order_state.', "'.$type.'", "'.$date.'", "'.$date.'")';
 
         // update sandbox status
-        $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . strtoupper($key) . '_TEST');
+        $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_'.strtoupper($key).'_TEST');
         $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
-            VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
+            INSERT INTO `'._DB_PREFIX_.'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
+            VALUES ('.$id_order_state.', "'.$type.'", "'.$date.'", "'.$date.'")';
     }
 
     if ($payplug_order_states_sql) {
@@ -92,7 +91,5 @@ function upgrade_module_3_3_0($object)
     $flag = $flag && $object->registerHook('actionObjectOrderStateDeleteAfter');
 
     // plug module on the hook displayAdminStatusesForm
-    $flag = $flag && $object->registerHook('displayAdminStatusesForm');
-
-    return $flag;
+    return $flag && $object->registerHook('displayAdminStatusesForm');
 }

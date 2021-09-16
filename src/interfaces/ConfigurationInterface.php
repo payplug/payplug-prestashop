@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,6 +26,8 @@ namespace PayPlug\src\interfaces;
 interface ConfigurationInterface
 {
     public function get($configuration_name);
+
     public function updateValue($key, $value);
+
     public function deleteByName($key);
 }

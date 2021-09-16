@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,16 +21,16 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use \PayPlug\classes\PayPlugClass;
+use PayPlug\classes\PayPlugClass;
 
 class PayplugPaymentModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
+        require_once _PS_ROOT_DIR_.'/config/config.inc.php';
 
         /** Call to payplug-php API */
-        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugBackward.php');
+        require_once _PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php';
 
         $payplug = new PayPlugClass();
         $payplug->apiClass->initializeApi();
@@ -41,15 +41,15 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $io = Tools::getValue('io', null);
         $is_oney = null;
         $with_fees = null;
-        if ((isset($type)) && ($type == 'oney')) {
+        if ((isset($type)) && ('oney' == $type)) {
             if (isset($io)) {
-                (bool)Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
+                (bool) Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
                 $is_oney = 'x'.$io.'_'.$with_fees;
             }
         }
         $options = [
             'is_oney' => $is_oney,
-            '_ajax' => 1
+            '_ajax' => 1,
         ];
 
         $payment_data = $payplug->preparePayment($options);
@@ -77,7 +77,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         }
 
         if ((isset($payment_data['response'])) || (isset($payment_data_16['response']))) {
-            die($payment_data['response']);
+            exit($payment_data['response']);
         }
     }
 }

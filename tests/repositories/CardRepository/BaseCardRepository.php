@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -44,13 +44,16 @@ class BaseCardRepository extends RepositoryBase
         $this->cardEntity = new CardEntity();
 
         $this->config
-            ->shouldReceive('get');
+            ->shouldReceive('get')
+        ;
 
         $this->constant
-            ->shouldReceive('get');
+            ->shouldReceive('get')
+        ;
 
         $this->logger
-            ->shouldReceive('setParams');
+            ->shouldReceive('setParams')
+        ;
 
         $this->repo = Mockery::mock(CardRepository::class, [
             $this->config,

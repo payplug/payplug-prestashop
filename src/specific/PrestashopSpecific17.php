@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -24,7 +24,6 @@
 namespace PayPlug\src\specific;
 
 use Language;
-use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Tab;
 use Tools;
@@ -42,8 +41,8 @@ class PrestashopSpecific17
 
     public function hookHeader()
     {
-        $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
-        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+        $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/front.css');
+        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/front.js');
     }
 
     public function displayPaymentOption($payment_options)
@@ -53,17 +52,18 @@ class PrestashopSpecific17
             $payment_method = $payment_option['name'];
             $paymentOption = new PaymentOption();
             if (isset($payment_option['expiry_date_card'])) {
-                $payment_option['callToActionText'] .= ' - '. $payment_option['expiry_date_card'];
+                $payment_option['callToActionText'] .= ' - '.$payment_option['expiry_date_card'];
             }
             $paymentOption
                 ->setLogo($payment_option['logo'])
                 ->setCallToActionText($payment_option['callToActionText'])
                 ->setAction($payment_option['action'])
                 ->setModuleName($payment_option['moduleName'])
-                ->setInputs($payment_option['inputs']);
+                ->setInputs($payment_option['inputs'])
+            ;
 
             // load oney schedule on e page loading
-            if ($payment_method == 'oney' && $payment_option['is_optimized']) {
+            if ('oney' == $payment_method && $payment_option['is_optimized']) {
                 try {
                     $payment_schedule = $this->payplug->oney->getOneyPaymentOptionsList(
                         $payment_option['amount'],
@@ -105,11 +105,11 @@ class PrestashopSpecific17
                 'en' => 'PayPlug',
                 'gb' => 'PayPlug',
                 'it' => 'PayPlug',
-                'fr' => 'PayPlug'
+                'fr' => 'PayPlug',
             ];
             $tab = new Tab();
             foreach (Language::getLanguages(false) as $language) {
-                $id_lang = (int)$language['id_lang'];
+                $id_lang = (int) $language['id_lang'];
                 $iso_code = Tools::strtolower($language['iso_code']);
                 if (isset($translationsAdminPayPlug[$iso_code])) {
                     $tab->name[$id_lang] = $translationsAdminPayPlug[$iso_code];
@@ -130,11 +130,11 @@ class PrestashopSpecific17
                 'en' => 'Installment Plans',
                 'gb' => 'Installment Plans',
                 'it' => 'Pagamenti frazionati',
-                'fr' => 'Paiements en plusieurs fois'
+                'fr' => 'Paiements en plusieurs fois',
             ];
             $tab = new Tab();
             foreach (Language::getLanguages(false) as $language) {
-                $id_lang = (int)$language['id_lang'];
+                $id_lang = (int) $language['id_lang'];
                 $iso_code = Tools::strtolower($language['iso_code']);
                 if (isset($translationsAdminPayPlugInstallment[$iso_code])) {
                     $tab->name[$id_lang] = $translationsAdminPayPlugInstallment[$iso_code];
@@ -178,11 +178,11 @@ class PrestashopSpecific17
      * @description Link to order by order state
      *
      * @param int $order_state
+     *
      * @return string
      */
     public function getOrdersByStateLink($order_state)
     {
-        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true, [], ['order[filters][osname]' => $order_state]);
-        return $link;
+        return $this->contextSpecific->link->getAdminLink('AdminOrders', true, [], ['order[filters][osname]' => $order_state]);
     }
 }

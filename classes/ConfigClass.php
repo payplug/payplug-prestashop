@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -42,6 +42,12 @@ use Validate;
 
 class ConfigClass
 {
+    public $logger;
+    public $myLogPHP;
+    public $email;
+    public $warning;
+    public $version;
+    protected $context;
     private $amountCurrencyClass;
     private $payplugClass;
     private $apiClass;
@@ -51,19 +57,13 @@ class ConfigClass
     private $validationErrors = [];
     private $html = '';
     private $constantSpecific;
-    protected $context;
-    public $logger;
-    public $myLogPHP;
     private $install;
     private $api_live;
     private $api_test;
-    public $email;
     private $img_lang;
     private $ssl_enable;
-    public $warning;
     private $payment_status;
     private $check_configuration;
-    public $version;
     private $PrestashopSpecificObject;
 
     public function __construct($payplug)
@@ -75,7 +75,7 @@ class ConfigClass
         $this->mediaClass = $payplug->mediaClass;
         $this->oney = $payplug->oney;
         $this->orderClass = $payplug->orderClass;
-        $this->constantSpecific = new ConstantSpecific;
+        $this->constantSpecific = new ConstantSpecific();
         $this->context = (new ContextSpecific())->getContext();
 
         $this->payplugClass = $payplug;
@@ -85,26 +85,9 @@ class ConfigClass
         $this->loadSpecificPrestaClasses();
     }
 
-    /**
-     * Create log files to be used everywhere in PayPlug module
-     *
-     * @return void
-     */
-    private function setLoggers()
-    {
-        $this->logger = new LoggerRepository();
-        $this->myLogPHP = new MyLogPHP();
-
-        $this->logger->setParams(['process' => 'payplug.php']);
-
-//        if ($this->active) {
-//            $this->logger->flush();
-//        }
-    }
-
     public function loadSpecificPrestaClasses()
     {
-        $PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        $PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific'._PS_VERSION_[0]._PS_VERSION_[2];
         if (class_exists($PrestashopSpecificClass)) {
             $this->PrestashopSpecificObject = new $PrestashopSpecificClass($this->payplugClass);
         }
@@ -118,53 +101,15 @@ class ConfigClass
     }
 
     /**
-     * Return specific constant
+     * Return specific constant.
+     *
      * @param string $constant
+     *
      * @return mixed
      */
     public function getConstant($constant)
     {
         return $this->constantSpecific->get($constant);
-    }
-
-    /**
-     * Set very specific properties
-     *
-     * @return void
-     */
-    private function setConfigurationProperties()
-    {
-        $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
-
-        $this->email = Configuration::get('PAYPLUG_EMAIL');
-        $available_img_lang = [
-            'fr',
-            'gb',
-            'en',
-            'it'
-        ];
-        $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
-            ? $this->context->language->iso_code : 'default';
-        $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
-
-        if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->payplugClass->l('payplug.setConfigurationProperties.configureModule');
-        }
-
-        $this->payment_status = [
-            1 => $this->payplugClass->l('payplug.setConfigurationProperties.notPaid'),
-            2 => $this->payplugClass->l('payplug.setConfigurationProperties.paid'),
-            3 => $this->payplugClass->l('payplug.setConfigurationProperties.failed'),
-            4 => $this->payplugClass->l('payplug.setConfigurationProperties.partiallyRefunded'),
-            5 => $this->payplugClass->l('payplug.setConfigurationProperties.refunded'),
-            6 => $this->payplugClass->l('payplug.setConfigurationProperties.onGoing'),
-            7 => $this->payplugClass->l('payplug.setConfigurationProperties.cancelled'),
-            8 => $this->payplugClass->l('payplug.setConfigurationProperties.authorized'),
-            9 => $this->payplugClass->l('payplug.setConfigurationProperties.authorizationExpired'),
-            10 => $this->payplugClass->l('payplug.setConfigurationProperties.oneyPending'),
-            11 => $this->payplugClass->l('payplug.setConfigurationProperties.abandoned'),
-        ];
     }
 
     public function getImgLang()
@@ -179,9 +124,10 @@ class ConfigClass
 
     /**
      * @param bool $force_all
-     * @return bool
-     * @see Module::disable()
      *
+     * @return bool
+     *
+     * @see Module::disable()
      */
     public function disable($force_all = false)
     {
@@ -189,9 +135,9 @@ class ConfigClass
         parent::disable($force_all);
 
         $req_disable = '
-            UPDATE `' . _DB_PREFIX_ . 'module`
+            UPDATE `'._DB_PREFIX_.'module`
             SET `active`= 0
-            WHERE `name` = \'' . pSQL($this->name) . '\'';
+            WHERE `name` = \''.pSQL($this->name).'\'';
 
         $res_disable = Db::getInstance()->Execute($req_disable);
         if (!$res_disable) {
@@ -203,7 +149,9 @@ class ConfigClass
 
     /**
      * @description
+     *
      * @param $cart
+     *
      * @return array
      */
     public static function getAvailableOptions($cart)
@@ -215,16 +163,16 @@ class ConfigClass
         $permissions = ApiClass::getAccountPermissions();
 
         $available_options = [
-            'standard' => (int)Configuration::get('PAYPLUG_STANDARD') === 1,
-            'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0,
-            'embedded' => (int)Configuration::get('PAYPLUG_EMBEDDED_MODE') === 1,
-            'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1,
-            'installment' => (int)Configuration::get('PAYPLUG_INST') === 1,
-            'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1,
-            'oney' => (int)Configuration::get('PAYPLUG_ONEY') === 1,
+            'standard' => 1 === (int) Configuration::get('PAYPLUG_STANDARD'),
+            'live' => 0 === (int) Configuration::get('PAYPLUG_SANDBOX_MODE'),
+            'embedded' => 1 === (int) Configuration::get('PAYPLUG_EMBEDDED_MODE'),
+            'one_click' => 1 === (int) Configuration::get('PAYPLUG_ONE_CLICK'),
+            'installment' => 1 === (int) Configuration::get('PAYPLUG_INST'),
+            'deferred' => 1 === (int) Configuration::get('PAYPLUG_DEFERRED'),
+            'oney' => 1 === (int) Configuration::get('PAYPLUG_ONEY'),
         ];
 
-        if (Configuration::get('PAYPLUG_EMAIL') === null
+        if (null === Configuration::get('PAYPLUG_EMAIL')
             || !AmountCurrencyClass::checkCurrency($cart)
             || !AmountCurrencyClass::checkAmount($cart)
         ) {
@@ -237,7 +185,7 @@ class ConfigClass
             $available_options['oney'] = false;
         } else {
             if (!$permissions['use_live_mode']
-                || Configuration::get('PAYPLUG_LIVE_API_KEY') === null
+                || null === Configuration::get('PAYPLUG_LIVE_API_KEY')
             ) {
                 $available_options['live'] = false;
             }
@@ -261,6 +209,7 @@ class ConfigClass
     /**
      * @description
      * Check if Payplug is allowed
+     *
      * @return bool
      */
     public static function isAllowed()
@@ -268,11 +217,12 @@ class ConfigClass
         if (!Module::isEnabled('payplug') || !Configuration::get('PAYPLUG_SHOW')) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * Check various configurations
+     * Check various configurations.
      *
      * @return string
      */
@@ -310,11 +260,11 @@ class ConfigClass
             $is_payplug_connected = true;
         }
 
-        if ($report['curl']['installed'] &&
-            $report['php']['up2date'] &&
-            $report['openssl']['installed'] &&
-            $report['openssl']['up2date'] &&
-            $is_payplug_connected
+        if ($report['curl']['installed']
+            && $report['php']['up2date']
+            && $report['openssl']['installed']
+            && $report['openssl']['up2date']
+            && $is_payplug_connected
         ) {
             $is_payplug_configured = true;
         } else {
@@ -362,8 +312,10 @@ class ConfigClass
     }
 
     /**
-     * Get iso code from language code
+     * Get iso code from language code.
+     *
      * @param $language
+     *
      * @return string
      */
     public static function getIsoFromLanguageCode(Language $language)
@@ -372,13 +324,12 @@ class ConfigClass
             return false;
         }
         $parse = explode('-', $language->language_code);
+
         return Tools::strtolower($parse[0]);
     }
 
     /**
-     * save configuration
-     *
-     * @return void
+     * save configuration.
      */
     public function saveConfiguration()
     {
@@ -401,10 +352,10 @@ class ConfigClass
 
         foreach ($configurationKeys as $key => $config) {
             $value = Tools::getValue($config);
-            if ($value != null) {
+            if (null != $value) {
                 Configuration::updateValue($key, $value);
             }
-            if ($key == 'PAYPLUG_SHOW' && $value) {
+            if ('PAYPLUG_SHOW' == $key && $value) {
                 $this->payplugClass->enable();
             }
         }
@@ -468,10 +419,10 @@ class ConfigClass
                 $permissions = $this->apiClass->getAccount($valid_key);
             } catch (ConfigurationNotSetException $e) {
 //                @todo Add Log
-                die('ConfigurationNotSetException'.$e->getMessage());
+                exit('ConfigurationNotSetException'.$e->getMessage());
             } catch (ConfigurationException $e) {
 //                @todo Add Log
-                die('ConfigurationException'.$e->getMessage());
+                exit('ConfigurationException'.$e->getMessage());
             }
             $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
         } else {
@@ -484,7 +435,7 @@ class ConfigClass
             $verified = false;
         }
 
-        $is_active = (bool)$configurations['show'];
+        $is_active = (bool) $configurations['show'];
 
         $this->apiClass->getSiteUrl();
 
@@ -507,8 +458,8 @@ class ConfigClass
             ]);
         }
 
-        $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->mediaClass->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
+        $this->mediaClass->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
@@ -522,7 +473,7 @@ class ConfigClass
         $login_infos = [];
 
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment';
-        $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
+        $installments_panel_url .= '&token='.Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
         $faq_links = $this->getFAQLinks($this->context->language->iso_code);
 
@@ -533,8 +484,8 @@ class ConfigClass
         $this->assignSwitchConfiguration($configurations);
 
         $this->context->smarty->assign([
-            'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
+            'form_action' => (string) ($_SERVER['REQUEST_URI']),
+            'url_logo' => __PS_BASE_URI__.'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->payplugClass->version,
@@ -570,27 +521,471 @@ class ConfigClass
     }
 
     /**
-     * Get FAQ link for given iso lang
+     * Get FAQ link for given iso lang.
+     *
      * @param $iso_code
+     *
      * @return array
      */
     public function getFAQLinks($iso_code)
     {
-        if ($iso_code == 'en') {
+        if ('en' == $iso_code) {
             $iso_code = 'en-gb';
         }
 
         return [
-            'activation' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021328991',
-            'deferred' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360010088420',
-            'install' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021389891',
-            'installments' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022447972',
-            'one_click' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022213892',
-            'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360013071080',
-            'payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142312',
-            'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
-            'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
-            'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
+            'activation' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360021328991',
+            'deferred' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360010088420',
+            'install' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360021389891',
+            'installments' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360022447972',
+            'one_click' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360022213892',
+            'oney' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360013071080',
+            'payment_page' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360021142312',
+            'refund' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360022214692',
+            'sandbox' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360021142492',
+            'guide' => 'https://support.payplug.com/hc/'.$iso_code.'/articles/360011715080',
+        ];
+    }
+
+    /**
+     * Check if current device used is mobile.
+     *
+     * @return bool
+     */
+    public static function isMobiledevice()
+    {
+        $useragent = $_SERVER['HTTP_USER_AGENT'];
+
+        $reg1 = '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|';
+        $reg1 .= 'iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|';
+        $reg1 .= 'palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|';
+        $reg1 .= 'up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i';
+
+        $reg2 = '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|';
+        $reg2 .= 'an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|';
+        $reg2 .= 'br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|';
+        $reg2 .= 'dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|';
+        $reg2 .= 'ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|';
+        $reg2 .= 'hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|';
+        $reg2 .= 'iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|';
+        $reg2 .= 'klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|';
+        $reg2 .= 'ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|';
+        $reg2 .= 'mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|';
+        $reg2 .= 'ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|';
+        $reg2 .= 'pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|';
+        $reg2 .= 'qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|';
+        $reg2 .= 'sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|';
+        $reg2 .= 'sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|';
+        $reg2 .= 'tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|';
+        $reg2 .= 'vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|';
+        $reg2 .= 'wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i';
+
+        if (preg_match($reg1, $useragent) || preg_match($reg2, Tools::substr($useragent, 0, 4))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if given phone number is valid mobile phone number.
+     *
+     * @param string $phone_number
+     * @param string $iso_code
+     *
+     * @throws libphonenumberlight\NumberParseException
+     *
+     * @return bool
+     */
+    public static function isValidMobilePhoneNumber($phone_number = false, $iso_code)
+    {
+        if (empty($phone_number)) {
+            return false;
+        }
+
+        try {
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $parsed = $phone_util->parse($phone_number, $iso_code);
+            $is_mobile = $phone_util->getNumberType($parsed);
+
+            return (bool) (in_array($is_mobile, [1, 2], true));
+        } catch (Exception $e) {
+            // @todo : Add Log
+            return false;
+        }
+    }
+
+//    /**
+//     * @return string
+//     */
+//    public function displayGDPRConsent()
+//    {
+//        $this->context->smarty->assign(['id_module' => $this->id]);
+//        return $this->payplugClass->fetchTemplate('customer/gdpr_consent.tpl');
+//    }
+
+    /**
+     * Return international formatted phone number (norm E.164).
+     *
+     * @param $phone_number
+     * @param $country
+     *
+     * @throws libphonenumberlight\NumberParseException
+     *
+     * @return null|string
+     */
+    public static function formatPhoneNumber($phone_number, $country)
+    {
+        if (empty($phone_number)) {
+            return null;
+        }
+        if (!is_object($country)) {
+            $country = new Country($country);
+        }
+        if (!Validate::isLoadedObject($country)) {
+            return null;
+        }
+
+        try {
+            $iso_code = self::getIsoCodeByCountryId($country->id);
+            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
+            $parsed = $phone_util->parse($phone_number, $iso_code);
+
+            if (!$phone_util->isValidNumber($parsed)) {
+                // todo: add log
+                return null;
+            }
+
+            return $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164);
+        } catch (Exception $e) {
+            // todo: add log
+            return null;
+        }
+    }
+
+    /**
+     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
+     *
+     * @param int $country_id
+     *
+     * @return false|int
+     */
+    public static function getIsoCodeByCountryId($country_id)
+    {
+        $iso_code_list = self::getIsoCodeList();
+        if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
+            return false;
+        }
+        if (!Validate::isInt($country_id)) {
+            return false;
+        }
+        $country = new Country((int) $country_id);
+        if (!Validate::isLoadedObject($country)) {
+            return false;
+        }
+        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list, true)) {
+            return false;
+        }
+
+        return Tools::strtoupper($country->iso_code);
+    }
+
+    /**
+     * Get all country iso-code of ISO 3166-1 alpha-2 norm
+     * Source: DB PayPlug.
+     *
+     * @return null|array
+     */
+    public static function getIsoCodeList()
+    {
+        $country_list_path = _PS_MODULE_DIR_.'payplug/lib/iso_3166-1_alpha-2/data.csv';
+        $iso_code_list = [];
+        if (($handle = fopen($country_list_path, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                $iso_code_list[] = Tools::strtoupper($data[0]);
+            }
+            fclose($handle);
+
+            return $iso_code_list;
+        }
+
+        return null;
+    }
+
+    /**
+     * @see Module::postProcess()
+     */
+    public function postProcess()
+    {
+        if (Tools::isSubmit('submitAccount')) {
+            $this->submitAccount();
+        }
+
+        if (Tools::getValue('submitDisable')) {
+            $this->submitDisable();
+        }
+
+        if (Tools::getValue('submitDisconnect')) {
+            $this->submitDisconnect();
+        }
+
+        if (Tools::isSubmit('submitSettings')) {
+            $this->submitSettings();
+        }
+
+        if (Tools::isSubmit('submitUninstallSettings')) {
+            $this->submitUninstallSettings();
+        }
+    }
+
+    /**
+     * @param $id_customer
+     *
+     * @throws PrestaShopDatabaseException
+     *
+     * @return null|array|bool
+     */
+    public function gdprCardExport($id_customer)
+    {
+        if (!is_int($id_customer) || null === $id_customer) {
+            return false;
+        }
+        $req_payplug_card = '
+            SELECT pc.last4, pc.exp_month, pc.exp_year, pc.brand, pc.country
+            FROM '._DB_PREFIX_.'payplug_card pc
+            WHERE pc.id_customer = '.(int) $id_customer;
+        $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
+        if (!$res_payplug_card) {
+            $cards = null;
+        } else {
+            $i = 1;
+            $cards = [];
+            foreach ($res_payplug_card as &$card) {
+                $card['expiry_date'] = date(
+                    'm / y',
+                    mktime(0, 0, 0, (int) $card['exp_month'], 1, (int) $card['exp_year'])
+                );
+                $cards[] = [
+                    '#' => $i,
+                    $this->payplugClass->l('payplug.gdprCardExport.brand') => $card['brand'],
+                    $this->payplugClass->l('payplug.gdprCardExport.country') => $card['country'],
+                    $this->payplugClass->l('payplug.gdprCardExport.card') => '**** **** **** '.$card['last4'],
+                    $this->payplugClass->l('payplug.gdprCardExport.expiryDate') => $card['expiry_date'],
+                ];
+                ++$i;
+            }
+        }
+
+        return $cards;
+    }
+
+    /**
+     * @description Check if current configuration requirements are respected
+     *
+     * @return array
+     */
+    public static function checkRequirements()
+    {
+        $php_min_version = 50600;
+        $curl_min_version = '7.21';
+        $openssl_min_version = 0x1000100f;
+        $report = [
+            'php' => [
+                'version' => 0,
+                'installed' => true,
+                'up2date' => false,
+            ],
+            'curl' => [
+                'version' => 0,
+                'installed' => false,
+                'up2date' => false,
+            ],
+            'openssl' => [
+                'version' => 0,
+                'installed' => false,
+                'up2date' => false,
+            ],
+        ];
+
+        //PHP
+        if (!defined('PHP_VERSION_ID')) {
+            $report['php']['version'] = PHP_VERSION;
+            $php_version = explode('.', PHP_VERSION);
+            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+        }
+        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
+
+        //cURL
+        $curl_exists = extension_loaded('curl');
+        if ($curl_exists) {
+            $curl_version = curl_version();
+            $report['curl']['version'] = $curl_version['version'];
+            $report['curl']['installed'] = true;
+            $report['curl']['up2date'] = version_compare(
+                $curl_version['version'],
+                $curl_min_version,
+                '>='
+            ) ? true : false;
+        }
+
+        //OpenSSl
+        $openssl_exists = extension_loaded('openssl');
+        if ($openssl_exists) {
+            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
+            $report['openssl']['installed'] = true;
+            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
+        }
+
+        return $report;
+    }
+
+    /**
+     * @description Process account submit
+     *
+     * @throws BadRequestException
+     */
+    public function submitAccount()
+    {
+        $curl_exists = extension_loaded('curl');
+        $openssl_exists = extension_loaded('openssl');
+
+        /*
+         * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+         * Because pwd with special chars don't work
+         */
+        $password = $_POST['PAYPLUG_PASSWORD'];
+        $email = Tools::getValue('PAYPLUG_EMAIL');
+
+        if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
+            exit(json_encode([
+                'content' => false,
+                'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect'),
+            ]));
+        }
+        if ($curl_exists && $openssl_exists) {
+            if ($this->apiClass->login($email, $password)) {
+                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
+                Configuration::updateValue('PAYPLUG_SHOW', 1);
+
+                $this->assignContentVar();
+                $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
+
+                exit(json_encode(['content' => $content]));
+            }
+
+            exit(json_encode([
+                'content' => false,
+                'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect'),
+            ]));
+        }
+    }
+
+    /**
+     * @description Process disable plugin submit
+     */
+    public function submitDisable()
+    {
+        Configuration::updateValue('PAYPLUG_SHOW', false);
+
+        $this->assignContentVar();
+        $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        $this->context->smarty->assign([
+            'title' => '',
+            'type' => 'save',
+        ]);
+        $popin = $this->payplugClass->fetchTemplate('/views/templates/admin/popin.tpl');
+
+        exit(json_encode(['popin' => $popin, 'content' => $content]));
+    }
+
+    /**
+     * @description Process disconnect submit
+     */
+    public function submitDisconnect()
+    {
+        $this->install->setConfig();
+        Configuration::updateValue('PAYPLUG_SHOW', 0);
+
+        // force reload configuration to be sure all config are reset
+        Configuration::loadConfiguration();
+
+        $this->assignContentVar();
+        $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
+
+        exit(json_encode(['content' => $content]));
+    }
+
+    /**
+     * @description Process settings submit
+     */
+    public function submitSettings()
+    {
+        if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
+            $this->payplugClass->displayError($this->l('payplug.submitSettings.settingsNotUpdated'));
+        } else {
+            $this->saveConfiguration();
+        }
+    }
+
+    /**
+     * @description Process uninstall submit
+     */
+    public function submitUninstallSettings()
+    {
+        Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
+    }
+
+    /**
+     * Create log files to be used everywhere in PayPlug module.
+     */
+    private function setLoggers()
+    {
+        $this->logger = new LoggerRepository();
+        $this->myLogPHP = new MyLogPHP();
+
+        $this->logger->setParams(['process' => 'payplug.php']);
+
+//        if ($this->active) {
+//            $this->logger->flush();
+//        }
+    }
+
+    /**
+     * Set very specific properties.
+     */
+    private function setConfigurationProperties()
+    {
+        $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
+
+        $this->email = Configuration::get('PAYPLUG_EMAIL');
+        $available_img_lang = [
+            'fr',
+            'gb',
+            'en',
+            'it',
+        ];
+        $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
+            ? $this->context->language->iso_code : 'default';
+        $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
+
+        if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
+            $this->warning = $this->payplugClass->l('payplug.setConfigurationProperties.configureModule');
+        }
+
+        $this->payment_status = [
+            1 => $this->payplugClass->l('payplug.setConfigurationProperties.notPaid'),
+            2 => $this->payplugClass->l('payplug.setConfigurationProperties.paid'),
+            3 => $this->payplugClass->l('payplug.setConfigurationProperties.failed'),
+            4 => $this->payplugClass->l('payplug.setConfigurationProperties.partiallyRefunded'),
+            5 => $this->payplugClass->l('payplug.setConfigurationProperties.refunded'),
+            6 => $this->payplugClass->l('payplug.setConfigurationProperties.onGoing'),
+            7 => $this->payplugClass->l('payplug.setConfigurationProperties.cancelled'),
+            8 => $this->payplugClass->l('payplug.setConfigurationProperties.authorized'),
+            9 => $this->payplugClass->l('payplug.setConfigurationProperties.authorizationExpired'),
+            10 => $this->payplugClass->l('payplug.setConfigurationProperties.oneyPending'),
+            11 => $this->payplugClass->l('payplug.setConfigurationProperties.abandoned'),
         ];
     }
 
@@ -691,384 +1086,7 @@ class ConfigClass
         ];
 
         $this->context->smarty->assign([
-            'payplug_switch' => $switch
+            'payplug_switch' => $switch,
         ]);
-    }
-
-    /**
-     * Check if current device used is mobile
-     *
-     * @return bool
-     */
-    public static function isMobiledevice()
-    {
-        $useragent = $_SERVER['HTTP_USER_AGENT'];
-
-        $reg1 = '/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|';
-        $reg1 .= 'iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|';
-        $reg1 .= 'palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|';
-        $reg1 .= 'up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i';
-
-        $reg2 = '/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|';
-        $reg2 .= 'an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|';
-        $reg2 .= 'br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|';
-        $reg2 .= 'dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|';
-        $reg2 .= 'ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|';
-        $reg2 .= 'hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|';
-        $reg2 .= 'iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|';
-        $reg2 .= 'klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|';
-        $reg2 .= 'ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|';
-        $reg2 .= 'mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|';
-        $reg2 .= 'ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|';
-        $reg2 .= 'pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|';
-        $reg2 .= 'qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|';
-        $reg2 .= 'sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|';
-        $reg2 .= 'sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|';
-        $reg2 .= 'tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|';
-        $reg2 .= 'vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|';
-        $reg2 .= 'wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i';
-
-        if (preg_match($reg1, $useragent) || preg_match($reg2, Tools::substr($useragent, 0, 4))) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Check if given phone number is valid mobile phone number
-     * @param string $phone_number
-     * @param string $iso_code
-     * @return bool
-     * @throws libphonenumberlight\NumberParseException
-     */
-    public static function isValidMobilePhoneNumber($phone_number = false, $iso_code)
-    {
-        if (empty($phone_number)) {
-            return false;
-        }
-
-        try {
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-            $is_mobile = $phone_util->getNumberType($parsed);
-            return (bool)(in_array($is_mobile, [1, 2], true));
-        } catch (Exception $e) {
-            // @todo : Add Log
-            return false;
-        }
-    }
-
-//    /**
-//     * @return string
-//     */
-//    public function displayGDPRConsent()
-//    {
-//        $this->context->smarty->assign(['id_module' => $this->id]);
-//        return $this->payplugClass->fetchTemplate('customer/gdpr_consent.tpl');
-//    }
-
-    /**
-     * Return international formatted phone number (norm E.164)
-     *
-     * @param $phone_number
-     * @param $country
-     * @return string|null
-     * @throws libphonenumberlight\NumberParseException
-     */
-    public static function formatPhoneNumber($phone_number, $country)
-    {
-        if (empty($phone_number)) {
-            return null;
-        }
-        if (!is_object($country)) {
-            $country = new Country($country);
-        }
-        if (!Validate::isLoadedObject($country)) {
-            return null;
-        }
-
-        try {
-            $iso_code = self::getIsoCodeByCountryId($country->id);
-            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if (!$phone_util->isValidNumber($parsed)) {
-                // todo: add log
-                return null;
-            }
-
-            $formated = $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164);
-            return $formated;
-        } catch (Exception $e) {
-            // todo: add log
-            return null;
-        }
-    }
-
-    /**
-     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm
-     *
-     * @param int $country_id
-     * @return int | false
-     */
-    public static function getIsoCodeByCountryId($country_id)
-    {
-        $iso_code_list = self::getIsoCodeList();
-        if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
-            return false;
-        }
-        if (!Validate::isInt($country_id)) {
-            return false;
-        }
-        $country = new Country((int)$country_id);
-        if (!Validate::isLoadedObject($country)) {
-            return false;
-        }
-        if (!in_array(Tools::strtoupper($country->iso_code), $iso_code_list, true)) {
-            return false;
-        } else {
-            return Tools::strtoupper($country->iso_code);
-        }
-    }
-
-    /**
-     * Get all country iso-code of ISO 3166-1 alpha-2 norm
-     * Source: DB PayPlug
-     *
-     * @return array | null
-     */
-    public static function getIsoCodeList()
-    {
-        $country_list_path = _PS_MODULE_DIR_ . 'payplug/lib/iso_3166-1_alpha-2/data.csv';
-        $iso_code_list = [];
-        if (($handle = fopen($country_list_path, 'r')) !== false) {
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $iso_code_list[] = Tools::strtoupper($data[0]);
-            }
-            fclose($handle);
-            return $iso_code_list;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return void
-     * @see Module::postProcess()
-     *
-     */
-    public function postProcess()
-    {
-        if (Tools::isSubmit('submitAccount')) {
-            $this->submitAccount();
-        }
-
-        if (Tools::getValue('submitDisable')) {
-            $this->submitDisable();
-        }
-
-        if (Tools::getValue('submitDisconnect')) {
-            $this->submitDisconnect();
-        }
-
-        if (Tools::isSubmit('submitSettings')) {
-            $this->submitSettings();
-        }
-
-        if (Tools::isSubmit('submitUninstallSettings')) {
-            $this->submitUninstallSettings();
-        }
-    }
-
-    /**
-     * @param $id_customer
-     * @return array|bool|null
-     * @throws PrestaShopDatabaseException
-     */
-    public function gdprCardExport($id_customer)
-    {
-        if (!is_int($id_customer) || $id_customer === null) {
-            return false;
-        }
-        $req_payplug_card = '
-            SELECT pc.last4, pc.exp_month, pc.exp_year, pc.brand, pc.country
-            FROM ' . _DB_PREFIX_ . 'payplug_card pc
-            WHERE pc.id_customer = ' . (int)$id_customer;
-        $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
-        if (!$res_payplug_card) {
-            $cards = null;
-        } else {
-            $i = 1;
-            $cards = [];
-            foreach ($res_payplug_card as &$card) {
-                $card['expiry_date'] = date(
-                    'm / y',
-                    mktime(0, 0, 0, (int)$card['exp_month'], 1, (int)$card['exp_year'])
-                );
-                $cards[] = [
-                    '#' => $i,
-                    $this->payplugClass->l('payplug.gdprCardExport.brand') => $card['brand'],
-                    $this->payplugClass->l('payplug.gdprCardExport.country') => $card['country'],
-                    $this->payplugClass->l('payplug.gdprCardExport.card') => '**** **** **** ' . $card['last4'],
-                    $this->payplugClass->l('payplug.gdprCardExport.expiryDate') => $card['expiry_date']
-                ];
-                $i++;
-            }
-        }
-        return $cards;
-    }
-
-    /**
-     * @description Check if current configuration requirements are respected
-     * @return array
-     */
-    public static function checkRequirements()
-    {
-        $php_min_version = 50600;
-        $curl_min_version = '7.21';
-        $openssl_min_version = 0x1000100f;
-        $report = [
-            'php' => [
-                'version' => 0,
-                'installed' => true,
-                'up2date' => false,
-            ],
-            'curl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-            'openssl' => [
-                'version' => 0,
-                'installed' => false,
-                'up2date' => false,
-            ],
-        ];
-
-        //PHP
-        if (!defined('PHP_VERSION_ID')) {
-            $report['php']['version'] = PHP_VERSION;
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
-        }
-        $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
-
-        //cURL
-        $curl_exists = extension_loaded('curl');
-        if ($curl_exists) {
-            $curl_version = curl_version();
-            $report['curl']['version'] = $curl_version['version'];
-            $report['curl']['installed'] = true;
-            $report['curl']['up2date'] = version_compare(
-                $curl_version['version'],
-                $curl_min_version,
-                '>='
-            ) ? true : false;
-        }
-
-        //OpenSSl
-        $openssl_exists = extension_loaded('openssl');
-        if ($openssl_exists) {
-            $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
-            $report['openssl']['installed'] = true;
-            $report['openssl']['up2date'] = OPENSSL_VERSION_NUMBER >= $openssl_min_version ? true : false;
-        }
-
-        return $report;
-    }
-
-    /**
-     * @description Process account submit
-     * @throws BadRequestException
-     */
-    public function submitAccount()
-    {
-        $curl_exists = extension_loaded('curl');
-        $openssl_exists = extension_loaded('openssl');
-
-        /*
-         * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
-         * Because pwd with special chars don't work
-         */
-        $password = $_POST['PAYPLUG_PASSWORD'];
-        $email = Tools::getValue('PAYPLUG_EMAIL');
-
-        if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
-            die(json_encode([
-                'content' => false,
-                'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect')
-            ]));
-        } elseif ($curl_exists && $openssl_exists) {
-            if ($this->apiClass->login($email, $password)) {
-                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
-                Configuration::updateValue('PAYPLUG_SHOW', 1);
-
-                $this->assignContentVar();
-                $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
-
-                die(json_encode(['content' => $content]));
-            } else {
-                die(json_encode([
-                    'content' => false,
-                    'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect')
-                ]));
-            }
-        }
-    }
-
-    /**
-     * @description Process disable plugin submit
-     */
-    public function submitDisable()
-    {
-        Configuration::updateValue('PAYPLUG_SHOW', false);
-
-        $this->assignContentVar();
-        $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
-
-        $this->context->smarty->assign([
-            'title' => '',
-            'type' => 'save',
-        ]);
-        $popin = $this->payplugClass->fetchTemplate('/views/templates/admin/popin.tpl');
-
-        die(json_encode(['popin' => $popin, 'content' => $content]));
-    }
-
-    /**
-     * @description Process disconnect submit
-     */
-    public function submitDisconnect()
-    {
-        $this->install->setConfig();
-        Configuration::updateValue('PAYPLUG_SHOW', 0);
-
-        // force reload configuration to be sure all config are reset
-        Configuration::loadConfiguration();
-
-        $this->assignContentVar();
-        $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
-
-        die(json_encode(['content' => $content]));
-    }
-
-    /**
-     * @description Process settings submit
-     */
-    public function submitSettings()
-    {
-        if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
-            $this->payplugClass->displayError($this->l('payplug.submitSettings.settingsNotUpdated'));
-        } else {
-            $this->saveConfiguration();
-        }
-    }
-
-    /**
-     * @description Process uninstall submit
-     */
-    public function submitUninstallSettings()
-    {
-        Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -38,24 +37,23 @@ function upgrade_module_3_1_2()
     $sql_requests = [];
 
     try {
-        $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
+        $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "'._DB_PREFIX_.'payplug_card"');
     } catch (Exception $e) {
         return $flag;
     }
 
     if ($exists) {
         $sql_payplug_card = [
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` 
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` 
                 CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` DROP PRIMARY KEY',
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` DROP `position`',
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP PRIMARY KEY',
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP `position`',
+            'ALTER TABLE `'._DB_PREFIX_.'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
                 ADD PRIMARY KEY (`id_payplug_card`)',
         ];
 
         $sql_requests = array_merge($sql_requests, $sql_payplug_card);
     }
-
 
     try {
         foreach ($sql_requests as $sql_request) {

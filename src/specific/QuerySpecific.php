@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\specific;
 
+use Db;
 use PayPlug\src\interfaces\QueryInterface;
-use \Db;
 
 class QuerySpecific implements QueryInterface
 {
@@ -46,7 +46,9 @@ class QuerySpecific implements QueryInterface
 
     /**
      * @description Called from src/repositories/QueryRepository.php
+     *
      * @param $SQLRequest
+     *
      * @return mixed
      */
     public function query($SQLRequest)
@@ -54,11 +56,11 @@ class QuerySpecific implements QueryInterface
         try {
             $action = 'execute';
 
-            if (stripos($SQLRequest, 'SELECT') !== false) {
+            if (false !== stripos($SQLRequest, 'SELECT')) {
                 $action = 'executeS';
             }
 
-            if (stripos($SQLRequest, 'SHOW TABLES LIKE') !== false) {
+            if (false !== stripos($SQLRequest, 'SHOW TABLES LIKE')) {
                 $action = 'ExecuteS';
             }
 

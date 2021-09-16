@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
-
 use PayPlug\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
@@ -30,6 +28,9 @@ use PHPUnit\Framework\TestCase;
  * @group entity
  * @group cache
  * @group cache_entity
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetDefinitionCacheTest extends TestCase
 {

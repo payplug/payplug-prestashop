@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -39,27 +38,27 @@ function upgrade_module_2_31_0()
     $flag = true;
 
     $states = [
-        'auth_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
-        'auth_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),
-        'exp_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP'),
-        'exp_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_EXP_TEST'),
-        'inst_pg_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'),
-        'inst_pg_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_INST_PG_TEST'),
-        'pending_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING') != _PS_OS_PENDING_ ?
-            (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING')
+        'auth_state' => (int) Configuration::get('PAYPLUG_ORDER_STATE_AUTH'),
+        'auth_state_test' => (int) Configuration::get('PAYPLUG_ORDER_STATE_AUTH_TEST'),
+        'exp_state' => (int) Configuration::get('PAYPLUG_ORDER_STATE_EXP'),
+        'exp_state_test' => (int) Configuration::get('PAYPLUG_ORDER_STATE_EXP_TEST'),
+        'inst_pg_state' => (int) Configuration::get('PAYPLUG_ORDER_STATE_INST_PG'),
+        'inst_pg_state_test' => (int) Configuration::get('PAYPLUG_ORDER_STATE_INST_PG_TEST'),
+        'pending_state' => _PS_OS_PENDING_ != (int) Configuration::get('PAYPLUG_ORDER_STATE_PENDING') ?
+            (int) Configuration::get('PAYPLUG_ORDER_STATE_PENDING')
             : null,
-        'pending_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
-        'error_state' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR') != _PS_OS_ERROR_ ?
-            (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR')
+        'pending_state_test' => (int) Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
+        'error_state' => _PS_OS_ERROR_ != (int) Configuration::get('PAYPLUG_ORDER_STATE_ERROR') ?
+            (int) Configuration::get('PAYPLUG_ORDER_STATE_ERROR')
             : null,
-        'error_state_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
-        'oney_pending' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
-        'oney_pending_test' => (int)Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),
+        'error_state_test' => (int) Configuration::get('PAYPLUG_ORDER_STATE_PENDING_TEST'),
+        'oney_pending' => (int) Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG'),
+        'oney_pending_test' => (int) Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG_TEST'),
     ];
 
     foreach ($states as $state) {
-        if ($state != null) {
-            $s = new OrderState((int)$state);
+        if (null != $state) {
+            $s = new OrderState((int) $state);
 
             // update object only if order state exist
             if (Validate::isLoadedObject($s)) {
@@ -74,11 +73,11 @@ function upgrade_module_2_31_0()
 
     // install table `payplug_order_payment`
     $req_payplug_order_payment = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
+            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'payplug_order_payment` (
             `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_order` INT(11) UNSIGNED NOT NULL,
             `id_payment` VARCHAR(255) NOT NULL
-            ) ENGINE=' . _MYSQL_ENGINE_;
+            ) ENGINE='._MYSQL_ENGINE_;
 
     $res_payplug_order_payment = Db::getInstance()->execute($req_payplug_order_payment);
 
@@ -88,12 +87,12 @@ function upgrade_module_2_31_0()
 
     try {
         // check if lock exists on id_cart
-        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+        $req_describe = 'DESCRIBE '._DB_PREFIX_.'payplug_lock;';
         $res_describe = Db::getInstance()->executeS($req_describe);
         $lock_exists = false;
         if ($res_describe) {
             foreach ($res_describe as $field) {
-                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
                     $lock_exists = true;
                 }
             }
@@ -101,13 +100,13 @@ function upgrade_module_2_31_0()
 
         // check doesn't exist then add it
         if (!$lock_exists) {
-            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
+            $req_truncate = 'TRUNCATE `'._DB_PREFIX_.'payplug_lock`;';
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
             }
             if ($flag) {
-                $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
+                $sql = 'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` 
                         ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
                 $res_alter = Db::getInstance()->execute($sql);
                 if (!$res_alter) {
@@ -115,11 +114,11 @@ function upgrade_module_2_31_0()
                 }
             }
             if ($flag) {
-                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+                $req_describe = 'DESCRIBE '._DB_PREFIX_.'payplug_lock;';
                 $res_describe = Db::getInstance()->executeS($req_describe);
                 if ($res_describe) {
                     foreach ($res_describe as $field) {
-                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                        if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
                             $flag = $flag && true;
                         }
                     }

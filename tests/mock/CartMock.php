@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -41,6 +41,7 @@ class CartMock
         $cart->id_customer = 1;
         $cart->date_add = '2021-01-01 00:00:00';
         $cart->date_upd = '2021-01-01 00:00:00';
+
         return $cart;
     }
 
@@ -89,7 +90,7 @@ class CartMock
                  Design Studio Design Studio Design Studio Design Studio Design Studio Design',
                 'price_wt' => 22.68,
                 'attributes' => 'Color : White',
-            ]
+            ],
         ];
     }
 }

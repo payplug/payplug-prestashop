@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -40,8 +40,10 @@ class OneyEntity
 
     /**
      * @param array $operations
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setOperations($operations)
     {
@@ -50,6 +52,7 @@ class OneyEntity
         }
 
         $this->operations = $operations;
+
         return $this;
     }
 }

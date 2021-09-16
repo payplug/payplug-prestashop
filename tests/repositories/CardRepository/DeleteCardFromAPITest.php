@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -30,6 +30,9 @@ namespace PayPlug\tests\repositories\CardRepository;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class DeleteCardFromAPITest extends BaseCardRepository
 {
@@ -49,24 +52,26 @@ final class DeleteCardFromAPITest extends BaseCardRepository
         yield [null];
         yield [false];
         yield [42];
-        yield [['key'=>'value']];
+        yield [['key' => 'value']];
     }
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $id_customer
      * @param $id_payplug_card
+     * @param mixed $id_card
      */
     public function testWithInvalidParams($id_card)
     {
         $this->assertFalse($this->repo->deleteCardFromAPI($id_card));
     }
 
-
     public function testWhenAPIThrowingConfigurationNotSetException()
     {
         $this->card->shouldReceive('delete')
-            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occurred', 500);
+            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occurred', 500)
+        ;
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));
     }
@@ -74,7 +79,8 @@ final class DeleteCardFromAPITest extends BaseCardRepository
     public function testWhenAPIThrowingNotFoundException()
     {
         $this->card->shouldReceive('delete')
-            ->andThrow('Payplug\Exception\NotFoundException', 'Card not found', 404);
+            ->andThrow('Payplug\Exception\NotFoundException', 'Card not found', 404)
+        ;
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));
     }
@@ -84,9 +90,9 @@ final class DeleteCardFromAPITest extends BaseCardRepository
         $this->card->shouldReceive([
             'delete' => [
                 'httpResponse' => [
-                    'object' => 'error'
-                ]
-            ]
+                    'object' => 'error',
+                ],
+            ],
         ]);
 
         $this->assertFalse($this->repo->deleteCardFromAPI($this->id_card));
@@ -97,9 +103,9 @@ final class DeleteCardFromAPITest extends BaseCardRepository
         $this->card->shouldReceive([
             'delete' => [
                 'httpResponse' => [
-                    'object' => 'success'
-                ]
-            ]
+                    'object' => 'success',
+                ],
+            ],
         ]);
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));

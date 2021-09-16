@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -36,6 +36,7 @@ class TranslationsRepository extends Repository
 
     /**
      * @description
+     *
      * @return self
      */
     public static function factory()
@@ -45,7 +46,9 @@ class TranslationsRepository extends Repository
 
     /**
      * @description Return trnaslation for index
+     *
      * @param $id
+     *
      * @return bool|mixed
      */
     public function translate($id)

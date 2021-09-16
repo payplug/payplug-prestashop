@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\specific;
 
+use OrderState;
 use PayPlug\src\interfaces\OrderStateInterface;
-use \OrderState;
 
 class OrderStateSpecific implements OrderStateInterface
 {
@@ -33,6 +33,7 @@ class OrderStateSpecific implements OrderStateInterface
     public function __construct($id = null)
     {
         $this->orderState = new OrderState($id);
+
         return $this;
     }
 
@@ -55,8 +56,8 @@ class OrderStateSpecific implements OrderStateInterface
     {
         if (method_exists($this->orderState, 'softDelete')) {
             return $this->orderState->softDelete();
-        } else {
-            return $this->delete();
         }
+
+        return $this->delete();
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -34,6 +34,9 @@ use PayPlug\tests\mock\OneySimulationsMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneySimulationsTest extends BaseOneyRepository
 {
@@ -42,7 +45,7 @@ final class GetOneySimulationsTest extends BaseOneyRepository
     protected $amount = [
         'lower' => 99,
         'upper' => 3001,
-        'default' => 500
+        'default' => 500,
     ];
     protected $iso = 'FR';
     protected $operation = 'x3_with_fees';
@@ -59,12 +62,14 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_SANDBOX_MODE')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
 
         $this->logger
             ->shouldReceive([
-                'setParams' => true
-            ]);
+                'setParams' => true,
+            ])
+        ;
 
         $this->simulations = OneySimulationsMock::get()[$this->operation];
     }
@@ -75,14 +80,15 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => false,
-                    'message' => 'set cacheKey error message'
-                ]
-            ]);
+                    'message' => 'set cacheKey error message',
+                ],
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'set cacheKey error message'
+                'error' => 'set cacheKey error message',
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
@@ -94,18 +100,19 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
-                    'message' => 'Success'
+                    'message' => 'Success',
                 ],
                 'getCacheByKey' => [
                     'result' => OneySimulationsMock::getFromCache(),
-                    'message' => 'Success'
-                ]
-            ]);
+                    'message' => 'Success',
+                ],
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => true,
-                'simulations' => OneySimulationsMock::get()
+                'simulations' => OneySimulationsMock::get(),
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
@@ -117,22 +124,24 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
-                    'message' => 'Success'
+                    'message' => 'Success',
                 ],
                 'getCacheByKey' => [
                     'result' => false,
-                    'message' => 'No cache found'
-                ]
-            ]);
+                    'message' => 'No cache found',
+                ],
+            ])
+        ;
 
         $this->oneyMock->shouldReceive('getSimulations')
-            ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403);
+            ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403)
+        ;
 
         $this->assertSame(
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
             [
                 'result' => false,
-                'error' => 'Payplug\Exception\HttpException: [0]: Forbidden method; HTTP Response: 403'
+                'error' => 'Payplug\Exception\HttpException: [0]: Forbidden method; HTTP Response: 403',
             ]
         );
 
@@ -145,26 +154,28 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
-                    'message' => 'Success'
+                    'message' => 'Success',
                 ],
                 'getCacheByKey' => [
                     'result' => false,
-                    'message' => 'No cache found'
-                ]
-            ]);
+                    'message' => 'No cache found',
+                ],
+            ])
+        ;
 
         $this->oneyMock
             ->shouldReceive([
                 'getSimulations' => [
                     'object' => 'error',
-                    'message' => 'error while getting simulations'
-                ]
-            ]);
+                    'message' => 'error while getting simulations',
+                ],
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'error while getting simulations'
+                'error' => 'error while getting simulations',
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
@@ -176,26 +187,28 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
-                    'message' => 'Success'
+                    'message' => 'Success',
                 ],
                 'getCacheByKey' => [
                     'result' => false,
-                    'message' => 'No cache found'
+                    'message' => 'No cache found',
                 ],
-                'setCache' => false
-            ]);
+                'setCache' => false,
+            ])
+        ;
 
         $this->oneyMock
             ->shouldReceive([
-                'getSimulations' => $this->simulations
-            ]);
+                'getSimulations' => $this->simulations,
+            ])
+        ;
 
         ksort($this->simulations);
 
         $this->assertSame(
             [
                 'result' => true,
-                'simulations' => $this->simulations
+                'simulations' => $this->simulations,
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
@@ -208,26 +221,28 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
-                    'message' => 'Success'
+                    'message' => 'Success',
                 ],
                 'getCacheByKey' => [
                     'result' => false,
-                    'message' => 'No cache found'
+                    'message' => 'No cache found',
                 ],
-                'setCache' => true
-            ]);
+                'setCache' => true,
+            ])
+        ;
 
         $this->oneyMock
             ->shouldReceive([
-                'getSimulations' => $this->simulations
-            ]);
+                'getSimulations' => $this->simulations,
+            ])
+        ;
 
         ksort($this->simulations);
 
         $this->assertSame(
             [
                 'result' => true,
-                'simulations' => $this->simulations
+                'simulations' => $this->simulations,
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );

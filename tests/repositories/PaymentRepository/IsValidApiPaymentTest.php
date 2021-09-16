@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,34 +26,40 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 
 use PayPlug\tests\mock\PaymentMock;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 final class IsValidApiPaymentTest extends BasePaymentRepository
 {
     /**
-     * Parameters to test method with empty $paiementDetails
+     * Parameters to test method with empty $paiementDetails.
      *
      * @return \Generator
      */
     public function invalidDataProvider()
     {
         yield [null, 'paymentDetails: null'];
-        yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
+        yield [[(string) 'I am a string!'], 'paymentDetails: ["I am a string!"]'];
         yield [['cartId' => null], 'paymentDetails: {"cartId":null}'];
         yield [['cartId' => 'string'], 'paymentDetails: {"cartId":null}'];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
+     * Test methods with nulled $paiementDetails.
      *
      * @dataProvider invalidDataProvider
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->isValidApiPayment($parameter),
@@ -67,18 +73,20 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             ->shouldReceive([
                 'checkPaymentTable' => [
                     'payment_method' => 'standard',
-                    'id_payment' => 1
-                ]
-            ]);
+                    'id_payment' => 1,
+                ],
+            ])
+        ;
 
         $this->paymentApi
             ->shouldReceive([
-                'retrieve' => PaymentMock::getStandard()
-            ]);
+                'retrieve' => PaymentMock::getStandard(),
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->isValidApiPayment(['cartId' => 1])['response'],
-            "Valid API payment/installment"
+            'Valid API payment/installment'
         );
     }
 
@@ -88,12 +96,14 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             ->shouldReceive([
                 'checkPaymentTable' => [
                     'payment_method' => 'standard',
-                    'id_payment' => 1
-                ]
-            ]);
+                    'id_payment' => 1,
+                ],
+            ])
+        ;
 
         $this->paymentApi
             ->shouldReceive(['retrieve' => mt_rand()])
-            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400);
+            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400)
+        ;
     }
 }

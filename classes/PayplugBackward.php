@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -31,15 +30,17 @@ class PayplugBackward
     {
         if (version_compare(_PS_VERSION_, '1.5', '>=') && $global) {
             return Configuration::updateGlobalValue($key, $value);
-        } elseif (version_compare(_PS_VERSION_, '1.5', '>=') && !$global) {
+        }
+        if (version_compare(_PS_VERSION_, '1.5', '>=') && !$global) {
             //don't cast in int beacause Prestashop need to get null value for global settings
             $id_shop_group = Shop::getContextShopGroupID();
             //don't cast in int beacause Prestashop need to get null value for global settings
             $id_shop = Shop::getContextShopID();
+
             return Configuration::updateValue($key, $value, false, $id_shop_group, $id_shop);
-        } else {
-            return Configuration::updateValue($key, $value);
         }
+
+        return Configuration::updateValue($key, $value);
     }
 
     public static function getConfiguration($key, $global = false)
@@ -51,6 +52,7 @@ class PayplugBackward
             $id_shop_group = Shop::getContextShopGroupID();
             //don't cast in int beacause Prestashop need to get null value for global settings
             $id_shop = Shop::getContextShopID();
+
             return Configuration::get($key, null, $id_shop_group, $id_shop);
         } else {
             $value = Configuration::get($key);
@@ -88,7 +90,7 @@ class PayplugBackward
         $id_shop = null,
         $relative_protocol = false
     ) {
-        $url = Context::getContext()->link->getModuleLink(
+        return Context::getContext()->link->getModuleLink(
             $module,
             $controller,
             $params,
@@ -97,13 +99,13 @@ class PayplugBackward
             $id_shop,
             $relative_protocol
         );
-        return $url;
     }
 
     /**
      * @param bool $id_gender
      * @param bool $id_lang
-     * @return string|null
+     *
+     * @return null|string
      */
     public static function getCustomerGender($id_gender = false, $id_lang = false)
     {
@@ -111,10 +113,11 @@ class PayplugBackward
             return null;
         }
         if (!$id_lang) {
-            $id_lang = (int)PayplugBackward::getConfiguration('PS_LANG_DEFAULT');
+            $id_lang = (int) PayplugBackward::getConfiguration('PS_LANG_DEFAULT');
         }
 
         $gender = new Gender($id_gender, $id_lang);
+
         return Validate::isLoadedObject($gender) ? $gender->name : null;
     }
 
@@ -124,32 +127,48 @@ class PayplugBackward
             switch ($field['type']) {
                 case 'int':
                     $field['type'] = ObjectModel::TYPE_INT;
+
                     break;
+
                 case 'bool':
                     $field['type'] = ObjectModel::TYPE_BOOL;
+
                     break;
+
                 case 'float':
                     $field['type'] = ObjectModel::TYPE_FLOAT;
+
                     break;
+
                 case 'date':
                     $field['type'] = ObjectModel::TYPE_DATE;
+
                     break;
+
                 case 'html':
                     $field['type'] = ObjectModel::TYPE_HTML;
+
                     break;
+
                 case 'nothing':
                     $field['type'] = ObjectModel::TYPE_NOTHING;
+
                     break;
+
                 case 'sql':
                     $field['type'] = ObjectModel::TYPE_SQL;
+
                     break;
+
                 case 'string':
                 default:
                     $field['type'] = ObjectModel::TYPE_STRING;
+
                     break;
             }
         }
         $object::$definition = $props;
+
         return $object;
     }
 }

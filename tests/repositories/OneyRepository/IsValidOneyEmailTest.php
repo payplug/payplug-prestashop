@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class IsValidOneyEmailTest extends BaseOneyRepository
 {
@@ -92,12 +95,12 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
 
     public function testWithForbiddenChar()
     {
-        $error_email = 'test+' . $this->email;
+        $error_email = 'test+'.$this->email;
         $response = $this->repo->isValidOneyEmail($error_email);
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'The + character is not valid. Please change your email address (100 characters max).'
+                'message' => 'The + character is not valid. Please change your email address (100 characters max).',
             ],
             $response
         );
@@ -107,7 +110,7 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
     {
         $max_lenght = 100;
         $error_email = '';
-        for ($i=0;$i<$max_lenght;$i++) {
+        for ($i = 0; $i < $max_lenght; ++$i) {
             $error_email .= 'a';
         }
         $error_email .= $this->email;
@@ -115,7 +118,7 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Your email address is too long. Please change your email address (100 characters max).'
+                'message' => 'Your email address is too long. Please change your email address (100 characters max).',
             ],
             $response
         );
@@ -125,15 +128,15 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
     {
         $max_lenght = 100;
         $error_email = '';
-        for ($i=0;$i<$max_lenght;$i++) {
+        for ($i = 0; $i < $max_lenght; ++$i) {
             $error_email .= 'a';
         }
-        $error_email .= '+' . $this->email;
+        $error_email .= '+'.$this->email;
         $response = $this->repo->isValidOneyEmail($error_email);
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).'
+                'message' => 'Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).',
             ],
             $response
         );

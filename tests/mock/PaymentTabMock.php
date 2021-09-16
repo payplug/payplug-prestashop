@@ -12,6 +12,7 @@ class PaymentTabMock
     public static function getInstallment()
     {
         $tab = self::getRaw();
+
         return array_merge(
             $tab,
             [
@@ -19,18 +20,18 @@ class PaymentTabMock
                     'schedule' => [
                         0 => [
                             'date' => 'TODAY',
-                            'amount' => 9280
+                            'amount' => 9280,
                         ],
                         1 => [
                             'date' => '2021-04-15',
-                            'amount' => 9280
+                            'amount' => 9280,
                         ],
                         2 => [
                             'date' => '2021-05-15',
-                            'amount' => 9280
-                        ]
-                    ]
-                ]
+                            'amount' => 9280,
+                        ],
+                    ],
+                ],
             ]
         );
     }

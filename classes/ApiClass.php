@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -23,10 +23,9 @@
 
 namespace PayPlug\classes;
 
-use Authentication;
 use Configuration;
-use Payplug\Core\HttpClient;
 use Payplug;
+use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use PayPlug\src\exceptions\BadParameterException;
@@ -35,9 +34,8 @@ use Tools;
 
 class ApiClass extends \PaymentModule
 {
-
     /**
-     * var Plugin
+     * var Plugin.
      */
     public $plugin;
 
@@ -58,7 +56,7 @@ class ApiClass extends \PaymentModule
         $this->plugin = new PluginRepository();
         $this->setEnvironment();
         self::setSecretKey();
-        $this->current_api_key =  self::getCurrentApiKey();
+        $this->current_api_key = self::getCurrentApiKey();
         $this->setUserAgent();
     }
 
@@ -66,14 +64,17 @@ class ApiClass extends \PaymentModule
      * @description Check if account is premium
      *
      * @param string $api_key
+     *
+     * @throws ConfigurationException|Payplug\Exception\ConfigurationNotSetException
+     *
      * @return bool
-     * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
      */
     public static function getAccountPermissions($api_key = null)
     {
-        if ($api_key == null) {
+        if (null == $api_key) {
             $api_key = self::setAPIKey();
         }
+
         return self::getAccount($api_key, false);
     }
 
@@ -81,9 +82,11 @@ class ApiClass extends \PaymentModule
      * @description Get account permission from Payplug API
      *
      * @param string $api_key
-     * @param boolean $sandbox
-     * @return array | bool
-     * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
+     * @param bool   $sandbox
+     *
+     * @throws ConfigurationException|Payplug\Exception\ConfigurationNotSetException
+     *
+     * @return array|bool
      */
     public static function getAccount($api_key, $sandbox = true)
     {
@@ -92,21 +95,214 @@ class ApiClass extends \PaymentModule
         $json_answer = $response['httpResponse'];
         if ($permissions = self::treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getCurrentApiKey()
+    {
+        if (1 === (int) Configuration::get('PAYPLUG_SANDBOX_MODE')) {
+            return Configuration::get('PAYPLUG_TEST_API_KEY');
+        }
+
+        return Configuration::get('PAYPLUG_LIVE_API_KEY');
+    }
+
+    /**
+     * Determine wich API key to use.
+     *
+     * @return string
+     */
+    public static function setAPIKey()
+    {
+        $sandbox_mode = (int) Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $valid_key = null;
+        if ($sandbox_mode) {
+            $valid_key = Configuration::get('PAYPLUG_TEST_API_KEY');
         } else {
+            $valid_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        }
+
+        return $valid_key;
+    }
+
+    /**
+     * @param string $api_url
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setApiUrl($api_url)
+    {
+        if (!is_string($api_url)
+            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
+            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
+        }
+        $this->api_url = $api_url;
+
+        return $this;
+    }
+
+    /**
+     * @description Set the current secret key used to interact with PayPlug API
+     *
+     * @param bool $token
+     *
+     * @throws ConfigurationException
+     *
+     * @return Payplug\Payplug
+     */
+    public static function setSecretKey($token = false)
+    {
+        if (!$token && null != self::getCurrentApiKey()) {
+            $token = self::getCurrentApiKey();
+        }
+
+        if (!$token) {
             return false;
         }
+
+        return \Payplug\Payplug::init([
+            'secretKey' => $token,
+            'apiVersion' => '2019-08-06',
+        ]);
+    }
+
+    public function initializeApi($sandbox = null)
+    {
+        if (null === $sandbox) {
+            $payplug_key = $this->current_api_key;
+        } else {
+            $payplug_key = Configuration::get('PAYPLUG_'.($sandbox ? 'TEST' : 'LIVE').'_API_KEY');
+        }
+
+        try {
+            \Payplug\Payplug::init([
+                'secretKey' => $payplug_key,
+                'apiVersion' => (new PluginRepository())->getEntity()->getApiVersion(),
+            ]);
+
+            return $payplug_key;
+        } catch (Exception $e) {
+            // todo: return error log
+            return false;
+        }
+    }
+
+    /**
+     * Return exeption error form API.
+     *
+     * @param $str
+     *
+     * @return array
+     */
+    public function catchErrorsFromApi($str)
+    {
+        $parses = explode(';', $str);
+        $response = null;
+        foreach ($parses as $parse) {
+            if (false !== strpos($parse, 'HTTP Response')) {
+                $parse = str_replace('HTTP Response:', '', $parse);
+                $parse = trim($parse);
+                $response = json_decode($parse, true);
+            }
+        }
+
+        $errors = [];
+        $errors[] = $str;
+        if (!isset($response['details']) || empty($response['details'])) {
+            // set a default error message
+            $error_key = md5('The transaction was not completed and your card was not charged.');
+            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+
+            return $errors;
+        }
+
+        $keys = array_keys($response['details']);
+        foreach ($keys as $key) {
+            // add specific error message
+            switch ($key) {
+                default:
+                    $error_key = md5('The transaction was not completed and your card was not charged.');
+                    // push error only if not catched before
+                    if (!array_key_exists($error_key, $errors)) {
+                        $errors[$error_key] =
+                            $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+                    }
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function hasLiveKey()
+    {
+        return (bool) Configuration::get('PAYPLUG_LIVE_API_KEY');
+    }
+
+    /**
+     * login to Payplug API.
+     *
+     * @param string $email
+     * @param string $password
+     *
+     * @throws BadRequestException
+     *
+     * @return bool
+     */
+    public function login($email, $password)
+    {
+        try {
+            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+
+            $json_answer = $response['httpResponse'];
+            if ($this->setApiKeysbyJsonResponse($json_answer)) {
+                return true;
+            }
+
+            return false;
+        } catch (BadRequestException $e) {
+            json_encode([
+                'content' => null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return $this->api_url;
+    }
+
+    public function getSiteUrl()
+    {
+        return $this->site_url;
     }
 
     /**
      * @description Read API response and return permissions
      *
      * @param string $json_answer
-     * @param bool $is_sandbox
+     * @param bool   $is_sandbox
+     *
      * @return array OR bool
      */
     private static function treatAccountResponse($json_answer, $is_sandbox = true)
     {
-        if ((isset($json_answer['object']) && $json_answer['object'] == 'error')
+        if ((isset($json_answer['object']) && 'error' == $json_answer['object'])
             || empty($json_answer)
         ) {
             return false;
@@ -136,7 +332,7 @@ class ApiClass extends \PaymentModule
                 && !empty($json_answer['configuration']['min_amounts'])) {
                 $configuration['min_amounts'] = '';
                 foreach ($json_answer['configuration']['min_amounts'] as $key => $value) {
-                    $configuration['min_amounts'] .= $key . ':' . $value . ';';
+                    $configuration['min_amounts'] .= $key.':'.$value.';';
                 }
                 $configuration['min_amounts'] = Tools::substr($configuration['min_amounts'], 0, -1);
             }
@@ -145,7 +341,7 @@ class ApiClass extends \PaymentModule
                 && !empty($json_answer['configuration']['max_amounts'])) {
                 $configuration['max_amounts'] = '';
                 foreach ($json_answer['configuration']['max_amounts'] as $key => $value) {
-                    $configuration['max_amounts'] .= $key . ':' . $value . ';';
+                    $configuration['max_amounts'] .= $key.':'.$value.';';
                 }
                 $configuration['max_amounts'] = Tools::substr($configuration['max_amounts'], 0, -1);
             }
@@ -157,7 +353,7 @@ class ApiClass extends \PaymentModule
                 ) {
                     $allowed = '';
                     foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
-                        $allowed .= $country . ',';
+                        $allowed .= $country.',';
                     }
                     $configuration['oney_allowed_countries'] = Tools::substr($allowed, 0, -1);
                 }
@@ -167,7 +363,7 @@ class ApiClass extends \PaymentModule
                 ) {
                     $configuration['oney_min_amounts'] = '';
                     foreach ($json_answer['configuration']['oney']['min_amounts'] as $key => $value) {
-                        $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
+                        $configuration['oney_min_amounts'] .= $key.':'.$value.';';
                     }
                     $configuration['oney_min_amounts'] = Tools::substr($configuration['oney_min_amounts'], 0, -1);
                 }
@@ -177,7 +373,7 @@ class ApiClass extends \PaymentModule
                 ) {
                     $configuration['oney_max_amounts'] = '';
                     foreach ($json_answer['configuration']['oney']['max_amounts'] as $key => $value) {
-                        $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
+                        $configuration['oney_max_amounts'] .= $key.':'.$value.';';
                     }
                     $configuration['oney_max_amounts'] = Tools::substr($configuration['oney_max_amounts'], 0, -1);
                 }
@@ -201,7 +397,7 @@ class ApiClass extends \PaymentModule
         // Get company country
         $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
 
-        Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
+        Configuration::updateValue('PAYPLUG_COMPANY_ID'.($is_sandbox ? '_TEST' : ''), $id);
         Configuration::updateValue('PAYPLUG_COMPANY_ISO', $company_iso);
         Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
         Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
@@ -214,45 +410,17 @@ class ApiClass extends \PaymentModule
     }
 
     /**
-     * @return string
-     */
-    public static function getCurrentApiKey()
-    {
-        if ((int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 1) {
-            return Configuration::get('PAYPLUG_TEST_API_KEY');
-        } else {
-            return Configuration::get('PAYPLUG_LIVE_API_KEY');
-        }
-    }
-
-    /**
-     * Determine wich API key to use
-     *
-     * @return string
-     */
-    public static function setAPIKey()
-    {
-        $sandbox_mode = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
-        $valid_key = null;
-        if ($sandbox_mode) {
-            $valid_key = Configuration::get('PAYPLUG_TEST_API_KEY');
-        } else {
-            $valid_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        }
-
-        return $valid_key;
-    }
-
-    /**
-     * Register API Keys
+     * Register API Keys.
      *
      * @param string $json_answer
-     * @return bool
+     *
      * @throws ConfigurationException
+     *
+     * @return bool
      */
     private function setApiKeysbyJsonResponse($json_answer)
     {
-        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+        if (isset($json_answer['object']) && 'error' == $json_answer['object']) {
             return false;
         }
 
@@ -282,9 +450,7 @@ class ApiClass extends \PaymentModule
     }
 
     /**
-     * Determine witch environment is used
-     *
-     * @return void
+     * Determine witch environment is used.
      */
     private function setEnvironment()
     {
@@ -302,168 +468,16 @@ class ApiClass extends \PaymentModule
     }
 
     /**
-     * @param string $api_url
-     * @return self
-     * @throws BadParameterException
-     */
-    public function setApiUrl($api_url)
-    {
-        if (!is_string($api_url)
-            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
-            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
-        }
-        $this->api_url = $api_url;
-        return $this;
-    }
-    /**
-     * @description Set the current secret key used to interact with PayPlug API
-     *
-     * @param bool $token
-     * @return Payplug\Payplug
-     * @throws ConfigurationException
-     */
-    public static function setSecretKey($token = false)
-    {
-        if (!$token && self::getCurrentApiKey() != null) {
-            $token = self::getCurrentApiKey();
-        }
-
-        if (!$token) {
-            return false;
-        }
-
-        return \Payplug\Payplug::init([
-            'secretKey' => $token,
-            'apiVersion' => '2019-08-06'
-        ]);
-    }
-
-    /**
-     * Set the user-agent referenced in every API call to identify the module
-     *
-     * @return void
+     * Set the user-agent referenced in every API call to identify the module.
      */
     private function setUserAgent()
     {
-        if ($this->current_api_key != null) {
+        if (null != $this->current_api_key) {
             HttpClient::setDefaultUserAgentProduct(
                 'PayPlug-Prestashop',
                 $this->version,
-                'Prestashop/' . _PS_VERSION_
+                'Prestashop/'._PS_VERSION_
             );
         }
-    }
-
-    public function initializeApi($sandbox = null)
-    {
-        if ($sandbox === null) {
-            $payplug_key = $this->current_api_key;
-        } else {
-            $payplug_key = Configuration::get('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
-        }
-
-        try {
-            \Payplug\Payplug::init([
-                'secretKey' => $payplug_key,
-                'apiVersion' => (new PluginRepository())->getEntity()->getApiVersion()
-            ]);
-
-            return $payplug_key;
-        } catch (Exception $e) {
-            // todo: return error log
-            return false;
-        }
-    }
-
-    /**
-     * Return exeption error form API
-     * @param $str
-     * @return array
-     */
-    public function catchErrorsFromApi($str)
-    {
-        $parses = explode(';', $str);
-        $response = null;
-        foreach ($parses as $parse) {
-            if (strpos($parse, 'HTTP Response') !== false) {
-                $parse = str_replace('HTTP Response:', '', $parse);
-                $parse = trim($parse);
-                $response = json_decode($parse, true);
-            }
-        }
-
-        $errors = [];
-        $errors[] = $str;
-        if (!isset($response['details']) || empty($response['details'])) {
-            // set a default error message
-            $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
-            return $errors;
-        }
-
-        $keys = array_keys($response['details']);
-        foreach ($keys as $key) {
-            // add specific error message
-            switch ($key) {
-                default:
-                    $error_key = md5('The transaction was not completed and your card was not charged.');
-                    // push error only if not catched before
-                    if (!array_key_exists($error_key, $errors)) {
-                        $errors[$error_key] =
-                            $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
-                    }
-            }
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function hasLiveKey()
-    {
-        return (bool)Configuration::get('PAYPLUG_LIVE_API_KEY');
-    }
-
-    /**
-     * login to Payplug API
-     *
-     * @param string $email
-     * @param string $password
-     * @return bool
-     * @throws BadRequestException
-     */
-    public function login($email, $password)
-    {
-        try {
-            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
-
-            $json_answer = $response['httpResponse'];
-            if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (BadRequestException $e) {
-            json_encode([
-                'content' => null,
-                'error' => $e->getMessage()
-            ]);
-            return false;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getApiUrl()
-    {
-        return $this->api_url;
-    }
-
-    public function getSiteUrl()
-    {
-        return $this->site_url;
     }
 }
