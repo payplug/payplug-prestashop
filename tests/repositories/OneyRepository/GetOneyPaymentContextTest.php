@@ -139,13 +139,13 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
                         'merchant_item_id' => 5,
                         'name' => 'Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun
                 Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours 
-                brun Coussin ours brun Coussin',
+                brun Coussin ours brun C',
                         'price' => 2268,
                         'quantity' => 1,
                         'total_amount' => 2268,
                         'brand' => 'Studio Design Studio DesignStudio DesignStudio Design Studio Design Studio Design
                  Studio Design Studio Design Studio Design Studio Design Studio Design Studio Design Studio Design Studio 
-                 Design Studio Design Studio Design',
+                 Design Studio Design Studio ',
                         'delivery_label' => 'Carrier name',
                         'expected_delivery_date' => date('Y-m-d'),
                         'delivery_type' => 'storepickup',
