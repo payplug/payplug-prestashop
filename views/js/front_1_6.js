@@ -85,7 +85,7 @@ var $document,
                 var $submitOneClick = $('input[name=SubmitPayplugOneClick]');
 
                 $.ajax({
-                    url: url + '?rand=' + new Date().getTime(),
+                    url: url + '?timestamp=' + new Date().getTime(),
                     headers: {"cache-control": "no-cache"},
                     type: 'POST',
                     async: true,
@@ -216,7 +216,7 @@ var $document,
                 var data = {_ajax: 1, getPaymentErrors: 1};
 
                 $.ajax({
-                    url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                    url: payplug_ajax_url + '?timestamp=' + new Date().getTime(),
                     headers: {"cache-control": "no-cache"},
                     type: 'POST',
                     async: true,
@@ -321,7 +321,7 @@ var $document,
                 oney.cleanQueries();
 
                 var query = $.ajax({
-                    url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                    url: payplug_ajax_url + '?timestamp=' + new Date().getTime(),
                     headers: {"cache-control": "no-cache"},
                     type: 'POST',
                     async: true,
@@ -536,7 +536,7 @@ var $document,
                     }
 
                     $.ajax({
-                        url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                        url: payplug_ajax_url + '?timestamp=' + new Date().getTime(),
                         headers: {"cache-control": "no-cache"},
                         type: 'POST',
                         async: true,
@@ -744,7 +744,7 @@ var $document,
                         $('.oneyRequired_message').removeClass('-success').removeClass('-error');
 
                         $.ajax({
-                            url: payplug_ajax_url + '?rand=' + new Date().getTime(),
+                            url: payplug_ajax_url + '?timestamp=' + new Date().getTime(),
                             headers: {"cache-control": "no-cache"},
                             type: 'POST',
                             async: true,
