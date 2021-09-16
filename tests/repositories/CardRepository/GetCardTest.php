@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\CardRepository;
 
+use PayPlug\tests\mock\PayPlugCardMock;
+
 /**
  * @group unit
  * @group repository
@@ -31,50 +33,23 @@ namespace PayPlug\tests\repositories\CardRepository;
  *
  * @runTestsInSeparateProcesses
  */
-final class GetCardIdTest extends BaseCardRepository
+final class GetCardTest extends BaseCardRepository
 {
-    private $customerId;
-    private $payplugCardId;
-    private $companyId;
-    private $cards;
+    private $payplug_card;
 
     public function setUp()
     {
         parent::setUp();
-
-        $this->customerId = 42;
-        $this->payplugCardId = 'pay_id';
-        $this->companyId = 123;
-        $this->cards = [[
-            'id_card' => 42,
-            'last4' => 4242,
-            'country' => 'FR',
-            'exp_year' => 2023,
-            'exp_month' => 03,
-            'brand' => 'Visa',
-            'id_payplug_card' => 2
-        ]];
+        $this->payplug_card = PayPlugCardMock::get();
     }
 
     public function invalidDataProvider()
     {
-        // invalid int $customerId
-        yield [null, 'I am a string!', 42];
-        yield [false, 'I am a string!', 42];
-        yield ['I am a string!', 'I am a string!', 42];
-        yield [['key'=>'value'], 'I am a string!', 42];
-
-        // invalid string $payplugCardId
-        yield [42, null, 42];
-        yield [42, false, 42];
-        yield [42, 42, 42];
-        yield [42, ['key'=>'value'], 42];
-
-        // invalid int $companyId
-        yield [42, 'I am a string!', null];
-        yield [42, 'I am a string!', false];
-        yield [42, 'I am a string!', 'I am a string!'];
-        yield [42, 'I am a string!', ['key'=>'value']];
+        // invalid int $payplugCardId
+        yield [null];
+        yield [false];
+        yield ['wrong parameter'];
+        yield [['key'=>'value']];
     }
 
     /**
@@ -83,9 +58,9 @@ final class GetCardIdTest extends BaseCardRepository
      * @param $payplugCardId
      * @param $companyId
      */
-    public function testWithInvalidParams($customerId, $payplugCardId, $companyId)
+    public function testWithInvalidParams($payplugCardId)
     {
-        $this->assertFalse($this->repo->getCardId($customerId, $payplugCardId, $companyId));
+        $this->assertFalse($this->repo->getCard($payplugCardId));
     }
 
     public function testWhenDataBaseThrowingException()
@@ -102,7 +77,7 @@ final class GetCardIdTest extends BaseCardRepository
             ->shouldReceive('build')
             ->andThrow('Exception', 'Build method throw exception', 500);
 
-        $this->assertFalse($this->repo->getCardId($this->customerId, $this->payplugCardId, $this->companyId));
+        $this->assertFalse($this->repo->getCard($this->payplug_card['id_payplug_card']));
     }
 
     public function testWithoutCardsFound()
@@ -116,10 +91,10 @@ final class GetCardIdTest extends BaseCardRepository
                 'build' => []
             ]);
 
-        $this->assertFalse($this->repo->getCardId($this->customerId, $this->payplugCardId, $this->companyId));
+        $this->assertFalse($this->repo->getCard($this->payplug_card['id_payplug_card']));
     }
 
-    public function testWithCardsFound()
+    public function testWithCardFound()
     {
         $this->query
             ->shouldReceive([
@@ -127,12 +102,12 @@ final class GetCardIdTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => $this->cards
+                'build' => [$this->payplug_card]
             ]);
 
         $this->assertSame(
-            42,
-            $this->repo->getCardId($this->customerId, $this->payplugCardId, $this->companyId)
+            $this->payplug_card,
+            $this->repo->getCard($this->payplug_card['id_payplug_card'])
         );
     }
 }

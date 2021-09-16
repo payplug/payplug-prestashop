@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\CardRepository;
 
 /**
- * @group dev
  * @group unit
  * @group repository
  * @group card_repository

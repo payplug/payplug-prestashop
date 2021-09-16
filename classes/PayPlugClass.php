@@ -2511,9 +2511,11 @@ class PayPlugClass extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $options['id_card'] && $options['id_card'] != 'new_card' ?
-                $this->card->getCardId((int)$cart->id_customer, $options['id_card'], $config['company'])
-                : null;
+            $payment_tab['payment_method'] = null;
+            if ($options['id_card'] && $options['id_card'] != 'new_card') {
+                $card = $this->card->getCard($options['id_card']);
+                $payment_tab['payment_method'] = $card['id_card'];
+            }
         }
 
         // check payment tab from current payment method
@@ -3757,7 +3759,7 @@ class PayPlugClass extends PaymentModule
                 foreach ($cards as $card) {
                     $id_customer = $card['id_customer'];
                     $id_payplug_card = $card['id_payplug_card'];
-                    if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
+                    if (!$this->card->deleteCard((int)$id_customer, (int)$id_payplug_card)) {
                         return false;
                     }
                 }
