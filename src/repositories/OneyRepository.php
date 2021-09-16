@@ -558,12 +558,12 @@ class OneyRepository extends Repository
 
             $item = [
                 'merchant_item_id' => $product['id_product'],
-                'name' =>  substr($productName, 0, 256),
+                'name' =>  substr($productName, 0, 250),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
-                    substr($product['manufacturer_name'], 0, 256) :
+                    substr($product['manufacturer_name'], 0, 250) :
                     $this->configurationSpecific->get('PS_SHOP_NAME')
             ];
 
