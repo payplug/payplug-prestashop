@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\CardRepository;
 
+use PayPlug\tests\mock\PayPlugCardMock;
+
 /**
  * @group unit
  * @group repository
@@ -33,36 +35,28 @@ namespace PayPlug\tests\repositories\CardRepository;
  */
 final class DeleteCardTest extends BaseCardRepository
 {
-    private $id_customer;
-    private $id_card;
-    private $id_payplug_card;
-    private $card;
+    private $payplug_card;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->id_customer = 42;
-        $this->id_card = 123;
-        $this->id_payplug_card = 'pay_id';
-        $this->card = \Mockery::mock('alias:Payplug\Card');
+        $this->payplug_card = PayPlugCardMock::get();
     }
 
     public function invalidDataProvider()
     {
-        $object = new \stdClass();
+        // invalid int $id_customer
+        yield [null, 42];
+        yield [false, 42];
+        yield ['I am a string!', 42];
+        yield [['key'=>'value'], 42];
 
-        yield [null, null];
-        yield ['I am a string!', null];
-        yield ['I am a string!', 'I am a string!'];
-        yield ['I am a string!', 123];
-        yield ['I am a string!', $object];
-        yield ['I am a string!', ['wrong_parameters' => 'value']];
-        yield [null, ['wrong_parameters' => 'value']];
-        yield ['I am a string!', ['wrong_parameters' => 'value']];
-        yield [123, ['wrong_parameters' => 'value']];
-        yield [$object, ['wrong_parameters' => 'value']];
-        yield [['wrong_parameters' => 'value'], ['wrong_parameters' => 'value']];
+        // invalid int $id_payplug_card
+        yield [42, null];
+        yield [42, false];
+        yield [42, 'I am a string!'];
+        yield [42, ['key'=>'value']];
     }
 
     /**
@@ -75,74 +69,42 @@ final class DeleteCardTest extends BaseCardRepository
         $this->assertFalse($this->repo->deleteCard($id_customer, $id_payplug_card));
     }
 
-    public function testWhenNoCardIdFound()
+    public function testWhenNoCardFound()
     {
         $this->repo
             ->shouldReceive([
-                'getCardId' => false
+                'getCard' => false
             ]);
 
-        $this->assertTrue($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
+        $this->assertFalse($this->repo->deleteCard(
+            $this->payplug_card['id_customer'],
+            $this->payplug_card['id_payplug_card']
+        ));
     }
 
-    public function testWhenAPIThrowingConfigurationNotSetException()
+    public function testWhenCardNotExpiredAndErrorReturnByAPI()
     {
         $this->repo
             ->shouldReceive([
-                'getCardId' => $this->id_card
+                'getCard' => $this->payplug_card,
+                'isValidExpiration' => true,
+                'deleteCardFromAPI' => false,
             ]);
 
-        $this->card->shouldReceive('delete')
-            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occurred', 500);
-
-        $this->assertTrue($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
-    }
-
-    public function testWhenAPIThrowingNotFoundException()
-    {
-        $this->repo
-            ->shouldReceive([
-                'getCardId' => $this->id_card
-            ]);
-
-        $this->card->shouldReceive('delete')
-            ->andThrow('Payplug\Exception\NotFoundException', 'Card not found', 404);
-
-        $this->assertTrue($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
-    }
-
-    public function testWhenAPIReturnError()
-    {
-        $this->repo
-            ->shouldReceive([
-                'getCardId' => $this->id_card
-            ]);
-
-        $this->card->shouldReceive([
-            'delete' => [
-                'httpResponse' => [
-                    'object' => 'error'
-                ]
-            ]
-        ]);
-
-        $this->assertFalse($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
+        $this->assertFalse($this->repo->deleteCard(
+            $this->payplug_card['id_customer'],
+            $this->payplug_card['id_payplug_card']
+        ));
     }
 
     public function testWhenDeleteCardFromDataBaseThrowingException()
     {
         $this->repo
             ->shouldReceive([
-                'getCardId' => $this->id_card
+                'getCard' => $this->payplug_card,
+                'isValidExpiration' => true,
+                'deleteCardFromAPI' => true,
             ]);
-
-        $this->card->shouldReceive([
-            'delete' => [
-                'httpResponse' => [
-                    'object' => 'success'
-                ]
-            ]
-        ]);
 
         $this->query
             ->shouldReceive([
@@ -155,23 +117,20 @@ final class DeleteCardTest extends BaseCardRepository
             ->shouldReceive('build')
             ->andThrow('Exception', 'Build method throw exception', 500);
 
-        $this->assertFalse($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
+        $this->assertFalse($this->repo->deleteCard(
+            $this->payplug_card['id_customer'],
+            $this->payplug_card['id_payplug_card']
+        ));
     }
 
     public function testWhenCardCantBeDeletedFromDataBase()
     {
         $this->repo
             ->shouldReceive([
-                'getCardId' => $this->id_card
+                'getCard' => $this->payplug_card,
+                'isValidExpiration' => true,
+                'deleteCardFromAPI' => true,
             ]);
-
-        $this->card->shouldReceive([
-            'delete' => [
-                'httpResponse' => [
-                    'object' => 'success'
-                ]
-            ]
-        ]);
 
         $this->query
             ->shouldReceive([
@@ -181,23 +140,20 @@ final class DeleteCardTest extends BaseCardRepository
                 'build' => false
             ]);
 
-        $this->assertFalse($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
+        $this->assertFalse($this->repo->deleteCard(
+            $this->payplug_card['id_customer'],
+            $this->payplug_card['id_payplug_card']
+        ));
     }
 
     public function testWhenCardIsDeletedFromDataBase()
     {
         $this->repo
             ->shouldReceive([
-                'getCardId' => $this->id_card
+                'getCard' => $this->payplug_card,
+                'isValidExpiration' => true,
+                'deleteCardFromAPI' => true,
             ]);
-
-        $this->card->shouldReceive([
-            'delete' => [
-                'httpResponse' => [
-                    'object' => 'success'
-                ]
-            ]
-        ]);
 
         $this->query
             ->shouldReceive([
@@ -207,6 +163,31 @@ final class DeleteCardTest extends BaseCardRepository
                 'build' => true
             ]);
 
-        $this->assertTrue($this->repo->deleteCard($this->id_customer, $this->id_payplug_card));
+        $this->assertTrue($this->repo->deleteCard(
+            $this->payplug_card['id_customer'],
+            $this->payplug_card['id_payplug_card']
+        ));
+    }
+
+    public function testWhenCardExpired()
+    {
+        $this->repo
+            ->shouldReceive([
+                'getCard' => $this->payplug_card,
+                'isValidExpiration' => false,
+            ]);
+
+        $this->query
+            ->shouldReceive([
+                'delete' => $this->query,
+                'from' => $this->query,
+                'where' => $this->query,
+                'build' => true
+            ]);
+
+        $this->assertTrue($this->repo->deleteCard(
+            $this->payplug_card['id_customer'],
+            $this->payplug_card['id_payplug_card']
+        ));
     }
 }

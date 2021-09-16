@@ -67,13 +67,13 @@ class CardRepository extends Repository
     {
         if (!$paymentId || !is_string($paymentId)) {
             $this->logger->addLog('Parameter $paymentId is null or invalid [checkExists]', 'error');
-            $this->logger->addLog('$paymentId: '.json_encode($paymentId), 'debug');
+            $this->logger->addLog('$paymentId: ' . json_encode($paymentId), 'debug');
             return false;
         }
 
         if (!$companyId || !is_int($companyId)) {
             $this->logger->addLog('Parameter $companyId is null or invalid [checkExists]', 'error');
-            $this->logger->addLog('$companyId: '.json_encode($companyId), 'debug');
+            $this->logger->addLog('$companyId: ' . json_encode($companyId), 'debug');
             return false;
         }
 
@@ -119,30 +119,64 @@ class CardRepository extends Repository
         if (!isset($id_customer) ||
             !is_int($id_customer) ||
             !isset($id_payplug_card) ||
-            !is_string($id_payplug_card)
+            !is_int($id_payplug_card)
         ) {
             $this->logger->addLog(
                 'Error:  Bad parameters were passed to [deleteCard] '
-                . '$id_customer: ' . isset($id_customer) ? $id_customer : (''
-                . '$id_payplug_card ' . isset($id_payplug_card) ? $id_payplug_card : '')
+                . '$id_customer: ' . json_encode($id_customer)
+                . '$id_payplug_card ' . json_encode($id_payplug_card)
+            );
+
+            return false;
+        }
+
+        $card = $this->getCard($id_payplug_card);
+
+        if (empty($card)) {
+            $this->logger->addLog(
+                'Error:  No Card found on [deleteCard] with payplug card id given: ' .
+                '$id_payplug_card ' . (isset($id_payplug_card) ? $id_payplug_card : '')
             );
             return false;
         }
 
-        $config = $this->configurationSpecific;
-        $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
-        $id_company = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
-        $id_card = $this->getCardId($id_customer, $id_payplug_card, $id_company);
-        //TODO : addLog avec $id_customer, $id_payplug_card, $id_company, $id_card if uninstall = true
+        if ($this->isValidExpiration((int)$card['exp_month'], (int)$card['exp_year'])) {
+            if (!$this->deleteCardFromAPI($card['id_card'])) {
+                return false;
+            }
+        }
 
-        if (!$id_card) {
-            /*
-             * To prevent Exceptions from API if no card found.
-             *
-             * No log needed, because we are uninstalling
-             * (return true, to continue uninstalling)
-             */
-            return true;
+        $this->query
+            ->delete()
+            ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
+            ->where('id_payplug_card = ' . (int)$id_payplug_card);
+
+        try {
+            if (!$this->query->build()) {
+                $this->logger->addLog('Error occured while deleting the card'
+                    . $id_payplug_card . 'from the DataBase', 'error');
+                return false;
+            }
+        } catch (Exception $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @description Delete Card From API with a given ID Card
+     * @param string $id_card
+     * @return bool
+     */
+    public function deleteCardFromAPI($id_card)
+    {
+        if (!isset($id_card) ||
+            !is_string($id_card)
+        ) {
+            $this->logger->addLog('Error:  Bad parameters were passed to [deleteCardFromAPI]'
+                . '$id_card: ' . json_encode($id_card));
+            return false;
         }
 
         try {
@@ -170,27 +204,9 @@ class CardRepository extends Repository
 
         if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
             $this->logger->addLog('Error occured while deleting the card'
-                . $id_card . 'from the API [deleteCard]', 'error');
+                . $id_card . 'from the API [deleteCardFromAPI]', 'error');
             $this->logger->addLog('JSON answer: ' . json_encode($json_answer));
             return false;
-        } else {
-            $this->query
-                ->delete()
-                ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
-                ->where(
-                    $this->constant->get('_DB_PREFIX_')
-                    . $this->cardEntity->getTable() . '.id_card = \'' . (string)$id_card . '\''
-                );
-
-            try {
-                if (!$this->query->build()) {
-                    $this->logger->addLog('Error occured while deleting the card'
-                        . $id_card . 'from the DataBase', 'error');
-                    return false;
-                }
-            } catch (Exception $exception) {
-                return false;
-            }
         }
 
         return true;
@@ -221,7 +237,7 @@ class CardRepository extends Repository
         $cardsToDelete = $this->getByCustomer((int)$id_customer, false);
         if (isset($cardsToDelete) && !empty($cardsToDelete) && sizeof($cardsToDelete)) {
             foreach ($cardsToDelete as $card) {
-                if (!$this->deleteCard($id_customer, $card['id_payplug_card'])) {
+                if (!$this->deleteCard((int)$id_customer, (int)$card['id_payplug_card'])) {
                     $this->logger->addLog('Error : card can not be deleted [deleteCards]', 'error');
                     $this->logger->addLog('$card : ' . json_encode($card), 'debug');
                     $this->logger->addLog('$card[id_payplug_card] : ' . $card['id_payplug_card'], 'debug');
@@ -245,7 +261,7 @@ class CardRepository extends Repository
     {
         if (!isset($id_customer) || !is_int($id_customer) || !$id_customer) {
             $this->logger->addLog('Parameter $id_customer is null or invalid [getByCustomer]', 'error');
-            $this->logger->addLog('$customer: '.json_encode($id_customer), 'debug');
+            $this->logger->addLog('$customer: ' . json_encode($id_customer), 'debug');
             return [];
         }
 
@@ -287,6 +303,42 @@ class CardRepository extends Repository
     }
 
     /**
+     * @description Get a card from DB for a given ID
+     * @param $id_payplug_card
+     * @return bool
+     */
+    public function getCard($id_payplug_card)
+    {
+        if (!isset($id_payplug_card) ||
+            !is_int($id_payplug_card)
+        ) {
+            $this->logger->addLog('Error:  Bad parameters were passed to [getCard]'
+                . '$id_payplug_card: ' . json_encode($id_payplug_card));
+            return false;
+        }
+
+        $this->query
+            ->select()
+            ->fields('*')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card')
+            ->where('`id_payplug_card` = ' . (int)$id_payplug_card);
+
+        try {
+            $card = $this->query->build();
+        } catch (Exception $exception) {
+            return false;
+        }
+
+        if (empty($card)) {
+            $this->logger->addLog('Error : No card found for these parameters [getCard]. $id_customer: '
+                . '$id_payplug_card: ' . json_encode($id_payplug_card));
+            return false;
+        }
+
+        return reset($card);
+    }
+
+    /**
      * @description  Get Card detail form a Payment resource
      *
      * @param object $payment
@@ -295,7 +347,10 @@ class CardRepository extends Repository
     public function getCardDetailFromPayment($payment)
     {
         if (!is_object($payment) || !$payment) {
-            $this->logger->addLog('[getCardDetailFromPayment] Param $payment is invalid: ' . json_encode($payment), 'error');
+            $this->logger->addLog(
+                '[getCardDetailFromPayment] Param $payment is invalid: ' . json_encode($payment),
+                'error'
+            );
             return [];
         }
 
@@ -321,59 +376,6 @@ class CardRepository extends Repository
                 ? $payment->card->brand
                 : null,
         ];
-    }
-
-    /**
-     * @description  get card id
-     *
-     * @param int $id_customer
-     * @param string $id_payplug_card
-     * @param int $id_company
-     * @return string | bool
-     */
-    public function getCardId($id_customer, $id_payplug_card, $id_company)
-    {
-        if (!isset($id_customer) ||
-            !is_int($id_customer) ||
-            !isset($id_payplug_card) ||
-            !is_string($id_payplug_card) ||
-            !isset($id_company) ||
-            !is_int($id_company)
-        ) {
-            $this->logger->addLog('Error:  Bad parameters were passed to [getCardId]'
-                . '$id_customer: ' . json_encode($id_customer)
-                . '$id_payplug_card: ' . json_encode($id_payplug_card)
-                . '$id_company: ' . json_encode($id_company));
-            return false;
-        }
-
-        $config = $this->configurationSpecific;
-        $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
-
-        $this->query
-            ->select()
-            ->fields('pc.id_card')
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card', 'pc')
-            ->where('pc.id_customer = ' . (int)$id_customer)
-            ->where('pc.id_payplug_card = ' . (int)$id_payplug_card)
-            ->where('pc.id_company = ' . (int)$id_company)
-            ->where('pc.is_sandbox = ' . (int)$is_sandbox);
-
-        try {
-            $cards = $this->query->build();
-        } catch (Exception $exception) {
-            return false;
-        }
-
-        if (empty($cards)) {
-            $this->logger->addLog('Error : No card found for these parameters [getCardId]. $id_customer: '
-                . $id_customer
-                . '$id_payplug_card : ' . $id_payplug_card
-                . '$id_company: ' . $id_company);
-            return false;
-        } else {
-            return $cards[0]['id_card'];
-        }
     }
 
     /**
@@ -410,7 +412,7 @@ class CardRepository extends Repository
     {
         if (!isset($payment) || !is_object($payment)) {
             $this->logger->addLog('Parameter $payment is null or invalid [saveCard]', 'error');
-            $this->logger->addLog('$payment: '.json_encode($payment), 'debug');
+            $this->logger->addLog('$payment: ' . json_encode($payment), 'debug');
             return false;
         }
 
