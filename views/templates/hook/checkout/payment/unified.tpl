@@ -22,9 +22,9 @@
 {assign var=parse_3x_4x value="_"|explode:$payplug_payment_option.logo_url}
 <div class="row">
     <div class="col-xs-12">
-        <p class="payment_module payplugPayment">
+        <p class="payment_module payplugPayment oneyPayment">
             <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}">
-                <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}" class="oneyPayment_logo_disabled"/>
+                <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}" class="-disabled"/>
                 {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
             </a>
         </p>
