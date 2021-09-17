@@ -146,6 +146,22 @@ var $document, $window, payplug = {
             var {form} = payplug;
             var {data} = form.props;
 
+            if (data.payplug_standard == 0) {
+                delete data.payplug_one_click
+            }
+            if (data.payplug_oney == 0) {
+                delete data.payplug_oney_fees;
+                delete data.payplug_oney_optimized;
+            }
+            if (data.payplug_inst == 0) {
+                delete data.PAYPLUG_INST_MODE;
+                delete data.PAYPLUG_INST_MIN_AMOUNT;
+            }
+            if (data.payplug_deferred == 0) {
+                delete data.payplug_deferred_auto;
+                delete data.payplug_deferred_state;
+            }
+
             data['_ajax'] = 1;
             data['submitSettings'] = 1;
 
