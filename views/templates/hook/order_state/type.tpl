@@ -35,6 +35,14 @@
                     <div class="col-lg-9">
                         {html_options name=order_state_type options=$order_state_types selected=$current_order_state_type}
                     </div>
+                    <div class="clearfix">&nbsp;</div>
+                    <br>
+                    <div class="col-lg-9">
+                        <div class="alert alert-info">
+                            {assign "payplug_order_state_link" "<a href='{$payplug_order_state_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
+                            {l s='hook.order_state.type.info' tags=[$payplug_order_state_link] mod='payplug'}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
