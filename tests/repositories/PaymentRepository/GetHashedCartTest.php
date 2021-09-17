@@ -29,7 +29,6 @@ use PayPlug\tests\mock\CartMock;
 /**
  * @group unit
  * @group repository
- * @group payment_local
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
@@ -86,7 +85,8 @@ final class GetHashedCartTest extends BasePaymentRepository
         $this->paymentDetails['cart'] = \Mockery::mock('cart');
         $this->paymentDetails['cart']
             ->shouldReceive([
-                'getProducts' => CartMock::getProducts()
+                'getProducts' => CartMock::getProducts(),
+                'getOrderTotal' => 42.42,
             ])
         ;
         $this->repo->getHashedCart($this->paymentDetails);
@@ -98,13 +98,40 @@ final class GetHashedCartTest extends BasePaymentRepository
         $this->paymentDetails['cart'] = \Mockery::mock('cart');
         $this->paymentDetails['cart']
             ->shouldReceive([
-                'getProducts' => CartMock::getProducts()
+                'getProducts' => CartMock::getProducts(),
+                'getOrderTotal' => 42.42,
             ])
         ;
         $this->paymentDetails['cart']->date_upd = $date->format("Y-m-d H:i:s");
         $firstHash = $this->repo->getHashedCart($this->paymentDetails);
         $date->add(new \DateInterval('PT5S'));
         $this->paymentDetails['cart']->date_upd = $date->format("Y-m-d H:i:s");
+
+        $secondHash = $this->repo->getHashedCart($this->paymentDetails);
+        $this->assertNotSame($firstHash, $secondHash);
+    }
+
+    public function testMethodWithAmountCart()
+    {
+        $this->paymentDetails['cart'] = \Mockery::mock('cart');
+        $this->paymentDetails['cart']
+            ->shouldReceive([
+                'getProducts' => CartMock::getProducts()
+            ])
+        ;
+        $this->paymentDetails['cart']
+            ->shouldReceive('getOrderTotal')
+            ->once()
+            ->andReturn(42.42)
+        ;
+
+        $firstHash = $this->repo->getHashedCart($this->paymentDetails);
+
+        $this->paymentDetails['cart']
+            ->shouldReceive('getOrderTotal')
+            ->once()
+            ->andReturn(142.42)
+        ;
 
         $secondHash = $this->repo->getHashedCart($this->paymentDetails);
         $this->assertNotSame($firstHash, $secondHash);

@@ -101,6 +101,9 @@ class PaymentRepository extends Repository
             $cartToHash[] = $paymentDetails['cart']->date_upd;
         }
 
+        // Adding cart amount to hash
+        $cartToHash[] = (float)$paymentDetails['cart']->getOrderTotal(true);
+
         return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
     }
 
