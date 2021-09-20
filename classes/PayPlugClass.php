@@ -2513,7 +2513,7 @@ class PayPlugClass extends PaymentModule
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = null;
             if ($options['id_card'] && $options['id_card'] != 'new_card') {
-                $card = $this->card->getCard($options['id_card']);
+                $card = $this->card->getCard((int)$options['id_card']);
                 $payment_tab['payment_method'] = $card['id_card'];
             }
         }
