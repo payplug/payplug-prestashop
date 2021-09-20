@@ -140,10 +140,13 @@ class PrestashopSpecific16
                      */
 
                     // Check if Oney is on error
-                    if ($oneyOptimized && $payment_method == 'oney'
-                        && $payment_method == 'oney'
+                    $payment_option['oney_error'] = false;
+                    if ($payment_method == 'oney'
                         && (isset($payment_option['err_label']) && $payment_option['err_label'])) {
-                        $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
+                        $payment_option['oney_error'] = '-disabled';
+                        if ($oneyOptimized) {
+                            $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
+                        }
                     }
 
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
@@ -156,6 +159,7 @@ class PrestashopSpecific16
                         'payment_url' => $payment_option['payment_controller_url'],
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
                             $payment_option['tpl'],
+                        'oney_error' => $payment_option['oney_error'],
                     ];
                 }
 
