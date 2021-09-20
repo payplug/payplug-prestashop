@@ -53,7 +53,7 @@ function upgrade_module_3_3_0($object)
         'paid' => 'paid',
         'error' => 'error',
         'auth' => 'pending',
-        'exp' => 'exp',
+        'expired' => 'expired',
         'oney_pg' => 'pending',
         'cancelled' => 'cancelled',
         'refund' => 'refund',

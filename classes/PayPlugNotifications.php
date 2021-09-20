@@ -897,7 +897,7 @@ class PayPlugNotifications
             'paid' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
             'error' => Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
             'auth' => Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
-            'exp' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
+            'expired' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
             'oney' => Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
             'cancelled' => Configuration::get('PAYPLUG_ORDER_STATE_CANCELED'),
             'refund' => Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
