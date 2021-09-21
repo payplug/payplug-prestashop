@@ -565,7 +565,7 @@ class PayPlugValidation
         $link_redirect = __PS_BASE_URI__ . $order_confirmation_url
             . 'id_cart=' . $cart->id . '&id_module=' . $this->payplug->id
             . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
-        $this->logger->addLog('Redirecting to :' . $link_redirect);
+        $this->logger->addLog('Redirecting to order-confirmation page');
 
         Tools::redirect($link_redirect);
     }
