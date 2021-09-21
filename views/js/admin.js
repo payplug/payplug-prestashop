@@ -73,6 +73,7 @@ var $document, $window, payplug = {
                 deferred: form.props.data['payplug_deferred'],
                 activate: 0
             };
+            console.log("kk" + data.installment);
 
             if (form.props.query != null) {
                 form.props.query.abort();
@@ -146,20 +147,17 @@ var $document, $window, payplug = {
             var {form} = payplug;
             var {data} = form.props;
 
-            if (data.payplug_standard == 0) {
-                delete data.payplug_one_click
-            }
             if (data.payplug_oney == 0) {
-                delete data.payplug_oney_fees;
-                delete data.payplug_oney_optimized;
+                data.payplug_oney_optimized = 0;
+                data.payplug_oney_optimized = 0;
             }
             if (data.payplug_inst == 0) {
-                delete data.PAYPLUG_INST_MODE;
-                delete data.PAYPLUG_INST_MIN_AMOUNT;
+                data.PAYPLUG_INST_MODE = 0;
+                data.PAYPLUG_INST_MIN_AMOUNT = 150 ;
             }
             if (data.payplug_deferred == 0) {
-                delete data.payplug_deferred_auto;
-                delete data.payplug_deferred_state;
+                data.payplug_deferred_auto = 0;
+                data.payplug_deferred_state = 27;
             }
 
             data['_ajax'] = 1;
@@ -204,9 +202,8 @@ var $document, $window, payplug = {
         check: function () {
             var error = '';
 
-            var {installment, oney, deferred} = payplug;
-
-            if (installment.props.error) {
+            var {installment, oney, deferred, form} = payplug;
+            if (installment.props.error && form.props.data['payplug_inst'] === 1) {
                 error = error_installment + installment.props.error;
             }
 
@@ -688,8 +685,9 @@ var $document, $window, payplug = {
         },
         change: function () {
             var {switcher} = payplug.tools,
-                {settings} = payplug,
+                {settings, login, installment} = payplug,
                 {identifier} = switcher.props;
+
 
             var $input = $(this),
                 $switcher = $input.parents('.' + identifier),
@@ -865,11 +863,13 @@ var $document, $window, payplug = {
 
             var {installment} = payplug,
                 {identifier} = installment.props;
+            console.log('ii' + installment.props.switcher);
 
             var inst = $('input[name=PAYPLUG_INST_MODE]:checked').val();
+            console.log('inst' + inst);
 
-            $('.' + identifier + '_schedule').removeClass('-select');
-            $('.' + identifier + '_schedule.-x' + inst).addClass('-select');
+            // $('.' + identifier + '_schedule').removeClass('-select');
+            // $('.' + identifier + '_schedule.-x' + inst).addClass('-select');
         },
         check: function (event) {
             var {installment} = payplug,
