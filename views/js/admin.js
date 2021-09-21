@@ -53,25 +53,25 @@ var $document, $window, payplug = {
 
             var {form} = payplug;
 
+            form.hydrate();
+
             var error = form.check();
             if (error) {
                 return payplug.tools.popup.error(error);
             }
 
-            form.hydrate();
-
             var data = {
                 _ajax: 1,
                 popin: 1,
                 type: 'confirm',
+                activate: 0,
                 sandbox: form.props.data['payplug_sandbox'],
                 embedded: form.props.data['payplug_embedded'],
-                oney: form.props.data['payplug_oney'],
                 standard: form.props.data['payplug_standard'],
                 one_click: form.props.data['payplug_one_click'],
+                oney: form.props.data['payplug_oney'],
                 installment: form.props.data['payplug_inst'],
-                deferred: form.props.data['payplug_deferred'],
-                activate: 0
+                deferred: form.props.data['payplug_deferred']
             };
 
             if (form.props.query != null) {
@@ -116,7 +116,7 @@ var $document, $window, payplug = {
                 var $elem = $(this),
                     name = $elem.attr('name'),
                     type = $elem.attr('type'),
-                    value = $elem.val();
+                    value = parseInt($elem.val());
 
                 switch (type) {
                     case 'radio' :
@@ -134,7 +134,7 @@ var $document, $window, payplug = {
             });
             $select.each(function () {
                 var $elem = $(this);
-                data[$elem.attr('name')] = $elem.val();
+                data[$elem.attr('name')] = parseInt($elem.val());
             });
 
             form.props.data = data;
@@ -145,22 +145,6 @@ var $document, $window, payplug = {
 
             var {form} = payplug;
             var {data} = form.props;
-
-            if (data.payplug_standard == 0) {
-                delete data.payplug_one_click
-            }
-            if (data.payplug_oney == 0) {
-                delete data.payplug_oney_fees;
-                delete data.payplug_oney_optimized;
-            }
-            if (data.payplug_inst == 0) {
-                delete data.PAYPLUG_INST_MODE;
-                delete data.PAYPLUG_INST_MIN_AMOUNT;
-            }
-            if (data.payplug_deferred == 0) {
-                delete data.payplug_deferred_auto;
-                delete data.payplug_deferred_state;
-            }
 
             data['_ajax'] = 1;
             data['submitSettings'] = 1;
@@ -202,19 +186,19 @@ var $document, $window, payplug = {
             });
         },
         check: function () {
+
             var error = '';
 
-            var {installment, oney, deferred} = payplug;
-
-            if (installment.props.error) {
+            var {installment, oney, deferred, form} = payplug;
+            if (installment.props.error && form.props.data['payplug_inst'] === 1) {
                 error = error_installment + installment.props.error;
             }
 
-            if (oney.props.error) {
+            if (oney.props.error && form.props.data['payplug_oney'] === 1) {
                 error += (error ? ' <br> ' : '') + error_oney + oney.props.error;
             }
 
-            if (deferred.props.error) {
+            if (deferred.props.error && form.props.data['payplug_deferred'] === 1) {
                 error += (error ? ' <br> ' : '') + error_deferred + deferred.props.error;
             }
 
