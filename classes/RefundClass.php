@@ -199,7 +199,7 @@ class RefundClass extends \PaymentModule
     public function refundPayment()
     {
         $this->payplug->logger->addLog('[Payplug] Start refund', 'notice');
-        $amount = Tools::getValue('amount');
+        $amount = str_replace(',', '.', Tools::getValue('amount'));
 
         if (!$this->payplug->amountCurrencyClass->checkAmountToRefund($amount)) {
             $this->payplug->logger->addLog('Incorrect amount to refund', 'notice');

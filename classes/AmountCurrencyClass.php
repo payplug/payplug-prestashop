@@ -85,7 +85,6 @@ class AmountCurrencyClass
      */
     public function checkAmountToRefund($amount)
     {
-        $amount = str_replace(',', '.', $amount);
         return is_numeric($amount);
     }
 
