@@ -471,7 +471,7 @@ class InstallRepository extends Repository
                 'invoice' => false,
                 'color' => '#8f0621',
                 'name' => [
-                    'en' => 'Authoriation expired',
+                    'en' => 'Autorization expired',
                     'es' => 'Autorización vencida',
                     'fr' => 'Autorisation expirée',
                     'it' => 'Autorizzazione scaduta',
