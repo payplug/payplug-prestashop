@@ -117,7 +117,7 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('refund') == 1) {
         $logger->addLog('[Ajax] Start refund', 'notice');
-        $amount = Tools::getValue('amount');
+        $amount = str_replace(',', '.', Tools::getValue('amount'));
         if (!$payplug->checkAmountToRefund($amount)) {
             die(json_encode([
                 'status' => 'error',
