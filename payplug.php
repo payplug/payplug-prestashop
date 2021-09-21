@@ -450,13 +450,11 @@ class Payplug extends PaymentModule
      */
     public function runUpgradeModule()
     {
-        $upgrade = parent::runUpgradeModule();
-
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
         }
 
-        return $upgrade;
+        return parent::runUpgradeModule();
     }
 
     public function setDependencies()
