@@ -459,7 +459,7 @@ class InstallRepository extends Repository
                 ],
                 'type' => 'pending',
             ],
-            'expired' => [
+            'exp' => [
                 'cfg' => null,
                 'template' => null,
                 'logable' => false,
