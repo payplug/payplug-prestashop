@@ -41,6 +41,7 @@ var $document, $window, payplugModule = {
             this.checkErrors();
 
             $document.on('click', '.payplugMsg_button', payplugModule.popup.close);
+            $document.on('click', '.payplugMsg_declineButton', payplugModule.popup.close);
         },
         checkErrors: function () {
             if (typeof payment_errors == 'undefined' || !payment_errors) {
@@ -312,43 +313,55 @@ var $document, $window, payplugModule = {
         props: {
             identifier: 'payplugCard',
             query: null,
+            id_card : 0,
         },
         init: function () {
             var card = payplugModule.card,
                 identifier = card.props.identifier;
-            $document.on('click', '.' + identifier + '_delete', payplugModule.card.delete);
+
+            $document.on('click', '.' + identifier + '_delete', payplugModule.card.delete)
+                .on('click', 'button[name="confirm_delete"]', payplugModule.card.confirm);
+
         },
+        //display first pop to confirm card deletion
         delete: function (event) {
             event.preventDefault();
             event.stopPropagation();
+            var $elem = $(this);
+            payplugModule.card.props.id_card = $elem.data('id_card');
+            payplugModule.popup.set(card_confirm_deleted_msg);
+        },
+        //display second popup to announce the card's deletion success
+        confirm: function (event) {
 
-            var $elem = $(this),
-                id_card = $elem.data('id_card'),
-                url = $(this).attr('href') + '&pc=' + id_card,
+            event.preventDefault();
+            event.stopPropagation();
+            var id_card = payplugModule.card.props.id_card,
+                url = payplug_delete_card_url + '&pc=' + id_card,
                 card = payplugModule.card,
                 identifier = card.props.identifier;
 
-            $.ajax({
-                type: 'POST',
-                url: url,
-                dataType: 'json',
-                data: {
-                    delete: 1,
-                    pc: id_card
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert('error CALL DELETE CARD');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
-                },
-                success: function (result) {
-                    if (result) {
-                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
-                        payplugModule.popup.set(card_deleted_msg);
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    data: {
+                        delete: 1,
+                        pc: id_card
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert('error CALL DELETE CARD');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                    success: function (result) {
+                        if (result) {
+                                $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                                payplugModule.popup.setDeleteCardPopup(card_deleted_msg);
+                        }
                     }
-                }
-            });
+                });
         },
     },
     oney: {
@@ -386,7 +399,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
-                };
+            };
 
             if (with_schedule) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
@@ -786,6 +799,14 @@ var $document, $window, payplugModule = {
             popup.hydrate(content);
             popup.open();
         },
+        setDeleteCardPopup:  function (content) {
+            var popup = payplugModule.popup,
+                props = popup.props;
+            popup.create();
+            popup.hydrate(content);
+            popup.open();
+            $document.on('click', 'button[name="card_deleted"]', payplugModule.popup.close);
+        },
         open: function () {
             var props = payplugModule.popup.props;
             var popin = $('.' + props.identifier);
@@ -799,9 +820,17 @@ var $document, $window, payplugModule = {
             var popin = $('.' + props.identifier);
 
             popin.removeClass('-show');
-            window.setTimeout(function () {
-                popin.removeClass('-open');
-            }, 500);
+            popin.removeClass('-open');
+
+
+
+        },
+        remove: function () {
+            var {popup} = payplug.tools,
+                {identifier} = popup.props,
+                $popup = $('.' + identifier);
+
+            $popup.remove();
         },
         create: function () {
             var props = payplugModule.popup.props,

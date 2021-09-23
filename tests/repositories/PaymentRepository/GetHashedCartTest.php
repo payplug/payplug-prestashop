@@ -29,7 +29,6 @@ use PayPlug\tests\mock\CartMock;
 /**
  * @group unit
  * @group repository
- * @group payment
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
@@ -43,7 +42,8 @@ final class GetHashedCartTest extends BasePaymentRepository
         parent::setUp();
 
         $cart = CartMock::get();
-        $cart->date_add = $cart->date_upd = null;
+        $startTestDate = date("Y-m-d H:i:s");
+        $cart->date_add = $cart->date_upd = $startTestDate;
         $cart->id_address_delivery = (string)$cart->id_address_delivery;
         $cart->id_address_invoice = (string)$cart->id_address_invoice;
         $this->paymentDetails = [
@@ -85,21 +85,72 @@ final class GetHashedCartTest extends BasePaymentRepository
         $this->paymentDetails['cart'] = \Mockery::mock('cart');
         $this->paymentDetails['cart']
             ->shouldReceive([
-                'getProducts' => CartMock::getProducts()
+                'getProducts' => CartMock::getProducts(),
+                'getOrderTotal' => 42.42,
             ])
         ;
         $this->repo->getHashedCart($this->paymentDetails);
     }
 
-    /** @group mytest */
+    public function testMethodWithUpdatedCart()
+    {
+        $date = new \DateTime();
+        $this->paymentDetails['cart'] = \Mockery::mock('cart');
+        $this->paymentDetails['cart']
+            ->shouldReceive([
+                'getProducts' => CartMock::getProducts(),
+                'getOrderTotal' => 42.42,
+            ])
+        ;
+        $this->paymentDetails['cart']->date_upd = $date->format("Y-m-d H:i:s");
+        $firstHash = $this->repo->getHashedCart($this->paymentDetails);
+        $date->add(new \DateInterval('PT5S'));
+        $this->paymentDetails['cart']->date_upd = $date->format("Y-m-d H:i:s");
+
+        $secondHash = $this->repo->getHashedCart($this->paymentDetails);
+        $this->assertNotSame($firstHash, $secondHash);
+    }
+
+    public function testMethodWithAmountCart()
+    {
+        $this->paymentDetails['cart'] = \Mockery::mock('cart');
+        $this->paymentDetails['cart']
+            ->shouldReceive([
+                'getProducts' => CartMock::getProducts()
+            ])
+        ;
+        $this->paymentDetails['cart']
+            ->shouldReceive('getOrderTotal')
+            ->once()
+            ->andReturn(42.42)
+        ;
+
+        $firstHash = $this->repo->getHashedCart($this->paymentDetails);
+
+        $this->paymentDetails['cart']
+            ->shouldReceive('getOrderTotal')
+            ->once()
+            ->andReturn(142.42)
+        ;
+
+        $secondHash = $this->repo->getHashedCart($this->paymentDetails);
+        $this->assertNotSame($firstHash, $secondHash);
+    }
+
     public function testMethodWithInvalidCartMethod()
     {
-        $logMessage = '[getHashedCart] The method getProducts() (in $paymentDetails[\'cart\']->getProducts()) 
-        doesn\'t exist';
+        $logMessage = '[getHashedCart] no product found';
+
+        $this->paymentDetails['cart'] = \Mockery::mock('cart');
+        $this->paymentDetails['cart']
+            ->shouldReceive([
+                'getProducts' => false
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
+                'returnPaymentError' => $logMessage,
             ]);
 
         $this->assertSame(

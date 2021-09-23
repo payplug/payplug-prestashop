@@ -99,9 +99,10 @@ class PayPlugAjax
                     if ((int)$id_customer == 0) {
                         die(false);
                     }
-                    $payplug_card = $this->card;
+                    $id_payplug_card = $tools->tool('getValue', 'pc');
+                    $deleted = $this->card->deleteCard((int)$id_customer, (int)$id_payplug_card);
 
-                    if ($payplug_card->delete((int)$tools->tool('getValue', 'pc'))) {
+                    if ($deleted) {
                         die(true);
                     } else {
                         die(false);
@@ -120,6 +121,7 @@ class PayPlugAjax
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
                     $quantity = (int)$tools->tool('getValue', 'quantity', 1);
+                    $quantity = $quantity ? $quantity : 1;
                     $product_price = Product::getPriceStatic(
                         $id_product,
                         $use_taxes,
@@ -159,6 +161,7 @@ class PayPlugAjax
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
                     $quantity = (int)$tools->tool('getValue', 'quantity', 1);
+                    $quantity = $quantity ? $quantity : 1;
                     $product_price = Product::getPriceStatic(
                         $id_product,
                         $use_taxes,

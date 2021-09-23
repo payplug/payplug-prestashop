@@ -62,9 +62,10 @@ class MediaClass extends \Payplug
      *
      * @param array $messages
      * @param bool $with_msg_button
+     * @param bool $with_yesno_buttons
      * @return bool|string
      */
-    public function displayMessages($messages = [], $with_msg_button = false)
+    public function displayMessages($messages = [], $with_msg_button = false, $with_yes_no_buttons = false)
     {
         if (empty($messages)) {
             return false;
@@ -80,7 +81,8 @@ class MediaClass extends \Payplug
 
         $this->context->smarty->assign([
             'messages' => $formated,
-            'with_msg_button' => $with_msg_button
+            'with_msg_button' => $with_msg_button,
+            'with_yes_no_buttons' => $with_yes_no_buttons
         ]);
 
         return $this->payplug->fetchTemplate('_partials/messages.tpl');

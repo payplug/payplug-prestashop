@@ -38,10 +38,17 @@
             {/if}
         </li>
         {foreach $oney_payment_option.installments as $oney_inst_number => $oney_installment}
-            {assign var="inst_number" value=$oney_inst_number+1}
             <li>
-                <span>{l s='hook.oney.popin.payment.detail.installment' mod='payplug' sprintf=[$inst_number]}</span>
-                <span><b>{$oney_installment.value|escape:'htmlall':'UTF-8'}</b></span>
+                <span>
+                    {if $oney_inst_number == 0}
+                        {l s='hook.oney.payment.detail.installmentFirst' mod='payplug'}
+                    {elseif $oney_inst_number == 1}
+                        {l s='hook.oney.payment.detail.installmentSecond' mod='payplug'}
+                    {elseif $oney_inst_number == 2}
+                        {l s='hook.oney.payment.detail.installmentThird' mod='payplug'}
+                    {/if}
+                </span>
+                <span>{$oney_installment.value|escape:'htmlall':'UTF-8'}</span>
             </li>
         {/foreach}
         {if isset($use_fees) && $use_fees}

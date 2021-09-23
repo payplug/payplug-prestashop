@@ -18,6 +18,12 @@ versionning_assets() {
 echo "Looking for tag in payplug.php..."
 tag=`grep '$this->version =' payplug.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
 
+echo "Moving file in views dir"
+rm -rf ./views/js ./views/css
+cp -r ./views/build/css ./views/
+cp -r ./views/build/js ./views/
+echo "***** DONE *****"
+
 echo "Starting versioning JS file with" $tag "tag..."
 versionning_assets 'js' $tag
 echo "***** DONE *****"
@@ -27,5 +33,5 @@ versionning_assets 'css' $tag
 echo "***** DONE *****"
 
 echo " FINISH !!!"
-ls -l views/js/*.js
-ls -l views/css/*.css
+ls -l ./views/css/*.css
+ls -l ./views/js/*.js

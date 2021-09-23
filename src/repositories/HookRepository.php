@@ -103,10 +103,10 @@ class HookRepository extends Repository
     {
         $types = [
             '' => $this->l('hook.displayAdminStatusesForm.undefined'),
-            'cancel' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
+            'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
+            'cancelled' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
             'error' => $this->l('hook.displayAdminStatusesForm.orderStateTypeError'),
             'expired' => $this->l('hook.displayAdminStatusesForm.orderStateTypeExpired'),
-            'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
             'paid' => $this->l('hook.displayAdminStatusesForm.orderStateTypePaid'),
             'pending' => $this->l('hook.displayAdminStatusesForm.orderStateTypePending'),
             'refund' => $this->l('hook.displayAdminStatusesForm.orderStateTypeRefund'),
@@ -114,8 +114,11 @@ class HookRepository extends Repository
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
         $current_order_state_type = $this->payplug->getPlugin()->getOrderState()->getType((int)$id_order_state);
-
+        $payplug_order_state_url = 'https://support.payplug.com/hc/'
+            . $this->payplug->context->language->iso_code
+            . '/articles/4406805105298';
         $this->context->getContext()->smarty->assign([
+            'payplug_order_state_url' => $payplug_order_state_url,
             'current_order_state_type' => $current_order_state_type,
             'order_state_types' => $types
         ]);

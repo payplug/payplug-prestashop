@@ -38,9 +38,16 @@
                 {/if}
             </li>
             {foreach $oney_payment_option.installments as $oney_inst_number => $oney_installment}
-                {assign var="inst_number" value=$oney_inst_number+1}
                 <li>
-                    <span>{l s='Installment no%d:' mod='payplug' sprintf=[$inst_number]}</span>
+                    <span>
+                        {if $oney_inst_number == 0}
+                            {l s='hook.oney.schedule.installmentFirst' mod='payplug'}
+                        {elseif $oney_inst_number == 1}
+                            {l s='hook.oney.schedule.installmentSecond' mod='payplug'}
+                        {elseif $oney_inst_number == 2}
+                            {l s='hook.oney.schedule.installmentThird' mod='payplug'}
+                        {/if}
+                    </span>
                     <span>{$oney_installment.value|escape:'htmlall':'UTF-8'}</span>
                 </li>
             {/foreach}

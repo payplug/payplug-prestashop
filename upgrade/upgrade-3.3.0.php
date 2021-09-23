@@ -42,18 +42,13 @@ function upgrade_module_3_3_0($object)
     $flag = $flag && Db::getInstance()->execute($sql);
     unset($sql);
 
-    // Add missing payplug order state
-    $os_cancel = Configuration::get('PS_OS_CANCELED');
-    $flag = $flag && Configuration::updateValue('PAYPLUG_ORDER_STATE_CANCELLED', $os_cancel);
-    $flag = $flag && Configuration::updateValue('PAYPLUG_ORDER_STATE_CANCELLED_TEST', $os_cancel);
-
     // Create default payplug order state
     $payplug_order_states = [
         'pending' => 'pending',
         'paid' => 'paid',
         'error' => 'error',
         'auth' => 'pending',
-        'exp' => 'exp',
+        'exp' => 'expired',
         'oney_pg' => 'pending',
         'cancelled' => 'cancelled',
         'refund' => 'refund',

@@ -52,6 +52,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             'cart' => $cart,
             'authorizedAt' => true,
             'isEmbedded' => true,
+            'isIntegrated' => false,
             'isMobileDevice' => true,
             'isPaid' => true,
             'paymentMethod' => 'payment_method',

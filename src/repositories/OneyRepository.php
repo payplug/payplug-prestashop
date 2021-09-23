@@ -195,14 +195,17 @@ class OneyRepository extends Repository
     public function assignLegalNotice()
     {
         $limits = $this->getOneyPriceLimit();
-        $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-        $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
+        $minAmount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
+        $maxAmount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
+        $learnMoreLink = $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO') == 'IT' &&
+            strtolower($this->contextSpecific->getContext()->language->iso_code) == 'it';
 
         $this->assign->assign([
-            'oney_with_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
-            'oney_min_amounts' => $this->toolsSpecific->tool('displayPrice', $min_amount),
-            'oney_max_amounts' => $this->toolsSpecific->tool('displayPrice', $max_amount),
-            'oney_url' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
+            'learnMoreLink' => (bool)$learnMoreLink,
+            'oneyWithFees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
+            'oneyMinAmounts' => $this->toolsSpecific->tool('displayPrice', $minAmount),
+            'oneyMaxAmounts' => $this->toolsSpecific->tool('displayPrice', $maxAmount),
+            'oneyUrl' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
         ]);
     }
 
@@ -337,13 +340,15 @@ class OneyRepository extends Repository
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
+        $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
         $vars = [
             'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
-            ]
+            ],
+            'withFirstSchedule' => $withFirstSchedule,
         ];
         $this->assign->assign($vars);
         return $this->media->fetchTemplate('oney/schedule.tpl');
@@ -547,16 +552,18 @@ class OneyRepository extends Repository
 
         foreach ($products as $product) {
             $unit_price = $this->amountCurrencyClass->convertAmount($product['price_wt']);
+            $productName = (string)$product['name'] . (isset($product['attributes'])
+                    ? ' - ' . $product['attributes']
+                    : '');
+
             $item = [
                 'merchant_item_id' => $product['id_product'],
-                'name' => (string)$product['name'] . (isset($product['attributes']) ?
-                        ' - ' . $product['attributes'] :
-                        ''),
+                'name' =>  substr($productName, 0, 250),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
-                    $product['manufacturer_name'] :
+                    substr($product['manufacturer_name'], 0, 250) :
                     $this->configurationSpecific->get('PS_SHOP_NAME')
             ];
 
@@ -662,6 +669,8 @@ class OneyRepository extends Repository
             $oney_payment_options ? false : $this->l('oney.getOneyPriceAndPaymentOptions.unavailable')
         );
 
+        $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
+
         $this->assign->assign([
             'payplug_oney_required_field' => $cart ? $this->displayOneyRequiredFields() : false,
             'payplug_oney_amount' => [
@@ -669,7 +678,8 @@ class OneyRepository extends Repository
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
-            'payplug_oney_error' => $error
+            'payplug_oney_error' => $error,
+            'withFirstSchedule' => $withFirstSchedule,
         ]);
 
         if ($oney_payment_options) {

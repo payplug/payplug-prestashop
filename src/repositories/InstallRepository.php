@@ -205,6 +205,8 @@ class InstallRepository extends Repository
             && $this->config->deleteByName('PAYPLUG_ONEY_FEES')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_CANCELLED')
+            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_CANCELLED_TEST')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP')
@@ -419,7 +421,7 @@ class InstallRepository extends Repository
                 ],
                 'type' => 'error',
             ],
-            'cancel' => [
+            'cancelled' => [
                 'cfg' => 'PS_OS_CANCELED',
                 'template' => 'order_canceled',
                 'logable' => false,
@@ -436,7 +438,7 @@ class InstallRepository extends Repository
                     'es' => 'Payment cancelled',
                     'it' => 'Payment cancelled',
                 ],
-                'type' => 'cancel',
+                'type' => 'cancelled',
             ],
             'auth' => [
                 'cfg' => null,
@@ -469,12 +471,12 @@ class InstallRepository extends Repository
                 'invoice' => false,
                 'color' => '#8f0621',
                 'name' => [
-                    'en' => 'Authoriation expired',
+                    'en' => 'Autorization expired',
                     'es' => 'Autorización vencida',
                     'fr' => 'Autorisation expirée',
                     'it' => 'Autorizzazione scaduta',
                 ],
-                'type' => 'exp',
+                'type' => 'expired',
             ],
             'oney_pg' => [
                 'cfg' => null,

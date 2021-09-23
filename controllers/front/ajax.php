@@ -81,7 +81,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         die(false);
                     }
                     $id_payplug_card = $tools->tool('getValue', 'pc');
-                    $deleted = $this->card->deleteCard($id_customer, $id_payplug_card);
+                    $deleted = $this->card->deleteCard((int)$id_customer, (int)$id_payplug_card);
                     if ($deleted) {
                         die(true);
                     } else {
@@ -116,6 +116,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'qty',
                         (int)$tools->tool('getValue', 'quantity_wanted', 1)
                     );
+                    $quantity = $quantity ? $quantity : 1;
                     $product_price = Product::getPriceStatic(
                         (int)$id_product,
                         $use_taxes,
@@ -147,6 +148,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     // Some integration will not use qty data but quantity_wanted
                     $quantity = (int)$tools->tool('getValue', 'qty');
                     $quantity = $quantity ? $quantity : (int)$tools->tool('getValue', 'quantity_wanted', 1);
+                    $quantity = $quantity ? $quantity : 1;
                     $product_price = Product::getPriceStatic(
                         (int)$id_product,
                         $use_taxes,

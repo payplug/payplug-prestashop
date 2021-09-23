@@ -457,7 +457,7 @@ class CardEntity
     public function setIsSandbox($is_sandbox)
     {
         if (!is_bool($is_sandbox)) {
-            throw (new BadParameterException('Param $id_card must be a boolean'));
+            throw (new BadParameterException('Param $is_sandbox must be a boolean'));
         }
 
         $this->is_sandbox = $is_sandbox;

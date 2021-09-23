@@ -117,8 +117,7 @@ class PrestashopSpecific16
             }
         }
 
-        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer($cart->id_customer, true);
-
+        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer((int)$cart->id_customer, true);
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
         foreach ($payment_options as $payment_option) {
@@ -138,6 +137,17 @@ class PrestashopSpecific16
                      * oney.tpl (Oney optimisé)
                      * unified.tpl (Oney non optimisé)
                      */
+
+                    // Check if Oney is on error
+                    $payment_option['oney_error'] = false;
+                    if ($payment_method == 'oney'
+                        && (isset($payment_option['err_label']) && $payment_option['err_label'])) {
+                        $payment_option['oney_error'] = '-disabled';
+                        if ($oneyOptimized) {
+                            $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
+                        }
+                    }
+
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
                             ($error ? '-alt' : ''),
@@ -148,6 +158,7 @@ class PrestashopSpecific16
                         'payment_url' => $payment_option['payment_controller_url'],
                         'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
                             $payment_option['tpl'],
+                        'oney_error' => $payment_option['oney_error'],
                     ];
                 }
 
@@ -159,11 +170,12 @@ class PrestashopSpecific16
                 }
 
                 // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
-                if ($oneyOptimized && ($payment_method == 'oney')) {
+                if ($oneyOptimized && $payment_method == 'oney') {
                     break;
                 }
             }
         }
+
         return $paymentOptions;
     }
 

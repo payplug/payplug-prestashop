@@ -115,6 +115,13 @@ final class InsertPaymentTableTest extends BasePaymentRepository
 
     public function testInsertPaymentTableWithInvalidData()
     {
+        $this->paymentDetails['cart'] = \Mockery::mock('cart');
+        $this->paymentDetails['cart']
+            ->shouldReceive([
+                'getProducts' => CartMock::getProducts(),
+                'getOrderTotal' => 42.42
+            ])
+        ;
         $this->query
             ->shouldReceive([
                 'insert' => $this->query,

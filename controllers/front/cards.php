@@ -61,14 +61,9 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
 
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $payplug_cards = $this->card->getByCustomer($this->contextSpecific->getContext()->customer);
-        } else {
-            $customer = $this->contextSpecific->getContext()->customer;
-            $payplug_cards = $this->card->getCards($customer->id);
-        }
-
-        $payplug_delete_card_url = $this->contextSpecific->getContext()->link->getModuleLink(
+        $customer = $this->contextSpecific->getContext()->customer;
+        $payplug_cards = $this->card->getByCustomer((int)$customer->id);
+        $payplug_delete_card_url  = $this->contextSpecific->getContext()->link->getModuleLink(
             'payplug',
             'ajax',
             ['_ajax' => 1],
@@ -76,13 +71,23 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         );
         $this->contextSpecific->getContext()->smarty->assign([
             'payplug_cards' => $payplug_cards,
-            'payplug_delete_card_url' => $payplug_delete_card_url
+            'payplug_delete_card_url' => $payplug_delete_card_url,
         ]);
-
+        $confirm_delete_message = $this->card->confirmDeleteCardMessage();
+        $popup_confirm_delete_message = $this->payplug->mediaClass->displayMessages(
+            [$confirm_delete_message],
+            false,
+            true
+        );
         $msg = $this->card->deleteCardMessage();
-        $card_deleted_msg = $this->payplug->mediaClass->displayMessages([$msg], true);
-
-        Media::addJsDef(['card_deleted_msg' => $card_deleted_msg]);
+        $card_deleted_msg = $this->payplug->mediaClass->displayMessages([$msg], true, false);
+        Media::addJsDef(
+            [
+                'card_confirm_deleted_msg' => $popup_confirm_delete_message,
+                'card_deleted_msg' => $card_deleted_msg,
+                'payplug_delete_card_url' => $payplug_delete_card_url
+            ]
+        );
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->contextSpecific->getContext()->smarty->assign([

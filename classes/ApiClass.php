@@ -25,7 +25,7 @@ namespace PayPlug\classes;
 
 use Authentication;
 use Configuration;
-use HttpClient;
+use Payplug\Core\HttpClient;
 use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
@@ -54,11 +54,12 @@ class ApiClass extends \PaymentModule
 
     public function __construct()
     {
+        parent::__construct();
         $this->plugin = new PluginRepository();
         $this->setEnvironment();
         self::setSecretKey();
-        $this->setUserAgent();
         $this->current_api_key =  self::getCurrentApiKey();
+        $this->setUserAgent();
     }
 
     /**
@@ -345,7 +346,7 @@ class ApiClass extends \PaymentModule
     private function setUserAgent()
     {
         if ($this->current_api_key != null) {
-            HttpClient::addDefaultUserAgentProduct(
+            HttpClient::setDefaultUserAgentProduct(
                 'PayPlug-Prestashop',
                 $this->version,
                 'Prestashop/' . _PS_VERSION_
@@ -364,7 +365,7 @@ class ApiClass extends \PaymentModule
         try {
             \Payplug\Payplug::init([
                 'secretKey' => $payplug_key,
-                'apiVersion' => $this->plugin->getApiVersion()
+                'apiVersion' => (new PluginRepository())->getEntity()->getApiVersion()
             ]);
 
             return $payplug_key;
@@ -444,7 +445,7 @@ class ApiClass extends \PaymentModule
             } else {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (BadRequestException $e) {
             json_encode([
                 'content' => null,
                 'error' => $e->getMessage()

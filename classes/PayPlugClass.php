@@ -49,7 +49,7 @@ use PaymentModule;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\InstallmentPlan;
-use Payplug\Payment;
+use Payplug\Resource\Payment;
 use Payplug\Refund;
 use PayPlug\src\repositories\PluginRepository;
 use Product;
@@ -70,6 +70,7 @@ class PayPlugClass extends PaymentModule
     public $mediaClass;
     public $orderClass;
     public $installmentClass;
+    public $refundClass;
     /** @var PayPlugConfiguration */
     public $configuration;
     /** @var array */
@@ -204,7 +205,7 @@ class PayPlugClass extends PaymentModule
             'invoice' => false,
             'color' => '#8f0621',
             'name' => [
-                'en' => 'Authoriation expired',
+                'en' => 'Autorization expired',
                 'es' => 'Autorización vencida',
                 'fr' => 'Autorisation expirée',
                 'it' => 'Autorizzazione scaduta',
@@ -302,6 +303,7 @@ class PayPlugClass extends PaymentModule
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass();
         $this->configClass = new ConfigClass($this);
+        $this->refundClass = new RefundClass($this);
 
         $this->payment_status = $this->configClass->getPaymentStatus();
     }
@@ -655,7 +657,7 @@ class PayPlugClass extends PaymentModule
 
         $payplug_card = $this->card;
 
-        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = $payplug_card->getByCustomer((int)$cart->id_customer, true);
 
         $use_taxes = Configuration::get('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
@@ -967,7 +969,7 @@ class PayPlugClass extends PaymentModule
         // check if one click allowed
         $one_click = Configuration::get('PAYPLUG_ONE_CLICK');
         $payplug_card = $this->card;
-        $payplug_cards = $payplug_card->getByCustomer($cart->id_customer, true);
+        $payplug_cards = $payplug_card->getByCustomer((int)$cart->id_customer, true);
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
@@ -1317,7 +1319,7 @@ class PayPlugClass extends PaymentModule
         $amount_available = 0;
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl('AdminModules', (int)$params['id_order']);
-        $amount_refunded_presta = $this->getTotalRefunded($order->id);
+        $amount_refunded_presta = RefundClass::getTotalRefunded($order->id);
 
         $inst_id = null;
         $payment_id = $this->getPayplugInstallmentCart($order->id_cart);
@@ -1686,37 +1688,37 @@ class PayPlugClass extends PaymentModule
         return $this->html;
     }
 
-    /**
-     * Get total amount already refunded
-     *
-     * @param $id_order
-     * @return bool|int
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    private function getTotalRefunded($id_order)
-    {
-        $order = new Order((int)$id_order);
-        if (!Validate::isLoadedObject($order)) {
-            return false;
-        } else {
-            $amount_refunded_presta = 0;
-            $flag_shipping_refunded = false;
-
-            $order_slips = OrderSlip::getOrdersSlip($order->id_customer, $order->id);
-            if (isset($order_slips) && !empty($order_slips) && sizeof($order_slips)) {
-                foreach ($order_slips as $order_slip) {
-                    $amount_refunded_presta += $order_slip['amount'];
-                    if (!$flag_shipping_refunded && $order_slip['shipping_cost'] == 1) {
-                        $amount_refunded_presta += $order_slip['shipping_cost_amount'];
-                        $flag_shipping_refunded = true;
-                    }
-                }
-            }
-
-            return $amount_refunded_presta;
-        }
-    }
+//    /**
+//     * Get total amount already refunded
+//     *
+//     * @param $id_order
+//     * @return bool|int
+//     * @throws PrestaShopDatabaseException
+//     * @throws PrestaShopException
+//     */
+//    private function getTotalRefunded($id_order)
+//    {
+//        $order = new Order((int)$id_order);
+//        if (!Validate::isLoadedObject($order)) {
+//            return false;
+//        } else {
+//            $amount_refunded_presta = 0;
+//            $flag_shipping_refunded = false;
+//
+//            $order_slips = OrderSlip::getOrdersSlip($order->id_customer, $order->id);
+//            if (isset($order_slips) && !empty($order_slips) && sizeof($order_slips)) {
+//                foreach ($order_slips as $order_slip) {
+//                    $amount_refunded_presta += $order_slip['amount'];
+//                    if (!$flag_shipping_refunded && $order_slip['shipping_cost'] == 1) {
+//                        $amount_refunded_presta += $order_slip['shipping_cost_amount'];
+//                        $flag_shipping_refunded = true;
+//                    }
+//                }
+//            }
+//
+//            return $amount_refunded_presta;
+//        }
+//    }
 
     /**
      * get cart installment
@@ -1853,20 +1855,14 @@ class PayPlugClass extends PaymentModule
          * Get card details to order details (views/templates/admin/order/details.tpl)
          * Mask (last4), exp date...
          */
-        $getCards_param = null;
+        $card_details = false;
         if (isset($payment->card->last4) && (!empty($payment->card->last4))) {
-            $getCards_param = $payment;
-        } elseif (!isset($payment->card->last4)
-            && isset($payment->metadata['ID Client'])
-            && (int)$payment->metadata['ID Client'] > 0) {
-            $getCards_param = $payment->metadata['ID Client'];
+            $card_details = $this->card->getCardDetailFromPayment($payment);
         }
-        $card_details = $this->card->getCards($getCards_param);
-        $card_details = end($card_details);
 
         // Card brand
         $card_brand = null;
-        if (isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
+        if ($card_details && isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
             $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
 
             // Country
@@ -1877,13 +1873,13 @@ class PayPlugClass extends PaymentModule
 
         // Card mask
         $card_mask = null;
-        if (isset($card_details['last4']) && !empty($card_details['last4'])) {
+        if ($card_details && isset($card_details['last4']) && !empty($card_details['last4'])) {
             $card_mask = '**** **** **** ' . $card_details['last4'];
         }
 
         // Card exp. date
         $card_date = null;
-        if ((isset($card_details['exp_month']) && !empty($card_details['exp_month']))
+        if ($card_details && (isset($card_details['exp_month']) && !empty($card_details['exp_month']))
             && (isset($card_details['exp_year']) && !empty($card_details['exp_year']))) {
             $card_date = $card_details['exp_month'] . '/' . $card_details['exp_year'];
         }
@@ -1935,7 +1931,8 @@ class PayPlugClass extends PaymentModule
             }
             $payment_details['type_code'] = $payment->payment_method['type'];
         }
-        if ($payment->authorization !== null) {
+
+        if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
                 $payment_details['date'] = date('d/m/Y', $payment->paid_at);
@@ -2518,9 +2515,11 @@ class PayPlugClass extends PaymentModule
             $payment_tab['schedule'] = $schedule;
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
-            $payment_tab['payment_method'] = $options['id_card'] && $options['id_card'] != 'new_card' ?
-                $this->card->getCardId((int)$cart->id_customer, $options['id_card'], $config['company'])
-                : null;
+            $payment_tab['payment_method'] = null;
+            if ($options['id_card'] && $options['id_card'] != 'new_card') {
+                $card = $this->card->getCard((int)$options['id_card']);
+                $payment_tab['payment_method'] = $card['id_card'];
+            }
         }
 
         // check payment tab from current payment method
@@ -2908,7 +2907,7 @@ class PayPlugClass extends PaymentModule
 
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
-        $payplug_cards = $options['one_click'] ? $this->card->getCards((int)$id_customer, true) : [];
+        $payplug_cards = $options['one_click'] ? $this->card->getByCustomer((int)$id_customer, true) : [];
 
         $paymentOption = [];
 
@@ -2951,9 +2950,9 @@ class PayPlugClass extends PaymentModule
                             [],
                             true
                         );
-                    $paymentOption[$payment_key]['logo'] = Media::getMediaPath(
-                        _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.png'
-                    );
+                    $paymentOption[$payment_key]['logo'] = $card['brand'] != 'none' ? Media::getMediaPath(
+                        _PS_MODULE_DIR_ . $this->name . '/views/img/' . Tools::strtolower($card['brand']) . '.svg'
+                    ) : '';
                     $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
                     $paymentOption[$payment_key]['expiry_date_card'] =
@@ -2999,9 +2998,9 @@ class PayPlugClass extends PaymentModule
                 'payment',
                 ['type' => 'standard']
             );
+
             $paymentOption['standard']['logo'] = Media::getMediaPath(
-                _PS_MODULE_DIR_ . $this->name . '/views/img/' . (count($payplug_cards) > 0 ?
-                    'none' : 'logos_schemes_' . $this->configClass->getImgLang()) . '.png'
+                _PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
                 $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payDifferentCard');
@@ -3363,285 +3362,285 @@ class PayPlugClass extends PaymentModule
         return $result;
     }
 
-    public function refundPayment()
-    {
-        $this->logger->addLog('[Payplug] Start refund', 'notice');
-        $amount = Tools::getValue('amount');
-
-        if (!$this->amountCurrencyClass->checkAmountToRefund($amount)) {
-            $this->logger->addLog('Incorrect amount to refund', 'notice');
-            die(json_encode([
-                'status' => 'error',
-                'data' => $this->l('payplug.refundPayment.incorrectAmount')
-            ]));
-        } elseif ($this->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
-            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
-            die(json_encode([
-                'status' => 'error',
-                'data' => $this->l('payplug.refundPayment.amountAtLeast')
-            ]));
-        } else {
-            $amount = str_replace(',', '.', Tools::getValue('amount'));
-            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
-            $amount = (int)$amount;
-        }
-
-        $id_order = Tools::getValue('id_order');
-        $pay_id = Tools::getValue('pay_id');
-        $inst_id = Tools::getValue('inst_id');
-        $metadata = [
-            'ID Client' => (int)Tools::getValue('id_customer'),
-            'reason' => 'Refunded with Prestashop'
-        ];
-        $pay_mode = Tools::getValue('pay_mode');
-        $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-
-        if ($refund == 'error') {
-            $this->logger->addLog('Cannot refund that amount.', 'notice');
-            $this->logger->addLog(
-                '$pay_id : ' . $pay_id .
-                ' - $amount : ' . $amount .
-                ' - $metadata : ' . json_encode($metadata) . /* or implode() ? */
-                ' - $pay_mode : ' . $pay_mode .
-                ' - $inst_id : ' . $inst_id,
-                'debug'
-            );
-
-            die(json_encode([
-                'status' => 'error',
-                'data' => $this->l('payplug.refundPayment.cannotRefund')
-            ]));
-        } else {
-            $new_state = 7;
-            $reload = false;
-
-            if ($inst_id != null) {
-                $installment = InstallmentClass::retrieveInstallment($inst_id);
-                $amount_available = 0;
-                $amount_refunded_payplug = 0;
-                if (isset($installment->schedule)) {
-                    foreach ($installment->schedule as $schedule) {
-                        if (!empty($schedule->payment_ids)) {
-                            foreach ($schedule->payment_ids as $p_id) {
-                                $p = Payment::retrieve($p_id);
-                                if ($p->is_paid && !$p->is_refunded) {
-                                    $amount_available += (int)($p->amount - $p->amount_refunded);
-                                }
-                                $amount_refunded_payplug += $p->amount_refunded;
-                            }
-                        }
-                    }
-                }
-                $amount_available = (float)($amount_available / 100);
-                $amount_refunded_payplug = (float)($amount_refunded_payplug / 100);
-                if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
-                    $new_state = (int)Tools::getValue('id_state');
-                    if ($new_state == 0) {
-                        if ($installment->is_live == 1) {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                        } else {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                        }
-                    }
-                    $order = new Order((int)$id_order);
-                    if (Validate::isLoadedObject($order)) {
-                        if (!$this->createLockFromCartId($order->id_cart)) {
-                            die(json_encode([
-                                'status' => 'error',
-                                'data' => $this->l('payplug.refundPayment.errorOccurred')
-                            ]));
-                        }
-
-                        $current_state = (int)$this->orderClass->getCurrentOrderState($order->id);
-                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
-                        if ($current_state != 0 && $current_state != $new_state) {
-                            $history = new OrderHistory();
-                            $history->id_order = (int)$order->id;
-                            $history->changeIdOrderState($new_state, (int)$order->id);
-                            $history->addWithemail();
-                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
-                        }
-
-                        if (!$this->deleteLockFromCartId($order->id_cart)) {
-                            $this->logger->addLog('Lock cannot be deleted.', 'error');
-                        } else {
-                            $this->logger->addLog('Lock deleted.', 'notice');
-                        }
-                    }
-                    $reload = true;
-                }
-            } else {
-                $payment = $this->retrievePayment($refund->payment_id);
-
-                if ((int)Tools::getValue('id_state') != 0) {
-                    $new_state = (int)Tools::getValue('id_state');
-                } elseif ($payment->is_refunded == 1) {
-                    if ($payment->is_live == 1) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
-                    } else {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
-                    }
-                }
-                if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
-                    $order = new Order((int)$id_order);
-                    if (Validate::isLoadedObject($order)) {
-                        if (!$this->createLockFromCartId($order->id_cart)) {
-                            die(json_encode([
-                                'status' => 'error',
-                                'data' => $this->l('payplug.refundPayment.errorOccurred')
-                            ]));
-                        }
-
-                        $current_state = (int)$this->orderClass->getCurrentOrderState($order->id);
-                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
-                        if ($current_state != 0 && $current_state != $new_state) {
-                            $history = new OrderHistory();
-                            $history->id_order = (int)$order->id;
-                            $history->changeIdOrderState($new_state, (int)$order->id);
-                            $history->addWithemail();
-                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
-                        } else {
-                            $this->logger->addLog('Order status is already \'refunded\'', 'notice');
-                        }
-
-                        if (!$this->deleteLockFromCartId($order->id_cart)) {
-                            $this->logger->addLog('Lock cannot be deleted.', 'error');
-                        } else {
-                            $this->logger->addLog('Lock deleted.', 'notice');
-                        }
-                    }
-                    $reload = true;
-                }
-
-                $amount_refunded_payplug = ($payment->amount_refunded) / 100;
-                $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
-            }
-
-
-            $data = $this->getRefundData(
-                $amount_refunded_payplug,
-                $amount_available
-            );
-            die(json_encode([
-                'status' => 'ok',
-                'data' => $data,
-                'template' => $this->hookDisplayAdminOrderMain(['id_order' => $id_order]),
-                'message' => $this->l('payplug.refundPayment.success'),
-                'reload' => $reload
-            ]));
-        }
-    }
-
-    /**
-     * Make a refund
-     *
-     * @param string $pay_id
-     * @param int $amount
-     * @param string $metadata
-     * @param string $pay_mode
-     * @param null $inst_id
-     * @return string
-     * @throws ConfigurationException
-     */
-    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
-    {
-        if (Tools::strtoupper($pay_mode) == 'TEST') {
-            ApiClass::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-        } else {
-            ApiClass::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-        }
-        if ($pay_id == null) {
-            if ($inst_id != null) {
-                try {
-                    $installment = InstallmentPlan::retrieve($inst_id);
-                    if (isset($installment->schedule)) {
-                        $total_amount = $amount;
-                        $refund_to_go = [];
-                        $truly_refundable_amount = 0;
-                        foreach ($installment->schedule as $schedule) {
-                            if (!empty($schedule->payment_ids)) {
-                                foreach ($schedule->payment_ids as $p_id) {
-                                    $p = Payment::retrieve($p_id);
-                                    if ($p->is_paid && !$p->is_refunded && $amount > 0) {
-                                        $amount_refundable = (int)($p->amount - $p->amount_refunded);
-                                        $truly_refundable_amount += $amount_refundable;
-                                        if ($truly_refundable_amount < 10) {
-                                            continue;
-                                        } elseif ($amount >= $amount_refundable) {
-                                            $data = [
-                                                'amount' => $amount_refundable,
-                                                'metadata' => $metadata
-                                            ];
-                                            $amount -= $amount_refundable;
-                                        } else {
-                                            $data = [
-                                                'amount' => $amount,
-                                                'metadata' => $metadata
-                                            ];
-                                            $amount = 0;
-                                        }
-                                        $refund_to_go[] = ['id' => $p_id, 'data' => $data];
-                                    }
-                                }
-                            }
-                        }
-                        if ($truly_refundable_amount < $total_amount) {
-                            return ('error');
-                        }
-                        if (!empty($refund_to_go)) {
-                            foreach ($refund_to_go as $refnd) {
-                                try {
-                                    $refund = Refund::create($refnd['id'], $refnd['data']);
-                                } catch (Exception $e) {
-                                    return ('error');
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception $e) {
-                    return ('error');
-                }
-                InstallmentClass::updatePayplugInstallment($installment);
-            } else {
-                return ('error');
-            }
-        } else {
-            $data = [
-                'amount' => (int)$amount,
-                'metadata' => $metadata
-            ];
-
-            try {
-                $refund = Refund::create($pay_id, $data);
-            } catch (Exception $e) {
-                $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
-                $this->logger->addLog($error, 'error');
-                return 'error';
-            }
-        }
-
-        return $refund;
-    }
-
-    /**
-     * Generate refund form
-     *
-     * @param int $amount_refunded_payplug
-     * @param int $amount_available
-     * @return string
-     */
-    public function getRefundData($amount_refunded_payplug, $amount_available)
-    {
-        $this->context->smarty->assign([
-            'amount_refunded_payplug' => $amount_refunded_payplug,
-            'amount_available' => $amount_available,
-        ]);
-
-        $this->html = $this->fetchTemplate('/views/templates/admin//order/refund_data.tpl');
-
-        return $this->html;
-    }
+//    public function refundPayment()
+//    {
+//        $this->logger->addLog('[Payplug] Start refund', 'notice');
+//        $amount = Tools::getValue('amount');
+//
+//        if (!$this->amountCurrencyClass->checkAmountToRefund($amount)) {
+//            $this->logger->addLog('Incorrect amount to refund', 'notice');
+//            die(json_encode([
+//                'status' => 'error',
+//                'data' => $this->l('payplug.refundPayment.incorrectAmount')
+//            ]));
+//        } elseif ($this->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
+//            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
+//            die(json_encode([
+//                'status' => 'error',
+//                'data' => $this->l('payplug.refundPayment.amountAtLeast')
+//            ]));
+//        } else {
+//            $amount = str_replace(',', '.', Tools::getValue('amount'));
+//            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
+//            $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
+//            $amount = (int)$amount;
+//        }
+//
+//        $id_order = Tools::getValue('id_order');
+//        $pay_id = Tools::getValue('pay_id');
+//        $inst_id = Tools::getValue('inst_id');
+//        $metadata = [
+//            'ID Client' => (int)Tools::getValue('id_customer'),
+//            'reason' => 'Refunded with Prestashop'
+//        ];
+//        $pay_mode = Tools::getValue('pay_mode');
+//        $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+//
+//        if ($refund == 'error') {
+//            $this->logger->addLog('Cannot refund that amount.', 'notice');
+//            $this->logger->addLog(
+//                '$pay_id : ' . $pay_id .
+//                ' - $amount : ' . $amount .
+//                ' - $metadata : ' . json_encode($metadata) . /* or implode() ? */
+//                ' - $pay_mode : ' . $pay_mode .
+//                ' - $inst_id : ' . $inst_id,
+//                'debug'
+//            );
+//
+//            die(json_encode([
+//                'status' => 'error',
+//                'data' => $this->l('payplug.refundPayment.cannotRefund')
+//            ]));
+//        } else {
+//            $new_state = 7;
+//            $reload = false;
+//
+//            if ($inst_id != null) {
+//                $installment = $this->retrieveInstallment($inst_id);
+//                $amount_available = 0;
+//                $amount_refunded_payplug = 0;
+//                if (isset($installment->schedule)) {
+//                    foreach ($installment->schedule as $schedule) {
+//                        if (!empty($schedule->payment_ids)) {
+//                            foreach ($schedule->payment_ids as $p_id) {
+//                                $p = Payment::retrieve($p_id);
+//                                if ($p->is_paid && !$p->is_refunded) {
+//                                    $amount_available += (int)($p->amount - $p->amount_refunded);
+//                                }
+//                                $amount_refunded_payplug += $p->amount_refunded;
+//                            }
+//                        }
+//                    }
+//                }
+//                $amount_available = (float)($amount_available / 100);
+//                $amount_refunded_payplug = (float)($amount_refunded_payplug / 100);
+//                if ((int)Tools::getValue('id_state') != 0 || $amount_available == 0) {
+//                    $new_state = (int)Tools::getValue('id_state');
+//                    if ($new_state == 0) {
+//                        if ($installment->is_live == 1) {
+//                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+//                        } else {
+//                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+//                        }
+//                    }
+//                    $order = new Order((int)$id_order);
+//                    if (Validate::isLoadedObject($order)) {
+//                        if (!$this->createLockFromCartId($order->id_cart)) {
+//                            die(json_encode([
+//                                'status' => 'error',
+//                                'data' => $this->l('payplug.refundPayment.errorOccurred')
+//                            ]));
+//                        }
+//
+//                        $current_state = (int)$this->orderClass->getCurrentOrderState($order->id);
+//                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
+//                        if ($current_state != 0 && $current_state != $new_state) {
+//                            $history = new OrderHistory();
+//                            $history->id_order = (int)$order->id;
+//                            $history->changeIdOrderState($new_state, (int)$order->id);
+//                            $history->addWithemail();
+//                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+//                        }
+//
+//                        if (!$this->deleteLockFromCartId($order->id_cart)) {
+//                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+//                        } else {
+//                            $this->logger->addLog('Lock deleted.', 'notice');
+//                        }
+//                    }
+//                    $reload = true;
+//                }
+//            } else {
+//                $payment = $this->retrievePayment($refund->payment_id);
+//
+//                if ((int)Tools::getValue('id_state') != 0) {
+//                    $new_state = (int)Tools::getValue('id_state');
+//                } elseif ($payment->is_refunded == 1) {
+//                    if ($payment->is_live == 1) {
+//                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+//                    } else {
+//                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+//                    }
+//                }
+//                if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
+//                    $order = new Order((int)$id_order);
+//                    if (Validate::isLoadedObject($order)) {
+//                        if (!$this->createLockFromCartId($order->id_cart)) {
+//                            die(json_encode([
+//                                'status' => 'error',
+//                                'data' => $this->l('payplug.refundPayment.errorOccurred')
+//                            ]));
+//                        }
+//
+//                        $current_state = (int)$this->orderClass->getCurrentOrderState($order->id);
+//                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
+//                        if ($current_state != 0 && $current_state != $new_state) {
+//                            $history = new OrderHistory();
+//                            $history->id_order = (int)$order->id;
+//                            $history->changeIdOrderState($new_state, (int)$order->id);
+//                            $history->addWithemail();
+//                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+//                        } else {
+//                            $this->logger->addLog('Order status is already \'refunded\'', 'notice');
+//                        }
+//
+//                        if (!$this->deleteLockFromCartId($order->id_cart)) {
+//                            $this->logger->addLog('Lock cannot be deleted.', 'error');
+//                        } else {
+//                            $this->logger->addLog('Lock deleted.', 'notice');
+//                        }
+//                    }
+//                    $reload = true;
+//                }
+//
+//                $amount_refunded_payplug = ($payment->amount_refunded) / 100;
+//                $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
+//            }
+//
+//
+//            $data = $this->getRefundData(
+//                $amount_refunded_payplug,
+//                $amount_available
+//            );
+//            die(json_encode([
+//                'status' => 'ok',
+//                'data' => $data,
+//                'template' => $this->hookDisplayAdminOrderMain(['id_order' => $id_order]),
+//                'message' => $this->l('payplug.refundPayment.success'),
+//                'reload' => $reload
+//            ]));
+//        }
+//    }
+//
+//    /**
+//     * Make a refund
+//     *
+//     * @param string $pay_id
+//     * @param int $amount
+//     * @param string $metadata
+//     * @param string $pay_mode
+//     * @param null $inst_id
+//     * @return string
+//     * @throws ConfigurationException
+//     */
+//    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
+//    {
+//        if (Tools::strtoupper($pay_mode) == 'TEST') {
+//            ApiClass::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+//        } else {
+//            ApiClass::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+//        }
+//        if ($pay_id == null) {
+//            if ($inst_id != null) {
+//                try {
+//                    $installment = InstallmentPlan::retrieve($inst_id);
+//                    if (isset($installment->schedule)) {
+//                        $total_amount = $amount;
+//                        $refund_to_go = [];
+//                        $truly_refundable_amount = 0;
+//                        foreach ($installment->schedule as $schedule) {
+//                            if (!empty($schedule->payment_ids)) {
+//                                foreach ($schedule->payment_ids as $p_id) {
+//                                    $p = Payment::retrieve($p_id);
+//                                    if ($p->is_paid && !$p->is_refunded && $amount > 0) {
+//                                        $amount_refundable = (int)($p->amount - $p->amount_refunded);
+//                                        $truly_refundable_amount += $amount_refundable;
+//                                        if ($truly_refundable_amount < 10) {
+//                                            continue;
+//                                        } elseif ($amount >= $amount_refundable) {
+//                                            $data = [
+//                                                'amount' => $amount_refundable,
+//                                                'metadata' => $metadata
+//                                            ];
+//                                            $amount -= $amount_refundable;
+//                                        } else {
+//                                            $data = [
+//                                                'amount' => $amount,
+//                                                'metadata' => $metadata
+//                                            ];
+//                                            $amount = 0;
+//                                        }
+//                                        $refund_to_go[] = ['id' => $p_id, 'data' => $data];
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        if ($truly_refundable_amount < $total_amount) {
+//                            return ('error');
+//                        }
+//                        if (!empty($refund_to_go)) {
+//                            foreach ($refund_to_go as $refnd) {
+//                                try {
+//                                    $refund = Refund::create($refnd['id'], $refnd['data']);
+//                                } catch (Exception $e) {
+//                                    return ('error');
+//                                }
+//                            }
+//                        }
+//                    }
+//                } catch (Exception $e) {
+//                    return ('error');
+//                }
+//                $this->updatePayplugInstallment($installment);
+//            } else {
+//                return ('error');
+//            }
+//        } else {
+//            $data = [
+//                'amount' => (int)$amount,
+//                'metadata' => $metadata
+//            ];
+//
+//            try {
+//                $refund = Refund::create($pay_id, $data);
+//            } catch (Exception $e) {
+//                $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
+//                $this->logger->addLog($error, 'error');
+//                return 'error';
+//            }
+//        }
+//
+//        return $refund;
+//    }
+//
+//    /**
+//     * Generate refund form
+//     *
+//     * @param int $amount_refunded_payplug
+//     * @param int $amount_available
+//     * @return string
+//     */
+//    public function getRefundData($amount_refunded_payplug, $amount_available)
+//    {
+//        $this->context->smarty->assign([
+//            'amount_refunded_payplug' => $amount_refunded_payplug,
+//            'amount_available' => $amount_available,
+//        ]);
+//
+//        $this->html = $this->fetchTemplate('/views/templates/admin//order/refund_data.tpl');
+//
+//        return $this->html;
+//    }
 
     /**
      * Register transaction as pending to etablish link with order in case of error
@@ -3773,7 +3772,7 @@ class PayPlugClass extends PaymentModule
                 foreach ($cards as $card) {
                     $id_customer = $card['id_customer'];
                     $id_payplug_card = $card['id_payplug_card'];
-                    if (!$this->card->deleteCard($id_customer, $id_payplug_card)) {
+                    if (!$this->card->deleteCard((int)$id_customer, (int)$id_payplug_card)) {
                         return false;
                     }
                 }

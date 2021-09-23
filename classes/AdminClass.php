@@ -39,6 +39,7 @@ class AdminClass extends \Payplug
     private $html = '';
     private $mediaClass;
     private $paymentRepository;
+    private $refundClass;
 
     public function __construct()
     {
@@ -47,6 +48,7 @@ class AdminClass extends \Payplug
         $this->configClass = $this->module->configClass;
         $this->mediaClass = new MediaClass($this->module);
         $this->paymentRepository = $this->module;
+        $this->refundClass = $this->module->refundClass;
         $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
@@ -102,58 +104,53 @@ class AdminClass extends \Payplug
             $args = null;
             if (Tools::getValue('type') == 'confirm') {
                 $keys = [
+                    'activate',
                     'sandbox',
                     'embedded',
                     'standard',
                     'one_click',
                     'oney',
                     'installment',
-                    'activate',
                     'deferred',
                 ];
                 $args = [];
                 foreach ($keys as $key) {
-                    $args[$key] = Tools::getValue($key);
+                    $args[$key] = (int)Tools::getValue($key);
                 }
             }
             $this->mediaClass->displayPopin(Tools::getValue('type'), $args);
         }
 
         if (Tools::getValue('submitSettings')) {
-            if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
-                $this->displayError($this->l('payplug.adminAjaxController.settingsNotUpdated'));
-
-                die(json_encode(['error' => $this->l('payplug.adminAjaxController.settingsNotUpdated')]));
-            } else {
-                if (Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
-                    $id_order_state = Tools::getValue('payplug_deferred_state');
-                    $order_state = new OrderState($id_order_state, $this->contextSpecific->language->id);
-                    if (Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
-                        $this->contextSpecific->smarty->assign([
-                            'updated_deferred_state' => true,
-                            'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
-                            'updated_deferred_state_name' => $order_state->name,
-                            'admin_orders_link' => $this->configClass
-                                ->getSpecificPrestaClasse()
-                                ->getOrdersByStateLink(
-                                    Tools::getValue('payplug_deferred_state')
-                                ),
-                        ]);
-                    }
+            if (Tools::getValue('payplug_deferred_state') && Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
+                $id_order_state = Tools::getValue('payplug_deferred_state');
+                $order_state = new OrderState($id_order_state, $this->contextSpecific->language->id);
+                if (Tools::getValue('payplug_deferred') && Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                    $this->contextSpecific->smarty->assign([
+                        'updated_deferred_state' => true,
+                        'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
+                        'updated_deferred_state_name' => $order_state->name,
+                        'admin_orders_link' => $this->configClass
+                            ->getSpecificPrestaClasse()
+                            ->getOrdersByStateLink(
+                                Tools::getValue('payplug_deferred_state')
+                            ),
+                    ]);
                 }
-                $this->configClass->saveConfiguration();
-
-                $this->configClass->assignContentVar();
-                $content = $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
-
-                $this->contextSpecific->smarty->assign([
-                    'title' => '',
-                    'type' => 'save',
-                ]);
-                $popin = $this->module->fetchTemplate('/views/templates/admin/popin.tpl');
-
-                die(json_encode(['popin' => $popin, 'content' => $content]));
             }
+
+            $this->configClass->saveConfiguration();
+
+            $this->configClass->assignContentVar();
+            $content = $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+
+            $this->contextSpecific->smarty->assign([
+                'title' => '',
+                'type' => 'save',
+            ]);
+            $popin = $this->module->fetchTemplate('/views/templates/admin/popin.tpl');
+
+            die(json_encode(['popin' => $popin, 'content' => $content]));
         }
 
         if (Tools::isSubmit('submitAccount')) {
@@ -223,7 +220,7 @@ class AdminClass extends \Payplug
             die(json_encode(['result' => ApiClass::hasLiveKey()]));
         }
         if ((int)Tools::getValue('refund') == 1) {
-            $this->paymentRepository->refundPayment();
+            $this->refundClass->refundPayment();
         }
         if ((int)Tools::getValue('capture') == 1) {
             $this->paymentRepository->capturePayment();

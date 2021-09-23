@@ -383,6 +383,7 @@ class ConfigClass
     public function saveConfiguration()
     {
         $configurationKeys = [
+
             'PAYPLUG_DEFERRED' => 'payplug_deferred',
             'PAYPLUG_DEFERRED_AUTO' => 'payplug_deferred_auto',
             'PAYPLUG_DEFERRED_STATE' => 'payplug_deferred_state',
@@ -401,8 +402,29 @@ class ConfigClass
 
         foreach ($configurationKeys as $key => $config) {
             $value = Tools::getValue($config);
+
             if ($value != null) {
-                Configuration::updateValue($key, $value);
+                switch ($config) {
+                    case 'payplug_one_click':
+                        if ((int)Tools::getValue('payplug_standard') === 1) {
+                            Configuration::updateValue($key, $value);
+                        }
+                        break;
+                    case 'payplug_oney_optimized':
+                    case 'payplug_oney_fees':
+                        if ((int)Tools::getValue('payplug_oney') === 1) {
+                            Configuration::updateValue($key, $value);
+                        }
+                        break;
+                    case 'PAYPLUG_INST_MIN_AMOUNT':
+                    case 'PAYPLUG_INST_MODE':
+                        if ((int)Tools::getValue('payplug_inst') === 1) {
+                            Configuration::updateValue($key, $value);
+                        }
+                        break;
+                    default:
+                        Configuration::updateValue($key, $value);
+                }
             }
             if ($key == 'PAYPLUG_SHOW' && $value) {
                 $this->payplugClass->enable();
@@ -741,8 +763,12 @@ class ConfigClass
      * @return bool
      * @throws libphonenumberlight\NumberParseException
      */
-    public static function isValidMobilePhoneNumber($phone_number, $iso_code)
+    public static function isValidMobilePhoneNumber($phone_number = false, $iso_code)
     {
+        if (empty($phone_number)) {
+            return false;
+        }
+
         try {
             $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
@@ -992,7 +1018,7 @@ class ConfigClass
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             die(json_encode([
                 'content' => false,
-                'error' => $this->l('payplug.submitAccount.credentialsNotCorrect')
+                'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect')
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->apiClass->login($email, $password)) {
@@ -1006,7 +1032,7 @@ class ConfigClass
             } else {
                 die(json_encode([
                     'content' => false,
-                    'error' => $this->l('payplug.submitAccount.credentialsNotCorrect')
+                    'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect')
                 ]));
             }
         }

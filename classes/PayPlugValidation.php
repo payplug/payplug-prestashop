@@ -47,6 +47,7 @@ class PayPlugValidation
 
     public function __construct()
     {
+        sleep(1);
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
@@ -395,8 +396,6 @@ class PayPlugValidation
                 ) {
                     $secure_key = $cart->secure_key;
                     $this->logger->addLog('Secure keys do not match.', 'error');
-                    $this->logger->addLog('Customer Secure Key: ' . $customer->secure_key, 'error');
-                    $this->logger->addLog('Cart Secure Key: ' . $cart->secure_key, 'error');
                 } else {
                     $secure_key = $customer->secure_key;
                 }
@@ -562,7 +561,7 @@ class PayPlugValidation
         $link_redirect = __PS_BASE_URI__ . $order_confirmation_url
             . 'id_cart=' . $cart->id . '&id_module=' . $this->payplug->id
             . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
-        $this->logger->addLog('Redirecting to :' . $link_redirect);
+        $this->logger->addLog('Redirecting to order-confirmation page');
 
         Tools::redirect($link_redirect);
     }
