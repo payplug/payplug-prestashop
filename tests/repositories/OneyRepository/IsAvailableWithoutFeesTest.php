@@ -36,10 +36,15 @@ final class IsAvailableWithoutFeesTest extends BaseOneyRepository
 {
     public function invalidIsoDataProvider()
     {
-        yield ['IT'];
+        yield ['GB'];
         yield [42];
         yield [null];
         yield [['array', 'array', 'array', 'array']];
+    }
+    public function validIsoDataProvider()
+    {
+        yield ['IT'];
+        yield ['FR'];
     }
     /**
      * @dataProvider invalidIsoDataProvider
@@ -52,9 +57,11 @@ final class IsAvailableWithoutFeesTest extends BaseOneyRepository
         );
     }
 
-    public function testWithValidIsoCode()
+    /**
+     * @dataProvider validIsoDataProvider
+     */
+    public function testWithValidIsoCode($iso_code)
     {
-        $iso_code = 'fr';
         $this->assertSame(
             true,
             $this->repo->isAvailableWithoutFees($iso_code)

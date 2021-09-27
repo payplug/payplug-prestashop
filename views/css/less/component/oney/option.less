@@ -86,8 +86,13 @@
     max-width: 100%;
 
     .-mobile & {
+      display: none;
+    }
+    &.-x3, &.-x4  {
       width: 140px;
-      height: 30px;
+      &.-withoutFees {
+        width: 200px;
+      }
     }
   }
 
