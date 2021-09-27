@@ -2877,7 +2877,9 @@ class PayPlugClass extends PaymentModule
 
     /**
      * @description Set payment errors in cookie
-     *
+     *{
+        "php": "5.6.*"
+    }
      * @param array $payplug_errors
      * @return mixed
      * @throws Exception
