@@ -23,8 +23,8 @@
     {foreach $oney_payment_options as $oney_type=>$oney_payment_option}
         <label class="oneyOption -{$oney_type|escape:'htmlall':'UTF-8'}{if !isset($oney_payment_option.installments) || !$oney_payment_option.installments} -withoutSchedule{/if}">
             <div class="oneyOption_title">
-                <span class="oneyOption_logo oneyLogo -x{$oney_payment_option.split|escape:'htmlall':'UTF-8'}{if isset($use_fees) && !$use_fees} -withoutFees{/if}"></span>
-                {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
+                <span class="oneyOption_logo oneyLogo -x{$oney_payment_option.split|escape:'htmlall':'UTF-8'}{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($merchant_company_iso) && $merchant_company_iso == 'IT' } -isItalian{/if}"></span>
+                   {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
             </div>
             {if isset($oney_payment_option.installments) && $oney_payment_option.installments}
                 <div class="oneyOption_prices">
