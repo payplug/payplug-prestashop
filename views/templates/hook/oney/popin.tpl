@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
+<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($merchant_company_iso) && $merchant_company_iso == 'IT' } -isItalian{/if}">
     {if isset($payplug_oney_error) && $payplug_oney_error}
         <p class="oneyPopin_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</p>
     {elseif isset($oney_payment_options) && $oney_payment_options}
