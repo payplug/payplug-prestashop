@@ -192,14 +192,20 @@ var $document, $window, payplug = {
             var {installment, oney, deferred, form} = payplug;
             if (installment.props.error && form.props.data['payplug_inst'] === 1) {
                 error = error_installment + installment.props.error;
+            } else {
+                installment.props.error = null;
             }
 
             if (oney.props.error && form.props.data['payplug_oney'] === 1) {
                 error += (error ? ' <br> ' : '') + error_oney + oney.props.error;
+            } else {
+                oney.props.error = null;
             }
 
             if (deferred.props.error && form.props.data['payplug_deferred'] === 1) {
                 error += (error ? ' <br> ' : '') + error_deferred + deferred.props.error;
+            } else {
+                deferred.props.error = null;
             }
 
             return error;
