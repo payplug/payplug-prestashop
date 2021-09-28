@@ -352,6 +352,7 @@ class OneyRepository extends Repository
             'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO'),
         ];
         $this->assign->assign($vars);
+
         return $this->media->fetchTemplate('oney/schedule.tpl');
     }
 
