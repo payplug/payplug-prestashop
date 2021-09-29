@@ -765,7 +765,7 @@ class ConfigClass
      */
     public static function isValidMobilePhoneNumber($phone_number = false, $iso_code)
     {
-        if (empty($phone_number)) {
+        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
             return false;
         }
 
@@ -799,7 +799,7 @@ class ConfigClass
      */
     public static function formatPhoneNumber($phone_number, $country)
     {
-        if (empty($phone_number)) {
+        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
             return null;
         }
         if (!is_object($country)) {
