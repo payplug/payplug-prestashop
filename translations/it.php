@@ -245,6 +245,7 @@ $_MODULE['<{payplug}prestashop>order-confirmation_eae9c553a9ba6b913ec08183247bd5
 $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Dettagli di pagamento PayPlug';
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'L\'avvio di questo pagamento è autorizzato prima del %s. Successivamente, non potrai più ricevere questo pagamento';
 $_MODULE['<{payplug}prestashop>payment_857c6756c12ade188400a6c60384191e'] = 'Pagamento in 3 o 4 con Carta di Credito';
+$_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = 'Scorpi di più';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>payplug_01abf60a14b2f7a636aefbb242c981f7'] = 'Il tuo server deve essere su PHP 5.6 o maggiore';
 $_MODULE['<{payplug}prestashop>payplug_078ed84f95595cd3a2d3e072e2a10d84'] = 'C\'è stato un errore';
@@ -414,6 +415,7 @@ $_MODULE['<{payplug}prestashop>schedule_50df9ae96246d6eb7d6e8a667c4f01be'] = 'Di
 $_MODULE['<{payplug}prestashop>schedule_5373c2bf7ae0b4507e2b5338b666888d'] = '2^ rata :';
 $_MODULE['<{payplug}prestashop>schedule_66c4c5112f455a19afde47829df363fa'] = 'Totale da rimborsare';
 $_MODULE['<{payplug}prestashop>schedule_6702a6e3bc2dce95c3e3b61fe578f29c'] = 'Prezzo bene :';
+$_MODULE['<{payplug}prestashop>schedule_708ff60040afa08d96955ee0072a533a'] = 'Scorpi di più';
 $_MODULE['<{payplug}prestashop>schedule_810b5c183d53c2990f950efec79cb10f'] = '4^ rata :';
 $_MODULE['<{payplug}prestashop>schedule_d8c95bbe3381aefc91f51bb6f92de615'] = 'TAEG :';
 $_MODULE['<{payplug}prestashop>settings_94cb47d890cbd4a457ea57dd1ccbfaa8'] = 'Attiva il tuo conto per effettuare transazioni LIVE.';
