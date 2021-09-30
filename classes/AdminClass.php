@@ -71,6 +71,28 @@ class AdminClass extends \Payplug
     }
 
     /**
+     * @param string $controller_name
+     * @param int $id_order
+     * @return string
+     */
+    public static function getAdminUrl($controller_name = 'AdminModules', $params = [])
+    {
+        if (!empty($params) && !is_array($params)) {
+            return false;
+        }
+
+        $context = (new ContextSpecific())->getContext();
+        $admin_url = $context->link->getAdminLink($controller_name);
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                $admin_url .= '&' . $key . (empty($value) ? '' : '='.$value);
+            }
+        }
+
+        return $admin_url;
+    }
+
+    /**
      * @return string
      * @see Module::getContent()
      *
