@@ -69,3 +69,7 @@
         </ul>
     {/if}
 </div>
+
+{if $language.iso_code == 'it' && $merchant_company_iso == 'IT'}
+    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf" target="_blank" class="oneyScheduleCGV">{l s='hook.oney.schedule.cgv' mod='payplug'}</a>
+{/if}
