@@ -40,6 +40,9 @@
             {/if}
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
+                {if $lang_iso == 'it' && $merchant_company_iso == 'IT'}
+                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
+                {/if}
             </div>
         {else}
             <div class="oneyOption_wrapper -loading">
