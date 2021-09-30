@@ -1323,7 +1323,6 @@ class PayPlugClass extends PaymentModule
 
         $inst_id = null;
         $payment_id = $this->getPayplugInstallmentCart($order->id_cart);
-
         // Backward if order validated before
         if (!$payment_id) {
             $payment_id = $this->getPayplugInstallmentCartBackward($order->id_cart);
@@ -1684,8 +1683,61 @@ class PayPlugClass extends PaymentModule
             $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
 
+        // check order state history
+        $undefined_history_states = $this->getUndefinedOrderHistory($order->id);
+        if (!empty($undefined_history_states)) {
+            $payplug_order_state_url = 'https://support.payplug.com/hc/'
+                . $this->context->language->iso_code
+                . '/articles/4406805105298';
+            $this->context->smarty->assign([
+                'payplug_order_state_url' => $payplug_order_state_url,
+                'undefined_history_states' => $undefined_history_states,
+            ]);
+        }
+
         $this->html .= $this->fetchTemplate('/views/templates/admin/order/order.tpl');
         return $this->html;
+    }
+
+    /**
+     * @description get the undefined order state on an history
+     * @param int $orderId
+     * @return array
+     */
+    public function getUndefinedOrderHistory($orderId = false)
+    {
+        if (!$orderId || !is_int($orderId)) {
+            return [];
+        }
+
+        $order_history_states = $this->query
+            ->select()
+            ->fields('oh.id_order_state, osl.name')
+            ->from(_DB_PREFIX_ . 'order_history', 'oh')
+            ->leftJoin(_DB_PREFIX_ . 'order_state_lang', 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
+            ->where('oh.id_order = ' . $orderId)
+            ->where('osl.id_lang = ' . $this->context->language->id)
+            ->build();
+
+        if (empty($order_history_states)) {
+            return [];
+        }
+
+        foreach ($order_history_states as $key => &$state) {
+            $type = $this->plugin->getOrderState()->getType((int)$state['id_order_state']);
+            $state['type'] = $type;
+            if (!$type || 'undefined' != $type) {
+                unset($order_history_states[$key]);
+                continue;
+            }
+            $update_link_params = [
+                'updateorder_state' => '',
+                'id_order_state' => $state['id_order_state']
+            ];
+            $state['updateLink'] = AdminClass::getAdminUrl('AdminStatuses', $update_link_params);
+        }
+
+        return $order_history_states;
     }
 
 //    /**
