@@ -244,6 +244,8 @@ $_MODULE['<{payplug}prestashop>order-confirmation_e28b1245d3810003295787de8c235f
 $_MODULE['<{payplug}prestashop>order-confirmation_eae9c553a9ba6b913ec08183247bd58a'] = 'Référence :';
 $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Détail du paiement PayPlug';
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'La capture de ce paiement est autorisée avant le %s. Après cette date, vous ne pourrez plus être payé.';
+$_MODULE['<{payplug}prestashop>order_state_87b9c32cfe0d587a0a635bc846380859'] = 'Attention, le statut de commande [1]%s[/1] n\'est pas configuré pour être interprété par le module PayPlug. Pour que vos paiements associés au module soient parfaitement traités, nous vous conseillons d\'éditer la [2]Configuratoin avec le module PayPlug[/2] depuis vos paramètres de commande en cliquant [3]ICI[/3].';
+$_MODULE['<{payplug}prestashop>order_state_da2fde2b954058fb173a89c89416e4e4'] = 'Si vous souhaitez avoir plus d\'informations, vous pouvez consultez notre FAQ en cliquant [1]ICI[/1].';
 $_MODULE['<{payplug}prestashop>payment_857c6756c12ade188400a6c60384191e'] = 'Payer en 3x ou 4x par carte bancaire';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transaction a échoué, votre carte de paiement ne sera pas débitée.';
 $_MODULE['<{payplug}prestashop>payplug_01abf60a14b2f7a636aefbb242c981f7'] = 'La version PHP de votre serveur doit être la version 5.6 au minimum';
