@@ -103,7 +103,7 @@ class HookRepository extends Repository
     public function displayAdminStatusesForm($param)
     {
         $types = [
-            '' => $this->l('hook.displayAdminStatusesForm.undefined'),
+            'undefined' => $this->l('hook.displayAdminStatusesForm.undefined'),
             'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
             'cancelled' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
             'error' => $this->l('hook.displayAdminStatusesForm.orderStateTypeError'),
