@@ -179,7 +179,9 @@ var $document, $window, payplug = {
         set: function (content) {
             var {popup} = payplug,
                 {identifier} = popup.props;
-
+            if (!sanitizePopupHtml(content)) {
+                return;
+            }
             if (!$('.' + identifier).length) {
                 popup.create();
             }
@@ -224,7 +226,7 @@ var $document, $window, payplug = {
             var {popup} = payplug,
                 {identifier} = popup.props;
             $('.' + identifier + '_content').html(content);
-        }
+        },
     }
 };
 $(document).ready(function () {
