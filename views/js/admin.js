@@ -1174,6 +1174,9 @@ var $document, $window, payplug = {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props;
 
+                if (!sanitizePopupHtml(content)) {
+                    return;
+                }
                 if ($('.' + identifier).length) {
                     popup.remove();
                 }
@@ -1223,6 +1226,7 @@ var $document, $window, payplug = {
                 var {popup} = payplug.tools,
                     {identifier} = popup.props;
                 $('.' + identifier + '_content').html(content);
+
             },
             error: function (str) {
                 var {popup} = payplug.tools;

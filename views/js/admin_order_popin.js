@@ -39,8 +39,11 @@ function callInfoRefund(){
             console.log(textStatus);
             console.log(errorThrown);
         },
-        success: function(result)
-        {
+        success: function (result) {
+            //html content
+            if (!sanitizePopupHtml(result.content)) {
+                return;
+            }
             $('body').append(result.content);
             $('.ppclose, span.ppcancel').bind('click', function(){
                 $('#payplug_popin').remove();
