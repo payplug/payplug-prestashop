@@ -558,7 +558,9 @@ var $document, $window, payplugModule = {
         set: function (content) {
             var popup = payplugModule.popup,
                 props = popup.props;
-
+            if (!sanitizePopupHtml(content)) {
+                return;
+            }
             if ($('.' + props.identifier).length) {
                 popup.close();
             } else {
@@ -566,6 +568,8 @@ var $document, $window, payplugModule = {
             }
             popup.hydrate(content);
             popup.open();
+
+
         },
         setDeleteCardPopup:  function (content) {
             var popup = payplugModule.popup,
@@ -609,6 +613,7 @@ var $document, $window, payplugModule = {
             var props = payplugModule.popup.props;
             $('.' + props.identifier + '_content').html(content);
         }
+
     }
 };
 $(document).ready(function () {

@@ -530,6 +530,7 @@ class ConfigClass
         }
 
         $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
         $this->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
