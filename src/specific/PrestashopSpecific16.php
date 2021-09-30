@@ -48,6 +48,7 @@ class PrestashopSpecific16
     {
         $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
         $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
+        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
 
         Media::addJsDef([
             'payplug_ajax_url' => $this->contextSpecific->link->getModuleLink('payplug', 'ajax', [], true),
