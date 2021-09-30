@@ -777,6 +777,23 @@ class PayPlugNotifications
     }
 
     /**
+     * @description Process Payment Ressource when related Order is with a status Nothing
+     */
+    private function processTypeUndefined()
+    {
+        $this->logger->addLog('Notification: processTypeUndefined');
+        $id_order_state = $this->order->current_state;
+
+        // check current order state type to create if it's empty
+        $type = $this->plugin->getOrderState()->getType((int)$id_order_state);
+        if ($type != $this->type) {
+            $this->order_state->setType((int)$id_order_state, $this->type);
+        }
+
+        $this->exitProcess('The order state is not defined');
+    }
+
+    /**
      * @description Update order from the notification
      *
      * @param $id_order Identificer of the order to update
