@@ -23,23 +23,13 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\CurrencyInterface;
-use Currency;
+use PayPlug\src\interfaces\OrderHistoryInterface;
+use \OrderHistory;
 
-class CurrencySpecific implements CurrencyInterface
+class OrderHistorySpecific implements OrderHistoryInterface
 {
-    public static function factory()
+    public function get($idOrderHistory = null)
     {
-        return new self();
-    }
-
-    public function getCurrency($idCurrency)
-    {
-        return new Currency($idCurrency);
-    }
-
-    public function getIdByIsoCode($isoCode)
-    {
-        return Currency::getIdByIsoCode($isoCode);
+        return new OrderHistory($idOrderHistory);
     }
 }

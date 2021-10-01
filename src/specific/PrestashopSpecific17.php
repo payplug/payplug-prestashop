@@ -40,7 +40,7 @@ class PrestashopSpecific17
         $this->contextSpecific = (new ContextSpecific())->getContext();
     }
 
-    public function hookHeader()
+    public function displayHeader()
     {
         $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
         $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');

@@ -160,7 +160,7 @@ class Payplug extends PaymentModule
     {
         //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
-            return $this->module->hookActionAdminPerformanceControllerAfter($params);
+            return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
         }
     }
 
@@ -173,7 +173,7 @@ class Payplug extends PaymentModule
     {
         //todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
-            return $this->module->hookActionClearCompileCache($params);
+            return $this->payplug_dependencies->hookClass->actionClearCompileCache($params);
         }
     }
 
@@ -184,7 +184,7 @@ class Payplug extends PaymentModule
     public function hookActionDeleteGDPRCustomer($params)
     {
         if ($this->module) {
-            return $this->module->hookActionDeleteGDPRCustomer($params);
+            return $this->payplug_dependencies->hookClass->actionDeleteGDPRCustomer($params);
         }
     }
 
@@ -195,7 +195,7 @@ class Payplug extends PaymentModule
     public function hookActionExportGDPRData($params)
     {
         if ($this->module) {
-            return $this->module->hookActionExportGDPRData($params);
+            return $this->payplug_dependencies->hookClass->actionExportGDPRData($params);
         }
     }
 
@@ -206,7 +206,7 @@ class Payplug extends PaymentModule
     public function hookActionOrderStatusUpdate($params)
     {
         if ($this->module) {
-            return $this->module->hookActionOrderStatusUpdate($params);
+            return $this->payplug_dependencies->hookClass->actionOrderStatusUpdate($params);
         }
     }
 
@@ -242,7 +242,7 @@ class Payplug extends PaymentModule
     public function hookAdminOrder($params)
     {
         if ($this->module) {
-            return $this->module->hookAdminOrder($params);
+            return $this->payplug_dependencies->hookClass->adminOrder($params);
         }
     }
 
@@ -253,7 +253,7 @@ class Payplug extends PaymentModule
     public function hookCustomerAccount($params)
     {
         if ($this->module) {
-            return $this->module->hookCustomerAccount($params);
+            return $this->payplug_dependencies->hookClass->customerAccount($params);
         }
     }
 
@@ -264,7 +264,7 @@ class Payplug extends PaymentModule
     public function hookDisplayAdminOrderMain($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayAdminOrderMain($params);
+            return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }
     /**
@@ -285,7 +285,7 @@ class Payplug extends PaymentModule
     public function hookDisplayBackOfficeFooter($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayBackOfficeFooter($params);
+            return $this->payplug_dependencies->hookClass->displayBackOfficeFooter($params);
         }
     }
 
@@ -297,7 +297,7 @@ class Payplug extends PaymentModule
     public function hookDisplayBeforeShoppingCartBlock($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayBeforeShoppingCartBlock($params);
+            return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
         }
     }
 
@@ -308,7 +308,7 @@ class Payplug extends PaymentModule
     public function hookDisplayExpressCheckout($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayExpressCheckout($params);
+            return $this->payplug_dependencies->hookClass->displayExpressCheckout($params);
         }
     }
 
@@ -319,7 +319,7 @@ class Payplug extends PaymentModule
     public function hookDisplayProductPriceBlock($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayProductPriceBlock($params);
+            return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
         }
     }
 
@@ -330,7 +330,7 @@ class Payplug extends PaymentModule
     public function hookHeader($params)
     {
         if ($this->module) {
-            return $this->module->hookHeader($params);
+            return $this->payplug_dependencies->hookClass->displayHeader($params);
         }
     }
 
@@ -343,7 +343,7 @@ class Payplug extends PaymentModule
     public function hookPayment($params)
     {
         if ($this->module) {
-            return $this->module->hookPayment($params);
+            return $this->payplug_dependencies->hookClass->payment($params);
         }
     }
 
@@ -354,7 +354,7 @@ class Payplug extends PaymentModule
     public function hookPaymentOptions($params)
     {
         if ($this->module) {
-            return $this->module->hookPaymentOptions($params);
+            return $this->payplug_dependencies->hookClass->paymentOptions($params);
         }
     }
 
@@ -365,7 +365,7 @@ class Payplug extends PaymentModule
     public function hookPaymentReturn($params)
     {
         if ($this->module) {
-            return $this->module->hookPaymentReturn($params);
+            return $this->payplug_dependencies->hookClass->paymentReturn($params);
         }
     }
 
@@ -376,7 +376,7 @@ class Payplug extends PaymentModule
     public function hookRegisterGDPRConsent($params)
     {
         if ($this->module) {
-            return $this->module->hookRegisterGDPRConsent($params);
+            return $this->payplug_dependencies->hookClass->registerGDPRConsent($params);
         }
     }
 

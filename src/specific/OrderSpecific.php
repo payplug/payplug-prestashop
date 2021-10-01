@@ -23,23 +23,13 @@
 
 namespace PayPlug\src\specific;
 
-use PayPlug\src\interfaces\CurrencyInterface;
-use Currency;
+use PayPlug\src\interfaces\OrderInterface;
+use \Order;
 
-class CurrencySpecific implements CurrencyInterface
+class OrderSpecific implements OrderInterface
 {
-    public static function factory()
+    public function get($idOrder = null)
     {
-        return new self();
-    }
-
-    public function getCurrency($idCurrency)
-    {
-        return new Currency($idCurrency);
-    }
-
-    public function getIdByIsoCode($isoCode)
-    {
-        return Currency::getIdByIsoCode($isoCode);
+        return new Order($idOrder);
     }
 }
