@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Annullare';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Il tuo cliente non verrà prelevato alle prossime scadenze';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Cancella';
@@ -107,7 +107,7 @@ $_MODULE['<{payplug}prestashop>deferred_c0a31a29ae3795479c755bea7de57d87'] = 'Vo
 $_MODULE['<{payplug}prestashop>deferred_f0e9528cdbef74b2eafcdc12f9ee1c7d'] = 'Ok';
 $_MODULE['<{payplug}prestashop>detail_1751f25e086816ff3f16ece383bf6748'] = 'Di cui una commissione :';
 $_MODULE['<{payplug}prestashop>detail_1ede4116fd872e9e0f5a98d7336c85f2'] = '3^ rata :';
-$_MODULE['<{payplug}prestashop>detail_37eb93e05c9251e795a791aa443a89d1'] = '1^ rata contestuale all’acquisto :';
+$_MODULE['<{payplug}prestashop>detail_37eb93e05c9251e795a791aa443a89d1'] = '1^ rata contestuale all\'acquisto :';
 $_MODULE['<{payplug}prestashop>detail_4d7da9ce0291d16b9a09ac2ec8396407'] = 'Prezzo :';
 $_MODULE['<{payplug}prestashop>detail_5ea124f367ed8b5153c6db03f4dcfa27'] = 'TAEG :';
 $_MODULE['<{payplug}prestashop>detail_6f1226fd92da3929f420967a15611609'] = 'Totale da rimborsare';
@@ -213,7 +213,6 @@ $_MODULE['<{payplug}prestashop>oneyrepository_16bfbf9c462762cf1cba4134ec53c504']
 $_MODULE['<{payplug}prestashop>oneyrepository_170f5e9365a8f2305fea05a99c36dfcc'] = 'L\'adresse e-mail est invalide';
 $_MODULE['<{payplug}prestashop>oneyrepository_22d545ded224c1e3f0f821e99f01ed09'] = 'L\'importo totale del tuo ordine deve essere compreso tra %s e %s per pagare tramite Oney.';
 $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56'] = 'Si prega di cambiarlo con un altro o selezionare un altro metodo di pagamento.';
-$_MODULE['<{payplug}prestashop>oneyrepository_37aad38a9a02f6659c12948a70b838fe'] = 'Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s à %s. Sous réserve d\'acceptation par Oney Bank. Vous disposez d\'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 www.orias.fr.  Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr';
 $_MODULE['<{payplug}prestashop>oneyrepository_427d2eef786cda4bb73d9ec1429a34b9'] = 'Per favore inserisci il tuo nome.';
 $_MODULE['<{payplug}prestashop>oneyrepository_46170db793b9e6e143d187c02a572b7c'] = 'Inserisci il tuo indirizzo di consegna.';
 $_MODULE['<{payplug}prestashop>oneyrepository_64f345381f968fbbd95f877090c2c984'] = 'Inserisci il tuo indirizzo di fatturazione.';
@@ -269,7 +268,6 @@ $_MODULE['<{payplug}prestashop>payplug_4184226d54ba4ad13a534c30e72e58f5'] = 'One
 $_MODULE['<{payplug}prestashop>payplug_4929cc1470a0d9160fc0ae0805274694'] = 'Non disponibile per questo metodo di spedizione';
 $_MODULE['<{payplug}prestashop>payplug_4e6cb8f062db9b5389f11b30b50358fc'] = 'Devi connetterti al tuo conto PayPlug';
 $_MODULE['<{payplug}prestashop>payplug_4e95b36ca864e9540cc94a3953477f43'] = 'Paga in %sx rate senza spese con carta di gradito grazie a Oney';
-$_MODULE['<{payplug}prestashop>payplug_50c92213aac3437fd7b6081ccb274cd8'] = 'Aggiornamento non riuscito';
 $_MODULE['<{payplug}prestashop>payplug_53f4a41ab6d3316c9da1ada62948d722'] = 'Il tuo carrello non è disponibile';
 $_MODULE['<{payplug}prestashop>payplug_5428457c441d4d06d6c1e689d7714348'] = 'PayPlug : Impossibile esportare il save card del cliente.';
 $_MODULE['<{payplug}prestashop>payplug_56be02fc0a037528c968cf3b02e550f0'] = 'PAGATO';
@@ -372,6 +370,7 @@ $_MODULE['<{payplug}prestashop>popin_19cf27400430cae294abe8c130a8d377'] = 'Pagam
 $_MODULE['<{payplug}prestashop>popin_4966fa949aed9ec282f487176693330f'] = 'PAGHI IN 3 o 4 RATE';
 $_MODULE['<{payplug}prestashop>popin_74e747c329df0fcd765e14259821f6a4'] = 'senza spese';
 $_MODULE['<{payplug}prestashop>popin_8b70bd53d8f4322982f066ecf5655fcc'] = 'con carta di credito';
+$_MODULE['<{payplug}prestashop>popin_8def3e33e7dfa02cf19538095121ef81'] = ' ';
 $_MODULE['<{payplug}prestashop>popin_cd73f52a61ee7f26a6d37a69c045c84f'] = '3x4x Oney è una dilazione di pagamento che non ricade nell\'ambito di applicazione del credito ai consumatori di cui al Titolo VI, Capo II TUB, offerta da Oney Bank SA., capitale € 51.286.585 - 34 Avenue de Flandre 59170 Croix - RCS Lille, Metropole - 546 380 197 - n° Orias 07 023 261, che opera in Italia in regime di libera prestazione di servizi. L\'utilizzo di 3x4xOney è riservato alle persone fisiche maggiorenni, per importi finanziabili compresi tra un minimo di %s e un massimo di %s con rimborsi rateali fino ad un massimo di 90 giorni ed è soggetto alla preventiva approvazione di Oney Bank SA. Oney Bank SA. prevede l\'applicazione di una commissione fissa per l\'utilizzo di 3x4xOney. Il cliente ha 14 giorni di tempo dalla data di conclusione di ciascun finanziamento per rinunciarvi e esercitare il diritto di recesso, senza spese e costi. Documenti informativi disponibili su [1]www.oney.it[/1]';
 $_MODULE['<{payplug}prestashop>popin_d3d2e617335f08df83599665eef8a418'] = 'Chiudere';
 $_MODULE['<{payplug}prestashop>premium_b2e272184549c5d806805623cd0abfea'] = 'Non hai accesso a questa funzione. [1]Per più informazioni contattaci tramite il nostro [2]sito web[/2].[/1]';
@@ -409,7 +408,7 @@ $_MODULE['<{payplug}prestashop>sandbox_77c3eb6aeafe60a4d58c65b6823b2dec'] = 'Pag
 $_MODULE['<{payplug}prestashop>sandbox_f990e553cdc4c29c2efffba33e08a8c7'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>save_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>save_a6489557b8e386d5c51fb94e856981ea'] = 'La tua configurazione è stata salvata';
-$_MODULE['<{payplug}prestashop>schedule_27eee3035a4c08284bfee82ababe49e6'] = '1^ rata contestuale all’acquisto :';
+$_MODULE['<{payplug}prestashop>schedule_27eee3035a4c08284bfee82ababe49e6'] = '1^ rata contestuale all\'acquisto :';
 $_MODULE['<{payplug}prestashop>schedule_4e05092e46f4c2261ee1bcc3a7b598ec'] = '3^ rata :';
 $_MODULE['<{payplug}prestashop>schedule_50df9ae96246d6eb7d6e8a667c4f01be'] = 'Di cui una commissione :';
 $_MODULE['<{payplug}prestashop>schedule_5373c2bf7ae0b4507e2b5338b666888d'] = '2^ rata :';
@@ -434,8 +433,8 @@ $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Si è verificato un errore. Riprova tra un attimo.';
 $_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c84ab97f'] = 'Le tue informazioni sono state salvate';
 $_MODULE['<{payplug}prestashop>translationsrepository_f5146f3861c487374c38fb5ec78cda73'] = 'Almeno un campo non è stato completato correttamente.';
+$_MODULE['<{payplug}prestashop>type_0d0369d8e376117618156ad1cf136e21'] = 'Seleziona un\'opzione tra quelle proposte';
 $_MODULE['<{payplug}prestashop>type_66329ddfb8a6bcfba7aa72f602bc4abc'] = 'Configurazione con il modulo PayPlug';
-$_MODULE['<{payplug}prestashop>type_0d0369d8e376117618156ad1cf136e21'] = 'Seleziona un’opzione tra quelle proposte';
-$_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'Grazie all’opzione che hai appena scelto, il modulo di pagamento PayPlug sarà in grado di identificare con precisione e in modo automatico lo stato del tuo ordine. [1]Per saperne di più[/1]';
+$_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'Grazie all\'opzione che hai appena scelto, il modulo di pagamento PayPlug sarà in grado di identificare con precisione e in modo automatico lo stato del tuo ordine. [1]Per saperne di più[/1]';
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Aggiorna';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Aggiorna questo ordine';
