@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Interrompre';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Votre client ne sera pas prélevé aux échéances prévues.';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Annuler';
@@ -269,7 +269,6 @@ $_MODULE['<{payplug}prestashop>payplug_4184226d54ba4ad13a534c30e72e58f5'] = 'One
 $_MODULE['<{payplug}prestashop>payplug_4929cc1470a0d9160fc0ae0805274694'] = 'Indisponible avec ce mode de livraison';
 $_MODULE['<{payplug}prestashop>payplug_4e6cb8f062db9b5389f11b30b50358fc'] = 'Votre compte PayPlug doit-être connecté';
 $_MODULE['<{payplug}prestashop>payplug_4e95b36ca864e9540cc94a3953477f43'] = 'Payer en %sx sans frais par carte avec Oney';
-$_MODULE['<{payplug}prestashop>payplug_50c92213aac3437fd7b6081ccb274cd8'] = 'Les changements n\'ont pas été mis à jour.';
 $_MODULE['<{payplug}prestashop>payplug_53f4a41ab6d3316c9da1ada62948d722'] = 'Votre panier est indisponible';
 $_MODULE['<{payplug}prestashop>payplug_5428457c441d4d06d6c1e689d7714348'] = 'PayPlug : Unable to export customer saved cards.';
 $_MODULE['<{payplug}prestashop>payplug_56be02fc0a037528c968cf3b02e550f0'] = 'PAYÉ';
@@ -434,8 +433,8 @@ $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Une erreur s\'est produite. Veuillez réessayer dans quelques secondes.';
 $_MODULE['<{payplug}prestashop>translationsrepository_53e41386744dfc0c2665f7f5c84ab97f'] = 'Vos informations ont été sauvegardées';
 $_MODULE['<{payplug}prestashop>translationsrepository_f5146f3861c487374c38fb5ec78cda73'] = 'Au moins un champ n\'est pas completé correctement.';
-$_MODULE['<{payplug}prestashop>type_66329ddfb8a6bcfba7aa72f602bc4abc'] = 'Configuration avec le module PayPlug';
 $_MODULE['<{payplug}prestashop>type_0d0369d8e376117618156ad1cf136e21'] = 'Veuillez sélectionner une option parmi celles proposées';
+$_MODULE['<{payplug}prestashop>type_66329ddfb8a6bcfba7aa72f602bc4abc'] = 'Configuration avec le module PayPlug';
 $_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'L\'option que vous choisirez ci-dessus permettra au module de paiement PayPlug d\'intérpreter avec précision votre statut de commande de façon automatisée. [1]En savoir plus[/1]';
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Mettre à jour';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Mettre à jour cette commande';
