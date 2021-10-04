@@ -1,5 +1,4 @@
 function getHtmlTags (html) {
-    console.log("getHtmlTags");
     var htmlContent =  document.createElement('div');
     htmlContent.innerHTML = html;
     allTags = htmlContent.getElementsByTagName("*");
@@ -14,10 +13,10 @@ function getHtmlTags (html) {
 }
 
 function sanitizePopupHtml (str) {
-    // if (str.match(/ on\w+="[^"]*"/g)) {
-    //     return;
-    // }
-    var tagsWhitelist = ['DIV','P', 'INPUT','BUTTON','A','UL','LI','STRONG','SPAN','FORM','SMALL','B','BR'];
+    if (str.match(/ on\w+="[^"]*"/g)) {
+        return;
+    }
+    var tagsWhitelist = ['DIV','P', 'INPUT','BUTTON','A','UL','U','LI','STRONG','SPAN','FORM','SMALL','B','BR'];
     tags = this.getHtmlTags(str);
     return tagsWhitelist.filter(e => tags.indexOf(e) !== -1).length === tags.length;
 }
