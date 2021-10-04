@@ -1,20 +1,14 @@
 /* Oney payment */
 .oneyPayment {
-  img {
-    max-height: 35px;
-  }
-
   .borderRadius(4px);
   .transition(~"max-height @{dur}");
   background: #fbfbfb;
   overflow: hidden;
+  border: 1px solid #d6d4d4;
+  max-height: 90px;
 
   &.-disabled {
     max-height: none;
-  }
-  &.-optimized {
-    border: 1px solid #d6d4d4;
-    max-height: 90px;
   }
 
   &.-open {
