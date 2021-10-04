@@ -914,7 +914,7 @@ var $document,
             hydrate: function (content) {
                 var props = payplugModule.popup.props;
                 $('.' + props.mainClass + '_content').html(content);
-            },
+            }
         }
     };
 $(document).ready(function () {
