@@ -24,6 +24,7 @@
 namespace PayPlug\classes;
 
 use Db;
+use DbQuery;
 use OrderState;
 
 class OrderClass extends \PaymentModule
@@ -53,6 +54,16 @@ class OrderClass extends \PaymentModule
             $id_lang = $this->context->language->id;
         }
         return OrderState::getOrderStates($id_lang);
+    }
+
+    public function getPayPlugOrderStates($module)
+    {
+        $query = new DbQuery();
+        $query->select('GROUP_CONCAT(id_order_state) as id_order_states');
+        $query->from('order_state');
+        $query->where('module_name = "' . pSQL($module) . '"');
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
     }
 
     /**
