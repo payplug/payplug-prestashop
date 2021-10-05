@@ -807,7 +807,7 @@ class PayPlugNotifications
         $this->logger->addLog('Current order state: ' . $this->order->current_state);
         $this->logger->addLog('Type: ' . $type);
 
-        $this->type = $type ?: 'nothing';
+        $this->type = $type ?: 'undefined';
         $method = 'processType' . Tools::ucfirst($this->type);
         $this->$method();
     }
