@@ -195,6 +195,7 @@ $_MODULE['<{payplug}prestashop>one_click_c5911ec14acf9721f1c3cdece83c86bf'] = 'L
 $_MODULE['<{payplug}prestashop>one_click_cea985da4143cee6631bf7048633e935'] = 'Enable one-click payments';
 $_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Enable garanteed installment Payments with Oney';
 $_MODULE['<{payplug}prestashop>oney_33b0504f0b776f2c13381c543bf2017c'] = 'Go further';
+$_MODULE['<{payplug}prestashop>oney_6203ef41221829a8ade1446b71a65884'] = 'I would like to offer guaranteed payment in installments for amounts between';
 $_MODULE['<{payplug}prestashop>oney_65ce6b12de05d7a1af6190b2ac9153c7'] = 'Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration.';
 $_MODULE['<{payplug}prestashop>oney_f990e553cdc4c29c2efffba33e08a8c7'] = 'Learn more.';
 $_MODULE['<{payplug}prestashop>oney_fe6c0722a97f8fc5aed036c7f16c8339'] = 'Allow customers to spread out payments over 3 or 4 installments from %d € to %d €.';

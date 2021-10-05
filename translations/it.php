@@ -195,6 +195,7 @@ $_MODULE['<{payplug}prestashop>one_click_c5911ec14acf9721f1c3cdece83c86bf'] = 'P
 $_MODULE['<{payplug}prestashop>one_click_cea985da4143cee6631bf7048633e935'] = 'Attivare i pagamenti in un click';
 $_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Attiva i pagamenti rateizzati garantiti Oney';
 $_MODULE['<{payplug}prestashop>oney_33b0504f0b776f2c13381c543bf2017c'] = 'Per andare più lontano:';
+$_MODULE['<{payplug}prestashop>oney_6203ef41221829a8ade1446b71a65884'] = 'Desidero proporre il pagamento a rate garantito per importi compresi tra';
 $_MODULE['<{payplug}prestashop>oney_65ce6b12de05d7a1af6190b2ac9153c7'] = 'Ottimizza l\'esperienza del cliente con uno scadenziario dinamico in 3 o 4 rate.';
 $_MODULE['<{payplug}prestashop>oney_f990e553cdc4c29c2efffba33e08a8c7'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>oney_fe6c0722a97f8fc5aed036c7f16c8339'] = 'Permetti ai tuoi clienti di scaglionare il pagamento dei loro ordini in 3x, 4x a partire da %d € e fino a %d €.';

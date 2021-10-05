@@ -195,6 +195,7 @@ $_MODULE['<{payplug}prestashop>one_click_c5911ec14acf9721f1c3cdece83c86bf'] = 'E
 $_MODULE['<{payplug}prestashop>one_click_cea985da4143cee6631bf7048633e935'] = 'Activer les paiements en un clic';
 $_MODULE['<{payplug}prestashop>oney_249cbcba7e12b6f306d087d9d17c48bf'] = 'Activer les paiements fractionnés garantis avec Oney';
 $_MODULE['<{payplug}prestashop>oney_33b0504f0b776f2c13381c543bf2017c'] = 'Pour aller plus loin :';
+$_MODULE['<{payplug}prestashop>oney_6203ef41221829a8ade1446b71a65884'] = 'Je souhaite proposer le paiement fractionné garanti pour des montants compris entre ';
 $_MODULE['<{payplug}prestashop>oney_65ce6b12de05d7a1af6190b2ac9153c7'] = 'Optimisez l\'expérience avec un calcul dynamique des échéanciers en 3 et 4 fois.';
 $_MODULE['<{payplug}prestashop>oney_f990e553cdc4c29c2efffba33e08a8c7'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>oney_fe6c0722a97f8fc5aed036c7f16c8339'] = 'Permettez à vos clients d\'échelonner le paiement de leurs commandes en 3x, 4x à partir de %d € jusqu\'à %d €.';
