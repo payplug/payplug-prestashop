@@ -81,13 +81,16 @@
 
   &_logo {
     display: block;
-    width: 200px;
+    width: 140px;
     height: 35px;
     max-width: 100%;
 
-    .-mobile & {
-      width: 140px;
-      height: 30px;
+    &.-withoutFees {
+      width: 200px;
+    }
+    
+    @media (@tablet) {
+      display: none;
     }
   }
 
