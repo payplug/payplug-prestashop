@@ -53,7 +53,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.3.3';
+        $this->version = '3.4.0';
 
         parent::__construct();
 
@@ -124,6 +124,7 @@ class Payplug extends PaymentModule
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
             'actionObjectOrderStateDeleteAfter',
+            'actionUpdateLangAfter',
             'adminOrder',
             'customerAccount',
             'displayAdminOrderMain',
@@ -237,6 +238,17 @@ class Payplug extends PaymentModule
                 'actionObjectOrderStateDeleteAfter',
                 $params
             );
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionUpdateLangAfter($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionUpdateLangAfter($params);
         }
     }
 
