@@ -805,12 +805,42 @@ var $document, $window, payplug = {
         props: {
             identifier: 'payplugOney',
             switcher: 'payplug_oney',
+            errorMin: null,
+            errorMax: null,
             error: null,
+            limits: {
+                min: 100,
+                max: 30000,
+            }
         },
         init: function () {
             var {oney} = payplug,
                 {identifier} = oney.props;
-            $document.on('change', '.' + identifier + 'Fees input', oney.selectFees);
+            $document.on('change', '.' + identifier + 'Fees input', oney.selectFees)
+                .on('keyup', 'input[name="PAYPLUG_ONEY_MIN_AMOUNT"]', oney.check)
+                .on('keyup', 'input[name="PAYPLUG_ONEY_MAX_AMOUNT"]', oney.check)
+
+            ;
+        },
+        check: function (event) {
+            var {oney} = payplug,
+                {identifier, limits} = oney.props,
+                amount = $(this).val(),
+                matches = amount.match(/^[0-9]+$/);
+            console.log(amount);
+
+            var $error = $('.' + identifier + '_amount').find('span');
+            console.log($error);
+            oney.props.error = null;
+
+            if (limits.min > amount || amount > limits.max || matches == null) {
+                $error.show();
+                oney.props.error = $error.text();
+                console.log("error");
+            } else {
+                //
+                console.log("pas derreur");
+            }
         },
         selectFees: function(event) {
             var {oney} = payplug,
@@ -868,7 +898,9 @@ var $document, $window, payplug = {
                 matches = amount.match(/^[0-9]+$/);
 
             var $error = $('.' + identifier + '_amount').find('span');
+            console.log($error);
             installment.props.error = null;
+
 
             if (limits.min > amount || amount > limits.max || matches == null) {
                 $error.show();

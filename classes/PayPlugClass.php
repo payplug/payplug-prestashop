@@ -77,9 +77,14 @@ class PayPlugClass extends PaymentModule
     public $errors = [];
     public $logger;
     public $oney;
+    public $payplug_languages = ['en', 'fr', 'es', 'it'];
     public $oney_order_state = [
         'oney_pg' => [
             'cfg' => null,
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_ONEY_PG',
+                'PAYPLUG_ORDER_STATE_ONEY_PG_TEST'
+            ],
             'template' => null,
             'logable' => false,
             'send_email' => false,
@@ -105,6 +110,10 @@ class PayPlugClass extends PaymentModule
     public $order_states = [
         'paid' => [
             'cfg' => 'PS_OS_PAYMENT',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_PAID',
+                'PAYPLUG_ORDER_STATE_PAID_TEST'
+            ],
             'template' => 'payment',
             'logable' => true,
             'send_email' => true,
@@ -123,6 +132,10 @@ class PayPlugClass extends PaymentModule
         ],
         'refund' => [
             'cfg' => 'PS_OS_REFUND',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_REFUND',
+                'PAYPLUG_ORDER_STATE_REFUND_TEST'
+            ],
             'template' => 'refund',
             'logable' => false,
             'send_email' => true,
@@ -141,6 +154,10 @@ class PayPlugClass extends PaymentModule
         ],
         'pending' => [
             'cfg' => 'PS_OS_PENDING',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_PENDING',
+                'PAYPLUG_ORDER_STATE_PENDING_TEST'
+            ],
             'template' => null,
             'logable' => false,
             'send_email' => false,
@@ -159,6 +176,10 @@ class PayPlugClass extends PaymentModule
         ],
         'error' => [
             'cfg' => 'PS_OS_ERROR',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_ERROR',
+                'PAYPLUG_ORDER_STATE_ERROR_TEST'
+            ],
             'template' => 'payment_error',
             'logable' => false,
             'send_email' => true,
@@ -175,8 +196,34 @@ class PayPlugClass extends PaymentModule
                 'it' => 'Payment failed',
             ],
         ],
+        'cancelled' => [
+            'cfg' => 'PS_OS_CANCELED',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_CANCELLED',
+                'PAYPLUG_ORDER_STATE_CANCELLED_TEST'
+            ],
+            'template' => 'order_canceled',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#2C3E50',
+            'name' => [
+                'en' => 'Payment cancelled',
+                'fr' => 'Paiement annulé',
+                'es' => 'Payment cancelled',
+                'it' => 'Payment cancelled',
+            ],
+        ],
         'auth' => [
             'cfg' => null,
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_AUTH',
+                'PAYPLUG_ORDER_STATE_AUTH_TEST'
+            ],
             'template' => null,
             'logable' => false,
             'send_email' => false,
@@ -195,6 +242,10 @@ class PayPlugClass extends PaymentModule
         ],
         'exp' => [
             'cfg' => null,
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_EXP',
+                'PAYPLUG_ORDER_STATE_EXP_TEST'
+            ],
             'template' => null,
             'logable' => false,
             'send_email' => false,
@@ -1179,6 +1230,36 @@ class PayPlugClass extends PaymentModule
         }
     }
 
+    public function hookActionUpdateLangAfter($params)
+    {
+        $payplug_order_states = explode(',', $this->orderClass->getPayPlugOrderStates($this->name));
+
+        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->payplug_languages)) {
+            return true;
+        }
+
+        $all_order_states = array_merge($this->order_states, $this->oney_order_state);
+
+        foreach ($all_order_states as $order_state) {
+            foreach ($order_state['payplug_cfg'] as $payplug_conf) {
+                if (in_array(Configuration::get($payplug_conf), $payplug_order_states)) {
+                    $ps_order_state_name = $order_state['name'][$params['lang']->iso_code];
+                    if (strpos($payplug_conf, '_TEST')) {
+                        $ps_order_state_name .= ' [TEST]';
+                    } else {
+                        $ps_order_state_name .= ' [PayPlug]';
+                    }
+
+                    $ps_order_state = new OrderState(Configuration::get($payplug_conf));
+                    $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
+                    $ps_order_state->save();
+                }
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return bool
      */
@@ -2130,7 +2211,7 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -2155,7 +2236,7 @@ class PayPlugClass extends PaymentModule
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -2220,7 +2301,7 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'product',
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -2923,7 +3004,7 @@ class PayPlugClass extends PaymentModule
         }
         $this->smarty->assign([
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
@@ -3199,7 +3280,7 @@ class PayPlugClass extends PaymentModule
 
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
-                $isItalian = $this->context->language->iso_code == 'it';
+                $isItalian = $this->tools->tool('strtoupper', $this->context->language->iso_code);
                 $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : ''). ($isItalian && !$use_fees ? '_IT' : '') . '.svg';
                 $text = $use_fees

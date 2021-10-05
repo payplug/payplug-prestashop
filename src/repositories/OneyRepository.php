@@ -327,7 +327,7 @@ class OneyRepository extends Repository
         $this->assignLegalNotice();
         $this->assign->assign([
             'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
+            'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code)
         ]);
         return $this->media->fetchTemplate('oney/popin.tpl');
     }
@@ -350,7 +350,7 @@ class OneyRepository extends Repository
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ],
             'withFirstSchedule' => $withFirstSchedule,
-            'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
+            'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code)
         ];
         $this->assign->assign($vars);
         return $this->media->fetchTemplate('oney/schedule.tpl');
@@ -375,7 +375,7 @@ class OneyRepository extends Repository
                 ),
                 'payplug_oney_loading_msg' => $this->l('Loading'),
                 'oney_required_fields' => $this->getOneyRequiredFields(),
-                'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
+                'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code)
             ]);
 
             return $this->media->fetchTemplate('oney/payment/payment.tpl');

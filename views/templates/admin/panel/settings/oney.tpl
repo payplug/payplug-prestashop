@@ -42,14 +42,22 @@
                                 <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                             </p>
                         </div>
+                        <div class="payplugOney_fieldset payplugPanel">
+                            <div class="payplugPanel_label" >{l s='admin.panel.settings.oney.thresholds' mod='payplug'}</div>
+                            <div class="payplugPanel_content">
+                                <div class="payplugOney_amount">
+                                     <input type="text" name="PAYPLUG_ONEY_MIN_AMOUNT"  value="{$oney_min_amounts|escape:'htmlall':'UTF-8'}">
 
-                        <div class="payplugThresholds">
-{*                            <p style="float:left;">{l s='admin.panel.settings.oney.thresholds' mod='payplug'}</p>*}
-{*                                <input class="payplugThresholds_Min" style="display:inline;width: 100px;margin-right: 5px;" type="text"  value="{$oney_min_amounts|escape:'htmlall':'UTF-8'}">*}
-{*                            <p>et</p>*}
-{*                                <input type="text" class="payplugThresholds_Max" style="display:inline;width: 100px;"  value="{$oney_max_amounts|escape:'htmlall':'UTF-8'}">*}
-                                <input type="text" class="payplugThresholds_Min" value="{$oney_min_amounts|escape:'htmlall':'UTF-8'}">
-                                <input type="text" class="payplugThresholds_Max" value="{$oney_max_amounts|escape:'htmlall':'UTF-8'}">
+                                    <p>et</p>
+                                        <input type="text" name="PAYPLUG_ONEY_MAX_AMOUNT" class="payplugThresholds_Max" style="display:inline;width: 50px;" value="{$oney_max_amounts|escape:'htmlall':'UTF-8'}">
+
+                                    <span style="display: none;" data-e2e-error="oney_amount">{l s='admin.panel.settings.oney.thresholds.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>
+                                    <span style="display: none;" data-e2e-error="oney_amount_max">{l s='admin.panel.settings.oney.thresholds.max.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>
+                                    <span style="display: none;" data-e2e-error="oney_amount_min">{l s='admin.panel.settings.oney.thresholds.min.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>
+
+
+                                </div>
+                            </div>
                         </div>
 
                     </div>
