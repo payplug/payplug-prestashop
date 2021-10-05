@@ -198,7 +198,7 @@ class OneyRepository extends Repository
         $minAmount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
         $maxAmount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
         $learnMoreLink = $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO') == 'IT' &&
-            strtolower($this->contextSpecific->getContext()->language->iso_code) == 'it';
+            $this->toolsSpecific->tools('strtolower', $this->contextSpecific->getContext()->language->iso_code) == 'it';
 
         $this->assign->assign([
             'learnMoreLink' => (bool)$learnMoreLink,
@@ -560,12 +560,12 @@ class OneyRepository extends Repository
 
             $item = [
                 'merchant_item_id' => $product['id_product'],
-                'name' =>  substr($productName, 0, 250),
+                'name' =>  $this->toolsSpecific->substr($productName, 0, 250),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
-                    substr($product['manufacturer_name'], 0, 250) :
+                    $this->toolsSpecific->substr($product['manufacturer_name'], 0, 250) :
                     $this->configurationSpecific->get('PS_SHOP_NAME')
             ];
 

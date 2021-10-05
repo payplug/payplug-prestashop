@@ -86,6 +86,11 @@ class MockHelper extends Mockery
 
                 return false;
             });
+        $tools
+            ->shouldReceive('substr')
+            ->andReturnUsing(function ($param, $param1, $param2) {
+                return substr($param, $param1, $param2);
+            });
         return $tools;
     }
 
