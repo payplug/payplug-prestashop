@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2013 - 2021 PayPlug SAS
  *

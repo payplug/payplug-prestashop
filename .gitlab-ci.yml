@@ -74,8 +74,10 @@ assets compile and revision:
     - mkdir ./views/build/css
     - mkdir ./views/build/js
     - mv ./views/css/*.css ./views/build/css
+    - cp ./views/templates/index.php ./views/build/css
     - mv ./views/js/* ./views/build/js
     - ls -l ./views/build/css/*.css
+    - ls -l ./views/build/css/*.php
     - ls -l ./views/build/js/*.js
   artifacts:
     paths:

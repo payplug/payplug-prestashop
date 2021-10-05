@@ -20,6 +20,7 @@ tag=`grep '$this->version =' payplug.php | sed -n "s/.*= '//p" | sed -n "s/';//p
 
 echo "Moving file in views dir"
 rm -rf ./views/js ./views/css
+cp ./views/templates/index.php ./views/css/index.php
 cp -r ./views/build/css ./views/
 cp -r ./views/build/js ./views/
 echo "***** DONE *****"
