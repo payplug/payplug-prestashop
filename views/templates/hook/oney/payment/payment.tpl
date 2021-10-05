@@ -21,8 +21,8 @@
 *}
 <div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
-        <span class="oneyPayment_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
-                <img src="/modules/payplug/views/img/oney/3x4x_with{if isset($use_fees) && !$use_fees}out{/if}_fees.svg"
+        <span class="oneyPayment_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($merchant_company_iso) && $merchant_company_iso == 'IT' } -isItalian{/if} ">
+                <img src="/modules/payplug/views/img/oney/3x4x_with{if isset($use_fees) && !$use_fees}out{/if}_fees{if isset($merchant_company_iso) && $merchant_company_iso == 'IT' }_IT{/if}.svg"
                      alt="{l s='Pay by card in 3 or 4' mod='payplug'}" />
         </span>
         <span class="oneyPayment_label">
@@ -41,7 +41,7 @@
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
                 {if $lang_iso == 'it' && $merchant_company_iso == 'IT'}
-                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
+                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
                 {/if}
             </div>
         {else}
