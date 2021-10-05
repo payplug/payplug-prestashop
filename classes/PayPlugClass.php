@@ -1291,6 +1291,36 @@ class PayPlugClass extends PaymentModule
 //        return true;
 //    }
 
+    public function hookActionUpdateLangAfter($params)
+    {
+        $payplug_order_states = explode(',', $this->orderClass->getPayPlugOrderStates($this->name));
+
+        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->payplug_languages)) {
+            return true;
+        }
+
+        $all_order_states = array_merge($this->order_states, $this->oney_order_state);
+
+        foreach ($all_order_states as $order_state) {
+            foreach ($order_state['payplug_cfg'] as $payplug_conf) {
+                if (in_array(Configuration::get($payplug_conf), $payplug_order_states)) {
+                    $ps_order_state_name = $order_state['name'][$params['lang']->iso_code];
+                    if (strpos($payplug_conf, '_TEST')) {
+                        $ps_order_state_name .= ' [TEST]';
+                    } else {
+                        $ps_order_state_name .= ' [PayPlug]';
+                    }
+
+                    $ps_order_state = new OrderState(Configuration::get($payplug_conf));
+                    $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
+                    $ps_order_state->save();
+                }
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return bool
      */
