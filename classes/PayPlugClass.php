@@ -2214,7 +2214,7 @@ class PayPlugClass extends PaymentModule
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
         return $this->oney->getOneyCTA('checkout');
@@ -2239,7 +2239,7 @@ class PayPlugClass extends PaymentModule
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -2304,7 +2304,7 @@ class PayPlugClass extends PaymentModule
         $this->smarty->assign([
             'env' => 'product',
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
         return $this->fetchTemplate('oney/cta.tpl');
     }
@@ -3007,7 +3007,7 @@ class PayPlugClass extends PaymentModule
         }
         $this->smarty->assign([
             'use_fees' => (bool)Configuration::get('PAYPLUG_ONEY_FEES'),
-            'merchant_company_iso' => (string)Configuration::get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => Tools::getHttpHost(true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
@@ -3283,7 +3283,7 @@ class PayPlugClass extends PaymentModule
 
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
-                $isItalian = $this->context->language->iso_code == 'it';
+                $isItalian = $this->tools->tool('strtoupper', $this->context->language->iso_code);
                 $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : ''). ($isItalian && !$use_fees ? '_IT' : '') . '.svg';
                 $text = $use_fees
