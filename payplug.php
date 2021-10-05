@@ -124,6 +124,7 @@ class Payplug extends PaymentModule
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
             'actionObjectOrderStateDeleteAfter',
+            'actionUpdateLangAfter',
             'adminOrder',
             'customerAccount',
             'displayAdminOrderMain',
@@ -237,6 +238,17 @@ class Payplug extends PaymentModule
                 'actionObjectOrderStateDeleteAfter',
                 $params
             );
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function hookActionUpdateLangAfter($params)
+    {
+        if ($this->module) {
+            return $this->module->hookActionUpdateLangAfter($params);
         }
     }
 
