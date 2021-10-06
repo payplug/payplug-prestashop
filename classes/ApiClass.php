@@ -290,13 +290,17 @@ class ApiClass
      */
     private function setEnvironment()
     {
-        if (isset($_SERVER['PAYPLUG_API_URL'])) {
+        if (isset(\Payplug\Core\APIRoutes::$API_BASE_URL)) {
+            $this->setApiUrl(\Payplug\Core\APIRoutes::$API_BASE_URL);
+        } elseif (isset($_SERVER['PAYPLUG_API_URL'])) {
             $this->setApiUrl($_SERVER['PAYPLUG_API_URL']);
         } else {
             $this->setApiUrl('https://api.payplug.com');
         }
 
-        if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
+        if (isset($_ENV['PAYPLUG_SITE_URL'])) {
+            $this->setApiUrl($_ENV['PAYPLUG_SITE_URL']);
+        } elseif (isset($_SERVER['PAYPLUG_SITE_URL'])) {
             $this->site_url = $_SERVER['PAYPLUG_SITE_URL'];
         } else {
             $this->site_url = 'https://www.payplug.com';
