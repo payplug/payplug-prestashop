@@ -122,10 +122,12 @@ class AdminClass extends \Payplug
         }
 
         if (Tools::getValue('submitSettings')) {
-            if (Tools::getValue('payplug_deferred_state') && Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
+            if (Tools::getValue('payplug_deferred_state')
+                && Tools::getValue('payplug_deferred_state') != Configuration::get('PAYPLUG_DEFERRED_STATE')) {
                 $id_order_state = Tools::getValue('payplug_deferred_state');
                 $order_state = new OrderState($id_order_state, $this->contextSpecific->language->id);
-                if (Tools::getValue('payplug_deferred') && Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                if (Tools::getValue('payplug_deferred')
+                    && Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
                     $this->contextSpecific->smarty->assign([
                         'updated_deferred_state' => true,
                         'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
