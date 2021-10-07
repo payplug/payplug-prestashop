@@ -198,7 +198,7 @@ class OneyRepository extends Repository
         $minAmount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
         $maxAmount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
         $learnMoreLink = $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO') == 'IT' &&
-            $this->toolsSpecific->tools('strtolower', $this->contextSpecific->getContext()->language->iso_code) == 'it';
+            $this->toolsSpecific->tool('strtolower', $this->contextSpecific->getContext()->language->iso_code) == 'it';
 
         $this->assign->assign([
             'learnMoreLink' => (bool)$learnMoreLink,
