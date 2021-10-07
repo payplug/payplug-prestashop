@@ -1995,7 +1995,10 @@ class PayPlugClass extends PaymentModule
 
         // Card brand
         $card_brand = null;
-        if ($card_details && isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
+        if ($card_details
+            && isset($card_details['brand'])
+            && !empty($card_details['brand'])
+            && ($card_details['brand'] !== 'none')) {
             $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
 
             // Country
@@ -2666,12 +2669,12 @@ class PayPlugClass extends PaymentModule
 
             // check billing phonenumber
             if (!$payment_tab['billing']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
-                $payment_tab['billing']['mobile_phone_number'],
-                $payment_tab['billing']['country']
+                $payment_tab['billing']['country'],
+                $payment_tab['billing']['mobile_phone_number']
             )) {
                 if (ConfigClass::isValidMobilePhoneNumber(
-                    $payment_tab['billing']['landline_phone_number'],
-                    $payment_tab['billing']['country']
+                    $payment_tab['billing']['country'],
+                    $payment_tab['billing']['landline_phone_number']
                 )) {
                     $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
                 }
@@ -2679,12 +2682,12 @@ class PayPlugClass extends PaymentModule
 
             // check shipping phonenumber
             if (!$payment_tab['shipping']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
-                $payment_tab['shipping']['mobile_phone_number'],
-                $payment_tab['shipping']['country']
+                $payment_tab['shipping']['country'],
+                $payment_tab['shipping']['mobile_phone_number']
             )) {
                 if (ConfigClass::isValidMobilePhoneNumber(
-                    $payment_tab['shipping']['landline_phone_number'],
-                    $payment_tab['shipping']['country']
+                    $payment_tab['shipping']['country'],
+                    $payment_tab['shipping']['landline_phone_number']
                 )) {
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }

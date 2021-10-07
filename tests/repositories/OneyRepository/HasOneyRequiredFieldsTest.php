@@ -40,7 +40,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
         $this->configClass
             ->shouldReceive('isValidMobilePhoneNumber')
-            ->andReturnUsing(function ($phone, $country) {
+            ->andReturnUsing(function ($country, $phone) {
                 if (!$phone) {
                     return false;
                 }
