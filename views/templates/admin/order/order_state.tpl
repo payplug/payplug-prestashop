@@ -27,7 +27,7 @@
             {assign "payplug_order_state_link" "<a href='{$payplug_order_state_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
             {assign "linkToUpdate" "<a href ='$orderStateUpdateLink' target='_blank'>"}
             <p>
-                {l s='admin.order.order_state.payplugOrderStateAlert.text' sprintf=[$state['name']] tags=['<strong>','<strong>',$linkToUpdate] mod='payplug'}
+                {l s='admin.order.order_state.payplugOrderStateAlert.text' sprintf=[$state['name']] tags=[$linkToUpdate] mod='payplug'}
             </p><br>
             <p>{l s='admin.order.order_state.payplugOrderStateAlert.faq' tags=[$payplug_order_state_link]  mod='payplug'}</p>
         </div>
