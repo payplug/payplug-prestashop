@@ -375,7 +375,8 @@ class OneyRepository extends Repository
                 ),
                 'payplug_oney_loading_msg' => $this->l('Loading'),
                 'oney_required_fields' => $this->getOneyRequiredFields(),
-                'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code)
+                'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code),
+                'merchant_company_iso' => (string)$this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
             ]);
 
             return $this->media->fetchTemplate('oney/payment/payment.tpl');
