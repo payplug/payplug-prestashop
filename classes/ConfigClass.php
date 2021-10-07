@@ -540,6 +540,8 @@ class ConfigClass
             'error_installment' => $this->payplugClass->l('payplug.assignContentVar.installment'),
             'error_deferred' => $this->payplugClass->l('payplug.assignContentVar.deferred'),
             'error_oney' => $this->payplugClass->l('payplug.assignContentVar.oney'),
+            'errorOneyMax' => $this->payplugClass->l('admin.panel.settings.oney.thresholds.max.error'),
+            'errorOneyMin' => $this->payplugClass->l('admin.panel.settings.oney.thresholds.min.error'),
         ]);
 
         $login_infos = [];
@@ -554,7 +556,16 @@ class ConfigClass
         $oney_max_amounts = ($amounts['max'] / 100);
 
         $this->assignSwitchConfiguration($configurations);
-
+        var_dump($oney_min_amounts);
+        Media::addJsDef(
+            [
+                'error_oneyThresholds' => sprintf(
+                    $this->payplugClass->l('admin.panel.settings.oney.thresholds.error'),
+                    $oney_min_amounts,
+                    $oney_max_amounts
+                )
+            ]
+        );
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
@@ -588,6 +599,7 @@ class ConfigClass
             'iso' => $this->context->language->iso_code,
             'can_use_oney_fees' => $this->oney->isAvailableWithoutFees(Configuration::get('PAYPLUG_COMPANY_ISO')),
         ]);
+
 
         return $this->html;
     }

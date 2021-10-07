@@ -51,12 +51,13 @@
                                     <p>et</p>
                                         <input type="text" name="PAYPLUG_ONEY_MAX_AMOUNT" class="payplugThresholds_Max" style="display:inline;width: 50px;" value="{$oney_max_amounts|escape:'htmlall':'UTF-8'}">
 
-                                    <span style="display: none;" data-e2e-error="oney_amount">{l s='admin.panel.settings.oney.thresholds.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>
-                                    <span style="display: none;" data-e2e-error="oney_amount_max">{l s='admin.panel.settings.oney.thresholds.max.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>
-                                    <span style="display: none;" data-e2e-error="oney_amount_min">{l s='admin.panel.settings.oney.thresholds.min.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>
+{*                                    <span style="display: none;" data-e2e-error="oney_amount">{l s='admin.panel.settings.oney.thresholds.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>*}
+{*                                    <span style="display: none;" data-e2e-error="oney_amount_max">{l s='admin.panel.settings.oney.thresholds.max.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>*}
+{*                                    <span style="display: none;" data-e2e-error="oney_amount_min">{l s='admin.panel.settings.oney.thresholds.min.error' mod='payplug' sprintf=[$oney_min_amounts, $oney_max_amounts]}</span>*}
 
 
                                 </div>
+                                <span id="errMsg"></span>
                             </div>
                         </div>
 

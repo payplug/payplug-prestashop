@@ -829,13 +829,17 @@ var $document, $window, payplug = {
                 matches = amount.match(/^[0-9]+$/);
             console.log(amount);
 
-            var $error = $('.' + identifier + '_amount').find('span');
-            console.log($error);
+            // var $error = $('.' + identifier + '_amount').find('span');
+            // console.log($error);
             oney.props.error = null;
 
             if (limits.min > amount || amount > limits.max || matches == null) {
-                $error.show();
-                oney.props.error = $error.text();
+                // var $error = error_oneyThresholds;
+                // $error.show();
+                // oney.props.error = $error.text();
+                console.log(error_oneyThresholds);
+                document.getElementById('errMsg').textContent = error_oneyThresholds;
+
                 console.log("error");
             } else {
                 //

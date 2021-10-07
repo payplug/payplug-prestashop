@@ -790,7 +790,7 @@ class PayPlugNotifications
         $this->logger->addLog('Type: ' . $type);
 
         $this->type = $type ?: 'undefined';
-        $method = 'processType' . ucfirst($this->type);
+        $method = 'processType' . Tools::ucfirst($this->type);
         $this->$method();
     }
 
