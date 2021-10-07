@@ -806,13 +806,90 @@ var $document, $window, payplug = {
             identifier: 'payplugOney',
             switcher: 'payplug_oney',
             error: null,
+            limits: {
+                min: oney_min_amounts,
+                max: oney_max_amounts,
+                custom_min: oney_custom_min_amounts,
+                custom_max: oney_custom_max_amounts,
+            },
+
         },
         init: function () {
             var {oney} = payplug,
                 {identifier} = oney.props;
-            $document.on('change', '.' + identifier + 'Fees input', oney.selectFees);
+            console.log('oney_custom_min_amounts' + oney_custom_min_amounts);
+            $document.on('change', '.' + identifier + 'Fees input', oney.selectFees)
+                .on('keyup', 'input[name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS"]', oney.checkMin)
+                .on('keyup', 'input[name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS"]', oney.checkMax);
         },
-        selectFees: function(event) {
+        checkMin: function (event) {
+            var {oney} = payplug,
+                {identifier, limits} = oney.props,
+                amount = $(this).val(),
+                matches = amount.match(/^[0-9]+$/);
+            console.log(amount + 'min' + oney_custom_min_amounts);;
+            oney.props.error = null;
+            // $('#oney_min').on('focusout', function () {
+            //     var min_input = document.getElementById('oney_min');
+            //     min_input.value = min_input.defaultValue;
+            //     console.log($('#oney_min').defaultValue);
+            //     console.log('but');
+            // });
+
+            var $error = $('.' + identifier + '_statement').find('span');
+            console.log("errrr" + identifier);
+            console.log(errorOneyThresholds);
+            oney.props.error = null;
+            if (limits.min > amount  || matches == null) {
+                $('#oney_min').addClass('error');
+                $error.text(errorOneyThresholds)
+                $error.show();
+                oney.props.error = $error.text();
+                console.log("error" + $error.text(errorOneyThresholds));
+            } else if (limits.max < amount) {
+                $('#oney_min').addClass('error');
+                $error.text(errorOneyMin);
+                $error.show();
+                oney.props.error = $error.text();
+            } else {
+                console.log('amoun'+ limits.max);
+                $('#oney_min').removeClass('error');
+                $error.hide();
+            }
+        },
+        checkMax: function (event) {
+            var {oney} = payplug,
+                {identifier, limits} = oney.props,
+                amount = $(this).val(),
+                matches = amount.match(/^[0-9]+$/);
+            console.log(amount);
+
+            // var $error = $('.' + identifier + '_amount').find('span');
+            // console.log($error);
+            oney.props.error = null;
+            var $error = $('.' + identifier + '_amount').find('span');
+            console.log("errrr" + $error);
+            oney.props.error = null;
+
+            if (limits.max < amount || matches == null) {
+                $('#oney_max').addClass('error');
+                $error.text(errorOneyThresholds)
+                $error.show();
+                oney.props.error = $error.text();
+                console.log("error" + $error.text(errorOneyThresholds));
+
+            } else if (limits.min > amount){
+                $('#oney_max').addClass('error');
+                $error.text(errorOneyMax);
+                $error.show();
+                oney.props.error = $error.text();
+            }
+            else {
+                $('#oney_max').removeClass('error');
+                $error.hide();
+            }
+        },
+            selectFees: function(event) {
             var {oney} = payplug,
                 {identifier} = oney.props,
                 $options = $('.' + identifier + 'Fees_option'),

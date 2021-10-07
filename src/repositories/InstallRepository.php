@@ -312,6 +312,8 @@ class InstallRepository extends Repository
             && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
             && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
             && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+            && $this->config->updateValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS', 'EUR:3000')
+            && $this->config->updateValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS', 'EUR:100')
             && $this->config->updateValue('PAYPLUG_ONEY_FEES', 1)
             && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
             && $this->config->updateValue('PAYPLUG_SHOW', 0)

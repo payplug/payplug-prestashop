@@ -41,10 +41,44 @@
                                 {l s='Maximise your customers\' experience with dynamic calculations of the 3 and 4 instalments by switching on to the advanced configuration.' mod='payplug'}
                                 <a class="payplugLink" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod='payplug'}</a>
                             </p>
+
                         </div>
+
                     </div>
+{*                    <div class="payplugOney_fieldset payplugPanel">*}
+{*                        <div class="payplugPanel_label" >*}
+{*                            <p>{l s='admin.panel.settings.oney.thresholds' mod='payplug' sprintf=[$oney_custom_min_amounts, $oney_custom_max_amounts]}</p>*}
+{*                           </div>*}
+{*                        <div class="payplugPanel_content">*}
+
+{*                            <div class="payplugOney_amount">*}
+{*                                <input type="text" id= "oney_min" name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS"  value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">*}
+
+{*                                <p>et</p>*}
+{*                                <input type="text" id="oney_max" name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS" class="payplugThresholds_Max" style="display:inline;width: 50px;" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">*}
+{*                                <span style="display: none;" data-e2e-error="oney_amount"></span>*}
+{*                            </div>*}
+
+{*                        </div>*}
+{*                    </div>*}
+                    <div class="flex-container">
+                        <div class="payplugOney_thresholds">
+                            <label for="text">{l s='admin.panel.settings.oney.thresholds' mod='payplug'}</label>
+                        </div>
+                        <div class="payplugOney_thresholds2">
+                            <input type="text" id= "oney_min" name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS" value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">
+                            <label>et</label>
+                            <input type="text" id= "oney_max" name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">
+                            <div class="payplugOney_statement"><span data-e2e-error="oney_amount"></span></div>
+                        </div>
+
+
+                    </div>
+
+
+
+                </div>
                 </div>
             </div>
         </div>
     </div>
-</div>

@@ -225,13 +225,19 @@ class Payplug extends PaymentModule
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateUpdateAfter', $params);
+            return $this->payplug_dependencies->getDependency('hook')->exe(
+                'actionObjectOrderStateUpdateAfter',
+                $params
+            );
         }
     }
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateDeleteAfter', $params);
+            return $this->payplug_dependencies->getDependency('hook')->exe(
+                'actionObjectOrderStateDeleteAfter',
+                $params
+            );
         }
     }
 

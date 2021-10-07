@@ -194,7 +194,8 @@ class OneyRepository extends Repository
      */
     public function assignLegalNotice()
     {
-        $limits = $this->getOneyPriceLimit();
+//        $limits = $this->getOneyPriceLimit();
+        $limits = $this->getCustomOneyPriceLimit();
         $minAmount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
         $maxAmount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
         $learnMoreLink = $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO') == 'IT' &&
@@ -203,8 +204,8 @@ class OneyRepository extends Repository
         $this->assign->assign([
             'learnMoreLink' => (bool)$learnMoreLink,
             'oneyWithFees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
-            'oneyMinAmounts' => $this->toolsSpecific->tool('displayPrice', $minAmount),
-            'oneyMaxAmounts' => $this->toolsSpecific->tool('displayPrice', $maxAmount),
+            'oneyMinAmounts' => $this->toolsSpecific->tool('displayPrice', $limits['min']),
+            'oneyMaxAmounts' => $this->toolsSpecific->tool('displayPrice', $limits['max']),
             'oneyUrl' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
         ]);
     }
@@ -245,7 +246,7 @@ class OneyRepository extends Repository
                         $this->contextSpecific->getContext()->cart->id_address_invoice;
                     $address = $this->addressSpecific->getAddress($id_address);
                     $country = $this->countrySpecific->getCountry($address->id_country);
-                    $valid = ConfigClass::isValidMobilePhoneNumber($data, $country->iso_code);
+                    $valid = ConfigClass::isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
                         $errors[] = $this->l('Please enter your mobile phone number.');
                     }
@@ -702,7 +703,45 @@ class OneyRepository extends Repository
             'payment' => $payment_tpl,
         ];
     }
+    /**
+     * @description Get Oney price limit
+     *
+     * @param boolean $id_currency
+     * @return array
+     */
+    public function getCustomOneyPriceLimit($id_currency = false)
+    {
+        $config = $this->configurationSpecific;
+        $tools = $this->toolsSpecific;
 
+        if ($this->validateSpecific->validate('isLoadedObject', $id_currency)) {
+            $currency = $id_currency;
+        } else {
+            if (!is_int($id_currency) && $this->validateSpecific->validate('isLanguageIsoCode', $id_currency)) {
+                $id_currency = $this->countrySpecific->getByIso($id_currency);
+            }
+            if (!$id_currency) {
+                $id_currency = $config->get('PS_CURRENCY_DEFAULT');
+            }
+
+            $currency = $this->currencySpecific->getCurrency($id_currency);
+        }
+
+        $limits = [
+            'min' => false,
+            'max' => false
+        ];
+
+        if (!$this->validateSpecific->validate('isLoadedObject', $currency)) {
+            return $limits;
+        }
+
+        $iso_code = $tools->tool('strtoupper', $currency->iso_code);
+
+        $limits['min'] =  (int)$config->get('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS');
+        $limits['max'] = (int) $config->get('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS');
+        return $limits;
+    }
     /**
      * @description Get Oney price limit
      *
@@ -1039,8 +1078,8 @@ class OneyRepository extends Repository
 
         // Validate phone number
         $valid_shipping_mobile = ConfigClass::isValidMobilePhoneNumber(
-            $shipping['mobile_phone_number'],
-            $shipping['country']
+            $shipping['country'],
+            $shipping['mobile_phone_number']
         );
         if (!$valid_shipping_mobile) {
             return true;
@@ -1056,8 +1095,8 @@ class OneyRepository extends Repository
 
         // Validate phone number
         $valid_billing_mobile = ConfigClass::isValidMobilePhoneNumber(
-            $billing['mobile_phone_number'],
-            $billing['country']
+            $billing['country'],
+            $billing['mobile_phone_number']
         );
         if (!$valid_billing_mobile) {
             return true;
@@ -1206,8 +1245,8 @@ class OneyRepository extends Repository
      */
     public function isValidOneyAmount($amount, $id_currency = false)
     {
-        $limits = $this->getOneyPriceLimit($id_currency);
-        $convert_amount = $this->amountCurrencyClass->convertAmount($amount);
+        $limits = $this->getCustomOneyPriceLimit();
+        $convert_amount = ($this->amountCurrencyClass->convertAmount($amount))/100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
             $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
             $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
@@ -1216,8 +1255,8 @@ class OneyRepository extends Repository
                 'result' => false,
                 'error' => sprintf(
                     $this->l('The total amount of your order should be between %s and %s to pay with Oney.'),
-                    $this->toolsSpecific->tool('displayPrice', $min_amount),
-                    $this->toolsSpecific->tool('displayPrice', $max_amount)
+                    $this->toolsSpecific->tool('displayPrice', $limits['min']),
+                    $this->toolsSpecific->tool('displayPrice', $limits['max'])
                 )
             ];
         }
@@ -1336,7 +1375,8 @@ class OneyRepository extends Repository
             $error = $this->l('Your email address is not a valid email');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
             && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
+            $error = $this->l('Your email address is too long and the + character is not valid');
+            $error .= $this->l(' please change it to another address (max 100 characters).');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
             $error = $this->l('Your email address is too long. Please change your email address (100 characters max).');
         } elseif (strpos($email, '+') !== false) {

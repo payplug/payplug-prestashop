@@ -183,7 +183,12 @@ class PrestashopSpecific17
      */
     public function getOrdersByStateLink($order_state)
     {
-        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true, [], ['order[filters][osname]' => $order_state]);
+        $link = $this->contextSpecific->link->getAdminLink(
+            'AdminOrders',
+            true,
+            [],
+            ['order[filters][osname]' => $order_state]
+        );
         return $link;
     }
 }

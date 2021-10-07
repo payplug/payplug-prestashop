@@ -1995,7 +1995,10 @@ class PayPlugClass extends PaymentModule
 
         // Card brand
         $card_brand = null;
-        if ($card_details && isset($card_details['brand']) && !empty($card_details['brand']) && ($card_details['brand'] !== 'none')) {
+        if ($card_details
+            && isset($card_details['brand'])
+            && !empty($card_details['brand'])
+            && ($card_details['brand'] !== 'none')) {
             $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
 
             // Country
@@ -2205,7 +2208,7 @@ class PayPlugClass extends PaymentModule
 
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
-
+        var_dump($is_valid_amount);
         $this->smarty->assign([
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
@@ -2231,7 +2234,6 @@ class PayPlugClass extends PaymentModule
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
         $is_elligible = $is_elligible['result'];
-
         $this->smarty->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
@@ -2290,8 +2292,8 @@ class PayPlugClass extends PaymentModule
             );
             $amount = $product_price * $quantity;
             $is_elligible = $this->oney->isValidOneyAmount($amount, $this->context->currency->id);
-            $is_elligible = $is_elligible['result'];
 
+            $is_elligible = $is_elligible['result'];
             $this->smarty->assign([
                 'payplug_is_oney_elligible' => $is_elligible,
             ]);
@@ -2666,12 +2668,12 @@ class PayPlugClass extends PaymentModule
 
             // check billing phonenumber
             if (!$payment_tab['billing']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
-                $payment_tab['billing']['mobile_phone_number'],
-                $payment_tab['billing']['country']
+                $payment_tab['billing']['country'],
+                $payment_tab['billing']['mobile_phone_number']
             )) {
                 if (ConfigClass::isValidMobilePhoneNumber(
-                    $payment_tab['billing']['landline_phone_number'],
-                    $payment_tab['billing']['country']
+                    $payment_tab['billing']['country'],
+                    $payment_tab['billing']['landline_phone_number']
                 )) {
                     $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
                 }
@@ -2679,12 +2681,12 @@ class PayPlugClass extends PaymentModule
 
             // check shipping phonenumber
             if (!$payment_tab['shipping']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
-                $payment_tab['shipping']['mobile_phone_number'],
-                $payment_tab['shipping']['country']
+                $payment_tab['shipping']['country'],
+                $payment_tab['shipping']['mobile_phone_number']
             )) {
                 if (ConfigClass::isValidMobilePhoneNumber(
-                    $payment_tab['shipping']['landline_phone_number'],
-                    $payment_tab['shipping']['country']
+                    $payment_tab['shipping']['country'],
+                    $payment_tab['shipping']['landline_phone_number']
                 )) {
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
@@ -3265,7 +3267,7 @@ class PayPlugClass extends PaymentModule
                         break;
                     case 'invalid_amount_bottom':
                     case 'invalid_amount_top':
-                        $err_label = $this->l('payplug.getPaymentOptions.invalidAmount');
+                        $err_label = sprintf($this->l('payplug.getPaymentOptions.invalidAmount'), Configuration::get('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS'),Configuration::get('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS'));
                         break;
                     case 'invalid_carrier':
                         $err_label = $this->l('payplug.getPaymentOptions.invalidCarrier');
