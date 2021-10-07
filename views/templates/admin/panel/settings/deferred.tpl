@@ -40,7 +40,7 @@
                             {l s='admin.panel.settings.deferred.trigger' mod='payplug'}
 
                         </label>
-                        <select name="payplug_deferred_state" data-id_state="{$PAYPLUG_DEFERRED_STATE}" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
+                        <select name="payplug_deferred_state" data-id_state="{$PAYPLUG_DEFERRED_STATE|escape:'htmlall':'UTF-8'}" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
                             <option value="0">{l s='admin.panel.settings.deferred.choose' mod='payplug'}</option>
                             {foreach from=$order_states item=order_state}
                                 <option value="{$order_state.id_order_state|escape:'htmlall':'UTF-8'}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name|escape:'htmlall':'UTF-8'}</option>
