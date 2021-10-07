@@ -101,7 +101,10 @@ class PayPlugValidation
 
             $this->logger->addLog('Wrong GET parameter ps = ' . $ps, 'error');
             $this->payplug->setPaymentErrorsCookie([
-                $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                $this->payplug->l(
+                    'The transaction was not completed and your card was not charged.',
+                    'payplugvalidation'
+                )
             ]);
             Tools::redirect($redirect_url_error);
         }
@@ -114,7 +117,10 @@ class PayPlugValidation
         if (!Validate::isLoadedObject($cart)) {
             $this->logger->addLog('Cart cannot be loaded.', 'error');
             $this->payplug->setPaymentErrorsCookie([
-                $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                $this->payplug->l(
+                    'The transaction was not completed and your card was not charged.',
+                    'payplugvalidation'
+                )
             ]);
             Tools::redirect($redirect_url_error);
         }
@@ -184,7 +190,10 @@ class PayPlugValidation
                             'error'
                         );
                         $this->payplug->setPaymentErrorsCookie([
-                            $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                            $this->payplug->l(
+                                'The transaction was not completed and your card was not charged.',
+                                'payplugvalidation'
+                            )
                         ]);
                         Tools::redirect($redirect_url_error);
                     }
@@ -196,7 +205,10 @@ class PayPlugValidation
                         $this->logger->addLog('Lock deleted.', 'debug');
                     }
                     $this->payplug->setPaymentErrorsCookie([
-                        $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                        $this->payplug->l(
+                            'The transaction was not completed and your card was not charged.',
+                            'payplugvalidation'
+                        )
                     ]);
                     Tools::redirect($redirect_url_error);
                 }
@@ -217,7 +229,10 @@ class PayPlugValidation
                     }
                     $this->logger->addLog('Payment failure : ' . $payment->failure->message, 'error');
                     $this->payplug->setPaymentErrorsCookie([
-                        $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                        $this->payplug->l(
+                            'The transaction was not completed and your card was not charged.',
+                            'payplugvalidation'
+                        )
                     ]);
                     if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
@@ -258,7 +273,10 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 $this->payplug->setPaymentErrorsCookie([
-                    $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                    $this->payplug->l(
+                        'The transaction was not completed and your card was not charged.',
+                        'payplugvalidation'
+                    )
                 ]);
                 Tools::redirect($redirect_url_error);
             }
@@ -309,7 +327,10 @@ class PayPlugValidation
         if (!Validate::isLoadedObject($customer)) {
             $this->logger->addLog('Customer cannot be loaded.', 'error');
             $this->payplug->setPaymentErrorsCookie([
-                $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                $this->payplug->l(
+                    'The transaction was not completed and your card was not charged.',
+                    'payplugvalidation'
+                )
             ]);
             if (!PayplugLock::deleteLockG2($cart->id)) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
@@ -415,10 +436,16 @@ class PayPlugValidation
                         $module_name = $this->payplug->l('Oney 4x', 'payplugvalidation');
                         break;
                     case 'oney_x3_without_fees':
-                        $module_name = $this->payplug->l('validation.createOrder.oneyX3WithoutFees', 'payplugvalidation');
+                        $module_name = $this->payplug->l(
+                            'validation.createOrder.oneyX3WithoutFees',
+                            'payplugvalidation'
+                        );
                         break;
                     case 'oney_x4_without_fees':
-                        $module_name = $this->payplug->l('validation.createOrder.oneyX4WithoutFees', 'payplugvalidation');
+                        $module_name = $this->payplug->l(
+                            'validation.createOrder.oneyX4WithoutFees',
+                            'payplugvalidation'
+                        );
                         break;
                     default:
                         break;
@@ -475,7 +502,10 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 $this->payplug->setPaymentErrorsCookie([
-                    $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                    $this->payplug->l(
+                        'The transaction was not completed and your card was not charged.',
+                        'payplugvalidation'
+                    )
                 ]);
                 Tools::redirect($redirect_url_error);
             }
@@ -517,7 +547,10 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 $this->payplug->setPaymentErrorsCookie([
-                    $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                    $this->payplug->l(
+                        'The transaction was not completed and your card was not charged.',
+                        'payplugvalidation'
+                    )
                 ]);
                 Tools::redirect($redirect_url_error);
             } elseif (count($res_nb_orders) > 1) {
@@ -546,7 +579,10 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 $this->payplug->setPaymentErrorsCookie([
-                    $this->payplug->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                    $this->payplug->l(
+                        'The transaction was not completed and your card was not charged.',
+                        'payplugvalidation'
+                    )
                 ]);
                 Tools::redirect($redirect_url_error);
             } elseif (count($payments) > 1) {
