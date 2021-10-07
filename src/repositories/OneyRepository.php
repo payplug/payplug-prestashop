@@ -245,7 +245,7 @@ class OneyRepository extends Repository
                         $this->contextSpecific->getContext()->cart->id_address_invoice;
                     $address = $this->addressSpecific->getAddress($id_address);
                     $country = $this->countrySpecific->getCountry($address->id_country);
-                    $valid = ConfigClass::isValidMobilePhoneNumber($data, $country->iso_code);
+                    $valid = ConfigClass::isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
                         $errors[] = $this->l('Please enter your mobile phone number.');
                     }
@@ -1037,8 +1037,8 @@ class OneyRepository extends Repository
 
         // Validate phone number
         $valid_shipping_mobile = ConfigClass::isValidMobilePhoneNumber(
-            $shipping['mobile_phone_number'],
-            $shipping['country']
+            $shipping['country'],
+            $shipping['mobile_phone_number']
         );
         if (!$valid_shipping_mobile) {
             return true;
@@ -1054,8 +1054,8 @@ class OneyRepository extends Repository
 
         // Validate phone number
         $valid_billing_mobile = ConfigClass::isValidMobilePhoneNumber(
-            $billing['mobile_phone_number'],
-            $billing['country']
+            $billing['country'],
+            $billing['mobile_phone_number']
         );
         if (!$valid_billing_mobile) {
             return true;
@@ -1334,7 +1334,8 @@ class OneyRepository extends Repository
             $error = $this->l('Your email address is not a valid email');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
             && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->l('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).');
+            $error = $this->l('Your email address is too long and the + character is not valid');
+            $error .= $this->l(' please change it to another address (max 100 characters).');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
             $error = $this->l('Your email address is too long. Please change your email address (100 characters max).');
         } elseif (strpos($email, '+') !== false) {

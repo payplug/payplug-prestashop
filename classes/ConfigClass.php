@@ -763,7 +763,7 @@ class ConfigClass
      * @return bool
      * @throws libphonenumberlight\NumberParseException
      */
-    public static function isValidMobilePhoneNumber($phone_number = false, $iso_code)
+    public static function isValidMobilePhoneNumber($iso_code, $phone_number = false)
     {
         if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
             return false;
