@@ -27,4 +27,5 @@ interface CurrencyInterface
 {
     public static function factory();
     public function getCurrency($idCurrency);
+    public function getIdByIsoCode($isoCode);
 }
