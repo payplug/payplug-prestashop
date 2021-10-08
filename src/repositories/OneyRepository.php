@@ -350,7 +350,8 @@ class OneyRepository extends Repository
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ],
             'withFirstSchedule' => $withFirstSchedule,
-            'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code)
+            'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code),
+            'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
         ];
         $this->assign->assign($vars);
         return $this->media->fetchTemplate('oney/schedule.tpl');
