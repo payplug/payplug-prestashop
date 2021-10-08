@@ -44,7 +44,7 @@ class PrestashopSpecific16
     }
 
 
-    public function hookHeader()
+    public function displayHeader()
     {
         $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
         $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
@@ -56,7 +56,7 @@ class PrestashopSpecific16
         $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
     }
 
-    public function hookCustomerAccount()
+    public function customerAccount()
     {
         $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
 

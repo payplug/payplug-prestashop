@@ -43,6 +43,9 @@ class PluginEntity
     private $api_version;
 
     /** @var object */
+    private $assign;
+
+    /** @var object */
     private $cache;
 
     /** @var object */
@@ -171,18 +174,36 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getOrderClass()
+    public function getOrder()
     {
-        return $this->orderClass;
+        return $this->order;
     }
 
     /**
-     * @param object $orderClass
+     * @param object $order
      * @return PluginEntity
      */
-    public function setOrderClass($orderClass)
+    public function setOrder($order)
     {
-        $this->orderClass = $orderClass;
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderHistory()
+    {
+        return $this->orderHistory;
+    }
+
+    /**
+     * @param object $orderHistory
+     * @return PluginEntity
+     */
+    public function setOrderHistory($orderHistory)
+    {
+        $this->orderHistory = $orderHistory;
         return $this;
     }
 
@@ -220,13 +241,20 @@ class PluginEntity
         return $this->address;
     }
 
-
     /**
      * @return string
      */
     public function getApiVersion()
     {
         return $this->api_version;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssign()
+    {
+        return $this->assign;
     }
 
     /**
@@ -448,6 +476,21 @@ class PluginEntity
         }
 
         $this->api_version = $api_version;
+        return $this;
+    }
+
+    /**
+     * @param object $assign
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setAssign($assign)
+    {
+        if (!is_object($assign)) {
+            throw (new BadParameterException('Invalid argument, $assign must be an AssignSpecific'));
+        }
+
+        $this->assign = $assign;
         return $this;
     }
 

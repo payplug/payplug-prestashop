@@ -34,4 +34,36 @@ class ProductSpecific implements ProductInterface
             return Product::$method;
         }
     }
+
+    public function getIdProductAttributesByIdAttributes($idProduct, $group)
+    {
+        return Product::getIdProductAttributesByIdAttributes($idProduct, $group);
+    }
+
+    public function getIdProductAttributeByIdAttributes($idProduct, $group)
+    {
+        return Product::getIdProductAttributeByIdAttributes($idProduct, $group);
+    }
+
+    public function getPriceStatic(
+        $id_product,
+        $usetax = true,
+        $id_product_attribute = null,
+        $decimals = 6,
+        $divisor = null,
+        $only_reduc = false,
+        $usereduc = true,
+        $quantity = 1
+    ) {
+        return Product::getPriceStatic(
+            $id_product,
+            $usetax,
+            $id_product_attribute,
+            $decimals,
+            $divisor,
+            $only_reduc,
+            $usereduc,
+            $quantity
+        );
+    }
 }
