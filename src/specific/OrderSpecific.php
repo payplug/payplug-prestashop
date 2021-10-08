@@ -21,12 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\specific;
 
-interface OrderStateInterface
+use PayPlug\src\interfaces\OrderInterface;
+use \Order;
+
+class OrderSpecific implements OrderInterface
 {
-    public function delete();
-    public function get($id);
-    public static function getOrderState($id);
-    public function softDelete();
+    public function get($idOrder = null)
+    {
+        return new Order($idOrder);
+    }
 }

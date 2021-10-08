@@ -37,4 +37,9 @@ class CurrencySpecific implements CurrencyInterface
     {
         return new Currency($idCurrency);
     }
+
+    public function getIdByIsoCode($isoCode)
+    {
+        return Currency::getIdByIsoCode($isoCode);
+    }
 }
