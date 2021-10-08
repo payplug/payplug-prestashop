@@ -23,10 +23,7 @@
 
 namespace PayPlug\src\interfaces;
 
-interface OrderStateInterface
+interface OrderHistoryInterface
 {
-    public function delete();
-    public function get($id);
-    public static function getOrderState($id);
-    public function softDelete();
+    public function get($idOrderHistory);
 }
