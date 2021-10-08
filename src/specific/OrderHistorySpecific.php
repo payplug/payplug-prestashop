@@ -21,12 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\specific;
 
-interface OrderStateInterface
+use PayPlug\src\interfaces\OrderHistoryInterface;
+use \OrderHistory;
+
+class OrderHistorySpecific implements OrderHistoryInterface
 {
-    public function delete();
-    public function get($id);
-    public static function getOrderState($id);
-    public function softDelete();
+    public function get($idOrderHistory = null)
+    {
+        return new OrderHistory($idOrderHistory);
+    }
 }
