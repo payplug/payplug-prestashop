@@ -71,5 +71,5 @@
 </div>
 
 {if $language.iso_code == 'it' && $merchant_company_iso == 'IT'}
-    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf" target="_blank" class="oneyScheduleCGV">{l s='hook.oney.schedule.cgv' mod='payplug'}</a>
+    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank" class="oneyScheduleCGV">{l s='hook.oney.schedule.cgv' mod='payplug'}</a>
 {/if}
