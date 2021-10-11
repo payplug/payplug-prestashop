@@ -15,7 +15,7 @@ $path = dirname(__FILE__) . '/translations.csv';
 if (file_exists($path)) {
     if ($csvfile = fopen($path, 'r')) {
         $count = 0;
-        while (($line = fgetcsv($csvfile, 2000, ';')) !== false) {
+        while (($line = fgetcsv($csvfile, 0, ';')) !== false) {
             if ($count) {
                 $translation_key = reset($line);
                 $row = [];
