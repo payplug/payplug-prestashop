@@ -202,6 +202,8 @@ class InstallRepository extends Repository
             && $this->config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && $this->config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
             && $this->config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
+            && $this->config->deleteByName('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS')
             && $this->config->deleteByName('PAYPLUG_ONEY_FEES')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
