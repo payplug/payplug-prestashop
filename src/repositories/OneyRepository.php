@@ -1238,11 +1238,11 @@ class OneyRepository extends Repository
      */
     public function isValidOneyAmount($amount, $id_currency = false)
     {
-        $limits = $this->getOneyPriceLimit($custom=true);
-        $convert_amount = ($this->amountCurrencyClass->convertAmount($amount))/100;
+        $limits = $this->getOneyPriceLimit($custom = true);
+        $convert_amount = ($this->amountCurrencyClass->convertAmount($amount)) / 100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
-            $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-            $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
+//            $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
+//            $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
             return [
                 'result' => false,
                 'error' => sprintf(
