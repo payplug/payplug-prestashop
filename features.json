@@ -1,0 +1,16 @@
+{
+    "features": [
+        "feature_sandbox_mode",
+        "feature_embedded_mode",
+        "feature_one_click",
+        "feature_inst",
+        "feature_inst_mode",
+        "feature_inst_min_amount",
+        "feature_show",
+        "feature_debug_mode",
+        "feature_deferred",
+        "feature_deferred_auto",
+        "feature_deferred_state",
+        "feature_oney"
+    ]
+}

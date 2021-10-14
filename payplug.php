@@ -33,6 +33,7 @@ require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
+    public $features_json;
 
     /**
      * Constructor
@@ -63,6 +64,8 @@ class Payplug extends PaymentModule
             $this->setDependencies();
             $this->setModule();
         }
+
+        $this->features_json = json_decode(file_get_contents(__DIR__."/features.json"));
     }
 
     /**

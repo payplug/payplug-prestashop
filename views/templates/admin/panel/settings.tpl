@@ -41,7 +41,9 @@
     </div>
 
     <div class="payplugSettings_advanced">
-        {include file='./settings/standard.tpl'}
+        {if isset($feature_standard)}
+            {include file='./settings/standard.tpl'}
+        {/if}
         {include file='./settings/oney.tpl'}
         {include file='./settings/installment.tpl'}
         {include file='./settings/deferred.tpl'}

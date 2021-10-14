@@ -46,6 +46,7 @@ use OrderHistory;
 use OrderSlip;
 use OrderState;
 use PaymentModule;
+use Payplug;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\InstallmentPlan;
@@ -991,8 +992,28 @@ class PayPlugClass extends PaymentModule
 
     public function fetchTemplate($file)
     {
+        if ($this->context->smarty->tpl_vars) {
+            foreach ($this->context->smarty->tpl_vars as $key => $value) {
+                if (strpos($key, 'feature_') !== false && !$this->isValidFeature($key)) {
+                    unset($this->context->smarty->tpl_vars[$key]);
+                }
+            }
+        }
+
         $output = $this->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
         return $output;
+    }
+
+    private function isValidFeature($name)
+    {
+        $module = Module::getInstanceByName($this->name);
+        foreach ($module->features_json->features as $feature) {
+            if ($feature == $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getAllowedPaymentOptions($cart)
@@ -3037,8 +3058,16 @@ class PayPlugClass extends PaymentModule
 
         $paymentOption = [];
 
+        $module = Module::getInstanceByName($this->name);
+        $enable_oneclick = false;
+        foreach ($module->features_json->features as $feature) {
+            if ($feature == 'feature_oneclick_payment') {
+                $enable_oneclick = true;
+            }
+        }
+
         // OneClick Payment
-        if (Configuration::get('PAYPLUG_STANDARD')) {
+        if (Configuration::get('PAYPLUG_STANDARD') && $enable_oneclick === true) {
             if ($options['one_click'] && !empty($payplug_cards)) {
                 foreach ($payplug_cards as $card) {
                     $brand = ($card['brand'] != 'none')
