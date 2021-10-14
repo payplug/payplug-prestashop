@@ -3266,7 +3266,7 @@ class PayPlugClass extends PaymentModule
                         break;
                     case 'invalid_amount_bottom':
                     case 'invalid_amount_top':
-                        $limits = $this->oney->getOneyPriceLimit($custom = true);
+                        $limits = $this->oney->getOneyPriceLimit(true);
                         $err_label = sprintf(
                             $this->l('payplug.getPaymentOptions.invalidAmount'),
                             $limits['min'],

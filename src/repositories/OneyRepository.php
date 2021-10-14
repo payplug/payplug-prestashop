@@ -193,7 +193,7 @@ class OneyRepository extends Repository
      */
     public function assignLegalNotice()
     {
-        $limits = $this->getOneyPriceLimit($custom = true);
+        $limits = $this->getOneyPriceLimit();
         $learnMoreLink = $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO') == 'IT' &&
             $this->toolsSpecific->tool('strtolower', $this->contextSpecific->getContext()->language->iso_code) == 'it';
         $this->assign->assign([
@@ -728,7 +728,7 @@ class OneyRepository extends Repository
      * @param boolean $id_currency
      * @return array
      */
-    public function getOneyPriceLimit($custom, $id_currency = false)
+    public function getOneyPriceLimit($custom = true, $id_currency = false)
     {
         $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
@@ -1187,7 +1187,7 @@ class OneyRepository extends Repository
         $amount = $amount ? $amount : $cart->getOrderTotal(true, \Cart::BOTH);
         $is_valid_amount = $this->isValidOneyAmount($amount, $cart->id_currency);
         if (!$is_valid_amount['result']) {
-            $limits = $this->getOneyPriceLimit($custom = true, $cart->id_currency);
+            $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
             $converted_amount = $this->amountCurrencyClass->convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
@@ -1238,7 +1238,7 @@ class OneyRepository extends Repository
      */
     public function isValidOneyAmount($amount, $id_currency = false)
     {
-        $limits = $this->getOneyPriceLimit($custom = true);
+        $limits = $this->getOneyPriceLimit();
         $convert_amount = ($this->amountCurrencyClass->convertAmount($amount)) / 100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
             return [

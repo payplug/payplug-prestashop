@@ -415,7 +415,7 @@ class ConfigClass
      */
     public function saveConfiguration()
     {
-        $limit_oney = $this->oney->getOneyPriceLimit($custom = false);
+        $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
 
             'PAYPLUG_DEFERRED' => 'payplug_deferred',
@@ -610,8 +610,8 @@ class ConfigClass
             'error_installment' => $this->payplugClass->l('payplug.assignContentVar.installment'),
             'error_deferred' => $this->payplugClass->l('payplug.assignContentVar.deferred'),
             'error_oney' => $this->payplugClass->l('payplug.assignContentVar.oney'),
-            'errorOneyMax' => $this->payplugClass->l('admin.panel.settings.oney.thresholds.max.error'),
-            'errorOneyMin' => $this->payplugClass->l('admin.panel.settings.oney.thresholds.min.error'),
+            'errorOneyMax' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMaxError'),
+            'errorOneyMin' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMinError'),
                         ]);
 
         $login_infos = [];
@@ -621,8 +621,8 @@ class ConfigClass
 
         $faq_links = $this->getFAQLinks($this->context->language->iso_code);
 
-        $amounts = $this->oney->getOneyPriceLimit($custom = false);
-        $customAmounts = $this->oney->getOneyPriceLimit($custom = true);
+        $amounts = $this->oney->getOneyPriceLimit(false);
+        $customAmounts = $this->oney->getOneyPriceLimit(true);
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
         $oney_custom_max_amounts = ($customAmounts['max']);
