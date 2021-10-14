@@ -162,13 +162,6 @@ class AdminClass extends \Payplug
                     ]);
                 }
             }
-//            if (Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
-//                && Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')!= Configuration::get('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')) {
-//                $this->contextSpecific->smarty->assign([
-//                    'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS' => Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS'),]);
-//
-//
-//            }
 
             $this->configClass->saveConfiguration();
 

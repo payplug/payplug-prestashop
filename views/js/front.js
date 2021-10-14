@@ -222,7 +222,7 @@ var $document, $window, payplugModule = {
                     }
                 }
 
-            })
+            });
         },
         loader: {
             props: {

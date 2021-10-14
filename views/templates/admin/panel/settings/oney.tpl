@@ -45,27 +45,11 @@
                         </div>
 
                     </div>
-{*                    <div class="payplugOney_fieldset payplugPanel">*}
-{*                        <div class="payplugPanel_label" >*}
-{*                            <p>{l s='admin.panel.settings.oney.thresholds' mod='payplug' sprintf=[$oney_custom_min_amounts, $oney_custom_max_amounts]}</p>*}
-{*                           </div>*}
-{*                        <div class="payplugPanel_content">*}
-
-{*                            <div class="payplugOney_amount">*}
-{*                                <input type="text" id= "oney_min" name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS"  value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">*}
-
-{*                                <p>et</p>*}
-{*                                <input type="text" id="oney_max" name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS" class="payplugThresholds_Max" style="display:inline;width: 50px;" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">*}
-{*                                <span style="display: none;" data-e2e-error="oney_amount"></span>*}
-{*                            </div>*}
-
-{*                        </div>*}
-{*                    </div>*}
                     <div class="flex-container">
                         <div class="payplugOney_thresholds">
                             <label for="text">{l s='admin.panel.settings.oney.thresholds' mod='payplug'}</label>
                         </div>
-                        <div class="payplugOney_thresholds2">
+                        <div class="payplugOney_thresholdsInputs">
                             <input type="text" id= "oney_min" name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS" value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">
                             <label>{l s='admin.panel.settings.oney.thresholds.and'  mod='payplug'}</label>
                             <input type="text" id= "oney_max" name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">

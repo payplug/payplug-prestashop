@@ -702,7 +702,7 @@ class OneyRepository extends Repository
 
 
     /**
-     * @desc  get custom oney ammount from BO form
+     * @description   get custom oney ammount from BO form
      * @param $custom_oney_amount
      * @return string
      */
@@ -1187,7 +1187,7 @@ class OneyRepository extends Repository
         $amount = $amount ? $amount : $cart->getOrderTotal(true, \Cart::BOTH);
         $is_valid_amount = $this->isValidOneyAmount($amount, $cart->id_currency);
         if (!$is_valid_amount['result']) {
-            $limits = $this->getOneyPriceLimit($customer=true, $cart->id_currency);
+            $limits = $this->getOneyPriceLimit($custom = true, $cart->id_currency);
             $converted_amount = $this->amountCurrencyClass->convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
@@ -1241,8 +1241,6 @@ class OneyRepository extends Repository
         $limits = $this->getOneyPriceLimit($custom = true);
         $convert_amount = ($this->amountCurrencyClass->convertAmount($amount)) / 100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
-//            $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-//            $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
             return [
                 'result' => false,
                 'error' => sprintf(

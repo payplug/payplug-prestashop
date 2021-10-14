@@ -824,7 +824,7 @@ var $document, $window, payplug = {
                 {identifier, limits} = oney.props,
                 amount = $(this).val(),
                 matches = amount.match(/^[0-9]+$/);
-
+            var $val_max = document.getElementById("oney_max").value;
             var $error = $('.' + identifier + '_statement').find('span');
             oney.props.error = null;
             if (limits.min > amount  || matches == null) {
@@ -832,7 +832,7 @@ var $document, $window, payplug = {
                 $error.text(errorOneyThresholds);
                 $error.show();
                 oney.props.error = $error.text();
-            } else if (limits.max < amount) {
+            } else if ( parseFloat($val_max) < amount) {
                 $('#oney_min').addClass('error');
                 $error.text(errorOneyMin);
                 $error.show();
@@ -848,6 +848,7 @@ var $document, $window, payplug = {
                 {identifier, limits} = oney.props,
                 amount = $(this).val(),
                 matches = amount.match(/^[0-9]+$/);
+            var $val_min = document.getElementById("oney_min").value;
             var $error = $('.' + identifier + '_statement').find('span');
             oney.props.error = null;
 
@@ -856,7 +857,7 @@ var $document, $window, payplug = {
                 $error.text(errorOneyThresholds)
                 $error.show();
                 oney.props.error = $error.text();
-            } else if (limits.min > amount) {
+            } else if (parseFloat($val_min)  > amount) {
                 $('#oney_max').addClass('error');
                 $error.text(errorOneyMax);
                 $error.show();

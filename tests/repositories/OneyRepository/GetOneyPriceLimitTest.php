@@ -86,8 +86,10 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
     {
         $this->currency->shouldReceive('getCurrency')
             ->andReturn($this->currencyMock);
-        $oney_custom_max_amount  = ($this->repo->getOneyPriceLimit(true, $this->currencyMock))['max'];
-        $oney_max_amount = (($this->repo->getOneyPriceLimit(false, $this->currencyMock))['max']) / 100;
+        $custom_amount = $this->repo->getOneyPriceLimit(true, $this->currencyMock);
+        $amount = $this->repo->getOneyPriceLimit(false, $this->currencyMock);
+        $oney_custom_max_amount  = $custom_amount['max'];
+        $oney_max_amount = $amount['max'] / 100;
 
         $this->assertGreaterThanOrEqual($oney_custom_max_amount, $oney_max_amount);
     }
@@ -95,8 +97,10 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
     {
         $this->currency->shouldReceive('getCurrency')
             ->andReturn($this->currencyMock);
-        $oney_custom_min_amount  = ($this->repo->getOneyPriceLimit(true, $this->currencyMock))['min'];
-        $oney_min_amount = (($this->repo->getOneyPriceLimit(false, $this->currencyMock))['min']) / 100;
+        $custom_amount = $this->repo->getOneyPriceLimit(true, $this->currencyMock);
+        $amount =  $this->repo->getOneyPriceLimit(false, $this->currencyMock);
+        $oney_custom_min_amount  = $custom_amount['min'];
+        $oney_min_amount = $amount['min'] / 100;
         $this->assertGreaterThanOrEqual($oney_min_amount, $oney_custom_min_amount);
     }
 

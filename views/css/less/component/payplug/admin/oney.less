@@ -1,97 +1,13 @@
 /* Payplug Admin Config */
-//.payplugOney {
-//  &_fieldset {
-//    .payplugPanel {
-//      &_label {
-//        align-items: flex-start;
-//        font-weight: 400;
-//      }
-//
-//      &_content {
-//        padding: 0;
-//        flex-direction: column;
-//        justify-content: flex-start;
-//        //align-items: flex-start;
-//      }
-//    }
-//    label {
-//      display: flex;
-//      font-weight: 400;
-//      cursor: pointer;
-//      align-items: center;
-//    }
-//  }
-//
-//  &_error {
-//    display: none;
-//    color: #colorMap[error];
-//  }
-//  &_amount {
-//    right: 0;
-//    display: flex;
-//    align-items: center;
-//    margin: -6px 0 0;
-//    float:right !important;
-//
-//    span {
-//      color: #colorMap[error];
-//      display: none;
-//      margin: 0 0 0 8px;
-//
-//      &.show {
-//        display: inline;
-//      }
-//    }
-//    input {
-//      &[type=text] {
-//        width: 50px;
-//        //height: 28px;
-//        //margin: 0 5px 0 0;
-//      }
-//
-//      &:focus[type="text"] {
-//        border-color: #00ab7a;
-//      }
-//
-//
-//    }
-//
-//
-//
-//
-//  }
-//
-//
-//}
-//.error {
-//  position: relative;
-//  animation: shake .1s linear;
-//  animation-iteration-count: 3;
-//  border: 1px solid red !important;
-//  outline: none;
-//}
-//.payplugThresholds {
-//  float: right;
-//  display: flex;
-//  flex-wrap: wrap;
-//  margin: 0 0 0 auto;
-//  padding: 0px;
-//  &_Min {
-//    width: 100px;
-//    margin: 20px;
-//    display: inline;
-//  }
-//  &_p {
-//    margin: 0 0 8.5px;
-//  }
-//
-//}
-
 .flex-container {
   display: flex;
   flex-wrap: wrap;
 }
 .payplugOney {
+  &_error {
+    display: none;
+    color: #colorMap[error];
+  }
   &_thresholds {
     label {
       font-weight: unset;
@@ -105,7 +21,7 @@
 
   }
 
-  &_thresholds2 {
+  &_thresholdsInputs {
     max-width: 220px;
     input {
       &[type=text] {
@@ -114,17 +30,19 @@
       }
 
       &:focus[type="text"] {
-        border-color: #00ab7a;
+        border: 2px dashed #00ab7a;
       }
     }
 
       .error {
-        //position: relative;
         animation: shake .1s linear;
         animation-iteration-count: 3;
         border: 2px dashed red !important;
         outline: none;
       }
+    label {
+          font-weight: 100;
+    }
     }
   &_statement {
     span {
@@ -136,10 +54,7 @@
       }
     }
 
-
-
   }
-
 
 }
 
