@@ -634,7 +634,7 @@ class ConfigClass
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    $this->payplugClass->l('admin.panel.settings.oney.thresholds.error'),
+                    $this->payplugClass->l('config.assignContentVar.oney.thresholdsError'),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),
