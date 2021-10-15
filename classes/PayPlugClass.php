@@ -2205,7 +2205,6 @@ class PayPlugClass extends PaymentModule
         if (!$this->oney->isOneyAllowed()) {
             return false;
         }
-
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
         $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
 
@@ -2294,7 +2293,6 @@ class PayPlugClass extends PaymentModule
             $amount = $product_price * $quantity;
             $is_elligible = $this->oney->isValidOneyAmount($amount, $this->context->currency->id);
             $is_elligible = $is_elligible['result'];
-
             $this->smarty->assign([
                 'payplug_is_oney_elligible' => $is_elligible,
             ]);
@@ -3276,7 +3274,12 @@ class PayPlugClass extends PaymentModule
                         break;
                     case 'invalid_amount_bottom':
                     case 'invalid_amount_top':
-                        $err_label = $this->l('payplug.getPaymentOptions.invalidAmount');
+                        $limits = $this->oney->getOneyPriceLimit(true);
+                        $err_label = sprintf(
+                            $this->l('payplug.getPaymentOptions.invalidAmount'),
+                            $limits['min'],
+                            $limits['max']
+                        );
                         break;
                     case 'invalid_carrier':
                         $err_label = $this->l('payplug.getPaymentOptions.invalidCarrier');
@@ -3297,6 +3300,7 @@ class PayPlugClass extends PaymentModule
                 $text = $use_fees
                     ? $this->l('payplug.getPaymentOptions.payWithOney')
                     : $this->l('payplug.getPaymentOptions.payWithOneyWithout');
+
                 $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
                 if ($optimized) {
