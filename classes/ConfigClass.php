@@ -376,12 +376,46 @@ class ConfigClass
     }
 
     /**
+     * @description  validate custom_oney_max value
+     * @param $payplug_oney
+     * @param $amount
+     * @param $oney_min
+     * @param $oney_max
+     * @return bool
+     */
+    public function validateCustomOneyMax($payplug_oney, $amount, $oney_min, $oney_max)
+    {
+        if ($payplug_oney === 1 && $amount != 0 && $amount > $oney_min / 100 && $amount <= $oney_max / 100) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @description validate custom_oney_min value
+     * @param $payplug_oney
+     * @param $amount
+     * @param $oney_min
+     * @param $oney_max
+     * @return bool
+     */
+    public function validateCustomOneyMin($payplug_oney, $amount, $oney_min, $oney_max)
+    {
+        if ($payplug_oney === 1 && $amount != 0 && $amount >= $oney_min / 100 && $amount < $oney_max / 100) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
      * save configuration
      *
      * @return void
      */
     public function saveConfiguration()
     {
+        $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
 
             'PAYPLUG_DEFERRED' => 'payplug_deferred',
@@ -398,10 +432,13 @@ class ConfigClass
             'PAYPLUG_ONEY_FEES' => 'payplug_oney_fees',
             'PAYPLUG_SANDBOX_MODE' => 'payplug_sandbox',
             'PAYPLUG_STANDARD' => 'payplug_standard',
+            'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS' => 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS',
+            'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS' => 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS',
         ];
 
         foreach ($configurationKeys as $key => $config) {
             $value = Tools::getValue($config);
+
 
             if ($value != null) {
                 switch ($config) {
@@ -422,6 +459,39 @@ class ConfigClass
                             Configuration::updateValue($key, $value);
                         }
                         break;
+                    case 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS':
+                        if (
+                        $this->validateCustomOneyMax(
+                            (int)Tools::getValue('payplug_oney'),
+                            Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS'),
+                            $limit_oney['min'],
+                            $limit_oney['max']
+                        )) {
+                            Configuration::updateValue(
+                                $key,
+                                $this->oney->setCustomOneyLimit(
+                                    (int)Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
+                                )
+                            );
+                        }
+                        break;
+                    case 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS':
+                        if ($this->validateCustomOneyMin(
+                            (int)Tools::getValue('payplug_oney'),
+                            (int)Tools::getValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS'),
+                            $limit_oney['min'],
+                            $limit_oney['max']
+                        )) {
+                            Configuration::updateValue(
+                                $key,
+                                $this->oney->setCustomOneyLimit(
+                                    (int)Tools::getValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS')
+                                )
+                            );
+                        }
+
+                        break;
+
                     default:
                         Configuration::updateValue($key, $value);
                 }
@@ -540,7 +610,9 @@ class ConfigClass
             'error_installment' => $this->payplugClass->l('payplug.assignContentVar.installment'),
             'error_deferred' => $this->payplugClass->l('payplug.assignContentVar.deferred'),
             'error_oney' => $this->payplugClass->l('payplug.assignContentVar.oney'),
-        ]);
+            'errorOneyMax' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMaxError'),
+            'errorOneyMin' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMinError'),
+                        ]);
 
         $login_infos = [];
 
@@ -549,11 +621,29 @@ class ConfigClass
 
         $faq_links = $this->getFAQLinks($this->context->language->iso_code);
 
-        $amounts = $this->oney->getOneyPriceLimit();
+        $amounts = $this->oney->getOneyPriceLimit(false);
+        $customAmounts = $this->oney->getOneyPriceLimit(true);
         $oney_min_amounts = ($amounts['min'] / 100);
         $oney_max_amounts = ($amounts['max'] / 100);
+        $oney_custom_max_amounts = ($customAmounts['max']);
+        $oney_custom_min_amounts = ($customAmounts['min']);
+
 
         $this->assignSwitchConfiguration($configurations);
+
+        Media::addJsDef(
+            [
+                'errorOneyThresholds' => sprintf(
+                    $this->payplugClass->l('config.assignContentVar.oney.thresholdsError'),
+                    $oney_min_amounts,
+                    $oney_max_amounts
+                ),
+                'oney_max_amounts' => $oney_max_amounts,
+                'oney_min_amounts' => $oney_min_amounts,
+            ]
+        );
+
+
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -584,6 +674,8 @@ class ConfigClass
             'order_states' => $this->orderClass->getOrderStates(),
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
+            'oney_custom_max_amounts' => $oney_custom_max_amounts ,
+            'oney_custom_min_amounts' => $oney_custom_min_amounts  ,
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
         ]);
