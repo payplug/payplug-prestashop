@@ -2293,7 +2293,6 @@ class PayPlugClass extends PaymentModule
             $amount = $product_price * $quantity;
             $is_elligible = $this->oney->isValidOneyAmount($amount);
             $is_elligible = $is_elligible['result'];
-
             $this->smarty->assign([
                 'payplug_is_oney_elligible' => $is_elligible,
             ]);
