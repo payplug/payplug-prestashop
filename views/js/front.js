@@ -232,6 +232,7 @@ var $document, $window, payplugModule = {
                         oney.cta.disable();
                     }
                 }
+
             });
         },
         loader: {
