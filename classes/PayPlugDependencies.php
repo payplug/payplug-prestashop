@@ -70,6 +70,7 @@ class PayPlugDependencies
         $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
 
         $this->hook = $this->getPlugin()->getHook();
+        $this->hookClass = new HookClass($this->payplug);
         $this->install = $this->getPlugin()->getInstall();
         $this->oney = $this->getPlugin()->getOney();
         $this->payment = $this->getPlugin()->getPayment();

@@ -26,4 +26,15 @@ namespace PayPlug\src\interfaces;
 interface ProductInterface
 {
     public function product($method);
+    public function getIdProductAttributesByIdAttributes($idProduct, $group);
+    public function getPriceStatic(
+        $id_product,
+        $usetax,
+        $id_product_attribute,
+        $decimals,
+        $divisor,
+        $only_reduc,
+        $usereduc,
+        $quantity
+    );
 }

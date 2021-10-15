@@ -47,7 +47,6 @@ class PayPlugValidation
 
     public function __construct()
     {
-        sleep(1);
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');

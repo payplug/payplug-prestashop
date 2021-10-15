@@ -42,6 +42,8 @@ use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\CurrencySpecific;
 use PayPlug\src\specific\LanguageSpecific;
+use PayPlug\src\specific\OrderSpecific;
+use PayPlug\src\specific\OrderHistorySpecific;
 use PayPlug\src\specific\OrderStateSpecific;
 use PayPlug\src\specific\ProductSpecific;
 use PayPlug\src\specific\ShopSpecific;
@@ -71,7 +73,6 @@ class PluginRepository extends Repository
     private $myLogPhp;
     private $oney;
     private $order_state;
-    private $orderClass;
     private $payment;
     private $query;
     private $sql;
@@ -88,6 +89,8 @@ class PluginRepository extends Repository
     private $country;
     private $currency;
     private $language;
+    private $order;
+    private $order_history;
     private $order_state_specific;
     private $product;
     private $shop;
@@ -109,6 +112,7 @@ class PluginRepository extends Repository
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
             ->setAmountCurrencyClass($this->amountCurrencyClass)
+            ->setAssign($this->assign)
             ->setCache($this->cache)
             ->setCard($this->card)
             ->setCarrier($this->carrier)
@@ -124,13 +128,14 @@ class PluginRepository extends Repository
             ->setPayment($this->payment)
             ->setProduct($this->product)
             ->setOney($this->oney)
-            ->setOrderClass($this->orderClass)
+            ->setOrder($this->order)
+            ->setOrderHistory($this->order_history)
+            ->setOrderState($this->order_state)
             ->setQuery($this->query)
             ->setSql($this->sql)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
-            ->setValidate($this->validate)
-            ->setOrderState($this->order_state);
+            ->setValidate($this->validate);
         $this->setEntity($this->plugin);
     }
 
@@ -252,6 +257,8 @@ class PluginRepository extends Repository
         $this->country = new CountrySpecific();
         $this->currency  = new CurrencySpecific();
         $this->language = new LanguageSpecific();
+        $this->order = new OrderSpecific();
+        $this->order_history = new OrderHistorySpecific();
         $this->order_state_specific = new OrderStateSpecific();
         $this->product = new ProductSpecific();
         $this->shop = new ShopSpecific();
