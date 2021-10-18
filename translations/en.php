@@ -244,7 +244,7 @@ $_MODULE['<{payplug}prestashop>order-confirmation_e28b1245d3810003295787de8c235f
 $_MODULE['<{payplug}prestashop>order-confirmation_eae9c553a9ba6b913ec08183247bd58a'] = 'Reference : ';
 $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'PayPlug payment details';
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'Capture of this payment is authorized before %s. After this date, you will not be able to get paid.';
-$_MODULE['<{payplug}prestashop>order_state_87b9c32cfe0d587a0a635bc846380859'] = 'Please note that the order status [1]%s[/1] is not configured to be interpreted by the PayPlug module. To ensure that your payments associated with the module are processed correctly, we advise you to edit the [2]Configuration with the PayPlug[2] module from your order settings by clicking [3]HERE[/3].';
+$_MODULE['<{payplug}prestashop>order_state_87b9c32cfe0d587a0a635bc846380859'] = 'Please note that the order status [1]%s[/1] is not configured to be interpreted by the PayPlug module. To ensure that your payments associated with the module are processed correctly, we advise you to edit the [2]Configuration with the PayPlug module[/2] from your order settings by clicking [3]HERE[/3].';
 $_MODULE['<{payplug}prestashop>order_state_da2fde2b954058fb173a89c89416e4e4'] = 'For more information, please read our FAQs by clicking [1]HERE[/1].';
 $_MODULE['<{payplug}prestashop>payment_857c6756c12ade188400a6c60384191e'] = 'Pay by card in 3 or 4';
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
