@@ -327,7 +327,10 @@ class OneyRepository extends Repository
         $this->assignLegalNotice();
         $this->assign->assign([
             'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
-            'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code)
+            'iso_code' => $this->toolsSpecific->tool(
+                'strtoupper',
+                $this->contextSpecific->getContext()->language->iso_code
+            )
         ]);
         return $this->media->fetchTemplate('oney/popin.tpl');
     }

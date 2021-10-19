@@ -37,6 +37,17 @@ var $document, $window, payplugModule = {
             var $options = $('input[data-module-name="payplug"]');
             $options.parents('.payment-option').addClass('payplugPaymentOption')
 
+            $options.each(function () {
+                var $form = $('#pay-with-' + this.id + '-form').find('form');
+                if ($form.find('input[name=method]').val()=="oney") {
+                    if ($form.find('input[name=oney_type]').val().includes("without_fees")) {
+                        $('#' + this.id + '-container').addClass('without_fees');
+                    } else if ($form.find('input[name=oney_type]').val().includes("with_fees")) {
+                        $('#' + this.id + '-container').addClass('with_fees');
+                    }
+                }
+            })
+
             this.checkErrors();
 
             $document.on('click', '.payplugMsg_button', payplugModule.popup.close);
