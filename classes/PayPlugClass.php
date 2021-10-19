@@ -3291,9 +3291,9 @@ class PayPlugClass extends PaymentModule
 
                 $type = explode('_', $oney_payment);
                 $split = (int)str_replace('x', '', $type[0]);
-                $isItalian = $this->tools->tool('strtoupper', $this->context->language->iso_code);
+                $iso = $this->tools->tool('strtoupper', $this->context->language->iso_code);
                 $oneyTpl = 'unified.tpl';
-                $oneyLogo = $oney_payment . ($error ? '-alt' : ''). ($isItalian && !$use_fees ? '_IT' : '') . '.svg';
+                $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
                 $text = $use_fees
                     ? $this->l('payplug.getPaymentOptions.payWithOney')
                     : $this->l('payplug.getPaymentOptions.payWithOneyWithout');
