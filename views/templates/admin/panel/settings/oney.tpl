@@ -53,6 +53,7 @@
                             <input type="text" id= "oney_min" name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS" value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">
                             <label>{l s='admin.panel.settings.oney.thresholds.and'  mod='payplug'}</label>
                             <input type="text" id= "oney_max" name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">
+                            <label for="text">€.</label>
                             <div class="payplugOney_statement"><span data-e2e-error="oney_amount"></span></div>
                         </div>
 
