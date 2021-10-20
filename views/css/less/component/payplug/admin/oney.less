@@ -2,6 +2,9 @@
 .flex-container {
   display: flex;
   flex-wrap: wrap;
+  @media (@mobile) {
+    width: 250px;
+  }
 }
 .payplugOney {
   &_error {
@@ -55,6 +58,8 @@
     }
 
   }
+
+
 
 }
 
