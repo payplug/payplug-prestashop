@@ -299,7 +299,7 @@ class PayPlugClass extends PaymentModule
         $this->context = $this->getPlugin()->getContext();
 
         $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
-        $this->apiClass = new ApiClass();
+        $this->apiClass = new ApiClass($this);
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass();
         $this->configClass = new ConfigClass($this);
