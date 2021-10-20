@@ -556,7 +556,6 @@ class ConfigClass
         $oney_max_amounts = ($amounts['max'] / 100);
 
         $this->assignSwitchConfiguration($configurations);
-        var_dump($oney_min_amounts);
         Media::addJsDef(
             [
                 'error_oneyThresholds' => sprintf(

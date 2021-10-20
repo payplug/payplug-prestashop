@@ -314,7 +314,9 @@ class OneyRepository extends Repository
         return ($config->deleteByName('PAYPLUG_ONEY')
             && $config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             && $config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS'));
+            && $config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
+            && $config->deleteByName('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
+            && $config->deleteByName('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS'));
     }
 
     /**
