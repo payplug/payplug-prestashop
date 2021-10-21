@@ -90,6 +90,7 @@ build zip release:
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
     - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
+    - cp features.json.dist features.json
     - mkdir payplug
   script:
     - shopt -s extglob
