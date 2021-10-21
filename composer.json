@@ -29,7 +29,8 @@
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "composer.*"
+            "composer.*",
+            "features.json.dist"
         ]
     },
     "autoload": {

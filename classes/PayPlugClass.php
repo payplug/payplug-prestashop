@@ -293,6 +293,7 @@ class PayPlugClass extends PaymentModule
         'PPPayment',
         'PPPaymentInstallment',
     ];
+    public $features_json;
     /** @var string */
     private $html = '';
     /** @var string */
@@ -332,6 +333,12 @@ class PayPlugClass extends PaymentModule
         $this->loadEntities();
         parent::__construct();
         $this->loadSpecificPrestaClasses();
+
+        if (file_exists(__DIR__."/../features.json")) {
+            $this->features_json = json_decode(file_get_contents(__DIR__."/../features.json"));
+        } else {
+            $this->features_json = [];
+        }
     }
 
     private function initializeAccessors()
@@ -992,8 +999,31 @@ class PayPlugClass extends PaymentModule
 
     public function fetchTemplate($file)
     {
+        if ($this->context->smarty->tpl_vars) {
+            foreach ($this->context->smarty->tpl_vars as $key => $value) {
+                if (strpos($key, 'feature_') !== false && !$this->isValidFeature($key)) {
+                    unset($this->context->smarty->tpl_vars[$key]);
+                }
+            }
+        }
+
         $output = $this->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
         return $output;
+    }
+
+    private function isValidFeature($name)
+    {
+        if (empty($this->features_json)) {
+            return false;
+        }
+
+        foreach ($this->features_json->features as $feature) {
+            if ($feature == $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getAllowedPaymentOptions($cart)
