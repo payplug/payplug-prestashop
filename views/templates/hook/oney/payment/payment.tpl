@@ -23,10 +23,15 @@
     <button href="javascript:void(0);" class="oneyPayment_trigger">
         <span class="oneyPayment_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if} ">
                 <img src="/modules/payplug/views/img/oney/3x4x_with{if isset($use_fees) && !$use_fees}out{/if}_fees{if isset($use_fees) && !$use_fees && isset($iso_code) && $iso_code == 'IT' }_IT{/if}.svg"
-                     alt="{l s='Pay by card in 3 or 4' mod='payplug'}" />
+                     alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}" />
         </span>
         <span class="oneyPayment_label">
-            {l s='Pay by card in 3 or 4' mod='payplug'}
+            {if isset($use_fees) && !$use_fees}
+                {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}
+            {else}
+                {l s='hook.oney.payment.paywithoney' mod='payplug'}
+            {/if}
+
             {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
         </span>
     </button>
