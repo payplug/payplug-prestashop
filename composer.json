@@ -1,7 +1,7 @@
 {
     "name": "payplug/payplug-prestashop",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "3.3.0",
+    "version": "3.3.1",
     "require": {
 	"php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
