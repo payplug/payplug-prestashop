@@ -1,15 +1,15 @@
 const path = require( 'path' );
 module.exports = {
-    context: __dirname,
+    //context: __dirname,
     entry: [
-        './views/js/utilities.js',
+        //'./views/js/utilities.js',
         './src/index.js',
     ],
     output: {
         path: path.resolve( __dirname, 'dist' ),
         filename: 'main.js',
-    },
-    module: {
+    }
+    /*module: {
         rules: [
             {
                 test: /\.js$/,
@@ -17,5 +17,5 @@ module.exports = {
                 use: 'babel-loader',
             }
         ]
-    }
+    }*/
 };
