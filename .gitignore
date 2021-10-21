@@ -15,5 +15,6 @@ views/css/less/*/*/*.map
 views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
 ci/translations.csv
+features.json
 html/
 phpunit.log
