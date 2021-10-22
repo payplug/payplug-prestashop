@@ -3,9 +3,9 @@ include:
     file: '/templates/main.gitlab-ci.yml'
 
 stages:
-  - releasy-review
-  - coverage and tests
   - check php
+  - coverage and tests
+  - releasy-review
   - translations
   - assets
   - build
