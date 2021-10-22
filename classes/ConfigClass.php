@@ -643,14 +643,12 @@ class ConfigClass
             ]
         );
 
-
-
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
-            'pp_version' => $this->payplugClass->version,
+            'pp_version' => Module::getInstanceByName($this->payplugClass->name)->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,
