@@ -643,8 +643,6 @@ class ConfigClass
             ]
         );
 
-
-
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
