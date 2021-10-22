@@ -20,8 +20,13 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-
-
+{if isset($feature_front)}
+    <p class="alert alert-warning" style="width: 100%;">
+        <span>
+            Ceci est une feature front
+        </span>
+    </p>
+{/if}
 
 <form class="payplug" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
     {if isset($updated_deferred_state) && $updated_deferred_state}

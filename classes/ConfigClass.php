@@ -679,6 +679,8 @@ class ConfigClass
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
             'can_use_oney_fees' => $this->oney->isAvailableWithoutFees(Configuration::get('PAYPLUG_COMPANY_ISO')),
+
+            'feature_front' => true,
         ]);
 
         return $this->html;

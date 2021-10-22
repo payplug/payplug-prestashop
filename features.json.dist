@@ -1,4 +1,6 @@
 {
     "features": [
+        "feature_front",
+        "feature_back"
     ]
 }

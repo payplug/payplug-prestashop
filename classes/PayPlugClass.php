@@ -339,6 +339,11 @@ class PayPlugClass extends PaymentModule
         } else {
             $this->features_json = [];
         }
+
+        if ($this->isValidFeature('feature_back')) {
+            dump(__LINE__ . ' Application du code dormant');
+            die;
+        }
     }
 
     private function initializeAccessors()
