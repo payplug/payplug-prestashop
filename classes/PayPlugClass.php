@@ -1206,7 +1206,7 @@ class PayPlugClass extends PaymentModule
 //    public function hookActionDeleteGDPRCustomer($customer)
 //    {
 //        if (!$this->card->deleteCards((int)$customer['id'])) {
-//            return json_encode($this->l('payplug.hookActionDeleteGDPRCustomer.unableDelete'));
+//            return json_encode($this->oldTranslate('payplug.hookActionDeleteGDPRCustomer.unableDelete'));
 //        }
 //        return json_encode(true);
 //    }
@@ -1219,7 +1219,7 @@ class PayPlugClass extends PaymentModule
 //    public function hookActionExportGDPRData($customer)
 //    {
 //        if (!$cards = $this->configClass->gdprCardExport((int)$customer['id'])) {
-//            return json_encode($this->l('payplug.hookActionExportGDPRData.unableToExport'));
+//            return json_encode($this->oldTranslate('payplug.hookActionExportGDPRData.unableToExport'));
 //        } else {
 //            return json_encode($cards);
 //        }
@@ -1462,8 +1462,8 @@ class PayPlugClass extends PaymentModule
 //            }
 //
 //            $pay_mode = $installment->is_live
-//                ? $this->l('payplug.hookDisplayAdminOrderMain.live')
-//                : $this->l('payplug.hookDisplayAdminOrderMain.test');
+//                ? $this->oldTranslate('payplug.hookDisplayAdminOrderMain.live')
+//                : $this->oldTranslate('payplug.hookDisplayAdminOrderMain.test');
 //            $payments = $order->getOrderPaymentCollection();
 //            $pps = [];
 //            if (count($payments) > 0) {
@@ -1523,11 +1523,11 @@ class PayPlugClass extends PaymentModule
 //            $id_currency = (int)Currency::getIdByIsoCode($installment->currency);
 //            $show_menu_installment = true;
 //            $inst_status = $installment->is_active ?
-//                $this->l('payplug.hookDisplayAdminOrderMain.ongoing') :
+//                $this->oldTranslate('payplug.hookDisplayAdminOrderMain.ongoing') :
 //                (
 //                    $installment->is_fully_paid ?
-//                    $this->l('payplug.hookDisplayAdminOrderMain.paid') :
-//                    $this->l('payplug.hookDisplayAdminOrderMain.suspended')
+//                    $this->oldTranslate('payplug.hookDisplayAdminOrderMain.paid') :
+//                    $this->oldTranslate('payplug.hookDisplayAdminOrderMain.suspended')
 //                );
 //            $inst_status_code = $installment->is_active ?
 //                'ongoing' :
@@ -1670,44 +1670,44 @@ class PayPlugClass extends PaymentModule
 //            }
 //
 //            $pay_status = ((int)$payment->is_paid == 1)
-//                ? $this->l('payplug.hookDisplayAdminOrderMain.paid')
-//                : $this->l('payplug.hookDisplayAdminOrderMain.notPaid');
+//                ? $this->oldTranslate('payplug.hookDisplayAdminOrderMain.paid')
+//                : $this->oldTranslate('payplug.hookDisplayAdminOrderMain.notPaid');
 //            if ((int)$payment->is_refunded == 1) {
-//                $pay_status = $this->l('payplug.hookDisplayAdminOrderMain.refunded');
+//                $pay_status = $this->oldTranslate('payplug.hookDisplayAdminOrderMain.refunded');
 //            } elseif ((int)$payment->amount_refunded > 0) {
-//                $pay_status = $this->l('payplug.hookDisplayAdminOrderMain.partiallyRefunded');
+//                $pay_status = $this->oldTranslate('payplug.hookDisplayAdminOrderMain.partiallyRefunded');
 //            }
 //            $pay_amount = (int)$payment->amount / 100;
 //            $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
 //            if ($payment->card->brand != '') {
 //                $pay_brand = $payment->card->brand;
 //            } else {
-//                $pay_brand = $this->l('payplug.hookDisplayAdminOrderMain.unavailable');
+//                $pay_brand = $this->oldTranslate('payplug.hookDisplayAdminOrderMain.unavailable');
 //            }
 //            if ($payment->card->country != '') {
-//                $pay_brand .= ' ' . $this->l('payplug.hookDisplayAdminOrderMain.card') .
+//                $pay_brand .= ' ' . $this->oldTranslate('payplug.hookDisplayAdminOrderMain.card') .
 //                    ' (' . $payment->card->country . ')';
 //            }
 //            if ($payment->card->last4 != '') {
 //                $pay_card_mask = '**** **** **** ' . $payment->card->last4;
 //            } else {
-//                $pay_card_mask = $this->l('payplug.hookDisplayAdminOrderMain.unavailable');
+//                $pay_card_mask = $this->oldTranslate('payplug.hookDisplayAdminOrderMain.unavailable');
 //            }
 //
 //            // Deferred payment does'nt display 3DS option before capture so we have to consider it null
 //            if ($payment->is_3ds !== null) {
 //                $pay_tds = $payment->is_3ds
-//                    ? $this->l('payplug.hookDisplayAdminOrderMain.yes')
-//                    : $this->l('payplug.hookDisplayAdminOrderMain.no');
+//                    ? $this->oldTranslate('payplug.hookDisplayAdminOrderMain.yes')
+//                    : $this->oldTranslate('payplug.hookDisplayAdminOrderMain.no');
 //                $this->context->smarty->assign(['pay_tds' => $pay_tds]);
 //            }
 //
 //            $pay_mode = $payment->is_live
-//                ? $this->l('payplug.hookDisplayAdminOrderMain.live')
-//                : $this->l('payplug.hookDisplayAdminOrderMain.test');
+//                ? $this->oldTranslate('payplug.hookDisplayAdminOrderMain.live')
+//                : $this->oldTranslate('payplug.hookDisplayAdminOrderMain.test');
 //
 //            if ($payment->card->exp_month === null) {
-//                $pay_card_date = $this->l('payplug.hookDisplayAdminOrderMain.unavailable');
+//                $pay_card_date = $this->oldTranslate('payplug.hookDisplayAdminOrderMain.unavailable');
 //            } else {
 //                $pay_card_date = date(
 //                    'm/y',
@@ -1731,8 +1731,8 @@ class PayPlugClass extends PaymentModule
 //            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
 //            if ($payment->is_3ds !== null) {
 //                $pay_tds = $payment->is_3ds
-//                    ? $this->l('payplug.hookDisplayAdminOrderMain.yes')
-//                    : $this->l('payplug.hookDisplayAdminOrderMain.no');
+//                    ? $this->oldTranslate('payplug.hookDisplayAdminOrderMain.yes')
+//                    : $this->oldTranslate('payplug.hookDisplayAdminOrderMain.no');
 //                $this->context->smarty->assign(['pay_tds' => $pay_tds]);
 //            }
 //        }
@@ -2388,7 +2388,7 @@ class PayPlugClass extends PaymentModule
 //                }
 //            } else {
 //                $this->setPaymentErrorsCookie([
-//                    $this->l('payplug.hookHeader.transactionNotCompleted')
+//                    $this->oldTranslate('payplug.hookHeader.transactionNotCompleted')
 //                ]);
 //                $error_url = 'index.php?controller=order&step=3&error=1';
 //                Tools::redirect($error_url);
@@ -2398,7 +2398,7 @@ class PayPlugClass extends PaymentModule
 //        if (Configuration::get('PAYPLUG_ONEY')) {
 //            Media::addJsDef([
 //                'payplug_oney' => true,
-//                'payplug_oney_loading_msg' => $this->l('payplug.hookHeader.loading')
+//                'payplug_oney_loading_msg' => $this->oldTranslate('payplug.hookHeader.loading')
 //            ]);
 //        }
 //
@@ -3533,13 +3533,13 @@ class PayPlugClass extends PaymentModule
 //            $this->logger->addLog('Incorrect amount to refund', 'notice');
 //            die(json_encode([
 //                'status' => 'error',
-//                'data' => $this->l('payplug.refundPayment.incorrectAmount')
+//                'data' => $this->oldTranslate('payplug.refundPayment.incorrectAmount')
 //            ]));
 //        } elseif ($this->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
 //            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
 //            die(json_encode([
 //                'status' => 'error',
-//                'data' => $this->l('payplug.refundPayment.amountAtLeast')
+//                'data' => $this->oldTranslate('payplug.refundPayment.amountAtLeast')
 //            ]));
 //        } else {
 //            $amount = str_replace(',', '.', Tools::getValue('amount'));
@@ -3571,7 +3571,7 @@ class PayPlugClass extends PaymentModule
 //
 //            die(json_encode([
 //                'status' => 'error',
-//                'data' => $this->l('payplug.refundPayment.cannotRefund')
+//                'data' => $this->oldTranslate('payplug.refundPayment.cannotRefund')
 //            ]));
 //        } else {
 //            $new_state = 7;
@@ -3610,7 +3610,7 @@ class PayPlugClass extends PaymentModule
 //                        if (!$this->createLockFromCartId($order->id_cart)) {
 //                            die(json_encode([
 //                                'status' => 'error',
-//                                'data' => $this->l('payplug.refundPayment.errorOccurred')
+//                                'data' => $this->oldTranslate('payplug.refundPayment.errorOccurred')
 //                            ]));
 //                        }
 //
@@ -3650,7 +3650,7 @@ class PayPlugClass extends PaymentModule
 //                        if (!$this->createLockFromCartId($order->id_cart)) {
 //                            die(json_encode([
 //                                'status' => 'error',
-//                                'data' => $this->l('payplug.refundPayment.errorOccurred')
+//                                'data' => $this->oldTranslate('payplug.refundPayment.errorOccurred')
 //                            ]));
 //                        }
 //
@@ -3688,7 +3688,7 @@ class PayPlugClass extends PaymentModule
 //                'status' => 'ok',
 //                'data' => $data,
 //                'template' => $this->hookDisplayAdminOrderMain(['id_order' => $id_order]),
-//                'message' => $this->l('payplug.refundPayment.success'),
+//                'message' => $this->oldTranslate('payplug.refundPayment.success'),
 //                'reload' => $reload
 //            ]));
 //        }

@@ -399,7 +399,7 @@ class ApiClass
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
             return $errors;
         }
 
