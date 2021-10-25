@@ -319,7 +319,7 @@ class PayPlugClass extends PaymentModule
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('payplug.construct.description');
+        $this->description = $this->l('payplug.construct.description', 'payplugclass');
         $this->displayName = 'PayPlug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
@@ -432,7 +432,7 @@ class PayPlugClass extends PaymentModule
         if ($abort == 'error') {
             die(json_encode([
                 'status' => 'error',
-                'data' => $this->l('payplug.abortPayment.cannotAbort')
+                'data' => $this->l('payplug.abortPayment.cannotAbort', 'payplugclass')
             ]));
         } else {
             $installment = InstallmentClass::retrieveInstallment($inst_id);
@@ -793,7 +793,7 @@ class PayPlugClass extends PaymentModule
             $this->logger->addLog('Cannot capture this payment', 'notice');
             die(json_encode([
                 'status' => 'error',
-                'data' => $this->l('payplug.capturePayment.cannotCapture'),
+                'data' => $this->l('payplug.capturePayment.cannotCapture', 'payplugclass'),
                 'message' => $capture['message'],
             ]));
         } else {
@@ -806,7 +806,7 @@ class PayPlugClass extends PaymentModule
                     $this->logger->addLog('An error occured on lock creation', 'notice');
                     die(json_encode([
                         'status' => 'error',
-                        'data' => $this->l('payplug.capturePayment.errorOccurred')
+                        'data' => $this->l('payplug.capturePayment.errorOccurred', 'payplugclass')
                     ]));
                 }
 
@@ -831,7 +831,7 @@ class PayPlugClass extends PaymentModule
             die(json_encode([
                 'status' => 'ok',
                 'data' => '',
-                'message' => $this->l('payplug.capturePayment.captured.'),
+                'message' => $this->l('payplug.capturePayment.captured.', 'payplugclass'),
                 'reload' => true,
             ]));
         }
@@ -910,7 +910,7 @@ class PayPlugClass extends PaymentModule
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'payplugclass');
             return $errors;
         }
 
@@ -923,7 +923,7 @@ class PayPlugClass extends PaymentModule
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
                         $errors[$error_key] =
-                            $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+                            $this->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'payplugclass');
                     }
             }
         }
@@ -2030,7 +2030,7 @@ class PayPlugClass extends PaymentModule
             && isset($card_details['brand'])
             && !empty($card_details['brand'])
             && ($card_details['brand'] !== 'none')) {
-            $card_brand = $this->l('payplug.adminAjaxController.card') . ' ' . $card_details['brand'];
+            $card_brand = $this->l('payplug.adminAjaxController.card', 'payplugclass') . ' ' . $card_details['brand'];
 
             // Country
             if ($card_brand && isset($card_details['country']) && !empty($card_details['country'])) {
@@ -2062,16 +2062,16 @@ class PayPlugClass extends PaymentModule
             'card_mask' => $card_mask,
             'card_date' => $card_date,
             'mode' => ($payment->is_live)
-                ? $this->l('payplug.buildPaymentDetails.live')
-                : $this->l('payplug.buildPaymentDetails.test'),
+                ? $this->l('payplug.buildPaymentDetails.live', 'payplugclass')
+                : $this->l('payplug.buildPaymentDetails.test', 'payplugclass'),
             'paid' => (bool)$payment->is_paid,
         ];
 
         //Deferred payment does'nt display 3DS option before capture so we have to consider it null
         if ($payment->is_3ds !== null) {
             $payment_details['tds'] = ($payment->is_3ds)
-                ? $this->l('payplug.buildPaymentDetails.yes')
-                : $this->l('payplug.buildPaymentDetails.no');
+                ? $this->l('payplug.buildPaymentDetails.yes', 'payplugclass')
+                : $this->l('payplug.buildPaymentDetails.no', 'payplugclass');
         }
 
         $is_oney = false;
@@ -2079,19 +2079,19 @@ class PayPlugClass extends PaymentModule
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithFees');
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithFees', 'payplugclass');
                     break;
                 case 'oney_x4_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithFees');
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithFees', 'payplugclass');
                     break;
                 case 'oney_x3_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithoutFees');
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithoutFees', 'payplugclass');
                     break;
                 case 'oney_x4_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithoutFees');
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'payplugclass');
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -2106,7 +2106,7 @@ class PayPlugClass extends PaymentModule
                 $payment_details['can_be_cancelled'] = false;
                 $payment_details['can_be_captured'] = false;
                 if (!isset($payment_details['type'])) {
-                    $payment_details['status_message'] = '(' . $this->l('payplug.buildPaymentDetails.deferred') . ')';
+                    $payment_details['status_message'] = '(' . $this->l('payplug.buildPaymentDetails.deferred', 'payplugclass') . ')';
                 }
             } else {
                 $expiration = date('d/m/Y', $payment->authorization->expires_at);
@@ -2118,14 +2118,14 @@ class PayPlugClass extends PaymentModule
                         $payment_details['can_be_captured'] = true;
                         $payment_details['can_be_cancelled'] = true;
                         $payment_details['status_message'] = sprintf(
-                            '(' . $this->l('payplug.buildPaymentDetails.captureAuthorizedBefore') . ')',
+                            '(' . $this->l('payplug.buildPaymentDetails.captureAuthorizedBefore', 'payplugclass') . ')',
                             $expiration
                         );
                     }
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->l('payplug.buildPaymentDetails.captureAuthorizedBeforeWarning'),
+                        $this->l('payplug.buildPaymentDetails.captureAuthorizedBeforeWarning', 'payplugclass'),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -2422,7 +2422,7 @@ class PayPlugClass extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->l('payplug.preparePayment.transactionNotCompleted')
+                'response' => $this->l('payplug.preparePayment.transactionNotCompleted', 'payplugclass')
             ];
         }
 
@@ -2446,7 +2446,7 @@ class PayPlugClass extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->l('payplug.preparePayment.transactionNotCompleted')
+                'response' => $this->l('payplug.preparePayment.transactionNotCompleted', 'payplugclass')
             ];
         }
 
@@ -2490,7 +2490,7 @@ class PayPlugClass extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->l('payplug.preparePayment.transactionNotCompleted')
+                'response' => $this->l('payplug.preparePayment.transactionNotCompleted', 'payplugclass')
             ];
         }
 
@@ -2502,7 +2502,7 @@ class PayPlugClass extends PaymentModule
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->l('payplug.preparePayment.transactionNotCompleted')
+                'response' => $this->l('payplug.preparePayment.transactionNotCompleted', 'payplugclass')
             ];
         }
 
@@ -2749,7 +2749,7 @@ class PayPlugClass extends PaymentModule
                         $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
                         return [
                             'result' => false,
-                            'response' => $this->l('payplug.preparePayment.fieldsNotCompleted')
+                            'response' => $this->l('payplug.preparePayment.fieldsNotCompleted', 'payplugclass')
                         ];
                     }
                 } else {
@@ -3081,7 +3081,7 @@ class PayPlugClass extends PaymentModule
                 foreach ($payplug_cards as $card) {
                     $brand = ($card['brand'] != 'none')
                         ? Tools::ucfirst($card['brand'])
-                        : $this->l('payplug.getPaymentOptions.card');
+                        : $this->l('payplug.getPaymentOptions.card', 'payplugclass');
                     $payment_key = 'one_click_' . $card['id_payplug_card'];
                     $paymentOption[$payment_key]['name'] = 'one_click';
                     $paymentOption[$payment_key]['inputs'] = [
@@ -3120,7 +3120,7 @@ class PayPlugClass extends PaymentModule
                     $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
                     $paymentOption[$payment_key]['expiry_date_card'] =
-                        $this->l('payplug.getPaymentOptions.expiryDate') . ': ' . $card['expiry_date'];
+                        $this->l('payplug.getPaymentOptions.expiryDate', 'payplugclass') . ': ' . $card['expiry_date'];
                     $paymentOption[$payment_key]['action'] = $this->context->link->getModuleLink(
                         $this->name,
                         'dispatcher',
@@ -3167,9 +3167,9 @@ class PayPlugClass extends PaymentModule
                 _PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
-                $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payDifferentCard');
+                $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payDifferentCard', 'payplugclass');
             } else {
-                $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payCreditCard');
+                $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payCreditCard', 'payplugclass');
             }
             $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
                 $this->name,
@@ -3221,7 +3221,7 @@ class PayPlugClass extends PaymentModule
                     Configuration::get('PAYPLUG_INST_MODE') . '_' . $this->configClass->getImgLang() . '.png'
                 );
                 $paymentOption['installment']['callToActionText'] = sprintf(
-                    $this->l('payplug.getPaymentOptions.payByCardInstallment'),
+                    $this->l('payplug.getPaymentOptions.payByCardInstallment', 'payplugclass'),
                     Configuration::get('PAYPLUG_INST_MODE')
                 );
                 $paymentOption['installment']['action'] = $this->context->link->getModuleLink(
@@ -3302,25 +3302,25 @@ class PayPlugClass extends PaymentModule
 
                 switch ($error) {
                     case 'invalid_addresses':
-                        $err_label = $this->l('payplug.getPaymentOptions.invalidAddresses');
+                        $err_label = $this->l('payplug.getPaymentOptions.invalidAddresses', 'payplugclass');
                         break;
                     case 'invalid_amount_bottom':
                     case 'invalid_amount_top':
                         $limits = $this->oney->getOneyPriceLimit(true);
                         $err_label = sprintf(
-                            $this->l('payplug.getPaymentOptions.invalidAmount'),
+                            $this->l('payplug.getPaymentOptions.invalidAmount', 'payplugclass'),
                             $limits['min'],
                             $limits['max']
                         );
                         break;
                     case 'invalid_carrier':
-                        $err_label = $this->l('payplug.getPaymentOptions.invalidCarrier');
+                        $err_label = $this->l('payplug.getPaymentOptions.invalidCarrier', 'payplugclass');
                         break;
                     case 'invalid_cart':
-                        $err_label = $this->l('payplug.getPaymentOptions.invalidCart');
+                        $err_label = $this->l('payplug.getPaymentOptions.invalidCart', 'payplugclass');
                         break;
                     default:
-                        $err_label = $this->l('payplug.getPaymentOptions.errorOccurred');
+                        $err_label = $this->l('payplug.getPaymentOptions.errorOccurred', 'payplugclass');
                         break;
                 }
 
@@ -3330,8 +3330,8 @@ class PayPlugClass extends PaymentModule
                 $oneyTpl = 'unified.tpl';
                 $oneyLogo = $oney_payment . ($error ? '-alt' : ''). ($isItalian && !$use_fees ? '_IT' : '') . '.svg';
                 $text = $use_fees
-                    ? $this->l('payplug.getPaymentOptions.payWithOney')
-                    : $this->l('payplug.getPaymentOptions.payWithOneyWithout');
+                    ? $this->l('payplug.getPaymentOptions.payWithOney', 'payplugclass')
+                    : $this->l('payplug.getPaymentOptions.payWithOneyWithout', 'payplugclass');
 
                 $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
@@ -3950,5 +3950,10 @@ class PayPlugClass extends PaymentModule
         }
 
         return true;
+    }
+
+    public function getPath()
+    {
+        return $this->_path;
     }
 }
