@@ -186,7 +186,7 @@ class AdminClass extends \Payplug
             if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
                     'content' => null,
-                    'error' => $this->l('payplug.adminAjaxController.passwordInvalid')
+                    'error' => $this->l('payplug.adminAjaxController.passwordInvalid', 'adminclass')
                 ]));
             }
 
@@ -210,7 +210,7 @@ class AdminClass extends \Payplug
             } else {
                 die(json_encode([
                     'content' => null,
-                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect')
+                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect', 'adminclass')
                 ]));
             }
 
@@ -284,7 +284,7 @@ class AdminClass extends \Payplug
             }
 
             die(json_encode([
-                'message' => $this->l('payplug.adminAjaxController.orderUpdated'),
+                'message' => $this->l('payplug.adminAjaxController.orderUpdated', 'adminclass'),
                 'reload' => true
             ]));
         }
