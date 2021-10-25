@@ -917,7 +917,7 @@ class HookClass
             'front_ajax_url' => $this->context->link->getModuleLink($this->payplug->name, 'ajax', [], true),
             'api_url' => $this->payplug->apiClass->getApiUrl(),
             'price2display' => $price2display,
-            'this_path' => $this->payplug->_path,
+            'this_path' => $this->payplug->getPath(),
         ]);
 
         return $this->payplug->fetchTemplate('checkout/payment/display.tpl');
