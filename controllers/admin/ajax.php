@@ -65,12 +65,14 @@ if (Tools::getValue('_ajax') == 1) {
             $embedded = (int)Tools::getValue('embedded');
             $one_click = (int)Tools::getValue('one_click');
             $installment = (int)Tools::getValue('installment');
+            $bancontact = (int)Tools::getValue('bancontact');
             $deferred = (int)Tools::getValue('deferred');
             $activate = (int)Tools::getValue('activate');
             $args = [
                 'sandbox' => $sandbox,
                 'embedded' => $embedded,
                 'one_click' => $one_click,
+                'bancontact' => $bancontact,
                 'installment' => $installment,
                 'deferred' => $deferred,
                 'activate' => $activate,
