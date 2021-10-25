@@ -204,13 +204,13 @@ class RefundClass extends \PaymentModule
             $this->payplug->logger->addLog('Incorrect amount to refund', 'notice');
             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.incorrectAmount')
+                                'data' => $this->payplug->l('payplug.refundPayment.incorrectAmount', 'refundclass')
                             ]));
         } elseif ($this->payplug->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
             $this->payplug->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.amountAtLeast')
+                                'data' => $this->payplug->l('payplug.refundPayment.amountAtLeast', 'refundclass')
                             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));
@@ -242,7 +242,7 @@ class RefundClass extends \PaymentModule
 
             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.cannotRefund')
+                                'data' => $this->payplug->l('payplug.refundPayment.cannotRefund', 'refundclass')
                             ]));
         } else {
             $new_state = 7;
@@ -281,7 +281,7 @@ class RefundClass extends \PaymentModule
                         if (!$this->payplug->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
                                                 'status' => 'error',
-                                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred')
+                                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
                                             ]));
                         }
 
@@ -321,9 +321,9 @@ class RefundClass extends \PaymentModule
                     if (Validate::isLoadedObject($order)) {
                         if (!$this->payplug->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
-                                                'status' => 'error',
-                                                'data' => $this->l('payplug.refundPayment.errorOccurred')
-                                            ]));
+                                'status' => 'error',
+                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
+                            ]));
                         }
 
                         $current_state = (int)$this->payplug->orderClass->getCurrentOrderState($order->id);
