@@ -43,6 +43,13 @@
     <div class="payplugSettings_advanced">
         {include file='./settings/standard.tpl'}
         {include file='./settings/oney.tpl'}
+
+        {if $feature_bancontact && !$payplug_switch.sandbox.checked}
+
+            {include file='./settings/bancontact.tpl'}
+
+        {/if}
+
         {include file='./settings/installment.tpl'}
         {include file='./settings/deferred.tpl'}
     </div>
