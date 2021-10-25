@@ -71,6 +71,7 @@ var $document, $window, payplug = {
                 one_click: form.props.data['payplug_one_click'],
                 oney: form.props.data['payplug_oney'],
                 installment: form.props.data['payplug_inst'],
+                bancontact: form.props.data['payplug_bancontact'],
                 deferred: form.props.data['payplug_deferred']
             };
 
@@ -689,9 +690,14 @@ var $document, $window, payplug = {
 
             var is_sandbox = parseInt($('input[name=payplug_sandbox]:checked').val());
 
+            $bancontact = $('.payplugBancontact');
+
             if (name == 'payplug_sandbox' && !is_sandbox) {
                 switcher.left($switcher, true);
+                $bancontact.show();
                 return settings.live();
+            } else if (name == 'payplug_sandbox' && is_sandbox) {
+                $bancontact.hide();
             }
 
             if (!value) {

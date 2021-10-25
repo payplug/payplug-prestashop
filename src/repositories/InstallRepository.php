@@ -177,6 +177,7 @@ class InstallRepository extends Repository
     private function deleteConfig()
     {
         return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
+            && $this->config->deleteByName('PAYPLUG_BANCONTACT')
             && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
             && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
             && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
@@ -291,6 +292,7 @@ class InstallRepository extends Repository
     public function setConfig()
     {
         return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
+            && $this->config->updateValue('PAYPLUG_BANCONTACT', null)
             && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
             && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
             && $this->config->updateValue('PAYPLUG_COMPANY_ISO', '')

@@ -132,6 +132,7 @@ class AdminClass extends \Payplug
                     'standard',
                     'one_click',
                     'oney',
+                    'bancontact',
                     'installment',
                     'deferred',
                 ];

@@ -703,6 +703,7 @@ class PayPlugClass extends PaymentModule
     {
         $standard = Configuration::get('PAYPLUG_STANDARD');
         $one_click = $standard && Configuration::get('PAYPLUG_ONE_CLICK');
+        $bancontact = Configuration::get('PAYPLUG_BANCONTACT');
         $installment = Configuration::get('PAYPLUG_INST');
         $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
         $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
@@ -1011,7 +1012,7 @@ class PayPlugClass extends PaymentModule
         return $output;
     }
 
-    private function isValidFeature($name)
+    public function isValidFeature($name)
     {
         if (empty($this->features_json)) {
             return false;
