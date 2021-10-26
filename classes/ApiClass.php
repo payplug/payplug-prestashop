@@ -33,13 +33,14 @@ use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\repositories\PluginRepository;
 use Tools;
 
-class ApiClass extends \PaymentModule
+class ApiClass
 {
 
-    /**
-     * var Plugin
-     */
+    /** var Plugin */
     public $plugin;
+
+    /** var PayPlugClass */
+    public $payplug;
 
     /** @var string */
     public $current_api_key;
@@ -52,10 +53,11 @@ class ApiClass extends \PaymentModule
     /** @var string */
     private $api_url;
 
-    public function __construct()
+    public function __construct($payplug)
     {
-        parent::__construct();
-        $this->plugin = new PluginRepository();
+        $this->payplug = $payplug;
+        $this->plugin = $payplug->getPlugin();
+
         $this->setEnvironment();
         self::setSecretKey();
         $this->current_api_key =  self::getCurrentApiKey();
@@ -348,7 +350,7 @@ class ApiClass extends \PaymentModule
         if ($this->current_api_key != null) {
             HttpClient::setDefaultUserAgentProduct(
                 'PayPlug-Prestashop',
-                $this->version,
+                $this->payplug->version,
                 'Prestashop/' . _PS_VERSION_
             );
         }
@@ -365,7 +367,7 @@ class ApiClass extends \PaymentModule
         try {
             \Payplug\Payplug::init([
                 'secretKey' => $payplug_key,
-                'apiVersion' => (new PluginRepository())->getEntity()->getApiVersion()
+                'apiVersion' => $this->plugin->getApiVersion()
             ]);
 
             return $payplug_key;

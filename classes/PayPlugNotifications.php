@@ -535,7 +535,10 @@ class PayPlugNotifications
             do {
                 $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
                 if (!$cart_lock) {
-                    PayplugLock::check($this->cart->id);
+                    $checkReturn = PayplugLock::check($this->cart->id);
+                    if ($checkReturn == "stop ipn") {
+                        $this->exitProcess('Lock cannot be created.', 500);
+                    }
                 } else {
                     $this->logger->addLog('Lock created');
                     $this->lock_key = $this->cart->id;
@@ -866,7 +869,10 @@ class PayPlugNotifications
         do {
             $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
-                PayplugLock::check($this->cart->id);
+                $checkReturn = PayplugLock::check($this->cart->id);
+                if ($checkReturn == "stop ipn") {
+                    $this->exitProcess('Lock cannot be created.', 500);
+                }
             } else {
                 $this->lock_key = $this->cart->id;
             }

@@ -273,7 +273,7 @@ class PayPlugClass extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.3.0';
+        $this->version = '3.3.1';
         $this->oneyLogoUrl = '';
 
         $this->initializeAccessors();
@@ -299,7 +299,7 @@ class PayPlugClass extends PaymentModule
         $this->context = $this->getPlugin()->getContext();
 
         $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
-        $this->apiClass = new ApiClass();
+        $this->apiClass = new ApiClass($this);
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass();
         $this->configClass = new ConfigClass($this);
