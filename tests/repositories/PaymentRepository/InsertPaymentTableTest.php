@@ -88,63 +88,28 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         );
     }
 
-    public function testInsertPaymentTableWithValidData()
+    public function testWithInvalidCartHashGetter()
     {
+        $error = '[insertPaymentTable] Problem with the getHashedCart method.';
         $this->repo
             ->shouldReceive([
-                'getHashedCart' => true
+                'getHashedCart' => ['result' => false],
+                'returnPaymentError' => $error
             ]);
 
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-                'build' => true
-            ]);
-
-        $this->assertTrue($this->repo->insertPaymentTable($this->paymentDetails)['result']);
-
-        $this->repo
-            ->shouldReceive([
-                $this->repo->insertPaymentTable($this->paymentDetails)['response'],
-                'Insert data in DB successfully'
-            ]);
-    }
-
-    public function testInsertPaymentTableWithInvalidData()
-    {
-        $this->paymentDetails['cart'] = \Mockery::mock('cart');
-        $this->paymentDetails['cart']
-            ->shouldReceive([
-                'getProducts' => CartMock::getProducts(),
-                'getOrderTotal' => 42.42
-            ])
-        ;
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-                'build' => false
-            ]);
-
-        $this->assertFalse($this->repo->insertPaymentTable($this->paymentDetails)['result']);
-
-        $this->repo
-            ->shouldReceive([
-                $this->repo->insertPaymentTable($this->paymentDetails)['response'],
-                '[insertPaymentCart] Unable to flush DB (build method)'
-            ]);
+        $this->assertSame(
+            $error,
+            $this->repo->insertPaymentTable($this->paymentDetails)
+        );
     }
 
     public function testInsertPaymentTableThrowException()
     {
+        $error = '[insertPaymentTable] Error: Bad Request';
         $this->repo
             ->shouldReceive([
-                'getHashedCart' => true
+                'getHashedCart' => ['result' => true],
+                'returnPaymentError' => $error
             ]);
 
         $this->query
@@ -160,24 +125,59 @@ final class InsertPaymentTableTest extends BasePaymentRepository
             ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'Bad Request', 400)
         ;
 
-        $this->assertFalse($this->repo->insertPaymentTable($this->paymentDetails)['result']);
         $this->assertSame(
-            $this->repo->insertPaymentTable($this->paymentDetails)['response'],
-            '[insertPaymentTable] Error: Bad Request'
+            $error,
+            $this->repo->insertPaymentTable($this->paymentDetails)
         );
     }
 
-    public function testInsertPaymentTableWithInvalidHashedCart()
+    public function testInsertPaymentTableReturnFalse()
     {
-        $this->paymentDetails['cart'] = null;
+        $error = '[insertPaymentCart] Unable to flush DB (build method)';
+        $this->repo
+            ->shouldReceive([
+                'getHashedCart' => ['result' => true],
+                'returnPaymentError' => $error
+            ]);
 
-        $this->assertFalse(
-            $this->repo->insertPaymentTable($this->paymentDetails)['result']
-        );
+        $this->query
+            ->shouldReceive([
+                'insert' => $this->query,
+                'into' => $this->query,
+                'fields' => $this->query,
+                'values' => $this->query,
+                'build' => false,
+            ]);
 
         $this->assertSame(
-            $this->repo->insertPaymentTable($this->paymentDetails)['response'],
-            '[insertPaymentTable] Problem with the getHashedCart method.'
+            $error,
+            $this->repo->insertPaymentTable($this->paymentDetails)
+        );
+    }
+
+    public function testInsertPaymentTableReturnValid()
+    {
+        $this->repo
+            ->shouldReceive([
+                'getHashedCart' => ['result' => true]
+            ]);
+
+        $this->query
+            ->shouldReceive([
+                'insert' => $this->query,
+                'into' => $this->query,
+                'fields' => $this->query,
+                'values' => $this->query,
+                'build' => true,
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => 'Insert data in DB successfully'
+            ],
+            $this->repo->insertPaymentTable($this->paymentDetails)
         );
     }
 }
