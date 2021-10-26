@@ -148,6 +148,9 @@ class PrestashopSpecific16
                             $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
                         }
                     }
+                    if ($payment_method == 'oney' && $oneyOptimized && strpos($payment_option['type'], 'without_fees')) {
+                        $payment_option['logo'] = str_replace('without_fees_side_', 'without_fees_', $payment_option['logo']);
+                    }
 
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
