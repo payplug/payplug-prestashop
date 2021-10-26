@@ -825,6 +825,11 @@ class PayPlugNotifications
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
+                if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
+                    $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
+                    $this->exitProcess('Payment timeout for paymentID: ' . $this->payment->installment_plan_id, 200);
+                }
+
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->payment->installment_plan_id;
                 $this->exitProcess($error_msg, 500);
             }
@@ -835,6 +840,11 @@ class PayPlugNotifications
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
+                if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
+                    $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
+                    $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
+                }
+
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
                 $this->exitProcess($error_msg, ($this->is_oney ? 242 : 500));
             }
