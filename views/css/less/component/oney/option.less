@@ -85,15 +85,15 @@
     height: 90px;
     max-width: 100%;
 
-    .-mobile & {
-      display: none;
-    }
     &.-x3, &.-x4  {
       width: 140px;
       &.-withoutFees {
         width: 150px;
         min-height: 90px;
       }
+    }
+    @media (@tablet) {
+      display: none;
     }
   }
 
