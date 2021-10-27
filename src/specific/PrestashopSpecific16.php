@@ -69,6 +69,7 @@ class PrestashopSpecific16
     {
         $paymentOptions = [];
         $payment_class = 'payplug';
+        $optimized_class = '';
         $logo_class = 'paymentLogo';
         $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
@@ -146,6 +147,7 @@ class PrestashopSpecific16
                         $payment_option['oney_error'] = '-disabled';
                         if ($oneyOptimized) {
                             $payment_option['logo'] = str_replace('x3_', 'x3x4_', $payment_option['logo']);
+                            $optimized_class = ' -optimized-16';
                         }
                     }
                     if ($payment_method == 'oney' && $oneyOptimized && strpos($payment_option['type'], 'without_fees')) {
@@ -153,8 +155,8 @@ class PrestashopSpecific16
                     }
 
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
-                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
-                            ($error ? '-alt' : ''),
+                        'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $extraClass .
+                            ($error ? '_alt' : '') . ' ' . $optimized_class,
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_method == 'one_click' ?
                             $payment_options['standard']['logo'] :
