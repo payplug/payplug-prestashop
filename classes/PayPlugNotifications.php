@@ -92,6 +92,18 @@ class PayPlugNotifications
     }
 
     /**
+     * @descrition Check if the payment resource can be treated
+     */
+    private function CheckIsValidPaymentResource()
+    {
+        if (!$this->payment->is_paid && !$this->is_deferred) {
+            $this->logger->addLog('The transaction is not paid yet.');
+            $this->logger->addLog('No action will be done.');
+            $this->exitProcess('The transaction is not paid.');
+        }
+    }
+
+    /**
      * @descrition Dispatch the payment to create or update the relative order
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -456,6 +468,9 @@ class PayPlugNotifications
 
         // Set the order state
         $this->setResourceProps(); // hydrate $resource_props
+
+        // Check the payment ressource
+        $this->CheckIsValidPaymentResource();
 
         // Save card
         $this->processSaveCard();

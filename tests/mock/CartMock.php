@@ -38,7 +38,9 @@ class CartMock
         $cart->id_carrier = 1;
         $cart->id_address_delivery = 2;
         $cart->id_address_invoice = 3;
+        $cart->id_currency = 1;
         $cart->id_customer = 1;
+        $cart->delivery_option = '{1, 2}';
         $cart->date_add = '2021-01-01 00:00:00';
         $cart->date_upd = '2021-01-01 00:00:00';
         return $cart;
