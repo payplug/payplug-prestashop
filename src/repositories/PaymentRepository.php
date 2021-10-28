@@ -96,13 +96,16 @@ class PaymentRepository extends Repository
         if (isset($paymentDetails['oneyDetails'])) {
             $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
         }
-        // Adding cart update to secure hash
-        if (isset($paymentDetails['cart']->date_upd)) {
-            $cartToHash[] = $paymentDetails['cart']->date_upd;
-        }
+
+        // Adding cart informationObjectModel
+        $cartToHash[] = 'Cart $id_address_delivery: ' . $paymentDetails['cart']->id_address_delivery;
+        $cartToHash[] = 'Cart $id_address_invoice: ' . $paymentDetails['cart']->id_address_invoice;
+        $cartToHash[] = 'Cart $id_currency: ' . $paymentDetails['cart']->id_currency;
+        $cartToHash[] = 'Cart $id_customer: ' . $paymentDetails['cart']->id_customer;
+        $cartToHash[] = 'Cart $delivery_option: ' . $paymentDetails['cart']->delivery_option;
 
         // Adding cart amount to hash
-        $cartToHash[] = (float)$paymentDetails['cart']->getOrderTotal(true);
+        $cartToHash[] = 'Cart amount: ' . (float)$paymentDetails['cart']->getOrderTotal(true);
 
         return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
     }
