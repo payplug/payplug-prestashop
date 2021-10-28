@@ -3292,6 +3292,11 @@ class PayPlugClass extends PaymentModule
                 $split = (int)str_replace('x', '', $type[0]);
                 $iso = $this->tools->tool('strtoupper', $this->context->language->iso_code);
                 $oneyTpl = 'unified.tpl';
+
+                if ($iso != 'IT' && $iso != 'FR') {
+                    $iso = Configuration::get('PAYPLUG_COMPANY_ISO');
+                }
+
                 $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
                 $text = $use_fees
                     ? $this->l('payplug.getPaymentOptions.payWithOney')
