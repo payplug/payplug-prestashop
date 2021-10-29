@@ -2397,9 +2397,7 @@ class PayPlugClass extends PaymentModule
             'title' => null,
             'first_name' => !empty($billing_address->firstname) ? $billing_address->firstname : null,
             'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
-            'company_name' => !empty($billing_address->company) ?
-                $billing_address->company :
-                $billing_address->firstname . ' ' . $billing_address->lastname,
+            'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
             'email' => $customer->email,
             'landline_phone_number' => ConfigClass::formatPhoneNumber(
                 $billing_address->phone,
@@ -2416,6 +2414,9 @@ class PayPlugClass extends PaymentModule
             'country' => $billing_iso,
             'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
         ];
+        $billing['company_name'] = empty($billing['company_name']) || ! $billing['company_name']
+            ? $billing['first_name'] . ' ' . $billing['last_name']
+            : $billing['company_name'];
         $billing['mobile_phone_number'] = $billing['mobile_phone_number']
             ? $billing['mobile_phone_number']
             : $billing['landline_phone_number'];
@@ -2431,9 +2432,7 @@ class PayPlugClass extends PaymentModule
             'title' => null,
             'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
             'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
-            'company_name' => !empty($shipping_address->company) ?
-                $shipping_address->company :
-                $shipping_address->firstname . ' ' . $shipping_address->lastname,
+            'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
             'email' => $customer->email,
             'landline_phone_number' => ConfigClass::formatPhoneNumber(
                 $shipping_address->phone,
@@ -2451,6 +2450,9 @@ class PayPlugClass extends PaymentModule
             'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
             'delivery_type' => $delivery_type,
         ];
+        $shipping['company_name'] = empty($shipping['company_name']) || ! $shipping['company_name']
+            ? $shipping['first_name'] . ' ' . $shipping['last_name']
+            : $shipping['company_name'];
         $shipping['mobile_phone_number'] = $shipping['mobile_phone_number']
             ? $shipping['mobile_phone_number']
             : $shipping['landline_phone_number'];
