@@ -2053,7 +2053,7 @@ class PayPlugClass extends PaymentModule
     public function hookDisplayBackOfficeFooter($params)
     {
         if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->assignContentVar();
+            $this->configClass->assignContentVar();
             $this->context->smarty->assign([
                 'js_def' => Media::getJsDef(),
             ]);
