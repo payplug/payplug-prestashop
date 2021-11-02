@@ -222,6 +222,7 @@ class ConfigClass
             'installment' => (int)Configuration::get('PAYPLUG_INST') === 1,
             'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1,
             'oney' => (int)Configuration::get('PAYPLUG_ONEY') === 1,
+            'bancontact' => (int)Configuration::get('PAYPLUG_BANCONTACT') === 1,
         ];
 
         if (Configuration::get('PAYPLUG_EMAIL') === null
@@ -235,6 +236,7 @@ class ConfigClass
             $available_options['installment'] = false;
             $available_options['deferred'] = false;
             $available_options['oney'] = false;
+            $available_options['bancontact'] = false;
         } else {
             if (!$permissions['use_live_mode']
                 || Configuration::get('PAYPLUG_LIVE_API_KEY') === null
@@ -434,6 +436,7 @@ class ConfigClass
             'PAYPLUG_STANDARD' => 'payplug_standard',
             'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS' => 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS',
             'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS' => 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS',
+            'PAYPLUG_BANCONTACT' => 'payplug_bancontact'
         ];
 
         foreach ($configurationKeys as $key => $config) {
@@ -491,7 +494,11 @@ class ConfigClass
                         }
 
                         break;
-
+                    case 'payplug_bancontact':
+                        if ((int)Tools::getValue('payplug_sandbox') != 1) {
+                            Configuration::updateValue($key, $value);
+                        }
+                        break;
                     default:
                         Configuration::updateValue($key, $value);
                 }
@@ -542,6 +549,7 @@ class ConfigClass
             'oney' => Configuration::get('PAYPLUG_ONEY'),
             'oney_fees' => Configuration::get('PAYPLUG_ONEY_FEES'),
             'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
+            'bancontact' => Configuration::get('PAYPLUG_BANCONTACT')
         ];
 
         $connected = !empty($configurations['email'])
@@ -667,6 +675,7 @@ class ConfigClass
             'feature_deferred_auto' => $configurations['deferred_auto'],
             'feature_deferred_state' => $configurations['deferred_state'],
             'feature_oney' => $configurations['oney'],
+            'feature_bancontact' => $this->payplugClass->isValidFeature('feature_bancontact'),
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->orderClass->getOrderStates(),
@@ -700,6 +709,7 @@ class ConfigClass
             'installments' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022447972',
             'one_click' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022213892',
             'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360013071080',
+            'bancontact' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4408157435794',
             'payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142312',
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
@@ -777,6 +787,14 @@ class ConfigClass
             'active' => true,
             'small' => true,
             'checked' => $configurations['oney_fees'],
+        ];
+
+        $switch['bancontact'] = [
+            'name' => 'payplug_bancontact',
+            'active' => $connected,
+            'checked' => $configurations['bancontact'],
+            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes'),
+            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no'),
         ];
 
         $switch['installment'] = [
