@@ -122,7 +122,7 @@ class PrestashopSpecific16
         $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer((int)$cart->id_customer, true);
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
-        foreach ($payment_options as $payment_option) {
+        foreach ($payment_options as &$payment_option) {
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
@@ -151,7 +151,37 @@ class PrestashopSpecific16
                         }
                     }
                     if ($payment_method == 'oney' && $oneyOptimized && strpos($payment_option['type'], 'without_fees')) {
-                        $payment_option['logo'] = str_replace('without_fees_side_', 'without_fees_', $payment_option['logo']);
+                        $oneyImageOptimized = '/modules/payplug/views/img/oney/x3x4_with';
+                        $oneyImagex3 = '/modules/payplug/views/img/oney/x3_with';
+                        $oneyImagex4 = '/modules/payplug/views/img/oney/x4_with';
+                        $oneyImage = '';
+
+                        $use_fees = (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+                        if (!$use_fees) {
+                            $oneyImage .= 'out';
+                        }
+
+                        $oneyImage .= '_fees';
+
+                        $iso = Tools::strtoupper($this->contextSpecific->getContext()->language->iso_code);
+                        $merchant_company_iso = (string)Configuration::get('PAYPLUG_COMPANY_ISO');
+                        if ($iso != 'IT' && $iso != 'FR') {
+                            $iso = $merchant_company_iso;
+                        }
+
+                        $oneyImage .= '_'.$iso;
+
+                        if ($is_elligible['result'] !== true) {
+                            $oneyImage .= '_alt.svg';
+                            $payment_option['logo'] = $oneyImageOptimized.$oneyImage;
+                        } else {
+                            $oneyImage .= '.svg';
+                            $payment_option['logo'] = [
+                                'optimized' => $oneyImageOptimized.$oneyImage,
+                                'x3' => $oneyImagex3.$oneyImage,
+                                'x4' => $oneyImagex4.$oneyImage
+                            ];
+                        }
                     }
 
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
