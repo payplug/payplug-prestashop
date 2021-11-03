@@ -19,12 +19,11 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
 <div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
-        <span class="oneyPayment_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if} ">
-            <img src="/modules/payplug/views/img/oney/x3x4_with{if isset($use_fees) && !$use_fees}out{/if}_fees{if isset($use_fees) && !$use_fees && isset($iso_code) && $iso_code == 'IT' }_IT{/if}.svg"
+        <img src="{$oney_image['optimized']|escape:'htmlall':'UTF-8'}"
                      alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}" />
-        </span>
         <span class="oneyPayment_label">
             {if isset($use_fees) && !$use_fees}
                 {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}
@@ -38,7 +37,7 @@
     {if $payplug_oney_allowed}
         {if isset($oney_payment_options) && $oney_payment_options}
             <div class="oneyOption_wrapper">
-                {include file="./options.tpl"}
+                {include file="./options.tpl" oney_image=$oney_image}
             </div>
             {if isset($oney_required_fields)}
                 {include file="./../required.tpl" oney_required_fields=$oney_required_fields}
