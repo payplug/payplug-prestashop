@@ -792,8 +792,8 @@ class ConfigClass
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no'),
+            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['installment'] = [
