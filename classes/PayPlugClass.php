@@ -2829,6 +2829,12 @@ class PayPlugClass extends PaymentModule
             unset($payment_tab['allow_save_card']);
         }
 
+        if ($options['is_bancontact']) {
+            $payment_tab['payment_method'] = "bancontact";
+            unset($payment_tab['force_3ds']);
+            unset($payment_tab['allow_save_card']);
+        }
+
         // Prepare details to create / retrieve payment
         $this->paymentDetails = [
             'paymentMethod' => $payment_method,
