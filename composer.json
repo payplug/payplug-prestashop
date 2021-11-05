@@ -18,6 +18,7 @@
     "archive": {
         "exclude": [
             "!vendor/*",
+            "!features.json",
             ".*",
             "ci",
 	        "*.sh",
