@@ -54,6 +54,7 @@ class PayPlugNotifications
     public $is_oney = false;
     public $is_installment = false;
     public $is_deferred = false;
+    public $is_bancontact = false;
     public $key;
     public $lock_key = null;
     public $logger;
@@ -316,6 +317,8 @@ class PayPlugNotifications
                     break;
             }
             $module_name = $name;
+        } elseif ($this->is_bancontact) {
+            $module_name = $this->payplug->l('notification.createOrder.bancontact', 'payplugnotifications');
         }
 
         // Create Order

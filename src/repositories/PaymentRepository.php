@@ -521,6 +521,7 @@ class PaymentRepository extends Repository
                     'return_url' => $paymentDetails['paymentUrl'],
                 ];
                 break;
+            case 'bancontact':
             case 'standard':
             case 'installment':
                 $returnUrl = $paymentDetails['paymentUrl'] ? $paymentDetails['paymentUrl'] :

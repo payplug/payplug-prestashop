@@ -42,6 +42,7 @@ class PayPlugValidation
     private $amountCurrencyClass;
     private $isDeferred;
     private $isOney;
+    private $isBancontact;
     private $orderClass;
     private $plugin;
 
@@ -59,6 +60,7 @@ class PayPlugValidation
         $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
         $this->isDeferred = false;
         $this->isOney = false;
+        $this->isBancontact = false;
         $this->type = 'payment';
         $this->setLogger();
     }
@@ -249,8 +251,12 @@ class PayPlugValidation
                         case 'oney_x4_without_fees':
                             $this->isOney = true;
                             break;
+                        case 'bancontact':
+                            $this->isBancontact = true;
+                            break;
                         default:
                             $this->isOney = false;
+                            $this->isBancontact = false;
                     }
                 }
 
@@ -449,6 +455,11 @@ class PayPlugValidation
                     default:
                         break;
                 }
+            } elseif ($this->isBancontact) {
+                $module_name = $this->payplug->l(
+                    'validation.createOrder.bancontact',
+                    'payplugvalidation'
+                );
             }
 
             $cart_amount = (float)$cart->getOrderTotal(true, Cart::BOTH);
