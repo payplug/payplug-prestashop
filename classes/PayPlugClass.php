@@ -2434,6 +2434,7 @@ class PayPlugClass extends PaymentModule
             'is_installment' => false,
             'is_deferred' => false,
             'is_oney' => false,
+            'is_bancontact' => false
         ];
 
         foreach ($default_options as $key => $value) {
@@ -2461,11 +2462,13 @@ class PayPlugClass extends PaymentModule
             'inst_mode' => (int)Configuration::get('PAYPLUG_INST_MODE'),
             'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED'),
             'oney' => (int)Configuration::get('PAYPLUG_ONEY'),
-            'standard' => (int)Configuration::get('PAYPLUG_STANDARD')
+            'standard' => (int)Configuration::get('PAYPLUG_STANDARD'),
+            'bancontact' => (int)Configuration::get('PAYPLUG_BANCONTACT')
         ];
 
         $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
         $options['is_installment'] = $options['is_installment'] && $config['installment'];
+        $options['is_bancontact'] = $options['is_bancontact'] && $config['bancontact'];
 
         // defined which is current payment method
         if ($is_one_click) {
@@ -2474,6 +2477,8 @@ class PayPlugClass extends PaymentModule
             $payment_method = 'oney';
         } elseif ($options['is_installment']) {
             $payment_method = 'installment';
+        } elseif ($options['is_bancontact']) {
+            $payment_method = 'bancontact';
         } else {
             $payment_method = 'standard';
         }
@@ -2528,7 +2533,7 @@ class PayPlugClass extends PaymentModule
         $metadata = [
             'ID Client' => (int)$customer->id,
             'ID Cart' => (int)$cart->id,
-            'Website' => Tools::getShopDomainSsl(true, false),
+            'Website' => Tools::getShopDomainSsl(true, false)
         ];
 
         // Addresses
@@ -2774,6 +2779,12 @@ class PayPlugClass extends PaymentModule
                 true
             );
             $payment_tab['hosted_payment']['return_url'] = $return_url;
+        }
+
+        if ($options['is_bancontact']) {
+            $payment_tab['payment_method'] = "bancontact";
+            unset($payment_tab['force_3ds']);
+            unset($payment_tab['allow_save_card']);
         }
 
         // Prepare details to create / retrieve payment
@@ -3374,6 +3385,53 @@ class PayPlugClass extends PaymentModule
                 $paymentOption[$payment_key]['moduleName'] = 'payplug';
                 $paymentOption[$payment_key]['err_label'] = $err_label;
             }
+        }
+        // Bancontact Payment
+        if ($options['bancontact'] && $this->isValidFeature('feature_bancontact')) {
+            $paymentOption['bancontact']['name'] = 'bancontact';
+            $paymentOption['bancontact']['tpl'] = 'bancontact.tpl';
+            $paymentOption['bancontact']['logo'] = Media::getMediaPath(_PS_MODULE_DIR_ .
+                $this->name . '/views/img/bancontact/bancontact.svg');
+            $paymentOption['bancontact']['callToActionText'] = $this->l(
+                'payplug.getPaymentOptions.payWithBancontact',
+                'payplugclass'
+            );
+            $paymentOption['bancontact']['extra_classes'] = 'bancontact';
+            $paymentOption['bancontact']['action'] = $this->context->link->getModuleLink(
+                $this->name,
+                'dispatcher',
+                [],
+                true
+            );
+            $paymentOption['bancontact']['payment_controller_url'] = $this->context->link->getModuleLink(
+                $this->name,
+                'payment',
+                ['type' => 'bancontact'],
+                true
+            );
+            $paymentOption['bancontact']['moduleName'] = 'payplug';
+            $paymentOption['bancontact']['inputs'] = [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'bancontact',
+                ],
+            ];
         }
         return $paymentOption;
     }
