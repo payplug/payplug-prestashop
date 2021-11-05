@@ -45,7 +45,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $is_installment = (bool)($method === 'installment');
             $oney_type = Tools::getValue('oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
-
+            $is_bancontact = (bool)($method === 'bancontact');
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -59,6 +59,20 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             if ($options['oney'] && $is_oney) {
                 $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
                 if (!$payment['result']) {
+                    Tools::redirect($error_url);
+                } else {
+                    Tools::redirect($payment['return_url']);
+                }
+            } elseif ($options['bancontact'] && $is_bancontact) {
+                $payment_options = [
+                    'id_card' => $id_card,
+                    'is_bancontact' => $is_bancontact,
+                ];
+                $payment = $payplug->preparePayment($payment_options);
+                if (!$payment['result']) {
+                    $payplug->setPaymentErrorsCookie([
+                        $payplug->l('The transaction was not completed and your card was not charged.')
+                    ]);
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);
