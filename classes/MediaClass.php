@@ -154,6 +154,12 @@ class MediaClass extends \Payplug
                 break;
         }
 
+        foreach ($this->payplug->features_json->features as $key => $value) {
+            $this->context->smarty->assign([
+                $value => $value
+            ]);
+        }
+
         $this->context->smarty->assign([
             'title' => $title,
             'type' => $type,
