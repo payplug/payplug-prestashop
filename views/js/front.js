@@ -19,6 +19,7 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 var allow_debug = true, debug = function (str) {
     if (allow_debug) {
         console.log(str);
@@ -30,6 +31,8 @@ var $document, $window, payplugModule = {
         this.order.init();
         this.oney.init();
         this.popup.init();
+        this.integrated.init();
+
     },
     order: {
         init: function () {
@@ -88,7 +91,291 @@ var $document, $window, payplugModule = {
             });
         },
     },
-    card: {
+    integrated: {
+        props: {
+            identifier: 'payplugIntegratedPayment',
+            paymentId: null,
+            paymentOptionId: null,
+            form: {},
+            checkoutForm: null,
+            api: null,
+            integratedPayment: null,
+            token: null,
+            notValid: false,
+            fieldsChange: {
+                changeCardHolder: false,
+                changePan: false,
+                changeExp: false,
+                changeCvv: false,
+                changeScheme: false,
+            },
+            fieldsValid: {
+                validCardHolder: false,
+                validPan: false,
+                validExp: false,
+                validCvv: false,
+                validScheme: false,
+            },
+            query: null,
+            submit: null,
+        },
+        init: function () {
+            var integrated = payplugModule.integrated,
+                $integratedForm = $('.' + integrated.props.identifier);
+            if ($integratedForm.length) {
+                var $methodInput = document.querySelectorAll('input[name=method][value=integrated]').item(0).parentNode,
+                    payment_option = ($methodInput.childNodes)[3];
+                integrated.props.paymentOptionId = payment_option.id.replace('pay-with-', '');
+                integrated.form.init();
+            } else {
+                return false;
+            }
+        },
+        form: {
+            init: function () {
+                var integrated = payplugModule.integrated,
+                    payment_option_id = integrated.props.paymentOptionId;
+
+                $document.on('click', '#' + payment_option_id, integrated.form.set);
+            },
+            set: function () {
+                var integrated = payplugModule.integrated;
+
+                integrated.props.api = Payplug;
+
+                var api = integrated.props.api,
+                    $form = $('.' + integrated.props.identifier),
+                    $cardholder = $form.find('.-cardholder'),
+                    $pan = $form.find('.-pan'),
+                    $cvv = $form.find('.-cvv'),
+                    $exp = $form.find('.-exp');
+
+                const integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                integrated.props.integratedPayment = integratedPayment;
+
+                form = {
+                    integratedPayment: integratedPayment,
+                    cardHolder: integratedPayment.cardHolder($cardholder.get(0)),
+                    pan: integratedPayment.cardNumber($pan.get(0)),
+                    cvv: integratedPayment.cvv($cvv.get(0)),
+                    exp: integratedPayment.expiration($exp.get(0)),
+                };
+
+                form.cardHolder.onChange((event) => {
+                    //validate card Holder field
+                    integrated.props.fieldsChange['changeCardHolder'] = true;
+                    integrated.form.validateSelectOptions();
+
+                    if (!event.valid) {
+                        var error = event.error;
+                        $('#errorCardHolder').html(error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validCardHolder'] = true;
+                        $('.errorCB').empty();
+                    }
+                });
+
+                form.pan.onChange((event) => {
+                    //validate pan field
+                    integrated.props.fieldsChange['changePan'] = true;
+                    integrated.props.changePan = true;
+                    integrated.form.validateSelectOptions();
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardPan').html(error['name'] + '<br>');
+                    } else {
+                        integrated.props.fieldsValid['validPan'] = true;
+                        $('.errorPan').empty();
+                    }
+                });
+                form.cvv.onChange((event) => {
+                    //validate cvv field
+                    integrated.props.fieldsChange['changeCvv'] = true;
+                    integrated.form.validateSelectOptions();
+
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardCvv').html('<br>' + error['name'] + '<br>');
+                    } else {
+                        integrated.props.fieldsValid['validCvv'] = true;
+                        $('.errorCvv').empty();
+                    }
+                });
+
+                form.exp.onChange((event) => {
+                    //validate expiry date field
+                    integrated.props.fieldsChange['changeExp'] = true;
+                    integrated.form.validateSelectOptions();
+
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardExp').html('<br>' + error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validExp'] = true;
+                        $('.errorExp').empty();
+                    }
+
+                });
+                $('#schemeOptions').change(function () {
+                    // validate scheme options field on change
+                    integrated.props.fieldsChange['changeScheme'] = true;
+                    integrated.form.validateSelectOptions();
+                });
+
+                integrated.props.form = form;
+
+                $document.on('submit', 'form', function (event) {
+                    if(integrated.props.submited) {
+                        integrated.props.integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                        integrated.form.getIntPaymentId();
+                        return false;
+                    }
+
+                    integrated.props.submited = true;
+                    integrated.form.getIntPaymentId();
+
+                    return false;
+                });
+
+                // Once an attempt has been made
+                integratedPayment.onCompleted(function (event) {
+                    integrated.form.confirmIntPayment(event.token);
+
+
+                });
+
+
+            },
+            validateSelectOptions: function (event) {
+                //validate selection options for schema
+
+                $('.errorScheme').empty();
+                var selected_options = $("#schemeOptions option:selected").val();
+                if (selected_options !== "auto") {
+                    payplugModule.integrated.props.notValid = true;
+                    $('#errorCardScheme').html('<br>' + 'Scheme card is mandatory');
+                } else {
+                    payplugModule.integrated.props.fieldsValid['validScheme'] = true;
+                }
+
+            },
+            validateForm: function (fieldsChange, fieldsValid) {
+                // valide integrated payment form
+                for (var key in fieldsChange) {
+                    if (!fieldsChange[key]) {
+                        return false;
+                    }
+                }
+                for (var key in fieldsValid) {
+                    if (!fieldsValid[key]) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            getIntPaymentId: function (event) {
+                //create integrated payment id
+                var integrated = payplugModule.integrated;
+                if (typeof event != 'undefined') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                integratedPayment = integrated.props.integratedPayment;
+
+                token = integratedPayment.token;
+                if (integrated.props.query != null) {
+                    integrated.props.query.abort();
+                    integrated.props.query = null;
+                }
+
+                var $fieldChange = integrated.props.fieldsChange,
+                    $fieldsValid = integrated.props.fieldsValid;
+                if (!integrated.form.validateForm($fieldChange, $fieldsValid)) {
+
+                    return;
+                }
+                integrated.props.query = $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        createIP: 1,
+                        token: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert('error CREATING PAYMENT ID');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                    success: function (result) {
+                        if (result && result.payment_id) {
+                            integrated.props.paymentId = result.payment_id;
+                            integrated.form.submitIntPayment();
+
+
+                        } else {
+                            payplugModule.popup.set(integratedPaymentError);
+                            return false;
+                        }
+                    },
+                });
+            },
+            submitIntPayment : function () {
+                // create an integrated payment
+
+                var integrated = payplugModule.integrated,
+                    paymentId = integrated.props.paymentId,
+                    integratedPayment = integrated.props.integratedPayment;
+
+                integratedPayment.pay(paymentId, Payplug.Scheme.AUTO, {save_card: false});
+            },
+            confirmIntPayment : function (token) {
+                payplugModule.tools.loadSpinner();
+                // confirm creation integrated paiement or show fail popup
+                var integrated = payplugModule.integrated;
+                if (integrated.props.query != null) {
+                    integrated.props.query.abort();
+                    integrated.props.query = null;
+                }
+
+                integrated.props.query = $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        confirmIP: 1,
+                        pay_id: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        payplugModule.popup.set("error");
+                    },
+                    success: function (data) {
+                        payplugModule.tools.removeSpinner();
+                        if (data.result) {
+                            window.location.href = data.return_url;
+                        } else {
+                            payplugModule.popup.set(integratedPaymentError);
+                            return false;
+                        }
+
+                    },
+                });
+
+            }
+        },
+    },
+
+        card: {
         props: {
             identifier: 'payplugCard',
             query: null,
@@ -624,7 +911,23 @@ var $document, $window, payplugModule = {
             $('.' + props.identifier + '_content').html(content);
         }
 
-    }
+    },
+    tools: {
+        loadSpinner: function () {
+            $('.payplugIntegratedPayment').append('<div class="ipOverlay -disabled">');
+            html = '<div class="ipOverlay_inner" ><div class="ipOverlay__content"><span class="ipOverlay_spinner"></span</div></div>';
+            $('.ipOverlay').append(html);
+
+            $('.ipOverlay').removeClass('-disabled');
+            $('.ipOverlay').addClass('-show');
+        },
+        removeSpinner: function() {
+            $('.ipOverlay').remove();
+        },
+
+    },
+
+
 };
 $(document).ready(function () {
     $document = $(document);

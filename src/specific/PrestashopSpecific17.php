@@ -26,6 +26,7 @@ namespace PayPlug\src\specific;
 use Language;
 use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+use Symfony\Component\Dotenv\Dotenv;
 use Tab;
 use Tools;
 
@@ -49,6 +50,10 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
+        if ($this->payplug->isValidFeature('feature_integrated')) {
+            $payment_options = $this->setIntegratedPaymentOption($payment_options);
+        }
+
         $paymentOptions = [];
         foreach ($payment_options as $payment_option) {
             $payment_method = $payment_option['name'];
@@ -93,6 +98,48 @@ class PrestashopSpecific17
 
         return $paymentOptions;
     }
+    /**
+     * @description  creation payment option
+     * for integreated payment
+     * @param $payment_options
+     * @return mixed
+     */
+    public function setIntegratedPaymentOption($payment_options)
+    {
+        $dotenv = new Dotenv();
+        $dotenvFile = dirname(__FILE__, 4) . "/payplugroutes/.env";
+        if (file_exists($dotenvFile)) {
+            $dotenv->load($dotenvFile);
+            $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
+        } else {
+            $integrated_payment_js_url = 'https://cdn.payplug.com/integrated/js';
+        }
+        $integrated = [];
+        $integrated['name'] = 'integrated';
+        $integrated['inputs']['method'] = [
+            'name' => 'method',
+            'type' => 'hidden',
+            'value' => 'integrated',
+        ];
+        $integrated['action'] = $this->payplug->context->link->getModuleLink(
+            $this->payplug->name,
+            'dispatcher',
+            [],
+            true
+        );
+        $integrated['logo'] = false;
+        $integrated['moduleName'] = 'payplug';
+        $integrated['callToActionText'] = $this->payplug->l('specific17.setIntegratedPaymentOption.name', 'prestashopspecific17');
+        $integrated['tpl'] = 'integrated_payment.tpl';
+        $integrated['extra_classes'] = 'payplug integrated';
+        $this->contextSpecific->smarty->assign(['integrated_payment_js_url' => $integrated_payment_js_url]);
+        $integrated['additionalInformation'] = $this->payplug->fetchTemplate('checkout/payment/integrated_payment.tpl');
+
+        $payment_options['integrated'] = $integrated;
+        unset($payment_options['standard']);
+        return $payment_options;
+    }
+
 
     // todo: set Tab install process in a specific
     public function installTab()

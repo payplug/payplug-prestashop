@@ -1,5 +1,6 @@
 {
     "features": [
-      "feature_bancontact"
+      "feature_bancontact",
+       "feature_integrated"
     ]
 }

@@ -314,7 +314,9 @@ class PaymentRepository extends Repository
             );
         }
 
-        if (isset($this->apiPayment->hosted_payment->return_url)) {
+        if (isset($paymentDetails['paymentTab']['integration'])) {
+            $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
+        } elseif (isset($this->apiPayment->hosted_payment->return_url)) {
             $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
         }
 
@@ -338,7 +340,6 @@ class PaymentRepository extends Repository
         if (isset($this->apiPayment->hosted_payment->payment_url)) {
             $paymentDetails['paymentUrl'] = $this->apiPayment->hosted_payment->payment_url;
         }
-
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
@@ -538,6 +539,9 @@ class PaymentRepository extends Repository
                     ['name' => 'paymentStored', 'value' => false],
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
+        }
+        if ($paymentDetails['isIntegrated']) {
+            $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
         }
 
         return [

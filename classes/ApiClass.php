@@ -61,6 +61,8 @@ class ApiClass
         $this->setEnvironment();
         self::setSecretKey();
         $this->current_api_key =  self::getCurrentApiKey();
+        $this->publishableKey = $this->getPublishableKeys();
+
         $this->setUserAgent();
     }
 
@@ -98,6 +100,19 @@ class ApiClass
             return false;
         }
     }
+    /**
+     * @description get publishable keys from payplug/payplug-php
+     * @throws Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationException
+     */
+    public function getPublishableKeys($api_key = null)
+    {
+        if ($this->current_api_key != null) {
+            $response = \Payplug\Authentication::getPublishableKeys();
+            return $response['httpResponse']['publishable_key'];
+        }
+    }
+
 
     /**
      * @description Read API response and return permissions
