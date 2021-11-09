@@ -49,6 +49,9 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
+        if ($this->payplug->isValidFeature('feature_integrated')) {
+            $payment_options = $this->setIntegratedPaymentOption($payment_options);
+        }
         $paymentOptions = [];
         foreach ($payment_options as $payment_option) {
             $payment_method = $payment_option['name'];
@@ -93,6 +96,41 @@ class PrestashopSpecific17
 
         return $paymentOptions;
     }
+
+    /**
+     * @description  creation payment option
+     * for integreated payment
+     * @param $payment_options
+     * @return mixed
+     */
+
+    public function setIntegratedPaymentOption($payment_options)
+    {
+        $paymentOption = [];
+        $integrated = [];
+        $integrated['name'] = 'integrated';
+        $integrated['inputs']['method'] = [
+            'name' => 'method',
+            'type' => 'hidden',
+            'value' => 'integrated',
+        ];
+        $integrated['action'] = $this->payplug->context->link->getModuleLink(
+            $this->payplug->name,
+            'dispatcher',
+            [],
+            true
+        );
+        $integrated['logo'] = false;
+        $integrated['moduleName'] = 'payplug';
+        $integrated['callToActionText'] = $this->payplug->l('Payment intégré');
+        $integrated['tpl'] = 'integrated_payment.tpl';
+        $integrated['extra_classes'] = 'payplug integrated';
+        $integrated['additionalInformation'] = $this->payplug->fetchTemplate('checkout/payment/integrated_payment.tpl');
+        $payment_options['integrated'] = $integrated;
+        unset($payment_options['standard']);
+        return $payment_options;
+    }
+
 
     // todo: set Tab install process in a specific
     public function installTab()

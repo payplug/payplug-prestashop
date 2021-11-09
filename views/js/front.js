@@ -19,6 +19,8 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
+
 var allow_debug = true, debug = function (str) {
     if (allow_debug) {
         console.log(str);
@@ -30,6 +32,7 @@ var $document, $window, payplugModule = {
         this.order.init();
         this.oney.init();
         this.popup.init();
+        this.integrated.init();
     },
     order: {
         init: function () {
@@ -130,6 +133,241 @@ var $document, $window, payplugModule = {
                         }
                     }
                 });
+        },
+    },
+    integrated: {
+        props: {
+            identifier: 'payplugIntegratedPayment',
+            paymentId: null,
+            paymentOptionId: null,
+            form: {},
+            checkoutForm: null,
+            api: null,
+            integratedPayment: null,
+            token: null,
+            valid: true,
+        },
+        init: function () {
+            var integrated = payplugModule.integrated,
+                $integratedForm = document.getElementsByClassName(integrated.props.identifier);
+            if ($integratedForm.length) {
+                var $methodInput = document.querySelectorAll('input[name=method][value=integrated]').item(0).parentNode,
+                    payment_option = ($methodInput.childNodes)[3];
+                integrated.props.paymentOptionId = payment_option.id.replace('pay-with-', '');
+                if (typeof Payplug == 'undefined' || typeof payplug_publishable_key == 'undefined') {
+                    payplugModule.tools.loadScript('https://cdn.payplug.com/js/integrated-payment/v0@0.6/index.js', payplugModule.integrated.init);
+
+                } else {
+                    integrated.form.init();
+                }
+            } else {
+                return false;
+            }
+        },
+        form: {
+            init: function () {
+                console.log('form init');
+                var integrated = payplugModule.integrated,
+                    payment_option_id = integrated.props.paymentOptionId;
+
+                console.log(payment_option_id + '#payment-option-' + payment_option_id);
+                $document.on('click', '#' + payment_option_id, integrated.form.set)
+                $document.on('submit', 'form', integrated.form.getIntPaymentId);
+
+            },
+            set: function () {
+                var integrated = payplugModule.integrated;
+
+                integrated.props.api = Payplug;
+
+                var api = integrated.props.api,
+                    $form = $('.' + integrated.props.identifier),
+                    $cardholder = $form.find('.-cardholder'),
+                    $pan = $form.find('.-pan'),
+                    $cvv = $form.find('.-cvv'),
+                    $exp = $form.find('.-exp');
+                console.log($cvv.get(0));
+                console.log('pusb' + payplug_publishable_key);
+                const integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                integrated.props.integratedPayment = integratedPayment;
+                console.log(integrated.props.integratedPayment);
+                form = {
+                    integratedPayment: integratedPayment,
+                    cardHolder: integratedPayment.cardHolder($cardholder.get(0)),
+                    pan: integratedPayment.cardNumber($pan.get(0)),
+                    cvv: integratedPayment.cvv($cvv.get(0)),
+                    exp: integratedPayment.expiration($exp.get(0)),
+                };
+                form.cardHolder.onChange((event) => {
+                    console.log(event);
+                    integrated.form.validateSelectOptions();
+                    $('button:submit').addClass('-disable');
+                    if (!event.valid) {
+                                integrated.props.valid = false;
+                                var error = event.error;
+                                document.getElementById('errorCardHolder').innerHTML = error['name'];
+                                payplugModule.tools.disableCGVCheckbox();
+                            }
+                    else {
+                        $('.errorCB').empty();
+                        payplugModule.tools.enableCGVCheckbox();
+                    }
+                });
+                form.pan.onChange((event) => {
+                    console.log(event);
+                    integrated.form.validateSelectOptions();
+                    $('button:submit').addClass('-disable');
+                    if (!event.valid) {
+                        integrated.props.valid = false;
+                        var error = event.error;
+                        document.getElementById('errorCardPan').innerHTML = error['name'] + '<br>';
+                        payplugModule.tools.disableCGVCheckbox();
+                    }
+                    else {
+                        $('.errorPan').empty();
+                        payplugModule.tools.enableCGVCheckbox();
+                    }
+                });
+                form.cvv.onChange((event) => {
+                    console.log(event);
+                    integrated.form.validateSelectOptions();
+                    $('button:submit').addClass('-disable');
+                    if (!event.valid) {
+                        integrated.props.valid = false;
+                        var error = event.error;
+                        // $('.errorCvv').append(error['name'] + '<br>');
+                        document.getElementById('errorCardCvv').innerHTML = '<br>' + error['name'] + '<br>';
+                        payplugModule.tools.disableCGVCheckbox();
+                    } else {
+                        $('.errorCvv').empty();
+                        payplugModule.tools.enableCGVCheckbox();
+                    }
+                });
+                form.exp.onChange((event) => {
+                    console.log(event);
+                    integrated.form.validateSelectOptions();
+                    $('button:submit').addClass('-disable');
+                    if (!event.valid) {
+                        integrated.props.valid = false;
+                        var error = event.error;
+                        document.getElementById('errorCardExp').innerHTML = '<br>' + error['name'];
+                        payplugModule.tools.disableCGVCheckbox();
+                    } else {
+                        $('.errorExp').empty();
+                        payplugModule.tools.enableCGVCheckbox();
+                    }
+
+                });
+                $('#schemeOptions').change(function() {
+                    integrated.form.validateSelectOptions();
+                });
+
+
+                integrated.props.form = form;
+
+                integratedPayment.onCompleted(function (event) {
+                    console.log(event.token);
+                    integrated.form.confirmIntPayment(event.token);
+                    // setTimeout(() => {  integrated.form.confirmIntPayment(paymentId); }, 2000);
+                });
+
+            },
+                validateSelectOptions: function (event) {
+                    var integrated = payplugModule.integrated;
+                    $('.errorScheme').empty();
+                    if (document.getElementById('schemeOptions').value !== "auto") {
+                        document.getElementById('errorCardScheme').innerHTML += '<br>' + 'error';
+                    }
+                },
+            getIntPaymentId: function (event) {
+                var integrated = payplugModule.integrated;
+
+                event.preventDefault();
+                event.stopPropagation();
+                integratedPayment = integrated.props.integratedPayment;
+                token = integratedPayment.token;
+                console.log(token);
+                $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        createIP: 1,
+                        token: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(payplug_ajax_url);
+                        alert('error CREATING PAYMENT ID');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                    success: function (result) {
+                        if (result && result.payment_id) {
+                            // $('.payplugIntegratedPayment').append('<div class="ipOverlay -disabled">');
+                            // html = '<div class="ipOverlay_inner" ><div class="ipOverlay__content"><span class="ipOverlay_spinner"></span</div></div>';
+                            // $('.ipOverlay').append(html);
+                            //
+                            // $('.ipOverlay').removeClass('-disabled');
+                            // $('.ipOverlay').addClass('-show');
+                            payplugModule.tools.loadSpinner();
+                            integrated.props.paymentId = result.payment_id;
+                            integrated.form.submitIntPayment();
+
+
+                        } else {
+                            console.log('fail');
+                        }
+                    },
+                });
+            },
+            submitIntPayment : function () {
+
+                var integrated = payplugModule.integrated,
+                    paymentId = integrated.props.paymentId,
+                    integratedPayment = integrated.props.integratedPayment;
+
+                integratedPayment.pay(paymentId, Payplug.Scheme.AUTO, {save_card: false});
+            },
+            confirmIntPayment : function (token) {
+                var integrated = payplugModule.integrated;
+                console.log('token' + token);
+                payplugModule.tools.removeSpinner();
+                $('.ipOverlay').remove();
+                $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        confirmIP: 1,
+                        pay_id: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // console.log(payplug_ajax_url);
+                        // console.log()
+                        // // alert('error VALIDATING PAYMENT');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        // console.log(errorThrown);
+                        console.log(errorThrown);
+
+                        payplugModule.popup.set("error");
+                        integrated.init();
+                    },
+                    success: function (data) {
+                        if (data.result) {
+                            window.location.href = data.return_url;
+                        } else {
+                            payplugModule.popup.set(integratedPaymentError);
+                            return false;
+                        }
+
+                    },
+                });
+
+            }
         },
     },
     oney: {
@@ -615,7 +853,55 @@ var $document, $window, payplugModule = {
             $('.' + props.identifier + '_content').html(content);
         }
 
-    }
+    },
+    tools: {
+        props: {
+            loadedScript: []
+        },
+        loadScript: function (url, callback) {
+            // Check if already loaded
+            if (payplugModule.tools.props.loadedScript.includes(url)) {
+                return callback();
+            }
+
+            var script = document.createElement("script")
+            script.type = "text/javascript";
+            if (script.readyState) {  // only required for IE <9
+                script.onreadystatechange = function () {
+                    if (script.readyState === "loaded" || script.readyState === "complete") {
+                        payplugModule.tools.props.loadedScript.push(url);
+                        script.onreadystatechange = null;
+                        callback();
+                    }
+                };
+            } else {  //Others
+                script.onload = function () {
+                    payplugModule.tools.props.loadedScript.push(url);
+                    callback();
+                };
+            }
+
+            script.src = url;
+            document.getElementsByTagName("head")[0].appendChild(script);
+        },
+        loadSpinner: function () {
+            $('.payplugIntegratedPayment').append('<div class="ipOverlay -disabled">');
+            html = '<div class="ipOverlay_inner" ><div class="ipOverlay__content"><span class="ipOverlay_spinner"></span</div></div>';
+            $('.ipOverlay').append(html);
+
+            $('.ipOverlay').removeClass('-disabled');
+            $('.ipOverlay').addClass('-show');
+        },
+        removeSpinner: function() {
+            $('.ipOverlay').remove();
+        },
+        disableCGVCheckbox: function() {
+            $('input[type=checkbox]').attr('disabled', true);
+        },
+        enableCGVCheckbox: function(){
+            $('input[type=checkbox]').attr('disabled', false);
+        }
+    },
 };
 $(document).ready(function () {
     $document = $(document);

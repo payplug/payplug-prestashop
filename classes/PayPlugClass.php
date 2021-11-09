@@ -2433,6 +2433,7 @@ class PayPlugClass extends PaymentModule
             'is_installment' => false,
             'is_deferred' => false,
             'is_oney' => false,
+            'is_integrated' => false,
         ];
 
         foreach ($default_options as $key => $value) {
@@ -2766,6 +2767,10 @@ class PayPlugClass extends PaymentModule
             );
             $payment_tab['hosted_payment']['return_url'] = $return_url;
         }
+        if ($options['is_integrated']) {
+            $payment_tab['integration'] = 'INTEGRATED_PAYMENT';
+            unset($payment_tab['hosted_payment']['cancel_url']);
+        }
 
         // Prepare details to create / retrieve payment
         $this->paymentDetails = [
@@ -2779,6 +2784,7 @@ class PayPlugClass extends PaymentModule
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
             'isEmbedded' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
+            'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ConfigClass::isMobiledevice(),
             'cart' => $cart,
             'cartId' => $payment_tab['metadata']['ID Cart'],

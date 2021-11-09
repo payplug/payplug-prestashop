@@ -191,6 +191,7 @@ $_MODULE['<{payplug}prestashop>hookclass_168859e827d7d100c94cc06cca846f41'] = 'i
 $_MODULE['<{payplug}prestashop>hookclass_217eecb205eb8bb9f73d545ff58b0846'] = 'Carta';
 $_MODULE['<{payplug}prestashop>hookclass_27b335e88221c2d4040cfa061d38afdd'] = 'NON PAGATO';
 $_MODULE['<{payplug}prestashop>hookclass_4ff51b5bdc732c85d2a7eeb64867ca9f'] = 'live';
+$_MODULE['<{payplug}prestashop>hookclass_511168732bd2b973e2fce3518b09d661'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>hookclass_5fb6efa0d317e9c9c95f3f5f806eb569'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>hookclass_700f4cec19a6a40d29d581317202df50'] = 'Caricamento in corso';
 $_MODULE['<{payplug}prestashop>hookclass_92f64324da63bb5dd4439c56e55604b4'] = 'RIMBORSATO';

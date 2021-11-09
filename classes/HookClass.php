@@ -778,9 +778,17 @@ class HookClass
         }
 
         $payplug_ajax_url = $this->context->link->getModuleLink($this->payplug->name, 'ajax', [], true);
-        Media::addJsDef([
-            'payplug_ajax_url' => $payplug_ajax_url,
-        ]);
+        Media::addJsDef(
+            [
+                'payplug_ajax_url' => $payplug_ajax_url,
+                'integratedPaymentError' => $this->payplug->mediaClass->displayMessages(
+                    [$this->payplug->l('hook.header.integratedPayment.error', 'hookClass')],
+                    true,
+                    false
+                ),
+                'payplug_publishable_key' => $this->payplug->apiClass->publishableKey,
+            ]
+        );
     }
 
     /**

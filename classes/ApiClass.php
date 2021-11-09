@@ -61,6 +61,7 @@ class ApiClass
         $this->setEnvironment();
         self::setSecretKey();
         $this->current_api_key =  self::getCurrentApiKey();
+        $this->publishableKey = self::getPublishableKeys();
         $this->setUserAgent();
     }
 
@@ -97,6 +98,21 @@ class ApiClass
         } else {
             return false;
         }
+    }
+    /**
+     * @description get publishable keys from payplug/payplug-php
+     * @throws Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationException
+     */
+    public static function getPublishableKeys($api_key = null)
+    {
+        if ($api_key == null) {
+            $api_key = self::setAPIKey();
+        }
+        self::setSecretKey($api_key);
+
+        $response = \Payplug\Authentication::getPublishableKeys();
+        return $response['httpResponse']['publishable_key'];
     }
 
     /**

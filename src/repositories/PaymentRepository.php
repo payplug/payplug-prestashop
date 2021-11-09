@@ -316,9 +316,11 @@ class PaymentRepository extends Repository
 
         if (isset($this->apiPayment->hosted_payment->return_url)) {
             $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
+        } elseif (isset($paymentDetails['paymentTab']['integration'])) {
+            $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
         }
 
-        if (!$paymentDetails['paymentReturnUrl']) {
+            if (!$paymentDetails['paymentReturnUrl']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] payment return URL is null.'
@@ -531,6 +533,10 @@ class PaymentRepository extends Repository
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
+
+                if ($paymentDetails['isIntegrated']) {
+                    $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+                }
                 break;
             default:
                 return $this->returnPaymentError(
