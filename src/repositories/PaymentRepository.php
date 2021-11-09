@@ -546,6 +546,9 @@ class PaymentRepository extends Repository
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
         }
+        if ($paymentDetails['isIntegrated']) {
+            $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+        }
 
         return [
             'result' => true,
