@@ -150,7 +150,8 @@ class PrestashopSpecific16
                             $optimized_class = ' -optimized-16';
                         }
                     }
-                    if ($payment_method == 'oney' && $oneyOptimized && strpos($payment_option['type'], 'without_fees')) {
+                    if ($payment_method == 'oney' && $oneyOptimized) {
+                        $optimized_class = ' -optimized-16';
                         $oneyImageOptimized = '/modules/payplug/views/img/oney/x3x4_with';
                         $oneyImagex3 = '/modules/payplug/views/img/oney/x3_with';
                         $oneyImagex4 = '/modules/payplug/views/img/oney/x4_with';
@@ -163,15 +164,17 @@ class PrestashopSpecific16
 
                         $oneyImage .= '_fees';
 
-                        $iso = Tools::strtoupper($this->contextSpecific->getContext()->language->iso_code);
-                        $merchant_company_iso = (string)Configuration::get('PAYPLUG_COMPANY_ISO');
-                        if ($iso != 'IT' && $iso != 'FR') {
-                            $iso = $merchant_company_iso;
+                        if (strpos($payment_option['type'], 'without_fees')) {
+                            $iso = Tools::strtoupper($this->contextSpecific->getContext()->language->iso_code);
+                            $merchant_company_iso = (string)Configuration::get('PAYPLUG_COMPANY_ISO');
+                            if ($iso != 'IT' && $iso != 'FR') {
+                                $iso = $merchant_company_iso;
+                            }
+
+                            $oneyImage .= '_'.$iso;
                         }
 
-                        $oneyImage .= '_'.$iso;
-
-                        if ($is_elligible['result'] !== true) {
+                        if ($error !== false) {
                             $oneyImage .= '_alt.svg';
                             $payment_option['logo'] = $oneyImageOptimized.$oneyImage;
                         } else {

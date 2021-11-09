@@ -19,11 +19,16 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
 <div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
-        <img src="{$oney_image['optimized']|escape:'htmlall':'UTF-8'}"
-                     alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}" />
+        {if isset($oney_image['optimized'])}
+            {assign var=oney_logo value=$oney_image['optimized']}
+        {else}
+            {assign var=oney_logo value=$oney_image}
+        {/if}
+        <img src="{$oney_logo|escape:'htmlall':'UTF-8'}"
+                     alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}"
+                    class="oneyLogo {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
         <span class="oneyPayment_label">
             {if isset($use_fees) && !$use_fees}
                 {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}
