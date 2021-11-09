@@ -171,8 +171,8 @@ var $document, $window, payplugModule = {
                     payment_option_id = integrated.props.paymentOptionId;
 
                 console.log(payment_option_id + '#payment-option-' + payment_option_id);
-                $document.on('click', '#' + payment_option_id, integrated.form.set)
-                $document.on('submit', 'form', integrated.form.getIntPaymentId);
+                $document.on('click', '#' + payment_option_id, integrated.form.set);
+
 
             },
             set: function () {
@@ -270,6 +270,8 @@ var $document, $window, payplugModule = {
                     integrated.form.confirmIntPayment(event.token);
                     // setTimeout(() => {  integrated.form.confirmIntPayment(paymentId); }, 2000);
                 });
+
+                $document.on('submit', 'form', integrated.form.getIntPaymentId);
 
             },
                 validateSelectOptions: function (event) {

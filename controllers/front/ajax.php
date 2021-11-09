@@ -213,7 +213,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
                 ]));
-
             } elseif ($tools->tool('getIsset', 'createIP')) {
                 $token = $tools->tool('getValue', 'token');
                 if ($token == false) {
