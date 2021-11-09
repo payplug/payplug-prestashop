@@ -56,7 +56,9 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             'isPaid' => true,
             'paymentMethod' => 'payment_method',
             'paymentReturnUrl' => 'payment_return_url',
-            'paymentUrl' => 'payment_return_url'
+            'paymentUrl' => 'payment_return_url',
+            'isIntegrated' => false,
+
         ];
     }
 
