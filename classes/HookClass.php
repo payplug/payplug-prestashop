@@ -28,6 +28,7 @@ use Dispatcher;
 use Media;
 use Module;
 use Product;
+use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
 {
@@ -786,9 +787,26 @@ class HookClass
         }
 
         $payplug_ajax_url = $this->context->link->getModuleLink($this->payplug->name, 'ajax', [], true);
-        Media::addJsDef([
-            'payplug_ajax_url' => $payplug_ajax_url,
-        ]);
+        $dotenv = new Dotenv();
+        $dotenvFile = dirname(__FILE__, 3) . "/payplugroutes/.env";
+        if (file_exists($dotenvFile)) {
+            $dotenv->load($dotenvFile);
+            $payplug_domain = $_ENV['PAYPLUG_DOMAIN'];
+        } else {
+            $payplug_domain = "https://secure.payplug.com";
+        }
+        Media::addJsDef(
+            [
+                'payplug_ajax_url' => $payplug_ajax_url,
+                'integratedPaymentError' => $this->payplug->mediaClass->displayMessages(
+                    [$this->payplug->l('hook.header.integratedPayment.error', 'hookclass')],
+                    true,
+                    false
+                ),
+                'payplug_publishable_key' => $this->payplug->apiClass->publishableKey,
+                'PAYPLUG_DOMAIN' => $payplug_domain,
+            ]
+        );
     }
 
     /**

@@ -212,7 +212,59 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             $this->translate->translate(3) : //('Your information has been saved') :
                             $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
-                ]));
+                    ]));
+            } elseif ($tools->tool('getIsset', 'createIP')) {
+                $token = $tools->tool('getValue', 'token');
+                if ($token == false) {
+                    die(
+                    json_encode(
+                        [
+                            'result' => true,
+                            'message' => $token,
+                        ]
+                    )
+                    );
+                } else {
+                    $payment = $this->payplug->preparePayment(['is_integrated' => 1]);
+                    die(json_encode($payment));
+                }
+            } elseif ($tools->tool('getIsset', 'confirmIP')) {
+                $payment_id = $tools->tool('getValue', 'pay_id');
+                $current_payment_id = $this->payplug->getPaymentByCart($context->cart->id);
+                if ($payment_id != $current_payment_id) {
+                    die(
+                    json_encode(
+                        [
+                            'result' => false,
+                        ]
+                    )
+                    );
+                }
+                $payment = $this->payplug->retrievePayment($payment_id);
+                if ($payment->is_paid && !$payment->failure) {
+                    $return_url = $context->link->getModuleLink(
+                        $this->payplug->name,
+                        'validation',
+                        ['ps' => 1, 'cartid' => (int)$context->cart->id],
+                        true
+                    );
+                    die(
+                    json_encode(
+                        [
+                            'result' => true,
+                            'return_url' => $return_url,
+                            'message' => 'Success'
+                        ]
+                    )
+                    );
+                }
+                die(
+                json_encode(
+                    [
+                        'result' => false,
+                    ]
+                )
+                );
             }
         }
     }
