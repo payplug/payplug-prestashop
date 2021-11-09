@@ -2519,6 +2519,12 @@ class PayPlugClass extends PaymentModule
             $payment_tab['payment_method'] = null;
             if ($options['id_card'] && $options['id_card'] != 'new_card') {
                 $card = $this->card->getCard((int)$options['id_card']);
+                if ($card["id_customer"] != $customer->id) {
+                    return [
+                        'result' => false,
+                        'response' => 'Card customer differs from cart customer'
+                    ];
+                }
                 $payment_tab['payment_method'] = $card['id_card'];
             }
         }
