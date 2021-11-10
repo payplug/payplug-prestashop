@@ -149,7 +149,8 @@ class CardRepository extends Repository
         $this->query
             ->delete()
             ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
-            ->where('id_payplug_card = ' . (int)$id_payplug_card);
+            ->where('id_payplug_card = ' . (int)$id_payplug_card)
+            ->where('id_customer = ' . (int)$id_customer);
 
         try {
             if (!$this->query->build()) {
