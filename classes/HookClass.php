@@ -99,7 +99,7 @@ class HookClass
     public function actionDeleteGDPRCustomer($customer)
     {
         if (!$this->card->deleteCards((int)$customer['id'])) {
-            return json_encode($this->payplug->l('hook.actionDeleteGDPRCustomer.unableDelete', 'hookClass'));
+            return json_encode($this->payplug->l('hook.actionDeleteGDPRCustomer.unableDelete', 'hookclass'));
         }
         return json_encode(true);
     }
@@ -112,7 +112,7 @@ class HookClass
     public function actionExportGDPRData($customer)
     {
         if (!$cards = $this->payplug->configClass->gdprCardExport((int)$customer['id'])) {
-            return json_encode($this->payplug->l('hook.actionExportGDPRData.unableToExport', 'hookClass'));
+            return json_encode($this->payplug->l('hook.actionExportGDPRData.unableToExport', 'hookclass'));
         } else {
             return json_encode($cards);
         }
@@ -300,8 +300,8 @@ class HookClass
             }
 
             $pay_mode = $installment->is_live
-                ? $this->payplug->l('hook.displayAdminOrderMain.live', 'hookClass')
-                : $this->payplug->l('hook.displayAdminOrderMain.test', 'hookClass');
+                ? $this->payplug->l('hook.displayAdminOrderMain.live', 'hookclass')
+                : $this->payplug->l('hook.displayAdminOrderMain.test', 'hookclass');
             $payments = $order->getOrderPaymentCollection();
             $pps = [];
             if (count($payments) > 0) {
@@ -361,11 +361,11 @@ class HookClass
             $id_currency = (int)$this->currency->getIdByIsoCode($installment->currency);
             $show_menu_installment = true;
             $inst_status = $installment->is_active ?
-                $this->payplug->l('hook.displayAdminOrderMain.ongoing', 'hookClass') :
+                $this->payplug->l('hook.displayAdminOrderMain.ongoing', 'hookclass') :
                 (
                     $installment->is_fully_paid ?
-                    $this->payplug->l('hook.displayAdminOrderMain.paid', 'hookClass') :
-                    $this->payplug->l('hook.displayAdminOrderMain.suspended', 'hookClass')
+                    $this->payplug->l('hook.displayAdminOrderMain.paid', 'hookclass') :
+                    $this->payplug->l('hook.displayAdminOrderMain.suspended', 'hookclass')
                 );
             $inst_status_code = $installment->is_active ?
                 'ongoing' :
@@ -508,44 +508,44 @@ class HookClass
             }
 
             $pay_status = ((int)$payment->is_paid == 1)
-                ? $this->payplug->l('hook.displayAdminOrderMain.paid', 'hookClass')
-                : $this->payplug->l('hook.displayAdminOrderMain.notPaid', 'hookClass');
+                ? $this->payplug->l('hook.displayAdminOrderMain.paid', 'hookclass')
+                : $this->payplug->l('hook.displayAdminOrderMain.notPaid', 'hookclass');
             if ((int)$payment->is_refunded == 1) {
-                $pay_status = $this->payplug->l('hook.displayAdminOrderMain.refunded', 'hookClass');
+                $pay_status = $this->payplug->l('hook.displayAdminOrderMain.refunded', 'hookclass');
             } elseif ((int)$payment->amount_refunded > 0) {
-                $pay_status = $this->payplug->l('hook.displayAdminOrderMain.partiallyRefunded', 'hookClass');
+                $pay_status = $this->payplug->l('hook.displayAdminOrderMain.partiallyRefunded', 'hookclass');
             }
             $pay_amount = (int)$payment->amount / 100;
             $pay_date = date('d/m/Y H:i', (int)$payment->created_at);
             if ($payment->card->brand != '') {
                 $pay_brand = $payment->card->brand;
             } else {
-                $pay_brand = $this->payplug->l('hook.displayAdminOrderMain.unavailable', 'hookClass');
+                $pay_brand = $this->payplug->l('hook.displayAdminOrderMain.unavailable', 'hookclass');
             }
             if ($payment->card->country != '') {
-                $pay_brand .= ' ' . $this->payplug->l('hook.displayAdminOrderMain.card', 'hookClass') .
+                $pay_brand .= ' ' . $this->payplug->l('hook.displayAdminOrderMain.card', 'hookclass') .
                     ' (' . $payment->card->country . ')';
             }
             if ($payment->card->last4 != '') {
                 $pay_card_mask = '**** **** **** ' . $payment->card->last4;
             } else {
-                $pay_card_mask = $this->payplug->l('hook.displayAdminOrderMain.unavailable', 'hookClass');
+                $pay_card_mask = $this->payplug->l('hook.displayAdminOrderMain.unavailable', 'hookclass');
             }
 
             // Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds
-                    ? $this->payplug->l('hook.displayAdminOrderMain.yes', 'hookClass')
-                    : $this->payplug->l('hook.displayAdminOrderMain.no', 'hookClass');
+                    ? $this->payplug->l('hook.displayAdminOrderMain.yes', 'hookclass')
+                    : $this->payplug->l('hook.displayAdminOrderMain.no', 'hookclass');
                 $this->assign->assign(['pay_tds' => $pay_tds]);
             }
 
             $pay_mode = $payment->is_live
-                ? $this->payplug->l('hook.displayAdminOrderMain.live', 'hookClass')
-                : $this->payplug->l('hook.displayAdminOrderMain.test', 'hookClass');
+                ? $this->payplug->l('hook.displayAdminOrderMain.live', 'hookclass')
+                : $this->payplug->l('hook.displayAdminOrderMain.test', 'hookclass');
 
             if ($payment->card->exp_month === null) {
-                $pay_card_date = $this->payplug->l('hook.displayAdminOrderMain.unavailable', 'hookClass');
+                $pay_card_date = $this->payplug->l('hook.displayAdminOrderMain.unavailable', 'hookclass');
             } else {
                 $pay_card_date = date(
                     'm/y',
@@ -569,8 +569,8 @@ class HookClass
             //Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if ($payment->is_3ds !== null) {
                 $pay_tds = $payment->is_3ds
-                    ? $this->payplug->l('hook.displayAdminOrderMain.yes', 'hookClass')
-                    : $this->payplug->l('hook.displayAdminOrderMain.no', 'hookClass');
+                    ? $this->payplug->l('hook.displayAdminOrderMain.yes', 'hookclass')
+                    : $this->payplug->l('hook.displayAdminOrderMain.no', 'hookclass');
                 $this->assign->assign(['pay_tds' => $pay_tds]);
             }
         }
@@ -763,7 +763,7 @@ class HookClass
                 }
             } else {
                 $this->payplug->setPaymentErrorsCookie([
-                    $this->payplug->l('hook.header.transactionNotCompleted', 'hookClass')
+                    $this->payplug->l('hook.header.transactionNotCompleted', 'hookclass')
                 ]);
                 $error_url = 'index.php?controller=order&step=3&error=1';
                 $this->tools->tool('redirect', $error_url);
@@ -773,7 +773,7 @@ class HookClass
         if ($this->config->get('PAYPLUG_ONEY')) {
             Media::addJsDef([
                 'payplug_oney' => true,
-                'payplug_oney_loading_msg' => $this->payplug->l('hook.header.loading', 'hookClass')
+                'payplug_oney_loading_msg' => $this->payplug->l('hook.header.loading', 'hookclass')
             ]);
         }
 

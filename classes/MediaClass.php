@@ -126,28 +126,28 @@ class MediaClass extends \Payplug
         switch ($type) {
             case 'pwd':
             case 'activate':
-                $title = $this->payplug->l('payplug.displayPopin.liveMode');
+                $title = $this->payplug->l('payplug.displayPopin.liveMode', 'mediaclass');
                 break;
             case 'premium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
                 break;
             case 'oneyPremium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
                 break;
             case 'confirm':
-                $title = $this->payplug->l('payplug.displayPopin.saveSettings');
+                $title = $this->payplug->l('payplug.displayPopin.saveSettings', 'mediaclass');
                 break;
             case 'deactivate':
-                $title = $this->payplug->l('payplug.displayPopin.deactivate');
+                $title = $this->payplug->l('payplug.displayPopin.deactivate', 'mediaclass');
                 break;
             case 'refund':
-                $title = $this->payplug->l('payplug.displayPopin.refund');
+                $title = $this->payplug->l('payplug.displayPopin.refund', 'mediaclass');
                 break;
             case 'abort':
-                $title = $this->payplug->l('payplug.displayPopin.suspendInstallment');
+                $title = $this->payplug->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
                 break;
             case 'deferred':
-                $title = $this->payplug->l('payplug.displayPopin.deferred');
+                $title = $this->payplug->l('payplug.displayPopin.deferred', 'mediaclass');
                 break;
             default:
                 $title = '';
