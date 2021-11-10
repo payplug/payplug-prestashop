@@ -300,20 +300,22 @@ class PayPlugNotifications
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                    $module_name = $this->payplug->l('Oney 3x');
+                    $name = $this->payplug->l('Oney 3x', 'payplugnotifications');
                     break;
                 case 'oney_x4_with_fees':
-                    $module_name = $this->payplug->l('Oney 4x');
+                    $name = $this->payplug->l('Oney 4x', 'payplugnotifications');
                     break;
                 case 'oney_x3_without_fees':
-                    $module_name = $this->payplug->l('notification.createOrder.oneyX3WithoutFees');
+                    $name = $this->payplug->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
                     break;
                 case 'oney_x4_without_fees':
-                    $module_name = $this->payplug->l('notification.createOrder.oneyX4WithoutFees');
+                    $name = $this->payplug->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
                     break;
                 default:
+                    $name = $module_name;
                     break;
             }
+            $module_name = $name;
         }
 
         // Create Order
@@ -712,8 +714,9 @@ class PayPlugNotifications
 
         if (!$is_valid_amount) {
             $message = new Message();
-            $message->message = $this->payplug->l('The amount collected by PayPlug is not the same');
-            $message->message .= $this->payplug->l(' as the total value of the order');
+            $msg = $this->payplug->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
+            $msg .= $this->payplug->l(' as the total value of the order', 'payplugnotifications');
+            $message->message = $msg;
             $message->id_order = $this->order->id;
             $message->id_cart = $this->order->id_cart;
             $message->private = true;
