@@ -80,7 +80,7 @@ class PayPlugValidation
     public function postProcess()
     {
         $redirect_url_error = 'index.php?controller=order&step=1&error=1';
-        $cancel_url = 'index.php?controller=order';
+        $cancel_url = 'index.php?controller=order&step=3';
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
         //Cancelling
