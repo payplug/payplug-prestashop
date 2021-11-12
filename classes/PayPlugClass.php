@@ -2487,7 +2487,7 @@ class PayPlugClass extends PaymentModule
             'cancel' => $this->context->link->getModuleLink(
                 $this->name,
                 'validation',
-                ['ps' => 2, 'cartid' => (int)$cart->id],
+                ['ps' => 2, 'cartid' => (int)$cart->id, 'step' => 3],
                 true
             ),
             'notification' => $this->context->link->getModuleLink($this->name, 'ipn', [], true)
