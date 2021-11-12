@@ -220,7 +220,7 @@ class PayPlugValidation
                 $this->api_key = (bool)$payment->is_live ?
                     Configuration::get('PAYPLUG_LIVE_API_KEY') :
                     Configuration::get('PAYPLUG_TEST_API_KEY');
-                $this->logger->addLog('Retrieving payment...');
+                $this->logger->addLog('Retrieving payment: ' . $payment->id);
                 if (isset($payment->failure) && $payment->failure !== null) {
                     if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
