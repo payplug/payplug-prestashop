@@ -202,6 +202,7 @@ class PayPlugNotifications
                 Configuration::get('PAYPLUG_TEST_API_KEY');
             ApiClass::setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
+            $this->logger->addLog('Resource ID: ' . $this->resource->id);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
         }
