@@ -186,7 +186,7 @@ class ConfigClass
     public function disable($force_all = false)
     {
         Configuration::updateValue('PAYPLUG_SHOW', 0);
-        parent::disable($force_all);
+        $this->payplugClass->disable($force_all);
 
         $req_disable = '
             UPDATE `' . _DB_PREFIX_ . 'module`
