@@ -25,6 +25,10 @@
         {l s='admin.popin.confirm.mode' mod='payplug'}
         <strong>{if $sandbox}{l s='admin.popin.confirm.test' mod='payplug'}{else}{l s='admin.popin.confirm.live' mod='payplug'}{/if}</strong>
     </li>
+    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
+        {l s='admin.popin.confirm.paymentpage' mod='payplug'}
+        <strong>{if $embedded}{l s='admin.popin.confirm.embedded' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
+    </li>
     <li data-e2e-type="standard" data-e2e-state="{if $standard}on{else}off{/if}">
         {l s='admin.popin.confirm.standard' mod='payplug'}
         <strong>{if $standard}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
@@ -32,10 +36,6 @@
     <li data-e2e-type="one_click" data-e2e-state="{if $one_click}on{else}off{/if}">
         {l s='admin.popin.confirm.one_click' mod='payplug'}
         <strong>{if $one_click}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
-    </li>
-    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
-        {l s='admin.popin.confirm.paymentpage' mod='payplug'}
-        <strong>{if $embedded}{l s='admin.popin.confirm.embedded' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
     </li>
     <li data-e2e-type="oney" data-e2e-state="{if $oney}on{else}off{/if}">
         {l s='admin.popin.confirm.oney' mod='payplug'}
