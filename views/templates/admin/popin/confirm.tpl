@@ -41,7 +41,7 @@
         {l s='admin.popin.confirm.oney' mod='payplug'}
         <strong>{if $oney}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
-    {if $feature_bancontact && !$payplug_switch.sandbox.checked}
+    {if $feature_bancontact && !$sandbox}
     <li data-e2e-type="bancontact" data-e2e-state="{if $bancontact}on{else}off{/if}">
         {l s='admin.popin.confirm.bancontact' mod='payplug'}
         <strong>{if $bancontact}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
