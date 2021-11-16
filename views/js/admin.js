@@ -701,7 +701,6 @@ var $document, $window, payplug = {
 
             if (name == 'payplug_sandbox' && !is_sandbox) {
                 switcher.left($switcher, true);
-                $bancontact.show();
                 return settings.live();
             } else if (name == 'payplug_sandbox' && is_sandbox) {
                 $bancontact.addClass('-hide');
