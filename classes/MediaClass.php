@@ -112,6 +112,7 @@ class MediaClass extends \Payplug
                 'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'bancontact' => $args['bancontact'],
+                'feature_bancontact' => $this->payplug->isValidFeature('feature_bancontact'),
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
