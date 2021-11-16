@@ -391,9 +391,9 @@ class OneyRepository extends Repository
 
             $oneyImage .= '_fees';
 
+            $iso = $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code);
+            $merchant_company_iso = (string)$this->configurationSpecific->get('PAYPLUG_COMPANY_ISO');
             if ($use_fees === false) {
-                $iso = $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code);
-                $merchant_company_iso = (string)$this->configurationSpecific->get('PAYPLUG_COMPANY_ISO');
                 if ($iso != 'IT' && $iso != 'FR') {
                     $iso = $merchant_company_iso;
                 }
