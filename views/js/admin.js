@@ -690,14 +690,16 @@ var $document, $window, payplug = {
 
             var is_sandbox = parseInt($('input[name=payplug_sandbox]:checked').val());
 
-            $bancontact = $('.payplugBancontact');
+            // Toggle bancontact only for live configuration
+            var {bancontact} = payplug,
+                {identifier} = bancontact.props,
+                $bancontact = $('.' + identifier);
 
             if (name == 'payplug_sandbox' && !is_sandbox) {
                 switcher.left($switcher, true);
-                $bancontact.show();
                 return settings.live();
             } else if (name == 'payplug_sandbox' && is_sandbox) {
-                $bancontact.hide();
+                $bancontact.addClass('-hide');
             }
 
             if (!value) {
@@ -749,11 +751,16 @@ var $document, $window, payplug = {
                     }
                 },
                 success: function (response) {
+                    console.log('in');
                     if (response.result) {
+                        console.log('in');
                         settings.reset();
-                        var {switcher} = payplug.tools,
+                        var {tools, bancontact} = payplug,
+                            $bancontact = $('.' + bancontact.props.identifier),
+                            {switcher} = tools,
                             $switcher = $('input[name=payplug_sandbox]').parents('.' + switcher.props.identifier);
                         switcher.right($switcher, true);
+                        $bancontact.removeClass('-hide');
                     } else {
                         var {login} = payplug;
                         login.reload();
@@ -1082,6 +1089,13 @@ var $document, $window, payplug = {
                 }
             });
         }
+    },
+    bancontact: {
+        props: {
+            identifier: 'payplugBancontact',
+            switcher: 'payplug_bancontact',
+        },
+        init: function() {}
     },
     tools: {
         init: function () {
