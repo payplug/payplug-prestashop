@@ -48,15 +48,15 @@
                         <div class="payplugPanel_label">{l s='Enable payments:' mod='payplug'}</div>
                         <div class="payplugPanel_content">
                             <label for="payplug_installment_mode_2">
-                                <input id="payplug_installment_mode_2" type="radio" name="PAYPLUG_INST_MODE" value="2" {if $feature_inst_mode == 2}checked="checked"{/if}>
+                                <input id="payplug_installment_mode_2" type="radio" name="PAYPLUG_INST_MODE" value="2" {if $inst_mode == 2}checked="checked"{/if}>
                                 {l s='in 2 installments' mod='payplug'}
                             </label>
                             <label for="payplug_installment_mode_3">
-                                <input id="payplug_installment_mode_3" type="radio" name="PAYPLUG_INST_MODE" value="3" {if $feature_inst_mode == 3}checked="checked"{/if}>
+                                <input id="payplug_installment_mode_3" type="radio" name="PAYPLUG_INST_MODE" value="3" {if $inst_mode == 3}checked="checked"{/if}>
                                 {l s='in 3 installments' mod='payplug'}
                             </label>
                             <label for="payplug_installment_mode_4">
-                                <input id="payplug_installment_mode_4" type="radio" name="PAYPLUG_INST_MODE" value="4" {if $feature_inst_mode == 4}checked="checked"{/if}>
+                                <input id="payplug_installment_mode_4" type="radio" name="PAYPLUG_INST_MODE" value="4" {if $inst_mode == 4}checked="checked"{/if}>
                                 {l s='in 4 installments' mod='payplug'}
                             </label>
                         </div>
@@ -66,7 +66,7 @@
                         <div class="payplugPanel_label">{l s='Enable this option from:' mod='payplug'}</div>
                         <div class="payplugPanel_content">
                             <div class="payplugInstallment_amount">
-                                <input type="text" name="PAYPLUG_INST_MIN_AMOUNT" value="{$feature_inst_min_amount|escape:'htmlall':'UTF-8'}"> €
+                                <input type="text" name="PAYPLUG_INST_MIN_AMOUNT" value="{$inst_min_amount|escape:'htmlall':'UTF-8'}"> €
                                 <span style="display: none;" data-e2e-error="installment_amount">{l s='Amount must be greater than 4€ and lower than 20000€.' mod='payplug'}</span>
                             </div>
                         </div>
@@ -75,16 +75,16 @@
                     <div class="payplugInstallment_fieldset payplugPanel">
                         <div class="payplugPanel_label">{l s='Receive:' mod='payplug'}</div>
                         <div class="payplugPanel_content">
-                            <p class="payplugInstallment_schedule -x2{if $feature_inst_mode == 2} -select{/if}">
+                            <p class="payplugInstallment_schedule -x2{if $inst_mode == 2} -select{/if}">
                                 50% {l s='of order amount on the first day' mod='payplug'},<br>
                                 50% {l s='of order amount after 30 days' mod='payplug'}.
                             </p>
-                            <p class="payplugInstallment_schedule -x3{if $feature_inst_mode == 3} -select{/if}">
+                            <p class="payplugInstallment_schedule -x3{if $inst_mode == 3} -select{/if}">
                                 34% {l s='of order amount on the first day' mod='payplug'},<br>
                                 33% {l s='of order amount after 30 days' mod='payplug'},<br>
                                 33% {l s='of order amount after 60 days' mod='payplug'}.
                             </p>
-                            <p class="payplugInstallment_schedule -x4{if $feature_inst_mode == 4} -select{/if}">
+                            <p class="payplugInstallment_schedule -x4{if $inst_mode == 4} -select{/if}">
                                 25% {l s='of order amount on the first day' mod='payplug'},<br>
                                 25% {l s='of order amount after 30 days' mod='payplug'},<br>
                                 25% {l s='of order amount after 60 days' mod='payplug'},<br>
