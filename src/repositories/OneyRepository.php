@@ -374,8 +374,12 @@ class OneyRepository extends Repository
             if ($this->validateSpecific->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
                 $is_elligible = $this->isOneyElligible($cart);
             } else {
-                $id_currency = $this->contextSpecific->currency->id;
-                $amount = $cart->getOrderTotal(true, Cart::BOTH);
+                $id_currency = $this->contextSpecific->getContext()->currency->id;
+                if ($this->validateSpecific->validate('isLoadedObject', $cart)) {
+                    $amount = $cart->getOrderTotal(true);
+                } else {
+                    $amount = 0;
+                }
                 $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
             }
 
