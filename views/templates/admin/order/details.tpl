@@ -86,6 +86,14 @@
             <span class="pp_col2" data-e2e-payment-details="tds">{$payment.tds|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
+    {if isset($payment.card_country) && ($payment.card_country) && isset($payment.type) && ($payment.type_code == 'bancontact')}
+        <li>
+            <span class="pp_col1">{l s='admin.details.country' mod='payplug'} :</span>
+            <span class="pp_col2" data-e2e-payment-details="card_country">
+                {$payment.card_country|escape:'htmlall':'UTF-8'}
+            </span>
+        </li>
+    {/if}
     {if isset($payment.card_date) && ($payment.card_date|intval|count neq 0)}
         <li>
             <span class="pp_col1">{l s='Expiry Date' mod='payplug'} :</span>
