@@ -2118,6 +2118,10 @@ class PayPlugClass extends PaymentModule
                         'payplugclass'
                     );
                     break;
+                case 'bancontact':
+                    $is_bancontact = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.bancontact', 'payplugclass');
+                    break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
             }
