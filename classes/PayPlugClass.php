@@ -2032,11 +2032,15 @@ class PayPlugClass extends PaymentModule
             && !empty($card_details['brand'])
             && ($card_details['brand'] !== 'none')) {
             $card_brand = $this->l('payplug.adminAjaxController.card', 'payplugclass') . ' ' . $card_details['brand'];
+        }
 
-            // Country
-            if ($card_brand && isset($card_details['country']) && !empty($card_details['country'])) {
-                $card_brand .= ' (' . $card_details['country'] . ')';
-            }
+        // Card Country
+        $card_country = null;
+        if ($card_details
+            && isset($card_details['country'])
+            && ($card_details['country'] !== 'none')) {
+            $card_country = $card_details['country'];
+            $card_brand .= ' (' . $card_details['country'] . ')';
         }
 
         // Card mask
@@ -2062,6 +2066,7 @@ class PayPlugClass extends PaymentModule
             'card_brand' => $card_brand,
             'card_mask' => $card_mask,
             'card_date' => $card_date,
+            'card_country' => $card_country,
             'mode' => ($payment->is_live)
                 ? $this->l('payplug.buildPaymentDetails.live', 'payplugclass')
                 : $this->l('payplug.buildPaymentDetails.test', 'payplugclass'),
@@ -2076,6 +2081,7 @@ class PayPlugClass extends PaymentModule
         }
 
         $is_oney = false;
+        $is_bancontact = false;
         if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
@@ -2094,11 +2100,17 @@ class PayPlugClass extends PaymentModule
                     $is_oney = true;
                     $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'payplugclass');
                     break;
+                case 'bancontact':
+                    $is_bancontact = true;
+                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.bancontact', 'payplugclass');
+                    break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
             }
             $payment_details['type_code'] = $payment->payment_method['type'];
         }
+
+
 
         if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
@@ -2155,6 +2167,10 @@ class PayPlugClass extends PaymentModule
             unset($payment_details['card_brand']);
             unset($payment_details['card_mask']);
             unset($payment_details['card_date']);
+        }
+        if ($is_bancontact) {
+            unset($payment_details['tds']);
+            unset($payment_details['card_brand']);
         }
 
         return $payment_details;
