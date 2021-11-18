@@ -353,7 +353,10 @@ class OneyRepository extends Repository
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ],
             'withFirstSchedule' => $withFirstSchedule,
-            'iso_code' => $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code),
+            'iso_code' => $this->toolsSpecific->tool(
+                'strtoupper',
+                $this->contextSpecific->getContext()->language->iso_code
+            ),
             'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
         ];
         $this->assign->assign($vars);
@@ -371,7 +374,8 @@ class OneyRepository extends Repository
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $cart = $this->contextSpecific->getContext()->cart;
-            if ($this->validateSpecific->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+            if ($this->validateSpecific->validate('isLoadedObject', $cart)
+                && $cart->id_address_invoice && $cart->id_address_delivery) {
                 $is_elligible = $this->isOneyElligible($cart);
             } else {
                 $id_currency = $this->contextSpecific->getContext()->currency->id;

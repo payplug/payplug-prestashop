@@ -94,7 +94,7 @@ class PayPlugNotifications
     /**
      * @descrition Check if the payment resource can be treated
      */
-    private function CheckIsValidPaymentResource()
+    private function checkIsValidPaymentResource()
     {
         if (!$this->payment->is_paid && !$this->is_deferred) {
             $this->logger->addLog('The transaction is not paid yet.');
@@ -471,7 +471,7 @@ class PayPlugNotifications
         $this->setResourceProps(); // hydrate $resource_props
 
         // Check the payment ressource
-        $this->CheckIsValidPaymentResource();
+        $this->checkIsValidPaymentResource();
 
         // Save card
         $this->processSaveCard();
