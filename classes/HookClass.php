@@ -435,6 +435,10 @@ class HookClass
                 && isset($payment->payment_method['type'])
                 && in_array($payment->payment_method['type'], $oney_payment_method);
 
+            $is_bancontact = isset($payment->payment_method)
+                && isset($payment->payment_method['type'])
+                && $payment->payment_method['type'] == 'bancontact';
+
             // Update order state if is pending
             $state_addons = $payment->is_live ? '' : '_TEST';
             $paid_state = $this->config->get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
@@ -458,6 +462,10 @@ class HookClass
                         $order_history->save();
                     }
                 }
+            }
+
+            if ($is_bancontact) {
+                $this->assign->assign(['pay_tds' => null]);
             }
 
             $single_payment = $this->payplug->buildPaymentDetails($payment);
@@ -810,11 +818,6 @@ class HookClass
 
             $id_product = (int)$this->tools->tool('getValue', 'id_product');
             $group = $this->tools->tool('getValue', 'group');
-
-            $id_product_attribute = $group ? (int)$this->product->getIdProductAttributeByIdAttributes(
-                $id_product,
-                $group
-            ) : 0;
 
             // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
             if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
