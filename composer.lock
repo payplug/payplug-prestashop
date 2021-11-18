@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3913c8f675ac95be2b396d3eb65e5e04",
+    "content-hash": "e7e29411add8693a36f3c4907c802e03",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -129,12 +129,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "ed3824933863b6107f4cab6c06ab1546a0b09c43"
+                "reference": "ba9db87ef32bc108ea991984b09a606ce53b63ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/ed3824933863b6107f4cab6c06ab1546a0b09c43",
-                "reference": "ed3824933863b6107f4cab6c06ab1546a0b09c43",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/ba9db87ef32bc108ea991984b09a606ce53b63ca",
+                "reference": "ba9db87ef32bc108ea991984b09a606ce53b63ca",
                 "shasum": ""
             },
             "require": {
@@ -167,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-17T10:32:00+00:00"
+            "time": "2021-11-18T11:13:03+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -3146,7 +3146,9 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "5.6.*"
+    },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
 }

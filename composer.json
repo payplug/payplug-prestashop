@@ -5,7 +5,7 @@
     "require": {
 	"php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
-        "payplug/payplug-php": "dev-wip-bancontact#ed3824933863b6107f4cab6c06ab1546a0b09c43"
+        "payplug/payplug-php": "dev-wip-bancontact#ba9db87ef32bc108ea991984b09a606ce53b63ca"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",

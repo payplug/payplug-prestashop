@@ -435,6 +435,10 @@ class HookClass
                 && isset($payment->payment_method['type'])
                 && in_array($payment->payment_method['type'], $oney_payment_method);
 
+            $is_bancontact = isset($payment->payment_method)
+                && isset($payment->payment_method['type'])
+                && $payment->payment_method['type'] == 'bancontact';
+
             // Update order state if is pending
             $state_addons = $payment->is_live ? '' : '_TEST';
             $paid_state = $this->config->get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
@@ -458,6 +462,10 @@ class HookClass
                         $order_history->save();
                     }
                 }
+            }
+
+            if ($is_bancontact) {
+                $this->assign->assign(['pay_tds' => null]);
             }
 
             $single_payment = $this->payplug->buildPaymentDetails($payment);
