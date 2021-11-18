@@ -151,7 +151,7 @@ class PrestashopSpecific16
 
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $logo_class . '-' . $extraClass .
-                            ($error ? '-alt' : ''),
+                            ($error ? '-alt' : '') . ' ' . $extraClass,
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_method == 'one_click' ?
                             $payment_options['standard']['logo'] :
