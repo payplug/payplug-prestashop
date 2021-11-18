@@ -359,8 +359,7 @@ class RefundClass extends \PaymentModule
             die(json_encode([
                                 'status' => 'ok',
                                 'data' => $data,
-                                //TODO: call hookDisplayAdminOrderMain from HookClass
-                                'template' => $this->payplug->hookDisplayAdminOrderMain(['id_order' => $id_order]),
+                                'template' => $this->payplug->hookclass->displayAdminOrderMain(['id_order' => $id_order]),
                                 'message' => $this->payplug->l('payplug.refundPayment.success', 'refundclass'),
                                 'reload' => $reload
                             ]));
