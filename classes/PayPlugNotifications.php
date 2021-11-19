@@ -1009,6 +1009,12 @@ class PayPlugNotifications
         }
         $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
+        // Define if payment is bancontact resource
+        if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
+            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+        }
+        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok':'nok'));
+
         // Define if payment is deferred resource
         if (isset($this->payment->authorization) && !$this->is_oney) {
             $this->is_deferred = isset($this->payment->authorization->authorized_at)
