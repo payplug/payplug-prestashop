@@ -433,6 +433,7 @@ $_MODULE['<{payplug}prestashop>schedule_50df9ae96246d6eb7d6e8a667c4f01be'] = 'Fi
 $_MODULE['<{payplug}prestashop>schedule_5373c2bf7ae0b4507e2b5338b666888d'] = 'Installment no1:';
 $_MODULE['<{payplug}prestashop>schedule_66c4c5112f455a19afde47829df363fa'] = 'Total:';
 $_MODULE['<{payplug}prestashop>schedule_6702a6e3bc2dce95c3e3b61fe578f29c'] = 'Amount:';
+$_MODULE['<{payplug}prestashop>schedule_708ff60040afa08d96955ee0072a533a'] = ' ';
 $_MODULE['<{payplug}prestashop>schedule_810b5c183d53c2990f950efec79cb10f'] = 'Installment no3:';
 $_MODULE['<{payplug}prestashop>schedule_d8c95bbe3381aefc91f51bb6f92de615'] = 'TAEG:';
 $_MODULE['<{payplug}prestashop>settings_94cb47d890cbd4a457ea57dd1ccbfaa8'] = 'Please activate your account to perform LIVE transactions.';
