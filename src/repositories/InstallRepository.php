@@ -242,13 +242,13 @@ class InstallRepository extends Repository
         // check requirement
         $report = ConfigClass::checkRequirements();
         if (!$report['php']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
+            return $this->setInstallError('Install failed: PHP Requirement.');
         }
         if (!$report['curl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
+            return $this->setInstallError('Install failed: cURL Requirement.');
         }
         if (!$report['openssl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
+            return $this->setInstallError('Install failed: OpenSSL Requirement.');
         }
 
         // Check if multishop feature is active then set the context
@@ -278,7 +278,7 @@ class InstallRepository extends Repository
 
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab()) {
-            return $this->setInstallError($this->l('Install failed: Install Tab'));
+            return $this->setInstallError('Install failed: Install Tab');
         }
 
         $this->log->info('Install successful.');
