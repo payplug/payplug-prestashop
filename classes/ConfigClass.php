@@ -255,6 +255,9 @@ class ConfigClass
             if (!$permissions['can_use_oney']) {
                 $available_options['oney'] = false;
             }
+            if (!$permissions['can_use_bancontact']) {
+                $available_options['bancontact'] = false;
+            }
         }
 
         return $available_options;
