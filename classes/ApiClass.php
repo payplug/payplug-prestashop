@@ -192,6 +192,7 @@ class ApiClass
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
+            'can_use_bancontact' => $json_answer['payment_methods']['bancontact']['enabled'],
         ];
 
         // If sandbox mode active, no allowed countries sent

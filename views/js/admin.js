@@ -769,13 +769,20 @@ var $document, $window, payplug = {
             });
         },
         disable: function ($switcher) {
-            var {switcher} = payplug.tools;
-            var {settings} = payplug;
+            var {switcher} = payplug.tools,
+                {settings} = payplug,
+                switcherName = $switcher.prevObject[0].name;
 
-
-            var checkpremium = 'premium';
-            if ($switcher.prevObject[0].name == 'payplug_oney') {
-                checkpremium = 'oneyPremium';
+            switch (switcherName) {
+                case 'payplug_oney' :
+                    var checkpremium = 'oneyPremium';
+                    break;
+                case 'payplug_bancontact' :
+                    var checkpremium = 'bancontactPremium';
+                    break;
+                default :
+                    var checkpremium = 'premium';
+                    break;
             }
 
             var data = {

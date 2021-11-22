@@ -130,9 +130,27 @@ class MediaClass extends \Payplug
                 $title = $this->payplug->l('payplug.displayPopin.liveMode', 'mediaclass');
                 break;
             case 'premium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
-                break;
             case 'oneyPremium':
+            case 'bancontactPremium':
+                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
+
+                if ($type == 'oneyPremium') {
+                    $link = 'https://portal.payplug.com/#/configuration/oney';
+                } elseif ($type == 'bancontactPremium') {
+                    $link = 'mailto:support@payplug.com';
+                } else {
+                    $link = 'https://www.payplug.com/contact';
+                }
+
+                $this->context->smarty->assign([
+                    'premiumContent' => [
+                        'use' => $type,
+                        'link' => $link
+                    ]
+                ]);
+
+                $type = 'premium';
+                break;
                 $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
                 break;
             case 'confirm':
