@@ -236,6 +236,7 @@ class AdminClass extends \Payplug
                 'payplug_sandbox' => $permissions['use_live_mode'],
                 'payplug_one_click' => $permissions['can_save_cards'],
                 'payplug_oney' => $permissions['can_use_oney'],
+                'payplug_bancontact' => $permissions['can_use_bancontact'],
                 'payplug_inst' => $permissions['can_create_installment_plan'],
                 'payplug_deferred' => $permissions['can_create_deferred_payment'],
             ];
