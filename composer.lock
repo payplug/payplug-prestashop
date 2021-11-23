@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f291c5ad6bd2340a2c71dc1d48561061",
+    "content-hash": "ac715cc0932804bc927284ecc2b8fd98",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -129,12 +129,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "d860966c2ed1fca4d92304c865caebfb22d84c4f"
+                "reference": "b91eb55b40a61ad760e1b4d32b490fafb52bcf64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/d860966c2ed1fca4d92304c865caebfb22d84c4f",
-                "reference": "d860966c2ed1fca4d92304c865caebfb22d84c4f",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/b91eb55b40a61ad760e1b4d32b490fafb52bcf64",
+                "reference": "b91eb55b40a61ad760e1b4d32b490fafb52bcf64",
                 "shasum": ""
             },
             "require": {
@@ -168,7 +168,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-18T15:17:58+00:00"
+            "time": "2021-11-22T14:27:29+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -3214,6 +3214,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
-
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
