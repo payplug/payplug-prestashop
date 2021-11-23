@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac715cc0932804bc927284ecc2b8fd98",
+    "content-hash": "c76a912f8ff1b79d5c8b86ffbfba4ab1",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -129,19 +129,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "4dc857f034040476625b19e423c677875deb9606"
+                "reference": "0f8b8fad810db092246080ed0449755ac4ed5fa1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/4dc857f034040476625b19e423c677875deb9606",
-                "reference": "4dc857f034040476625b19e423c677875deb9606",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/0f8b8fad810db092246080ed0449755ac4ed5fa1",
+                "reference": "0f8b8fad810db092246080ed0449755ac4ed5fa1",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-openssl": "*",
-                "php": ">=5.4.0",
-                "symfony/dotenv": "3.4.*"
+                "php": ">=5.3.0"
             },
             "require-dev": {
                 "phpdocumentor/phpdocumentor": "2.*",
@@ -168,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-23T10:01:34+00:00"
+            "time": "2021-11-23T16:07:51+00:00"
         },
         {
             "name": "symfony/dotenv",
