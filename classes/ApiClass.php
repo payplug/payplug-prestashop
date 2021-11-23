@@ -31,6 +31,7 @@ use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\repositories\PluginRepository;
+use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 
 class ApiClass
@@ -57,7 +58,7 @@ class ApiClass
     {
         $this->payplug = $payplug;
         $this->plugin = $payplug->getPlugin();
-
+        $this->checkEnvironment();
         $this->setEnvironment();
         self::setSecretKey();
         $this->current_api_key =  self::getCurrentApiKey();
@@ -66,6 +67,23 @@ class ApiClass
         $this->setUserAgent();
     }
 
+    /**
+     * @description Check environnement and try to set API_BASE_URL into payplug-php lib
+     */
+    public function checkEnvironment()
+    {
+        if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == "localhost" || preg_match("/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i", $_SERVER['SERVER_NAME'])) {
+            $dotenv = new Dotenv();
+            $dotenvFile = dirname(__FILE__, 3) . "/payplugroutes/.env";
+            if (file_exists($dotenvFile)) {
+                $dotenv->load($dotenvFile);
+            }
+        }
+        if (isset($_ENV['API_BASE_URL'])) {
+            \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
+        }
+    }
+    
     /**
      * @description Check if account is premium
      *
@@ -201,13 +219,16 @@ class ApiClass
             }
         }
 
+        $can_use_bancontact = isset($json_answer['payment_methods']['bancontact']['enabled'])
+            && $json_answer['payment_methods']['bancontact']['enabled'];
+
         $permissions = [
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
-            'can_use_bancontact' => $json_answer['payment_methods']['bancontact']['enabled'],
+            'can_use_bancontact' => $can_use_bancontact,
         ];
 
         // If sandbox mode active, no allowed countries sent
