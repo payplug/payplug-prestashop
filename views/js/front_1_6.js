@@ -409,6 +409,9 @@ var $document,
                         return false;
                     }
                     var is_open = $('.oneyCta').is('.-open');
+                    if (!sanitizePopupHtml(content)) {
+                        return;
+                    }
                     $('.oneyPopin').replaceWith(content).removeClass('-loading');
                     var $button = $('.oneyPopin_navigation button').eq(0);
                     payplugModule.oney.popin.choose($button.data('type'));
@@ -875,7 +878,9 @@ var $document,
             set: function (content) {
                 var popup = payplugModule.popup,
                     props = popup.props;
-
+                if (!sanitizePopupHtml(content)) {
+                    return;
+                }
                 if ($('.' + props.mainClass).length) {
                     popup.close();
                 } else {

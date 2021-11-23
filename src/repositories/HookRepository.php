@@ -46,6 +46,7 @@ class HookRepository extends Repository
             $this->payplug->mediaClass->setMedia([
                 $module_url . 'views/css/admin_order.css',
                 $module_url . 'views/js/admin_order.js',
+                $module_url . 'views/js/utilities.js',
             ]);
         } else {
             $this->payplug->mediaClass->setMedia([
@@ -102,7 +103,7 @@ class HookRepository extends Repository
     public function displayAdminStatusesForm($param)
     {
         $types = [
-            '' => $this->l('hook.displayAdminStatusesForm.undefined'),
+            'undefined' => $this->l('hook.displayAdminStatusesForm.undefined'),
             'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
             'cancelled' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
             'error' => $this->l('hook.displayAdminStatusesForm.orderStateTypeError'),

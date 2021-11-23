@@ -25,7 +25,7 @@
         <p class="payment_module payplugPayment">
             <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}">
                 <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"
-                     class="oneyLogo {if $payplug_payment_option.oney_error}{$payplug_payment_option.oney_error|escape:'htmlall':'UTF-8'}{/if}"/>
+                     class="{$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'} oneyLogo  -with{if isset($use_fees) && !$use_fees}out{/if}Fees {if $payplug_payment_option.oney_error}{$payplug_payment_option.oney_error|escape:'htmlall':'UTF-8'}{/if}"/>
                 {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
             </a>
         </p>

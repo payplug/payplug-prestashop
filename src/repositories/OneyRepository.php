@@ -326,7 +326,11 @@ class OneyRepository extends Repository
     {
         $this->assignLegalNotice();
         $this->assign->assign([
-            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES')
+            'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
+            'iso_code' => $this->toolsSpecific->tool(
+                'strtoupper',
+                $this->contextSpecific->getContext()->language->iso_code
+            )
         ]);
         return $this->media->fetchTemplate('oney/popin.tpl');
     }
@@ -349,7 +353,11 @@ class OneyRepository extends Repository
                 'value' => $this->toolsSpecific->tool('displayPrice', $amount),
             ],
             'withFirstSchedule' => $withFirstSchedule,
-            'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO'),
+            'iso_code' => $this->toolsSpecific->tool(
+                'strtoupper',
+                $this->contextSpecific->getContext()->language->iso_code
+            ),
+            'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
         ];
         $this->assign->assign($vars);
         return $this->media->fetchTemplate('oney/schedule.tpl');
@@ -365,8 +373,55 @@ class OneyRepository extends Repository
     public function displayOneyPaymentOptions()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $cart = $this->contextSpecific->getContext()->cart;
+            if ($this->validateSpecific->validate('isLoadedObject', $cart)
+                && $cart->id_address_invoice && $cart->id_address_delivery) {
+                $is_elligible = $this->isOneyElligible($cart);
+            } else {
+                $id_currency = $this->contextSpecific->getContext()->currency->id;
+                if ($this->validateSpecific->validate('isLoadedObject', $cart)) {
+                    $amount = $cart->getOrderTotal(true);
+                } else {
+                    $amount = 0;
+                }
+                $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+            }
+
+            $oneyImageOptimized = '/modules/payplug/views/img/oney/x3x4_with';
+            $oneyImagex3 = '/modules/payplug/views/img/oney/x3_with';
+            $oneyImagex4 = '/modules/payplug/views/img/oney/x4_with';
+            $oneyImage = '';
+
+            $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
+            if (!$use_fees) {
+                $oneyImage .= 'out';
+            }
+
+            $oneyImage .= '_fees';
+
+            $iso = $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code);
+            $merchant_company_iso = (string)$this->configurationSpecific->get('PAYPLUG_COMPANY_ISO');
+            if ($use_fees === false) {
+                if ($iso != 'IT' && $iso != 'FR') {
+                    $iso = $merchant_company_iso;
+                }
+
+                $oneyImage .= '_'.$iso;
+            }
+
+            if ($is_elligible['result'] !== true) {
+                $oneyImage .= '_alt';
+            }
+
+            $oneyImage .= '.svg';
+            $oneyImageUrls = [
+                'optimized' => $oneyImageOptimized.$oneyImage,
+                'x3' => $oneyImagex3.$oneyImage,
+                'x4' => $oneyImagex4.$oneyImage
+            ];
+
             $this->assign->assign([
-                'use_fees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
+                'use_fees' => $use_fees,
                 'payplug_module_dir' => str_replace(
                     'payplug/payplug.php',
                     '',
@@ -374,7 +429,9 @@ class OneyRepository extends Repository
                 ),
                 'payplug_oney_loading_msg' => $this->l('Loading'),
                 'oney_required_fields' => $this->getOneyRequiredFields(),
-                'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO'),
+                'iso_code' => $iso,
+                'merchant_company_iso' => $merchant_company_iso,
+                'oney_image' => $oneyImageUrls
             ]);
 
             return $this->media->fetchTemplate('oney/payment/payment.tpl');
@@ -1076,7 +1133,7 @@ class OneyRepository extends Repository
      */
     public function isAvailableWithoutFees($iso_code)
     {
-        $valid_iso_code = ['FR'];
+        $valid_iso_code = ['FR', 'IT'];
 
         if (!is_string($iso_code)) {
             return false;

@@ -19,14 +19,14 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
+<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if}">
     {if isset($payplug_oney_error) && $payplug_oney_error}
         <p class="oneyPopin_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</p>
     {elseif isset($oney_payment_options) && $oney_payment_options}
         <button class="oneyPopin_close">{l s='Close' mod='payplug'}</button>
         <span class="oneyPopin_title">
             {l s='hook.oney.popin.pay' mod='payplug'}
-            {if isset($use_fees) && !$use_fees}
+            {if isset($use_fees) && !$use_fees && isset($iso_code) && $iso_code != 'IT'}
                 <u>{l s='hook.oney.popin.withoutFees' mod='payplug'}</u>
             {/if}
             <strong>{l s='hook.oney.popin.card' mod='payplug'}</strong>
@@ -59,7 +59,7 @@
                 {l s='hook.oney.popin.legalNoticeWithoutFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod='payplug'}
             {/if}
             {if isset($learnMoreLink) && $learnMoreLink}
-                <a class="oneyPopin_external" href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf"  target="_blank">{l s='hook.oney.popin.learnMore' mod='payplug'}</a>
+                <a class="oneyPopin_external" href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf"  target="_blank">{l s='hook.oney.popin.learnMore' mod='payplug'}</a>
             {/if}
         </span>
     {else}

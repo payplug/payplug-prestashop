@@ -81,14 +81,17 @@
 
   &_logo {
     display: block;
-    width: 140px;
-    height: 35px;
+    width: 200px;
+    height: 90px;
     max-width: 100%;
 
-    &.-withoutFees {
-      width: 200px;
+    &.-x3, &.-x4  {
+      width: 140px;
+      &.-withoutFees {
+        width: 150px;
+        min-height: 90px;
+      }
     }
-    
     @media (@tablet) {
       display: none;
     }
@@ -104,6 +107,10 @@
     font-weight: 500;
     color: #2f2930;
     padding: 0 0 35px;
+
+    img {
+      margin-bottom: 5px;
+    }
 
     .-mobile & {
       width: 50%;

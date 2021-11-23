@@ -21,19 +21,28 @@
 *}
 <div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
     <button href="javascript:void(0);" class="oneyPayment_trigger">
-        <span class="oneyPayment_logo oneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
-                <img src="/modules/payplug/views/img/oney/3x4x_with{if isset($use_fees) && !$use_fees}out{/if}_fees.svg"
-                     alt="{l s='Pay by card in 3 or 4' mod='payplug'}" />
-        </span>
+        {if isset($oney_image['optimized'])}
+            {assign var=oney_logo value=$oney_image['optimized']}
+        {else}
+            {assign var=oney_logo value=$oney_image}
+        {/if}
+        <img src="{$oney_logo|escape:'htmlall':'UTF-8'}"
+                     alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}"
+                    class="oneyLogo {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
         <span class="oneyPayment_label">
-            {l s='Pay by card in 3 or 4' mod='payplug'}
+            {if isset($use_fees) && !$use_fees}
+                {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}
+            {else}
+                {l s='hook.oney.payment.paywithoney' mod='payplug'}
+            {/if}
+
             {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
         </span>
     </button>
     {if $payplug_oney_allowed}
         {if isset($oney_payment_options) && $oney_payment_options}
             <div class="oneyOption_wrapper">
-                {include file="./options.tpl"}
+                {include file="./options.tpl" oney_image=$oney_image}
             </div>
             {if isset($oney_required_fields)}
                 {include file="./../required.tpl" oney_required_fields=$oney_required_fields}
@@ -41,7 +50,7 @@
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
                 {if $lang_iso == 'it' && $merchant_company_iso == 'IT'}
-                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
+                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
                 {/if}
             </div>
         {else}

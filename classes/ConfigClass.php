@@ -530,6 +530,7 @@ class ConfigClass
         }
 
         $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
         $this->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
@@ -559,7 +560,7 @@ class ConfigClass
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
-            'pp_version' => $this->payplugClass->version,
+            'pp_version' => Module::getInstanceByName($this->payplugClass->name)->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,
