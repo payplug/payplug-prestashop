@@ -1127,22 +1127,6 @@ class OneyRepository extends Repository
     }
 
     /**
-     * @description Return if iso country can use Oney without fees
-     * @param $iso_code
-     * return bool
-     */
-    public function isAvailableWithoutFees($iso_code)
-    {
-        $valid_iso_code = ['FR', 'IT'];
-
-        if (!is_string($iso_code)) {
-            return false;
-        }
-
-        return in_array($this->toolsSpecific->tool('strtoupper', $iso_code), $valid_iso_code);
-    }
-
-    /**
      * @description Check if Oney allow a given currency
      *
      * @param $id_currency

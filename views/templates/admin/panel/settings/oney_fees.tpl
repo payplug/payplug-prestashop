@@ -20,31 +20,29 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{if isset($can_use_oney_fees) && $can_use_oney_fees}
-    <div class="payplugOneyFees">
-        <label class="payplugOneyFees_option{if $payplug_switch.oney_fees.checked} -selected{/if}">
-            <span class="payplugOneyFees_title">{l s='admin.panel.setting.oney.withFees' mod='payplug'}</span>
-            <span class="payplugOneyFees_content">{l s='admin.panel.setting.oney.withFeesText' mod='payplug'}</span>
-            <span class="payplugOneyFees_state">{l s='admin.panel.setting.oney.activate' mod='payplug'}</span>
-            <span class="payplugOneyFees_checker">
+<div class="payplugOneyFees">
+    <label class="payplugOneyFees_option{if $payplug_switch.oney_fees.checked} -selected{/if}">
+        <span class="payplugOneyFees_title">{l s='admin.panel.setting.oney.withFees' mod='payplug'}</span>
+        <span class="payplugOneyFees_content">{l s='admin.panel.setting.oney.withFeesText' mod='payplug'}</span>
+        <span class="payplugOneyFees_state">{l s='admin.panel.setting.oney.activate' mod='payplug'}</span>
+        <span class="payplugOneyFees_checker">
                 <input type="radio"
-                        id="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}_left"
-                        name="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}"
-                        value="1"
+                       id="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}_left"
+                       name="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}"
+                       value="1"
                         {if $payplug_switch.oney_fees.checked} checked="checked"{/if}/>
             </span>
-        </label>
-        <label class="payplugOneyFees_option{if !$payplug_switch.oney_fees.checked} -selected{/if}">
-            <span class="payplugOneyFees_title">{l s='admin.panel.setting.oney.withoutFees' mod='payplug'}</span>
-            <span class="payplugOneyFees_content">{l s='admin.panel.setting.oney.withoutFeesText' mod='payplug'}</span>
-            <span class="payplugOneyFees_state">{l s='admin.panel.setting.oney.activate' mod='payplug'}</span>
-            <span class="payplugOneyFees_checker">
+    </label>
+    <label class="payplugOneyFees_option{if !$payplug_switch.oney_fees.checked} -selected{/if}">
+        <span class="payplugOneyFees_title">{l s='admin.panel.setting.oney.withoutFees' mod='payplug'}</span>
+        <span class="payplugOneyFees_content">{l s='admin.panel.setting.oney.withoutFeesText' mod='payplug'}</span>
+        <span class="payplugOneyFees_state">{l s='admin.panel.setting.oney.activate' mod='payplug'}</span>
+        <span class="payplugOneyFees_checker">
                 <input type="radio"
-                        id="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}_right"
-                        name="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}"
-                        value="0"
+                       id="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}_right"
+                       name="{$payplug_switch.oney_fees.name|escape:'htmlall':'UTF-8'}"
+                       value="0"
                         {if !$payplug_switch.oney_fees.checked} checked="checked"{/if}/>
             </span>
-        </label>
-    </div>
-{/if}
+    </label>
+</div>
