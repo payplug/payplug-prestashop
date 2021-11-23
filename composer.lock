@@ -129,12 +129,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "b91eb55b40a61ad760e1b4d32b490fafb52bcf64"
+                "reference": "4dc857f034040476625b19e423c677875deb9606"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/b91eb55b40a61ad760e1b4d32b490fafb52bcf64",
-                "reference": "b91eb55b40a61ad760e1b4d32b490fafb52bcf64",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/4dc857f034040476625b19e423c677875deb9606",
+                "reference": "4dc857f034040476625b19e423c677875deb9606",
                 "shasum": ""
             },
             "require": {
@@ -168,7 +168,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-22T14:27:29+00:00"
+            "time": "2021-11-23T10:01:34+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -2251,6 +2251,7 @@
             ],
             "description": "Provides a list of PHP built-in functions that operate on resources",
             "homepage": "https://www.github.com/sebastianbergmann/resource-operations",
+            "abandoned": true,
             "time": "2015-07-28T20:34:47+00:00"
         },
         {
