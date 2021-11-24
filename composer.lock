@@ -167,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-23T16:07:51+00:00"
+            "time": "2021-11-24T09:32:47+00:00"
         },
         {
             "name": "symfony/dotenv",
