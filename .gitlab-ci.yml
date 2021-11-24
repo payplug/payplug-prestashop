@@ -106,3 +106,25 @@ build zip release:
     paths:
       - payplug_$CI_COMMIT_REF_NAME.zip
       - payplug_qa_$CI_COMMIT_REF_NAME.zip
+
+
+build zip bancontact:
+  image: composer:1.9
+  stage: build
+  before_script:
+    - composer install --no-dev
+    - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
+    - ./ci/copy_translations.sh
+    - find ./vendor -type d -exec cp index.php {} \;
+    - git status
+    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
+    - cp features.json.dist features.json
+    - mkdir payplug
+  script:
+    - shopt -s extglob
+    - mv !(payplug|composer.json) payplug
+    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+    - composer archive --file payplug_qa_bancontact_$CI_COMMIT_REF_NAME --format zip
+  artifacts:
+    paths:
+      - payplug_qa_bancontact_$CI_COMMIT_REF_NAME.zip
