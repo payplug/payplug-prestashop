@@ -129,12 +129,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "0f8b8fad810db092246080ed0449755ac4ed5fa1"
+                "reference": "51d459b1c70742cceeaec935910d1203385d3c85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/0f8b8fad810db092246080ed0449755ac4ed5fa1",
-                "reference": "0f8b8fad810db092246080ed0449755ac4ed5fa1",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/51d459b1c70742cceeaec935910d1203385d3c85",
+                "reference": "51d459b1c70742cceeaec935910d1203385d3c85",
                 "shasum": ""
             },
             "require": {
@@ -167,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-23T16:07:51+00:00"
+            "time": "2021-11-24T09:32:47+00:00"
         },
         {
             "name": "symfony/dotenv",
