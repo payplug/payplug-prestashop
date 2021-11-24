@@ -167,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2021-11-24T09:32:47+00:00"
+            "time": "2015-05-06T00:00:00+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -2316,7 +2316,6 @@
             ],
             "description": "Provides a list of PHP built-in functions that operate on resources",
             "homepage": "https://www.github.com/sebastianbergmann/resource-operations",
-            "abandoned": true,
             "time": "2015-07-28T20:34:47+00:00"
         },
         {
