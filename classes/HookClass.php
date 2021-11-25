@@ -796,14 +796,17 @@ class HookClass
         } else {
             $payplug_domain = "https://secure.payplug.com";
         }
+
+        $integratedPaymentError = str_replace(["\r", "\n"], '', $this->payplug->mediaClass->displayMessages(
+            [$this->payplug->l('hook.header.integratedPayment.error', 'hookclass')],
+            true,
+            false
+        ));
+
         Media::addJsDef(
             [
                 'payplug_ajax_url' => $payplug_ajax_url,
-                'integratedPaymentError' => $this->payplug->mediaClass->displayMessages(
-                    [$this->payplug->l('hook.header.integratedPayment.error', 'hookclass')],
-                    true,
-                    false
-                ),
+                'integratedPaymentError' => $integratedPaymentError,
                 'payplug_publishable_key' => $this->payplug->apiClass->publishableKey,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
             ]
