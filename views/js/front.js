@@ -152,6 +152,7 @@ var $document, $window, payplugModule = {
 
                 const integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
                 integrated.props.integratedPayment = integratedPayment;
+                integratedPayment.setDisplayMode3ds(integrated.props.api.DisplayMode3ds.LIGHTBOX);
 
                 form = {
                     integratedPayment: integratedPayment,
@@ -166,7 +167,7 @@ var $document, $window, payplugModule = {
                     integrated.props.fieldsChange['changeCardHolder'] = true;
                     integrated.form.validateSelectOptions();
 
-                    if (!event.valid) {
+                    if (!event.valid && $('#cardholder').text() != '') {
                         var error = event.error;
                         $('#errorCardHolder').html(error['name']);
                     } else {
@@ -243,8 +244,6 @@ var $document, $window, payplugModule = {
                 // Once an attempt has been made
                 integratedPayment.onCompleted(function (event) {
                     integrated.form.confirmIntPayment(event.token);
-
-
                 });
 
 
@@ -365,6 +364,10 @@ var $document, $window, payplugModule = {
                             window.location.href = data.return_url;
                         } else {
                             payplugModule.popup.set(integratedPaymentError);
+                            form.cardHolder.clear();
+                            form.pan.clear();
+                            form.cvv.clear();
+                            form.exp.clear();
                             return false;
                         }
 
