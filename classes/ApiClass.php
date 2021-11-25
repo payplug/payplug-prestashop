@@ -74,7 +74,7 @@ class ApiClass
     {
         if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == "localhost" || preg_match("/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i", $_SERVER['SERVER_NAME'])) {
             $dotenv = new Dotenv();
-            $dotenvFile = dirname(__FILE__, 3) . "/payplugroutes/.env";
+            $dotenvFile = dirname(dirname(dirname(__FILE__))) . "/payplugroutes/.env";
             if (file_exists($dotenvFile)) {
                 $dotenv->load($dotenvFile);
             }

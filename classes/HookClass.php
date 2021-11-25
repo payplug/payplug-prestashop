@@ -788,7 +788,7 @@ class HookClass
 
         $payplug_ajax_url = $this->context->link->getModuleLink($this->payplug->name, 'ajax', [], true);
         $dotenv = new Dotenv();
-        $dotenvFile = dirname(__FILE__, 3) . "/payplugroutes/.env";
+        $dotenvFile = dirname(dirname(dirname(__FILE__))) . "/payplugroutes/.env";
         if (file_exists($dotenvFile)) {
             $dotenv->load($dotenvFile);
             $payplug_domain = $_ENV['PAYPLUG_DOMAIN'];
