@@ -23,6 +23,7 @@
 
 namespace PayPlug\classes;
 
+use OrderState;
 use Payplug\Exception\ConfigurationException;
 use Dispatcher;
 use Media;
@@ -163,7 +164,7 @@ class HookClass
         $id_order_states = $this->payplug->orderClass->getPayPlugOrderStates($this->payplug->name);
         $payplug_order_states = explode(',', $id_order_states);
 
-        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->payplug_languages)) {
+        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->payplug->payplug_languages)) {
             return true;
         }
 
@@ -179,7 +180,7 @@ class HookClass
                         $ps_order_state_name .= ' [PayPlug]';
                     }
 
-                    $ps_order_state = $this->orderState->get($this->config->get($payplug_conf));
+                    $ps_order_state = new OrderState($this->config->get($payplug_conf));
                     $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
                     $ps_order_state->save();
                 }
