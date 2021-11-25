@@ -316,7 +316,7 @@ var $document, $window, payplugModule = {
                     }
                 });
 
-                integrated.props.form = form;
+                    integrated.props.form = form;
 
                 $document.on('submit', 'form', function (event) {
                     if (($(event.target).is('.' + integrated.props.identifier) || $(event.target).is('#payment-form'))
