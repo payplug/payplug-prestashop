@@ -116,6 +116,7 @@ var $document, $window, payplugModule = {
                 validCvv: false,
                 validScheme: false,
             },
+            save_card: false,
             query: null,
             submit: null,
         },
@@ -220,12 +221,19 @@ var $document, $window, payplugModule = {
                             $('.errorExp').empty();
                         }
 
-                    });
-                    $('#schemeOptions').change(function () {
-                        // validate scheme options field on change
-                        integrated.props.fieldsChange['changeScheme'] = true;
-                        integrated.form.validateSelectOptions();
-                    });
+                });
+                $('#schemeOptions').change(function () {
+                    // validate scheme options field on change
+                    integrated.props.fieldsChange['changeScheme'] = true;
+                    integrated.form.validateSelectOptions();
+                });
+                $('#savecard').change(function () {
+                    if ($(this).prop('checked')) {
+                        integrated.props.save_card = true;
+                    } else {
+                        integrated.props.save_card = false;
+                    }
+                });
 
                     integrated.props.form = form;
 
@@ -332,7 +340,7 @@ var $document, $window, payplugModule = {
                     paymentId = integrated.props.paymentId,
                     integratedPayment = integrated.props.integratedPayment;
 
-                integratedPayment.pay(paymentId, Payplug.Scheme.AUTO, {save_card: false});
+                integratedPayment.pay(paymentId, Payplug.Scheme.AUTO, {save_card: integrated.props.save_card});
             },
             confirmIntPayment : function (token) {
                 payplugModule.tools.loadSpinner();
