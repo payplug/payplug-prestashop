@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\specific;
 
+use Configuration;
 use Language;
 use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
@@ -132,7 +133,10 @@ class PrestashopSpecific17
         $integrated['callToActionText'] = $this->payplug->l('specific17.setIntegratedPaymentOption.name', 'prestashopspecific17');
         $integrated['tpl'] = 'integrated_payment.tpl';
         $integrated['extra_classes'] = 'payplug integrated';
-        $this->contextSpecific->smarty->assign(['integrated_payment_js_url' => $integrated_payment_js_url]);
+        $this->contextSpecific->smarty->assign([
+                'integrated_payment_js_url' => $integrated_payment_js_url,
+                'is_one_click_activated' => (bool)Configuration::get('PAYPLUG_ONE_CLICK')
+            ]);
         $integrated['additionalInformation'] = $this->payplug->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
         $payment_options['integrated'] = $integrated;

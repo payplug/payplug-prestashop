@@ -17,5 +17,11 @@
         <span class="errorExp" id="errorCardExp"></span>
         <span class="errorCvv" id="errorCardCvv"></span>
     </div>
+    {if isset($is_one_click_activated) && $is_one_click_activated }
+    <div class="integratedSaveCard">
+        <input type="checkbox" id="savecard">
+        <label>{l s='hook.integratedPayment.savecard' mod='payplug'}</label>
+    </div>
+    {/if}
 </form>
 <script src={$integrated_payment_js_url}></script>
