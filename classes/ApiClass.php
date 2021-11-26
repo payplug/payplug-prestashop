@@ -219,8 +219,7 @@ class ApiClass
             }
         }
 
-        $can_use_bancontact = isset($json_answer['payment_methods']['bancontact']['enabled'])
-            && $json_answer['payment_methods']['bancontact']['enabled'];
+        $can_use_bancontact = isset($json_answer['payment_methods']['bancontact']['enabled']) ? $json_answer['payment_methods']['bancontact']['enabled'] : true;
 
         $permissions = [
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
