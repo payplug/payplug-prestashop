@@ -88,6 +88,12 @@
     <div class="payplugIntegratedPayment_error -api">
         {l s='hook.header.integratedPayment.api.genericError' tags=['<br>'] mod='payplug'}
     </div>
+    {if isset($is_one_click_activated) && $is_one_click_activated }
+    <div class="integratedSaveCard">
+        <input type="checkbox" id="savecard">
+        <label>{l s='hook.integratedPayment.savecard' mod='payplug'}</label>
+    </div>
+    {/if}
 </form>
 <script type="text/javascript">
     {literal}
