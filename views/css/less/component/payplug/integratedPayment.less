@@ -2,7 +2,10 @@
   display: none;
 
   &.-loaded {
-    display: block;
+    display: flex;
+    width: 100%;
+    max-width: 250px;
+    flex-wrap: wrap;
   }
 
   &_select {
@@ -12,7 +15,6 @@
     margin: 0 0 10px;
     height: 36px;
     width: 100%;
-    max-width: 250px;
   }
 
   &_input {
@@ -22,19 +24,14 @@
     margin: 0 0 10px;
     height: 36px;
     width: 100%;
-    max-width: 250px;
 
-    &.-exp {
-      width: calc(50% - 5px);
-      max-width: 120px;
-      display: inline-block;
-      margin-right: 7px;
-    }
-
+    &.-exp,
     &.-cvv {
-      width: calc(50% - 5px);
-      max-width: 120px;
-      display: inline-block;
+      width: 100%;
+      max-width: calc(50% - 5px);
+    }
+    &.-exp {
+      margin: 0 10px 0 0;
     }
 
     &.-saveCard {
@@ -54,8 +51,10 @@
     }
   }
 
-  .errorScheme, .errorCB, .errorPan, .errorExp, .errorCvv {
+  &_error {
     color: red;
+    display: block;
+    margin: -10px 0 10px;
   }
 
   .ipOverlay {
