@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\OrderHistoryInterface;
-use \OrderHistory;
+use OrderHistory;
 
 class OrderHistorySpecific implements OrderHistoryInterface
 {

@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use \PayPlug\classes\PayPlugClass;
+use PayPlug\classes\PayPlugClass;
 
 class PayplugPaymentModuleFrontController extends ModuleFrontController
 {

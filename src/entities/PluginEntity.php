@@ -80,7 +80,7 @@ class PluginEntity
 
 //    /** @var object */
 //    private $installment;
-    
+
     /** @var object */
     private $logger;
 
@@ -354,7 +354,7 @@ class PluginEntity
 //        $this->installment = $installment;
 //        return $this;
 //    }
-    
+
     /**
      * @return object
      */

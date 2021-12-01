@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\QueryInterface;
-use \Db;
+use Db;
 
 class QuerySpecific implements QueryInterface
 {

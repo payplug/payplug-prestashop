@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\OrderInterface;
-use \Order;
+use Order;
 
 class OrderSpecific implements OrderInterface
 {

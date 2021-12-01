@@ -75,7 +75,7 @@ class ConfigClass
         $this->mediaClass = $payplug->mediaClass;
         $this->oney = $payplug->oney;
         $this->orderClass = $payplug->orderClass;
-        $this->constantSpecific = new ConstantSpecific;
+        $this->constantSpecific = new ConstantSpecific();
         $this->context = (new ContextSpecific())->getContext();
 
         $this->payplugClass = $payplug;

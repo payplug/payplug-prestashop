@@ -1000,24 +1000,24 @@ class PayPlugNotifications
         if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
             $this->is_oney = in_array($this->payment->payment_method['type'], $oney_payment_methods);
         }
-        $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok' : 'nok'));
 
         // Define if payment is bancontact resource
         if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
             $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
         }
-        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is deferred resource
         if (isset($this->payment->authorization) && !$this->is_oney) {
             $this->is_deferred = isset($this->payment->authorization->authorized_at)
                 && $this->payment->authorization->authorized_at;
         }
-        $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok' : 'nok'));
 
         // Define if payment is from installment
         $this->is_installment = $this->payment->installment_plan_id ?: false;
-        $this->logger->addLog('Notification: is_installment: ' . ($this->is_installment ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_installment: ' . ($this->is_installment ? 'ok' : 'nok'));
     }
 
     /**
