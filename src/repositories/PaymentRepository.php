@@ -525,23 +525,25 @@ class PaymentRepository extends Repository
             case 'bancontact':
             case 'standard':
             case 'installment':
-                $returnUrl = $paymentDetails['paymentUrl'] ? $paymentDetails['paymentUrl'] :
-                    $paymentDetails['paymentReturnUrl'];
+            case 'integrated':
+                $returnUrl = $paymentDetails['paymentUrl']
+                    ? $paymentDetails['paymentUrl']
+                    : $paymentDetails['paymentReturnUrl'];
                 $paymentReturnUrl = [
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
+                if ($paymentDetails['isIntegrated']) {
+                    $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+                }
                 break;
             default:
                 return $this->returnPaymentError(
                     ['name' => 'paymentStored', 'value' => false],
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
-        }
-        if ($paymentDetails['isIntegrated']) {
-            $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
         }
 
         return [
