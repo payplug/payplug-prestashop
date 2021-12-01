@@ -31,7 +31,7 @@ function upgrade_module_2_11_0()
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
         return true;
     }
-    
+
     //sql
     $req_payplug_payment_cart = '
         ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`

@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\ValidateInterface;
-use \Validate;
+use Validate;
 
 class ValidateSpecific implements ValidateInterface
 {
