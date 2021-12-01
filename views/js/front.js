@@ -225,13 +225,13 @@ var $document, $window, payplugModule = {
 
                 });
 
-                $('#schemeOptions').change(function () {
+                $('select[name=schemeOptions]').on('change', function () {
                     // validate scheme options field on change
                     integrated.props.fieldsChange['changeScheme'] = true;
                     integrated.form.validateSelectOptions();
                 });
 
-                $('input[name=savecard]').change(function () {
+                $('input[name=savecard]').on('change', function () {
                     if ($(this).prop('checked')) {
                         integrated.props.save_card = true;
                     } else {
