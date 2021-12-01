@@ -27,7 +27,6 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class LoggerEntity
 {
-
     /** @var string */
     private $content;
 

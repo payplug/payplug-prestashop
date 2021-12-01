@@ -27,7 +27,7 @@ namespace PayPlug\tests\repositories;
 use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 class RepositoryBase extends TestCase
 {
