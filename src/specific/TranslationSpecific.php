@@ -24,7 +24,7 @@
 namespace PayPlug\src\specific;
 
 use PayPlug\src\interfaces\TranslationInterface;
-use \Translate;
+use Translate;
 
 class TranslationSpecific implements TranslationInterface
 {

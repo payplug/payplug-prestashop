@@ -63,7 +63,7 @@ function upgrade_module_2_18_0($object)
     } catch (PrestaShopDatabaseException $e) {
         $flag = false;
     }
-    
+
     if (!$object->installTab()) {
         $flag = false;
     }

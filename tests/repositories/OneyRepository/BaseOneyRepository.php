@@ -21,6 +21,7 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\classes\AmountCurrencyClass;

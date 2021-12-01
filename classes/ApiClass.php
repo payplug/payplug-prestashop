@@ -36,7 +36,6 @@ use Tools;
 
 class ApiClass
 {
-
     /** var Plugin */
     public $plugin;
 
@@ -83,7 +82,7 @@ class ApiClass
             \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
     }
-    
+
     /**
      * @description Check if account is premium
      *

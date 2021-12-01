@@ -1,18 +1,19 @@
 <?php
 
-$finder = PhpCsFixer\Finder::create()
+$finder = (new PhpCsFixer\Finder)
     ->exclude('test')
     ->exclude('vendor')
     ->exclude('translations')
     ->in(__DIR__)
 ;
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config)
     ->setUsingCache(false)
     ->setRules([
-        '@PSR2' => true,
-        'strict_param' => false,
-        'array_syntax' => ['syntax' => 'short'],
+        '@PSR12' => true,
+        'phpdoc_summary' => false,
+        'yoda_style' => false,
+        'visibility_required' => false,
     ])
     ->setFinder($finder)
 ;
