@@ -31,8 +31,6 @@ var $document, $window, payplugModule = {
         this.order.init();
         this.oney.init();
         this.popup.init();
-        this.integrated.init();
-
     },
     order: {
         init: function () {
@@ -151,83 +149,89 @@ var $document, $window, payplugModule = {
                     $cvv = $form.find('.-cvv'),
                     $exp = $form.find('.-exp');
 
-                if (typeof form == 'undefined') {
-                    const integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
-                    integrated.props.integratedPayment = integratedPayment;
-                    integratedPayment.setDisplayMode3ds(integrated.props.api.DisplayMode3ds.LIGHTBOX);
+                // check if form already exists
+                if ($form.is('.-loaded')) {
+                    return;
+                }
 
-                    form = {
-                        integratedPayment: integratedPayment,
-                        cardHolder: integratedPayment.cardHolder($cardholder.get(0)),
-                        pan: integratedPayment.cardNumber($pan.get(0)),
-                        cvv: integratedPayment.cvv($cvv.get(0)),
-                        exp: integratedPayment.expiration($exp.get(0)),
-                    };
+                var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                integrated.props.integratedPayment = integratedPayment;
+                integratedPayment.setDisplayMode3ds(integrated.props.api.DisplayMode3ds.LIGHTBOX);
 
-                    form.cardHolder.onChange((event) => {
-                        //validate card Holder field
-                        integrated.props.fieldsChange['changeCardHolder'] = true;
-                        integrated.form.validateSelectOptions();
+                form = {
+                    integratedPayment: integratedPayment,
+                    cardHolder: integratedPayment.cardHolder($cardholder.get(0)),
+                    pan: integratedPayment.cardNumber($pan.get(0)),
+                    cvv: integratedPayment.cvv($cvv.get(0)),
+                    exp: integratedPayment.expiration($exp.get(0)),
+                };
 
-                        if (!event.valid && $('#cardholder').text() != '') {
-                            var error = event.error;
-                            $('#errorCardHolder').html(error['name']);
-                        } else {
-                            integrated.props.fieldsValid['validCardHolder'] = true;
-                            $('.errorCB').empty();
-                        }
-                    });
+                $form.addClass('-loaded');
 
-                    form.pan.onChange((event) => {
-                        //validate pan field
-                        integrated.props.fieldsChange['changePan'] = true;
-                        integrated.props.changePan = true;
-                        integrated.form.validateSelectOptions();
-                        if (!event.valid) {
-                            integrated.props.notValid = true;
-                            var error = event.error;
-                            $('#errorCardPan').html(error['name'] + '<br>');
-                        } else {
-                            integrated.props.fieldsValid['validPan'] = true;
-                            $('.errorPan').empty();
-                        }
-                    });
-                    form.cvv.onChange((event) => {
-                        //validate cvv field
-                        integrated.props.fieldsChange['changeCvv'] = true;
-                        integrated.form.validateSelectOptions();
+                form.cardHolder.onChange(function(event){
+                    //validate card Holder field
+                    integrated.props.fieldsChange['changeCardHolder'] = true;
+                    integrated.form.validateSelectOptions();
 
-                        if (!event.valid) {
-                            integrated.props.notValid = true;
-                            var error = event.error;
-                            $('#errorCardCvv').html('<br>' + error['name'] + '<br>');
-                        } else {
-                            integrated.props.fieldsValid['validCvv'] = true;
-                            $('.errorCvv').empty();
-                        }
-                    });
+                    if (!event.valid && $('#cardholder').text() != '') {
+                        var error = event.error;
+                        $('#errorCardHolder').html(error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validCardHolder'] = true;
+                        $('.errorCB').empty();
+                    }
+                });
+                form.pan.onChange(function(event){
+                    //validate pan field
+                    integrated.props.fieldsChange['changePan'] = true;
+                    integrated.props.changePan = true;
+                    integrated.form.validateSelectOptions();
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardPan').html(error['name'] + '<br>');
+                    } else {
+                        integrated.props.fieldsValid['validPan'] = true;
+                        $('.errorPan').empty();
+                    }
+                });
+                form.cvv.onChange(function(event){
+                    //validate cvv field
+                    integrated.props.fieldsChange['changeCvv'] = true;
+                    integrated.form.validateSelectOptions();
 
-                    form.exp.onChange((event) => {
-                        //validate expiry date field
-                        integrated.props.fieldsChange['changeExp'] = true;
-                        integrated.form.validateSelectOptions();
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardCvv').html('<br>' + error['name'] + '<br>');
+                    } else {
+                        integrated.props.fieldsValid['validCvv'] = true;
+                        $('.errorCvv').empty();
+                    }
+                });
+                form.exp.onChange(function(event){
+                    //validate expiry date field
+                    integrated.props.fieldsChange['changeExp'] = true;
+                    integrated.form.validateSelectOptions();
 
-                        if (!event.valid) {
-                            integrated.props.notValid = true;
-                            var error = event.error;
-                            $('#errorCardExp').html('<br>' + error['name']);
-                        } else {
-                            integrated.props.fieldsValid['validExp'] = true;
-                            $('.errorExp').empty();
-                        }
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardExp').html('<br>' + error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validExp'] = true;
+                        $('.errorExp').empty();
+                    }
 
                 });
+
                 $('#schemeOptions').change(function () {
                     // validate scheme options field on change
                     integrated.props.fieldsChange['changeScheme'] = true;
                     integrated.form.validateSelectOptions();
                 });
-                $('#savecard').change(function () {
+
+                $('input[name=savecard]').change(function () {
                     if ($(this).prop('checked')) {
                         integrated.props.save_card = true;
                     } else {
@@ -235,26 +239,23 @@ var $document, $window, payplugModule = {
                     }
                 });
 
-                    integrated.props.form = form;
+                integrated.props.form = form;
 
-                    $document.on('submit', 'form', function (event) {
-                        if(integrated.props.submited) {
-                            integrated.props.integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
-                            integrated.form.getIntPaymentId();
-                            return false;
-                        }
-
-                        integrated.props.submited = true;
-                        integrated.form.getIntPaymentId();
-
+                $document.on('submit', 'form', function (event) {
+                    if(integrated.props.submited) {
                         return false;
-                    });
+                    }
 
-                    // Once an attempt has been made
-                    integratedPayment.onCompleted(function (event) {
-                        integrated.form.confirmIntPayment(event.token);
-                    });
-                }
+                    integrated.props.submited = true;
+                    integrated.form.getIntPaymentId();
+
+                    return false;
+                });
+
+                // Once an attempt has been made
+                integratedPayment.onCompleted(function (event) {
+                    integrated.form.confirmIntPayment(event.token);
+                });
             },
             validateSelectOptions: function (event) {
                 //validate selection options for schema
@@ -301,10 +302,11 @@ var $document, $window, payplugModule = {
 
                 var $fieldChange = integrated.props.fieldsChange,
                     $fieldsValid = integrated.props.fieldsValid;
-                if (!integrated.form.validateForm($fieldChange, $fieldsValid)) {
 
+                if (!integrated.form.validateForm($fieldChange, $fieldsValid)) {
                     return;
                 }
+
                 integrated.props.query = $.ajax({
                     type: 'POST',
                     url: payplug_ajax_url,
@@ -385,8 +387,7 @@ var $document, $window, payplugModule = {
             }
         },
     },
-
-        card: {
+    card: {
         props: {
             identifier: 'payplugCard',
             query: null,
@@ -937,11 +938,9 @@ var $document, $window, payplugModule = {
         removeSpinner: function() {
             $('.ipOverlay').remove();
         },
-
     },
-
-
 };
+
 $(document).ready(function () {
     $document = $(document);
     $window = $(window);

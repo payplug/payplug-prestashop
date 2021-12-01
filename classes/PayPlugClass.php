@@ -2496,6 +2496,8 @@ class PayPlugClass extends PaymentModule
             $payment_method = 'installment';
         } elseif ($options['is_bancontact']) {
             $payment_method = 'bancontact';
+        } elseif ($options['is_integrated']) {
+            $payment_method = 'integrated';
         } else {
             $payment_method = 'standard';
         }
@@ -2925,8 +2927,12 @@ class PayPlugClass extends PaymentModule
             /*
              * If timeout < 3 min and hash OK
              */
+            $store_payment = $this->payment->checkPaymentTable($cart->id);
+            $this->paymentDetails['paymentId'] = $store_payment['id_payment'];
+
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
-            if ($getpaymentReturnUrl['result'] && $getpaymentReturnUrl['url']) {
+
+            if ($getpaymentReturnUrl['result'] && isset($getpaymentReturnUrl['url']) && $getpaymentReturnUrl['url']) {
                 return $getpaymentReturnUrl['url'];
             } elseif (!$getpaymentReturnUrl['result']) {
                 return [
