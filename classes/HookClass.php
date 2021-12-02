@@ -29,6 +29,7 @@ use Dispatcher;
 use Media;
 use Module;
 use Product;
+use Configuration;
 use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
@@ -706,7 +707,10 @@ class HookClass
      */
     public function displayExpressCheckout($param)
     {
-        if (!$this->oney->isOneyAllowed()) {
+        if (!$this->oney->isOneyAllowed() ||
+            (string)$this->tools->tool('strtoupper', $this->context->language->iso_code) !=
+            Configuration::get('PAYPLUG_COMPANY_ISO')
+        ) {
             return false;
         }
 
@@ -820,7 +824,11 @@ class HookClass
     public function displayProductPriceBlock($param)
     {
         $current_controller = Dispatcher::getInstance()->getController();
-        if (!$this->oney->isOneyAllowed() || $current_controller != 'product') {
+
+        if (!$this->oney->isOneyAllowed()
+            || $current_controller != 'product'
+            || (string)$this->tools->tool('strtoupper', $this->context->language->iso_code) !=
+            Configuration::get('PAYPLUG_COMPANY_ISO')) {
             return false;
         }
 
