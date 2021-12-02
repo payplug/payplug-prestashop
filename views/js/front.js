@@ -261,7 +261,7 @@ var $document, $window, payplugModule = {
                 //validate selection options for schema
 
                 $('.errorScheme').empty();
-                var selected_options = $("#schemeOptions option:selected").val();
+                var selected_options = $('select[name=schemeOptions]').val();
                 if (selected_options !== "auto") {
                     payplugModule.integrated.props.notValid = true;
                     $('#errorCardScheme').html('<br>' + 'Scheme card is mandatory');
