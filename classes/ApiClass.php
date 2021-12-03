@@ -78,7 +78,9 @@ class ApiClass
                 $dotenv->load($dotenvFile);
             }
         }
-        if (isset($_ENV['API_BASE_URL'])) {
+        if (Configuration::get('API_BASE_URL') !== null) {
+            \Payplug\Core\APIRoutes::setApiBaseUrl(Configuration::get('API_BASE_URL'));
+        } elseif (Configuration::get('API_BASE_URL') === null && isset($_ENV['API_BASE_URL'])) {
             \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
     }
