@@ -178,7 +178,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardHolder').html(error['name']);
                     } else {
                         integrated.props.fieldsValid['validCardHolder'] = true;
-                        $('.errorCB').empty();
+                        $('#errorCardHolder').empty();
                     }
                 });
                 form.pan.onChange(function(event){
@@ -192,7 +192,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardPan').html(error['name'] + '<br>');
                     } else {
                         integrated.props.fieldsValid['validPan'] = true;
-                        $('.errorPan').empty();
+                        $('#errorCardPan').empty();
                     }
                 });
                 form.cvv.onChange(function(event){
@@ -206,7 +206,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardCvv').html('<br>' + error['name'] + '<br>');
                     } else {
                         integrated.props.fieldsValid['validCvv'] = true;
-                        $('.errorCvv').empty();
+                        $('#errorCardCvv').empty();
                     }
                 });
                 form.exp.onChange(function(event){
@@ -220,7 +220,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardExp').html('<br>' + error['name']);
                     } else {
                         integrated.props.fieldsValid['validExp'] = true;
-                        $('.errorExp').empty();
+                        $('#errorCardExp').empty();
                     }
 
                 });
@@ -260,11 +260,12 @@ var $document, $window, payplugModule = {
             validateSelectOptions: function (event) {
                 //validate selection options for schema
 
-                $('.errorScheme').empty();
+                var schemeError= $('#errorCardScheme');
+                schemeError.empty();
                 var selected_options = $('select[name=schemeOptions]').val();
                 if (selected_options !== "auto") {
                     payplugModule.integrated.props.notValid = true;
-                    $('#errorCardScheme').html('<br>' + 'Scheme card is mandatory');
+                    schemeError.html('<br>' + 'Scheme card is mandatory');
                 } else {
                     payplugModule.integrated.props.fieldsValid['validScheme'] = true;
                 }
