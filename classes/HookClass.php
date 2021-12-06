@@ -794,9 +794,9 @@ class HookClass
         $payplug_ajax_url = $this->context->link->getModuleLink($this->payplug->name, 'ajax', [], true);
         $dotenv = new Dotenv();
         $dotenvFile = dirname(dirname(dirname(__FILE__))) . "/payplugroutes/.env";
-        if (Configuration::get('PAYPLUG_SECURE_DOMAIN') !== null) {
+        if (Configuration::get('PAYPLUG_SECURE_DOMAIN') && Configuration::get('PAYPLUG_SECURE_DOMAIN') !== null) {
             $payplug_domain = Configuration::get('PAYPLUG_SECURE_DOMAIN');
-        } elseif (file_exists($dotenvFile) && Configuration::get('PAYPLUG_SECURE_DOMAIN') === null) {
+        } elseif (file_exists($dotenvFile) && (!Configuration::get('PAYPLUG_SECURE_DOMAIN') || Configuration::get('PAYPLUG_SECURE_DOMAIN') === null)) {
             $dotenv->load($dotenvFile);
             $payplug_domain = $_ENV['PAYPLUG_DOMAIN'];
         } else {

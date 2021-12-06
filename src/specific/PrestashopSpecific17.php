@@ -109,9 +109,9 @@ class PrestashopSpecific17
     {
         $dotenv = new Dotenv();
         $dotenvFile = dirname(__FILE__, 4) . "/payplugroutes/.env";
-        if (Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN') !== null) {
+        if (Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN') && Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN') !== null) {
             $integrated_payment_js_url = Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN');
-        } elseif (file_exists($dotenvFile) && Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN') === null) {
+        } elseif ((!Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN') || Configuration::get('PAYPLUG_INTEGRATED_PAYMENT_DOMAIN') === null) && file_exists($dotenvFile)) {
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
         } else {

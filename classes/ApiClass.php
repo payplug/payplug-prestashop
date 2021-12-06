@@ -78,9 +78,9 @@ class ApiClass
                 $dotenv->load($dotenvFile);
             }
         }
-        if (Configuration::get('PAYPLUG_API_BASE_URL') !== null) {
+        if (Configuration::get('PAYPLUG_API_BASE_URL') && Configuration::get('PAYPLUG_API_BASE_URL') !== null) {
             \Payplug\Core\APIRoutes::setApiBaseUrl(Configuration::get('PAYPLUG_API_BASE_URL'));
-        } elseif (Configuration::get('PAYPLUG_API_BASE_URL') === null && isset($_ENV['API_BASE_URL'])) {
+        } elseif ((!Configuration::get('PAYPLUG_API_BASE_URL') || Configuration::get('PAYPLUG_API_BASE_URL') === null) && isset($_ENV['API_BASE_URL'])) {
             \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
     }
