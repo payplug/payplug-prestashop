@@ -367,6 +367,7 @@ var $document, $window, payplugModule = {
                         console.log(textStatus);
                         console.log(errorThrown);
                         payplugModule.popup.set("error");
+                        integrated.props.submited = false;
                     },
                     success: function (data) {
                         payplugModule.tools.removeSpinner();
@@ -374,6 +375,7 @@ var $document, $window, payplugModule = {
                             window.location.href = data.return_url;
                         } else {
                             payplugModule.popup.set(integratedPaymentError);
+                            integrated.props.submited = false;
                             form.cardHolder.clear();
                             form.pan.clear();
                             form.cvv.clear();
