@@ -41,8 +41,8 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         parent::setUp();
 
         $this->limits = [
-            'min' => 10000,
-            'max' => 300000
+            'min' => 100,
+            'max' => 3000
         ];
 
         $this->repo
@@ -54,6 +54,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
     public function testWithTooLowAmount()
     {
         $amount = 99;
+        $this->repo->isValidOneyAmount($amount);
 
         $this->assertSame(
             [

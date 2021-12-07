@@ -100,7 +100,7 @@ class HookRepository extends Repository
      * @param $param
      * @return mixed
      */
-    public function displayAdminStatusesForm($param)
+    public function displayAdminStatusesForm()
     {
         $types = [
             'undefined' => $this->l('hook.displayAdminStatusesForm.undefined'),

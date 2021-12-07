@@ -325,7 +325,7 @@ class PayPlugClass extends PaymentModule
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
         $this->oneyLogoUrl = '';
-        $this->version = '3.4.0';
+        $this->version = '3.5.0';
 
         $this->initializeAccessors();
 
@@ -2205,9 +2205,8 @@ class PayPlugClass extends PaymentModule
         if (!$this->oney->isOneyAllowed()) {
             return false;
         }
-
         $amount = $params['cart']->getOrderTotal(true, Cart::BOTH);
-        $is_valid_amount = $this->oney->isValidOneyAmount($amount, $params['cart']->id_currency);
+        $is_valid_amount = $this->oney->isValidOneyAmount($amount);
 
         $this->smarty->assign([
             'payplug_oney_amount' => $amount,
@@ -2292,7 +2291,7 @@ class PayPlugClass extends PaymentModule
                 $quantity
             );
             $amount = $product_price * $quantity;
-            $is_elligible = $this->oney->isValidOneyAmount($amount, $this->context->currency->id);
+            $is_elligible = $this->oney->isValidOneyAmount($amount);
             $is_elligible = $is_elligible['result'];
 
             $this->smarty->assign([
@@ -2467,7 +2466,7 @@ class PayPlugClass extends PaymentModule
 
         // Amount
         $amount = $cart->getOrderTotal(true, Cart::BOTH);
-        $amount = (int)(round(($amount * 100), PHP_ROUND_HALF_UP));
+        $amount = $this->amountCurrencyClass->convertAmount($amount);
         $current_amounts = $this->amountCurrencyClass->getAmountsByCurrency($currency);
         if ($amount < $current_amounts['min_amount'] || $amount > $current_amounts['max_amount']) {
             // todo: add error log
@@ -2488,7 +2487,7 @@ class PayPlugClass extends PaymentModule
             'cancel' => $this->context->link->getModuleLink(
                 $this->name,
                 'validation',
-                ['ps' => 2, 'cartid' => (int)$cart->id, 'step' => 3],
+                ['ps' => 2, 'cartid' => (int)$cart->id],
                 true
             ),
             'notification' => $this->context->link->getModuleLink($this->name, 'ipn', [], true)
@@ -3276,7 +3275,12 @@ class PayPlugClass extends PaymentModule
                         break;
                     case 'invalid_amount_bottom':
                     case 'invalid_amount_top':
-                        $err_label = $this->l('payplug.getPaymentOptions.invalidAmount');
+                        $limits = $this->oney->getOneyPriceLimit(true);
+                        $err_label = sprintf(
+                            $this->l('payplug.getPaymentOptions.invalidAmount'),
+                            $limits['min'],
+                            $limits['max']
+                        );
                         break;
                     case 'invalid_carrier':
                         $err_label = $this->l('payplug.getPaymentOptions.invalidCarrier');
@@ -3302,6 +3306,7 @@ class PayPlugClass extends PaymentModule
                 $text = $use_fees
                     ? $this->l('payplug.getPaymentOptions.payWithOney')
                     : $this->l('payplug.getPaymentOptions.payWithOneyWithout');
+
                 $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
                 if ($optimized) {

@@ -118,11 +118,9 @@ class OneyRepository extends Repository
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart);
         } else {
-            $id_currency = $this->contextSpecific->getContext()->currency->id;
             $amount = $cart->getOrderTotal(true, \Cart::BOTH);
-            $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+            $is_elligible = $this->isValidOneyAmount($amount);
         }
-
         $this->assign->assign([
             'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
             'payplug_oney' => true,
@@ -157,8 +155,7 @@ class OneyRepository extends Repository
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart, $amount, $country);
         } else {
-            $id_currency = $this->contextSpecific->getContext()->currency->id;
-            $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+            $is_elligible = $this->isValidOneyAmount($amount);
         }
 
         if ($is_elligible['result']) {
@@ -195,16 +192,13 @@ class OneyRepository extends Repository
     public function assignLegalNotice()
     {
         $limits = $this->getOneyPriceLimit();
-        $minAmount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-        $maxAmount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
         $learnMoreLink = $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO') == 'IT' &&
             $this->toolsSpecific->tool('strtolower', $this->contextSpecific->getContext()->language->iso_code) == 'it';
-
         $this->assign->assign([
             'learnMoreLink' => (bool)$learnMoreLink,
             'oneyWithFees' => (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES'),
-            'oneyMinAmounts' => $this->toolsSpecific->tool('displayPrice', $minAmount),
-            'oneyMaxAmounts' => $this->toolsSpecific->tool('displayPrice', $maxAmount),
+            'oneyMinAmounts' => $this->toolsSpecific->tool('displayPrice', $limits['min']),
+            'oneyMaxAmounts' => $this->toolsSpecific->tool('displayPrice', $limits['max']),
             'oneyUrl' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
         ]);
     }
@@ -384,7 +378,7 @@ class OneyRepository extends Repository
                 } else {
                     $amount = 0;
                 }
-                $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+                $is_elligible = $this->isValidOneyAmount($amount);
             }
 
             $oneyImageOptimized = '/modules/payplug/views/img/oney/x3x4_with';
@@ -714,8 +708,7 @@ class OneyRepository extends Repository
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart, $amount, $country);
         } else {
-            $id_currency = $this->contextSpecific->getContext()->currency->id;
-            $is_elligible = $this->isValidOneyAmount($amount, $id_currency);
+            $is_elligible = $this->isValidOneyAmount($amount);
         }
 
         if ($is_elligible['result']) {
@@ -749,7 +742,6 @@ class OneyRepository extends Repository
 
         $popin_tpl = $this->displayOneyPopin();
         $payment_tpl = $this->displayOneyPaymentOptions();
-
         return [
             'result' => $is_elligible['result'] && $oney_payment_options,
             'error' => $error,
@@ -758,13 +750,35 @@ class OneyRepository extends Repository
         ];
     }
 
+
+    /**
+     * @description   get custom oney ammount from BO form
+     * @param $custom_oney_amount
+     * @return string
+     */
+    public function setCustomOneyLimit($custom_oney_amount)
+    {
+        $config = $this->configurationSpecific;
+        $tools = $this->toolsSpecific;
+
+        $id_currency = $config->get('PS_CURRENCY_DEFAULT');
+        $currency = $this->currencySpecific->getCurrency($id_currency);
+
+        $iso_code = $tools->tool('strtoupper', $currency->iso_code);
+
+        $oneyAmount = [
+            'currency' => $iso_code . ':',
+            'ammount' => $custom_oney_amount,
+        ];
+        return implode($oneyAmount);
+    }
     /**
      * @description Get Oney price limit
      *
      * @param boolean $id_currency
      * @return array
      */
-    public function getOneyPriceLimit($id_currency = false)
+    public function getOneyPriceLimit($custom = true, $id_currency = false)
     {
         $config = $this->configurationSpecific;
         $tools = $this->toolsSpecific;
@@ -793,10 +807,17 @@ class OneyRepository extends Repository
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
-        $oney_min_amounts = explode(
-            ',',
-            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MIN_AMOUNTS'))
-        );
+        if ($custom == true) {
+            $oney_min_amounts = explode(
+                ',',
+                $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS'))
+            );
+        } else {
+            $oney_min_amounts = explode(
+                ',',
+                $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MIN_AMOUNTS'))
+            );
+        }
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -804,11 +825,17 @@ class OneyRepository extends Repository
                 break;
             }
         }
-
-        $oney_max_amounts = explode(
-            ',',
-            $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MAX_AMOUNTS'))
-        );
+        if ($custom) {
+            $oney_max_amounts = explode(
+                ',',
+                $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS'))
+            );
+        } else {
+            $oney_max_amounts = explode(
+                ',',
+                $tools->tool('strtoupper', $config->get('PAYPLUG_ONEY_MAX_AMOUNTS'))
+            );
+        }
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
@@ -1192,9 +1219,9 @@ class OneyRepository extends Repository
 
         // check if current amount is between min and max values
         $amount = $amount ? $amount : $cart->getOrderTotal(true, \Cart::BOTH);
-        $is_valid_amount = $this->isValidOneyAmount($amount, $cart->id_currency);
+        $is_valid_amount = $this->isValidOneyAmount($amount);
         if (!$is_valid_amount['result']) {
-            $limits = $this->getOneyPriceLimit($cart->id_currency);
+            $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
             $converted_amount = $this->amountCurrencyClass->convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
@@ -1240,27 +1267,22 @@ class OneyRepository extends Repository
      * @description Check if amount is valid for Oney
      *
      * @param float $amount
-     * @param boolean $id_currency
      * @return array
      */
-    public function isValidOneyAmount($amount, $id_currency = false)
+    public function isValidOneyAmount($amount)
     {
-        $limits = $this->getOneyPriceLimit($id_currency);
-        $convert_amount = $this->amountCurrencyClass->convertAmount($amount);
+        $limits = $this->getOneyPriceLimit();
+        $convert_amount = ($this->amountCurrencyClass->convertAmount($amount)) / 100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
-            $min_amount = $this->amountCurrencyClass->convertAmount($limits['min'], true);
-            $max_amount = $this->amountCurrencyClass->convertAmount($limits['max'], true);
-
             return [
                 'result' => false,
                 'error' => sprintf(
                     $this->l('The total amount of your order should be between %s and %s to pay with Oney.'),
-                    $this->toolsSpecific->tool('displayPrice', $min_amount),
-                    $this->toolsSpecific->tool('displayPrice', $max_amount)
+                    $this->toolsSpecific->tool('displayPrice', $limits['min']),
+                    $this->toolsSpecific->tool('displayPrice', $limits['max'])
                 )
             ];
         }
-
         return ['result' => true, 'error' => false];
     }
 

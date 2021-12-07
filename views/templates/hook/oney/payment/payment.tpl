@@ -28,7 +28,7 @@
         {/if}
         <img src="{$oney_logo|escape:'htmlall':'UTF-8'}"
                      alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}"
-                    class="oneyLogo {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
+                    class="oneyLogo -optimized-16 {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
         <span class="oneyPayment_label">
             {if isset($use_fees) && !$use_fees}
                 {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}

@@ -98,9 +98,8 @@ class PrestashopSpecific16
                 $is_elligible = $this->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
-                $id_currency = $this->contextSpecific->currency->id;
                 $amount = $cart->getOrderTotal(true, Cart::BOTH);
-                $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
+                $is_elligible = $this->oney->isValidOneyAmount($amount);
                 $error = !$is_elligible['result'];
             }
 

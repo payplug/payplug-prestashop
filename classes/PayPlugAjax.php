@@ -133,12 +133,10 @@ class PayPlugAjax
                         $quantity
                     );
                     $amount = $product_price * $quantity;
-                    $id_currency = $context->currency->id;
-                    $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount);
                 } elseif (((int)$tools->tool('getValue', 'is_summary_cta')) === 1) {
                     $amount = $context->cart->getOrderTotal($use_taxes);
-                    $id_currency = $context->currency->id;
-                    $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency);
+                    $is_elligible = $this->oney->isValidOneyAmount($amount);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
                     $cart = $context->cart;
@@ -149,8 +147,7 @@ class PayPlugAjax
                     if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
                         $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
                     } else {
-                        $id_currency = $context->currency->id;
-                        $is_elligible = $this->oney->isValidOneyAmount($amount, $id_currency, $iso_code);
+                        $is_elligible = $this->oney->isValidOneyAmount($amount);
                     }
                 }
 

@@ -495,10 +495,10 @@ var $document,
                     payplugModule.oney.popin.close();
                 },
                 handleProductEvent: function () {
-                    $document.on('click', '.product_quantity_down, .product_quantity_up', function () {
+                    $document.on('click', '.product_quantity_down, .product_quantity_up, #attributes a', function () {
                         return payplugModule.oney.load(payplugModule.oney.payment.props.open);
                     });
-                    $document.on('change', 'input[name=qty]', function () {
+                    $document.on('change', 'input[name=qty], #attributes', function () {
                         return payplugModule.oney.load(payplugModule.oney.payment.props.open);
                     });
                 },
