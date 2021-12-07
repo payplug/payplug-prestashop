@@ -124,7 +124,7 @@ class PrestashopSpecific17
         ];
 
         $integrated['action'] = 'javascript:payplugModule.integrated.form.getIntPaymentId();';
-        $integrated['logo'] = false;
+        $integrated['logo'] = $payment_options['standard']['logo'];
         $integrated['moduleName'] = 'payplug';
         $integrated['callToActionText'] = $this->payplug->l('specific17.setIntegratedPaymentOption.name', 'prestashopspecific17');
         $integrated['tpl'] = 'integrated_payment.tpl';
