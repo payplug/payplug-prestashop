@@ -406,7 +406,7 @@ class OrderStateRepository extends Repository
             return false;
         }
 
-        if ($old_type = $this->getType($id_order_state)) {
+        if ($this->getType($id_order_state)) {
             return $this->updateType($id_order_state, $type);
         }
 

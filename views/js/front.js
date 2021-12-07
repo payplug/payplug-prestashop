@@ -167,9 +167,7 @@ var $document, $window, payplugModule = {
             this.cta.init();
             this.required.init();
 
-            $window.on('load', function () {
-                oney.load();
-            });
+            oney.load();
 
             var popin = oney.cta.popin;
             prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
@@ -232,6 +230,7 @@ var $document, $window, payplugModule = {
                         oney.cta.disable();
                     }
                 }
+
             });
         },
         loader: {

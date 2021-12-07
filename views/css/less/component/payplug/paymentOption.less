@@ -6,7 +6,7 @@
   }
   img {
     margin: 0 12px 0 5px;
-    width: 200px;
+    max-height: 30px;
 
     @media (@tablet) {
       display: none;
@@ -15,6 +15,11 @@
   &.with_fees {
     img {
       width: 150px;
+    }
+  }
+  &.without_fees {
+    img {
+      width: 200px;
     }
   }
   .custom-radio {
