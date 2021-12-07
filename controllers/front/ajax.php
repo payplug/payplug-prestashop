@@ -224,46 +224,47 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     )
                     );
                 } else {
-                    $payment = $this->payplug->preparePayment(['is_integrated' => 1]);
+                    $payment = $this->payplug->preparePayment([
+                        'is_integrated' => 1,
+                        'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED')
+                    ]);
                     die(json_encode($payment));
                 }
             } elseif ($tools->tool('getIsset', 'confirmIP')) {
                 $payment_id = $tools->tool('getValue', 'pay_id');
+
+                // Check payment correspondence
                 $current_payment_id = $this->payplug->getPaymentByCart($context->cart->id);
                 if ($payment_id != $current_payment_id) {
-                    die(
-                    json_encode(
-                        [
-                            'result' => false,
-                        ]
-                    )
-                    );
-                }
-                $payment = $this->payplug->retrievePayment($payment_id);
-                if ($payment->is_paid && !$payment->failure) {
-                    $return_url = $context->link->getModuleLink(
-                        $this->payplug->name,
-                        'validation',
-                        ['ps' => 1, 'cartid' => (int)$context->cart->id],
-                        true
-                    );
-                    die(
-                    json_encode(
-                        [
-                            'result' => true,
-                            'return_url' => $return_url,
-                            'message' => 'Success'
-                        ]
-                    )
-                    );
-                }
-                die(
-                json_encode(
-                    [
+                    die(json_encode([
                         'result' => false,
-                    ]
-                )
+                        'message' => 'invalid payment id'
+                    ]));
+                }
+
+                // Retrieve payment
+                $payment = $this->payplug->retrievePayment($payment_id);
+
+                // Check if payment has failure
+                if ($payment->failure != null) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $payment->failure->message
+                    ]));
+                }
+
+                $return_url = $context->link->getModuleLink(
+                    $this->payplug->name,
+                    'validation',
+                    ['ps' => 1, 'cartid' => (int)$context->cart->id],
+                    true
                 );
+
+                die(json_encode([
+                    'result' => true,
+                    'return_url' => $return_url,
+                    'message' => 'Success'
+                ]));
             }
         }
     }
