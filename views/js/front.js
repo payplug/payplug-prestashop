@@ -173,7 +173,7 @@ var $document, $window, payplugModule = {
                     integrated.props.fieldsChange['changeCardHolder'] = true;
                     integrated.form.validateSelectOptions();
 
-                    if (!event.valid && $('#cardholder').text() != '') {
+                    if (!event.valid) {
                         var error = event.error;
                         $('#errorCardHolder').html(error['name']);
                     } else {
