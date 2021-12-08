@@ -211,7 +211,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             $this->translate->translate(3) : //('Your information has been saved') :
                             $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
-                    ]));
+                ]));
             } elseif ($tools->tool('getIsset', 'createIP')) {
                 $token = $tools->tool('getValue', 'token');
                 if ($token == false) {
@@ -232,13 +232,23 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
             } elseif ($tools->tool('getIsset', 'confirmIP')) {
                 $payment_id = $tools->tool('getValue', 'pay_id');
+                $cart_id = $tools->tool('getValue', 'cart_id');
 
                 // Check payment correspondence
-                $current_payment_id = $this->payplug->getPaymentByCart($context->cart->id);
+                $query = $this->plugin->getQuery();
+
+                // todo: request should not be here but to many different method are used to get the payment
+                // todo: extract this part with PaymentClass
+                $current_payment_id = $query
+                    ->select()
+                    ->fields('id_payment')
+                    ->from(_DB_PREFIX_ . 'payplug_payment')
+                    ->where('id_cart = ' . $cart_id)
+                    ->build('unique_value');
                 if ($payment_id != $current_payment_id) {
                     die(json_encode([
                         'result' => false,
-                        'message' => 'invalid payment id'
+                        'message' => 'invalid payment id, giver: ' . $payment_id . ' and current :' . $current_payment_id
                     ]));
                 }
 
@@ -253,10 +263,24 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
+                // Check if payment is paid
+                $is_payment_deferred = isset($payment->authorization) && $payment->authorization;
+                if (!$payment->is_paid && !$is_payment_deferred) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Payment is not paid'
+                    ]));
+                } elseif (isset($payment->authorization->authorized_at) && !$payment->authorization->authorized_at) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Deferred payment is not authorized'
+                    ]));
+                }
+
                 $return_url = $context->link->getModuleLink(
                     $this->payplug->name,
                     'validation',
-                    ['ps' => 1, 'cartid' => (int)$context->cart->id],
+                    ['ps' => 1, 'cartid' => (int)$cart_id],
                     true
                 );
 

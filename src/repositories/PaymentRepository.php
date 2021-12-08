@@ -537,6 +537,7 @@ class PaymentRepository extends Repository
                 ];
                 if ($paymentDetails['isIntegrated']) {
                     $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+                    $paymentReturnUrl['cart_id'] = $paymentDetails['cartId'];
                 }
                 break;
             default:
