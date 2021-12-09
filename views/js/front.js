@@ -40,7 +40,7 @@ var $document, $window, payplugModule = {
 
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
-                if ($form.find('input[name=method]').val()=="oney") {
+                if ($form.find('input[name=method]').val() == "oney") {
                     if ($form.find('input[name=oney_type]').val().includes("without_fees")) {
                         $('#' + this.id + '-container').addClass('without_fees');
                     } else if ($form.find('input[name=oney_type]').val().includes("with_fees")) {
@@ -92,6 +92,7 @@ var $document, $window, payplugModule = {
     integrated: {
         props: {
             identifier: 'payplugIntegratedPayment',
+            cartId: null,
             paymentId: null,
             paymentOptionId: null,
             form: {},
@@ -168,7 +169,7 @@ var $document, $window, payplugModule = {
 
                 $form.addClass('-loaded');
 
-                form.cardHolder.onChange(function(event){
+                form.cardHolder.onChange(function (event) {
                     //validate card Holder field
                     integrated.props.fieldsChange['changeCardHolder'] = true;
                     integrated.form.validateSelectOptions();
@@ -181,7 +182,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardHolder').empty();
                     }
                 });
-                form.pan.onChange(function(event){
+                form.pan.onChange(function (event) {
                     //validate pan field
                     integrated.props.fieldsChange['changePan'] = true;
                     integrated.props.changePan = true;
@@ -195,7 +196,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardPan').empty();
                     }
                 });
-                form.cvv.onChange(function(event){
+                form.cvv.onChange(function (event) {
                     //validate cvv field
                     integrated.props.fieldsChange['changeCvv'] = true;
                     integrated.form.validateSelectOptions();
@@ -209,7 +210,7 @@ var $document, $window, payplugModule = {
                         $('#errorCardCvv').empty();
                     }
                 });
-                form.exp.onChange(function(event){
+                form.exp.onChange(function (event) {
                     //validate expiry date field
                     integrated.props.fieldsChange['changeExp'] = true;
                     integrated.form.validateSelectOptions();
@@ -242,7 +243,7 @@ var $document, $window, payplugModule = {
                 integrated.props.form = form;
 
                 $document.on('submit', 'form', function (event) {
-                    if(integrated.props.submited) {
+                    if (integrated.props.submited) {
                         return false;
                     }
 
@@ -260,16 +261,15 @@ var $document, $window, payplugModule = {
             validateSelectOptions: function (event) {
                 //validate selection options for schema
 
-                var schemeError= $('#errorCardScheme');
+                var schemeError = $('#errorCardScheme');
                 schemeError.empty();
                 var selected_options = $('select[name=schemeOptions]').val();
                 if (selected_options !== "auto") {
                     payplugModule.integrated.props.notValid = true;
-                    schemeError.html('<br>' + 'Scheme card is mandatory');
+                    schemeError.html('Scheme card is mandatory');
                 } else {
                     payplugModule.integrated.props.fieldsValid['validScheme'] = true;
                 }
-
             },
             validateForm: function (fieldsChange, fieldsValid) {
                 // valide integrated payment form
@@ -305,6 +305,7 @@ var $document, $window, payplugModule = {
                     $fieldsValid = integrated.props.fieldsValid;
 
                 if (!integrated.form.validateForm($fieldChange, $fieldsValid)) {
+                    integrated.props.submited = false;
                     return;
                 }
 
@@ -319,6 +320,7 @@ var $document, $window, payplugModule = {
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         alert('error CREATING PAYMENT ID');
+                        integrated.props.submited = false;
                         console.log(jqXHR);
                         console.log(textStatus);
                         console.log(errorThrown);
@@ -326,17 +328,17 @@ var $document, $window, payplugModule = {
                     success: function (result) {
                         if (result && result.payment_id) {
                             integrated.props.paymentId = result.payment_id;
+                            integrated.props.cart_id = result.cart_id;
                             integrated.form.submitIntPayment();
-
-
                         } else {
                             payplugModule.popup.set(integratedPaymentError);
+                            integrated.props.submited = false;
                             return false;
                         }
                     },
                 });
             },
-            submitIntPayment : function () {
+            submitIntPayment: function () {
                 // create an integrated payment
 
                 var integrated = payplugModule.integrated,
@@ -345,7 +347,7 @@ var $document, $window, payplugModule = {
 
                 integratedPayment.pay(paymentId, Payplug.Scheme.AUTO, {save_card: integrated.props.save_card});
             },
-            confirmIntPayment : function (token) {
+            confirmIntPayment: function (token) {
                 payplugModule.tools.loadSpinner();
                 // confirm creation integrated paiement or show fail popup
                 var integrated = payplugModule.integrated;
@@ -361,6 +363,7 @@ var $document, $window, payplugModule = {
                     data: {
                         _ajax: 1,
                         confirmIP: 1,
+                        cart_id: integrated.props.cart_id,
                         pay_id: token,
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -394,7 +397,7 @@ var $document, $window, payplugModule = {
         props: {
             identifier: 'payplugCard',
             query: null,
-            id_card : 0,
+            id_card: 0,
         },
         init: function () {
             var card = payplugModule.card,
@@ -422,27 +425,27 @@ var $document, $window, payplugModule = {
                 card = payplugModule.card,
                 identifier = card.props.identifier;
 
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    dataType: 'json',
-                    data: {
-                        delete: 1,
-                        pc: id_card
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert('error CALL DELETE CARD');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
-                    },
-                    success: function (result) {
-                        if (result) {
-                                $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
-                                payplugModule.popup.setDeleteCardPopup(card_deleted_msg);
-                        }
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: {
+                    delete: 1,
+                    pc: id_card
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('error CALL DELETE CARD');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (result) {
+                    if (result) {
+                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                        payplugModule.popup.setDeleteCardPopup(card_deleted_msg);
                     }
-                });
+                }
+            });
         },
     },
     oney: {
@@ -478,7 +481,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
-            };
+                };
 
             if (with_schedule) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
@@ -883,7 +886,7 @@ var $document, $window, payplugModule = {
 
 
         },
-        setDeleteCardPopup:  function (content) {
+        setDeleteCardPopup: function (content) {
             var popup = payplugModule.popup,
                 props = popup.props;
             popup.create();
@@ -905,7 +908,6 @@ var $document, $window, payplugModule = {
 
             popin.removeClass('-show');
             popin.removeClass('-open');
-
 
 
         },
@@ -936,7 +938,7 @@ var $document, $window, payplugModule = {
             $('.ipOverlay').removeClass('-disabled');
             $('.ipOverlay').addClass('-show');
         },
-        removeSpinner: function() {
+        removeSpinner: function () {
             $('.ipOverlay').remove();
         },
     },
