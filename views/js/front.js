@@ -328,8 +328,8 @@ var $document, $window, payplugModule = {
                             return false;
                         }
 
-                    integrated.props.submited = true;
-                    integrated.form.getIntPaymentId();
+                        integrated.props.submited = true;
+                        integrated.form.getIntPaymentId();
 
                         return false;
                     }
