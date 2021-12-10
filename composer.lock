@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f291c5ad6bd2340a2c71dc1d48561061",
+    "content-hash": "57860b3ed0f0b75054a06fb49eb9470c",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -125,16 +125,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "3.3.3",
+            "version": "dev-update-ca-certificate-2021",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "b0c2edf22b46ffbade9550db97bfb0f86cfbb5a3"
+                "reference": "c99d8f3fd17dbd4e0a206b325e8c45f1b77a0f85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/b0c2edf22b46ffbade9550db97bfb0f86cfbb5a3",
-                "reference": "b0c2edf22b46ffbade9550db97bfb0f86cfbb5a3",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/c99d8f3fd17dbd4e0a206b325e8c45f1b77a0f85",
+                "reference": "c99d8f3fd17dbd4e0a206b325e8c45f1b77a0f85",
                 "shasum": ""
             },
             "require": {
@@ -144,7 +144,7 @@
             },
             "require-dev": {
                 "phpdocumentor/phpdocumentor": "2.*",
-                "phpunit/phpunit": "4.6.*"
+                "phpunit/phpunit": "5.7.*"
             },
             "type": "library",
             "autoload": {
@@ -167,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2015-05-06T00:00:00+00:00"
+            "time": "2021-12-10T13:03:19+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
