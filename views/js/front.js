@@ -304,6 +304,8 @@ var $document, $window, payplugModule = {
                 var $fieldChange = integrated.props.fieldsChange,
                     $fieldsValid = integrated.props.fieldsValid;
 
+                $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
+
                 if (!integrated.form.validateForm($fieldChange, $fieldsValid)) {
                     integrated.props.submited = false;
                     return;
@@ -378,15 +380,17 @@ var $document, $window, payplugModule = {
                         if (data.result) {
                             window.location.href = data.return_url;
                         } else {
-                            payplugModule.popup.set(integratedPaymentError);
+                            $('.' + integrated.props.identifier + '_error.-payment')
+                                .text(integratedPaymentError)
+                                .addClass('-show');
                             integrated.props.submited = false;
                             form.cardHolder.clear();
                             form.pan.clear();
                             form.cvv.clear();
                             form.exp.clear();
+                            $('input[name="savecard"]').prop('checked', false);
                             return false;
                         }
-
                     },
                 });
 
@@ -927,7 +931,6 @@ var $document, $window, payplugModule = {
             var props = payplugModule.popup.props;
             $('.' + props.identifier + '_content').html(content);
         }
-
     },
     tools: {
         loadSpinner: function () {
