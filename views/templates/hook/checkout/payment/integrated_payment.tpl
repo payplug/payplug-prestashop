@@ -23,6 +23,8 @@
             <label for="savecard">{l s='hook.integratedPayment.savecard' mod='payplug'}</label>
         </div>
     {/if}
+
+    <div class="payplugIntegratedPayment_error -payment"></div>
 </form>
 <script type="text/javascript">
     {literal}

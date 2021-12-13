@@ -801,11 +801,7 @@ class HookClass
             $payplug_domain = "https://secure.payplug.com";
         }
 
-        $integratedPaymentError = str_replace(["\r", "\n"], '', $this->payplug->mediaClass->displayMessages(
-            [$this->payplug->l('hook.header.integratedPayment.error', 'hookclass')],
-            true,
-            false
-        ));
+        $integratedPaymentError = $this->payplug->l('hook.header.integratedPayment.error', 'hookclass');
 
         Media::addJsDef(
             [
