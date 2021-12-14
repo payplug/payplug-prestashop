@@ -161,10 +161,10 @@ var $document, $window, payplugModule = {
 
                 form = {
                     integratedPayment: integratedPayment,
-                    cardHolder: integratedPayment.cardHolder($cardholder.get(0)),
                     pan: integratedPayment.cardNumber($pan.get(0)),
                     cvv: integratedPayment.cvv($cvv.get(0)),
                     exp: integratedPayment.expiration($exp.get(0)),
+                    cardHolder: integratedPayment.cardHolder($cardholder.get(0)),
                 };
 
                 $form.addClass('-loaded');
