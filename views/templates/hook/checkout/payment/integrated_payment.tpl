@@ -1,26 +1,40 @@
 <form class="payplugIntegratedPayment">
-
-    <select name="schemeOptions" class="payplugIntegratedPayment_select">
-        <option class="selectWording" value="nothing">{l s='hook.integratedPayment.select.message' mod='payplug'}</option>
-        <option class="selectAuto" value="auto">{l s='hook.integratedPayment.select.Auto' mod='payplug'}</option>
-    </select>
-    <span class="payplugIntegratedPayment_error" id="errorCardScheme"></span>
-
-    <div class="payplugIntegratedPayment_input -cardholder"></div>
+    <div class="payplugIntegratedPayment_container -cardholder"></div>
     <span class="payplugIntegratedPayment_error" id="errorCardHolder"></span>
 
-    <div class="payplugIntegratedPayment_input -pan"></div>
+    <div class="payplugIntegratedPayment_container -scheme">
+        <div>{l s='hook.integratedPayment.scheme' mod='payplug'}</div>
+        <div class="payplugIntegratedPayment_schemes">
+            <label class="payplugIntegratedPayment_scheme -visa">
+                <input type="radio" name="schemeOptions" value="visa" />
+                <span></span>
+            </label>
+            <label class="payplugIntegratedPayment_scheme -mastercard">
+                <input type="radio" name="schemeOptions" value="mastercard" />
+                <span></span>
+            </label>
+            <label class="payplugIntegratedPayment_scheme -cb">
+                <input type="radio" name="schemeOptions" value="cb" />
+                <span></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="payplugIntegratedPayment_container -pan"></div>
     <span class="payplugIntegratedPayment_error" id="errorCardPan"></span>
 
-    <div class="payplugIntegratedPayment_input -exp"></div>
-    <div class="payplugIntegratedPayment_input -cvv"></div>
-    <span class="payplugIntegratedPayment_error" id="errorCardExp"></span>
-    <span class="payplugIntegratedPayment_error" id="errorCardCvv"></span>
+    <div class="payplugIntegratedPayment_container -exp"></div>
+    <div class="payplugIntegratedPayment_container -cvv"></div>
+    <span class="payplugIntegratedPayment_error -exp" id="errorCardExp"></span>
+    <span class="payplugIntegratedPayment_error -cvv" id="errorCardCvv"></span>
 
     {if isset($is_one_click_activated) && $is_one_click_activated }
-        <div class="payplugIntegratedPayment_input -saveCard">
-            <input type="checkbox" name="savecard">
-            <label for="savecard">{l s='hook.integratedPayment.savecard' mod='payplug'}</label>
+        <div class="payplugIntegratedPayment_container -saveCard">
+            <label>
+                <input type="checkbox" name="savecard">
+                <span></span>
+                {l s='hook.integratedPayment.savecard' mod='payplug'}
+            </label>
         </div>
     {/if}
 
@@ -28,6 +42,10 @@
 </form>
 <script type="text/javascript">
     {literal}
+        var placeholderCardholder = '{/literal}{$placeholderCardholder}{literal}';
+        var placeholderPan = '{/literal}{$placeholderPan}{literal}';
+        var placeholderCvv = '{/literal}{$placeholderCvv}{literal}';
+        var placeholderExp = '{/literal}{$placeholderExp}{literal}';
         var loadIntegrated = function() {
             if (typeof payplug_utilities != 'undefined') {
                 payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url}{literal}', function() {

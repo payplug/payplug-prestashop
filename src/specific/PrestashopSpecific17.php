@@ -28,6 +28,7 @@ use Language;
 use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
+use Media;
 use Tab;
 use Tools;
 
@@ -131,12 +132,16 @@ class PrestashopSpecific17
         $integrated['extra_classes'] = 'payplug integrated';
         $this->contextSpecific->smarty->assign([
                 'integrated_payment_js_url' => $integrated_payment_js_url,
-                'is_one_click_activated' => (bool)Configuration::get('PAYPLUG_ONE_CLICK')
-            ]);
+                'is_one_click_activated' => (bool)Configuration::get('PAYPLUG_ONE_CLICK'),
+                'placeholderCardholder' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopspecific17'),
+                'placeholderPan' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopspecific17'),
+                'placeholderExp' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopspecific17'),
+                'placeholderCvv' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopspecific17'),
+        ]);
+
         $integrated['additionalInformation'] = $this->payplug->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
-        $payment_options['integrated'] = $integrated;
-        unset($payment_options['standard']);
+        $payment_options['standard'] = $integrated;
         return $payment_options;
     }
 
