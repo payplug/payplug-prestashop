@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const path = require('path');
 
 const lessFiles = ['front', 'admin', 'admin_order'];
@@ -58,8 +59,10 @@ module.exports = {
         minimize: true,
     },
     plugins: [
+        new RemoveEmptyScriptsPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css',
+            chunkFilename: '[id].css'
         })
     ]
 };
