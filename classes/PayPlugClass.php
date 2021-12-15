@@ -326,8 +326,7 @@ class PayPlugClass extends PaymentModule
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
         $this->oneyLogoUrl = '';
-        $this->version = '3.5.0';
-
+        $this->version = PAYPLUG_VERSION;
         $this->initializeAccessors();
 
         $this->loadEntities();
