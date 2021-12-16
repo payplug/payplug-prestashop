@@ -639,7 +639,13 @@ class ConfigClass
         $oney_custom_min_amounts = ($customAmounts['min']);
 
 
-        $this->assignSwitchConfiguration($configurations);
+        if ((class_exists($this->payplugClass->PrestashopSpecificClass))
+            && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))) {
+            $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
+        } else {
+            $this->assignSwitchConfiguration($configurations);
+        }
+
 
         Media::addJsDef(
             [
@@ -712,9 +718,11 @@ class ConfigClass
             'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360013071080',
             'bancontact' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4408157435794',
             'payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142312',
+            'integrated_payment_page' => 'https://support.payplug.com/hc/'. $iso_code .'/articles/360021390191',
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
+            'support' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
         ];
     }
 
@@ -748,7 +756,7 @@ class ConfigClass
             'name' => 'payplug_embedded',
             'active' => $connected,
             'checked' => $configurations['embedded_mode'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.embedded', 'configclass'),
+            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.popup', 'configclass'),
             'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.redirected', 'configclass'),
         ];
 

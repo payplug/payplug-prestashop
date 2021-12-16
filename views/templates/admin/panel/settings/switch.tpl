@@ -19,10 +19,15 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugSwitch{if !$switch.checked || !$switch.active} -right{/if}{if isset($switch.small) && $switch.small} -small{/if}{if !$switch.active} -disabled{/if}">
+<div class="payplugSwitch{if !$switch.checked || !$switch.active} -right{/if}{if isset($switch.small) && $switch.small} -small{/if}{if !$switch.active} -disabled{/if} {if isset($switch.format) && $switch.format} -format{/if}">
     <input type="radio" name="{$switch.name|escape:'htmlall':'UTF-8'}" value="1" id="{$switch.name|escape:'htmlall':'UTF-8'}_left" {if $switch.checked}checked="checked"{/if}>
+    {if isset($switch.format) && $switch.format}
+        <input type="radio" name="{$switch.name|escape:'htmlall':'UTF-8'}" value="2" id="{$switch.name|escape:'htmlall':'UTF-8'}_center" {if !$switch.checked}checked="checked"{/if}>
+    {/if}
     <input type="radio" name="{$switch.name|escape:'htmlall':'UTF-8'}" value="0" id="{$switch.name|escape:'htmlall':'UTF-8'}_right" {if !$switch.checked}checked="checked"{/if}>
 
     {if isset($switch.label_left) && $switch.label_left}<label for="{$switch.name|escape:'htmlall':'UTF-8'}_left" class="payplugSwitch_label -left">{$switch.label_left|escape:'htmlall':'UTF-8'}</label>{/if}
+    {if isset($switch.label_center) && $switch.label_center}<label for="{$switch.name|escape:'htmlall':'UTF-8'}_center" class="payplugSwitch_label -center">{$switch.label_center|escape:'htmlall':'UTF-8'}</label>{/if}
     {if isset($switch.label_right) && $switch.label_right}<label for="{$switch.name|escape:'htmlall':'UTF-8'}_right" class="payplugSwitch_label -right">{$switch.label_right|escape:'htmlall':'UTF-8'}</label>{/if}
+
 </div>

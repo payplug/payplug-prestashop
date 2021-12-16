@@ -124,8 +124,53 @@
       cursor: default;
       background: fade(#colorMap[grey], 50%);
     }
-  }
 
+  }
+  &.-format {
+    width: 240px;
+    flex: 0 0 240px;
+    &_label {
+      label& {
+        .transition(color @dur);
+        width: 33.33%;
+      }
+    }
+    &:before {
+      .borderRadius(.25em);
+      .transition(left @dur);
+      //.boxShadow(rgba(0,0,0,.15) 0 1px 4px 1px inset);
+      .border(darken(#colorMap[payplug], 5%));
+      width: 33.33%;
+    }
+    &.-right {
+      .payplugSwitch_label {
+        &.-left, &.-center {
+          color: inherit;
+        }
+
+        &.-right {
+          color: #fff;
+        }
+      }
+      &:before {
+        left: 67%;
+      }
+    }
+    &.-center {
+      .payplugSwitch_label {
+        &.-left, &.-right {
+          color: inherit;
+        }
+
+        &.-center {
+          color: #fff;
+        }
+      }
+      &:before {
+        left: 33%;
+      }
+    }
+  }
   input {
     display: none;
   }
