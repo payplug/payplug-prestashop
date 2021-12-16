@@ -29,6 +29,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
 
 class Payplug extends PaymentModule
 {
@@ -53,7 +54,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.6.0';
+        $this->version = PAYPLUG_VERSION;
 
         parent::__construct();
 
