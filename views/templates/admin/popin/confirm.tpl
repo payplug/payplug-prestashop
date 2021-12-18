@@ -27,8 +27,13 @@
     </li>
     <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
         {l s='admin.popin.confirm.paymentpage' mod='payplug'}
-        <strong>{if $embedded == 1}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 2}{l s='admin.popin.confirm.popup' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
+        {if $feature_integrated && $version > 16}
+            <strong>{if $embedded == 1}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 2}{l s='admin.popin.confirm.popup' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
+        {else}
+            <strong>{if $embedded == 1}{l s='admin.popin.confirm.popup' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
+        {/if}
     </li>
+
     <li data-e2e-type="standard" data-e2e-state="{if $standard}on{else}off{/if}">
         {l s='admin.popin.confirm.standard' mod='payplug'}
         <strong>{if $standard}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>

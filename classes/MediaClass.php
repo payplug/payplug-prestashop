@@ -27,11 +27,14 @@ class MediaClass extends \Payplug
 {
     protected $context;
     private $payplug;
+    public $version;
 
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
+        $this->configClass = $this->payplug->configClass;
         $this->context = \Context::getContext();
+        $this->version = _PS_VERSION_[0] . _PS_VERSION_[2];
     }
 
     /**
@@ -113,6 +116,8 @@ class MediaClass extends \Payplug
                 'oney' => $args['oney'],
                 'bancontact' => $args['bancontact'],
                 'feature_bancontact' => $this->payplug->isValidFeature('feature_bancontact'),
+                'feature_integrated' => $this->payplug->isValidFeature('feature_integrated'),
+                'version' => $this->version,
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],

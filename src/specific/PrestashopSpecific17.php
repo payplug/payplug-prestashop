@@ -354,5 +354,4 @@ class PrestashopSpecific17
             'payplug_switch' => $switch
         ]);
     }
-
 }
