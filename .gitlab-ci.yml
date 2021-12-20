@@ -4,6 +4,7 @@ include:
 
 stages:
   - coverage and tests
+  - check-php-version
   - check php
   - releasy-review
   - translations
@@ -36,6 +37,13 @@ coverage test:
     - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
     - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
     - vendor/bin/phpunit --coverage-text --colors=never
+
+check php version:
+  image: php:8.0-alpine
+  stage: check-php-version
+  script:
+    - sh ci/check_php.sh
+
 
 php cs fixer:
   image: composer:1.9
@@ -106,7 +114,6 @@ build zip release:
     paths:
       - payplug_$CI_COMMIT_REF_NAME.zip
       - payplug_qa_$CI_COMMIT_REF_NAME.zip
-
 
 build zip bancontact:
   image: composer:1.9
