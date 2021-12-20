@@ -122,7 +122,11 @@ var $document, $window, payplug = {
                 switch (type) {
                     case 'radio' :
                         if ($elem.prop('checked')) {
-                            data[name] = value;
+                            if (isNaN(value)) {
+                                data[name] = $elem.val();
+                            } else {
+                                data[name] = value;
+                            }
                         }
                         break;
                     case 'checkbox' :
@@ -1212,7 +1216,7 @@ var $document, $window, payplug = {
                     $('.payplugTips.-' + name + ' > .-right').removeClass('-hide');
                 }
 
-                var $selected = target.find('input[value=0]');
+                var $selected = target.find('input').last();
                 $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');
@@ -1234,7 +1238,7 @@ var $document, $window, payplug = {
                     $('.payplugTips.-' + name + ' > .-left').removeClass('-hide');
                 }
 
-                var $selected = target.find('input[value=1]');
+                var $selected = target.find('input').first();
                 $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');
@@ -1256,7 +1260,7 @@ var $document, $window, payplug = {
                     $('.payplugTips.-' + name + ' > .-center').removeClass('-hide');
                 }
 
-                var $selected = target.find('input[value=2]');
+                var $selected = target.find('input').eq(1);
                 $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');

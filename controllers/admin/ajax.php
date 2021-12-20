@@ -62,7 +62,7 @@ if (Tools::getValue('_ajax') == 1) {
         $args = null;
         if (Tools::getValue('type') == 'confirm') {
             $sandbox = (int)Tools::getValue('sandbox');
-            $embedded = (int)Tools::getValue('embedded');
+            $embedded = (string)Tools::getValue('embedded');
             $one_click = (int)Tools::getValue('one_click');
             $installment = (int)Tools::getValue('installment');
             $bancontact = (int)Tools::getValue('bancontact');
