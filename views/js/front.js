@@ -31,6 +31,7 @@ var $document, $window, payplugModule = {
         this.order.init();
         this.oney.init();
         this.popup.init();
+        this.integrated.init();
     },
     order: {
         init: function () {
