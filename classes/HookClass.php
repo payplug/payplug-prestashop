@@ -26,6 +26,7 @@ namespace PayPlug\classes;
 use OrderState;
 use Payplug\Exception\ConfigurationException;
 use Dispatcher;
+use Language;
 use Media;
 use Module;
 use Product;
@@ -45,6 +46,7 @@ class HookClass
     private $order;
     private $orderHistory;
     private $product;
+    private $query;
     private $sql;
     private $tools;
     private $validate;
@@ -52,21 +54,58 @@ class HookClass
     public function __construct($payplug)
     {
         $this->payplug = $payplug;
-        $this->assign           = $payplug->getPlugin()->getAssign();
-        $this->cache            = $payplug->getPlugin()->getCache();
-        $this->card             = $payplug->getPlugin()->getCard();
-        $this->cart             = $payplug->getPlugin()->getCart();
-        $this->config           = $payplug->getPlugin()->getConfiguration();
-        $this->context          = $payplug->getPlugin()->getContext()->getContext();
-        $this->currency         = $payplug->getPlugin()->getCurrency();
-        $this->oney             = $payplug->getPlugin()->getOney();
-        $this->order            = $payplug->getPlugin()->getOrder();
-        $this->orderHistory     = $payplug->getPlugin()->getOrderHistory();
-        $this->orderState       = $payplug->getPlugin()->getOrderState();
-        $this->product          = $payplug->getPlugin()->getProduct();
-        $this->sql              = $payplug->getPlugin()->getSql();
-        $this->tools            = $payplug->getPlugin()->getTools();
-        $this->validate         = $payplug->getPlugin()->getValidate();
+        $this->assign = $payplug->getPlugin()->getAssign();
+        $this->cache = $payplug->getPlugin()->getCache();
+        $this->card = $payplug->getPlugin()->getCard();
+        $this->cart = $payplug->getPlugin()->getCart();
+        $this->config = $payplug->getPlugin()->getConfiguration();
+        $this->context = $payplug->getPlugin()->getContext()->getContext();
+        $this->currency = $payplug->getPlugin()->getCurrency();
+        $this->oney = $payplug->getPlugin()->getOney();
+        $this->order = $payplug->getPlugin()->getOrder();
+        $this->orderHistory = $payplug->getPlugin()->getOrderHistory();
+        $this->orderState = $payplug->getPlugin()->getOrderState();
+        $this->product = $payplug->getPlugin()->getProduct();
+        $this->query = $payplug->getPlugin()->getQuery();
+        $this->sql = $payplug->getPlugin()->getSql();
+        $this->tools = $payplug->getPlugin()->getTools();
+        $this->validate = $payplug->getPlugin()->getValidate();
+    }
+
+    public function actionAdminLanguagesControllerSaveAfter($params)
+    {
+        $language = $params['return'];
+
+        if (!in_array($language->iso_code, $this->payplug->payplug_languages)) {
+            return true;
+        }
+
+        // clear Language cache
+        Language::loadLanguages();
+
+        $all_order_states = array_merge($this->payplug->order_states, $this->payplug->oney_order_state);
+        $id_order_states = $this->payplug->orderClass->getPayPlugOrderStates($this->payplug->name);
+        $payplug_order_states = explode(',', $id_order_states);
+
+        foreach ($all_order_states as $state) {
+            foreach ($state['payplug_cfg'] as $config) {
+                $name = $state['name'][$language->iso_code];
+                $id_order_state = $this->config->get($config);
+                if (in_array($id_order_state, $payplug_order_states)) {
+                    if (strpos($config, '_TEST')) {
+                        $name .= ' [TEST]';
+                    } else {
+                        $name .= ' [PayPlug]';
+                    }
+                }
+
+                $order_state = new OrderState((int)$id_order_state);
+                $order_state->name[$language->id] = $name;
+                $order_state->save();
+            }
+        }
+
+        return true;
     }
 
     /**

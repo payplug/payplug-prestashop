@@ -96,7 +96,7 @@ class Payplug extends PaymentModule
             if ($iso_code == 'en' || $iso_code == 'gb') {
                 $iso_code = 'en-gb';
             }
-            $faq_url = 'https://support.payplug.com/hc/' . $iso_code.'/articles/360021267140';
+            $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
             $this->context->smarty->assign('faq_url', $faq_url);
 
             $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
@@ -115,6 +115,7 @@ class Payplug extends PaymentModule
     {
         return [
             'actionAdminControllerSetMedia',
+            'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
             'actionCarrierUpdate',
             'actionClearCompileCache',
@@ -223,6 +224,13 @@ class Payplug extends PaymentModule
         }
     }
 
+    public function hookActionAdminLanguagesControllerSaveAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->hookClass->actionAdminLanguagesControllerSaveAfter($params);
+        }
+    }
+
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
@@ -232,6 +240,7 @@ class Payplug extends PaymentModule
             );
         }
     }
+
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
@@ -286,6 +295,7 @@ class Payplug extends PaymentModule
             return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }
+
     /**
      * @return mixed
      */
