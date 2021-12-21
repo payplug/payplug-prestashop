@@ -302,7 +302,7 @@ class InstallRepository extends Repository
             && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
             && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
             && $this->config->updateValue('PAYPLUG_EMAIL', null)
-            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected')
             && $this->config->updateValue('PAYPLUG_INST', null)
             && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
             && $this->config->updateValue('PAYPLUG_INST_MODE', 3)

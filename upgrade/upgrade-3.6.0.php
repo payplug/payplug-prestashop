@@ -27,9 +27,21 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_6_0($object)
 {
+    $flag = true;
+
+    // update embedded configuration
+    $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
+    if ($embedded_mode) {
+        $flag = $flag && Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'popup');
+    } else {
+        $flag = $flag && Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected');
+    }
+
     // add  PAYPLUG_BANCONTACT to database
-    return Configuration::updateValue(
+    $flag = $flag && Configuration::updateValue(
         'PAYPLUG_BANCONTACT',
         null
     );
+
+    return $flag;
 }
