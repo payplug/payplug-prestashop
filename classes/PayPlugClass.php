@@ -2820,7 +2820,7 @@ class PayPlugClass extends PaymentModule
             'authorizedAt' => null,
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
-            'isEmbedded' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
+            'isEmbedded' => (string)Configuration::get('PAYPLUG_EMBEDDED_MODE') !== 'redirected',
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ConfigClass::isMobiledevice(),
             'cart' => $cart,
