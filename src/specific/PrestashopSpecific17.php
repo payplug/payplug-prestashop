@@ -52,7 +52,7 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
-        if ($this->payplug->isValidFeature('feature_integrated')) {
+        if ($this->payplug->isValidFeature('feature_integrated') && (string)Configuration::get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
 
@@ -242,5 +242,116 @@ class PrestashopSpecific17
             ['order[filters][osname]' => $order_state]
         );
         return $link;
+    }
+
+    public function assignSwitchConfiguration($configurations)
+    {
+        $switch = [];
+
+        // defined if user is connected
+        $connected = !empty($configurations['email'])
+            && (!empty($configurations['test_api_key'])
+                || !empty($configurations['live_api_key']));
+
+        // show module to the customer
+        $switch['show'] = [
+            'name' => 'PAYPLUG_SHOW',
+            'label' => $this->payplug->l('payplug.assignSwitchConfiguration.showPayplug', 'prestashopspecific17'),
+            'active' => $connected,
+            'small' => true,
+            'checked' => $configurations['show'],
+        ];
+
+        $switch['sandbox'] = [
+            'name' => 'payplug_sandbox',
+            'active' => $connected,
+            'checked' => $configurations['sandbox_mode'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.test', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.live', 'prestashopspecific17'),
+        ];
+
+        $switch['embedded'] = [
+            'name' => 'payplug_embedded',
+            'active' => $connected,
+            'format' => true,
+            'checked' => $configurations['embedded_mode'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.embedded', 'prestashopspecific17'),
+            'label_center' => $this->payplug->l('payplug.assignSwitchConfiguration.popup', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.redirected', 'prestashopspecific17'),
+        ];
+
+        $switch['one_click'] = [
+            'name' => 'payplug_one_click',
+            'active' => $connected,
+            'checked' => $configurations['one_click'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $switch['standard'] = [
+            'name' => 'payplug_standard',
+            'active' => $connected,
+            'checked' => $configurations['standard'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $switch['oney'] = [
+            'name' => 'payplug_oney',
+            'active' => $connected,
+            'checked' => $configurations['oney'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $switch['oney_optimized'] = [
+            'name' => 'payplug_oney_optimized',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_optimized'],
+        ];
+
+        $switch['oney_fees'] = [
+            'name' => 'payplug_oney_fees',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_fees'],
+        ];
+
+        $switch['bancontact'] = [
+            'name' => 'payplug_bancontact',
+            'active' => $connected,
+            'checked' => $configurations['bancontact'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $switch['installment'] = [
+            'name' => 'payplug_inst',
+            'active' => $connected,
+            'checked' => $configurations['inst'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $switch['deferred'] = [
+            'name' => 'payplug_deferred',
+            'active' => $connected,
+            'checked' => $configurations['deferred'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $switch['deferred_auto'] = [
+            'name' => 'payplug_deferred_auto',
+            'active' => $connected,
+            'checked' => $configurations['deferred_auto'],
+            'label_left' => $this->payplug->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
+            'label_right' => $this->payplug->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+        ];
+
+        $this->contextSpecific->smarty->assign([
+            'payplug_switch' => $switch
+        ]);
     }
 }

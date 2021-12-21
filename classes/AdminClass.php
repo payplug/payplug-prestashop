@@ -138,7 +138,11 @@ class AdminClass extends \Payplug
                 ];
                 $args = [];
                 foreach ($keys as $key) {
-                    $args[$key] = (int)Tools::getValue($key);
+                    if ($key !== 'embedded') {
+                        $args[$key] = (int)Tools::getValue($key);
+                    } else {
+                        $args[$key] = (string)Tools::getValue($key);
+                    }
                 }
             }
             $this->mediaClass->displayPopin(Tools::getValue('type'), $args);

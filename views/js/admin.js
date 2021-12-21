@@ -122,7 +122,11 @@ var $document, $window, payplug = {
                 switch (type) {
                     case 'radio' :
                         if ($elem.prop('checked')) {
-                            data[name] = value;
+                            if (isNaN(value)) {
+                                data[name] = $elem.val();
+                            } else {
+                                data[name] = value;
+                            }
                         }
                         break;
                     case 'checkbox' :
@@ -1145,17 +1149,20 @@ var $document, $window, payplug = {
                 event.stopPropagation();
                 var {switcher} = payplug.tools,
                     $switch = $(this),
-                    is_right = $switch.is('.-right');
+                    is_right = $switch.is('.-right'),
+                    is_format = $switch.is('.-format');
 
                 if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
-
-                if (is_right) {
-                    switcher.left($switch);
-                } else {
-                    switcher.right($switch);
+                if (!is_format) {
+                    if (is_right) {
+                        switcher.left($switch);
+                    } else {
+                        switcher.right($switch);
+                    }
                 }
+
             },
             select: function (event) {
                 event.preventDefault();
@@ -1163,32 +1170,43 @@ var $document, $window, payplug = {
                 var {switcher} = payplug.tools,
                     {identifier} = switcher.props,
                     $label = $(this),
-                    id = $label.attr('for').replace('_left', '').replace('_right', ''),
+                    id = $label.attr('for').replace('_left', '').replace('_right', '').replace('_center', ''),
                     is_right = $label.is('.-right'),
+                    is_left = $label.is('.-left'),
+                    is_center = $label.is('.-center'),
                     $switch = $label.parents('.' + identifier),
                     $tips = null;
 
                 if ($switch.is('.-disabled') || $switch.parents('.-hide').length) {
                     return;
                 }
-
                 if (is_right) {
                     if (!$switch.is('.-right')) {
                         switcher.right($switch);
                     }
-                } else {
-                    if ($switch.is('.-right')) {
+                } else if (is_left) {
+                    if (!$switch.is('.-left')) {
                         switcher.left($switch);
                         if ($tips) {
                             $tips.find('.payplugTips_item.-left').show();
                         }
                     }
+                } else if (is_center) {
+                    if (!$switch.is('.-center')) {
+                        switcher.center($switch);
+                        if ($tips) {
+                            $tips.find('.payplugTips_item.-center').show();
+                        }
+                    }
                 }
+
             },
             right: function (target, withoutEvent) {
                 var {switcher} = payplug.tools,
                     {identifier} = switcher.props;
                 target.addClass('-right');
+                target.removeClass('-left');
+                target.removeClass('-center');
                 target.find('input').removeAttr('checked').prop('checked', false);
                 var name = target.find('input').eq(0).attr('name'),
                     $tips = $('.payplugTips.-' + name);
@@ -1198,7 +1216,7 @@ var $document, $window, payplug = {
                     $('.payplugTips.-' + name + ' > .-right').removeClass('-hide');
                 }
 
-                var $selected = target.find('input[value=0]');
+                var $selected = target.find('input').last();
                 $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');
@@ -1208,6 +1226,8 @@ var $document, $window, payplug = {
                 var {switcher} = payplug.tools,
                     {identifier} = switcher.props;
                 target.removeClass('-right');
+                target.removeClass('-center');
+                target.addClass('-left');
                 target.find('input').removeAttr('checked').prop('checked', false);
 
                 var name = target.find('input').eq(0).attr('name'),
@@ -1218,7 +1238,29 @@ var $document, $window, payplug = {
                     $('.payplugTips.-' + name + ' > .-left').removeClass('-hide');
                 }
 
-                var $selected = target.find('input[value=1]');
+                var $selected = target.find('input').first();
+                $selected.attr('checked', 'checked').prop('checked', true);
+                if (typeof withoutEvent == 'undefined' || !withoutEvent) {
+                    $selected.trigger('switchSelected');
+                }
+            },
+            center: function (target, withoutEvent) {
+                var {switcher} = payplug.tools,
+                    {identifier} = switcher.props;
+                target.removeClass('-right');
+                target.removeClass('-left');
+                target.addClass('-center');
+                target.find('input').removeAttr('checked').prop('checked', false);
+
+                var name = target.find('input').eq(0).attr('name'),
+                    $tips = $('.payplugTips.-' + name);
+
+                if ($tips.length) {
+                    $('.payplugTips.-' + name + ' > .payplugTips_item').addClass('-hide');
+                    $('.payplugTips.-' + name + ' > .-center').removeClass('-hide');
+                }
+
+                var $selected = target.find('input').eq(1);
                 $selected.attr('checked', 'checked').prop('checked', true);
                 if (typeof withoutEvent == 'undefined' || !withoutEvent) {
                     $selected.trigger('switchSelected');

@@ -54,6 +54,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $options = \PayPlug\classes\ConfigClass::getAvailableOptions($cart);
 
+            $embedded = $options['embedded'] != 'redirected';
             $error_url = 'index.php?controller=order&step=3&error=1';
 
             if ($options['oney'] && $is_oney) {
@@ -77,7 +78,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 } else {
                     Tools::redirect($payment['return_url']);
                 }
-            } elseif (!$options['embedded'] && !$is_one_click) {
+            } elseif (!$embedded && !$is_one_click) {
                 // if the payment is redirect and not a one click payment, prepare the payment and redirect
                 $payment_options = [
                     'id_card' => $id_card,
