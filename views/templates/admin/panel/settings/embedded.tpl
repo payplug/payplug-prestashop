@@ -57,16 +57,16 @@
         <div class="payplugPanel_content">
             <div class="payplugTips -{$payplug_switch.embedded.name|escape:'htmlall':'UTF-8'}">
                 {if isset($payplug_switch.embedded.format) && $integrated }
-                    <div class="payplugTips_item -left {if !$payplug_switch.embedded.checked}-hide{/if}">
+                    <div class="payplugTips_item -left {if $payplug_switch.embedded.checked !== 'integrated'}-hide{/if}">
                         {l s='admin.panel.settings.embedded.integrated' mod='payplug'}
                         <a class="payplugLink" href="{$faq_links.support|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='admin.panel.settings.embedded.learnmore' mod='payplug'}</a>
                     </div>
                 {/if}
-                    <div class="payplugTips_item {if isset($payplug_switch.embedded.format)}-center{else}-left{/if} {if !isset($payplug_switch.embedded.format) && !$payplug_switch.embedded.checked || isset($payplug_switch.embedded.format) && $payplug_switch.embedded.checked}-hide{/if}">
+                    <div class="payplugTips_item {if isset($payplug_switch.embedded.format) && $integrated}-center{else}-left{/if} {if $payplug_switch.embedded.checked != 'popup'}-hide{/if}">
                         {l s='admin.panel.settings.embedded.popup' tags=[$paymentPagePersoPopup] mod='payplug'}
                         <a class="payplugLink" href="{$faq_links.support|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='admin.panel.settings.embedded.learnmore' mod='payplug'}</a>
                     </div>
-                    <div class="payplugTips_item -right {if $payplug_switch.embedded.checked}-hide{/if}">
+                    <div class="payplugTips_item -right {if $payplug_switch.embedded.checked != 'redirected'}-hide{/if}">
                         {l s='admin.panel.settings.embedded.redirected' tags=[$paymentPagePersoRedirect] mod='payplug'}
                         <a class="payplugLink" href="{$faq_links.support|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='admin.panel.settings.embedded.learnmore' mod='payplug'}</a>
                     </div>
