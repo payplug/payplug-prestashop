@@ -54,6 +54,9 @@
       &.-focus {
         border-color: #2b343d;
       }
+      &.-invalid {
+        border-color: #E91932;
+      }
     }
 
     &.-cardholder {
@@ -163,6 +166,13 @@
         }
       }
     }
+
+    &.-errorContainer {
+      display: flex;
+      .left {
+        width: calc(50% + 5px);
+      }
+    }
   }
 
   &_error {
@@ -172,14 +182,17 @@
     margin: -10px 0 10px;
     width: 100%;
     line-height: 18px;
+    padding-left: 5px;
 
     &.-exp,
     &.-cvv {
       width: 100%;
-      max-width: calc(50% - 5px);
-    }
 
-    &.-payment {
+    }
+    &.-hide {
+      display: none;
+    }
+    &.-payment, &.-fields {
       .Poppins(14px);
       display: none;
       background: rgba(233, 25, 50, 0.08);
