@@ -74,10 +74,10 @@ assets compile and revision:
   stage: assets
   before_script:
     - npm --version
-    - npm install less -g
-    - lessc --version
+    - npm init -y
+    - npm install --save-dev webpack
   script:
-    - chmod 777 ./ci/assets_compil.sh && ./ci/assets_compil.sh
+    - npm run build
     - echo "Moving file in build dir"
     - mkdir ./views/build
     - mkdir ./views/build/css
