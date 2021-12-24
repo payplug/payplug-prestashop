@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64adeddadfcde80af05f84ac090c6864",
+    "content-hash": "6e4d23112a795f2663181692e143caf7",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -125,16 +125,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "3.5.1",
+            "version": "3.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "4a7abdaefad6f456beafa3d760811b9450fb99a5"
+                "reference": "fa2533b281bddcea1bdccf985b9278893bf65728"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/4a7abdaefad6f456beafa3d760811b9450fb99a5",
-                "reference": "4a7abdaefad6f456beafa3d760811b9450fb99a5",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/fa2533b281bddcea1bdccf985b9278893bf65728",
+                "reference": "fa2533b281bddcea1bdccf985b9278893bf65728",
                 "shasum": ""
             },
             "require": {

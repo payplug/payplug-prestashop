@@ -846,7 +846,7 @@ class HookClass
             [
                 'payplug_ajax_url' => $payplug_ajax_url,
                 'integratedPaymentError' => $integratedPaymentError,
-                'payplug_publishable_key' => $this->payplug->apiClass->publishableKey,
+                'payplug_publishable_key' => $this->payplug->apiClass->getPublishableKeys(),
                 'PAYPLUG_DOMAIN' => $payplug_domain,
             ]
         );
