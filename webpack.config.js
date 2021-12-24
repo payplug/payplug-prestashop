@@ -24,7 +24,7 @@ const loaders = [
         loader: "less-loader", // compiles Less to CSS
         options: {
             lessOptions: {
-                relativeUrls: true,
+                relativeUrls: false,
                 sourceMap: true,
             },
         },
