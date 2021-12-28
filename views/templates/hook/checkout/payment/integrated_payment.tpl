@@ -54,6 +54,13 @@
             </label>
         </div>
     {/if}
+
+    {if isset($is_deferred_activated) && $is_deferred_activated }
+        <div class="payplugIntegratedPayment_container -deferred">
+            <span>{l s='hook.integratedPayment.deferred' mod='payplug'}</span>
+        </div>
+    {/if}
+
     <div class="payplugIntegratedPayment_error -fields -hide">
         {l s='hook.checkout.payment.integrated.fields.error' mod='payplug'}
     </div>
