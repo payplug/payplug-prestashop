@@ -103,10 +103,10 @@ var $document, $window, payplugModule = {
             token: null,
             notValid: false,
             fieldsValid: {
-                validCardHolder: false,
-                validPan: false,
-                validExp: false,
-                validCvv: false,
+                cardHolder: false,
+                pan: false,
+                cvv: false,
+                exp: false,
             },
             save_card: false,
             scheme: null,
@@ -140,10 +140,10 @@ var $document, $window, payplugModule = {
                 var api = integrated.props.api,
                     $form = $('.' + integrated.props.identifier),
                     $scheme = $form.find('.-scheme'),
-                    $cardholder = $form.find('.-cardholder'),
-                    $pan = $form.find('.-pan'),
-                    $cvv = $form.find('.-cvv'),
-                    $exp = $form.find('.-exp'),
+                    $cardHolder = $form.find('.payplugIntegratedPayment_container.-cardHolder'),
+                    $pan = $form.find('.payplugIntegratedPayment_container.-pan'),
+                    $cvv = $form.find('.payplugIntegratedPayment_container.-cvv'),
+                    $exp = $form.find('.payplugIntegratedPayment_container.-exp'),
                     $saveCard = $form.find('.-saveCard'),
                     payment_option_id = integrated.props.paymentOptionId;
 
@@ -154,7 +154,7 @@ var $document, $window, payplugModule = {
 
                 var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
                 integrated.props.integratedPayment = integratedPayment;
-                integratedPayment.setDisplayMode3ds(integrated.props.api.DisplayMode3ds.LIGHTBOX);
+                integratedPayment.setDisplayMode3ds(api.DisplayMode3ds.LIGHTBOX);
 
                 var input_style = {
                     default: {
@@ -177,7 +177,7 @@ var $document, $window, payplugModule = {
                 form = {
                     integratedPayment: integratedPayment,
                     cardHolder: integratedPayment.cardHolder(
-                        $cardholder.get(0),
+                        $cardHolder.get(0),
                         {
                             placeholder: placeholderCardholder,
                             default: input_style.default,
@@ -212,121 +212,7 @@ var $document, $window, payplugModule = {
 
                 $form.addClass('-loaded');
 
-                form.cardHolder.onChange(function (event) {
-                    //validate card Holder field
-                    if (!event.valid) {
-                        $('#errorCardHolder').removeClass('-hide');
-                        $('.payplugIntegratedPayment_container.-cardholder').addClass('-invalid');
-                    } else {
-                        integrated.props.fieldsValid['validCardHolder'] = true;
-                        $('#errorCardHolder').addClass('-hide');
-                        $('.payplugIntegratedPayment_container.-cardholder').removeClass('-invalid');
-                    }
-                });
-                form.pan.onChange(function (event) {
-                    //validate pan field
-                    if (!event.valid) {
-                        integrated.props.notValid = true;
-                        $('#errorCardPan').removeClass('-hide');
-                        $('.payplugIntegratedPayment_container.-pan').addClass('-invalid');
-                    } else {
-                        integrated.props.fieldsValid['validPan'] = true;
-                        $('#errorCardPan').addClass('-hide');
-                        $('.payplugIntegratedPayment_container.-pan').removeClass('-invalid');
-                    }
-                });
-                form.cvv.onChange(function (event) {
-                    //validate cvv field
-                    if (!event.valid) {
-                        integrated.props.notValid = true;
-                        $('#errorCardCvv').removeClass('-hide');
-                        $('.payplugIntegratedPayment_container.-cardcvv').addClass('-invalid');
-                    } else {
-                        integrated.props.fieldsValid['validCvv'] = true;
-                        $('#errorCardCvv').addClass('-hide');
-                        $('.payplugIntegratedPayment_container.-cardcvv').removeClass('-invalid');
-                    }
-                });
-                form.exp.onChange(function (event) {
-                    //validate expiry date field
-                    if (!event.valid) {
-                        integrated.props.notValid = true;
-                        $('#errorCardExp').removeClass('-hide');
-                        $('.payplugIntegratedPayment_container.-cardexp').addClass('-invalid');
-                    } else {
-                        integrated.props.fieldsValid['validExp'] = true;
-                        $('#errorCardExp').addClass('-hide');
-                        $('.payplugIntegratedPayment_container.-cardexp').removeClass('-invalid');
-                    }
-                });
-
-                form.cardHolder.onFocus(function(){
-                    $cardholder.addClass('-focus');
-                    //remove error on focus
-                    $('#errorCardHolder').addClass('-hide');
-                    $cardholder.removeClass('-invalid');
-                    //remove main error on focus
-                    $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
-                    $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
-                });
-                form.pan.onFocus(function(){
-                    $pan.addClass('-focus');
-                    //remove error on focus
-                    $('#errorCardPan').addClass('-hide');
-                    $pan.removeClass('-invalid');
-                    //remove main error on focus
-                    $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
-                    $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
-                });
-                form.cvv.onFocus(function(){
-                    $cvv.addClass('-focus');
-                    //remove error on focus
-                    $('#errorCardCvv').addClass('-hide');
-                    $cvv.removeClass('-invalid');
-                    //remove main error on focus
-                    $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
-                    $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
-                });
-                form.exp.onFocus(function(){
-                    $exp.addClass('-focus');
-                    //remove error on focus
-                    $('#errorCardExp').addClass('-hide');
-                    $exp.removeClass('-invalid');
-                    //remove main error on focus
-                    $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
-                    $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
-                });
-
-                form.cardHolder.onBlur(function(){
-                    $cardholder.removeClass('-focus');
-                    if (integrated.props.fieldsValid['validCardHolder'] == false) {
-                        $cardholder.addClass('-invalid');
-                        $('#errorCardHolder').removeClass('-hide');
-                    }
-                });
-                form.pan.onBlur(function(){
-                    $pan.removeClass('-focus');
-                    if (integrated.props.fieldsValid['validPan'] == false) {
-                        $pan.addClass('-invalid');
-                        $('#errorPan').removeClass('-hide');
-                    }
-                });
-                form.cvv.onBlur(function(){
-                    $cvv.removeClass('-focus');
-                    if (integrated.props.fieldsValid['validCvv'] == false) {
-                        $cvv.addClass('-invalid');
-                        $('#errorCvv').removeClass('-hide');
-                    }
-                });
-                form.exp.onBlur(function(){
-                    $exp.removeClass('-focus');
-                    if (integrated.props.fieldsValid['validExp'] == false) {
-                        $exp.addClass('-invalid');
-                        $('#errorExp').removeClass('-hide');
-                    }
-                });
-
-                $cardholder.on('click', function(event){
+                $cardHolder.on('click', function(event){
                     event.preventDefault();
                     event.stopPropagation();
                     form.cardHolder.focus();
@@ -360,6 +246,8 @@ var $document, $window, payplugModule = {
                 });
 
                 integrated.props.form = form;
+                // defined all event on form field
+                integrated.form.field.init();
 
                 $document.on('submit', 'form', function (event) {
                     if (($(event.target).is('.' + integrated.props.identifier) || $(event.target).is('#payment-form'))
@@ -383,8 +271,102 @@ var $document, $window, payplugModule = {
                     integrated.form.confirmIntPayment(event.token);
                 });
             },
-            validateForm: function (fieldsValid) {
+            field: {
+                init: function(){
+                    var integrated = payplugModule.integrated,
+                        field = integrated.form.field,
+                        form = integrated.props.form;
 
+                    form.cardHolder.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('cardHolder');
+                        } else {
+                            field.valid('cardHolder');
+                        }
+                    });
+                    form.pan.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('pan');
+                        } else {
+                            field.valid('pan');
+                        }
+                    });
+                    form.cvv.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('cvv');
+                        } else {
+                            field.valid('cvv');
+                        }
+                    });
+                    form.exp.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('exp');
+                        } else {
+                            field.valid('exp');
+                        }
+                    });
+
+                    form.cardHolder.onFocus(function(event){
+                        field.focus('cardHolder');
+                    });
+                    form.pan.onFocus(function(){
+                        field.focus('pan');
+                    });
+                    form.cvv.onFocus(function(){
+                        field.focus('cvv');
+                    });
+                    form.exp.onFocus(function(){
+                        field.focus('exp');
+                    });
+
+                    form.cardHolder.onBlur(function(event){
+                        field.blur('cardHolder');
+                    });
+                    form.pan.onBlur(function(){
+                        field.blur('pan');
+                    });
+                    form.cvv.onBlur(function(){
+                        field.blur('cvv');
+                    });
+                    form.exp.onBlur(function(){
+                        field.blur('exp');
+                    });
+                },
+                error: function(type) {
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    var integrated = payplugModule.integrated;
+                    integrated.props.fieldsValid[type] = false;
+                    $('.payplugIntegratedPayment_error.-' + type).removeClass('-hide');
+                    $('.payplugIntegratedPayment_container.-' + type).addClass('-invalid');
+                },
+                blur: function(type){
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    $('.payplugIntegratedPayment_container.-' + type).removeClass('-focus');
+                },
+                focus: function(type){
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    $('.payplugIntegratedPayment_container.-' + type).addClass('-focus').removeClass('-invalid');
+                    $('.payplugIntegratedPayment_error.-' + type).addClass('-hide');
+                    $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
+                    $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
+                },
+                valid: function(type) {
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    var integrated = payplugModule.integrated;
+                    integrated.props.fieldsValid[type] = true;
+                    $('.payplugIntegratedPayment_error.-' + type).addClass('-hide');
+                    $('.payplugIntegratedPayment_container.-' + type).removeClass('-invalid');
+                },
+            },
+            validateForm: function (fieldsValid) {
                 // valide integrated payment form
                 for (var key in fieldsValid) {
                     if (!fieldsValid[key]) {
