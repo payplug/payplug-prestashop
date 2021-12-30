@@ -79,7 +79,7 @@
 
     {if isset($is_deferred_activated) && $is_deferred_activated }
         <div class="payplugIntegratedPayment_container -deferred">
-            <span>{l s='hook.integratedPayment.deferred' mod='payplug'}</span>
+            {l s='hook.integratedPayment.deferred' mod='payplug'}
         </div>
     {/if}
 
