@@ -21,10 +21,10 @@
 *}
 
 <form class="payplugIntegratedPayment">
-    <div class="payplugIntegratedPayment_container -cardholder"></div>
-    <span class="payplugIntegratedPayment_error -hide" id="errorCardHolder">
+    <div class="payplugIntegratedPayment_container -cardHolder"></div>
+    <div class="payplugIntegratedPayment_error -hide -cardHolder">
         {l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}
-    </span>
+    </div>
 
     <div class="payplugIntegratedPayment_container -scheme">
         <div>{l s='hook.integratedPayment.scheme' mod='payplug'}</div>
@@ -45,25 +45,18 @@
     </div>
 
     <div class="payplugIntegratedPayment_container -pan"></div>
-    <span class="payplugIntegratedPayment_error -hide" id="errorCardPan">
+    <div class="payplugIntegratedPayment_error -hide -pan">
         {l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}
-        <br>
-    </span>
+    </div>
 
     <div class="payplugIntegratedPayment_container -exp"></div>
     <div class="payplugIntegratedPayment_container -cvv"></div>
 
-    <div class="payplugIntegratedPayment_container -errorContainer">
-        <div class="left">
-            <span class="payplugIntegratedPayment_error -exp -hide" id="errorCardExp">
-                {l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}
-            </span>
-        </div>
-        <div class="right">
-            <span class="payplugIntegratedPayment_error -cvv -hide" id="errorCardCvv">
-                {l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}
-            </span>
-        </div>
+    <div class="payplugIntegratedPayment_error -exp -hide">
+        {l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}
+    </div>
+    <div class="payplugIntegratedPayment_error -cvv -hide">
+        {l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}
     </div>
 
 
