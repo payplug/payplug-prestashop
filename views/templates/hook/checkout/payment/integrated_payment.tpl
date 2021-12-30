@@ -1,8 +1,8 @@
 <form class="payplugIntegratedPayment">
-    <div class="payplugIntegratedPayment_container -cardholder"></div>
-    <span class="payplugIntegratedPayment_error -hide" id="errorCardHolder">
+    <div class="payplugIntegratedPayment_container -cardHolder"></div>
+    <div class="payplugIntegratedPayment_error -hide -cardHolder">
         {l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}
-    </span>
+    </div>
 
     <div class="payplugIntegratedPayment_container -scheme">
         <div>{l s='hook.integratedPayment.scheme' mod='payplug'}</div>
@@ -23,25 +23,18 @@
     </div>
 
     <div class="payplugIntegratedPayment_container -pan"></div>
-    <span class="payplugIntegratedPayment_error -hide" id="errorCardPan">
+    <div class="payplugIntegratedPayment_error -hide -pan">
         {l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}
-        <br>
-    </span>
+    </div>
 
     <div class="payplugIntegratedPayment_container -exp"></div>
     <div class="payplugIntegratedPayment_container -cvv"></div>
 
-    <div class="payplugIntegratedPayment_container -errorContainer">
-        <div class="left">
-            <span class="payplugIntegratedPayment_error -exp -hide" id="errorCardExp">
-                {l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}
-            </span>
-        </div>
-        <div class="right">
-            <span class="payplugIntegratedPayment_error -cvv -hide" id="errorCardCvv">
-                {l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}
-            </span>
-        </div>
+    <div class="payplugIntegratedPayment_error -exp -hide">
+        {l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}
+    </div>
+    <div class="payplugIntegratedPayment_error -cvv -hide">
+        {l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}
     </div>
 
 
@@ -68,13 +61,13 @@
 </form>
 <script type="text/javascript">
     {literal}
-        var placeholderCardholder = '{/literal}{$placeholderCardholder}{literal}';
-        var placeholderPan = '{/literal}{$placeholderPan}{literal}';
-        var placeholderCvv = '{/literal}{$placeholderCvv}{literal}';
-        var placeholderExp = '{/literal}{$placeholderExp}{literal}';
+        var placeholderCardholder = '{/literal}{$placeholderCardholder|escape:'htmlall':'UTF-8'}{literal}';
+        var placeholderPan = '{/literal}{$placeholderPan|escape:'htmlall':'UTF-8'}{literal}';
+        var placeholderCvv = '{/literal}{$placeholderCvv|escape:'htmlall':'UTF-8'}{literal}';
+        var placeholderExp = '{/literal}{$placeholderExp|escape:'htmlall':'UTF-8'}{literal}';
         var loadIntegrated = function() {
             if (typeof payplug_utilities != 'undefined') {
-                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url}{literal}', function() {
+                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url|escape:'htmlall':'UTF-8'}{literal}', function() {
                     if(typeof payplugModule != 'undefined') {
                         payplugModule.integrated.init();
                     } else {

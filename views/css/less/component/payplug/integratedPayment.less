@@ -26,7 +26,7 @@
     width: 100%;
     position: relative;
 
-    &.-cardholder,
+    &.-cardHolder,
     &.-pan,
     &.-exp,
     &.-cvv {
@@ -50,7 +50,6 @@
         background-size: 100% auto;
       }
 
-      &:hover,
       &.-focus {
         border-color: #2b343d;
       }
@@ -59,7 +58,7 @@
       }
     }
 
-    &.-cardholder {
+    &.-cardHolder {
       &:before {
         mask-image: url(~"@{img_scheme}account.svg");
         -webkit-mask-image: url(~"@{img_scheme}account.svg");
@@ -175,19 +174,12 @@
       display: block;
       text-align: center;
     }
-
-    &.-errorContainer {
-      display: flex;
-      .left {
-        width: calc(50% + 5px);
-      }
-    }
   }
 
   &_error {
     color: #E91932;
     font-size: 12px;
-    display: block;
+    display: flex;
     margin: -10px 0 10px;
     width: 100%;
     line-height: 18px;
@@ -196,7 +188,11 @@
     &.-exp,
     &.-cvv {
       width: 100%;
-
+      max-width: calc(50% - 5px);
+    }
+    &.-cvv {
+      justify-self: flex-end;
+      margin: -10px 0 10px auto;
     }
     &.-hide {
       display: none;
