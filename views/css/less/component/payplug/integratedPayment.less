@@ -53,6 +53,7 @@
       &.-focus {
         border-color: #2b343d;
       }
+
       &.-invalid {
         border-color: #E91932;
       }
@@ -84,6 +85,7 @@
         -webkit-mask-image: url(~"@{img_scheme}lock.svg");
       }
     }
+
     &.-exp {
       &:before {
         mask-image: url(~"@{img_scheme}calendar.svg");
@@ -147,6 +149,7 @@
 
         &:hover {
           color: #2b343d;
+
           span {
             border-color: #2b343d;
           }
@@ -156,8 +159,10 @@
       &.-checked {
         label {
           color: #2b343d;
+
           span {
             border-color: #2b343d;
+
             &:before {
               opacity: 1;
             }
@@ -167,6 +172,7 @@
     }
 
     &.-deferred {
+      margin: 10px 0;
       background: #colorMap[deferred_background];
       padding: 4px 15px;
       font-size: 12px;
@@ -177,26 +183,34 @@
   }
 
   &_error {
+    .Poppins();
     color: #E91932;
     font-size: 12px;
     display: flex;
     margin: -10px 0 10px;
     width: 100%;
     line-height: 18px;
-    padding-left: 5px;
+    padding-left: 4px;
+
+    &.-cardHolder {
+      margin: -10px 0 0;
+    }
 
     &.-exp,
     &.-cvv {
       width: 100%;
       max-width: calc(50% - 5px);
     }
+
     &.-cvv {
       justify-self: flex-end;
       margin: -10px 0 10px auto;
     }
+
     &.-hide {
       display: none;
     }
+
     &.-payment, &.-fields {
       .Poppins(14px);
       display: none;
@@ -224,6 +238,8 @@
       flex-wrap: wrap;
       width: 115px;
     }
+
+    margin: 0;
 
     span {
       cursor: pointer;
@@ -260,22 +276,27 @@
     &.-visa {
       span {
         background-image: url(~"@{img_scheme}visa-dark.svg");
+
         &:before {
           background-image: url(~"@{img_scheme}visa.svg");
         }
       }
     }
+
     &.-mastercard {
       span {
         background-image: url(~"@{img_scheme}mastercard-dark.svg");
+
         &:before {
           background-image: url(~"@{img_scheme}mastercard.svg");
         }
       }
     }
+
     &.-cb {
       span {
         background-image: url(~"@{img_scheme}cb-dark.svg");
+
         &:before {
           background-image: url(~"@{img_scheme}cb.svg");
         }

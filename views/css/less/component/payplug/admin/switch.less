@@ -47,6 +47,7 @@
     background: #colorMap[payplug];
     width: 50%;
     height: 100%;
+
     .-hide & {
       background: #colorMap[grey];
       .border(darken(#colorMap[grey], 5%));
@@ -126,36 +127,47 @@
     }
 
   }
+
   &.-format {
     width: 240px;
     flex: 0 0 240px;
+
     &_label {
       label& {
         .transition(color @dur);
-        width: 33.33%;
+        width: calc(100% / 3);
+        z-index: 2;
       }
     }
+
     &:before {
       .borderRadius(.25em);
       .transition(left @dur);
       //.boxShadow(rgba(0,0,0,.15) 0 1px 4px 1px inset);
       .border(darken(#colorMap[payplug], 5%));
-      width: 33.33%;
+      width: calc(100% / 3);
+      z-index: 1;
     }
-    &.-right {
-      .payplugSwitch_label {
-        &.-left, &.-center {
-          color: inherit;
-        }
 
-        &.-right {
-          color: #fff;
-        }
-      }
+    &:after {
+      .border(rgba(0, 0, 0, .2), rl);
+      .transform(translateY(-50%));
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: calc(100% / 3);
+      width: calc(100% / 3);
+      content: "";
+      height: 70%;
+      z-index: 0;
+    }
+
+    &.-left {
       &:before {
-        left: 67%;
+        width: calc(100% / 3 + 1px);
       }
     }
+
     &.-center {
       .payplugSwitch_label {
         &.-left, &.-right {
@@ -166,11 +178,31 @@
           color: #fff;
         }
       }
+
       &:before {
-        left: 33%;
+        left: calc(100% / 3);
+      }
+    }
+
+    &.-right {
+      .payplugSwitch_label {
+        &.-left,
+        &.-center {
+          color: inherit;
+        }
+
+        &.-right {
+          color: #fff;
+        }
+      }
+
+      &:before {
+        width: calc(100% / 3 + 1px);
+        left: calc(200% / 3 - 1px);
       }
     }
   }
+
   input {
     display: none;
   }
