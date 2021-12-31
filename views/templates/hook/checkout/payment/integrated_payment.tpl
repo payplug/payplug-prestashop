@@ -22,8 +22,9 @@
 
 <form class="payplugIntegratedPayment">
     <div class="payplugIntegratedPayment_container -cardHolder"></div>
-    <div class="payplugIntegratedPayment_error -hide -cardHolder">
-        {l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}
+    <div class="payplugIntegratedPayment_error -cardHolder">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
     </div>
 
     <div class="payplugIntegratedPayment_container -scheme">
@@ -45,18 +46,21 @@
     </div>
 
     <div class="payplugIntegratedPayment_container -pan"></div>
-    <div class="payplugIntegratedPayment_error -hide -pan">
-        {l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}
+    <div class="payplugIntegratedPayment_error -pan">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
     </div>
 
     <div class="payplugIntegratedPayment_container -exp"></div>
     <div class="payplugIntegratedPayment_container -cvv"></div>
 
-    <div class="payplugIntegratedPayment_error -exp -hide">
-        {l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}
+    <div class="payplugIntegratedPayment_error -exp">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
     </div>
-    <div class="payplugIntegratedPayment_error -cvv -hide">
-        {l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}
+    <div class="payplugIntegratedPayment_error -cvv">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
     </div>
 
 

@@ -108,6 +108,12 @@ var $document, $window, payplugModule = {
                 cvv: false,
                 exp: false,
             },
+            fieldsEmpty: {
+                cardHolder: true,
+                pan: true,
+                cvv: true,
+                exp: true,
+            },
             save_card: false,
             scheme: null,
             query: null,
@@ -283,6 +289,7 @@ var $document, $window, payplugModule = {
                         } else {
                             field.valid('cardHolder');
                         }
+                        integrated.props.fieldsEmpty['cardHolder'] = false;
                     });
                     form.pan.onChange(function (event) {
                         if (!event.valid) {
@@ -290,6 +297,7 @@ var $document, $window, payplugModule = {
                         } else {
                             field.valid('pan');
                         }
+                        integrated.props.fieldsEmpty['pan'] = false;
                     });
                     form.cvv.onChange(function (event) {
                         if (!event.valid) {
@@ -297,6 +305,7 @@ var $document, $window, payplugModule = {
                         } else {
                             field.valid('cvv');
                         }
+                        integrated.props.fieldsEmpty['cvv'] = false;
                     });
                     form.exp.onChange(function (event) {
                         if (!event.valid) {
@@ -304,6 +313,7 @@ var $document, $window, payplugModule = {
                         } else {
                             field.valid('exp');
                         }
+                        integrated.props.fieldsEmpty['exp'] = false;
                     });
 
                     form.cardHolder.onFocus(function(event){
@@ -338,8 +348,8 @@ var $document, $window, payplugModule = {
                     }
                     var integrated = payplugModule.integrated;
                     integrated.props.fieldsValid[type] = false;
-                    $('.payplugIntegratedPayment_error.-' + type).removeClass('-hide');
-                    $('.payplugIntegratedPayment_container.-' + type).addClass('-invalid');
+                    $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').removeClass('-hide');
+                    $('.payplugIntegratedPayment_container.-' + type + ' span.invalidField').addClass('-invalid');
                 },
                 blur: function(type){
                     if (!type || typeof type == undefined) {
@@ -352,7 +362,8 @@ var $document, $window, payplugModule = {
                         return false;
                     }
                     $('.payplugIntegratedPayment_container.-' + type).addClass('-focus').removeClass('-invalid');
-                    $('.payplugIntegratedPayment_error.-' + type).addClass('-hide');
+                    $('.payplugIntegratedPayment_error.-' + type + ' span.emptyField').addClass('-hide');
+                    $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').addClass('-hide');
                     $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
                     $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
                 },
@@ -362,20 +373,38 @@ var $document, $window, payplugModule = {
                     }
                     var integrated = payplugModule.integrated;
                     integrated.props.fieldsValid[type] = true;
-                    $('.payplugIntegratedPayment_error.-' + type).addClass('-hide');
-                    $('.payplugIntegratedPayment_container.-' + type).removeClass('-invalid');
+                    $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').addClass('-hide');
+                    $('.payplugIntegratedPayment_container.-' + type + ' span.invalidField').removeClass('-invalid');
                 },
             },
-            validateForm: function (fieldsValid) {
+            validateForm: function (fieldsValid, fieldsEmpty) {
                 // valide integrated payment form
-                for (var key in fieldsValid) {
-                    if (!fieldsValid[key]) {
-                        $('.payplugIntegratedPayment_error.-fields').removeClass('-hide');
-                        $('.payplugIntegratedPayment_error.-fields').addClass('-show');
+                var has_error = false;
+
+                for (var key in fieldsEmpty) {
+                    if (fieldsEmpty[key]) {
+                        has_error = true;
+                        console.log('fieldsEmpty : '+key);
+                        $('.payplugIntegratedPayment_error.-' + key + ' span.emptyField').removeClass('-hide');
+                        $('.payplugIntegratedPayment_error.-' + key + ' span.emptyField').addClass('-show');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
-                        return false;
                     }
                 }
+
+                for (var key in fieldsValid) {
+                    if (!fieldsValid[key] && !fieldsEmpty[key]) {
+                        has_error = true;
+                        console.log('fieldsValid : '+key);
+                        $('.payplugIntegratedPayment_error.-' + key + ' span.invalidField').removeClass('-hide');
+                        $('.payplugIntegratedPayment_error.-' + key + ' span.invalidField').addClass('-show');
+                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                    }
+                }
+
+                if (has_error === true) {
+                    return false;
+                }
+
                 return true;
             },
             getIntPaymentId: function (event) {
@@ -395,10 +424,11 @@ var $document, $window, payplugModule = {
                 }
 
                 var fieldsValid = integrated.props.fieldsValid;
+                var fieldsEmpty = integrated.props.fieldsEmpty;
 
                 $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
 
-                if (!integrated.form.validateForm(fieldsValid)) {
+                if (!integrated.form.validateForm(fieldsValid, fieldsEmpty)) {
                     integrated.props.submited = false;
                     return;
                 }
