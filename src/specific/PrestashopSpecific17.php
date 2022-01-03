@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -52,7 +52,8 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
-        if ($this->payplug->isValidFeature('feature_integrated') && (string)Configuration::get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
+        if ($this->payplug->isValidFeature('feature_integrated')
+            && (string)Configuration::get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
 
@@ -127,16 +128,31 @@ class PrestashopSpecific17
         $integrated['action'] = 'javascript:payplugModule.integrated.form.getIntPaymentId();';
         $integrated['logo'] = $payment_options['standard']['logo'];
         $integrated['moduleName'] = 'payplug';
-        $integrated['callToActionText'] = $this->payplug->l('specific17.setIntegratedPaymentOption.name', 'prestashopspecific17');
+        $integrated['callToActionText'] = $this->payplug->l(
+            'specific17.setIntegratedPaymentOption.name',
+            'prestashopspecific17'
+        );
         $integrated['tpl'] = 'integrated_payment.tpl';
         $integrated['extra_classes'] = 'payplug integrated';
         $this->contextSpecific->smarty->assign([
                 'integrated_payment_js_url' => $integrated_payment_js_url,
                 'is_one_click_activated' => (bool)Configuration::get('PAYPLUG_ONE_CLICK'),
-                'placeholderCardholder' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopspecific17'),
-                'placeholderPan' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopspecific17'),
-                'placeholderExp' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopspecific17'),
-                'placeholderCvv' => $this->payplug->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopspecific17'),
+                'placeholderCardholder' => $this->payplug->l(
+                    'specific17.setIntegratedPaymentOption.placeholderCardholder',
+                    'prestashopspecific17'
+                ),
+                'placeholderPan' => $this->payplug->l(
+                    'specific17.setIntegratedPaymentOption.placeholderPan',
+                    'prestashopspecific17'
+                ),
+                'placeholderExp' => $this->payplug->l(
+                    'specific17.setIntegratedPaymentOption.placeholderExp',
+                    'prestashopspecific17'
+                ),
+                'placeholderCvv' => $this->payplug->l(
+                    'specific17.setIntegratedPaymentOption.placeholderCvv',
+                    'prestashopspecific17'
+                ),
         ]);
 
         $integrated['additionalInformation'] = $this->payplug->fetchTemplate('checkout/payment/integrated_payment.tpl');

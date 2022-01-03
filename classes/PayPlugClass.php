@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -333,8 +333,8 @@ class PayPlugClass extends PaymentModule
         parent::__construct();
         $this->loadSpecificPrestaClasses();
 
-        if (file_exists(__DIR__."/../features.json")) {
-            $this->features_json = json_decode(file_get_contents(__DIR__."/../features.json"));
+        if (file_exists(dirname(__FILE__)."/../features.json")) {
+            $this->features_json = json_decode(Tools::file_get_contents(dirname(__FILE__)."/../features.json"));
         } else {
             $this->features_json = [];
         }
@@ -702,7 +702,6 @@ class PayPlugClass extends PaymentModule
     {
         $standard = Configuration::get('PAYPLUG_STANDARD');
         $one_click = $standard && Configuration::get('PAYPLUG_ONE_CLICK');
-        $bancontact = Configuration::get('PAYPLUG_BANCONTACT');
         $installment = Configuration::get('PAYPLUG_INST');
         $installment_mode = Configuration::get('PAYPLUG_INST_MODE');
         $installment_min_amount = Configuration::get('PAYPLUG_INST_MIN_AMOUNT');
@@ -2085,23 +2084,38 @@ class PayPlugClass extends PaymentModule
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithFees', 'payplugclass');
+                    $payment_details['type'] = $this->l(
+                        'payplug.buildPaymentDetails.oneyX3WithFees',
+                        'payplugclass'
+                    );
                     break;
                 case 'oney_x4_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithFees', 'payplugclass');
+                    $payment_details['type'] = $this->l(
+                        'payplug.buildPaymentDetails.oneyX4WithFees',
+                        'payplugclass'
+                    );
                     break;
                 case 'oney_x3_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX3WithoutFees', 'payplugclass');
+                    $payment_details['type'] = $this->l(
+                        'payplug.buildPaymentDetails.oneyX3WithoutFees',
+                        'payplugclass'
+                    );
                     break;
                 case 'oney_x4_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'payplugclass');
+                    $payment_details['type'] = $this->l(
+                        'payplug.buildPaymentDetails.oneyX4WithoutFees',
+                        'payplugclass'
+                    );
                     break;
                 case 'bancontact':
                     $is_bancontact = true;
-                    $payment_details['type'] = $this->l('payplug.buildPaymentDetails.bancontact', 'payplugclass');
+                    $payment_details['type'] = $this->l(
+                        'payplug.buildPaymentDetails.bancontact',
+                        'payplugclass'
+                    );
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -3208,9 +3222,15 @@ class PayPlugClass extends PaymentModule
                 _PS_MODULE_DIR_ . $this->name . '/views/img/logos_schemes_' . $this->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
-                $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payDifferentCard', 'payplugclass');
+                $paymentOption['standard']['callToActionText'] = $this->l(
+                    'payplug.getPaymentOptions.payDifferentCard',
+                    'payplugclass'
+                );
             } else {
-                $paymentOption['standard']['callToActionText'] = $this->l('payplug.getPaymentOptions.payCreditCard', 'payplugclass');
+                $paymentOption['standard']['callToActionText'] = $this->l(
+                    'payplug.getPaymentOptions.payCreditCard',
+                    'payplugclass'
+                );
             }
             $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
                 $this->name,
@@ -3487,7 +3507,8 @@ class PayPlugClass extends PaymentModule
 //
 //        $payment_options = $this->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
 //
-//        return $this->PrestashopSpecificObject->displayPaymentOption($payment_options); // Transforme tableau en object
+//        // Transforme tableau en object
+//        return $this->PrestashopSpecificObject->displayPaymentOption($payment_options);
 //    }
 
 //    /**
