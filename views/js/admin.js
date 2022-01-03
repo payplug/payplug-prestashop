@@ -831,8 +831,8 @@ var $document, $window, payplug = {
             switcher: 'payplug_oney',
             error: null,
             limits: {
-                min: oney_min_amounts,
-                max: oney_max_amounts,
+                min: (typeof oney_min_amounts == 'undefined') ? 0 : oney_min_amounts,
+                max: (typeof oney_max_amounts == 'undefined') ? 0 : oney_max_amounts,
             },
 
         },
