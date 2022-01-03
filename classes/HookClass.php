@@ -843,13 +843,18 @@ class HookClass
             $payplug_domain = "https://secure.payplug.com";
         }
 
-        $integratedPaymentError = $this->payplug->l('hook.header.integratedPayment.error', 'hookclass');
+
+        if ((string)Configuration::get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
+            $integratedPaymentError = $this->payplug->l('hook.header.integratedPayment.error', 'hookclass');
+            Media::addJsDef([
+                'integratedPaymentError' => $integratedPaymentError,
+                'payplug_publishable_key' => $this->payplug->apiClass->getPublishableKeys(),
+            ]);
+        }
 
         Media::addJsDef(
             [
                 'payplug_ajax_url' => $payplug_ajax_url,
-                'integratedPaymentError' => $integratedPaymentError,
-                'payplug_publishable_key' => $this->payplug->apiClass->getPublishableKeys(),
                 'PAYPLUG_DOMAIN' => $payplug_domain,
             ]
         );
