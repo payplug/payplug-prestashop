@@ -574,7 +574,6 @@ class ApiClass
     {
         try {
             $response = \Payplug\Authentication::getKeysByLogin($email, $password);
-
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
