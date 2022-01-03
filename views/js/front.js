@@ -384,9 +384,9 @@ var $document, $window, payplugModule = {
                 for (var key in fieldsEmpty) {
                     if (fieldsEmpty[key]) {
                         has_error = true;
-                        console.log('fieldsEmpty : '+key);
                         $('.payplugIntegratedPayment_error.-' + key + ' span.emptyField').removeClass('-hide');
                         $('.payplugIntegratedPayment_error.-' + key + ' span.emptyField').addClass('-show');
+                        $('.payplugIntegratedPayment_container.-' + key).addClass('-invalid');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
@@ -394,9 +394,9 @@ var $document, $window, payplugModule = {
                 for (var key in fieldsValid) {
                     if (!fieldsValid[key] && !fieldsEmpty[key]) {
                         has_error = true;
-                        console.log('fieldsValid : '+key);
                         $('.payplugIntegratedPayment_error.-' + key + ' span.invalidField').removeClass('-hide');
                         $('.payplugIntegratedPayment_error.-' + key + ' span.invalidField').addClass('-show');
+                        $('.payplugIntegratedPayment_container.-' + key).addClass('-invalid');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
