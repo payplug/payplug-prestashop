@@ -645,7 +645,7 @@ class ConfigClass
         if ((class_exists($this->payplugClass->PrestashopSpecificClass))
             && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
             && $this->payplugClass->isValidFeature('feature_integrated')
-
+            && $this->payplugClass->apiClass->getPublishableKeys()
         ) {
             $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
         } else {
