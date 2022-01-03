@@ -634,7 +634,6 @@ class ConfigClass
         $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
         $faq_links = $this->getFAQLinks($this->context->language->iso_code);
-
         $amounts = $this->oney->getOneyPriceLimit(false);
         $customAmounts = $this->oney->getOneyPriceLimit(true);
         $oney_min_amounts = ($amounts['min'] / 100);
@@ -645,7 +644,7 @@ class ConfigClass
         if ((class_exists($this->payplugClass->PrestashopSpecificClass))
             && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
             && $this->payplugClass->isValidFeature('feature_integrated')
-            && $this->payplugClass->apiClass->getPublishableKeys()
+            && Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($configurations['sandbox_mode'] ? '_TEST' : ''))
         ) {
             $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
         } else {

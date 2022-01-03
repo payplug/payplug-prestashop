@@ -846,9 +846,10 @@ class HookClass
 
         if ((string)Configuration::get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
             $integratedPaymentError = $this->payplug->l('hook.header.integratedPayment.error', 'hookclass');
+            $sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
             Media::addJsDef([
                 'integratedPaymentError' => $integratedPaymentError,
-                'payplug_publishable_key' => $this->payplug->apiClass->getPublishableKeys(),
+                'payplug_publishable_key' => Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : '')),
             ]);
         }
 

@@ -30,6 +30,8 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_3_7_0($object)
 {
     $flag = true;
+
+    // Set type to native OrderState
     $prestashop_order_states = [
         'PS_OS_PAYMENT' => 'paid',
         'PS_OS_WS_PAYMENT' => 'nothing',
@@ -63,5 +65,9 @@ function upgrade_module_3_7_0($object)
             unset($sql);
         }
     }
+
+    // Set PayPlug Publishable key if merchand account connected
+    $flag = $flag && $object->payplug_dependencies->api->setPublishableKeys();
+
     return $flag;
 }
