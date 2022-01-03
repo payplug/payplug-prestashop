@@ -58,7 +58,7 @@
         </div>
     {/if}
 
-    <div class="payplugIntegratedPayment_error -fields -hide">
+    <div class="payplugIntegratedPayment_error -fields">
         {l s='hook.checkout.payment.integrated.fields.error' mod='payplug'}
     </div>
     <div class="payplugIntegratedPayment_error -payment"></div>

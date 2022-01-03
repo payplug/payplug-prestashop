@@ -146,10 +146,10 @@ var $document, $window, payplugModule = {
                 var api = integrated.props.api,
                     $form = $('.' + integrated.props.identifier),
                     $scheme = $form.find('.-scheme'),
-                    $cardHolder = $form.find('.payplugIntegratedPayment_container.-cardHolder'),
-                    $pan = $form.find('.payplugIntegratedPayment_container.-pan'),
-                    $cvv = $form.find('.payplugIntegratedPayment_container.-cvv'),
-                    $exp = $form.find('.payplugIntegratedPayment_container.-exp'),
+                    $cardHolder = $form.find('.' + integrated.props.identifier + '_container.-cardHolder'),
+                    $pan = $form.find('.' + integrated.props.identifier + '_container.-pan'),
+                    $cvv = $form.find('.' + integrated.props.identifier + '_container.-cvv'),
+                    $exp = $form.find('.' + integrated.props.identifier + '_container.-exp'),
                     $saveCard = $form.find('.-saveCard'),
                     payment_option_id = integrated.props.paymentOptionId;
 
@@ -348,24 +348,25 @@ var $document, $window, payplugModule = {
                     }
                     var integrated = payplugModule.integrated;
                     integrated.props.fieldsValid[type] = false;
-                    $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').removeClass('-hide');
-                    $('.payplugIntegratedPayment_container.-' + type).addClass('-invalid');
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').removeClass('-hide');
+                    $('.' + integrated.props.identifier + '_container.-' + type).addClass('-invalid');
                 },
                 blur: function(type){
                     if (!type || typeof type == undefined) {
                         return false;
                     }
-                    $('.payplugIntegratedPayment_container.-' + type).removeClass('-focus');
+                    var integrated = payplugModule.integrated;
+                    $('.' + integrated.props.identifier + '_container.-' + type).removeClass('-focus');
                 },
                 focus: function(type){
                     if (!type || typeof type == undefined) {
                         return false;
                     }
-                    $('.payplugIntegratedPayment_container.-' + type).addClass('-focus').removeClass('-invalid');
-                    $('.payplugIntegratedPayment_error.-' + type + ' span.emptyField').addClass('-hide');
-                    $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').addClass('-hide');
-                    $('.payplugIntegratedPayment_error.-fields').removeClass('-show');
-                    $('.payplugIntegratedPayment_error.-fields').addClass('-hide');
+                    var integrated = payplugModule.integrated;
+                    $('.' + integrated.props.identifier + '_container.-' + type).addClass('-focus').removeClass('-invalid');
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.emptyField').addClass('-hide');
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
+                    $('.' + integrated.props.identifier + '_error.-fields').removeClass('-show');
                 },
                 valid: function(type) {
                     if (!type || typeof type == undefined) {
@@ -373,20 +374,20 @@ var $document, $window, payplugModule = {
                     }
                     var integrated = payplugModule.integrated;
                     integrated.props.fieldsValid[type] = true;
-                    $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').addClass('-hide');
-                    $('.payplugIntegratedPayment_container.-' + type + ' span.invalidField').removeClass('-invalid');
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
+                    $('.' + integrated.props.identifier + '_container.-' + type + ' span.invalidField').removeClass('-invalid');
                 },
             },
             validateForm: function (fieldsValid, fieldsEmpty) {
                 // valide integrated payment form
                 var has_error = false;
+                var integrated = payplugModule.integrated;
 
                 for (var key in fieldsEmpty) {
                     if (fieldsEmpty[key]) {
                         has_error = true;
-                        $('.payplugIntegratedPayment_error.-' + key + ' span.emptyField').removeClass('-hide');
-                        $('.payplugIntegratedPayment_error.-' + key + ' span.emptyField').addClass('-show');
-                        $('.payplugIntegratedPayment_container.-' + key).addClass('-invalid');
+                        $('.' + integrated.props.identifier + '_error.-' + key + ' span.emptyField').removeClass('-hide');
+                        $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
@@ -394,9 +395,8 @@ var $document, $window, payplugModule = {
                 for (var key in fieldsValid) {
                     if (!fieldsValid[key] && !fieldsEmpty[key]) {
                         has_error = true;
-                        $('.payplugIntegratedPayment_error.-' + key + ' span.invalidField').removeClass('-hide');
-                        $('.payplugIntegratedPayment_error.-' + key + ' span.invalidField').addClass('-show');
-                        $('.payplugIntegratedPayment_container.-' + key).addClass('-invalid');
+                        $('.' + integrated.props.identifier + '_error.-' + key + ' span.invalidField').removeClass('-hide');
+                        $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
