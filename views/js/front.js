@@ -349,7 +349,7 @@ var $document, $window, payplugModule = {
                     var integrated = payplugModule.integrated;
                     integrated.props.fieldsValid[type] = false;
                     $('.payplugIntegratedPayment_error.-' + type + ' span.invalidField').removeClass('-hide');
-                    $('.payplugIntegratedPayment_container.-' + type + ' span.invalidField').addClass('-invalid');
+                    $('.payplugIntegratedPayment_container.-' + type).addClass('-invalid');
                 },
                 blur: function(type){
                     if (!type || typeof type == undefined) {
