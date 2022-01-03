@@ -60,7 +60,7 @@ class ApiClass
         $this->checkEnvironment();
         $this->setEnvironment();
         self::setSecretKey();
-        $this->current_api_key =  self::getCurrentApiKey();
+        $this->current_api_key = self::getCurrentApiKey();
 
         $this->setUserAgent();
     }
@@ -116,20 +116,69 @@ class ApiClass
             return false;
         }
     }
+
     /**
-     * @description get publishable keys from payplug/payplug-php
+     * @description set publishable keys from payplug/payplug-php
      * @throws Payplug\Exception\ConfigurationNotSetException
      * @throws ConfigurationException
      */
-    public function getPublishableKeys($api_key = null)
+    public function setPublishableKeys()
     {
-        if ($this->current_api_key != null) {
-            if ($response = \Payplug\Authentication::getPublishableKeys()) {
-                return $response['httpResponse']['publishable_key'];
-            }
+        if (!$this->current_api_key) {
+            return false;
         }
-    }
 
+        $sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $flag = true;
+
+        // Set the publishable for the given sandbox configuration
+        try {
+            $response = \Payplug\Authentication::getPublishableKeys();
+            $publishable_key = $response['httpResponse']['publishable_key'];
+            $flag = $flag
+                && Configuration::updateValue(
+                    'PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : ''),
+                    $publishable_key
+                );
+        } catch (BadRequestException $e) {
+            json_encode([
+                'content' => null,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+
+        if ($sandbox) {
+            self::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+        } else {
+            self::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+        }
+
+        // Set the publishable for the other sandbox configuration
+        try {
+            $response = \Payplug\Authentication::getPublishableKeys();
+            $publishable_key = $response['httpResponse']['publishable_key'];
+            $flag = $flag
+                && Configuration::updateValue(
+                    'PAYPLUG_PUBLISHABLE_KEY' . (!$sandbox ? '_TEST' : ''),
+                    $publishable_key
+                );
+        } catch (BadRequestException $e) {
+            json_encode([
+                'content' => null,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+
+        if (!$sandbox) {
+            self::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+        } else {
+            self::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+        }
+
+        return $flag;
+    }
 
     /**
      * @description Read API response and return permissions
@@ -352,6 +401,7 @@ class ApiClass
         $this->api_url = $api_url;
         return $this;
     }
+
     /**
      * @description Set the current secret key used to interact with PayPlug API
      *
@@ -475,10 +525,10 @@ class ApiClass
     {
         try {
             $response = \Payplug\Authentication::getKeysByLogin($email, $password);
-
             $json_answer = $response['httpResponse'];
+
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                return true;
+                return $this->setPublishableKeys();
             } else {
                 return false;
             }

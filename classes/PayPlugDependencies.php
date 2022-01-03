@@ -69,6 +69,7 @@ class PayPlugDependencies
         $this->payplug = new PayPlugClass();
         $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
 
+        $this->api = new ApiClass($this->payplug);
         $this->hook = $this->getPlugin()->getHook();
         $this->hookClass = new HookClass($this->payplug);
         $this->install = $this->getPlugin()->getInstall();
