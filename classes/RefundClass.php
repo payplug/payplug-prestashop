@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -41,7 +41,7 @@ use Validate;
 
 class RefundClass extends \PaymentModule
 {
-    protected $context;
+    public $context;
     private $payplug;
 
     public function __construct($payplug)
@@ -280,9 +280,9 @@ class RefundClass extends \PaymentModule
                     if (Validate::isLoadedObject($order)) {
                         if (!$this->payplug->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
-                                                'status' => 'error',
-                                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
-                                            ]));
+                                'status' => 'error',
+                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
+                            ]));
                         }
 
                         $current_state = (int)$this->payplug->orderClass->getCurrentOrderState($order->id);
@@ -357,12 +357,12 @@ class RefundClass extends \PaymentModule
                 $amount_available
             );
             die(json_encode([
-                                'status' => 'ok',
-                                'data' => $data,
-                                'template' => $this->payplug->hookClass->displayAdminOrderMain(['id_order' => $id_order]),
-                                'message' => $this->payplug->l('payplug.refundPayment.success', 'refundclass'),
-                                'reload' => $reload
-                            ]));
+                'status' => 'ok',
+                'data' => $data,
+                'template' => $this->payplug->hookClass->displayAdminOrderMain(['id_order' => $id_order]),
+                'message' => $this->payplug->l('payplug.refundPayment.success', 'refundclass'),
+                'reload' => $reload
+            ]));
         }
     }
 }

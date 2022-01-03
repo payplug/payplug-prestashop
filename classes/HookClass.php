@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -896,7 +896,11 @@ class HookClass
                     $group
                 ) : 0;
             }
-            $quantity = (int)$this->tools->tool('getValue', 'qty', (int)$this->tools->tool('getValue', 'quantity_wanted', 1));
+            $quantity = (int)$this->tools->tool(
+                'getValue',
+                'qty',
+                (int)$this->tools->tool('getValue', 'quantity_wanted', 1)
+            );
 
             $product_price = $this->product->getPriceStatic(
                 (int)$id_product,
@@ -1014,7 +1018,8 @@ class HookClass
 
         $payment_options = $this->payplug->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
 
-        return $this->payplug->PrestashopSpecificObject->displayPaymentOption($payment_options); // Transforme tableau en object
+        // Transforme tableau en object
+        return $this->payplug->PrestashopSpecificObject->displayPaymentOption($payment_options);
     }
 
     /**

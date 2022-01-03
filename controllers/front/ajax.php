@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -216,12 +216,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $token = $tools->tool('getValue', 'token');
                 if ($token == false) {
                     die(
-                    json_encode(
-                        [
-                            'result' => true,
-                            'message' => $token,
-                        ]
-                    )
+                        json_encode(
+                            [
+                                'result' => true,
+                                'message' => $token,
+                            ]
+                        )
                     );
                 } else {
                     $payment = $this->payplug->preparePayment([
@@ -248,7 +248,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if ($payment_id != $current_payment_id) {
                     die(json_encode([
                         'result' => false,
-                        'message' => 'invalid payment id, giver: ' . $payment_id . ' and current :' . $current_payment_id
+                        'message' => 'invalid payment id, giver: ' . $payment_id . ' and current:' . $current_payment_id
                     ]));
                 }
 
