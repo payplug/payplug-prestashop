@@ -259,6 +259,8 @@ class InstallRepository extends Repository
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND')
             && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
+            && $this->config->deleteByName('PAYPLUG_PUBLISHABLE_KEY')
+            && $this->config->deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST')
             && $this->config->deleteByName('PAYPLUG_SANDBOX_MODE')
             && $this->config->deleteByName('PAYPLUG_SHOW')
             && $this->config->deleteByName('PAYPLUG_STANDARD')
