@@ -66,16 +66,12 @@ class PayPlugDependencies
         $this->dependencies = new DependenciesClass();
 
         $this->apiClass = $this->dependencies->apiClass;
-
         $this->hook = $this->dependencies->getPlugin()->getHook();
         $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
-
         $this->hookClass = $this->dependencies->hookClass;
-
         $this->configClass = $this->dependencies->configClass;
-
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
 
