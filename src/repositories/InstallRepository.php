@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\classes\ConfigClass;
 use Db;
 
 class InstallRepository extends Repository
