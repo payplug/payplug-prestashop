@@ -538,7 +538,10 @@ var $document, $window, payplugModule = {
                     form.pan.clear();
                     form.cvv.clear();
                     form.exp.clear();
-                    $('input[name="savecard"]').prop('checked', false);
+                    $('.' + integrated.props.identifier + '_container.-saveCard')
+                        .removeClass('-checked')
+                        .find('input')
+                        .prop('checked', false);
                 }
 
                 // unchecked tos
