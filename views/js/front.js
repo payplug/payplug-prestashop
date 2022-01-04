@@ -357,6 +357,9 @@ var $document, $window, payplugModule = {
                     }
                     var integrated = payplugModule.integrated;
                     $('.' + integrated.props.identifier + '_container.-' + type).removeClass('-focus');
+                    if ($('.' + integrated.props.identifier + '_container.-' + type).is('.integrated_payment_error')) {
+                        integrated.form.field.error(type);
+                    }
                 },
                 focus: function(type){
                     if (!type || typeof type == undefined) {
