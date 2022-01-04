@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\classes\ConfigClass;
+use Db;
 
 class InstallRepository extends Repository
 {
@@ -164,6 +165,42 @@ class InstallRepository extends Repository
             if ($id_order_state_sandbox) {
                 $res = $this->order_state->setType((int)$id_order_state_sandbox, $state['type']);
                 $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
+            }
+        }
+        // mapping of the native prestashop statuses
+        $prestashop_order_states = [
+            'PS_OS_PAYMENT' => 'paid',
+            'PS_OS_WS_PAYMENT' => 'nothing',
+            'PS_OS_OUTOFSTOCK_PAID' => 'paid',
+            'PS_OS_CANCELED' => 'cancelled',
+            'PS_OS_REFUND' => 'refund',
+            'PS_OS_ERROR' => 'error',
+            'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
+            'PS_OS_CHEQUE' => 'nothing',
+            'PS_OS_BANKWIRE' => 'nothing',
+            'PS_OS_COD_VALIDATION' =>'nothing',
+            'PS_OS_PREPARATION' =>'nothing',
+            'PS_OS_SHIPPING' =>'nothing',
+            'PS_OS_DELIVERED'=>'nothing',
+        ];
+        $date = date('Y-m-d');
+        $payplug_order_states_sql = [];
+        foreach ($prestashop_order_states as $key => $type) {
+            $id_order_state = $this->config->get($key);
+            $getTypeQuery = ' SELECT `type` FROM `' . _DB_PREFIX_ . 'payplug_order_state` WHERE  `id_order_state` = ' . $id_order_state;
+            $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
+            if ($sqlGetType  && $sqlGetType  != $type) {
+                $payplug_order_states_sql[] = ' UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` SET `type` = ' . "'$type'" . ' WHERE  `id_order_state` = ' . $id_order_state;
+            } else {
+                $payplug_order_states_sql[] = '
+            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
+            VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
+            }
+        }
+        if ($payplug_order_states_sql) {
+            foreach ($payplug_order_states_sql as $sql) {
+                $db = Db::getInstance()->execute($sql);
+                unset($sql);
             }
         }
 
