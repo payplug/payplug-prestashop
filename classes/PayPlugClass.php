@@ -78,6 +78,7 @@ class PayPlugClass extends PaymentModule
     public $logger;
     public $oney;
     public $payplug_languages = ['en', 'fr', 'es', 'it'];
+
     public $oney_order_state = [
         'oney_pg' => [
             'cfg' => null,
@@ -263,6 +264,7 @@ class PayPlugClass extends PaymentModule
             ],
         ],
     ];
+
     /** @var array */
     public $payment_status = [];
     public $PrestashopSpecificClass;
