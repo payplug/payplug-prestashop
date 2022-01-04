@@ -381,13 +381,13 @@ var $document, $window, payplugModule = {
                     $('.' + integrated.props.identifier + '_container.-' + type + ' span.invalidField').removeClass('-invalid');
                 },
             },
-            validateForm: function (fieldsValid, fieldsEmpty) {
+            validateForm: function () {
                 // valide integrated payment form
-                var has_error = false;
-                var integrated = payplugModule.integrated;
+                var integrated = payplugModule.integrated,
+                    has_error = false;
 
-                for (var key in fieldsEmpty) {
-                    if (fieldsEmpty[key]) {
+                for (var key in integrated.props.fieldsEmpty) {
+                    if (integrated.props.fieldsEmpty[key]) {
                         has_error = true;
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.emptyField').removeClass('-hide');
                         $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
@@ -395,11 +395,12 @@ var $document, $window, payplugModule = {
                     }
                 }
 
-                for (var key in fieldsValid) {
-                    if (!fieldsValid[key] && !fieldsEmpty[key]) {
+                for (var key in integrated.props.fieldsValid) {
+                    if (!integrated.props.fieldsValid[key] && !integrated.props.fieldsEmpty[key]) {
                         has_error = true;
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.invalidField').removeClass('-hide');
                         $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
+                        $('.' + integrated.props.identifier + '_error.-fields').addClass('-show');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
@@ -426,12 +427,9 @@ var $document, $window, payplugModule = {
                     integrated.props.query = null;
                 }
 
-                var fieldsValid = integrated.props.fieldsValid;
-                var fieldsEmpty = integrated.props.fieldsEmpty;
-
                 $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
 
-                if (!integrated.form.validateForm(fieldsValid, fieldsEmpty)) {
+                if (!integrated.form.validateForm()) {
                     integrated.props.submited = false;
                     return;
                 }
