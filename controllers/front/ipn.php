@@ -21,10 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
-
 /**
  * @description
  * Treat notification received
