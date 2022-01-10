@@ -115,7 +115,7 @@ class ConfigClass
     {
         $PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
         if (class_exists($PrestashopSpecificClass)) {
-            $this->PrestashopSpecificObject = new $PrestashopSpecificClass($this->payplugClass);
+            $this->PrestashopSpecificObject = new $PrestashopSpecificClass($this->dependenciesClass);
         }
     }
 
@@ -158,21 +158,21 @@ class ConfigClass
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->payplugClass->l('payplug.setConfigurationProperties.configureModule', 'configclass');
+            $this->warning = $this->dependenciesClass->l('payplug.setConfigurationProperties.configureModule', 'configclass');
         }
 
         $this->payment_status = [
-            1 => $this->payplugClass->l('payplug.setConfigurationProperties.notPaid', 'configclass'),
-            2 => $this->payplugClass->l('payplug.setConfigurationProperties.paid', 'configclass'),
-            3 => $this->payplugClass->l('payplug.setConfigurationProperties.failed', 'configclass'),
-            4 => $this->payplugClass->l('payplug.setConfigurationProperties.partiallyRefunded', 'configclass'),
-            5 => $this->payplugClass->l('payplug.setConfigurationProperties.refunded', 'configclass'),
-            6 => $this->payplugClass->l('payplug.setConfigurationProperties.onGoing', 'configclass'),
-            7 => $this->payplugClass->l('payplug.setConfigurationProperties.cancelled', 'configclass'),
-            8 => $this->payplugClass->l('payplug.setConfigurationProperties.authorized', 'configclass'),
-            9 => $this->payplugClass->l('payplug.setConfigurationProperties.authorizationExpired', 'configclass'),
-            10 => $this->payplugClass->l('payplug.setConfigurationProperties.oneyPending', 'configclass'),
-            11 => $this->payplugClass->l('payplug.setConfigurationProperties.abandoned', 'configclass'),
+            1 => $this->dependenciesClass->l('payplug.setConfigurationProperties.notPaid', 'configclass'),
+            2 => $this->dependenciesClass->l('payplug.setConfigurationProperties.paid', 'configclass'),
+            3 => $this->dependenciesClass->l('payplug.setConfigurationProperties.failed', 'configclass'),
+            4 => $this->dependenciesClass->l('payplug.setConfigurationProperties.partiallyRefunded', 'configclass'),
+            5 => $this->dependenciesClass->l('payplug.setConfigurationProperties.refunded', 'configclass'),
+            6 => $this->dependenciesClass->l('payplug.setConfigurationProperties.onGoing', 'configclass'),
+            7 => $this->dependenciesClass->l('payplug.setConfigurationProperties.cancelled', 'configclass'),
+            8 => $this->dependenciesClass->l('payplug.setConfigurationProperties.authorized', 'configclass'),
+            9 => $this->dependenciesClass->l('payplug.setConfigurationProperties.authorizationExpired', 'configclass'),
+            10 => $this->dependenciesClass->l('payplug.setConfigurationProperties.oneyPending', 'configclass'),
+            11 => $this->dependenciesClass->l('payplug.setConfigurationProperties.abandoned', 'configclass'),
         ];
     }
 
@@ -195,7 +195,7 @@ class ConfigClass
     public function disable($force_all = false)
     {
         Configuration::updateValue('PAYPLUG_SHOW', 0);
-        $this->payplugClass->disable($force_all);
+        $this->dependenciesClass->disable($force_all);
 
         $req_disable = '
             UPDATE `' . _DB_PREFIX_ . 'module`
@@ -302,7 +302,7 @@ class ConfigClass
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->version,
         ]);
-        $this->html = $this->payplugClass->fetchTemplate('/views/templates/admin/panel/fieldset.tpl');
+        $this->html = $this->fetchTemplate('/views/templates/admin/panel/fieldset.tpl');
 
         return $this->html;
     }
@@ -337,35 +337,35 @@ class ConfigClass
 
         $this->check_configuration = ['warning' => [], 'error' => [], 'success' => []];
 
-        $curl_warning = $this->payplugClass->l('payplug.checkConfiguration.curlExtension', 'configclass');
+        $curl_warning = $this->dependenciesClass->l('payplug.checkConfiguration.curlExtension', 'configclass');
         if ($report['curl']['installed']) {
             $this->check_configuration['success'][] .= $curl_warning;
         } else {
             $this->check_configuration['error'][] .= $curl_warning;
         }
 
-        $php_warning = $this->payplugClass->l('payplug.checkConfiguration.phpVersion', 'configclass');
+        $php_warning = $this->dependenciesClass->l('payplug.checkConfiguration.phpVersion', 'configclass');
         if ($report['php']['up2date']) {
             $this->check_configuration['success'][] .= $php_warning;
         } else {
             $this->check_configuration['error'][] .= $php_warning;
         }
 
-        $openssl_warning = $this->payplugClass->l('payplug.checkConfiguration.openssl', 'configclass');
+        $openssl_warning = $this->dependenciesClass->l('payplug.checkConfiguration.openssl', 'configclass');
         if ($report['openssl']['installed'] && $report['openssl']['up2date']) {
             $this->check_configuration['success'][] .= $openssl_warning;
         } else {
             $this->check_configuration['error'][] .= $openssl_warning;
         }
 
-        $connexion_warning = $this->payplugClass->l('payplug.checkConfiguration.payplugAccount', 'configclass');
+        $connexion_warning = $this->dependenciesClass->l('payplug.checkConfiguration.payplugAccount', 'configclass');
         if ($is_payplug_connected) {
             $this->check_configuration['success'][] .= $connexion_warning;
         } else {
             $this->check_configuration['error'][] .= $connexion_warning;
         }
 
-        $check_warning = $this->payplugClass->l('payplug.checkConfiguration.issue', 'configclass');
+        $check_warning = $this->dependenciesClass->l('payplug.checkConfiguration.issue', 'configclass');
         if ($is_payplug_configured) {
         } else {
             Configuration::get('PAYPLUG_SHOW', 0);
@@ -515,7 +515,7 @@ class ConfigClass
                 }
             }
             if ($key == 'PAYPLUG_SHOW' && $value) {
-                $this->payplugClass->enable();
+                $this->dependenciesClass->enable();
             }
         }
     }
@@ -626,11 +626,11 @@ class ConfigClass
 
         Media::addJsDef([
             'admin_ajax_url' => $admin_ajax_url,
-            'error_installment' => $this->payplugClass->l('payplug.assignContentVar.installment', 'configclass'),
-            'error_deferred' => $this->payplugClass->l('payplug.assignContentVar.deferred', 'configclass'),
-            'error_oney' => $this->payplugClass->l('payplug.assignContentVar.oney', 'configclass'),
-            'errorOneyMax' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass'),
-            'errorOneyMin' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMinError', 'configclass'),
+            'error_installment' => $this->dependenciesClass->l('payplug.assignContentVar.installment', 'configclass'),
+            'error_deferred' => $this->dependenciesClass->l('payplug.assignContentVar.deferred', 'configclass'),
+            'error_oney' => $this->dependenciesClass->l('payplug.assignContentVar.oney', 'configclass'),
+            'errorOneyMax' => $this->dependenciesClass->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass'),
+            'errorOneyMin' => $this->dependenciesClass->l('config.assignContentVar.oney.thresholdsMinError', 'configclass'),
         ]);
 
         $login_infos = [];
@@ -646,12 +646,12 @@ class ConfigClass
         $oney_custom_max_amounts = ($customAmounts['max']);
         $oney_custom_min_amounts = ($customAmounts['min']);
 
-        if ((class_exists($this->payplugClass->PrestashopSpecificClass))
-            && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
+        if ((class_exists($this->dependenciesClass->PrestashopSpecificClass))
+            && (method_exists($this->dependenciesClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
             && $this->isValidFeature('feature_integrated')
             && Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($configurations['sandbox_mode'] ? '_TEST' : ''))
         ) {
-            $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
+            $this->dependenciesClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
         } else {
             $this->assignSwitchConfiguration($configurations);
         }
@@ -659,7 +659,7 @@ class ConfigClass
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    $this->payplugClass->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
+                    $this->dependenciesClass->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),
@@ -673,7 +673,7 @@ class ConfigClass
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
-            'pp_version' => Module::getInstanceByName($this->payplugClass->name)->version,
+            'pp_version' => Module::getInstanceByName($this->dependenciesClass->name)->version,
             'connected' => $connected,
             'verified' => $verified,
             'premium' => $premium,
@@ -748,7 +748,7 @@ class ConfigClass
         // show module to the customer
         $switch['show'] = [
             'name' => 'PAYPLUG_SHOW',
-            'label' => $this->payplugClass->l('payplug.assignSwitchConfiguration.showPayplug', 'configclass'),
+            'label' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.showPayplug', 'configclass'),
             'active' => $connected,
             'small' => true,
             'checked' => $configurations['show'],
@@ -758,40 +758,40 @@ class ConfigClass
             'name' => 'payplug_sandbox',
             'active' => $connected,
             'checked' => $configurations['sandbox_mode'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.test', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.live', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.test', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.live', 'configclass'),
         ];
 
         $switch['embedded'] = [
             'name' => 'payplug_embedded',
             'active' => $connected,
             'checked' => $configurations['embedded_mode'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.popup', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.redirected', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.popup', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.redirected', 'configclass'),
         ];
 
         $switch['one_click'] = [
             'name' => 'payplug_one_click',
             'active' => $connected,
             'checked' => $configurations['one_click'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['standard'] = [
             'name' => 'payplug_standard',
             'active' => $connected,
             'checked' => $configurations['standard'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['oney'] = [
             'name' => 'payplug_oney',
             'active' => $connected,
             'checked' => $configurations['oney'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['oney_optimized'] = [
@@ -812,32 +812,32 @@ class ConfigClass
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['installment'] = [
             'name' => 'payplug_inst',
             'active' => $connected,
             'checked' => $configurations['inst'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['deferred'] = [
             'name' => 'payplug_deferred',
             'active' => $connected,
             'checked' => $configurations['deferred'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $switch['deferred_auto'] = [
             'name' => 'payplug_deferred_auto',
             'active' => $connected,
             'checked' => $configurations['deferred_auto'],
-            'label_left' => $this->payplugClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->payplugClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+            'label_left' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependenciesClass->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
         $this->context->smarty->assign([
@@ -914,7 +914,7 @@ class ConfigClass
 //    public function displayGDPRConsent()
 //    {
 //        $this->context->smarty->assign(['id_module' => $this->id]);
-//        return $this->payplugClass->fetchTemplate('customer/gdpr_consent.tpl');
+//        return $this->fetchTemplate('customer/gdpr_consent.tpl');
 //    }
 
     /**
@@ -1057,10 +1057,10 @@ class ConfigClass
                 );
                 $cards[] = [
                     '#' => $i,
-                    $this->payplugClass->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
-                    $this->payplugClass->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
-                    $this->payplugClass->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
-                    $this->payplugClass->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date']
+                    $this->dependenciesClass->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
+                    $this->dependenciesClass->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
+                    $this->dependenciesClass->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
+                    $this->dependenciesClass->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date']
                 ];
                 $i++;
             }
@@ -1146,7 +1146,7 @@ class ConfigClass
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             die(json_encode([
                 'content' => false,
-                'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
+                'error' => $this->dependenciesClass->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->apiClass->login($email, $password)) {
@@ -1154,13 +1154,13 @@ class ConfigClass
                 Configuration::updateValue('PAYPLUG_SHOW', 1);
 
                 $this->assignContentVar();
-                $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
                 die(json_encode(['content' => $content]));
             } else {
                 die(json_encode([
                     'content' => false,
-                    'error' => $this->payplugClass->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
+                    'error' => $this->dependenciesClass->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
                 ]));
             }
         }
@@ -1174,13 +1174,13 @@ class ConfigClass
         Configuration::updateValue('PAYPLUG_SHOW', false);
 
         $this->assignContentVar();
-        $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
         $this->context->smarty->assign([
             'title' => '',
             'type' => 'save',
         ]);
-        $popin = $this->payplugClass->fetchTemplate('/views/templates/admin/popin.tpl');
+        $popin = $this->fetchTemplate('/views/templates/admin/popin.tpl');
 
         die(json_encode(['popin' => $popin, 'content' => $content]));
     }
@@ -1197,7 +1197,7 @@ class ConfigClass
         Configuration::loadConfiguration();
 
         $this->assignContentVar();
-        $content = $this->payplugClass->fetchTemplate('/views/templates/admin/admin.tpl');
+        $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
         die(json_encode(['content' => $content]));
     }
@@ -1208,8 +1208,8 @@ class ConfigClass
     public function submitSettings()
     {
         if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
-            $this->payplugClass->displayError(
-                $this->payplugClass->l('payplug.submitSettings.settingsNotUpdated', 'configclass')
+            $this->dependenciesClass->displayError(
+                $this->dependenciesClass->l('payplug.submitSettings.settingsNotUpdated', 'configclass')
             );
         } else {
             $this->saveConfiguration();
