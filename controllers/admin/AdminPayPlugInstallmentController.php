@@ -30,10 +30,12 @@ require_once(_PS_MODULE_DIR_.'payplug/payplug.php');
 class AdminPayPlugInstallmentController extends ModuleAdminController
 {
     private $payplug;
+    private $paymentClass;
 
     public function __construct()
     {
         $this->payplug = new \PayPlug\classes\PayPlugClass();
+        $this->paymentClass = new \PayPlug\classes\PaymentClass($this->payplug);
         $this->bootstrap = true;
         $this->table = 'payplug_installment';
         $this->id = 'id_payplug_installment';
@@ -113,8 +115,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function getPaymentStatusById($id_status)
     {
-        $id_lang = $this->context->language->id;
-        return $this->payplug->getPaymentStatusById($id_status, $id_lang);
+        return $this->paymentClass->getPaymentStatusById($id_status);
     }
 
     public static function setOrderCurrency($amount, $tr)

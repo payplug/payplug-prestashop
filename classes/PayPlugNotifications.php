@@ -369,7 +369,7 @@ class PayPlugNotifications
             $data['metadata']['Order'] = $this->order->id;
             try {
                 $this->logger->addLog('Payment patched.', 'debug');
-                $this->payplug->patchPayment($this->payment->id, $data);
+                $this->paymentClass->patchPayment($this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
                     'Payment cannot be patched: ' . $exception->getMessage(),
@@ -877,6 +877,7 @@ class PayPlugNotifications
         $this->resp = [];
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
+        $this->paymentClass = new PaymentClass($this->payplug);
         $this->plugin = $this->payplug->getPlugin();
         $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
         $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');

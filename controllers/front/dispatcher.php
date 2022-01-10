@@ -38,6 +38,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     {
         if ($method = Tools::getValue('method')) {
             $payplug = new \PayPlug\classes\PayPlugClass();
+            $paymentClass = new \PayPlug\classes\PaymentClass($payplug);
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
             $is_deferred = (bool)Tools::getValue('def');
@@ -58,7 +59,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $error_url = 'index.php?controller=order&step=3&error=1';
 
             if ($options['oney'] && $is_oney) {
-                $payment = $payplug->preparePayment(['is_oney' => $oney_type]);
+                $payment = $paymentClass->preparePayment(['is_oney' => $oney_type]);
                 if (!$payment['result']) {
                     Tools::redirect($error_url);
                 } else {
@@ -69,9 +70,9 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     'id_card' => $id_card,
                     'is_bancontact' => $is_bancontact,
                 ];
-                $payment = $payplug->preparePayment($payment_options);
+                $payment = $paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    $payplug->setPaymentErrorsCookie([
+                    $paymentClass->setPaymentErrorsCookie([
                         $payplug->l('The transaction was not completed and your card was not charged.')
                     ]);
                     Tools::redirect($error_url);
@@ -85,9 +86,9 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     'is_installment' => $is_installment,
                     'is_deferred' => $is_deferred,
                 ];
-                $payment = $payplug->preparePayment($payment_options);
+                $payment = $paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    $payplug->setPaymentErrorsCookie([
+                    $paymentClass->setPaymentErrorsCookie([
                         $payplug->l('The transaction was not completed and your card was not charged.')
                     ]);
                     Tools::redirect($error_url);

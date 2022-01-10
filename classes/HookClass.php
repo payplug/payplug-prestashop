@@ -46,11 +46,13 @@ class HookClass
     private $oney;
     private $order;
     private $orderHistory;
+    private $paymentClass;
     private $product;
     private $query;
     private $sql;
     private $tools;
     private $validate;
+
 
     public function __construct($payplug)
     {
@@ -72,6 +74,8 @@ class HookClass
         $this->sql = $payplug->getPlugin()->getSql();
         $this->tools = $payplug->getPlugin()->getTools();
         $this->validate = $payplug->getPlugin()->getValidate();
+
+        $this->paymentClass = new PaymentClass($this->payplug);
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
@@ -171,14 +175,14 @@ class HookClass
         $active = Module::isEnabled($this->dependenciesClass->name);
         if (!$active
             || $order->payment != $this->dependenciesClass->displayName
-            || !$this->dependenciesClass->isDeferredPaymentsActive()
-            || !$this->dependenciesClass->isDeferredAutoActive()
+            || !$this->config->get('PAYPLUG_DEFERRED')
+            || !$this->config->get('PAYPLUG_DEFERRED_AUTO')
             || $params['newOrderStatus']->id != $this->config->get('PAYPLUG_DEFERRED_STATE')
         ) {
             return;
         } else {
             $cart = $this->cart->get((int)$order->id_cart);
-            $payment_method = $this->dependenciesClass->getPaymentMethodByCart($cart);
+            $payment_method = $this->paymentClass->getPaymentMethodByCart($cart);
             if ($payment_method['type'] == 'installment') {
                 $installment = new PPPaymentInstallment($payment_method['id']);
                 $payment = $installment->getFirstPayment();
@@ -355,8 +359,8 @@ class HookClass
             foreach ($installment->schedule as $schedule) {
                 if ($schedule->payment_ids != null) {
                     foreach ($schedule->payment_ids as $pay_id) {
-                        $p = $this->dependenciesClass->retrievePayment($pay_id);
-                        $payment_list_new[] = $this->dependenciesClass->buildPaymentDetails($p);
+                        $p = $this->paymentClass->retrievePayment($pay_id);
+                        $payment_list_new[] = $this->paymentClass->buildPaymentDetails($p);
                         if ((int)$p->is_paid == 0) {
                             $amount_refunded_payplug += 0;
                             $amount_available += 0;
@@ -438,7 +442,7 @@ class HookClass
 
             InstallmentClass::updatePayplugInstallment($installment);
         } else {
-            if (!$pay_id = $this->dependenciesClass->isTransactionPending($order->id_cart)) {
+            if (!$pay_id = $this->paymentClass->isTransactionPending($order->id_cart)) {
                 $pay_id = $this->dependenciesClass->orderClass->getPayplugOrderPayment($order->id);
 
                 if (!$pay_id) {
@@ -453,16 +457,16 @@ class HookClass
 
             $sandbox = (bool)$this->config->get('PAYPLUG_SANDBOX_MODE');
 
-            if (!$pay_id || empty($pay_id) || !$payment = $this->dependenciesClass->retrievePayment($pay_id)) {
+            if (!$pay_id || empty($pay_id) || !$payment = $this->paymentClass->retrievePayment($pay_id)) {
                 if ($sandbox) {
                     ApiClass::setSecretKey($this->config->get('PAYPLUG_LIVE_API_KEY'));
-                    if (empty($pay_id) || !$payment = $this->dependenciesClass->retrievePayment($pay_id)) {
+                    if (empty($pay_id) || !$payment = $this->paymentClass->retrievePayment($pay_id)) {
                         ApiClass::setSecretKey($this->config->get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } else {
                     ApiClass::setSecretKey($this->config->get('PAYPLUG_TEST_API_KEY'));
-                    if (empty($pay_id) || !$payment = $this->dependenciesClass->retrievePayment($pay_id)) {
+                    if (empty($pay_id) || !$payment = $this->paymentClass->retrievePayment($pay_id)) {
                         ApiClass::setSecretKey($this->config->get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
@@ -514,7 +518,7 @@ class HookClass
                 $this->assign->assign(['pay_tds' => null]);
             }
 
-            $single_payment = $this->dependenciesClass->buildPaymentDetails($payment);
+            $single_payment = $this->paymentClass->buildPaymentDetails($payment);
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
@@ -804,7 +808,7 @@ class HookClass
                 'is_deferred' => (bool)$this->tools->tool('getValue', 'def'),
             ];
 
-            $payment = $this->dependenciesClass->preparePayment($payment_options);
+            $payment = $this->paymentClass->preparePayment($payment_options);
 
             $dotenv = new Dotenv();
             $dotenvFile = dirname(__FILE__, 4) . "/payplugroutes/.env";
@@ -838,7 +842,7 @@ class HookClass
                     return $this->dependenciesClass->fetchTemplate('checkout/embedded.tpl');
                 }
             } else {
-                $this->dependenciesClass->setPaymentErrorsCookie([
+                $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependenciesClass->l('hook.header.transactionNotCompleted', 'hookclass')
                 ]);
                 $error_url = 'index.php?controller=order&step=3&error=1';
@@ -994,7 +998,7 @@ class HookClass
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
-        $payment_options = $this->dependenciesClass->getPaymentOptions($cart);
+        $payment_options = $this->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en TPL
         $paymentOptions = $this->dependenciesClass->PrestashopSpecificObject->displayPaymentOption(
@@ -1045,7 +1049,7 @@ class HookClass
             'api_url' => $this->dependenciesClass->apiClass->getApiUrl(),
         ]);
 
-        $payment_options = $this->dependenciesClass->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
+        $payment_options = $this->paymentClass->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
 
         // Transforme tableau en object
         return $this->dependenciesClass->PrestashopSpecificObject->displayPaymentOption($payment_options);

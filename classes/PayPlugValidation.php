@@ -35,6 +35,7 @@ use Validate;
 class PayPlugValidation
 {
     public $logger;
+    public $paymentClass;
     public $payplug;
     public $debug;
     public $type;
@@ -50,6 +51,7 @@ class PayPlugValidation
     {
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
+        $this->paymentClass = new PaymentClass($this->payplug);
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
         $this->setConfig();
@@ -152,7 +154,7 @@ class PayPlugValidation
         } while (!$cart_lock);
 
         $amount = 0;
-        if (!$pay_id = PayPlugClass::getPaymentByCart((int)$cart_id)) {
+        if (!$pay_id = $this->paymentClass->getPaymentByCart((int)$cart_id)) {
             if (!$inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Payment is not stored or is already consumed.');
                 $id_order = Order::getOrderByCartId($cart->id);
@@ -352,7 +354,7 @@ class PayPlugValidation
             $this->logger->addLog('Order already exists.');
             if ($this->type == 'payment') {
                 $this->logger->addLog('Deleting stored payment.');
-                if ($this->payplug->isTransactionPending((int)$cart_id)) {
+                if ($this->paymentClass->isTransactionPending((int)$cart_id)) {
                     $this->logger->addLog('Transaction is pending so stored payment will not be deleted.');
                 }
             }
@@ -395,7 +397,7 @@ class PayPlugValidation
             } else {
                 $order_state = $pending_state;
                 $this->logger->addLog('Stored payment become pending.');
-                if (!$this->payplug->registerPendingTransaction((int)$cart_id)) {
+                if (!$this->paymentClass->registerPendingTransaction((int)$cart_id)) {
                     $this->logger->addLog('Stored payment cannot be pending.', 'error');
                 } else {
                     $this->logger->addLog('Stored payment successfully set up to pending.');
@@ -526,7 +528,7 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-                $this->payplug->patchPayment($payment->id, $data);
+                $this->paymentClass->patchPayment($payment->id, $data);
 
                 if (!$this->orderClass->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');

@@ -22,6 +22,7 @@
  */
 
 use PayPlug\classes\PayPlugClass;
+use PayPlug\classes\PaymentClass;
 
 class PayplugPaymentModuleFrontController extends ModuleFrontController
 {
@@ -33,6 +34,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugBackward.php');
 
         $payplug = new PayPlugClass();
+        $paymentClass = new PaymentClass($payplug);
         $payplug->apiClass->initializeApi();
 
         $context = Context::getContext();
@@ -52,7 +54,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             '_ajax' => 1
         ];
 
-        $payment_data = $payplug->preparePayment($options);
+        $payment_data = $paymentClass->preparePayment($options);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';

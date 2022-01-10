@@ -23,6 +23,8 @@
 
 namespace PayPlug\classes;
 
+use Media;
+
 class MediaClass extends \Payplug
 {
     private $dependenciesClass;
@@ -231,5 +233,14 @@ class MediaClass extends \Payplug
         }
 //        exit;
         return true;
+    }
+
+    public function getMediaPath($path = false)
+    {
+        if (!$path) {
+            return false;
+        }
+
+        return Media::getMediaPath($path);
     }
 }
