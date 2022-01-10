@@ -65,7 +65,7 @@ class PaymentClass
         $this->card =           $payplug->getPlugin()->getCard();
         $this->cart =           $payplug->getPlugin()->getCart();
         $this->config =         $payplug->getPlugin()->getConfiguration();
-        $this->constant =       $payplug->getPlugins()->getConstant();
+        $this->constant =       $payplug->getPlugin()->getConstant();
         $this->context =        $payplug->getPlugin()->getContext()->getContext();
         $this->country =        $payplug->getPlugin()->getCountry();
         $this->currency =       $payplug->getPlugin()->getCurrency();
@@ -84,7 +84,7 @@ class PaymentClass
         $this->apiClass =               new ApiClass($this->payplug);
         $this->cartClass =              new CartClass();
         $this->configClass =            new ConfigClass($this->payplug);
-        $this->mediaClass =             new MediaClass($this->payplug);
+        $this->mediaClass =             new MediaClass();
     }
 
     /**

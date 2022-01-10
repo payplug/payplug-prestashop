@@ -37,9 +37,9 @@ class OrderClass
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
-        $this->constant = $this->dependencies->getPlugins()->getConstant();
-        $this->context = $this->dependencies->getPlugins()->getContext()->get();
-        $this->query = $this->dependencies->getPlugins()->getQuery();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->query = $this->dependencies->getPlugin()->getQuery();
     }
 
     /**

@@ -25,20 +25,20 @@ namespace PayPlug\classes;
 
 use Media;
 
-class MediaClass extends \Payplug
+class MediaClass
 {
+    private $apiClass;
     private $dependencies;
-    private $dependenciesClass;
     private $configClass;
-    public $context;
+    private $context;
 
-    public function __construct($payplug)
+    public function __construct()
     {
         $this->dependencies = new DependenciesClass();
 
-        $this->dependenciesClass = $payplug;
-        $this->configClass = $payplug->configClass;
-        $this->context = \Context::getContext();
+        $this->apiClass = new ApiClass();
+        $this->configClass = new ConfigClass();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
     }
 
     /**
@@ -135,12 +135,12 @@ class MediaClass extends \Payplug
         switch ($type) {
             case 'pwd':
             case 'activate':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.liveMode', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.liveMode', 'mediaclass');
                 break;
             case 'premium':
             case 'oneyPremium':
             case 'bancontactPremium':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.enableFeature', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.enableFeature', 'mediaclass');
 
                 if ($type == 'oneyPremium') {
                     $link = 'https://portal.payplug.com/#/configuration/oney';
@@ -159,22 +159,22 @@ class MediaClass extends \Payplug
 
                 $type = 'premium';
                 break;
-                $title = $this->dependenciesClass->l('payplug.displayPopin.enableFeature', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.enableFeature', 'mediaclass');
                 break;
             case 'confirm':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.saveSettings', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.saveSettings', 'mediaclass');
                 break;
             case 'deactivate':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.deactivate', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.deactivate', 'mediaclass');
                 break;
             case 'refund':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.refund', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.refund', 'mediaclass');
                 break;
             case 'abort':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
                 break;
             case 'deferred':
-                $title = $this->dependenciesClass->l('payplug.displayPopin.deferred', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.deferred', 'mediaclass');
                 break;
             default:
                 $title = '';
@@ -191,7 +191,7 @@ class MediaClass extends \Payplug
             'title' => $title,
             'type' => $type,
             'admin_ajax_url' => $admin_ajax_url,
-            'site_url' => $this->dependenciesClass->apiClass->getSiteUrl(),
+            'site_url' => $this->apiClass->getSiteUrl(),
             'inst_id' => $inst_id,
         ]);
         $this->html = $this->configClass->fetchTemplate('/views/templates/admin/popin.tpl');

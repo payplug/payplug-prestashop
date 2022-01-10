@@ -47,7 +47,7 @@ class AdminClass extends \Payplug
         parent::__construct();
         $this->apiClass = $this->module->apiClass;
         $this->configClass = $this->module->configClass;
-        $this->mediaClass = new MediaClass($this->module);
+        $this->mediaClass = new MediaClass();
         $this->paymentClass = new PaymentClass($this->module);
         $this->paymentRepository = $this->module;
         $this->refundClass = $this->module->refundClass;

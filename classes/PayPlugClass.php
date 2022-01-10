@@ -361,7 +361,7 @@ class PayPlugClass extends PaymentModule
 
         $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
         $this->apiClass = new ApiClass($this);
-        $this->mediaClass = new MediaClass($this);
+        $this->mediaClass = new MediaClass();
         $this->orderClass = new OrderClass();
         $this->configClass = new ConfigClass($this);
         $this->refundClass = new RefundClass($this);

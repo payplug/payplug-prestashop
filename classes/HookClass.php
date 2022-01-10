@@ -77,7 +77,6 @@ class HookClass
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
 
-        $this->cartClass = new CartClass();
         $this->configClass = new ConfigClass();
 
         die(dump(__LINE__));
