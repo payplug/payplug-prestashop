@@ -64,6 +64,9 @@ class PluginEntity
     private $configuration;
 
     /** @var object */
+    private $constant;
+
+    /** @var object */
     private $context;
 
     /** @var object */
@@ -89,6 +92,9 @@ class PluginEntity
 
     /** @var object */
     private $myLogPHP;
+
+    /** @var object */
+    private $module;
 
     /** @var object */
     private $oney;
@@ -144,6 +150,14 @@ class PluginEntity
     public function getMyLogPHP()
     {
         return $this->myLogPHP;
+    }
+
+    /**
+     * @return object
+     */
+    public function getModule()
+    {
+        return $this->module;
     }
 
     /**
@@ -728,6 +742,21 @@ class PluginEntity
         }
 
         $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @param object $module
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setModule($module)
+    {
+        if (!is_object($module)) {
+            throw (new BadParameterException('Invalid argument, $module must be a ModuleSpecific'));
+        }
+
+        $this->module = $module;
         return $this;
     }
 

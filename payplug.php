@@ -76,7 +76,7 @@ class Payplug extends PaymentModule
     public function disable($force_all = false)
     {
         if ($this->module) {
-            return $this->module->disable($force_all);
+            return parent::disable && $this->payplug_dependencies->getDependency('configClass')->disable();
         }
     }
 

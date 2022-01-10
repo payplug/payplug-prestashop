@@ -43,6 +43,7 @@ use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\CurrencySpecific;
 use PayPlug\src\specific\CustomerSpecific;
 use PayPlug\src\specific\LanguageSpecific;
+use PayPlug\src\specific\ModuleSpecific;
 use PayPlug\src\specific\OrderSpecific;
 use PayPlug\src\specific\OrderHistorySpecific;
 use PayPlug\src\specific\OrderStateSpecific;
@@ -91,6 +92,7 @@ class PluginRepository extends Repository
     private $currency;
     private $customer;
     private $language;
+    private $module;
     private $order;
     private $order_history;
     private $order_state_specific;
@@ -130,6 +132,7 @@ class PluginRepository extends Repository
 //            ->setInstallment($this->installment)
             ->setLanguage($this->language)
             ->setLogger($this->logger)
+            ->setModule($this->module)
             ->setPayment($this->payment)
             ->setProduct($this->product)
             ->setOney($this->oney)
@@ -263,6 +266,7 @@ class PluginRepository extends Repository
         $this->currency  = new CurrencySpecific();
         $this->customer  = new CustomerSpecific();
         $this->language = new LanguageSpecific();
+        $this->module = new ModuleSpecific();
         $this->order = new OrderSpecific();
         $this->order_history = new OrderHistorySpecific();
         $this->order_state_specific = new OrderStateSpecific();

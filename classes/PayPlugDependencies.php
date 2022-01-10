@@ -38,6 +38,9 @@ class PayPlugDependencies
     /** @var AdminClass */
     private $adminClass;
 
+    /** @var ConfigClass */
+    private $configClass;
+
     /** @var HookRepository */
     private $hook;
 
@@ -76,6 +79,7 @@ class PayPlugDependencies
 
         $this->hookClass = new HookClass($this->dependencies);
         die(dump(__LINE__));
+        $this->configClass = new ConfigClass();
 
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }

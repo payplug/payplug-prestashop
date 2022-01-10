@@ -85,7 +85,7 @@ class DependenciesClass
     /**
      * @return false|mixed
      */
-    public function loadSpecificPrestaClasses()
+    public function loadSpecificPresta()
     {
         $PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
         if (class_exists($PrestashopSpecificClass)) {
