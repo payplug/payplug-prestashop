@@ -28,6 +28,15 @@ use Language;
 
 class LanguageSpecific implements LanguageInterface
 {
+    public function get($idLanguage = false)
+    {
+        if (!is_int($idLanguage)) {
+            $idLanguage = false;
+        }
+
+        return new Language($idLanguage);
+    }
+
     public function getLanguages($active = false)
     {
         return Language::getLanguages($active);

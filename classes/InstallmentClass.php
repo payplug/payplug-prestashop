@@ -65,7 +65,7 @@ class InstallmentClass extends \PaymentModule
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
                     $payment = Payment::retrieve($pay_id);
-                    $status = PayPlugClass::getPaymentStatusByPayment($payment);
+                    $status = PaymentClass::getPaymentStatusByPayment($payment);
                 } else {
                     if ((int)$installment->is_active == 1) {
                         $status = 6; //ongoing
@@ -140,7 +140,7 @@ class InstallmentClass extends \PaymentModule
                     $pay_id = '';
                     if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
                         $pay_id = $schedule->payment_ids[0];
-                        $status = PayPlugClass::getPaymentStatusByPayment($pay_id);
+                        $status = PaymentClass::getPaymentStatusByPayment($pay_id);
                     } else {
                         $status = 6;
                     }

@@ -42,6 +42,7 @@ class PayPlugAjax
     private $card;
     private $contextSpecific;
     private $oney;
+    private $paymentClass;
     private $payplug;
     private $plugin;
     private $toolsSpecific;
@@ -56,6 +57,8 @@ class PayPlugAjax
         $this->oney = $this->plugin->getOney();
         $this->toolsSpecific = $this->plugin->getTools();
         $this->translate = $this->plugin->getTranslate();
+
+        $this->paymentClass = new PaymentClass($this->payplug);
     }
 
     /**
@@ -93,7 +96,7 @@ class PayPlugAjax
                         'is_oney' => $is_oney,
                         '_ajax' => 1,
                     ];
-                    $payment = $this->payplug->preparePayment($options);
+                    $payment = $this->paymentClass->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
                 } else {
                     $cookie = $context->cookie;
@@ -198,10 +201,10 @@ class PayPlugAjax
                 die($tools->tool('jsonEncode', $payment_options));
             } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
-                $errors = $this->payplug->getPaymentErrorsCookie();
+                $errors = $this->paymentClass->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die($tools->tool('jsonEncode', ['result' => $this->payplug->displayPaymentErrors($errors)]));
+                    die($tools->tool('jsonEncode', ['result' => $this->paymentClass->displayPaymentErrors($errors)]));
                 }
 
                 die($tools->tool('jsonEncode', ['result' => false]));
@@ -224,7 +227,7 @@ class PayPlugAjax
                     throw new Exception($e);
                 }
 
-                $result = $this->payplug->setPaymentDataCookie($payment_data);
+                $result = $this->paymentClass->setPaymentDataCookie($payment_data);
 
                 die($tools->tool('jsonEncode', [
                     'result' => $result,

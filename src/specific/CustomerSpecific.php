@@ -21,10 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\specific;
 
-interface AddressInterface
+use PayPlug\src\interfaces\CustomerInterface;
+use Customer;
+
+class CustomerSpecific implements CustomerInterface
 {
-    public function get($idAddress);
-    public function getAddress($idAddress);
+    public function get($idCustomer)
+    {
+        return new Customer($idCustomer);
+    }
 }

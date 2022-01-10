@@ -38,6 +38,7 @@ class AdminClass extends \Payplug
     private $contextSpecific;
     private $html = '';
     private $mediaClass;
+    private $paymentClass;
     private $paymentRepository;
     private $refundClass;
 
@@ -47,6 +48,7 @@ class AdminClass extends \Payplug
         $this->apiClass = $this->module->apiClass;
         $this->configClass = $this->module->configClass;
         $this->mediaClass = new MediaClass($this->module);
+        $this->paymentClass = new PaymentClass($this->module);
         $this->paymentRepository = $this->module;
         $this->refundClass = $this->module->refundClass;
         $this->contextSpecific = (new ContextSpecific())->getContext();
@@ -223,7 +225,7 @@ class AdminClass extends \Payplug
         }
 
         if (Tools::getValue('submit') == 'submitPopin_abort') {
-            $this->paymentRepository->abortPayment();
+            $this->paymentClass->abortPayment();
         }
         if ((int)Tools::getValue('check') == 1) {
             $content = $this->configClass->getCheckFieldset();
@@ -253,7 +255,7 @@ class AdminClass extends \Payplug
             $this->refundClass->refundPayment();
         }
         if ((int)Tools::getValue('capture') == 1) {
-            $this->paymentRepository->capturePayment();
+            $this->paymentClass->capturePayment();
         }
         if ((int)Tools::getValue('popinRefund') == 1) {
             $popin = $this->mediaClass->displayPopin('refund');

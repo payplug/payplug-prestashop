@@ -29,4 +29,5 @@ interface CartInterface
     public function isVirtualCart($cart);
     public function getProducts($cart);
     public function nbProducts($cart);
+    public function isGuestCartByCartId($idCart);
 }

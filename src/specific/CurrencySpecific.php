@@ -33,6 +33,14 @@ class CurrencySpecific implements CurrencyInterface
         return new self();
     }
 
+    public function get($idCurrency = false)
+    {
+        if (!is_int($idCurrency)) {
+            $idCurrency = false;
+        }
+        return new Currency($idCurrency);
+    }
+
     public function getCurrency($idCurrency)
     {
         return new Currency($idCurrency);

@@ -23,8 +23,7 @@
 
 namespace PayPlug\src\interfaces;
 
-interface AddressInterface
+interface CustomerInterface
 {
-    public function get($idAddress);
-    public function getAddress($idAddress);
+    public function get($idCustomer);
 }

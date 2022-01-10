@@ -64,4 +64,12 @@ class CartSpecific implements CartInterface
         }
         return $cart->nbProducts();
     }
+
+    public function isGuestCartByCartId($idCart = false)
+    {
+        if (!is_int($idCart)) {
+            return false;
+        }
+        return Cart::isGuestCartByCartId($idCart);
+    }
 }

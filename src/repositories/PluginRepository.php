@@ -41,6 +41,7 @@ use PayPlug\src\specific\ConstantSpecific;
 use PayPlug\src\specific\ContextSpecific;
 use PayPlug\src\specific\CountrySpecific;
 use PayPlug\src\specific\CurrencySpecific;
+use PayPlug\src\specific\CustomerSpecific;
 use PayPlug\src\specific\LanguageSpecific;
 use PayPlug\src\specific\OrderSpecific;
 use PayPlug\src\specific\OrderHistorySpecific;
@@ -88,6 +89,7 @@ class PluginRepository extends Repository
     private $context;
     private $country;
     private $currency;
+    private $customer;
     private $language;
     private $order;
     private $order_history;
@@ -121,9 +123,11 @@ class PluginRepository extends Repository
             ->setContext($this->context)
             ->setCountry($this->country)
             ->setCurrency($this->currency)
+            ->setCustomer($this->customer)
             ->setHook($this->hook)
             ->setInstall($this->install)
 //            ->setInstallment($this->installment)
+            ->setLanguage($this->language)
             ->setLogger($this->logger)
             ->setPayment($this->payment)
             ->setProduct($this->product)
@@ -256,6 +260,7 @@ class PluginRepository extends Repository
         $this->context = new ContextSpecific();
         $this->country = new CountrySpecific();
         $this->currency  = new CurrencySpecific();
+        $this->customer  = new CustomerSpecific();
         $this->language = new LanguageSpecific();
         $this->order = new OrderSpecific();
         $this->order_history = new OrderHistorySpecific();

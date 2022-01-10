@@ -73,6 +73,9 @@ class PluginEntity
     private $currency;
 
     /** @var object */
+    private $customer;
+
+    /** @var object */
     private $hook;
 
     /** @var object */
@@ -324,6 +327,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+    /**
+     * @return object
+     */
     public function getHook()
     {
         return $this->hook;
@@ -369,6 +380,14 @@ class PluginEntity
     public function getProduct()
     {
         return $this->product;
+    }
+
+    /**
+     * @return object
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
     /**
@@ -618,6 +637,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $customer
+     * @return PluginEntity
+     */
+    public function setCustomer($customer)
+    {
+        if (!is_object($customer)) {
+            throw (
+            new BadParameterException(
+                'Invalid Currency object, param $customer must be a CurrencySpecific'
+            )
+            );
+        } else {
+            $this->customer = $customer;
+            return $this;
+        }
+    }
+
+    /**
      * @param object $hook
      * @return self
      * @throws BadParameterException
@@ -643,6 +680,16 @@ class PluginEntity
         }
 
         $this->install = $install;
+        return $this;
+    }
+
+    /**
+     * @param object $language
+     * @return PluginEntity
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
         return $this;
     }
 
