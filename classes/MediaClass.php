@@ -27,12 +27,15 @@ use Media;
 
 class MediaClass extends \Payplug
 {
+    private $dependencies;
     private $dependenciesClass;
     private $configClass;
     public $context;
 
     public function __construct($payplug)
     {
+        $this->dependencies = new DependenciesClass();
+
         $this->dependenciesClass = $payplug;
         $this->configClass = $payplug->configClass;
         $this->context = \Context::getContext();

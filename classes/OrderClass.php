@@ -27,8 +27,21 @@ use Db;
 use DbQuery;
 use OrderState;
 
-class OrderClass extends \PaymentModule
+class OrderClass
 {
+    private $constant;
+    private $context;
+    private $dependencies;
+    private $query;
+
+    public function __construct()
+    {
+        $this->dependencies = new DependenciesClass();
+        $this->constant = $this->dependencies->getPlugins()->getConstant();
+        $this->context = $this->dependencies->getPlugins()->getContext()->get();
+        $this->query = $this->dependencies->getPlugins()->getQuery();
+    }
+
     /**
      * @description Add Order Payment
      *
@@ -38,10 +51,13 @@ class OrderClass extends \PaymentModule
      */
     public function addPayplugOrderPayment($id_order, $id_payment)
     {
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_order_payment (id_order, id_payment) 
-                VALUE (' . (int)$id_order . ',\'' . pSQL($id_payment) . '\')';
+        $this->query
+            ->insert()
+            ->into($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
+            ->fields('id_order')    ->values((int)$id_order)
+            ->fields('id_payment')  ->values($id_payment);
 
-        return Db::getInstance()->execute($sql);
+        return $this->query->build();
     }
 
     /**
@@ -58,12 +74,13 @@ class OrderClass extends \PaymentModule
 
     public function getPayPlugOrderStates($module)
     {
-        $query = new DbQuery();
-        $query->select('GROUP_CONCAT(id_order_state) as id_order_states');
-        $query->from('order_state');
-        $query->where('module_name = "' . pSQL($module) . '"');
+        $this->query
+            ->select()
+            ->field('GROUP_CONCAT(id_order_state) as id_order_states')
+            ->from($this->constant->get('_DB_PREFIX_') . 'order_state')
+            ->where('module_name = "' . $module . '"');
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
+        return $this->query->build('unique_value');
     }
 
     /**
@@ -75,11 +92,13 @@ class OrderClass extends \PaymentModule
      */
     public function getPayplugOrderPayment($id_order)
     {
-        $sql = 'SELECT id_payment 
-                FROM ' . _DB_PREFIX_ . 'payplug_order_payment   
-                WHERE id_order = ' . (int)$id_order;
+        $this->query
+            ->select()
+            ->field('id_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
+            ->where('id_order = ' . (int)$id_order);
 
-        return Db::getInstance()->getValue($sql);
+        return $this->query->build('unique_value');
     }
 
     /**
@@ -91,11 +110,12 @@ class OrderClass extends \PaymentModule
      */
     public function getPayplugOrderPayments($id_order)
     {
-        $sql = 'SELECT * 
-                FROM ' . _DB_PREFIX_ . 'payplug_order_payment 
-                WHERE id_order = ' . (int)$id_order;
+        $this->query
+            ->select()
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
+            ->where('id_order = ' . (int)$id_order);
 
-        return Db::getInstance()->executeS($sql);
+        return $this->query->build();
     }
 
     /**
@@ -110,7 +130,12 @@ class OrderClass extends \PaymentModule
             return false;
         }
 
-        $sql = 'SELECT `current_state` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . (int)$id_order;
-        return Db::getInstance()->getValue($sql);
+        $this->query
+            ->select()
+            ->field('current_state')
+            ->from($this->constant->get('_DB_PREFIX_') . 'orders')
+            ->where('id_order = ' . (int)$id_order);
+
+        return $this->query->build('unique_value');
     }
 }

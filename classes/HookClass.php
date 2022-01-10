@@ -41,6 +41,7 @@ class HookClass
     private $config;
     private $configClass;
     private $context;
+    private $dependencies;
     private $dependenciesClass;
     private $html;
     private $oney;
@@ -56,26 +57,32 @@ class HookClass
 
     public function __construct($payplug)
     {
-        $this->dependenciesClass = $payplug;
-        $this->configClass = $payplug->configClass;
-        $this->assign = $payplug->getPlugin()->getAssign();
-        $this->cache = $payplug->getPlugin()->getCache();
-        $this->card = $payplug->getPlugin()->getCard();
-        $this->cart = $payplug->getPlugin()->getCart();
-        $this->config = $payplug->getPlugin()->getConfiguration();
-        $this->context = $payplug->getPlugin()->getContext()->getContext();
-        $this->currency = $payplug->getPlugin()->getCurrency();
-        $this->oney = $payplug->getPlugin()->getOney();
-        $this->order = $payplug->getPlugin()->getOrder();
-        $this->orderHistory = $payplug->getPlugin()->getOrderHistory();
-        $this->orderState = $payplug->getPlugin()->getOrderState();
-        $this->product = $payplug->getPlugin()->getProduct();
-        $this->query = $payplug->getPlugin()->getQuery();
-        $this->sql = $payplug->getPlugin()->getSql();
-        $this->tools = $payplug->getPlugin()->getTools();
-        $this->validate = $payplug->getPlugin()->getValidate();
+        $this->dependencies = new DependenciesClass();
 
-        $this->paymentClass = new PaymentClass($this->payplug);
+        $this->assign = $this->dependencies->getPlugin()->getAssign();
+        $this->cache = $this->dependencies->getPlugin()->getCache();
+        $this->card = $this->dependencies->getPlugin()->getCard();
+        $this->cart = $this->dependencies->getPlugin()->getCart();
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->context = $this->dependencies->getPlugin()->getContext()->getContext();
+        $this->currency = $this->dependencies->getPlugin()->getCurrency();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->order = $this->dependencies->getPlugin()->getOrder();
+        $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
+        $this->orderState = $this->dependencies->getPlugin()->getOrderState();
+        $this->product = $this->dependencies->getPlugin()->getProduct();
+        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->sql = $this->dependencies->getPlugin()->getSql();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+        $this->validate = $this->dependencies->getPlugin()->getValidate();
+
+        $this->configClass = new ConfigClass($this->dependenciesClass);
+
+        die(dump(__LINE__));
+
+        $this->paymentClass = new PaymentClass($this->dependenciesClass);
+
+        $this->dependenciesClass = $payplug;
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
@@ -276,7 +283,7 @@ class HookClass
             'payplug_cards_url' => $payplug_cards_url
         ]);
 
-        return $this->dependenciesClass->fetchTemplate('customer/my_account.tpl');
+        return $this->configClass->fetchTemplate('customer/my_account.tpl');
     }
 
     /**
@@ -688,7 +695,7 @@ class HookClass
         }
 
         if ($show_popin && $display_refund) {
-            $this->dependenciesClass->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
+            $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/admin_order_popin.js');
         }
 
         // check order state history
@@ -703,7 +710,7 @@ class HookClass
             ]);
         }
 
-        $this->html .= $this->dependenciesClass->fetchTemplate('/views/templates/admin/order/order.tpl');
+        $this->html .= $this->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
         return $this->html;
     }
 
@@ -717,7 +724,7 @@ class HookClass
             $this->assign->assign([
                 'js_def' => Media::getJsDef(),
             ]);
-            return $this->dependenciesClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
+            return $this->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
         }
     }
 
@@ -800,7 +807,7 @@ class HookClass
                 return;
             }
 
-            $this->dependenciesClass->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
+            $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/embedded.js');
 
             $payment_options = [
                 'id_card' => $this->tools->tool('getValue', 'pc', 'new_card'),
@@ -839,7 +846,7 @@ class HookClass
                         'payment_url' => $payment['return_url'],
                         'api_url' => $api_url
                     ]);
-                    return $this->dependenciesClass->fetchTemplate('checkout/embedded.tpl');
+                    return $this->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
             } else {
                 $this->paymentClass->setPaymentErrorsCookie([
@@ -1025,7 +1032,7 @@ class HookClass
             'this_path' => $this->dependenciesClass->getPath(),
         ]);
 
-        return $this->dependenciesClass->fetchTemplate('checkout/payment/display.tpl');
+        return $this->configClass->fetchTemplate('checkout/payment/display.tpl');
     }
 
     /**
@@ -1096,6 +1103,6 @@ class HookClass
             $context['reference'] = $order->reference;
         }
         $this->assign->assign($context);
-        return $this->dependenciesClass->fetchTemplate('checkout/order-confirmation.tpl');
+        return $this->configClass->fetchTemplate('checkout/order-confirmation.tpl');
     }
 }

@@ -503,7 +503,7 @@ class PayPlugNotifications
         $this->logger->addLog('Refund ID : ' . $this->resource->id);
 
         try {
-            $this->payment = $this->payplug->retrievePayment($this->resource->payment_id);
+            $this->payment = $this->paymentClass->retrievePayment($this->resource->payment_id);
             $this->setOrderStates();
         } catch (Exception $exception) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
@@ -966,17 +966,17 @@ class PayPlugNotifications
     private function setPayment()
     {
         $this->logger->addLog('Notification: setPayment');
-        if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
+        if (!$this->payment = $this->paymentClass->retrievePayment($this->resource->id)) {
             if ($this->sandbox) {
                 $this->payplug->apiClass->initializeApi(false);
-                if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
+                if (!$this->payment = $this->paymentClass->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with LIVE API Key.', 'debug');
                     $this->payplug->apiClass->initializeApi(true);
                     $this->payment = null;
                 }
             } else {
                 $this->payplug->apiClass->initializeApi(true);
-                if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
+                if (!$this->payment = $this->paymentClass->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with the TEST API Key.', 'debug');
                     $this->payplug->apiClass->initializeApi(false);
                     $this->payment = null;

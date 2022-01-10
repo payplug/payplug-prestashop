@@ -464,6 +464,7 @@ class PayPlugClass extends PaymentModule
 
     /**
      * Return exeption error form API
+     * @todo: move this method to APIClass
      * @param $str
      * @return array
      */
@@ -505,6 +506,9 @@ class PayPlugClass extends PaymentModule
         return $errors;
     }
 
+    /**
+     * @todo: check method usage
+     */
     public function fetchTemplate($file)
     {
         if ($this->context->smarty->tpl_vars) {
@@ -519,6 +523,9 @@ class PayPlugClass extends PaymentModule
         return $output;
     }
 
+    /**
+     * @todo: check method usage
+     */
     public function isValidFeature($name)
     {
         if (empty($this->features_json)) {
@@ -535,6 +542,7 @@ class PayPlugClass extends PaymentModule
     }
 
     /**
+     * @todo: move this method to AdminClass
      * @return string
      */
     public function getUninstallContent()
@@ -544,8 +552,8 @@ class PayPlugClass extends PaymentModule
 
         $PAYPLUG_KEEP_CARDS = (int)Configuration::get('PAYPLUG_KEEP_CARDS');
 
-        $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -561,6 +569,7 @@ class PayPlugClass extends PaymentModule
 
     /**
      * @description get the undefined order state on an history
+     * @todo: move this method to OrderClass
      * @param int $orderId
      * @return array
      */

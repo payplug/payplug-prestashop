@@ -34,6 +34,7 @@ include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
 $payplug = new PayPlugClass();
 $adminClass = new AdminClass();
 $refundClass = new RefundClass($payplug);
+$paymentClass = new PaymentClass($payplug);
 $logger = $payplug->getPlugin()->logger();
 
 if (Tools::getValue('_ajax') == 1) {
@@ -160,7 +161,7 @@ if (Tools::getValue('_ajax') == 1) {
                 'data' => $payplug->l('Cannot refund that amount.')
             ]));
         } else {
-            $payment = $payplug->retrievePayment($pay_id);
+            $payment = $paymentClass->retrievePayment($pay_id);
             $new_state = 7;
             if ((int)Tools::getValue('id_state') != 0) {
                 $new_state = (int)Tools::getValue('id_state');
@@ -224,7 +225,7 @@ if (Tools::getValue('_ajax') == 1) {
     }
     if ((int)Tools::getValue('update') == 1) {
         $pay_id = Tools::getValue('pay_id');
-        $payment = $payplug->retrievePayment($pay_id);
+        $payment = $paymentClass->retrievePayment($pay_id);
         $id_order = Tools::getValue('id_order');
 
         if ((int)$payment->is_paid == 1) {

@@ -37,6 +37,7 @@ class PaymentClass
     private $cart;
     private $config;
     private $configClass;
+    private $constant;
     private $context;
     private $country;
     private $currency;
@@ -63,6 +64,7 @@ class PaymentClass
         $this->card =           $payplug->getPlugin()->getCard();
         $this->cart =           $payplug->getPlugin()->getCart();
         $this->config =         $payplug->getPlugin()->getConfiguration();
+        $this->constant =       $payplug->getPlugins()->getConstant();
         $this->context =        $payplug->getPlugin()->getContext()->getContext();
         $this->country =        $payplug->getPlugin()->getCountry();
         $this->currency =       $payplug->getPlugin()->getCurrency();
@@ -163,7 +165,7 @@ class PaymentClass
         }
 
         $path_ssl = $this->tools->tool('getShopDomainSsl', true, true)
-            . $this->configClass->getConstant(__PS_BASE_URI__)
+            . $this->constant->get(__PS_BASE_URI__)
             . 'modules/' . $this->name . '/';
 
         $payplug_cards = $this->card->getByCustomer((int)$cart->id_customer, true);
@@ -217,7 +219,7 @@ class PaymentClass
 
         $this->assign->assign([
             'spinner_url' => $this->tools->tool('getHttpHost', true)
-                . $this->configClass->getConstant(__PS_BASE_URI__)
+                . $this->constant->get(__PS_BASE_URI__)
                 . 'modules/payplug/views/img/admin/spinner.gif',
             'payment_url' => $payment_url,
             'payment_controller_url' => $payment_controller_url,
@@ -546,7 +548,7 @@ class PaymentClass
     {
         $this->query
             ->delete()
-            ->from($this->configClass->getConstant(_DB_PREFIX_).'payplug_payment')
+            ->from($this->constant->get(_DB_PREFIX_).'payplug_payment')
             ->where('id_cart = ' . (int)$cart_id)
             ->where('id_payment = "' . $pay_id . '"');
 
@@ -595,7 +597,7 @@ class PaymentClass
             'with_msg_button' => $with_msg_button
         ]);
 
-        return $this->payplug->fetchTemplate('_partials/messages.tpl');
+        return $this->configClass->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
@@ -681,7 +683,7 @@ class PaymentClass
         $this->query
             ->select()
             ->fields('id_payment')
-            ->from($this->configClass->getConstant('_DB_PREFIX_') . 'payplug_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
             ->where('payment_method != "installment"')
             ->where('id_cart = ' . (int)$cart_id);
 
@@ -810,7 +812,7 @@ class PaymentClass
                             true
                         );
                     $paymentOption[$payment_key]['logo'] = $card['brand'] != 'none' ? $this->mediaClass->getMediaPath(
-                        $this->configClass->getConstant('_PS_MODULE_DIR_')
+                        $this->constant->get('_PS_MODULE_DIR_')
                         . $this->name . '/views/img/'
                         . $this->tools->tool('strtolower', $card['brand']) . '.svg'
                     ) : '';
@@ -862,7 +864,7 @@ class PaymentClass
             );
 
             $paymentOption['standard']['logo'] = $this->mediaClass->getMediaPath(
-                $this->configClass->getConstant('_PS_MODULE_DIR_')
+                $this->constant->get('_PS_MODULE_DIR_')
                 . $this->name . '/views/img/logos_schemes_' . $this->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
@@ -916,7 +918,7 @@ class PaymentClass
                     true
                 );
                 $paymentOption['installment']['logo'] = $this->mediaClass->getMediaPath(
-                    $this->configClass->getConstant('_PS_MODULE_DIR_')
+                    $this->constant->get('_PS_MODULE_DIR_')
                     . $this->name . '/views/img/logos_schemes_installment_'
                     . $this->config->get('PAYPLUG_INST_MODE') . '_' . $this->configClass->getImgLang() . '.png'
                 );
@@ -1060,7 +1062,7 @@ class PaymentClass
                     true
                 );
                 $paymentOption[$payment_key]['logo'] = $this->mediaClass->getMediaPath(
-                    $this->configClass->getConstant('_PS_MODULE_DIR_')
+                    $this->constant->get('_PS_MODULE_DIR_')
                     . $this->name . '/views/img/oney/' . $oneyLogo
                 );
                 $paymentOption[$payment_key]['callToActionText'] = $oneyLabel;
@@ -1080,7 +1082,7 @@ class PaymentClass
             $paymentOption['bancontact']['name'] = 'bancontact';
             $paymentOption['bancontact']['tpl'] = 'bancontact.tpl';
             $paymentOption['bancontact']['logo'] = $this->mediaClass->getMediaPath(
-                $this->configClass->getConstant('_PS_MODULE_DIR_')
+                $this->constant->get('_PS_MODULE_DIR_')
                 . $this->name . '/views/img/bancontact/bancontact.svg'
             );
             $paymentOption['bancontact']['callToActionText'] = $this->payplug->l(
@@ -1303,7 +1305,7 @@ class PaymentClass
         $payment_cart = $this->query
             ->select()
             ->fields('*')
-            ->from($this->configClass->getConstant('_DB_PREFIX_') . 'payplug_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
             ->where('id_cart = ' . (int)$id_cart)
             ->where('id_payment LIKE "pending"')
             ->build();
@@ -1332,7 +1334,7 @@ class PaymentClass
         return $this->query
             ->select()
             ->fields('id_payment')
-            ->from($this->configClass->getConstant('_DB_PREFIX_') . 'payplug_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
             ->where('id_cart = ' . (int)$id_cart)
             ->where('is_pending = 1')
             ->build('unique_value');
@@ -1898,7 +1900,7 @@ class PaymentClass
 
         return $this->query
             ->update()
-            ->table($this->configClass->getConstant('_DB_PREFIX_') . 'payplug_payment')
+            ->table($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
             ->set('is_pending = 1')
             ->where('id_cart = ' . (int)$id_cart)
             ->build();

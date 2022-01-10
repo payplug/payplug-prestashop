@@ -303,6 +303,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getConstant()
+    {
+        return $this->constant;
+    }
+
+    /**
+     * @return object
+     */
     public function getContext()
     {
         return $this->context;
@@ -585,6 +593,21 @@ class PluginEntity
         }
 
         $this->configuration = $configuration;
+        return $this;
+    }
+
+    /**
+     * @param object $context
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setConstant($constant)
+    {
+        if (!is_object($constant)) {
+            throw (new BadParameterException('Invalid argument, $constant must be a ConstantSpecific'));
+        }
+
+        $this->constant = $constant;
         return $this;
     }
 

@@ -263,7 +263,7 @@ class AdminClass extends \Payplug
         }
         if ((int)Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
-            $payment = $this->apiClass->retrievePayment($pay_id);
+            $payment = $this->paymentClass->retrievePayment($pay_id);
             $id_order = Tools::getValue('id_order');
 
             if ((int)$payment->is_paid == 1) {

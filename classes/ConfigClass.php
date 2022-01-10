@@ -50,7 +50,7 @@ class ConfigClass
     private $orderClass;
     private $validationErrors = [];
     private $html = '';
-    private $constantSpecific;
+    protected $constant;
     protected $context;
     public $logger;
     public $myLogPHP;
@@ -70,22 +70,24 @@ class ConfigClass
 
     public function __construct($payplug)
     {
-        $this->amountCurrencyClass = $payplug->amountCurrencyClass;
-        $this->apiClass = $payplug->apiClass;
-        $this->install = $payplug->install;
-        $this->context = $payplug->context;
-        $this->mediaClass = $payplug->mediaClass;
-        $this->oney = $payplug->oney;
-        $this->orderClass = $payplug->orderClass;
-        $this->constantSpecific = new ConstantSpecific();
-        $this->context = (new ContextSpecific())->getContext();
+        $this->dependencies = new DependenciesClass();
+
+        $this->amountCurrencyClass = $this->dependencies->getPlugins()->getAmountCurrencyClass();
+        $this->install = $this->dependencies->getPlugins()->getInstall();
+        $this->constant = $this->dependencies->getPlugins()->getConstant();
+        $this->context = $this->dependencies->getPlugins()->getContext()->get();
+        $this->oney = $this->dependencies->getPlugins()->getOney();
+
+        $this->apiClass = new ApiClass();
+        $this->orderClass = new OrderClass();
+
         $this->dependenciesClass = $payplug;
 
-        $this->payplugClass = $payplug;
+        // todo: to remove when method getUninstallContent is moved
+        $this->payplugClass = new PayPlugClass();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
-        $this->loadSpecificPrestaClasses();
 
         if (file_exists(__DIR__."/../features.json")) {
             $this->features_json = json_decode(file_get_contents(__DIR__."/../features.json"));
@@ -111,29 +113,9 @@ class ConfigClass
 //        }
     }
 
-    public function loadSpecificPrestaClasses()
-    {
-        $PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
-        if (class_exists($PrestashopSpecificClass)) {
-            $this->PrestashopSpecificObject = new $PrestashopSpecificClass($this->dependenciesClass);
-        }
-    }
-
     public function getSpecificPrestaClasse()
     {
-        if ($this->PrestashopSpecificObject) {
-            return $this->PrestashopSpecificObject;
-        }
-    }
-
-    /**
-     * Return specific constant
-     * @param string $constant
-     * @return mixed
-     */
-    public function getConstant($constant)
-    {
-        return $this->constantSpecific->get($constant);
+        return $this->dependencies->loadSpecificPrestaClasses();
     }
 
     /**
@@ -145,8 +127,8 @@ class ConfigClass
     {
         $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
         $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
-
         $this->email = Configuration::get('PAYPLUG_EMAIL');
+
         $available_img_lang = [
             'fr',
             'gb',
@@ -621,9 +603,9 @@ class ConfigClass
             ]);
         }
 
-        $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
-        $this->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->context->controller->addJS($this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/admin.js');
+        $this->context->controller->addJS($this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/utilities.js');
+        $this->context->controller->addCSS($this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/css/admin.css');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
@@ -683,7 +665,7 @@ class ConfigClass
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
+            'url_logo' => $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
             'pp_version' => Module::getInstanceByName($this->dependenciesClass->name)->version,

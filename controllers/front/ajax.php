@@ -257,7 +257,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Retrieve payment
-                $payment = $this->payplug->retrievePayment($payment_id);
+                $payment = $this->paymentClass->retrievePayment($payment_id);
 
                 // Check if payment has failure
                 if ($payment->failure != null) {

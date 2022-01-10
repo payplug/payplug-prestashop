@@ -111,7 +111,7 @@ class PluginRepository extends Repository
 
         $this->plugin
             ->setApiClass($this->apiClass)
-            ->setApiVersion('2019-08-06')
+            ->setApiVersion(PAYPLUG_API_VERSION)
             ->setAddress($this->address)
             ->setAmountCurrencyClass($this->amountCurrencyClass)
             ->setAssign($this->assign)
@@ -120,6 +120,7 @@ class PluginRepository extends Repository
             ->setCarrier($this->carrier)
             ->setCart($this->cart)
             ->setConfiguration($this->configuration)
+            ->setConstant($this->constant)
             ->setContext($this->context)
             ->setCountry($this->country)
             ->setCurrency($this->currency)

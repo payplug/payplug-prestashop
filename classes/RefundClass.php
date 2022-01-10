@@ -305,7 +305,7 @@ class RefundClass extends \PaymentModule
                 }
             } else {
                 //TODO: call retrievePayment from PaymentClass
-                $payment = $this->payplug->retrievePayment($refund->payment_id);
+                $payment = $this->paymentClass->retrievePayment($refund->payment_id);
 
                 if ((int)Tools::getValue('id_state') != 0) {
                     $new_state = (int)Tools::getValue('id_state');

@@ -33,6 +33,11 @@ class ContextSpecific implements ContextInterface
         return new self();
     }
 
+    public function get()
+    {
+        return Context::getContext();
+    }
+
     public function getContext()
     {
         return Context::getContext();

@@ -67,26 +67,17 @@ class PayPlugDependencies
     private function initializeAccessors()
     {
         $this->dependencies = new DependenciesClass();
-        $this->setPlugin((new PluginRepository($this->dependencies))->getEntity());
+        $this->api = new ApiClass();
 
-        $this->api = new ApiClass($this->dependencies);
-        $this->hook = $this->getPlugin()->getHook();
+        $this->hook = $this->dependencies->getPlugin()->getHook();
+        $this->install = $this->dependencies->getPlugin()->getInstall();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->payment = $this->dependencies->getPlugin()->getPayment();
+
         $this->hookClass = new HookClass($this->dependencies);
-        $this->install = $this->getPlugin()->getInstall();
-        $this->oney = $this->getPlugin()->getOney();
-        $this->payment = $this->getPlugin()->getPayment();
+        die(dump(__LINE__));
+
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-    }
-
-    public function getPlugin()
-    {
-        return $this->plugin;
-    }
-
-    public function setPlugin($plugin)
-    {
-        $this->plugin = $plugin;
-        return $this;
     }
 
     public function getDependency($dependency)

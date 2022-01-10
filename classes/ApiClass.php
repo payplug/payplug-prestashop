@@ -36,27 +36,23 @@ use Tools;
 
 class ApiClass
 {
-    /** var Plugin */
-    public $plugin;
-
-    /** var PayPlugClass */
-    public $payplug;
+    /** @var string */
+    private $api_url;
 
     /** @var string */
     public $current_api_key;
+
+    /** var DependenciesClass */
+    public $dependencies;
 
     /**
      * @var mixed
      */
     private $site_url;
 
-    /** @var string */
-    private $api_url;
-
-    public function __construct($payplug)
+    public function __construct()
     {
-        $this->payplug = $payplug;
-        $this->plugin = $payplug->getPlugin();
+        $this->dependencies = new DependenciesClass();
         $this->checkEnvironment();
         $this->setEnvironment();
         self::setSecretKey();
@@ -478,7 +474,7 @@ class ApiClass
         if ($this->current_api_key != null) {
             HttpClient::setDefaultUserAgentProduct(
                 'PayPlug-Prestashop',
-                $this->payplug->version,
+                $this->dependencies->version,
                 'Prestashop/' . _PS_VERSION_
             );
         }
@@ -495,7 +491,7 @@ class ApiClass
         try {
             \Payplug\Payplug::init([
                 'secretKey' => $payplug_key,
-                'apiVersion' => $this->plugin->getApiVersion()
+                'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
             ]);
 
             return $payplug_key;
@@ -527,7 +523,7 @@ class ApiClass
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->payplug->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
+            $errors[$error_key] = $this->dependencies->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
             return $errors;
         }
 
@@ -540,7 +536,7 @@ class ApiClass
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
                         $errors[$error_key] =
-                            $this->payplug->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
+                            $this->dependencies->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
                     }
             }
         }
