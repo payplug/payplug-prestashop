@@ -124,10 +124,6 @@ class ApiClass
      */
     public function setPublishableKeys()
     {
-        if (!$this->current_api_key) {
-            return false;
-        }
-
         $sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
         $flag = true;
 
