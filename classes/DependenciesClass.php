@@ -76,7 +76,7 @@ class DependenciesClass
      */
     public function l($string = false, $name = false)
     {
-        if (!$string || !$this->tools->tool('is_string', $string)) {
+        if (!$string || !$this->getPlugin()->getValidate()->validate('isString', $string)) {
             return false;
         }
         return TranslationSpecific::translate($this->name, $string, $name);

@@ -51,7 +51,7 @@ class PayPlugValidation
     {
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
-        $this->paymentClass = new PaymentClass($this->payplug);
+        $this->paymentClass = new PaymentClass();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->payplug->getPlugin();
         $this->setConfig();

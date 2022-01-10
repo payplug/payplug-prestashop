@@ -42,6 +42,194 @@ use Validate;
 
 class ConfigClass
 {
+    public $email;
+    public $features_json;
+    public $logger;
+    public $myLogPHP;
+    public $orderStates = [
+        'paid' => [
+            'cfg' => 'PS_OS_PAYMENT',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_PAID',
+                'PAYPLUG_ORDER_STATE_PAID_TEST'
+            ],
+            'template' => 'payment',
+            'logable' => true,
+            'send_email' => true,
+            'paid' => true,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#04b404',
+            'name' => [
+                'en' => 'Payment accepted',
+                'fr' => 'Paiement effectué',
+                'es' => 'Pago efectuado',
+                'it' => 'Pagamento effettuato',
+            ],
+        ],
+        'refund' => [
+            'cfg' => 'PS_OS_REFUND',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_REFUND',
+                'PAYPLUG_ORDER_STATE_REFUND_TEST'
+            ],
+            'template' => 'refund',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#ea3737',
+            'name' => [
+                'en' => 'Refunded',
+                'fr' => 'Remboursé',
+                'es' => 'Reembolsado',
+                'it' => 'Rimborsato',
+            ],
+        ],
+        'pending' => [
+            'cfg' => 'PS_OS_PENDING',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_PENDING',
+                'PAYPLUG_ORDER_STATE_PENDING_TEST'
+            ],
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#a1f8a1',
+            'name' => [
+                'en' => 'Payment in progress',
+                'fr' => 'Paiement en cours',
+                'es' => 'Pago en curso',
+                'it' => 'Pagamento in corso',
+            ],
+        ],
+        'error' => [
+            'cfg' => 'PS_OS_ERROR',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_ERROR',
+                'PAYPLUG_ORDER_STATE_ERROR_TEST'
+            ],
+            'template' => 'payment_error',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#8f0621',
+            'name' => [
+                'en' => 'Payment failed',
+                'fr' => 'Paiement échoué',
+                'es' => 'Payment failed',
+                'it' => 'Payment failed',
+            ],
+        ],
+        'cancelled' => [
+            'cfg' => 'PS_OS_CANCELED',
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_CANCELLED',
+                'PAYPLUG_ORDER_STATE_CANCELLED_TEST'
+            ],
+            'template' => 'order_canceled',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#2C3E50',
+            'name' => [
+                'en' => 'Payment cancelled',
+                'fr' => 'Paiement annulé',
+                'es' => 'Payment cancelled',
+                'it' => 'Payment cancelled',
+            ],
+        ],
+        'auth' => [
+            'cfg' => null,
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_AUTH',
+                'PAYPLUG_ORDER_STATE_AUTH_TEST'
+            ],
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => true,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#04b404',
+            'name' => [
+                'en' => 'Payment authorized',
+                'fr' => 'Paiement autorisé',
+                'es' => 'Pago',
+                'it' => 'Pagamento',
+            ],
+        ],
+        'exp' => [
+            'cfg' => null,
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_EXP',
+                'PAYPLUG_ORDER_STATE_EXP_TEST'
+            ],
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#8f0621',
+            'name' => [
+                'en' => 'Autorization expired',
+                'es' => 'Autorización vencida',
+                'fr' => 'Autorisation expirée',
+                'it' => 'Autorizzazione scaduta',
+            ],
+        ],
+    ];
+    public $orderStatesOney = [
+        'oney_pg' => [
+            'cfg' => null,
+            'payplug_cfg' => [
+                'PAYPLUG_ORDER_STATE_ONEY_PG',
+                'PAYPLUG_ORDER_STATE_ONEY_PG_TEST'
+            ],
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'module_name' => 'payplug',
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#a1f8a1',
+            'name' => [
+                'en' => 'Oney - Pending',
+                'fr' => 'Oney - En attente',
+                'es' => 'Oney - Pending',
+                'it' => 'Oney - Pending',
+            ],
+        ],
+    ];
+    public $payplugLanguages = ['en', 'fr', 'es', 'it'];
+    public $version;
+    public $warning;
+
     private $amountCurrencyClass;
     private $apiClass;
     private $api_live;
@@ -52,21 +240,16 @@ class ConfigClass
     private $context;
     private $dependenciesClass;
     private $dependencies;
-    public $email;
-    public $features_json;
     private $html = '';
     private $img_lang;
     private $install;
-    public $logger;
-    public $myLogPHP;
     private $oney;
     private $orderClass;
     private $payment_status;
     private $payplugClass;
     private $ssl_enable;
     private $validationErrors = [];
-    public $version;
-    public $warning;
+
 
     public function __construct()
     {
@@ -82,9 +265,6 @@ class ConfigClass
 
         $this->apiClass = new ApiClass();
         $this->orderClass = new OrderClass();
-
-        // todo: to remove when method getUninstallContent is moved
-        $this->payplugClass = new PayPlugClass();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
@@ -508,7 +688,7 @@ class ConfigClass
     public function assignContentVar()
     {
         if (Tools::getValue('uninstall_config')) {
-            return $this->payplugClass->getUninstallContent();
+            return $this->getUninstallContent();
         }
 
         $this->checkConfiguration();
@@ -1237,5 +1417,30 @@ class ConfigClass
 
         $output = $this->module->getInstanceByName($this->dependencies->name)->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
         return $output;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUninstallContent()
+    {
+        $this->configClass->postProcess();
+        $this->html = '';
+
+        $PAYPLUG_KEEP_CARDS = (int)$this->config->get('PAYPLUG_KEEP_CARDS');
+
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+
+        $this->context->smarty->assign([
+            'form_action' => (string)($_SERVER['REQUEST_URI']),
+            'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
+            'site_url' => $this->apiClass->getSiteUrl(),
+            'PAYPLUG_KEEP_CARDS' => $PAYPLUG_KEEP_CARDS,
+        ]);
+
+        $this->html .= $this->fetchTemplate('/views/templates/admin/admin_uninstall_configuration.tpl');
+
+        return $this->html;
     }
 }

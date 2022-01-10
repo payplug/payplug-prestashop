@@ -77,8 +77,8 @@ class PayPlugDependencies
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
 
-        $this->hookClass = new HookClass($this->dependencies);
-        die(dump(__LINE__));
+        $this->hookClass = new HookClass();
+
         $this->configClass = new ConfigClass();
 
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');

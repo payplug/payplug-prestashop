@@ -292,7 +292,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayAdminOrderMain($params)
     {
-        if ($this->module) {
+        if ($this->module && $this->active) {
             return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }

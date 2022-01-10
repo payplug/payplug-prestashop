@@ -41,7 +41,7 @@ class AdminPayplugController extends ModuleAdminController
         $this->postProcess();
 
         if (Tools::getValue('uninstall_config') == 1) {
-            return $this->getUninstallContent();
+            return (new \PayPlug\classes\AdminClass())->getUninstallContent();
         }
 
         $this->html = '';

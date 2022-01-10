@@ -34,7 +34,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugBackward.php');
 
         $payplug = new PayPlugClass();
-        $paymentClass = new PaymentClass($payplug);
+        $paymentClass = new PaymentClass();
         $payplug->apiClass->initializeApi();
 
         $context = Context::getContext();

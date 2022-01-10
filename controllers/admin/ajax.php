@@ -35,7 +35,7 @@ $payplug = new PayPlugClass();
 $adminClass = new AdminClass();
 $cartClass = new CartClass();
 $refundClass = new RefundClass($payplug);
-$paymentClass = new PaymentClass($payplug);
+$paymentClass = new PaymentClass();
 $logger = $payplug->getPlugin()->logger();
 
 if (Tools::getValue('_ajax') == 1) {

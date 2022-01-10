@@ -58,7 +58,7 @@ class PayPlugAjax
         $this->toolsSpecific = $this->plugin->getTools();
         $this->translate = $this->plugin->getTranslate();
 
-        $this->paymentClass = new PaymentClass($this->payplug);
+        $this->paymentClass = new PaymentClass();
     }
 
     /**

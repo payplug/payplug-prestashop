@@ -138,4 +138,46 @@ class OrderClass
 
         return $this->query->build('unique_value');
     }
+
+    /**
+     * @description get the undefined order state on an history
+     *
+     * @param int $orderId
+     * @return array
+     */
+    public function getUndefinedOrderHistory($orderId = false)
+    {
+        if (!$orderId || !is_int($orderId)) {
+            return [];
+        }
+
+        $order_history_states = $this->query
+            ->select()
+            ->fields('oh.id_order_state, osl.name')
+            ->from($this->constant->get('_DB_PREFIX_') . 'order_history', 'oh')
+            ->leftJoin($this->constant->get('_DB_PREFIX_') . 'order_state_lang', 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
+            ->where('oh.id_order = ' . $orderId)
+            ->where('osl.id_lang = ' . $this->context->language->id)
+            ->build();
+
+        if (empty($order_history_states)) {
+            return [];
+        }
+
+        foreach ($order_history_states as $key => &$state) {
+            $type = $this->plugin->getOrderState()->getType((int)$state['id_order_state']);
+            $state['type'] = $type;
+            if (!$type || 'undefined' != $type) {
+                unset($order_history_states[$key]);
+                continue;
+            }
+            $update_link_params = [
+                'updateorder_state' => '',
+                'id_order_state' => $state['id_order_state']
+            ];
+            $state['updateLink'] = AdminClass::getAdminUrl('AdminStatuses', $update_link_params);
+        }
+
+        return $order_history_states;
+    }
 }

@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\classes\MediaClass;
+
 class HookRepository extends Repository
 {
     protected $constant;
@@ -30,12 +32,16 @@ class HookRepository extends Repository
     protected $context;
     protected $tools;
 
+    private $mediaClass;
+
     public function __construct($payplug, $constant, $context, $tools)
     {
         $this->payplug = $payplug;
         $this->constant = $constant;
         $this->context = $context;
         $this->tools = $tools;
+
+        $this->mediaClass = new MediaClass();
     }
 
     public function actionAdminControllerSetMedia()
@@ -43,13 +49,13 @@ class HookRepository extends Repository
         $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
 
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
-            $this->payplug->mediaClass->setMedia([
+            $this->mediaClass->setMedia([
                 $module_url . 'views/css/admin_order.css',
                 $module_url . 'views/js/admin_order.js',
                 $module_url . 'views/js/utilities.js',
             ]);
         } else {
-            $this->payplug->mediaClass->setMedia([
+            $this->mediaClass->setMedia([
                 $module_url . 'views/js/admin.js',
                 $module_url . 'views/css/admin.css',
             ]);

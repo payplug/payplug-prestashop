@@ -877,7 +877,7 @@ class PayPlugNotifications
         $this->resp = [];
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
-        $this->paymentClass = new PaymentClass($this->payplug);
+        $this->paymentClass = new PaymentClass();
         $this->plugin = $this->payplug->getPlugin();
         $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
         $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');

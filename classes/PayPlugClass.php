@@ -106,7 +106,6 @@ class PayPlugClass extends PaymentModule
     /**
      * @var To inject logo_url in oney payment template
      */
-    public $oneyLogoUrl;
     public $order_state;
     public $order_states = [
         'paid' => [
@@ -327,7 +326,6 @@ class PayPlugClass extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->oneyLogoUrl = '';
         $this->version = PAYPLUG_VERSION;
         $this->initializeAccessors();
 
@@ -525,51 +523,6 @@ class PayPlugClass extends PaymentModule
 
         return $this->html;
     }
-
-    /**
-     * @description get the undefined order state on an history
-     * @todo: move this method to OrderClass
-     * @param int $orderId
-     * @return array
-     */
-    public function getUndefinedOrderHistory($orderId = false)
-    {
-        if (!$orderId || !is_int($orderId)) {
-            return [];
-        }
-
-        $order_history_states = $this->query
-            ->select()
-            ->fields('oh.id_order_state, osl.name')
-            ->from(_DB_PREFIX_ . 'order_history', 'oh')
-            ->leftJoin(_DB_PREFIX_ . 'order_state_lang', 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
-            ->where('oh.id_order = ' . $orderId)
-            ->where('osl.id_lang = ' . $this->context->language->id)
-            ->build();
-
-        if (empty($order_history_states)) {
-            return [];
-        }
-
-        foreach ($order_history_states as $key => &$state) {
-            $type = $this->plugin->getOrderState()->getType((int)$state['id_order_state']);
-            $state['type'] = $type;
-            if (!$type || 'undefined' != $type) {
-                unset($order_history_states[$key]);
-                continue;
-            }
-            $update_link_params = [
-                'updateorder_state' => '',
-                'id_order_state' => $state['id_order_state']
-            ];
-            $state['updateLink'] = AdminClass::getAdminUrl('AdminStatuses', $update_link_params);
-        }
-
-        return $order_history_states;
-    }
-
-
-
 
     /**
      * @todo: move this method to PayplugNotifications
