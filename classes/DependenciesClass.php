@@ -332,7 +332,7 @@ class DependenciesClass extends PaymentModule
         $this->initializeAccessors();
 
         $this->loadEntities();
-//        parent::__construct();
+        parent::__construct();
         $this->loadSpecificPrestaClasses();
 
         if (file_exists(__DIR__."/../features.json")) {

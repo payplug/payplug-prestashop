@@ -107,7 +107,7 @@ class AdminClass extends \Payplug
 
         $this->configClass->assignContentVar();
 
-        $this->html .= $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+        $this->html .= $this->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
         return $this->html;
     }
@@ -171,13 +171,13 @@ class AdminClass extends \Payplug
             $this->configClass->saveConfiguration();
 
             $this->configClass->assignContentVar();
-            $content = $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+            $content = $this->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
             $this->contextSpecific->smarty->assign([
                 'title' => '',
                 'type' => 'save',
             ]);
-            $popin = $this->module->fetchTemplate('/views/templates/admin/popin.tpl');
+            $popin = $this->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
 
             die(json_encode(['popin' => $popin, 'content' => $content]));
         }
@@ -202,14 +202,14 @@ class AdminClass extends \Payplug
                 if ((bool)$api_key) {
                     Configuration::updateValue('PAYPLUG_SANDBOX_MODE', 0);
                     $this->configClass->assignContentVar();
-                    $content = $this->module->fetchTemplate('/views/templates/admin/admin.tpl');
+                    $content = $this->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
                     die(json_encode(['content' => $content]));
                 } else {
                     $this->contextSpecific->smarty->assign([
                         'title' => '',
                         'type' => 'activate',
                     ]);
-                    $popin = $this->module->fetchTemplate('/views/templates/admin/popin.tpl');
+                    $popin = $this->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
                     die(json_encode(['popin' => $popin]));
                 }
             } else {
@@ -339,7 +339,7 @@ class AdminClass extends \Payplug
 
         $this->configClass->assignContentVar();
 
-        $this->html = $this->module->fetchTemplate('/views/templates/admin/panel/login.tpl');
+        $this->html = $this->configClass->fetchTemplate('/views/templates/admin/panel/login.tpl');
 
         return $this->html;
     }

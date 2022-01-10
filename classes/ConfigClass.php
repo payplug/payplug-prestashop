@@ -65,6 +65,8 @@ class ConfigClass
     private $check_configuration;
     public $version;
     private $PrestashopSpecificObject;
+    public $features_json;
+    private $dependenciesClass;
 
     public function __construct($payplug)
     {
@@ -77,12 +79,19 @@ class ConfigClass
         $this->orderClass = $payplug->orderClass;
         $this->constantSpecific = new ConstantSpecific();
         $this->context = (new ContextSpecific())->getContext();
+        $this->dependenciesClass = $payplug;
 
         $this->payplugClass = $payplug;
 
         $this->setLoggers();
         $this->setConfigurationProperties();
         $this->loadSpecificPrestaClasses();
+
+        if (file_exists(__DIR__."/../features.json")) {
+            $this->features_json = json_decode(file_get_contents(__DIR__."/../features.json"));
+        } else {
+            $this->features_json = [];
+        }
     }
 
     /**
@@ -639,7 +648,7 @@ class ConfigClass
 
         if ((class_exists($this->payplugClass->PrestashopSpecificClass))
             && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
-            && $this->payplugClass->isValidFeature('feature_integrated')
+            && $this->isValidFeature('feature_integrated')
             && Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($configurations['sandbox_mode'] ? '_TEST' : ''))
         ) {
             $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
@@ -683,8 +692,8 @@ class ConfigClass
             'deferred_auto' => $configurations['deferred_auto'],
             'deferred_state' => $configurations['deferred_state'],
             'oney' => $configurations['oney'],
-            'bancontact' => $this->payplugClass->isValidFeature('feature_bancontact'),
-            'integrated' => $this->payplugClass->isValidFeature('feature_integrated'),
+            'bancontact' => $this->isValidFeature('feature_bancontact'),
+            'integrated' => $this->isValidFeature('feature_integrated'),
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->orderClass->getOrderStates(),
@@ -1213,5 +1222,34 @@ class ConfigClass
     public function submitUninstallSettings()
     {
         Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
+    }
+
+    public function isValidFeature($name)
+    {
+        if (empty($this->features_json)) {
+            return false;
+        }
+
+        foreach ($this->features_json->features as $feature) {
+            if ($feature == $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function fetchTemplate($file)
+    {
+        if ($this->context->smarty->tpl_vars) {
+            foreach ($this->context->smarty->tpl_vars as $key => $value) {
+                if (strpos($key, 'feature_') !== false && !$this->isValidFeature($key)) {
+                    unset($this->context->smarty->tpl_vars[$key]);
+                }
+            }
+        }
+
+        $output = $this->dependenciesClass->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
+        return $output;
     }
 }
