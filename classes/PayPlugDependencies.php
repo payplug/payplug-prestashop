@@ -51,7 +51,7 @@ class PayPlugDependencies
     public $oney;
 
     /** @var object */
-    public $payplug;
+    public $dependencies;
 
     /** @var object */
     public $payment;
@@ -66,12 +66,12 @@ class PayPlugDependencies
 
     private function initializeAccessors()
     {
-        $this->payplug = new PayPlugClass();
-        $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
+        $this->dependencies = new DependenciesClass();
+        $this->setPlugin((new PluginRepository($this->dependencies))->getEntity());
 
-        $this->api = new ApiClass($this->payplug);
+        $this->api = new ApiClass($this->dependencies);
         $this->hook = $this->getPlugin()->getHook();
-        $this->hookClass = new HookClass($this->payplug);
+        $this->hookClass = new HookClass($this->dependencies);
         $this->install = $this->getPlugin()->getInstall();
         $this->oney = $this->getPlugin()->getOney();
         $this->payment = $this->getPlugin()->getPayment();

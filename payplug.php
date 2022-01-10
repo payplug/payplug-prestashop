@@ -481,7 +481,7 @@ class Payplug extends PaymentModule
 
     private function setModule()
     {
-        $this->module = $this->payplug_dependencies->payplug;
+        $this->module = $this->payplug_dependencies->dependencies;
     }
 
     /**
