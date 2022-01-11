@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2021 PayPlug SAS
+ *  @copyright 2013 - 2022 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -62,15 +62,17 @@ if (Tools::getValue('_ajax') == 1) {
         $args = null;
         if (Tools::getValue('type') == 'confirm') {
             $sandbox = (int)Tools::getValue('sandbox');
-            $embedded = (int)Tools::getValue('embedded');
+            $embedded = (string)Tools::getValue('embedded');
             $one_click = (int)Tools::getValue('one_click');
             $installment = (int)Tools::getValue('installment');
+            $bancontact = (int)Tools::getValue('bancontact');
             $deferred = (int)Tools::getValue('deferred');
             $activate = (int)Tools::getValue('activate');
             $args = [
                 'sandbox' => $sandbox,
                 'embedded' => $embedded,
                 'one_click' => $one_click,
+                'bancontact' => $bancontact,
                 'installment' => $installment,
                 'deferred' => $deferred,
                 'activate' => $activate,

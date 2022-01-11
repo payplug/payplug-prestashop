@@ -3,6 +3,7 @@ config*.xml
 php-cs-fixer-v2.phar
 .DS_Store
 .idea
+node_modules/
 vendor/
 views/css/*.css
 views/css/*.map
@@ -15,5 +16,6 @@ views/css/less/*/*/*.map
 views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
 ci/translations.csv
+features.json
 html/
 phpunit.log

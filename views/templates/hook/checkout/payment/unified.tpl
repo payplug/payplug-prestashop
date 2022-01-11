@@ -1,5 +1,5 @@
 {*
-* 2021 PayPlug
+* 2022 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,14 +15,14 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2021 PayPlug SAS
+*  @copyright 2022 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {assign var=parse_3x_4x value="_"|explode:$payplug_payment_option.logo_url}
 <div class="row">
     <div class="col-xs-12">
-        <p class="payment_module payplugPayment">
+        <p class="payment_module payplugPayment oneyPayment">
             <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}">
                 <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"
                      class="{$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'} oneyLogo  -with{if isset($use_fees) && !$use_fees}out{/if}Fees {if $payplug_payment_option.oney_error}{$payplug_payment_option.oney_error|escape:'htmlall':'UTF-8'}{/if}"/>

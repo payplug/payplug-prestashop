@@ -1,11 +1,12 @@
 {
     "name": "payplug/payplug-prestashop",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "3.5.0",
+    "version": "3.6.0",
     "require": {
 	"php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
-        "payplug/payplug-php": "3.*"
+        "payplug/payplug-php": "3.*",
+        "symfony/dotenv": "3.4.*"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",
@@ -18,6 +19,7 @@
     "archive": {
         "exclude": [
             "!vendor/*",
+            "!features.json",
             ".*",
             "ci",
 	        "*.sh",
@@ -29,7 +31,8 @@
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "composer.*"
+            "composer.*",
+            "features.json.dist"
         ]
     },
     "autoload": {

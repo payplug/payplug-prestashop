@@ -1,5 +1,5 @@
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2021 PayPlug SAS
+ *  @copyright 2013 - 2022 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  @version   3.4.0
  *  International Registered Trademark & Property of PayPlug SAS
@@ -42,3 +42,38 @@ function sanitizePopupHtml (str) {
     tags = this.getHtmlTags(str);
     return tagsWhitelist.filter(e => tags.indexOf(e) !== -1).length === tags.length;
 }
+
+var payplug_utilities = {
+    props: {
+        loadedScript: []
+    },
+    init: function(){
+
+    },
+    loadScript: function (url, callback) {
+        // Check if already loaded
+        if (payplug_utilities.props.loadedScript.includes(url)) {
+            return callback();
+        }
+
+        var script = document.createElement("script")
+        script.type = "text/javascript";
+        if (script.readyState) {  // only required for IE <9
+            script.onreadystatechange = function () {
+                if (script.readyState === "loaded" || script.readyState === "complete") {
+                    payplug_utilities.props.loadedScript.push(url);
+                    script.onreadystatechange = null;
+                    callback();
+                }
+            };
+        } else {  //Others
+            script.onload = function () {
+                payplug_utilities.props.loadedScript.push(url);
+                callback();
+            };
+        }
+
+        script.src = url;
+        document.getElementsByTagName("head")[0].appendChild(script);
+    }
+};

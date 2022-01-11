@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -26,4 +26,15 @@ namespace PayPlug\src\interfaces;
 interface ProductInterface
 {
     public function product($method);
+    public function getIdProductAttributesByIdAttributes($idProduct, $group);
+    public function getPriceStatic(
+        $id_product,
+        $usetax,
+        $id_product_attribute,
+        $decimals,
+        $divisor,
+        $only_reduc,
+        $usereduc,
+        $quantity
+    );
 }

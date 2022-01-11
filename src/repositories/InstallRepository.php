@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -177,6 +177,7 @@ class InstallRepository extends Repository
     private function deleteConfig()
     {
         return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
+            && $this->config->deleteByName('PAYPLUG_BANCONTACT')
             && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
             && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
             && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
@@ -241,13 +242,13 @@ class InstallRepository extends Repository
         // check requirement
         $report = ConfigClass::checkRequirements();
         if (!$report['php']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: PHP Requirement.'));
+            return $this->setInstallError('Install failed: PHP Requirement.');
         }
         if (!$report['curl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: cURL Requirement.'));
+            return $this->setInstallError('Install failed: cURL Requirement.');
         }
         if (!$report['openssl']['up2date']) {
-            return $this->setInstallError($this->l('Install failed: OpenSSL Requirement.'));
+            return $this->setInstallError('Install failed: OpenSSL Requirement.');
         }
 
         // Check if multishop feature is active then set the context
@@ -277,7 +278,7 @@ class InstallRepository extends Repository
 
         // Install tab
         if (!$this->payplug->PrestashopSpecificObject->installTab()) {
-            return $this->setInstallError($this->l('Install failed: Install Tab'));
+            return $this->setInstallError('Install failed: Install Tab');
         }
 
         $this->log->info('Install successful.');
@@ -291,6 +292,7 @@ class InstallRepository extends Repository
     public function setConfig()
     {
         return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
+            && $this->config->updateValue('PAYPLUG_BANCONTACT', null)
             && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
             && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
             && $this->config->updateValue('PAYPLUG_COMPANY_ISO', '')
@@ -300,7 +302,7 @@ class InstallRepository extends Repository
             && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
             && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
             && $this->config->updateValue('PAYPLUG_EMAIL', null)
-            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 0)
+            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected')
             && $this->config->updateValue('PAYPLUG_INST', null)
             && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
             && $this->config->updateValue('PAYPLUG_INST_MODE', 3)

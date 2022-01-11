@@ -1,5 +1,5 @@
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,11 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2021 PayPlug SAS
+ *  @copyright 2013 - 2022 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
+
 var allow_debug = true, debug = function (str) {
     if (allow_debug) {
         console.log(str);
@@ -30,6 +31,7 @@ var $document, $window, payplugModule = {
         this.order.init();
         this.oney.init();
         this.popup.init();
+        this.integrated.init();
     },
     order: {
         init: function () {
@@ -39,7 +41,7 @@ var $document, $window, payplugModule = {
 
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
-                if ($form.find('input[name=method]').val()=="oney") {
+                if ($form.find('input[name=method]').val() == "oney") {
                     if ($form.find('input[name=oney_type]').val().includes("without_fees")) {
                         $('#' + this.id + '-container').addClass('without_fees');
                     } else if ($form.find('input[name=oney_type]').val().includes("with_fees")) {
@@ -88,11 +90,405 @@ var $document, $window, payplugModule = {
             });
         },
     },
+    integrated: {
+        props: {
+            identifier: 'payplugIntegratedPayment',
+            cartId: null,
+            paymentId: null,
+            paymentOptionId: null,
+            form: {},
+            checkoutForm: null,
+            api: null,
+            integratedPayment: null,
+            token: null,
+            notValid: false,
+            fieldsValid: {
+                validCardHolder: false,
+                validPan: false,
+                validExp: false,
+                validCvv: false,
+            },
+            save_card: false,
+            scheme: null,
+            query: null,
+            submit: null,
+        },
+        init: function () {
+            var integrated = payplugModule.integrated,
+                $integratedForm = $('.' + integrated.props.identifier);
+            if ($integratedForm.length) {
+                var $methodInput = document.querySelectorAll('input[name=method][value=integrated]').item(0).parentNode,
+                    payment_option = ($methodInput.childNodes)[3];
+                integrated.props.paymentOptionId = payment_option.id.replace('pay-with-', '');
+                integrated.form.init();
+            } else {
+                return false;
+            }
+        },
+        form: {
+            init: function () {
+                var integrated = payplugModule.integrated,
+                    payment_option_id = integrated.props.paymentOptionId;
+
+                $document.on('click', '#' + payment_option_id, integrated.form.set);
+            },
+            set: function () {
+                var integrated = payplugModule.integrated;
+
+                integrated.props.api = Payplug;
+
+                var api = integrated.props.api,
+                    $form = $('.' + integrated.props.identifier),
+                    $scheme = $form.find('.-scheme'),
+                    $cardholder = $form.find('.-cardholder'),
+                    $pan = $form.find('.-pan'),
+                    $cvv = $form.find('.-cvv'),
+                    $exp = $form.find('.-exp'),
+                    $saveCard = $form.find('.-saveCard'),
+                    payment_option_id = integrated.props.paymentOptionId;
+
+                // check if form already exists
+                if ($form.is('.-loaded')) {
+                    return;
+                }
+
+                var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                integrated.props.integratedPayment = integratedPayment;
+                integratedPayment.setDisplayMode3ds(integrated.props.api.DisplayMode3ds.LIGHTBOX);
+
+                var input_style = {
+                    default: {
+                        color: '#2B343D',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
+                        textAlign: 'left',
+                        '::placeholder': {
+                            color: '#969a9f',
+                        },
+                        ':focus': {
+                            color: '#2B343D',
+                        },
+                    },
+                    invalid: {
+                        color: '#E91932',
+                    },
+                };
+
+                form = {
+                    integratedPayment: integratedPayment,
+                    cardHolder: integratedPayment.cardHolder(
+                        $cardholder.get(0),
+                        {
+                            placeholder: placeholderCardholder,
+                            default: input_style.default,
+                            invalid: input_style.invalid
+                        }
+                    ),
+                    pan: integratedPayment.cardNumber(
+                        $pan.get(0),
+                        {
+                            placeholder: placeholderPan,
+                            default: input_style.default,
+                            invalid: input_style.invalid
+                        }
+                    ),
+                    cvv: integratedPayment.cvv(
+                        $cvv.get(0),
+                        {
+                            placeholder: placeholderCvv,
+                            default: input_style.default,
+                            invalid: input_style.invalid
+                        }
+                    ),
+                    exp: integratedPayment.expiration(
+                        $exp.get(0),
+                        {
+                            placeholder: placeholderExp,
+                            default: input_style.default,
+                            invalid: input_style.invalid
+                        }
+                    ),
+                };
+
+                $form.addClass('-loaded');
+
+                form.cardHolder.onChange(function (event) {
+                    //validate card Holder field
+                    if (!event.valid) {
+                        var error = event.error;
+                        $('#errorCardHolder').html(error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validCardHolder'] = true;
+                        $('#errorCardHolder').empty();
+                    }
+                });
+                form.pan.onChange(function (event) {
+                    //validate pan field
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardPan').html(error['name'] + '<br>');
+                    } else {
+                        integrated.props.fieldsValid['validPan'] = true;
+                        $('#errorCardPan').empty();
+                    }
+                });
+                form.cvv.onChange(function (event) {
+                    //validate cvv field
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardCvv').html(error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validCvv'] = true;
+                        $('#errorCardCvv').empty();
+                    }
+                });
+                form.exp.onChange(function (event) {
+                    //validate expiry date field
+                    if (!event.valid) {
+                        integrated.props.notValid = true;
+                        var error = event.error;
+                        $('#errorCardExp').html(error['name']);
+                    } else {
+                        integrated.props.fieldsValid['validExp'] = true;
+                        $('#errorCardExp').empty();
+                    }
+
+                });
+
+                form.cardHolder.onFocus(function(){
+                    $cardholder.addClass('-focus');
+                });
+                form.pan.onFocus(function(){
+                    $pan.addClass('-focus');
+                });
+                form.cvv.onFocus(function(){
+                    $cvv.addClass('-focus');
+                });
+                form.exp.onFocus(function(){
+                    $exp.addClass('-focus');
+                });
+
+                form.cardHolder.onBlur(function(){
+                    $cardholder.removeClass('-focus');
+                });
+                form.pan.onBlur(function(){
+                    $pan.removeClass('-focus');
+                });
+                form.cvv.onBlur(function(){
+                    $cvv.removeClass('-focus');
+                });
+                form.exp.onBlur(function(){
+                    $exp.removeClass('-focus');
+                });
+
+                $cardholder.on('click', function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.cardHolder.focus();
+                });
+                $scheme.find('input').on('click', function(event){
+                    integrated.props.scheme = $(this).val();
+                });
+                $pan.on('click', function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.pan.focus();
+                });
+                $exp.on('click', function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.exp.focus();
+                });
+                $cvv.on('click', function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.cvv.focus();
+                });
+                $saveCard.find('input').on('change', function () {
+                    if ($(this).prop('checked')) {
+                        integrated.props.save_card = true;
+                        $saveCard.addClass('-checked');
+                    } else {
+                        integrated.props.save_card = false;
+                        $saveCard.removeClass('-checked');
+                    }
+                });
+
+                integrated.props.form = form;
+
+                $document.on('submit', 'form', function (event) {
+                    if (($(event.target).is('.' + integrated.props.identifier) || $(event.target).is('#payment-form'))
+                        && $('#' + payment_option_id).is(':checked')) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        if (integrated.props.submited) {
+                            return false;
+                        }
+
+                        integrated.props.submited = true;
+                        integrated.form.getIntPaymentId();
+
+                        return false;
+                    }
+                });
+
+                // Once an attempt has been made
+                integratedPayment.onCompleted(function (event) {
+                    integrated.form.confirmIntPayment(event.token);
+                });
+            },
+            validateForm: function (fieldsValid) {
+                // valide integrated payment form
+                for (var key in fieldsValid) {
+                    if (!fieldsValid[key]) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            getIntPaymentId: function (event) {
+                //create integrated payment id
+                var integrated = payplugModule.integrated;
+                if (typeof event != 'undefined') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                integratedPayment = integrated.props.integratedPayment;
+
+                token = integratedPayment.token;
+                if (integrated.props.query != null) {
+                    integrated.props.query.abort();
+                    integrated.props.query = null;
+                }
+
+                var fieldsValid = integrated.props.fieldsValid;
+
+                $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
+
+                if (!integrated.form.validateForm(fieldsValid)) {
+                    integrated.props.submited = false;
+                    return;
+                }
+
+                integrated.props.query = $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        createIP: 1,
+                        token: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        integrated.form.resetIntPayment();
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                    success: function (result) {
+                        if (result && result.payment_id) {
+                            integrated.props.paymentId = result.payment_id;
+                            integrated.props.cart_id = result.cart_id;
+                            integrated.form.submitIntPayment();
+                        } else {
+                            payplugModule.popup.set(integratedPaymentError);
+                            integrated.form.resetIntPayment();
+                            return false;
+                        }
+                    },
+                });
+            },
+            submitIntPayment: function () {
+                // create an integrated payment
+
+                var integrated = payplugModule.integrated,
+                    paymentId = integrated.props.paymentId,
+                    integratedPayment = integrated.props.integratedPayment,
+                    integratedPaymentScheme = null;
+
+                switch(integrated.props.scheme) {
+                    case 'cb':
+                        integratedPaymentScheme = Payplug.Scheme.CARTE_BANCAIRE;
+                        break;
+                    case 'visa':
+                        integratedPaymentScheme = Payplug.Scheme.VISA;
+                        break;
+                    case 'mastercard':
+                        integratedPaymentScheme = Payplug.Scheme.MASTERCARD;
+                        break;
+                    default:
+                        integratedPaymentScheme = Payplug.Scheme.AUTO;
+                        break;
+                }
+
+                integratedPayment.pay(paymentId, integratedPaymentScheme, {save_card: integrated.props.save_card});
+            },
+            confirmIntPayment: function (token) {
+                payplugModule.tools.loadSpinner();
+                // confirm creation integrated paiement or show fail popup
+                var integrated = payplugModule.integrated;
+                if (integrated.props.query != null) {
+                    integrated.props.query.abort();
+                    integrated.props.query = null;
+                }
+
+                integrated.props.query = $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        confirmIP: 1,
+                        cart_id: integrated.props.cart_id,
+                        pay_id: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        integrated.form.resetIntPayment();
+                    },
+                    success: function (data) {
+                        payplugModule.tools.removeSpinner();
+                        if (data.result) {
+                            window.location.href = data.return_url;
+                        } else {
+                            $('.' + integrated.props.identifier + '_error.-payment')
+                                .text(integratedPaymentError)
+                                .addClass('-show');
+                            integrated.form.resetIntPayment(true);
+                            return false;
+                        }
+                    },
+                });
+            },
+            resetIntPayment: function(clear){
+                // confirm creation integrated paiement or show fail popup
+                var integrated = payplugModule.integrated;
+                integrated.props.submited = false;
+
+                if (clear) {
+                    form.cardHolder.clear();
+                    form.pan.clear();
+                    form.cvv.clear();
+                    form.exp.clear();
+                    $('input[name="savecard"]').prop('checked', false);
+                }
+
+                // unchecked tos
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+            }
+        },
+    },
     card: {
         props: {
             identifier: 'payplugCard',
             query: null,
-            id_card : 0,
+            id_card: 0,
         },
         init: function () {
             var card = payplugModule.card,
@@ -120,27 +516,27 @@ var $document, $window, payplugModule = {
                 card = payplugModule.card,
                 identifier = card.props.identifier;
 
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    dataType: 'json',
-                    data: {
-                        delete: 1,
-                        pc: id_card
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert('error CALL DELETE CARD');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
-                    },
-                    success: function (result) {
-                        if (result) {
-                                $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
-                                payplugModule.popup.setDeleteCardPopup(card_deleted_msg);
-                        }
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: {
+                    delete: 1,
+                    pc: id_card
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('error CALL DELETE CARD');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+                success: function (result) {
+                    if (result) {
+                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                        payplugModule.popup.setDeleteCardPopup(card_deleted_msg);
                     }
-                });
+                }
+            });
         },
     },
     oney: {
@@ -176,7 +572,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
-            };
+                };
 
             if (with_schedule) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
@@ -581,7 +977,7 @@ var $document, $window, payplugModule = {
 
 
         },
-        setDeleteCardPopup:  function (content) {
+        setDeleteCardPopup: function (content) {
             var popup = payplugModule.popup,
                 props = popup.props;
             popup.create();
@@ -605,7 +1001,6 @@ var $document, $window, payplugModule = {
             popin.removeClass('-open');
 
 
-
         },
         remove: function () {
             var {popup} = payplug.tools,
@@ -623,9 +1018,22 @@ var $document, $window, payplugModule = {
             var props = payplugModule.popup.props;
             $('.' + props.identifier + '_content').html(content);
         }
+    },
+    tools: {
+        loadSpinner: function () {
+            $('.payplugIntegratedPayment').append('<div class="ipOverlay -disabled">');
+            html = '<div class="ipOverlay_inner" ><div class="ipOverlay__content"><span class="ipOverlay_spinner"></span</div></div>';
+            $('.ipOverlay').append(html);
 
-    }
+            $('.ipOverlay').removeClass('-disabled');
+            $('.ipOverlay').addClass('-show');
+        },
+        removeSpinner: function () {
+            $('.ipOverlay').remove();
+        },
+    },
 };
+
 $(document).ready(function () {
     $document = $(document);
     $window = $(window);

@@ -193,4 +193,34 @@ final class CreatePaymentTest extends BasePaymentRepository
             '[createPayment] payment return URL is null.'
         );
     }
+
+    public function testCreateIntegratedPaymentReturnUrl()
+    {
+        $paymentDetails = [
+            'paymentMethod' => 'standard',
+            'paymentTab'=> [
+                'hosted_payment' =>
+                    ['return_url' => mt_rand(),
+                    ],
+            ],
+            'paymentReturnUrl' => null,
+        ];
+        $paymentDetails['paymentTab']['integration'] = 'INTEGRATED_PAYMENT';
+        $paymentMock = PaymentMock::getStandard();
+        $paymentMock->hosted_payment->return_url = null;
+        $this->config
+            ->shouldReceive([
+                                'get' => true
+                            ]);
+
+        $this->paymentApi
+            ->shouldReceive([
+                                'create' => $paymentMock,
+                            ]);
+        $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
+        $this->assertSame(
+            '[createPayment] Payment successfully created',
+            $this->repo->createPayment($paymentDetails)['response']
+        );
+    }
 }

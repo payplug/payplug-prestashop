@@ -1,5 +1,5 @@
 {*
-* 2021 PayPlug
+* 2022 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2021 PayPlug SAS
+*  @copyright 2022 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -43,6 +43,11 @@
     <div class="payplugSettings_advanced">
         {include file='./settings/standard.tpl'}
         {include file='./settings/oney.tpl'}
+
+        {if $bancontact}
+            {include file='./settings/bancontact.tpl'}
+        {/if}
+
         {include file='./settings/installment.tpl'}
         {include file='./settings/deferred.tpl'}
     </div>

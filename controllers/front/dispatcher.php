@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -45,7 +45,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $is_installment = (bool)($method === 'installment');
             $oney_type = Tools::getValue('oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
-
+            $is_bancontact = (bool)($method === 'bancontact');
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -54,6 +54,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $options = \PayPlug\classes\ConfigClass::getAvailableOptions($cart);
 
+            $embedded = $options['embedded'] != 'redirected';
             $error_url = 'index.php?controller=order&step=3&error=1';
 
             if ($options['oney'] && $is_oney) {
@@ -63,7 +64,21 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 } else {
                     Tools::redirect($payment['return_url']);
                 }
-            } elseif (!$options['embedded'] && !$is_one_click) {
+            } elseif ($options['bancontact'] && $is_bancontact) {
+                $payment_options = [
+                    'id_card' => $id_card,
+                    'is_bancontact' => $is_bancontact,
+                ];
+                $payment = $payplug->preparePayment($payment_options);
+                if (!$payment['result']) {
+                    $payplug->setPaymentErrorsCookie([
+                        $payplug->l('The transaction was not completed and your card was not charged.')
+                    ]);
+                    Tools::redirect($error_url);
+                } else {
+                    Tools::redirect($payment['return_url']);
+                }
+            } elseif (!$embedded && !$is_one_click) {
                 // if the payment is redirect and not a one click payment, prepare the payment and redirect
                 $payment_options = [
                     'id_card' => $id_card,

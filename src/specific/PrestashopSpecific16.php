@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -44,7 +44,7 @@ class PrestashopSpecific16
     }
 
 
-    public function hookHeader()
+    public function displayHeader()
     {
         $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
         $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
@@ -56,7 +56,7 @@ class PrestashopSpecific16
         $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
     }
 
-    public function hookCustomerAccount()
+    public function customerAccount()
     {
         $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
 
@@ -188,7 +188,7 @@ class PrestashopSpecific16
 
                     $paymentOptions[$payment_method.'-'.$extraClass] = [
                         'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $extraClass .
-                            ($error ? '_alt' : '') . ' ' . $optimized_class,
+                            ($error ? '_alt' : '') . ' ' . $optimized_class . ' ' . $extraClass,
                         'label' => $payment_option['callToActionText'],
                         'logo_url' => $payment_method == 'one_click' ?
                             $payment_options['standard']['logo'] :

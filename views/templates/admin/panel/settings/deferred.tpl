@@ -1,5 +1,5 @@
 {*
-* 2021 PayPlug
+* 2022 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2021 PayPlug SAS
+*  @copyright 2022 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -40,10 +40,10 @@
                             {l s='admin.panel.settings.deferred.trigger' mod='payplug'}
 
                         </label>
-                        <select name="payplug_deferred_state" data-id_state="{$PAYPLUG_DEFERRED_STATE|escape:'htmlall':'UTF-8'}" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
+                        <select name="payplug_deferred_state" data-id_state="{$deferred_state|escape:'htmlall':'UTF-8'}" id="payplug_deferred_state"{if !$payplug_switch.deferred_auto.checked} disabled="disabled"{/if}>
                             <option value="0">{l s='admin.panel.settings.deferred.choose' mod='payplug'}</option>
                             {foreach from=$order_states item=order_state}
-                                <option value="{$order_state.id_order_state|escape:'htmlall':'UTF-8'}"{if $PAYPLUG_DEFERRED_STATE == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name|escape:'htmlall':'UTF-8'}</option>
+                                <option value="{$order_state.id_order_state|escape:'htmlall':'UTF-8'}"{if $deferred_state == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name|escape:'htmlall':'UTF-8'}</option>
                             {/foreach}
                         </select>
                             <span style="display: none;" data-e2e-error="deferred_state" class="payplugDeferred_error">{l s='admin.panel.settings.deferred.mustchoose' mod='payplug'}</span>
