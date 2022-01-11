@@ -1,5 +1,5 @@
 {*
-* 2021 PayPlug
+* 2022 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2021 PayPlug SAS
+*  @copyright 2022 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -84,6 +84,14 @@
         <li>
             <span class="pp_col1">{l s='3-D Secure' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="tds">{$payment.tds|escape:'htmlall':'UTF-8'}</span>
+        </li>
+    {/if}
+    {if isset($payment.card_country) && ($payment.card_country) && isset($payment.type) && ($payment.type_code == 'bancontact')}
+        <li>
+            <span class="pp_col1">{l s='admin.details.country' mod='payplug'} :</span>
+            <span class="pp_col2" data-e2e-payment-details="card_country">
+                {$payment.card_country|escape:'htmlall':'UTF-8'}
+            </span>
         </li>
     {/if}
     {if isset($payment.card_date) && ($payment.card_date|intval|count neq 0)}

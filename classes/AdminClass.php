@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -132,12 +132,17 @@ class AdminClass extends \Payplug
                     'standard',
                     'one_click',
                     'oney',
+                    'bancontact',
                     'installment',
                     'deferred',
                 ];
                 $args = [];
                 foreach ($keys as $key) {
-                    $args[$key] = (int)Tools::getValue($key);
+                    if ($key !== 'embedded') {
+                        $args[$key] = (int)Tools::getValue($key);
+                    } else {
+                        $args[$key] = (string)Tools::getValue($key);
+                    }
                 }
             }
             $this->mediaClass->displayPopin(Tools::getValue('type'), $args);
@@ -186,7 +191,7 @@ class AdminClass extends \Payplug
             if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
                     'content' => null,
-                    'error' => $this->l('payplug.adminAjaxController.passwordInvalid')
+                    'error' => $this->l('payplug.adminAjaxController.passwordInvalid', 'adminclass')
                 ]));
             }
 
@@ -210,7 +215,7 @@ class AdminClass extends \Payplug
             } else {
                 die(json_encode([
                     'content' => null,
-                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect')
+                    'error' => $this->l('payplug.adminAjaxController.credentialsNotCorrect', 'adminclass')
                 ]));
             }
 
@@ -235,6 +240,7 @@ class AdminClass extends \Payplug
                 'payplug_sandbox' => $permissions['use_live_mode'],
                 'payplug_one_click' => $permissions['can_save_cards'],
                 'payplug_oney' => $permissions['can_use_oney'],
+                'payplug_bancontact' => $permissions['can_use_bancontact'],
                 'payplug_inst' => $permissions['can_create_installment_plan'],
                 'payplug_deferred' => $permissions['can_create_deferred_payment'],
             ];
@@ -284,7 +290,7 @@ class AdminClass extends \Payplug
             }
 
             die(json_encode([
-                'message' => $this->l('payplug.adminAjaxController.orderUpdated'),
+                'message' => $this->l('payplug.adminAjaxController.orderUpdated', 'adminclass'),
                 'reload' => true
             ]));
         }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -191,7 +191,7 @@ class PaymentRepository extends Repository
     public function returnPaymentError($element = [], $errorMessage = null, $level = 'error')
     {
         if (!$errorMessage || !is_string($errorMessage)) {
-            $errorMessage = $this->l('[PaymentRepository] Error during payment creation process.');
+            $errorMessage = '[PaymentRepository] Error during payment creation process.';
         }
 
         $this->payplug->setPaymentErrorsCookie([
@@ -314,7 +314,9 @@ class PaymentRepository extends Repository
             );
         }
 
-        if (isset($this->apiPayment->hosted_payment->return_url)) {
+        if (isset($paymentDetails['paymentTab']['integration'])) {
+            $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
+        } elseif (isset($this->apiPayment->hosted_payment->return_url)) {
             $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
         }
 
@@ -338,7 +340,6 @@ class PaymentRepository extends Repository
         if (isset($this->apiPayment->hosted_payment->payment_url)) {
             $paymentDetails['paymentUrl'] = $this->apiPayment->hosted_payment->payment_url;
         }
-
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
@@ -521,16 +522,23 @@ class PaymentRepository extends Repository
                     'return_url' => $paymentDetails['paymentUrl'],
                 ];
                 break;
+            case 'bancontact':
             case 'standard':
             case 'installment':
-                $returnUrl = $paymentDetails['paymentUrl'] ? $paymentDetails['paymentUrl'] :
-                    $paymentDetails['paymentReturnUrl'];
+            case 'integrated':
+                $returnUrl = $paymentDetails['paymentUrl']
+                    ? $paymentDetails['paymentUrl']
+                    : $paymentDetails['paymentReturnUrl'];
                 $paymentReturnUrl = [
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
+                if ($paymentDetails['isIntegrated']) {
+                    $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+                    $paymentReturnUrl['cart_id'] = $paymentDetails['cartId'];
+                }
                 break;
             default:
                 return $this->returnPaymentError(

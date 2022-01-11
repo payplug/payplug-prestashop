@@ -1,0 +1,85 @@
+/**
+ * 2013 - 2022 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2022 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
+const path = require('path');
+
+
+const css_path = 'views/css';
+const lessFiles = ['front', 'front_1_6', 'admin', 'admin_order'];
+
+let entryFiles = {};
+lessFiles.map((file) => {
+    entryFiles[file] = path.resolve(__dirname, css_path + '/' + file + '.less');
+});
+
+const loaders = [
+    MiniCssExtractPlugin.loader,
+    {
+        loader: "css-loader",
+        options: {
+            url: false,
+        }
+    },
+    {
+        loader: "less-loader", // compiles Less to CSS
+        options: {
+            lessOptions: {
+                relativeUrls: false,
+                sourceMap: true,
+            },
+        },
+    },
+];
+const optimization = {
+    minimizer: [
+        new CssMinimizerPlugin(),
+    ],
+    minimize: true,
+};
+const plugins = [
+    new RemoveEmptyScriptsPlugin(),
+    new MiniCssExtractPlugin({
+        filename: '[name].css',
+        chunkFilename: '[id].css'
+    })
+];
+
+module.exports = {
+    mode: 'production',
+    entry: entryFiles,
+    output: {
+        path: path.resolve(__dirname, css_path)
+    },
+    module: {
+        rules: [
+            {
+                test: /\.less$/,
+                use: loaders,
+            },
+        ],
+    },
+    optimization: optimization,
+    plugins: plugins
+};

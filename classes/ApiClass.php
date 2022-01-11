@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -31,11 +31,11 @@ use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\repositories\PluginRepository;
+use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 
 class ApiClass
 {
-
     /** var Plugin */
     public $plugin;
 
@@ -57,11 +57,31 @@ class ApiClass
     {
         $this->payplug = $payplug;
         $this->plugin = $payplug->getPlugin();
-
+        $this->checkEnvironment();
         $this->setEnvironment();
         self::setSecretKey();
         $this->current_api_key =  self::getCurrentApiKey();
+
         $this->setUserAgent();
+    }
+
+    /**
+     * @description Check environnement and try to set API_BASE_URL into payplug-php lib
+     */
+    public function checkEnvironment()
+    {
+        if (isset($_SERVER['SERVER_NAME'])
+            && $_SERVER['SERVER_NAME'] == "localhost"
+            || preg_match("/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i", $_SERVER['SERVER_NAME'])) {
+            $dotenv = new Dotenv();
+            $dotenvFile = dirname(dirname(dirname(__FILE__))) . "/payplugroutes/.env";
+            if (file_exists($dotenvFile)) {
+                $dotenv->load($dotenvFile);
+            }
+        }
+        if (isset($_ENV['API_BASE_URL'])) {
+            \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
+        }
     }
 
     /**
@@ -98,6 +118,20 @@ class ApiClass
             return false;
         }
     }
+    /**
+     * @description get publishable keys from payplug/payplug-php
+     * @throws Payplug\Exception\ConfigurationNotSetException
+     * @throws ConfigurationException
+     */
+    public function getPublishableKeys()
+    {
+        if ($this->current_api_key != null) {
+            if ($response = \Payplug\Authentication::getPublishableKeys()) {
+                return $response['httpResponse']['publishable_key'];
+            }
+        }
+    }
+
 
     /**
      * @description Read API response and return permissions
@@ -186,12 +220,19 @@ class ApiClass
             }
         }
 
+        if (isset($json_answer['payment_methods']['bancontact']['enabled'])) {
+            $can_use_bancontact = $json_answer['payment_methods']['bancontact']['enabled'];
+        } else {
+            $can_use_bancontact = true;
+        }
+
         $permissions = [
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
+            'can_use_bancontact' => $can_use_bancontact,
         ];
 
         // If sandbox mode active, no allowed countries sent
@@ -399,7 +440,7 @@ class ApiClass
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+            $errors[$error_key] = $this->payplug->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
             return $errors;
         }
 
@@ -412,7 +453,7 @@ class ApiClass
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
                         $errors[$error_key] =
-                            $this->l('payplug.catchErrorsFromApi.transactionNotCompleted');
+                            $this->payplug->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
                     }
             }
         }

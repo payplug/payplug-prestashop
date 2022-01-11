@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -29,6 +29,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
 
 class Payplug extends PaymentModule
 {
@@ -53,7 +54,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.5.0';
+        $this->version = PAYPLUG_VERSION;
 
         parent::__construct();
 
@@ -95,7 +96,7 @@ class Payplug extends PaymentModule
             if ($iso_code == 'en' || $iso_code == 'gb') {
                 $iso_code = 'en-gb';
             }
-            $faq_url = 'https://support.payplug.com/hc/' . $iso_code.'/articles/360021267140';
+            $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
             $this->context->smarty->assign('faq_url', $faq_url);
 
             $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
@@ -114,6 +115,7 @@ class Payplug extends PaymentModule
     {
         return [
             'actionAdminControllerSetMedia',
+            'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
             'actionCarrierUpdate',
             'actionClearCompileCache',
@@ -161,7 +163,7 @@ class Payplug extends PaymentModule
     {
         //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
-            return $this->module->hookActionAdminPerformanceControllerAfter($params);
+            return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
         }
     }
 
@@ -174,7 +176,7 @@ class Payplug extends PaymentModule
     {
         //todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
-            return $this->module->hookActionClearCompileCache($params);
+            return $this->payplug_dependencies->hookClass->actionClearCompileCache($params);
         }
     }
 
@@ -185,7 +187,7 @@ class Payplug extends PaymentModule
     public function hookActionDeleteGDPRCustomer($params)
     {
         if ($this->module) {
-            return $this->module->hookActionDeleteGDPRCustomer($params);
+            return $this->payplug_dependencies->hookClass->actionDeleteGDPRCustomer($params);
         }
     }
 
@@ -196,7 +198,7 @@ class Payplug extends PaymentModule
     public function hookActionExportGDPRData($params)
     {
         if ($this->module) {
-            return $this->module->hookActionExportGDPRData($params);
+            return $this->payplug_dependencies->hookClass->actionExportGDPRData($params);
         }
     }
 
@@ -207,7 +209,7 @@ class Payplug extends PaymentModule
     public function hookActionOrderStatusUpdate($params)
     {
         if ($this->module) {
-            return $this->module->hookActionOrderStatusUpdate($params);
+            return $this->payplug_dependencies->hookClass->actionOrderStatusUpdate($params);
         }
     }
 
@@ -222,6 +224,13 @@ class Payplug extends PaymentModule
         }
     }
 
+    public function hookActionAdminLanguagesControllerSaveAfter($params)
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->hookClass->actionAdminLanguagesControllerSaveAfter($params);
+        }
+    }
+
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
@@ -231,6 +240,7 @@ class Payplug extends PaymentModule
             );
         }
     }
+
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
@@ -248,7 +258,7 @@ class Payplug extends PaymentModule
     public function hookActionUpdateLangAfter($params)
     {
         if ($this->module) {
-            return $this->module->hookActionUpdateLangAfter($params);
+            return $this->payplug_dependencies->hookClass->actionUpdateLangAfter($params);
         }
     }
 
@@ -260,7 +270,7 @@ class Payplug extends PaymentModule
     public function hookAdminOrder($params)
     {
         if ($this->module) {
-            return $this->module->hookAdminOrder($params);
+            return $this->payplug_dependencies->hookClass->adminOrder($params);
         }
     }
 
@@ -271,7 +281,7 @@ class Payplug extends PaymentModule
     public function hookCustomerAccount($params)
     {
         if ($this->module) {
-            return $this->module->hookCustomerAccount($params);
+            return $this->payplug_dependencies->hookClass->customerAccount($params);
         }
     }
 
@@ -282,9 +292,10 @@ class Payplug extends PaymentModule
     public function hookDisplayAdminOrderMain($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayAdminOrderMain($params);
+            return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }
+
     /**
      * @return mixed
      */
@@ -302,7 +313,7 @@ class Payplug extends PaymentModule
     public function hookDisplayBackOfficeFooter($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayBackOfficeFooter($params);
+            return $this->payplug_dependencies->hookClass->displayBackOfficeFooter($params);
         }
     }
 
@@ -314,18 +325,17 @@ class Payplug extends PaymentModule
     public function hookDisplayBeforeShoppingCartBlock($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayBeforeShoppingCartBlock($params);
+            return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
         }
     }
 
     /**
-     * @param $params
      * @return mixed
      */
-    public function hookDisplayExpressCheckout($params)
+    public function hookDisplayExpressCheckout()
     {
         if ($this->module) {
-            return $this->module->hookDisplayExpressCheckout($params);
+            return $this->payplug_dependencies->hookClass->displayExpressCheckout();
         }
     }
 
@@ -336,7 +346,7 @@ class Payplug extends PaymentModule
     public function hookDisplayProductPriceBlock($params)
     {
         if ($this->module) {
-            return $this->module->hookDisplayProductPriceBlock($params);
+            return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
         }
     }
 
@@ -347,7 +357,7 @@ class Payplug extends PaymentModule
     public function hookHeader($params)
     {
         if ($this->module) {
-            return $this->module->hookHeader($params);
+            return $this->payplug_dependencies->hookClass->displayHeader($params);
         }
     }
 
@@ -360,7 +370,7 @@ class Payplug extends PaymentModule
     public function hookPayment($params)
     {
         if ($this->module) {
-            return $this->module->hookPayment($params);
+            return $this->payplug_dependencies->hookClass->payment($params);
         }
     }
 
@@ -371,7 +381,7 @@ class Payplug extends PaymentModule
     public function hookPaymentOptions($params)
     {
         if ($this->module) {
-            return $this->module->hookPaymentOptions($params);
+            return $this->payplug_dependencies->hookClass->paymentOptions($params);
         }
     }
 
@@ -382,18 +392,7 @@ class Payplug extends PaymentModule
     public function hookPaymentReturn($params)
     {
         if ($this->module) {
-            return $this->module->hookPaymentReturn($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    public function hookRegisterGDPRConsent($params)
-    {
-        if ($this->module) {
-            return $this->module->hookRegisterGDPRConsent($params);
+            return $this->payplug_dependencies->hookClass->paymentReturn($params);
         }
     }
 

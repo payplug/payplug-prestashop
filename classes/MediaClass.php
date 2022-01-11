@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -111,6 +111,9 @@ class MediaClass extends \Payplug
                 'standard' => $args['standard'],
                 'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
+                'bancontact' => $args['bancontact'],
+                'feature_bancontact' => $this->payplug->isValidFeature('feature_bancontact'),
+                'feature_integrated' => $this->payplug->isValidFeature('feature_integrated'),
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
@@ -125,32 +128,55 @@ class MediaClass extends \Payplug
         switch ($type) {
             case 'pwd':
             case 'activate':
-                $title = $this->payplug->l('payplug.displayPopin.liveMode');
+                $title = $this->payplug->l('payplug.displayPopin.liveMode', 'mediaclass');
                 break;
             case 'premium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature');
-                break;
             case 'oneyPremium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature');
+            case 'bancontactPremium':
+                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
+
+                if ($type == 'oneyPremium') {
+                    $link = 'https://portal.payplug.com/#/configuration/oney';
+                } elseif ($type == 'bancontactPremium') {
+                    $link = 'mailto:support@payplug.com';
+                } else {
+                    $link = 'https://www.payplug.com/contact';
+                }
+
+                $this->context->smarty->assign([
+                    'premiumContent' => [
+                        'use' => $type,
+                        'link' => $link
+                    ]
+                ]);
+
+                $type = 'premium';
+                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
                 break;
             case 'confirm':
-                $title = $this->payplug->l('payplug.displayPopin.saveSettings');
+                $title = $this->payplug->l('payplug.displayPopin.saveSettings', 'mediaclass');
                 break;
             case 'deactivate':
-                $title = $this->payplug->l('payplug.displayPopin.deactivate');
+                $title = $this->payplug->l('payplug.displayPopin.deactivate', 'mediaclass');
                 break;
             case 'refund':
-                $title = $this->payplug->l('payplug.displayPopin.refund');
+                $title = $this->payplug->l('payplug.displayPopin.refund', 'mediaclass');
                 break;
             case 'abort':
-                $title = $this->payplug->l('payplug.displayPopin.suspendInstallment');
+                $title = $this->payplug->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
                 break;
             case 'deferred':
-                $title = $this->payplug->l('payplug.displayPopin.deferred');
+                $title = $this->payplug->l('payplug.displayPopin.deferred', 'mediaclass');
                 break;
             default:
                 $title = '';
                 break;
+        }
+
+        foreach ($this->payplug->features_json->features as $key => $value) {
+            $this->context->smarty->assign([
+                $value => $value
+            ]);
         }
 
         $this->context->smarty->assign([

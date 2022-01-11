@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -41,6 +41,9 @@ class PluginEntity
 
     /** @var string */
     private $api_version;
+
+    /** @var object */
+    private $assign;
 
     /** @var object */
     private $cache;
@@ -77,7 +80,7 @@ class PluginEntity
 
 //    /** @var object */
 //    private $installment;
-    
+
     /** @var object */
     private $logger;
 
@@ -171,18 +174,36 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getOrderClass()
+    public function getOrder()
     {
-        return $this->orderClass;
+        return $this->order;
     }
 
     /**
-     * @param object $orderClass
+     * @param object $order
      * @return PluginEntity
      */
-    public function setOrderClass($orderClass)
+    public function setOrder($order)
     {
-        $this->orderClass = $orderClass;
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderHistory()
+    {
+        return $this->orderHistory;
+    }
+
+    /**
+     * @param object $orderHistory
+     * @return PluginEntity
+     */
+    public function setOrderHistory($orderHistory)
+    {
+        $this->orderHistory = $orderHistory;
         return $this;
     }
 
@@ -220,13 +241,20 @@ class PluginEntity
         return $this->address;
     }
 
-
     /**
      * @return string
      */
     public function getApiVersion()
     {
         return $this->api_version;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssign()
+    {
+        return $this->assign;
     }
 
     /**
@@ -326,7 +354,7 @@ class PluginEntity
 //        $this->installment = $installment;
 //        return $this;
 //    }
-    
+
     /**
      * @return object
      */
@@ -448,6 +476,21 @@ class PluginEntity
         }
 
         $this->api_version = $api_version;
+        return $this;
+    }
+
+    /**
+     * @param object $assign
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setAssign($assign)
+    {
+        if (!is_object($assign)) {
+            throw (new BadParameterException('Invalid argument, $assign must be an AssignSpecific'));
+        }
+
+        $this->assign = $assign;
         return $this;
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -211,6 +211,83 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             $this->translate->translate(3) : //('Your information has been saved') :
                             $this->translate->translate(4) //('An error occurred. Please retry in few seconds.')
                     ]
+                ]));
+            } elseif ($tools->tool('getIsset', 'createIP')) {
+                $token = $tools->tool('getValue', 'token');
+                if ($token == false) {
+                    die(
+                        json_encode(
+                            [
+                                'result' => true,
+                                'message' => $token,
+                            ]
+                        )
+                    );
+                } else {
+                    $payment = $this->payplug->preparePayment([
+                        'is_integrated' => 1,
+                        'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED')
+                    ]);
+                    die(json_encode($payment));
+                }
+            } elseif ($tools->tool('getIsset', 'confirmIP')) {
+                $payment_id = $tools->tool('getValue', 'pay_id');
+                $cart_id = $tools->tool('getValue', 'cart_id');
+
+                // Check payment correspondence
+                $query = $this->plugin->getQuery();
+
+                // todo: request should not be here but to many different method are used to get the payment
+                // todo: extract this part with PaymentClass
+                $current_payment_id = $query
+                    ->select()
+                    ->fields('id_payment')
+                    ->from(_DB_PREFIX_ . 'payplug_payment')
+                    ->where('id_cart = ' . $cart_id)
+                    ->build('unique_value');
+                if ($payment_id != $current_payment_id) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'invalid payment id, giver: ' . $payment_id . ' and current:' . $current_payment_id
+                    ]));
+                }
+
+                // Retrieve payment
+                $payment = $this->payplug->retrievePayment($payment_id);
+
+                // Check if payment has failure
+                if ($payment->failure != null) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $payment->failure->message
+                    ]));
+                }
+
+                // Check if payment is paid
+                $is_payment_deferred = isset($payment->authorization) && $payment->authorization;
+                if (!$payment->is_paid && !$is_payment_deferred) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Payment is not paid'
+                    ]));
+                } elseif (isset($payment->authorization->authorized_at) && !$payment->authorization->authorized_at) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Deferred payment is not authorized'
+                    ]));
+                }
+
+                $return_url = $context->link->getModuleLink(
+                    $this->payplug->name,
+                    'validation',
+                    ['ps' => 1, 'cartid' => (int)$cart_id],
+                    true
+                );
+
+                die(json_encode([
+                    'result' => true,
+                    'return_url' => $return_url,
+                    'message' => 'Success'
                 ]));
             }
         }

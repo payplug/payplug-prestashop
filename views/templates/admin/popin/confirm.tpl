@@ -1,5 +1,5 @@
 {*
-* 2021 PayPlug
+* 2022 PayPlug
 *
 * NOTICE OF LICENSE
 *
@@ -15,7 +15,7 @@
  * versions in the future.
 *
 *  @author PayPlug SAS
-*  @copyright 2021 PayPlug SAS
+*  @copyright 2022 PayPlug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
@@ -25,6 +25,10 @@
         {l s='admin.popin.confirm.mode' mod='payplug'}
         <strong>{if $sandbox}{l s='admin.popin.confirm.test' mod='payplug'}{else}{l s='admin.popin.confirm.live' mod='payplug'}{/if}</strong>
     </li>
+    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
+        {l s='admin.popin.confirm.paymentpage' mod='payplug'}
+        <strong>{if $embedded == 'integrated'}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 'popup'}{l s='admin.popin.confirm.popup' mod='payplug'}{elseif $embedded == 'redirected'}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
+    </li>
     <li data-e2e-type="standard" data-e2e-state="{if $standard}on{else}off{/if}">
         {l s='admin.popin.confirm.standard' mod='payplug'}
         <strong>{if $standard}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
@@ -33,14 +37,16 @@
         {l s='admin.popin.confirm.one_click' mod='payplug'}
         <strong>{if $one_click}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
-    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
-        {l s='admin.popin.confirm.paymentpage' mod='payplug'}
-        <strong>{if $embedded}{l s='admin.popin.confirm.embedded' mod='payplug'}{else}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
-    </li>
     <li data-e2e-type="oney" data-e2e-state="{if $oney}on{else}off{/if}">
         {l s='admin.popin.confirm.oney' mod='payplug'}
         <strong>{if $oney}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
     </li>
+    {if $feature_bancontact && !$sandbox}
+        <li data-e2e-type="bancontact" data-e2e-state="{if $bancontact}on{else}off{/if}">
+            {l s='admin.popin.confirm.bancontact' mod='payplug'}
+            <strong>{if $bancontact}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
+        </li>
+    {/if}
     <li data-e2e-type="installment" data-e2e-state="{if $installment}on{else}off{/if}">
         {l s='admin.popin.confirm.installment' mod='payplug'}
         <strong>{if $installment}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -54,6 +54,7 @@ class PayPlugNotifications
     public $is_oney = false;
     public $is_installment = false;
     public $is_deferred = false;
+    public $is_bancontact = false;
     public $key;
     public $lock_key = null;
     public $logger;
@@ -300,20 +301,24 @@ class PayPlugNotifications
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                    $module_name = $this->payplug->l('Oney 3x');
+                    $name = $this->payplug->l('Oney 3x', 'payplugnotifications');
                     break;
                 case 'oney_x4_with_fees':
-                    $module_name = $this->payplug->l('Oney 4x');
+                    $name = $this->payplug->l('Oney 4x', 'payplugnotifications');
                     break;
                 case 'oney_x3_without_fees':
-                    $module_name = $this->payplug->l('notification.createOrder.oneyX3WithoutFees');
+                    $name = $this->payplug->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
                     break;
                 case 'oney_x4_without_fees':
-                    $module_name = $this->payplug->l('notification.createOrder.oneyX4WithoutFees');
+                    $name = $this->payplug->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
                     break;
                 default:
+                    $name = $module_name;
                     break;
             }
+            $module_name = $name;
+        } elseif ($this->is_bancontact) {
+            $module_name = $this->payplug->l('notification.createOrder.bancontact', 'payplugnotifications');
         }
 
         // Create Order
@@ -712,8 +717,9 @@ class PayPlugNotifications
 
         if (!$is_valid_amount) {
             $message = new Message();
-            $message->message = $this->payplug->l('The amount collected by PayPlug is not the same');
-            $message->message .= $this->payplug->l(' as the total value of the order');
+            $msg = $this->payplug->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
+            $msg .= $this->payplug->l(' as the total value of the order', 'payplugnotifications');
+            $message->message = $msg;
             $message->id_order = $this->order->id;
             $message->id_cart = $this->order->id_cart;
             $message->private = true;
@@ -826,6 +832,11 @@ class PayPlugNotifications
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
+                if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
+                    $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
+                    $this->exitProcess('Payment timeout for paymentID: ' . $this->payment->installment_plan_id, 200);
+                }
+
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->payment->installment_plan_id;
                 $this->exitProcess($error_msg, 500);
             }
@@ -836,6 +847,11 @@ class PayPlugNotifications
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
+                if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
+                    $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
+                    $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
+                }
+
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
                 $this->exitProcess($error_msg, ($this->is_oney ? 242 : 500));
             }
@@ -984,18 +1000,24 @@ class PayPlugNotifications
         if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
             $this->is_oney = in_array($this->payment->payment_method['type'], $oney_payment_methods);
         }
-        $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok' : 'nok'));
+
+        // Define if payment is bancontact resource
+        if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
+            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+        }
+        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is deferred resource
         if (isset($this->payment->authorization) && !$this->is_oney) {
             $this->is_deferred = isset($this->payment->authorization->authorized_at)
                 && $this->payment->authorization->authorized_at;
         }
-        $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok' : 'nok'));
 
         // Define if payment is from installment
         $this->is_installment = $this->payment->installment_plan_id ?: false;
-        $this->logger->addLog('Notification: is_installment: ' . ($this->is_installment ? 'ok':'nok'));
+        $this->logger->addLog('Notification: is_installment: ' . ($this->is_installment ? 'ok' : 'nok'));
     }
 
     /**

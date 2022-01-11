@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -84,10 +84,12 @@ class PayPlugAjax
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
                     $is_deferred = Configuration::get('PAYPLUG_DEFERRED') == 1;
                     $is_oney = $tools->tool('getValue', 'io');
+                    $is_bancontact = $tools->tool('getValue', 'bancontact');
                     $options = [
                         'id_card' => $tools->tool('getValue', 'pc'),
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
+                        'is_bancontact' => $is_bancontact,
                         'is_oney' => $is_oney,
                         '_ajax' => 1,
                     ];

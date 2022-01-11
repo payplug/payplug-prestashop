@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -42,12 +42,12 @@ class PayPlugValidation
     private $amountCurrencyClass;
     private $isDeferred;
     private $isOney;
+    private $isBancontact;
     private $orderClass;
     private $plugin;
 
     public function __construct()
     {
-        sleep(1);
         $this->orderClass = new OrderClass();
         $this->payplug = new PayPlugClass();
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
@@ -60,6 +60,7 @@ class PayPlugValidation
         $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
         $this->isDeferred = false;
         $this->isOney = false;
+        $this->isBancontact = false;
         $this->type = 'payment';
         $this->setLogger();
     }
@@ -79,7 +80,7 @@ class PayPlugValidation
 
     public function postProcess()
     {
-        $redirect_url_error = 'index.php?controller=order&step=1&error=1';
+        $redirect_url_error = 'index.php?controller=order&step=3&error=1';
         $cancel_url = 'index.php?controller=order&step=3';
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
@@ -250,8 +251,12 @@ class PayPlugValidation
                         case 'oney_x4_without_fees':
                             $this->isOney = true;
                             break;
+                        case 'bancontact':
+                            $this->isBancontact = true;
+                            break;
                         default:
                             $this->isOney = false;
+                            $this->isBancontact = false;
                     }
                 }
 
@@ -283,8 +288,7 @@ class PayPlugValidation
 
             if (((isset($payment->save_card) && (int)$payment->save_card == 1))
                 ||
-                ((isset($payment->card->id) && $payment->card->id != '')
-                    && ((isset($payment->hosted_payment)) && $payment->hosted_payment != ''))
+                ((isset($payment->card->id) && $payment->card->id != ''))
             ) {
                 $this->logger->addLog('[Save Card] Saving card...');
                 $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
@@ -450,6 +454,11 @@ class PayPlugValidation
                     default:
                         break;
                 }
+            } elseif ($this->isBancontact) {
+                $module_name = $this->payplug->l(
+                    'validation.createOrder.bancontact',
+                    'payplugvalidation'
+                );
             }
 
             $cart_amount = (float)$cart->getOrderTotal(true, Cart::BOTH);
