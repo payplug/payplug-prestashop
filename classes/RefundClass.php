@@ -39,9 +39,10 @@ use PrestaShopException;
 use Tools;
 use Validate;
 
-class RefundClass extends \PaymentModule
+class RefundClass
 {
-    public $context;
+    protected $context;
+    private $cartClass;
     private $payplug;
 
     public function __construct($payplug)
@@ -49,6 +50,7 @@ class RefundClass extends \PaymentModule
         parent::__construct();
         $this->payplug = $payplug;
         $this->context = \Context::getContext();
+        $this->cartClass = new CartClass();
     }
     /**
      * Generate refund form
@@ -278,7 +280,7 @@ class RefundClass extends \PaymentModule
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        if (!$this->payplug->createLockFromCartId($order->id_cart)) {
+                        if (!$this->cartClass->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
                                 'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
@@ -295,7 +297,7 @@ class RefundClass extends \PaymentModule
                             $this->payplug->logger->addLog('Change order state to ' . $new_state, 'notice');
                         }
 
-                        if (!$this->payplug->deleteLockFromCartId($order->id_cart)) {
+                        if (!$this->cartClass->deleteLockFromCartId($order->id_cart)) {
                             $this->payplug->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->payplug->logger->addLog('Lock deleted.', 'notice');
@@ -319,7 +321,7 @@ class RefundClass extends \PaymentModule
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        if (!$this->payplug->createLockFromCartId($order->id_cart)) {
+                        if (!$this->cartClass->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
                                 'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
@@ -338,7 +340,7 @@ class RefundClass extends \PaymentModule
                             $this->payplug->logger->addLog('Order status is already \'refunded\'', 'notice');
                         }
 
-                        if (!$this->payplug->deleteLockFromCartId($order->id_cart)) {
+                        if (!$this->cartClass->deleteLockFromCartId($order->id_cart)) {
                             $this->payplug->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->payplug->logger->addLog('Lock deleted.', 'notice');

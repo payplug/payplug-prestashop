@@ -35,6 +35,7 @@ class PaymentClass
     private $assign;
     private $card;
     private $cart;
+    private $cartClass;
     private $config;
     private $configClass;
     private $constant;
@@ -81,6 +82,7 @@ class PaymentClass
 
         $this->amountCurrencyClass =    new AmountCurrencyClass($this->tools);
         $this->apiClass =               new ApiClass($this->payplug);
+        $this->cartClass =              new CartClass();
         $this->configClass =            new ConfigClass($this->payplug);
         $this->mediaClass =             new MediaClass($this->payplug);
     }
@@ -501,7 +503,7 @@ class PaymentClass
 
             $order = $this->order->get((int)$id_order);
             if ($this->validate->validate('isLoadedObject', $order)) {
-                if (!$this->payplug->createLockFromCartId($order->id_cart)) {
+                if (!$this->cartClass->createLockFromCartId($order->id_cart)) {
                     $this->logger->addLog('An error occured on lock creation', 'notice');
                     die(json_encode([
                         'status' => 'error',
@@ -520,7 +522,7 @@ class PaymentClass
                     $order_history->addWithemail();
                 }
 
-                if (!$this->payplug->deleteLockFromCartId($order->id_cart)) {
+                if (!$this->cartClass->deleteLockFromCartId($order->id_cart)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'notice');

@@ -33,6 +33,7 @@ include_once(_PS_MODULE_DIR_.'payplug/classes/PayPlugClass.php');
 
 $payplug = new PayPlugClass();
 $adminClass = new AdminClass();
+$cartClass = new CartClass();
 $refundClass = new RefundClass($payplug);
 $paymentClass = new PaymentClass($payplug);
 $logger = $payplug->getPlugin()->logger();
@@ -177,7 +178,7 @@ if (Tools::getValue('_ajax') == 1) {
             if ((int)Tools::getValue('id_state') != 0 || $payment->is_refunded == 1) {
                 $order = new Order((int)$id_order);
                 if (Validate::isLoadedObject($order)) {
-                    if (!$payplug->createLockFromCartId($order->id_cart)) {
+                    if (!$cartClass->createLockFromCartId($order->id_cart)) {
                         die(json_encode([
                             'status' => 'error',
                             'data' => $payplug->l('An error has occurred')
@@ -194,7 +195,7 @@ if (Tools::getValue('_ajax') == 1) {
                         $logger->addLog('Change order state to ' . $new_state, 'notice');
                     }
 
-                    if (!$payplug->deleteLockFromCartId($order->id_cart)) {
+                    if (!$cartClass->deleteLockFromCartId($order->id_cart)) {
                         $logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $logger->addLog('Lock deleted.', 'notice');

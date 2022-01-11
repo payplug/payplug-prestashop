@@ -38,6 +38,7 @@ class HookClass
     private $assign;
     private $cache;
     private $card;
+    private $cartClass;
     private $config;
     private $configClass;
     private $context;
@@ -76,6 +77,7 @@ class HookClass
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
 
+        $this->cartClass = new CartClass();
         $this->configClass = new ConfigClass($this->dependenciesClass);
 
         die(dump(__LINE__));
@@ -324,10 +326,10 @@ class HookClass
         $amount_refunded_presta = RefundClass::getTotalRefunded($order->id);
 
         $inst_id = null;
-        $payment_id = $this->dependenciesClass->getPayplugInstallmentCart($order->id_cart);
+        $payment_id = $this->cartClass->getPayplugInstallmentCart($order->id_cart);
         // Backward if order validated before
         if (!$payment_id) {
-            $payment_id = $this->dependenciesClass->getPayplugInstallmentCartBackward($order->id_cart);
+            $payment_id = $this->cartClass->getPayplugInstallmentCartBackward($order->id_cart);
         }
 
         if ($payment_id && strpos($payment_id, 'inst') !== false) {
