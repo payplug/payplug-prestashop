@@ -198,22 +198,22 @@ class PluginRepository extends Repository
         );
 
         $this->oney = new OneyRepository(
-            $this->cache,
-            $this->logger,
             $this->address,
-            $this->cart,
+            $this->amountCurrencyClass,
+            $this->assign,
+            $this->cache,
             $this->carrier,
+            $this->cart,
             $this->configuration,
             $this->context,
             $this->country,
             $this->currency,
-            $this->tools,
-            $this->validate,
-            $this->oneyEntity,
+            $this->dependencies,
+            $this->logger,
             $this->myLogPhp,
-            $this->payplug,
-            $this->assign,
-            $this->amountCurrencyClass
+            $this->oneyEntity,
+            $this->tools,
+            $this->validate
         );
 
         $this->order_state = new OrderStateRepository(

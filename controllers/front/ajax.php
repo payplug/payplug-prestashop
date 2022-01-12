@@ -57,9 +57,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
-        $this->payplug = new \PayPlug\classes\PayPlugClass();
-        $this->paymentClass = new \PayPlug\classes\PaymentClass($this->payplug);
-        $this->plugin = $this->payplug->getPlugin();
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->paymentClass = $this->dependencies->paymentClass;
+        $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
         $this->toolsSpecific = $this->plugin->getTools();
 
@@ -308,7 +308,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
             } elseif ($tools->tool('getIsset', 'updatePublishableKey')) {
-                $publishable_keys = $this->payplug->apiClass->setPublishableKeys();
+                $publishable_keys = $this->dependencies->apiClass->setPublishableKeys();
 
                 if (!$publishable_keys['result']) {
                     if (!empty($publishable_keys['error'])
@@ -316,7 +316,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $payment_options = [
                             'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED'),
                         ];
-                        $payment = $this->payplug->preparePayment($payment_options);
+                        $payment = $this->paymentClass->preparePayment($payment_options);
                         if (!$payment['result']) {
                             die(json_encode([
                                 'result' => false

@@ -36,36 +36,36 @@ class OneyRepository extends Repository
     private $addressSpecific;
     private $amountCurrencyClass;
     private $cache;
-    private $configClass;
+    private $dependencies;
     private $log;
     private $logger;
     private $configurationSpecific;
     private $contextSpecific;
     private $countrySpecific;
     private $currencySpecific;
-    private $media;
     private $toolsSpecific;
     private $validateSpecific;
     private $assign;
 
     public function __construct(
-        $cache,
-        $logger,
         $addressSpecific,
-        $cartSpecific,
+        $amountCurrencyClass,
+        $assign,
+        $cache,
         $carrierSpecific,
+        $cartSpecific,
         $configurationSpecific,
         $contextSpecific,
         $countrySpecific,
         $currencySpecific,
-        $toolsSpecific,
-        $validateSpecific,
-        $oneyEntity,
+        $dependencies,
+        $logger,
         $myLogPHP,
-        $payplug,
-        $assign,
-        $amountCurrencyClass
+        $oneyEntity,
+        $toolsSpecific,
+        $validateSpecific
     ) {
+        $this->dependencies = $dependencies;
         $this->cache = $cache;
         $this->logger = $logger;
         $this->addressSpecific = $addressSpecific;
@@ -79,8 +79,6 @@ class OneyRepository extends Repository
         $this->validateSpecific = $validateSpecific;
         $this->oneyEntity = $oneyEntity;
         $this->log = $myLogPHP;
-        $this->media = $payplug;
-        $this->payplug = $payplug;
         $this->assign = $assign;
         $this->amountCurrencyClass = $amountCurrencyClass;
 
@@ -326,7 +324,7 @@ class OneyRepository extends Repository
                 $this->contextSpecific->getContext()->language->iso_code
             )
         ]);
-        return $this->media->fetchTemplate('oney/popin.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/popin.tpl');
     }
 
     /**
@@ -354,7 +352,7 @@ class OneyRepository extends Repository
             'merchant_company_iso' => $this->configurationSpecific->get('PAYPLUG_COMPANY_ISO')
         ];
         $this->assign->assign($vars);
-        return $this->media->fetchTemplate('oney/schedule.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/schedule.tpl');
     }
 
     /**
@@ -427,7 +425,7 @@ class OneyRepository extends Repository
                 'oney_image' => $oneyImageUrls
             ]);
 
-            return $this->media->fetchTemplate('oney/payment/payment.tpl');
+            return $this->dependencies->configClass->fetchTemplate('oney/payment/payment.tpl');
         }
     }
 
@@ -451,7 +449,7 @@ class OneyRepository extends Repository
             'oney_required_fields' => $fields
         ]);
 
-        return $this->media->fetchTemplate('oney/required.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/required.tpl');
     }
 
     /**
@@ -546,7 +544,7 @@ class OneyRepository extends Repository
             'payplug_oney_loading_msg' => $this->l('Loading')
         ]);
 
-        return $this->media->fetchTemplate('oney/cta.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
     }
 
     /**
