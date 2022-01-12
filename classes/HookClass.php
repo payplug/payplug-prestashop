@@ -72,21 +72,20 @@ class HookClass
         $this->sql = $this->dependencies->getPlugin()->getSql();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
-
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
     {
         $language = $params['return'];
 
-        if (!in_array($language->iso_code,$this->dependencies->configClass->payplugLanguages)) {
+        if (!in_array($language->iso_code, $this->dependencies->configClass->payplugLanguages)) {
             return true;
         }
 
         // clear Language cache
         Language::loadLanguages();
 
-        $all_order_states = array_merge($this->configClass->orderStates,$this->dependencies->configClass->orderStatesOney);
+        $all_order_states = array_merge($this->configClass->orderStates, $this->dependencies->configClass->orderStatesOney);
         $id_order_states =$this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = explode(',', $id_order_states);
 
@@ -205,11 +204,11 @@ class HookClass
         $id_order_states =$this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = explode(',', $id_order_states);
 
-        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code,$this->dependencies->configClass->payplugLanguages)) {
+        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->dependencies->configClass->payplugLanguages)) {
             return true;
         }
 
-        $all_order_states = array_merge($this->configClass->orderStates,$this->dependencies->configClass->orderStatesOney);
+        $all_order_states = array_merge($this->configClass->orderStates, $this->dependencies->configClass->orderStatesOney);
 
         foreach ($all_order_states as $order_state) {
             foreach ($order_state['payplug_cfg'] as $payplug_conf) {
@@ -707,7 +706,7 @@ class HookClass
     public function displayBackOfficeFooter()
     {
         if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-           $this->dependencies->configClass->assignContentVar();
+            $this->dependencies->configClass->assignContentVar();
             $this->assign->assign([
                 'js_def' => Media::getJsDef(),
             ]);
@@ -838,7 +837,7 @@ class HookClass
                     return$this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
             } else {
-               $this->dependencies->paymentClass->setPaymentErrorsCookie([
+                $this->dependencies->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('hook.header.transactionNotCompleted', 'hookclass')
                 ]);
                 $error_url = 'index.php?controller=order&step=3&error=1';
