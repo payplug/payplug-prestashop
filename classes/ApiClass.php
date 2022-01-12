@@ -50,9 +50,9 @@ class ApiClass
      */
     private $site_url;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
         $this->checkEnvironment();
         $this->setEnvironment();
         self::setSecretKey();

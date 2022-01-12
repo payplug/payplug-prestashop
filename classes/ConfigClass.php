@@ -230,8 +230,8 @@ class ConfigClass
     public $version;
     public $warning;
 
-    private $amountCurrencyClass;
-    private $apiClass;
+//    private $amountCurrencyClass;
+//    private $apiClass;
     private $api_live;
     private $api_test;
     private $check_configuration;
@@ -244,16 +244,16 @@ class ConfigClass
     private $img_lang;
     private $install;
     private $oney;
-    private $orderClass;
+//    private $orderClass;
     private $payment_status;
     private $payplugClass;
     private $ssl_enable;
     private $validationErrors = [];
 
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
 
         $this->amountCurrencyClass = $this->dependencies->getPlugins()->getAmountCurrencyClass();
         $this->install = $this->dependencies->getPlugins()->getInstall();
@@ -262,9 +262,6 @@ class ConfigClass
         $this->context = $this->dependencies->getPlugins()->getContext()->get();
         $this->oney = $this->dependencies->getPlugins()->getOney();
         $this->module = $this->dependencies->getPlugins()->getModule();
-
-        $this->apiClass = new ApiClass();
-        $this->orderClass = new OrderClass();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
@@ -724,11 +721,11 @@ class ConfigClass
             ]);
         }
 
-        $api_class = $this->apiClass;
+        $api_class = $this->dependencies->apiClass;
         $valid_key = $api_class::setAPIKey();
         if (!empty($valid_key)) {
             try {
-                $permissions = $this->apiClass->getAccount($valid_key);
+                $permissions = $this->dependencies->apiClass->getAccount($valid_key);
             } catch (ConfigurationNotSetException $e) {
 //                @todo Add Log
                 die('ConfigurationNotSetException'.$e->getMessage());
@@ -749,7 +746,7 @@ class ConfigClass
 
         $is_active = (bool)$configurations['show'];
 
-        $this->apiClass->getSiteUrl();
+        $this->dependencies->apiClass->getSiteUrl();
 
         $p_error = '';
         if (!$connected) {
@@ -841,7 +838,7 @@ class ConfigClass
             'verified' => $verified,
             'premium' => $premium,
             'is_active' => $is_active,
-            'site_url' => $this->apiClass->getSiteUrl(),
+            'site_url' => $this->dependencies->apiClass->getSiteUrl(),
             'sandbox_mode' => $configurations['sandbox_mode'],
             'embedded_mode' => $configurations['embedded_mode'],
             'one_click' => $configurations['one_click'],
@@ -859,7 +856,7 @@ class ConfigClass
             'integrated' => $this->isValidFeature('feature_integrated'),
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
-            'order_states' => $this->orderClass->getOrderStates(),
+            'order_states' => $this->dependencies->orderClass->getOrderStates(),
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
             'oney_custom_max_amounts' => $oney_custom_max_amounts ,
@@ -1315,7 +1312,7 @@ class ConfigClass
                 'error' => $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
             ]));
         } elseif ($curl_exists && $openssl_exists) {
-            if ($this->apiClass->login($email, $password)) {
+            if ($this->dependencies->apiClass->login($email, $password)) {
                 Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
                 Configuration::updateValue('PAYPLUG_SHOW', 1);
 
@@ -1435,7 +1432,7 @@ class ConfigClass
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
             'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
-            'site_url' => $this->apiClass->getSiteUrl(),
+            'site_url' => $this->dependencies->apiClass->getSiteUrl(),
             'PAYPLUG_KEEP_CARDS' => $PAYPLUG_KEEP_CARDS,
         ]);
 

@@ -34,9 +34,9 @@ class OrderClass
     private $dependencies;
     private $query;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->query = $this->dependencies->getPlugin()->getQuery();

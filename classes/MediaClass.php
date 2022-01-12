@@ -27,17 +27,13 @@ use Media;
 
 class MediaClass
 {
-    private $apiClass;
     private $dependencies;
-    private $configClass;
     private $context;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
 
-        $this->apiClass = new ApiClass();
-        $this->configClass = new ConfigClass();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
     }
 
@@ -92,7 +88,7 @@ class MediaClass
             'with_yes_no_buttons' => $with_yes_no_buttons
         ]);
 
-        return $this->configClass->fetchTemplate('_partials/messages.tpl');
+        return $this->dependencies->configClass->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
@@ -119,8 +115,8 @@ class MediaClass
                 'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'bancontact' => $args['bancontact'],
-                'feature_bancontact' => $this->configClass->isValidFeature('feature_bancontact'),
-                'feature_integrated' => $this->configClass->isValidFeature('feature_integrated'),
+                'feature_bancontact' => $this->dependencies->configClass->isValidFeature('feature_bancontact'),
+                'feature_integrated' => $this->dependencies->configClass->isValidFeature('feature_integrated'),
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
@@ -181,7 +177,7 @@ class MediaClass
                 break;
         }
 
-        foreach ($this->configClass->features_json->features as $key => $value) {
+        foreach ($this->dependencies->configClass->features_json->features as $key => $value) {
             $this->context->smarty->assign([
                 $value => $value
             ]);
@@ -191,10 +187,10 @@ class MediaClass
             'title' => $title,
             'type' => $type,
             'admin_ajax_url' => $admin_ajax_url,
-            'site_url' => $this->apiClass->getSiteUrl(),
+            'site_url' => $this->dependencies->apiClass->getSiteUrl(),
             'inst_id' => $inst_id,
         ]);
-        $this->html = $this->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
+        $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
 
         die(json_encode(['content' => $this->html]));
     }
@@ -207,7 +203,7 @@ class MediaClass
      */
     public function fetchTemplateRC($file)
     {
-        $output = $this->configClass->fetchTemplate($file);
+        $output = $this->dependencies->configClass->fetchTemplate($file);
         return $output;
     }
 

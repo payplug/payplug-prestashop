@@ -35,21 +35,16 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
 {
-    private $apiClass;
     private $assign;
     private $cache;
     private $card;
-    private $cartClass;
     private $config;
-    private $configClass;
     private $context;
     private $dependencies;
-    private $dependenciesClass;
     private $html;
     private $oney;
     private $order;
     private $orderHistory;
-    private $paymentClass;
     private $product;
     private $query;
     private $sql;
@@ -57,9 +52,9 @@ class HookClass
     private $validate;
 
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
         $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->cache = $this->dependencies->getPlugin()->getCache();
         $this->card = $this->dependencies->getPlugin()->getCard();
@@ -78,26 +73,21 @@ class HookClass
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
 
-        $this->apiClass = new ApiClass();
-        $this->cartClass = new CartClass();
-        $this->configClass = new ConfigClass();
-        $this->orderClass = new OrderClass();
-        $this->paymentClass = new PaymentClass();
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
     {
         $language = $params['return'];
 
-        if (!in_array($language->iso_code, $this->configClass->payplugLanguages)) {
+        if (!in_array($language->iso_code,$this->dependencies->configClass->payplugLanguages)) {
             return true;
         }
 
         // clear Language cache
         Language::loadLanguages();
 
-        $all_order_states = array_merge($this->configClass->orderStates, $this->configClass->orderStatesOney);
-        $id_order_states = $this->orderClass->getPayPlugOrderStates($this->dependencies->name);
+        $all_order_states = array_merge($this->configClass->orderStates,$this->dependencies->configClass->orderStatesOney);
+        $id_order_states =$this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = explode(',', $id_order_states);
 
         foreach ($all_order_states as $state) {
@@ -164,7 +154,7 @@ class HookClass
      */
     public function actionExportGDPRData($customer)
     {
-        if (!$cards = $this->configClass->gdprCardExport((int)$customer['id'])) {
+        if (!$cards =$this->dependencies->configClass->gdprCardExport((int)$customer['id'])) {
             return json_encode($this->dependencies->l('hook.actionExportGDPRData.unableToExport', 'hookclass'));
         } else {
             return json_encode($cards);
@@ -189,7 +179,7 @@ class HookClass
             return;
         } else {
             $cart = $this->cart->get((int)$order->id_cart);
-            $payment_method = $this->paymentClass->getPaymentMethodByCart($cart);
+            $payment_method =$this->dependencies->paymentClass->getPaymentMethodByCart($cart);
             if ($payment_method['type'] == 'installment') {
                 $installment = new PPPaymentInstallment($payment_method['id']);
                 $payment = $installment->getFirstPayment();
@@ -212,14 +202,14 @@ class HookClass
      */
     public function actionUpdateLangAfter($params)
     {
-        $id_order_states = $this->orderClass->getPayPlugOrderStates($this->dependencies->name);
+        $id_order_states =$this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = explode(',', $id_order_states);
 
-        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->configClass->payplugLanguages)) {
+        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code,$this->dependencies->configClass->payplugLanguages)) {
             return true;
         }
 
-        $all_order_states = array_merge($this->configClass->orderStates, $this->configClass->orderStatesOney);
+        $all_order_states = array_merge($this->configClass->orderStates,$this->dependencies->configClass->orderStatesOney);
 
         foreach ($all_order_states as $order_state) {
             foreach ($order_state['payplug_cfg'] as $payplug_conf) {
@@ -284,7 +274,7 @@ class HookClass
             'payplug_cards_url' => $payplug_cards_url
         ]);
 
-        return $this->configClass->fetchTemplate('customer/my_account.tpl');
+        return$this->dependencies->configClass->fetchTemplate('customer/my_account.tpl');
     }
 
     /**
@@ -321,10 +311,10 @@ class HookClass
         $amount_refunded_presta = RefundClass::getTotalRefunded($order->id);
 
         $inst_id = null;
-        $payment_id = $this->cartClass->getPayplugInstallmentCart($order->id_cart);
+        $payment_id =$this->dependencies->cartClass->getPayplugInstallmentCart($order->id_cart);
         // Backward if order validated before
         if (!$payment_id) {
-            $payment_id = $this->cartClass->getPayplugInstallmentCartBackward($order->id_cart);
+            $payment_id =$this->dependencies->cartClass->getPayplugInstallmentCartBackward($order->id_cart);
         }
 
         if ($payment_id && strpos($payment_id, 'inst') !== false) {
@@ -363,8 +353,8 @@ class HookClass
             foreach ($installment->schedule as $schedule) {
                 if ($schedule->payment_ids != null) {
                     foreach ($schedule->payment_ids as $pay_id) {
-                        $p = $this->paymentClass->retrievePayment($pay_id);
-                        $payment_list_new[] = $this->paymentClass->buildPaymentDetails($p);
+                        $p =$this->dependencies->paymentClass->retrievePayment($pay_id);
+                        $payment_list_new[] =$this->dependencies->paymentClass->buildPaymentDetails($p);
                         if ((int)$p->is_paid == 0) {
                             $amount_refunded_payplug += 0;
                             $amount_available += 0;
@@ -391,9 +381,9 @@ class HookClass
                     }
                 } else {
                     if ($installment->is_active) {
-                        $status =  $this->configClass->getPaymentStatus()[6];
+                        $status =  $this->dependencies->configClass->getPaymentStatus()[6];
                     } else {
-                        $status =  $this->configClass->getPaymentStatus()[7];
+                        $status =  $this->dependencies->configClass->getPaymentStatus()[7];
                     }
                     $payment_list_new[] = [
                         'id' => null,
@@ -446,8 +436,8 @@ class HookClass
 
             InstallmentClass::updatePayplugInstallment($installment);
         } else {
-            if (!$pay_id = $this->paymentClass->isTransactionPending($order->id_cart)) {
-                $pay_id = $this->orderClass->getPayplugOrderPayment($order->id);
+            if (!$pay_id =$this->dependencies->paymentClass->isTransactionPending($order->id_cart)) {
+                $pay_id =$this->dependencies->orderClass->getPayplugOrderPayment($order->id);
 
                 if (!$pay_id) {
                     $payments = $order->getOrderPaymentCollection();
@@ -461,16 +451,16 @@ class HookClass
 
             $sandbox = (bool)$this->config->get('PAYPLUG_SANDBOX_MODE');
 
-            if (!$pay_id || empty($pay_id) || !$payment = $this->paymentClass->retrievePayment($pay_id)) {
+            if (!$pay_id || empty($pay_id) || !$payment =$this->dependencies->paymentClass->retrievePayment($pay_id)) {
                 if ($sandbox) {
                     ApiClass::setSecretKey($this->config->get('PAYPLUG_LIVE_API_KEY'));
-                    if (empty($pay_id) || !$payment = $this->paymentClass->retrievePayment($pay_id)) {
+                    if (empty($pay_id) || !$payment =$this->dependencies->paymentClass->retrievePayment($pay_id)) {
                         ApiClass::setSecretKey($this->config->get('PAYPLUG_TEST_API_KEY'));
                         return false;
                     }
                 } else {
                     ApiClass::setSecretKey($this->config->get('PAYPLUG_TEST_API_KEY'));
-                    if (empty($pay_id) || !$payment = $this->paymentClass->retrievePayment($pay_id)) {
+                    if (empty($pay_id) || !$payment =$this->dependencies->paymentClass->retrievePayment($pay_id)) {
                         ApiClass::setSecretKey($this->config->get('PAYPLUG_LIVE_API_KEY'));
                         return false;
                     }
@@ -522,7 +512,7 @@ class HookClass
                 $this->assign->assign(['pay_tds' => null]);
             }
 
-            $single_payment = $this->paymentClass->buildPaymentDetails($payment);
+            $single_payment =$this->dependencies->paymentClass->buildPaymentDetails($payment);
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
@@ -696,7 +686,7 @@ class HookClass
         }
 
         // check order state history
-        $undefined_history_states = $this->orderClass->getUndefinedOrderHistory($order->id);
+        $undefined_history_states =$this->dependencies->orderClass->getUndefinedOrderHistory($order->id);
         if (!empty($undefined_history_states)) {
             $payplug_order_state_url = 'https://support.payplug.com/hc/'
                 . $this->context->language->iso_code
@@ -707,7 +697,7 @@ class HookClass
             ]);
         }
 
-        $this->html .= $this->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
+        $this->html .=$this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
         return $this->html;
     }
 
@@ -717,11 +707,11 @@ class HookClass
     public function displayBackOfficeFooter()
     {
         if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->configClass->assignContentVar();
+           $this->dependencies->configClass->assignContentVar();
             $this->assign->assign([
                 'js_def' => Media::getJsDef(),
             ]);
-            return $this->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
+            return$this->dependencies->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
         }
     }
 
@@ -776,7 +766,7 @@ class HookClass
             'use_fees' => (bool)$this->config->get('PAYPLUG_ONEY_FEES'),
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
-        return $this->configClass->fetchTemplate('oney/cta.tpl');
+        return$this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -814,7 +804,7 @@ class HookClass
                 'is_deferred' => (bool)$this->tools->tool('getValue', 'def'),
             ];
 
-            $payment = $this->paymentClass->preparePayment($payment_options);
+            $payment =$this->dependencies->paymentClass->preparePayment($payment_options);
 
             $dotenv = new Dotenv();
             $dotenvFile = dirname(__FILE__, 4) . "/payplugroutes/.env";
@@ -845,10 +835,10 @@ class HookClass
                         'payment_url' => $payment['return_url'],
                         'api_url' => $api_url
                     ]);
-                    return $this->configClass->fetchTemplate('checkout/embedded.tpl');
+                    return$this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
             } else {
-                $this->paymentClass->setPaymentErrorsCookie([
+               $this->dependencies->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('hook.header.transactionNotCompleted', 'hookclass')
                 ]);
                 $error_url = 'index.php?controller=order&step=3&error=1';
@@ -966,7 +956,7 @@ class HookClass
             'use_fees' => (bool)$this->config->get('PAYPLUG_ONEY_FEES'),
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
-        return $this->configClass->fetchTemplate('oney/cta.tpl');
+        return$this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -1004,7 +994,7 @@ class HookClass
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
-        $payment_options = $this->paymentClass->getPaymentOptions($cart);
+        $payment_options =$this->dependencies->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en TPL
         $paymentOptions = $this->dependencies->loadSpecificPresta()->displayPaymentOption(
@@ -1019,12 +1009,12 @@ class HookClass
             'spinner_url' => $this->tools->tool('getHttpHost', true) .
                 __PS_BASE_URI__ . 'modules/payplug/views/img/admin/spinner.gif',
             'front_ajax_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true),
-            'api_url' => $this->apiClass->getApiUrl(),
+            'api_url' =>$this->dependencies->apiClass->getApiUrl(),
             'price2display' => $price2display,
-            'this_path' =>  $this->configClass->getPaymentStatus()[6]
+            'this_path' => $this->module->getInstanceByName($this->dependencies->name)->_path,
         ]);
 
-        return $this->configClass->fetchTemplate('checkout/payment/display.tpl');
+        return$this->dependencies->configClass->fetchTemplate('checkout/payment/display.tpl');
     }
 
     /**
@@ -1045,10 +1035,10 @@ class HookClass
         }
 
         $this->assign->assign([
-            'api_url' => $this->apiClass->getApiUrl(),
+            'api_url' =>$this->dependencies->apiClass->getApiUrl(),
         ]);
 
-        $payment_options = $this->paymentClass->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
+        $payment_options =$this->dependencies->paymentClass->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
 
         // Transforme tableau en object
         return $this->dependencies->loadSpecificPresta()->displayPaymentOption($payment_options);
@@ -1095,6 +1085,6 @@ class HookClass
             $context['reference'] = $order->reference;
         }
         $this->assign->assign($context);
-        return $this->configClass->fetchTemplate('checkout/order-confirmation.tpl');
+        return$this->dependencies->configClass->fetchTemplate('checkout/order-confirmation.tpl');
     }
 }

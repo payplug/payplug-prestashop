@@ -41,7 +41,7 @@ class HookRepository extends Repository
         $this->context = $context;
         $this->tools = $tools;
 
-        $this->mediaClass = new MediaClass();
+        //$this->mediaClass = new MediaClass();
     }
 
     public function actionAdminControllerSetMedia()

@@ -32,24 +32,13 @@ use Validate;
 
 class AdminClass
 {
-    private $apiClass;
     private $config;
-    private $configClass;
     private $html = '';
-    private $mediaClass;
-    private $paymentClass;
     private $paymentRepository;
-    private $refundClass;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
-
-        $this->apiClass = new ApiClass();
-        $this->configClass = new ConfigClass();
-        $this->mediaClass = new MediaClass();
-        $this->paymentClass = new PaymentClass();
-        $this->refundClass = new RefundClass();
+        $this->dependencies = $dependencies;
 
         $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
@@ -107,11 +96,11 @@ class AdminClass
             $this->adminAjaxController();
         }
 
-        $this->configClass->postProcess();
+        $this->dependencies->configClass->postProcess();
 
-        $this->configClass->assignContentVar();
+        $this->dependencies->configClass->assignContentVar();
 
-        $this->html .= $this->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
+        $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
         return $this->html;
     }
@@ -149,7 +138,7 @@ class AdminClass
                     }
                 }
             }
-            $this->mediaClass->displayPopin(Tools::getValue('type'), $args);
+            $this->dependencies->mediaClass->displayPopin(Tools::getValue('type'), $args);
         }
 
         if (Tools::getValue('submitSettings')) {
@@ -163,7 +152,7 @@ class AdminClass
                         'updated_deferred_state' => true,
                         'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
                         'updated_deferred_state_name' => $order_state->name,
-                        'admin_orders_link' => $this->configClass
+                        'admin_orders_link' => $this->dependencies->configClass
                             ->getSpecificPrestaClasse()
                             ->getOrdersByStateLink(
                                 Tools::getValue('payplug_deferred_state')
@@ -172,22 +161,22 @@ class AdminClass
                 }
             }
 
-            $this->configClass->saveConfiguration();
+            $this->dependencies->configClass->saveConfiguration();
 
-            $this->configClass->assignContentVar();
-            $content = $this->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
+            $this->dependencies->configClass->assignContentVar();
+            $content = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
             $this->context->smarty->assign([
                 'title' => '',
                 'type' => 'save',
             ]);
-            $popin = $this->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
+            $popin = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
 
             die(json_encode(['popin' => $popin, 'content' => $content]));
         }
 
         if (Tools::isSubmit('submitAccount')) {
-            $this->configClass->submitAccount();
+            $this->dependencies->configClass->submitAccount();
         }
 
         if (Tools::getValue('submitPwd')) {
@@ -201,19 +190,19 @@ class AdminClass
 
             $email = $this->config->get('PAYPLUG_EMAIL');
 
-            if ($this->apiClass->login($email, $password)) {
+            if ($this->dependencies->apiClass->login($email, $password)) {
                 $api_key = $this->config->get('PAYPLUG_LIVE_API_KEY');
                 if ((bool)$api_key) {
                     $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 0);
-                    $this->configClass->assignContentVar();
-                    $content = $this->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
+                    $this->dependencies->configClass->assignContentVar();
+                    $content = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
                     die(json_encode(['content' => $content]));
                 } else {
                     $this->context->smarty->assign([
                         'title' => '',
                         'type' => 'activate',
                     ]);
-                    $popin = $this->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
+                    $popin = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
                     die(json_encode(['popin' => $popin]));
                 }
             } else {
@@ -227,10 +216,10 @@ class AdminClass
         }
 
         if (Tools::getValue('submit') == 'submitPopin_abort') {
-            $this->paymentClass->abortPayment();
+            $this->dependencies->paymentClass->abortPayment();
         }
         if ((int)Tools::getValue('check') == 1) {
-            $content = $this->configClass->getCheckFieldset();
+            $content = $this->dependencies->configClass->getCheckFieldset();
             die(json_encode(['content' => $content]));
         }
         if ((int)Tools::getValue('log') == 1) {
@@ -239,7 +228,7 @@ class AdminClass
         }
         if ((int)Tools::getValue('checkPremium') == 1) {
             $api_key = $this->config->get('PAYPLUG_LIVE_API_KEY');
-            $permissions = $this->apiClass->getAccountPermissions($api_key);
+            $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
             $return = [
                 'payplug_sandbox' => $permissions['use_live_mode'],
                 'payplug_one_click' => $permissions['can_save_cards'],
@@ -254,18 +243,18 @@ class AdminClass
             die(json_encode(['result' => ApiClass::hasLiveKey()]));
         }
         if ((int)Tools::getValue('refund') == 1) {
-            $this->refundClass->refundPayment();
+            $this->dependencies->refundClass->refundPayment();
         }
         if ((int)Tools::getValue('capture') == 1) {
-            $this->paymentClass->capturePayment();
+            $this->dependencies->paymentClass->capturePayment();
         }
         if ((int)Tools::getValue('popinRefund') == 1) {
-            $popin = $this->mediaClass->displayPopin('refund');
+            $popin = $this->dependencies->mediaClass->displayPopin('refund');
             die(json_encode(['content' => $popin]));
         }
         if ((int)Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
-            $payment = $this->paymentClass->retrievePayment($pay_id);
+            $payment = $this->dependencies->paymentClass->retrievePayment($pay_id);
             $id_order = Tools::getValue('id_order');
 
             if ((int)$payment->is_paid == 1) {
@@ -309,7 +298,7 @@ class AdminClass
     public function submitPopinPwd($pwd)
     {
         $email = $this->config->get('PAYPLUG_EMAIL');
-        $connected = $this->apiClass->login($email, $pwd);
+        $connected = $this->dependencies->apiClass->login($email, $pwd);
         $use_live_mode = false;
 
         if ($connected) {
@@ -317,7 +306,7 @@ class AdminClass
                 $use_live_mode = true;
 
                 $valid_key = $this->config->get('PAYPLUG_LIVE_API_KEY');
-                $permissions = $this->apiClass->getAccount($valid_key);
+                $permissions = $this->dependencies->apiClass->getAccount($valid_key);
                 $can_save_cards = $permissions['can_save_cards'];
                 $can_create_installment_plan = $permissions['can_create_installment_plan'];
             }
@@ -339,11 +328,11 @@ class AdminClass
 
     public function getLogin()
     {
-        $this->configClass->postProcess();
+        $this->dependencies->configClass->postProcess();
 
-        $this->configClass->assignContentVar();
+        $this->dependencies->configClass->assignContentVar();
 
-        $this->html = $this->configClass->fetchTemplate('/views/templates/admin/panel/login.tpl');
+        $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/panel/login.tpl');
 
         return $this->html;
     }

@@ -31,13 +31,10 @@ use Payplug\Resource\Payment;
 class PaymentClass
 {
     private $address;
-    private $amountCurrencyClass;
     private $assign;
     private $card;
     private $cart;
-    private $cartClass;
     private $config;
-    private $configClass;
     private $constant;
     private $context;
     private $country;
@@ -46,7 +43,6 @@ class PaymentClass
     private $dependencies;
     private $language;
     private $logger;
-    private $mediaClass;
     private $name;
     private $oney;
     private $order;
@@ -56,9 +52,9 @@ class PaymentClass
     private $tools;
     private $validate;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
         $this->name = $this->dependencies->name;
 
         $this->address =        $this->dependencies->getPlugin()->getAddress();
@@ -81,12 +77,6 @@ class PaymentClass
         $this->query =          $this->dependencies->getPlugin()->getQuery();
         $this->tools =          $this->dependencies->getPlugin()->getTools();
         $this->validate =       $this->dependencies->getPlugin()->getValidate();
-
-        $this->amountCurrencyClass =    new AmountCurrencyClass($this->tools);
-        $this->apiClass =               new ApiClass();
-        $this->cartClass =              new CartClass();
-        $this->configClass =            new ConfigClass();
-        $this->mediaClass =             new MediaClass();
     }
 
     /**
@@ -163,8 +153,8 @@ class PaymentClass
         $installment_mode = $this->config->get('PAYPLUG_INST_MODE');
         $installment_min_amount = $this->config->get('PAYPLUG_INST_MIN_AMOUNT');
 
-        if (!$this->amountCurrencyClass->checkCurrency($cart) ||
-            !$this->amountCurrencyClass->checkAmount($cart)) {
+        if (!$this->dependencies->amountCurrencyClass->checkCurrency($cart) ||
+            !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return false;
         }
 
@@ -199,7 +189,7 @@ class PaymentClass
 
         $this->assign->assign([
             'front_ajax_url' => $front_ajax_url,
-            'api_url' => $this->apiClass->getApiUrl(),
+            'api_url' => $this->dependencies->apiClass->getApiUrl(),
         ]);
 
         if (!empty($payplug_cards) && $one_click == 1) {
@@ -505,7 +495,7 @@ class PaymentClass
 
             $order = $this->order->get((int)$id_order);
             if ($this->validate->validate('isLoadedObject', $order)) {
-                if (!$this->cartClass->createLockFromCartId($order->id_cart)) {
+                if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
                     $this->logger->addLog('An error occured on lock creation', 'notice');
                     die(json_encode([
                         'status' => 'error',
@@ -524,7 +514,7 @@ class PaymentClass
                     $order_history->addWithemail();
                 }
 
-                if (!$this->cartClass->deleteLockFromCartId($order->id_cart)) {
+                if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'notice');
@@ -601,7 +591,7 @@ class PaymentClass
             'with_msg_button' => $with_msg_button
         ]);
 
-        return $this->configClass->fetchTemplate('_partials/messages.tpl');
+        return $this->dependencies->configClass->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
@@ -622,8 +612,8 @@ class PaymentClass
 
         if (!$this->active ||
             !$this->config->get('PAYPLUG_SHOW') ||
-            !$this->amountCurrencyClass->checkCurrency($cart) ||
-            !$this->amountCurrencyClass->checkAmount($cart)) {
+            !$this->dependencies->amountCurrencyClass->checkCurrency($cart) ||
+            !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return $options;
         }
 
@@ -815,7 +805,7 @@ class PaymentClass
                             [],
                             true
                         );
-                    $paymentOption[$payment_key]['logo'] = $card['brand'] != 'none' ? $this->mediaClass->getMediaPath(
+                    $paymentOption[$payment_key]['logo'] = $card['brand'] != 'none' ? $this->dependencies->mediaClass->getMediaPath(
                         $this->constant->get('_PS_MODULE_DIR_')
                         . $this->name . '/views/img/'
                         . $this->tools->tool('strtolower', $card['brand']) . '.svg'
@@ -867,9 +857,9 @@ class PaymentClass
                 ['type' => 'standard']
             );
 
-            $paymentOption['standard']['logo'] = $this->mediaClass->getMediaPath(
+            $paymentOption['standard']['logo'] = $this->dependencies->mediaClass->getMediaPath(
                 $this->constant->get('_PS_MODULE_DIR_')
-                . $this->name . '/views/img/logos_schemes_' . $this->configClass->getImgLang() . '.svg'
+                . $this->name . '/views/img/logos_schemes_' . $this->dependencies->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
                 $paymentOption['standard']['callToActionText'] = $this->dependencies->l('payplug.getPaymentOptions.payDifferentCard', 'paymentclass');
@@ -921,10 +911,10 @@ class PaymentClass
                     ['type' => 'installment', 'i' => 1],
                     true
                 );
-                $paymentOption['installment']['logo'] = $this->mediaClass->getMediaPath(
+                $paymentOption['installment']['logo'] = $this->dependencies->mediaClass->getMediaPath(
                     $this->constant->get('_PS_MODULE_DIR_')
                     . $this->name . '/views/img/logos_schemes_installment_'
-                    . $this->config->get('PAYPLUG_INST_MODE') . '_' . $this->configClass->getImgLang() . '.png'
+                    . $this->config->get('PAYPLUG_INST_MODE') . '_' . $this->dependencies->configClass->getImgLang() . '.png'
                 );
                 $paymentOption['installment']['callToActionText'] = sprintf(
                     $this->dependencies->l('payplug.getPaymentOptions.payByCardInstallment', 'paymentclass'),
@@ -1066,7 +1056,7 @@ class PaymentClass
                     ['type' => 'oney', 'io' => sprintf('%s', $split)],
                     true
                 );
-                $paymentOption[$payment_key]['logo'] = $this->mediaClass->getMediaPath(
+                $paymentOption[$payment_key]['logo'] = $this->dependencies->mediaClass->getMediaPath(
                     $this->constant->get('_PS_MODULE_DIR_')
                     . $this->name . '/views/img/oney/' . $oneyLogo
                 );
@@ -1086,7 +1076,7 @@ class PaymentClass
         if ($options['bancontact'] && $this->isValidFeature('feature_bancontact')) {
             $paymentOption['bancontact']['name'] = 'bancontact';
             $paymentOption['bancontact']['tpl'] = 'bancontact.tpl';
-            $paymentOption['bancontact']['logo'] = $this->mediaClass->getMediaPath(
+            $paymentOption['bancontact']['logo'] = $this->dependencies->mediaClass->getMediaPath(
                 $this->constant->get('_PS_MODULE_DIR_')
                 . $this->name . '/views/img/bancontact/bancontact.svg'
             );
@@ -1142,7 +1132,7 @@ class PaymentClass
      */
     public function getPaymentStatusById($id_status)
     {
-        $paymentStatus = $this->configClass->getPaymentStatus();
+        $paymentStatus = $this->dependencies->configClass->getPaymentStatus();
         return $paymentStatus[$id_status];
     }
 
@@ -1467,8 +1457,8 @@ class PaymentClass
 
         // Amount
         $amount = $cart->getOrderTotal(true);
-        $amount = $this->amountCurrencyClass->convertAmount($amount);
-        $current_amounts = $this->amountCurrencyClass->getAmountsByCurrency($currency_iso_code);
+        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+        $current_amounts = $this->dependencies->amountCurrencyClass->getAmountsByCurrency($currency_iso_code);
         if ($amount < $current_amounts['min_amount'] || $amount > $current_amounts['max_amount']) {
             // todo: add error log
             return [

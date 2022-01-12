@@ -34,21 +34,34 @@ require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
 
 class DependenciesClass
 {
+    public $adminClass;
+    public $amountCurrencyClass;
+    public $apiClass;
+    public $cartClass;
+    public $configClass;
+    public $hookClass;
+    public $mediaClass;
     public $name;
+    public $orderClass;
+    public $paymentClass;
+    public $version;
+    public $refundClass;
 
+    private $logger;
     private $plugin;
-
     private $tools;
 
-    public $version;
+
 
     public function __construct()
     {
         $this->version = PAYPLUG_VERSION;
         $this->name = PAYPLUG_NAME;
+
         $this->initializeAccessors();
 
         $this->tools = $this->getPlugin()->getTools();
+        $this->logger = $this->getPlugin()->getLogger();
     }
 
     public function getPlugin()
@@ -59,6 +72,17 @@ class DependenciesClass
     public function initializeAccessors()
     {
         $this->setPlugin((new PluginRepository($this))->getEntity());
+
+        $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
+        $this->adminClass = new AdminClass($this);
+        $this->apiClass = new ApiClass($this);
+        $this->cartClass = new CartClass();
+        $this->configClass = new ConfigClass($this);
+        $this->hookClass = new HookClass($this);
+        $this->mediaClass = new MediaClass($this);
+        $this->orderClass = new OrderClass($this);
+        $this->paymentClass = new PaymentClass($this);
+        $this->refundClass = new RefundClass($this);
     }
 
     public function setPlugin($plugin)
