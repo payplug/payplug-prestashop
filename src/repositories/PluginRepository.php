@@ -54,7 +54,7 @@ use PayPlug\src\specific\ValidateSpecific;
 
 class PluginRepository extends Repository
 {
-    protected $payplug;
+    protected $dependencies;
 
     // Entities
     private $cacheEntity;
@@ -102,9 +102,9 @@ class PluginRepository extends Repository
     private $validate;
     private $constantSpecific;
 
-    public function __construct($payplug = null)
+    public function __construct($dependencies = null)
     {
-        $this->payplug = $payplug;
+        $this->dependencies = $dependencies;
         $this->myLogPhp = new MyLogPHP();
 
         $this->setEntities();
@@ -183,7 +183,7 @@ class PluginRepository extends Repository
         );
 
         $this->hook = new HookRepository(
-            $this->payplug,
+            $this->dependencies,
             $this->constant,
             $this->context,
             $this->tools

@@ -50,7 +50,7 @@ class PrestashopSpecific17
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
 
-        $this->configClass = new ConfigClass();
+        $this->configClass = $this->dependencies->configClass;
     }
 
     public function displayHeader()

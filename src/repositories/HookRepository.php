@@ -28,20 +28,18 @@ use PayPlug\classes\MediaClass;
 class HookRepository extends Repository
 {
     protected $constant;
-    protected $payplug;
+    protected $dependencies;
     protected $context;
     protected $tools;
 
     private $mediaClass;
 
-    public function __construct($payplug, $constant, $context, $tools)
+    public function __construct($dependencies, $constant, $context, $tools)
     {
-        $this->payplug = $payplug;
+        $this->dependencies = $dependencies;
         $this->constant = $constant;
         $this->context = $context;
         $this->tools = $tools;
-
-        //$this->mediaClass = new MediaClass();
     }
 
     public function actionAdminControllerSetMedia()
@@ -49,13 +47,13 @@ class HookRepository extends Repository
         $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
 
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
-            $this->mediaClass->setMedia([
+            $this->dependencies->mediaClass->setMedia([
                 $module_url . 'views/css/admin_order.css',
                 $module_url . 'views/js/admin_order.js',
                 $module_url . 'views/js/utilities.js',
             ]);
         } else {
-            $this->mediaClass->setMedia([
+            $this->dependencies->mediaClass->setMedia([
                 $module_url . 'views/js/admin.js',
                 $module_url . 'views/css/admin.css',
             ]);
@@ -71,7 +69,7 @@ class HookRepository extends Repository
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        return $this->payplug->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
+        return $this->dependencies->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
     }
 
     /**
@@ -96,7 +94,7 @@ class HookRepository extends Repository
     public function actionObjectOrderStateDeleteAfter($param)
     {
         $order_state = $param['object'];
-        return $this->payplug->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
+        return $this->dependencies->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
     }
 
     /**
@@ -120,9 +118,9 @@ class HookRepository extends Repository
         ];
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
-        $current_order_state_type = $this->payplug->getPlugin()->getOrderState()->getType((int)$id_order_state);
+        $current_order_state_type = $this->dependencies->getPlugin()->getOrderState()->getType((int)$id_order_state);
         $payplug_order_state_url = 'https://support.payplug.com/hc/'
-            . $this->payplug->context->language->iso_code
+            . $this->context->language->iso_code
             . '/articles/4406805105298';
         $this->context->getContext()->smarty->assign([
             'payplug_order_state_url' => $payplug_order_state_url,
@@ -130,7 +128,7 @@ class HookRepository extends Repository
             'order_state_types' => $types
         ]);
 
-        return $this->payplug->fetchTemplate('order_state/type.tpl');
+        return $this->dependencies->configClass->fetchTemplate('order_state/type.tpl');
     }
 
     public function exe($method = false, $params = [])

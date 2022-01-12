@@ -27,11 +27,13 @@ use Configuration;
 use OrderHistory;
 use OrderState;
 use PayPlug\backward\PayPlugBackward;
+use PayPlug\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
 class AdminClass
 {
+    private $dependencies;
     private $config;
     private $html = '';
     private $paymentRepository;
