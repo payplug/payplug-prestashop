@@ -568,7 +568,7 @@ class InstallRepository extends Repository
         if (!$keep_cards) {
             $this->log->info('Saved cards will be deleted.');
 
-            if (!$this->payplug->uninstallCards()) {
+            if (!$this->dependencies->cardClass->uninstallCards()) {
                 return $this->setUninstallError('Unable to delete saved cards.');
             }
 

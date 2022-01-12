@@ -24,8 +24,6 @@
 namespace Payplug\classes;
 
 use PayPlug\src\repositories\CardRepository;
-use Address;
-use Configuration;
 use Country;
 use Exception;
 use Product;
@@ -39,24 +37,29 @@ require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
  */
 class PayPlugAjax
 {
+    private $address;
     private $card;
-    private $contextSpecific;
+    private $config;
+    private $context;
+    private $country;
+    private $dependencies;
     private $oney;
     private $paymentClass;
-    private $payplug;
-    private $plugin;
     private $toolsSpecific;
     private $translate;
 
     public function __construct()
     {
-        $this->payplug = new PayPlugClass();
-        $this->plugin = $this->payplug->getPlugin();
-        $this->card = $this->plugin->getCard();
-        $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
-        $this->oney = $this->plugin->getOney();
-        $this->toolsSpecific = $this->plugin->getTools();
-        $this->translate = $this->plugin->getTranslate();
+        $this->dependencies = new DependenciesClass();
+
+        $this->address = $this->dependencies->getPlugin()->getAddress();
+        $this->card = $this->dependencies->getPlugin()->getCard();
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->country = $this->dependencies->getPlugin()->getCountry();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->toolsSpecific = $this->dependencies->getPlugin()->getTools();
+        $this->translate = $this->dependencies->getPlugin()->getTranslate();
 
         $this->paymentClass = new PaymentClass();
     }
@@ -77,7 +80,7 @@ class PayPlugAjax
      */
     public function postProcess()
     {
-        $context = $this->contextSpecific->getContext(); // get the method
+        $this->context = $this->context->getContext(); // get the method
         $tools = $this->toolsSpecific;
 
         if (($tools->tool('getValue', '_ajax')) == 1) {
@@ -85,7 +88,7 @@ class PayPlugAjax
                 if ((int)$tools->tool('getValue', 'pay') == 1) {
                     $is_installment = $tools->tool('getValue', 'i');
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
-                    $is_deferred = Configuration::get('PAYPLUG_DEFERRED') == 1;
+                    $is_deferred = $this->config->get('PAYPLUG_DEFERRED') == 1;
                     $is_oney = $tools->tool('getValue', 'io');
                     $is_bancontact = $tools->tool('getValue', 'bancontact');
                     $options = [
@@ -99,7 +102,7 @@ class PayPlugAjax
                     $payment = $this->paymentClass->preparePayment($options);
                     die($tools->tool('jsonEncode', $payment));
                 } else {
-                    $cookie = $context->cookie;
+                    $cookie = $this->context->cookie;
                     $id_customer = (int)$cookie->id_customer;
                     if ((int)$id_customer == 0) {
                         die(false);
@@ -114,14 +117,14 @@ class PayPlugAjax
                     }
                 }
             } elseif ($tools->tool('getIsset', 'checkOneyAddresses')) {
-                if (!Configuration::get('PAYPLUG_ONEY')) {
+                if (!$this->config->get('PAYPLUG_ONEY')) {
                     die($tools->tool('jsonEncode', ['result' => false, 'error' => false]));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');
                 $id_billing = $tools->tool('getValue', 'id_address_invoice');
                 die($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
-                $use_taxes = (bool)Configuration::get('PS_TAX');
+                $use_taxes = (bool)$this->config->get('PS_TAX');
 
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
@@ -140,13 +143,13 @@ class PayPlugAjax
                     $amount = $product_price * $quantity;
                     $is_elligible = $this->oney->isValidOneyAmount($amount);
                 } elseif (((int)$tools->tool('getValue', 'is_summary_cta')) === 1) {
-                    $amount = $context->cart->getOrderTotal($use_taxes);
+                    $amount = $this->context->cart->getOrderTotal($use_taxes);
                     $is_elligible = $this->oney->isValidOneyAmount($amount);
                 } else {
-                    $amount = $context->cart->getOrderTotal($use_taxes);
-                    $cart = $context->cart;
-                    $delivery_address = new Address($context->cart->id_address_delivery);
-                    $delivery_country = new Country($delivery_address->id_country);
+                    $amount = $this->context->cart->getOrderTotal($use_taxes);
+                    $cart = $this->context->cart;
+                    $delivery_address = $this->address->get($this->context->cart->id_address_delivery);
+                    $delivery_country = $this->country->get($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
 
                     if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
@@ -158,7 +161,7 @@ class PayPlugAjax
 
                 die($tools->tool('jsonEncode', $is_elligible));
             } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
-                $use_taxes = (bool)Configuration::get('PS_TAX');
+                $use_taxes = (bool)$this->config->get('PS_TAX');
 
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
@@ -179,14 +182,14 @@ class PayPlugAjax
                     $cart = false;
                 } elseif (((int)$tools->tool('getValue', 'is_summary_cta')) === 1) {
                     $cart = false;
-                    $amount = $context->cart->getOrderTotal($use_taxes);
+                    $amount = $this->context->cart->getOrderTotal($use_taxes);
                     $iso_code = false;
                 } else {
-                    $amount = $context->cart->getOrderTotal($use_taxes);
-                    $delivery_address = new Address($context->cart->id_address_delivery);
-                    $delivery_country = new Country($delivery_address->id_country);
+                    $amount = $this->context->cart->getOrderTotal($use_taxes);
+                    $delivery_address = $this->address->get($this->context->cart->id_address_delivery);
+                    $delivery_country = $this->country->get($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
-                    $cart = $context->cart;
+                    $cart = $this->context->cart;
                 }
 
                 try {

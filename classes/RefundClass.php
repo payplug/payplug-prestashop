@@ -42,7 +42,9 @@ use Validate;
 class RefundClass
 {
     protected $context;
-    private $dependencies;
+    private $cartClass;
+    private $configClass;
+    private $payplug;
 
     public function __construct($dependencies)
     {

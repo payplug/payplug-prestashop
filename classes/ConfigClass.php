@@ -246,7 +246,6 @@ class ConfigClass
     private $oney;
 //    private $orderClass;
     private $payment_status;
-    private $payplugClass;
     private $ssl_enable;
     private $validationErrors = [];
 

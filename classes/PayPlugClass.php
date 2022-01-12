@@ -329,9 +329,6 @@ class PayPlugClass extends PaymentModule
         $this->version = PAYPLUG_VERSION;
         $this->initializeAccessors();
 
-        // A supprimer
-        $this->loadEntities();
-
         parent::__construct();
         $this->loadSpecificPrestaClasses();
 
