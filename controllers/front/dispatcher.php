@@ -37,8 +37,8 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         if ($method = Tools::getValue('method')) {
-            $payplug = new \PayPlug\classes\PayPlugClass();
-            $paymentClass = new \PayPlug\classes\PaymentClass($payplug);
+            $dependencies = new \PayPlug\classes\DependenciesClass();
+            $paymentClass = $dependencies->paymentClass;
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
             $is_deferred = (bool)Tools::getValue('def');
@@ -73,7 +73,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 $payment = $paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
                     $paymentClass->setPaymentErrorsCookie([
-                        $payplug->l('The transaction was not completed and your card was not charged.')
+                        $dependencies->l('The transaction was not completed and your card was not charged.')
                     ]);
                     Tools::redirect($error_url);
                 } else {
@@ -89,7 +89,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 $payment = $paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
                     $paymentClass->setPaymentErrorsCookie([
-                        $payplug->l('The transaction was not completed and your card was not charged.')
+                        $dependencies->l('The transaction was not completed and your card was not charged.')
                     ]);
                     Tools::redirect($error_url);
                 } else {

@@ -62,6 +62,7 @@ class DependenciesClass
 
         $this->tools = $this->getPlugin()->getTools();
         $this->logger = $this->getPlugin()->getLogger();
+        $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
     }
 
     public function getPlugin()
@@ -73,7 +74,6 @@ class DependenciesClass
     {
         $this->setPlugin((new PluginRepository($this))->getEntity());
 
-        $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
         $this->adminClass = new AdminClass($this);
         $this->apiClass = new ApiClass($this);
         $this->cartClass = new CartClass();

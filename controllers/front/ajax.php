@@ -32,7 +32,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $contextSpecific;
     private $logger;
     private $oney;
-    private $payplug;
+    private $dependencies;
     private $paymentClass;
     private $plugin;
     private $productSpecific;
@@ -282,7 +282,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 $return_url = $context->link->getModuleLink(
-                    $this->payplug->name,
+                    $this->dependencies->name,
                     'validation',
                     ['ps' => 1, 'cartid' => (int)$cart_id],
                     true
