@@ -94,7 +94,7 @@ class OrderClass
     {
         $this->query
             ->select()
-            ->field('id_payment')
+            ->fields('id_payment')
             ->from($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
             ->where('id_order = ' . (int)$id_order);
 
@@ -165,7 +165,7 @@ class OrderClass
         }
 
         foreach ($order_history_states as $key => &$state) {
-            $type = $this->plugin->getOrderState()->getType((int)$state['id_order_state']);
+            $type = $this->dependencies->getPlugin()->getOrderState()->getType((int)$state['id_order_state']);
             $state['type'] = $type;
             if (!$type || 'undefined' != $type) {
                 unset($order_history_states[$key]);
