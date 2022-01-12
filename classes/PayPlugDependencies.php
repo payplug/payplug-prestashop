@@ -70,16 +70,16 @@ class PayPlugDependencies
     private function initializeAccessors()
     {
         $this->dependencies = new DependenciesClass();
-        $this->api = new ApiClass($this->dependencies);
+//        $this->api = new ApiClass($this->dependencies);
 
         $this->hook = $this->dependencies->getPlugin()->getHook();
         $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
 
-        $this->hookClass = new HookClass($this->dependencies);
+        $this->hookClass = $this->dependencies->hookClass;
 
-        $this->configClass = new ConfigClass($this->dependencies);
+        $this->configClass = $this->dependencies->configClass;
 
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
     }
