@@ -41,7 +41,6 @@ class AdminClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-
         $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();

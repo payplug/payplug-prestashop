@@ -23,12 +23,6 @@
 
 namespace PayPlug\classes;
 
-use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\repositories\HookRepository;
-use PayPlug\src\repositories\InstallRepository;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\src\repositories\PluginRepository;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -70,7 +64,7 @@ class PayPlugDependencies
     private function initializeAccessors()
     {
         $this->dependencies = new DependenciesClass();
-//        $this->api = new ApiClass($this->dependencies);
+        $this->apiClass = new ApiClass($this->dependencies);
 
         $this->hook = $this->dependencies->getPlugin()->getHook();
         $this->install = $this->dependencies->getPlugin()->getInstall();
