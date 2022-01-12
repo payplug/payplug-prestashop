@@ -1073,7 +1073,7 @@ class PaymentClass
         }
 
         // Bancontact Payment
-        if ($options['bancontact'] && $this->configClass->isValidFeature('feature_bancontact')) {
+        if ($options['bancontact'] && $this->dependencies->configClass->isValidFeature('feature_bancontact')) {
             $paymentOption['bancontact']['name'] = 'bancontact';
             $paymentOption['bancontact']['tpl'] = 'bancontact.tpl';
             $paymentOption['bancontact']['logo'] = $this->dependencies->mediaClass->getMediaPath(
