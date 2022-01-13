@@ -641,6 +641,7 @@ class ConfigClass
             && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
             && $this->payplugClass->isValidFeature('feature_integrated')
             && Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($configurations['sandbox_mode'] ? '_TEST' : ''))
+            &&  Configuration::get('PAYPLUG_PUBLISHABLE_KEY')
         ) {
             $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
         } else {
