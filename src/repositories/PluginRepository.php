@@ -241,6 +241,7 @@ class PluginRepository extends Repository
             $this->configuration,
             $this->constant,
             $this->context,
+            $this->dependencies,
             $this->order_state,
             $this->order_state_entity,
             $this->order_state_specific,

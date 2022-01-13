@@ -76,7 +76,7 @@ class Payplug extends PaymentModule
     public function disable($force_all = false)
     {
         if ($this->module) {
-            return parent::disable && $this->payplug_dependencies->getDependency('configClass')->disable();
+            return parent::disable() && $this->payplug_dependencies->getDependency('configClass')->disable();
         }
     }
 
@@ -157,7 +157,7 @@ class Payplug extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
-     * @param $params
+     * @param $params   $this->setDependencies();
      * @return mixed
      */
     public function hookActionAdminPerformanceControllerAfter($params)

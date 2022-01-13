@@ -38,6 +38,9 @@ class InstallRepository extends Repository
     protected $context;
 
     /** @var object */
+    protected $dependencies;
+
+    /** @var object */
     public $log;
 
     /** @var object OrderStateRepository */
@@ -68,6 +71,7 @@ class InstallRepository extends Repository
         $config,
         $constant,
         $context,
+        $dependencies,
         $order_state,
         $order_state_entity,
         $order_state_specific,
@@ -81,6 +85,7 @@ class InstallRepository extends Repository
         $this->config = $config;
         $this->constant = $constant;
         $this->context = $context;
+        $this->dependencies = $dependencies;
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
         $this->order_state_specific = $order_state_specific;

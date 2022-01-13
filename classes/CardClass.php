@@ -31,9 +31,9 @@ class CardClass
     private $query;
     private $sql;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
-        $this->dependencies = new DependenciesClass();
+        $this->dependencies = $dependencies;
         $this->card =       $this->dependencies->getPlugin()->getCard();
         $this->constant =   $this->dependencies->getPlugin()->getConstant();
         $this->query =      $this->dependencies->getPlugin()->getQuery();

@@ -29,8 +29,8 @@ if (!defined('_PS_VERSION_')) {
 
 class PayPlugDependencies
 {
-    /** @var AdminClass */
-    private $adminClass;
+    /** @var ApiClass */
+    private $apiClass;
 
     /** @var ConfigClass */
     private $configClass;
@@ -64,7 +64,8 @@ class PayPlugDependencies
     private function initializeAccessors()
     {
         $this->dependencies = new DependenciesClass();
-        $this->apiClass = new ApiClass($this->dependencies);
+
+        $this->apiClass = $this->dependencies->apiClass;
 
         $this->hook = $this->dependencies->getPlugin()->getHook();
         $this->install = $this->dependencies->getPlugin()->getInstall();

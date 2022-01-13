@@ -37,6 +37,7 @@ class DependenciesClass
     public $adminClass;
     public $amountCurrencyClass;
     public $apiClass;
+    public $cardClass;
     public $cartClass;
     public $configClass;
     public $hookClass;
@@ -47,11 +48,7 @@ class DependenciesClass
     public $version;
     public $refundClass;
 
-    private $logger;
     private $plugin;
-    private $tools;
-
-
 
     public function __construct()
     {
@@ -59,10 +56,6 @@ class DependenciesClass
         $this->name = PAYPLUG_NAME;
 
         $this->initializeAccessors();
-
-        $this->tools = $this->getPlugin()->getTools();
-        $this->logger = $this->getPlugin()->getLogger();
-        $this->amountCurrencyClass = new AmountCurrencyClass($this->tools);
     }
 
     public function getPlugin()
@@ -74,8 +67,10 @@ class DependenciesClass
     {
         $this->setPlugin((new PluginRepository($this))->getEntity());
 
+        $this->amountCurrencyClass = $this->getPlugin()->getAmountCurrencyClass();
         $this->adminClass = new AdminClass($this);
         $this->apiClass = new ApiClass($this);
+        $this->cardClass = new CardClass($this);
         $this->cartClass = new CartClass();
         $this->configClass = new ConfigClass($this);
         $this->hookClass = new HookClass($this);
