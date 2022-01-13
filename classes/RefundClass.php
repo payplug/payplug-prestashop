@@ -198,17 +198,17 @@ class RefundClass
      */
     public function refundPayment()
     {
-         $this->logger->addLog('[Payplug] Start refund', 'notice');
+        $this->logger->addLog('[Payplug] Start refund', 'notice');
         $amount = str_replace(',', '.', Tools::getValue('amount'));
 
         if (!$this->dependencies->amountCurrencyClass->checkAmountToRefund($amount)) {
-             $this->logger->addLog('Incorrect amount to refund', 'notice');
+            $this->logger->addLog('Incorrect amount to refund', 'notice');
             die(json_encode([
                                 'status' => 'error',
                                 'data' => $this->dependencies->l('payplug.refundPayment.incorrectAmount', 'refundclass')
                             ]));
         } elseif ($this->dependencies->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
-             $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
+            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
             die(json_encode([
                                 'status' => 'error',
                                 'data' => $this->dependencies->l('payplug.refundPayment.amountAtLeast', 'refundclass')
@@ -231,8 +231,8 @@ class RefundClass
         $refund = RefundClass::makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 
         if ($refund == 'error') {
-             $this->logger->addLog('Cannot refund that amount.', 'notice');
-             $this->logger->addLog(
+            $this->logger->addLog('Cannot refund that amount.', 'notice');
+            $this->logger->addLog(
                 '$pay_id : ' . $pay_id .
                 ' - $amount : ' . $amount .
                 ' - $metadata : ' . json_encode($metadata) . /* or implode() ? */
@@ -287,19 +287,19 @@ class RefundClass
                         }
 
                         $current_state = (int)$this->dependencies->orderClass->getCurrentOrderState($order->id);
-                         $this->logger->addLog('Current order state: ' . $current_state, 'notice');
+                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
-                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         }
 
                         if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
-                             $this->logger->addLog('Lock cannot be deleted.', 'error');
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
-                             $this->logger->addLog('Lock deleted.', 'notice');
+                            $this->logger->addLog('Lock deleted.', 'notice');
                         }
                     }
                     $reload = true;
@@ -328,21 +328,21 @@ class RefundClass
                         }
 
                         $current_state = (int)$this->dependencies->orderClass->getCurrentOrderState($order->id);
-                         $this->logger->addLog('Current order state: ' . $current_state, 'notice');
+                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
-                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         } else {
-                             $this->logger->addLog('Order status is already \'refunded\'', 'notice');
+                            $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                         }
 
                         if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
-                             $this->logger->addLog('Lock cannot be deleted.', 'error');
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
-                             $this->logger->addLog('Lock deleted.', 'notice');
+                            $this->logger->addLog('Lock deleted.', 'notice');
                         }
                     }
                     $reload = true;
