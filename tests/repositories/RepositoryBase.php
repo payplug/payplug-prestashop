@@ -82,7 +82,6 @@ class RepositoryBase extends TestCase
         $this->setSpecific();
         $this->setRepository();
         $this->setTemporariesClasses();
-
     }
 
     private function setSpecific()
@@ -114,7 +113,7 @@ class RepositoryBase extends TestCase
 
     private function setTemporariesClasses()
     {
-    //    $this->dependencies          = new DependenciesClass();
+        $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
         $this->amountCurrencyClass   = new AmountCurrencyClass($this->tools);
         $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
 //        $this->amountCurrencyClass          = \Mockery::mock('Payplug\classes\AmountCurrencyClass');

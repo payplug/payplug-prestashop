@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\InstallRepository;
 
+use Mockery\Mock;
+
 /**
  * @group unit
  * @group repository
@@ -279,9 +281,11 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $this->dependencies = \Mockery::mock();
-        $this->dependencies->shouldReceive('loadSpecificPresta');
+        $specific = \Mockery::mock();
         $this->dependencies
+            ->shouldReceive('loadSpecificPresta')
+            ->andReturn($specific);
+        $specific
             ->shouldReceive([
                 'installTab' => false
             ]);
@@ -321,9 +325,11 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $this->dependencies = \Mockery::mock();
-        $this->dependencies->shouldReceive('loadSpecificPresta');
+        $specific = \Mockery::mock();
         $this->dependencies
+            ->shouldReceive('loadSpecificPresta')
+            ->andReturn($specific);
+        $specific
             ->shouldReceive([
                 'installTab' => true
             ]);

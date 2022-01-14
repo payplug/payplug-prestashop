@@ -60,10 +60,6 @@ class BaseInstallRepository extends RepositoryBase
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 
-        $this->dependencies = \Mockery::mock(DependenciesClass::class, [
-            $this->loadSpecificPresta
-        ]);
-
         $this->shop
             ->shouldReceive('isFeatureActive')
             ->andReturn(false);
