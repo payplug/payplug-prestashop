@@ -198,7 +198,6 @@ class PluginRepository extends Repository
 
         $this->oney = new OneyRepository(
             $this->address,
-            $this->amountCurrencyClass,
             $this->assign,
             $this->cache,
             $this->carrier,

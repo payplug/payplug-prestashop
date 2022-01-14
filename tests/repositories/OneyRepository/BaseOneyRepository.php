@@ -36,7 +36,6 @@ class BaseOneyRepository extends RepositoryBase
 
     protected $arrayCache;
     protected $arrayLogger;
-    protected $amountCurrencyClass;
 
     public function setUp()
     {
@@ -48,7 +47,6 @@ class BaseOneyRepository extends RepositoryBase
         $this->repo = \Mockery::mock(OneyRepository::class, [
             $this->address,
             $this->assign,
-            $this->amountCurrencyClass,
             $this->cache,
             $this->carrier,
             $this->cart,

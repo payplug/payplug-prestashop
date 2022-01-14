@@ -49,7 +49,6 @@ class OneyRepository extends Repository
 
     public function __construct(
         $addressSpecific,
-        $amountCurrencyClass,
         $assign,
         $cache,
         $carrierSpecific,
@@ -80,7 +79,6 @@ class OneyRepository extends Repository
         $this->oneyEntity = $oneyEntity;
         $this->log = $myLogPHP;
         $this->assign = $assign;
-        $this->amountCurrencyClass = $amountCurrencyClass;
 
         $this->setParams();
     }
@@ -484,23 +482,23 @@ class OneyRepository extends Repository
         $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
 
         // format price
-        $total_cost = $this->amountCurrencyClass->convertAmount($resource['total_cost'], true);
+        $total_cost = $this->dependencies->amountCurrencyClass->convertAmount($resource['total_cost'], true);
         $resource['total_cost'] = [
             'amount' => number_format($total_cost, 2),
             'value' => $tools->tool('displayPrice', $total_cost),
         ];
-        $down_payment_amount = $this->amountCurrencyClass->convertAmount($resource['down_payment_amount'], true);
+        $down_payment_amount = $this->dependencies->amountCurrencyClass->convertAmount($resource['down_payment_amount'], true);
         $resource['down_payment_amount'] = [
             'amount' => number_format($down_payment_amount, 2),
             'value' => $tools->tool('displayPrice', $down_payment_amount),
         ];
         foreach ($resource['installments'] as &$installment) {
-            $amount = $this->amountCurrencyClass->convertAmount($installment['amount'], true);
+            $amount = $this->dependencies->amountCurrencyClass->convertAmount($installment['amount'], true);
             $installment['amount'] = number_format($amount, 2);
             $installment['value'] = $tools->tool('displayPrice', $amount);
         }
 
-        $total_amount = $this->amountCurrencyClass->convertAmount($total_amount, true);
+        $total_amount = $this->dependencies->amountCurrencyClass->convertAmount($total_amount, true);
         $total_amount += $total_cost;
         $resource['total_amount'] = [
             'amount' => number_format($total_amount, 2),
@@ -601,7 +599,7 @@ class OneyRepository extends Repository
         $delivery_context = $this->getOneyDeliveryContext();
 
         foreach ($products as $product) {
-            $unit_price = $this->amountCurrencyClass->convertAmount($product['price_wt']);
+            $unit_price = $this->dependencies->amountCurrencyClass->convertAmount($product['price_wt']);
             $productName = (string)$product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
@@ -643,7 +641,7 @@ class OneyRepository extends Repository
             return $payment_list;
         }
 
-        $amount = $this->amountCurrencyClass->convertAmount($amount);
+        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
 
         if (!$country) {
             $iso_code_list = $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES');
@@ -1219,7 +1217,7 @@ class OneyRepository extends Repository
         $is_valid_amount = $this->isValidOneyAmount($amount);
         if (!$is_valid_amount['result']) {
             $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
-            $converted_amount = $this->amountCurrencyClass->convertAmount($amount);
+            $converted_amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
             return ['result' => false, 'error_type' => $error_type, 'error' => $is_valid_amount['error']];
@@ -1269,7 +1267,7 @@ class OneyRepository extends Repository
     public function isValidOneyAmount($amount)
     {
         $limits = $this->getOneyPriceLimit();
-        $convert_amount = ($this->amountCurrencyClass->convertAmount($amount)) / 100;
+        $convert_amount = ($this->dependencies->amountCurrencyClass->convertAmount($amount)) / 100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
             return [
                 'result' => false,
