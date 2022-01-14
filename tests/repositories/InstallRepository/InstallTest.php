@@ -279,8 +279,9 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $this->payplug->PrestashopSpecificObject = \Mockery::mock();
-        $this->payplug->PrestashopSpecificObject
+        $this->dependencies = \Mockery::mock();
+        $this->dependencies->shouldReceive('loadSpecificPresta');
+        $this->dependencies
             ->shouldReceive([
                 'installTab' => false
             ]);
@@ -320,8 +321,9 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $this->payplug->PrestashopSpecificObject = \Mockery::mock();
-        $this->payplug->PrestashopSpecificObject
+        $this->dependencies = \Mockery::mock();
+        $this->dependencies->shouldReceive('loadSpecificPresta');
+        $this->dependencies
             ->shouldReceive([
                 'installTab' => true
             ]);

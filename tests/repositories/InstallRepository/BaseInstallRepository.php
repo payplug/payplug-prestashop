@@ -24,6 +24,7 @@
 
 namespace PayPlug\tests\repositories\InstallRepository;
 
+use PayPlug\classes\DependenciesClass;
 use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\entities\OrderStateEntity;
 use PayPlug\tests\repositories\RepositoryBase;
@@ -46,6 +47,7 @@ class BaseInstallRepository extends RepositoryBase
             $this->config,
             $this->constant,
             $this->context,
+            $this->dependencies,
             $this->order_state,
             $this->order_state_entity,
             $this->order_state_specific,
@@ -53,11 +55,14 @@ class BaseInstallRepository extends RepositoryBase
             $this->sql,
             $this->tools,
             $this->validate,
-            $this->payplug,
             $this->myLogPhp
         ])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
+
+        $this->dependencies = \Mockery::mock(DependenciesClass::class, [
+            $this->loadSpecificPresta
+        ]);
 
         $this->shop
             ->shouldReceive('isFeatureActive')

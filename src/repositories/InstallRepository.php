@@ -64,9 +64,6 @@ class InstallRepository extends Repository
     /** @var object */
     protected $validate;
 
-    /** @var object */
-    protected $payplug;
-
     public function __construct(
         $config,
         $constant,
@@ -79,7 +76,6 @@ class InstallRepository extends Repository
         $sql,
         $tools,
         $validate,
-        $payplug,
         $mylogphp
     ) {
         $this->config = $config;
@@ -93,7 +89,6 @@ class InstallRepository extends Repository
         $this->sql = $sql;
         $this->tools = $tools;
         $this->validate = $validate;
-        $this->payplug = $payplug;
         $this->log = $mylogphp;
 
         $this->setParams();
@@ -321,7 +316,7 @@ class InstallRepository extends Repository
         }
 
         // Install tab
-        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
+        if (!$this->dependencies->loadSpecificPresta()->installTab()) {
             return $this->setInstallError('Install failed: Install Tab');
         }
 
@@ -590,7 +585,7 @@ class InstallRepository extends Repository
             return $this->setUninstallError('Uninstall failed: sql.');
         }
 
-        if (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
+        if (!$this->dependencies->loadSpecificPresta()->uninstallTab()) {
             return $this->setUninstallError('Uninstall failed: tab.');
         }
 

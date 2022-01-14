@@ -169,7 +169,6 @@ class PluginRepository extends Repository
             $this->configuration,
             $this->constant,
             $this->logger,
-            $this->payplug,
             $this->query,
             $this->tools
         );
@@ -228,9 +227,9 @@ class PluginRepository extends Repository
         );
 
         $this->payment = new PaymentRepository(
-            $this->payplug,
             $this->cart,
             $this->configuration,
+            $this->dependencies,
             $this->logger,
             $this->paymentEntity,
             $this->query,
@@ -249,7 +248,6 @@ class PluginRepository extends Repository
             $this->sql,
             $this->tools,
             $this->validate,
-            $this->payplug,
             $this->myLogPhp
         );
     }

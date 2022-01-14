@@ -41,7 +41,6 @@ class CardRepository extends Repository
         $configurationSpecific,
         $constant,
         $logger,
-        $payplug,
         $query,
         $tools
     ) {
@@ -50,7 +49,6 @@ class CardRepository extends Repository
         $this->constant = $constant;
         $this->logger = $logger;
         $this->query = $query;
-        $this->payplug = $payplug;
         $this->toolsSpecific = $tools;
         $this->setParams();
     }
