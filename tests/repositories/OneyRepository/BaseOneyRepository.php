@@ -46,22 +46,22 @@ class BaseOneyRepository extends RepositoryBase
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->repo = \Mockery::mock(OneyRepository::class, [
-            $this->cache,
-            $this->logger,
             $this->address,
-            $this->cart,
+            $this->assign,
+            $this->amountCurrencyClass,
+            $this->cache,
             $this->carrier,
+            $this->cart,
             $this->config,
             $this->context,
             $this->country,
             $this->currency,
-            $this->tools,
-            $this->validate,
-            $this->oney,
+            $this->dependencies,
+            $this->logger,
             $this->myLogPhp,
-            $this->payplug,
-            $this->assign,
-            $this->amountCurrencyClass
+            $this->oney,
+            $this->tools,
+            $this->validate
         ])->makePartial();
 
         $this->arrayCache = [];

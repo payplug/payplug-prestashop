@@ -49,7 +49,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         $this->country->shouldReceive('getCountry')
             ->andReturn(CountryMock::get());
 
-        $this->payplug->shouldReceive('isValidMobilePhoneNumber')
+        $this->dependencies->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($phone_number) {
                 return (!is_null($phone_number) && $phone_number !== '');
             });
