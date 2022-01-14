@@ -151,9 +151,9 @@ class PrestashopSpecific16
                     }
                     if ($payment_method == 'oney' && $oneyOptimized) {
                         $optimized_class = ' -optimized-16';
-                        $oneyImageOptimized = '/modules/payplug/views/img/oney/x3x4_with';
-                        $oneyImagex3 = '/modules/payplug/views/img/oney/x3_with';
-                        $oneyImagex4 = '/modules/payplug/views/img/oney/x4_with';
+                        $oneyImageOptimized = '/views/img/oney/x3x4_with';
+                        $oneyImagex3 = '/views/img/oney/x3_with';
+                        $oneyImagex4 = '/views/img/oney/x4_with';
                         $oneyImage = '';
 
                         $use_fees = (bool)Configuration::get('PAYPLUG_ONEY_FEES');
@@ -175,13 +175,21 @@ class PrestashopSpecific16
 
                         if ($error !== false) {
                             $oneyImage .= '_alt.svg';
-                            $payment_option['logo'] = $oneyImageOptimized.$oneyImage;
+                            $payment_option['logo'] = Media::getMediaPath(
+                                _PS_MODULE_DIR_ . $this->payplug->name . $oneyImageOptimized  . $oneyImage
+                            );
                         } else {
                             $oneyImage .= '.svg';
                             $payment_option['logo'] = [
-                                'optimized' => $oneyImageOptimized.$oneyImage,
-                                'x3' => $oneyImagex3.$oneyImage,
-                                'x4' => $oneyImagex4.$oneyImage
+                                'optimized' => Media::getMediaPath(
+                                    _PS_MODULE_DIR_ . $this->payplug->name . $oneyImageOptimized  . $oneyImage
+                                ),
+                                'x3' => Media::getMediaPath(
+                                    _PS_MODULE_DIR_ . $this->payplug->name . $oneyImagex3 .$oneyImage
+                                ),
+                                'x4' => Media::getMediaPath(
+                                    _PS_MODULE_DIR_ . $this->payplug->name  . $oneyImagex4 .$oneyImage
+                                )
                             ];
                         }
                     }
