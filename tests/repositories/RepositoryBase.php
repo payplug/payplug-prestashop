@@ -67,7 +67,7 @@ class RepositoryBase extends TestCase
     protected $sql;
 
     // temporary classes
-  //  protected $amountCurrencyClass;
+    //  protected $amountCurrencyClass;
 //    protected $amountCurrencyClass_static;
     protected $configClass;
 
