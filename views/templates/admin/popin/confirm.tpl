@@ -29,10 +29,6 @@
         {l s='admin.popin.confirm.paymentpage' mod='payplug'}
         <strong>{if $embedded == 'integrated'}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 'popup'}{l s='admin.popin.confirm.popup' mod='payplug'}{elseif $embedded == 'redirected'}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
     </li>
-    <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
-        {l s='admin.popin.confirm.paymentpage' mod='payplug'}
-        <strong>{if $embedded == 'integrated'}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 'popup'}{l s='admin.popin.confirm.popup' mod='payplug'}{elseif $embedded == 'redirected'}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
-    </li>
     <li data-e2e-type="standard" data-e2e-state="{if $standard}on{else}off{/if}">
         {l s='admin.popin.confirm.standard' mod='payplug'}
         <strong>{if $standard}{l s='admin.popin.confirm.enabled' mod='payplug'}{else}{l s='admin.popin.confirm.disabled' mod='payplug'}{/if}</strong>
