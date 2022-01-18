@@ -306,7 +306,7 @@ class RefundClass
                 }
             } else {
                 //TODO: call retrievePayment from PaymentClass
-                $payment = $this->paymentClass->retrievePayment($refund->payment_id);
+                $payment = $this->dependencies->paymentClass->retrievePayment($refund->payment_id);
 
                 if ((int)Tools::getValue('id_state') != 0) {
                     $new_state = (int)Tools::getValue('id_state');
