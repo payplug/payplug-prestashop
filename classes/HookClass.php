@@ -827,7 +827,7 @@ class HookClass
                             'isIntegratedPayment' => true
                         ]);
                     } else {
-                        $api_url = $this->dependencies->apiClass->getApiUrl() . '/js/1/form.latest.js';
+                        $api_url = $this->payplug->apiClass->getApiUrl() . '/js/1/form.latest.js';
                     }
 
                     $this->assign->assign([
