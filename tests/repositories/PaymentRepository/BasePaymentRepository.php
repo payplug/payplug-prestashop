@@ -66,6 +66,9 @@ class BasePaymentRepository extends RepositoryBase
             ->shouldReceive('setPaymentErrorsCookie')
             ->andReturn(true);
 
+        $this->dependencies
+            ->shouldReceive('l');
+
         $this->constant
             ->shouldReceive('get')
             ->andReturn('constant');
