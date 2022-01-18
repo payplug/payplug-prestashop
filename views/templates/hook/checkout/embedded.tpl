@@ -20,4 +20,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<script id="payplug_form_js" data-payment-url="{$payment_url|escape:'htmlall':'UTF-8'}" type="text/javascript" src="{$api_url|escape:'htmlall':'UTF-8'}/js/1/form.latest.js"></script>
+<script id="payplug_form_js" data-payment-url="{$payment_url|escape:'htmlall':'UTF-8'}" type="text/javascript"
+src="{$api_url|escape:'htmlall':'UTF-8'}">
+</script>
