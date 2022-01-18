@@ -32,6 +32,9 @@ $(document).ready(function() {
         window.location.href = url;
         return false;
     }
-
-    Payplug.showPayment(url);
+    if (typeof isIntegratedPayment != 'undefined' && isIntegratedPayment) {
+        Payplug.Form.showPayment(url);
+    } else {
+        Payplug.showPayment(url);
+    }
 });
