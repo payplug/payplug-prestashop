@@ -107,14 +107,38 @@ class HookRepository extends Repository
     public function displayAdminStatusesForm()
     {
         $types = [
-            'undefined' => $this->l('hook.displayAdminStatusesForm.undefined'),
-            'nothing' => $this->l('hook.displayAdminStatusesForm.orderStateTypeNothing'),
-            'cancelled' => $this->l('hook.displayAdminStatusesForm.orderStateTypeCancelled'),
-            'error' => $this->l('hook.displayAdminStatusesForm.orderStateTypeError'),
-            'expired' => $this->l('hook.displayAdminStatusesForm.orderStateTypeExpired'),
-            'paid' => $this->l('hook.displayAdminStatusesForm.orderStateTypePaid'),
-            'pending' => $this->l('hook.displayAdminStatusesForm.orderStateTypePending'),
-            'refund' => $this->l('hook.displayAdminStatusesForm.orderStateTypeRefund'),
+            'undefined' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.undefined',
+                'hookrepository'
+            ),
+            'nothing' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypeNothing',
+                'hookrepository'
+            ),
+            'cancelled' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypeCancelled',
+                'hookrepository'
+            ),
+            'error' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypeError',
+                'hookrepository'
+            ),
+            'expired' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypeExpired',
+                'hookrepository'
+            ),
+            'paid' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypePaid',
+                'hookrepository'
+            ),
+            'pending' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypePending',
+                'hookrepository'
+            ),
+            'refund' => $this->dependencies->l(
+                'hook.displayAdminStatusesForm.orderStateTypeRefund',
+                'hookrepository'
+            ),
         ];
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');

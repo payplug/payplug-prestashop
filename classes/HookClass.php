@@ -208,7 +208,7 @@ class HookClass
             return true;
         }
 
-        $all_order_states = array_merge($this->configClass->orderStates, $this->dependencies->configClass->orderStatesOney);
+        $all_order_states = array_merge($this->dependencies->configClass->orderStates, $this->dependencies->configClass->orderStatesOney);
 
         foreach ($all_order_states as $order_state) {
             foreach ($order_state['payplug_cfg'] as $payplug_conf) {
