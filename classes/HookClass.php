@@ -805,15 +805,34 @@ class HookClass
 
             $payment = $this->payplug->preparePayment($payment_options);
 
+            $dotenv = new Dotenv();
+            $dotenvFile = dirname(__FILE__, 4) . "/payplugroutes/.env";
+            if (file_exists($dotenvFile)) {
+                $dotenv->load($dotenvFile);
+                $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
+            } else {
+                $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v0/index.js';
+            }
+
             if ($payment['result']) {
                 // If payment is paid then redirect
                 if ($payment['redirect']) {
                     $this->tools->tool('redirect', $payment['return_url']);
                 } else {
                     // else show the popin
+
+                    if ($this->config->get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
+                        $api_url = $integrated_payment_js_url;
+                        Media::addJsDef([
+                            'isIntegratedPayment' => true
+                        ]);
+                    } else {
+                        $api_url = $this->dependencies->apiClass->getApiUrl() . '/js/1/form.latest.js';
+                    }
+
                     $this->assign->assign([
                         'payment_url' => $payment['return_url'],
-                        'api_url' => $this->payplug->apiClass->getApiUrl(),
+                        'api_url' => $api_url
                     ]);
                     return $this->payplug->fetchTemplate('checkout/embedded.tpl');
                 }
