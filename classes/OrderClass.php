@@ -76,7 +76,7 @@ class OrderClass
     {
         $this->query
             ->select()
-            ->field('GROUP_CONCAT(id_order_state) as id_order_states')
+            ->fields('GROUP_CONCAT(id_order_state) as id_order_states')
             ->from($this->constant->get('_DB_PREFIX_') . 'order_state')
             ->where('module_name = "' . $module . '"');
 
