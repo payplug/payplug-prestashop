@@ -1082,7 +1082,7 @@ class PaymentClass
             );
             $paymentOption['bancontact']['callToActionText'] = $this->dependencies->l(
                 'payplug.getPaymentOptions.payWithBancontact',
-                'payplugclass'
+                'paymentclass'
             );
             $paymentOption['bancontact']['extra_classes'] = 'bancontact';
             $paymentOption['bancontact']['action'] = $this->context->link->getModuleLink(
