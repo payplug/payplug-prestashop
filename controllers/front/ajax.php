@@ -30,6 +30,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $card;
     private $configurationSpecific;
     private $contextSpecific;
+    private $logger;
     private $oney;
     private $payplug;
     private $plugin;
@@ -57,6 +58,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
         $this->payplug = new \PayPlug\classes\PayPlugClass();
         $this->plugin = $this->payplug->getPlugin();
+        $this->logger = $this->plugin->getLogger();
         $this->toolsSpecific = $this->plugin->getTools();
 
         if ($this->toolsSpecific->tool('getValue', '_ajax') == 1) {
@@ -289,6 +291,20 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'return_url' => $return_url,
                     'message' => 'Success'
                 ]));
+            } elseif ($tools->tool('getIsset', 'addLogger')) {
+                $message = $tools->tool('getValue', 'message');
+                if (!$message || !is_string($message)) {
+                    die(json_encode([
+                        'result' => true,
+                        'message' =>  'Failed to add log' // specific error
+                    ]));
+                } else {
+                    $this->logger->addLog($message);
+                    die(json_encode([
+                        'result' => true,
+                        'message' =>  $message // specific error
+                    ]));
+                }
             }
         }
     }
