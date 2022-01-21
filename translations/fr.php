@@ -247,6 +247,8 @@ $_MODULE['<{payplug}prestashop>integrated_payment_135d8119e3d51e37c192ec3aa6cb07
 $_MODULE['<{payplug}prestashop>integrated_payment_31025818b7246ef6978773c7f97cdbba'] = 'Nom et/ou Prénom invalide(s).';
 $_MODULE['<{payplug}prestashop>integrated_payment_51828e2fbedf61f6e4056a798e92f1ec'] = 'Enregistrer ma carte bancaire';
 $_MODULE['<{payplug}prestashop>integrated_payment_58679831fad529b286ea96e1b0fe14ed'] = 'Saisie invalide, veuillez corriger pour continuer.';
+$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'La transaction n\'a pas pu aboutir,[1] et votre carte n\'a pas été débitée.[1]
+ Veuillez réessayer.';
 $_MODULE['<{payplug}prestashop>integrated_payment_76921e9f92347ff287c289e7b676bf88'] = 'Champ obligatoire.';
 $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e50508313c'] = 'Vous serez prélevé(e) lors du traitement de votre commande.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Numéro de carte invalide.';

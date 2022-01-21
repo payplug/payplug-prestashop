@@ -158,7 +158,20 @@ var $document, $window, payplugModule = {
                     return;
                 }
 
-                var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                try {
+                    var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                } catch (e) {
+                    // @todo find a solution if an error block IP form display
+                    if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
+                        addLogger(e.name + " : " + e.message);
+                    }
+                }
+
+                // @todo remove testing generic error
+                // erreur provoquée en fonction d'un montant spécifique'
+                var error = 'GENERIC_ERROR : 1428';
+                console.log(error);
+
                 integrated.props.integratedPayment = integratedPayment;
                 integratedPayment.setDisplayMode3ds(api.DisplayMode3ds.LIGHTBOX);
 
@@ -274,7 +287,42 @@ var $document, $window, payplugModule = {
 
                 // Once an attempt has been made
                 integratedPayment.onCompleted(function (event) {
-                    integrated.form.confirmIntPayment(event.token);
+
+                    // @todo : remove generic error testing
+                    var price = $('.cart-total span.value').text().replace(/\D+/g, '');
+
+                    switch (price) {
+                        case '1428' :
+                            console.log('GENERIC_ERROR : ' + price);
+                            event.error = {
+                                "name": 'GENERIC_ERROR',
+                                "message": 'A generic error occured'
+                            };
+                        break;
+                        default:
+                            console.log('pas d\'erreur');
+                    }
+
+                    // @todo remove comment after IP is finished
+                    // Ici le code definitif :
+                    if (typeof event.error != 'undefined' && event.error != null) {
+                        if (!event.error.hasOwnProperty('name')) {
+                            event.error.name = 'API_ERROR';
+                        }
+                        if (!event.error.hasOwnProperty('message')) {
+                            event.error.message = 'A generic error occured';
+                        }
+                        addLogger(event.error.name + " : " + event.error.message);
+
+                        $('.' + integrated.props.identifier + '_error.-api')
+                            .addClass('-show');
+
+                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+
+                        integrated.form.clearIntPayment();
+                    } else {
+                        integrated.form.confirmIntPayment(event.token);
+                    }
                 });
             },
             field: {
@@ -370,6 +418,7 @@ var $document, $window, payplugModule = {
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.emptyField').addClass('-hide');
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
                     $('.' + integrated.props.identifier + '_error.-fields').removeClass('-show');
+                    $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
                 },
                 valid: function(type) {
                     if (!type || typeof type == undefined) {
@@ -428,6 +477,7 @@ var $document, $window, payplugModule = {
                 }
 
                 $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
+                $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
 
                 if (!integrated.form.validateForm()) {
                     integrated.props.submited = false;
@@ -444,7 +494,7 @@ var $document, $window, payplugModule = {
                         token: token,
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        integrated.form.resetIntPayment();
+                        integrated.form.clearIntPayment();
                         console.log(jqXHR);
                         console.log(textStatus);
                         console.log(errorThrown);
@@ -456,7 +506,7 @@ var $document, $window, payplugModule = {
                             integrated.form.submitIntPayment();
                         } else {
                             payplugModule.popup.set(integratedPaymentError);
-                            integrated.form.resetIntPayment();
+                            integrated.form.clearIntPayment();
                             return false;
                         }
                     },
@@ -510,7 +560,7 @@ var $document, $window, payplugModule = {
                         console.log(jqXHR);
                         console.log(textStatus);
                         console.log(errorThrown);
-                        integrated.form.resetIntPayment();
+                        integrated.form.clearIntPayment();
                     },
                     success: function (data) {
                         payplugModule.tools.removeSpinner();
@@ -520,13 +570,13 @@ var $document, $window, payplugModule = {
                             $('.' + integrated.props.identifier + '_error.-payment')
                                 .text(integratedPaymentError)
                                 .addClass('-show');
-                            integrated.form.resetIntPayment(true);
+                            integrated.form.clearIntPayment(true);
                             return false;
                         }
                     },
                 });
             },
-            resetIntPayment: function(clear){
+            clearIntPayment: function(clear){
                 // confirm creation integrated paiement or show fail popup
                 var integrated = payplugModule.integrated;
                 integrated.props.submited = false;
