@@ -618,14 +618,15 @@ class ConfigClass
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
+        // @todo : avoid addJsDef with translations (quotes are not escaped on 1.6 and break header)
         Media::addJsDef([
             'admin_ajax_url' => $admin_ajax_url,
             'error_installment' => $this->payplugClass->l('payplug.assignContentVar.installment', 'configclass'),
             'error_deferred' => $this->payplugClass->l('payplug.assignContentVar.deferred', 'configclass'),
             'error_oney' => $this->payplugClass->l('payplug.assignContentVar.oney', 'configclass'),
-            'errorOneyMax' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass'),
-            'errorOneyMin' => $this->payplugClass->l('config.assignContentVar.oney.thresholdsMinError', 'configclass'),
-                        ]);
+            'errorOneyMax' => addslashes($this->payplugClass->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass')),
+            'errorOneyMin' => addslashes($this->payplugClass->l('config.assignContentVar.oney.thresholdsMinError', 'configclass')),
+        ]);
 
         $login_infos = [];
 
@@ -641,21 +642,20 @@ class ConfigClass
         $oney_custom_max_amounts = ($customAmounts['max']);
         $oney_custom_min_amounts = ($customAmounts['min']);
 
-
         if ((class_exists($this->payplugClass->PrestashopSpecificClass))
             && (method_exists($this->payplugClass->PrestashopSpecificObject, 'assignSwitchConfiguration'))
             && $this->payplugClass->isValidFeature('feature_integrated')
+
         ) {
             $this->payplugClass->PrestashopSpecificObject->assignSwitchConfiguration($configurations);
         } else {
             $this->assignSwitchConfiguration($configurations);
         }
 
-
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    $this->payplugClass->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
+                    addslashes($this->payplugClass->l('config.assignContentVar.oney.thresholdsError', 'configclass')),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),

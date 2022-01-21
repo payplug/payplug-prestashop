@@ -853,12 +853,14 @@ var $document, $window, payplug = {
             oney.props.error = null;
             if (limits.min > amount  || matches == null) {
                 $('#oney_min').addClass('error');
-                $error.text(errorOneyThresholds);
+                // WARNING .replace() is used to strip antislash from var in header
+                $error.text(errorOneyThresholds.replace(/\\(.)/mg, "$1"));
                 $error.show();
                 oney.props.error = $error.text();
             } else if ( parseFloat($val_max) < amount) {
                 $('#oney_min').addClass('error');
-                $error.text(errorOneyMin);
+                // WARNING .replace() is used to strip antislash from var in header
+                $error.text(errorOneyMin.replace(/\\(.)/mg, "$1"));
                 $error.show();
                 oney.props.error = $error.text();
             } else {
@@ -878,12 +880,14 @@ var $document, $window, payplug = {
 
             if (limits.max < amount || matches == null) {
                 $('#oney_max').addClass('error');
-                $error.text(errorOneyThresholds)
+                // WARNING .replace() is used to strip antislash from var in header
+                $error.text(errorOneyThresholds.replace(/\\(.)/mg, "$1"));
                 $error.show();
                 oney.props.error = $error.text();
             } else if (parseFloat($val_min)  > amount) {
                 $('#oney_max').addClass('error');
-                $error.text(errorOneyMax);
+                // WARNING .replace() is used to strip antislash from var in header
+                $error.text(errorOneyMax.replace(/\\(.)/mg, "$1"));
                 $error.show();
                 oney.props.error = $error.text();
             } else {
