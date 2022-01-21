@@ -77,3 +77,20 @@ var payplug_utilities = {
         document.getElementsByTagName("head")[0].appendChild(script);
     }
 };
+
+function addLogger(message)
+{
+    $.ajax({
+        url: payplug_ajax_url,
+        headers: {"cache-control": "no-cache"},
+        type: 'POST',
+        async: true,
+        cache: false,
+        dataType: 'json',
+        data: {
+            _ajax: 1,
+            addLogger: true,
+            message: message
+        }
+    });
+};

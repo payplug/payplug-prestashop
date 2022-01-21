@@ -247,6 +247,8 @@ $_MODULE['<{payplug}prestashop>integrated_payment_135d8119e3d51e37c192ec3aa6cb07
 $_MODULE['<{payplug}prestashop>integrated_payment_31025818b7246ef6978773c7f97cdbba'] = 'Invalid Surname and/or First name.';
 $_MODULE['<{payplug}prestashop>integrated_payment_51828e2fbedf61f6e4056a798e92f1ec'] = 'Save my credit card';
 $_MODULE['<{payplug}prestashop>integrated_payment_58679831fad529b286ea96e1b0fe14ed'] = 'Invalid entry. Please correct to continue.';
+$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'The transaction was not completed[1]and your card was not charged.[1]
+Please try again.';
 $_MODULE['<{payplug}prestashop>integrated_payment_76921e9f92347ff287c289e7b676bf88'] = 'Mandatory field.';
 $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e50508313c'] = 'The debit will be made as soon as your order has been processed.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Invalid credit card number.';
