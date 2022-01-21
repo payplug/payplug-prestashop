@@ -247,6 +247,8 @@ $_MODULE['<{payplug}prestashop>integrated_payment_135d8119e3d51e37c192ec3aa6cb07
 $_MODULE['<{payplug}prestashop>integrated_payment_31025818b7246ef6978773c7f97cdbba'] = 'Cognome e/o nome non valido(i).';
 $_MODULE['<{payplug}prestashop>integrated_payment_51828e2fbedf61f6e4056a798e92f1ec'] = 'Salva i dati della mia carta di credito';
 $_MODULE['<{payplug}prestashop>integrated_payment_58679831fad529b286ea96e1b0fe14ed'] = 'Voce non valida. Per favore, correggi per continuare.';
+$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'La transazione non è stata conclusa[1]e non è stato effettuato alcun[1]addebito sulla tua carta.[1]
+Per favore, riprova.';
 $_MODULE['<{payplug}prestashop>integrated_payment_76921e9f92347ff287c289e7b676bf88'] = 'Campo obbligatorio.';
 $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e50508313c'] = 'L\'addebito sarà effettuato al momento dell\'elaborazione dell\'ordine.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Numero di carta non valido.';
