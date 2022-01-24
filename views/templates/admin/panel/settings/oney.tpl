@@ -63,11 +63,4 @@
                 </div>
             </div>
         </div>
-    <script type="text/javascript">
-        {literal}
-            var errorOneyMax = "{/literal}{$errorOneyMax|escape:'all':'UTF-8'}{literal}";
-            var errorOneyMin = "{/literal}{$errorOneyMin|escape:'all':'UTF-8'}{literal}";
-            var errorOneyThresholds = "{/literal}{$errorOneyThresholds|escape:'all':'UTF-8'}{literal}";
-        {/literal}
-    </script>
     </div>
