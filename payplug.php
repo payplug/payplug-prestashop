@@ -31,9 +31,22 @@ if (!defined('_PS_VERSION_')) {
 require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
 require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
 
+require 'vendor/autoload.php';
+
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException;
+use ContextCore as Context;
+
 class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    private $emailSupport;
 
     /**
      * Constructor
@@ -55,7 +68,10 @@ class Payplug extends PaymentModule
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
         // todo: automate module version in CI with constant value
-        $this->version = '3.7.0';
+        $this->version = '3.8.0';
+
+        // todo: check if needed for psAccount
+        $this->emailSupport = 'support@payplug.com';
 
         parent::__construct();
 
@@ -89,6 +105,51 @@ class Payplug extends PaymentModule
         if ($this->module) {
             if (!$this->isValidInstallation()) {
                 $this->install(true);
+            }
+
+            // Load context for PsAccount
+            // todo: move to another file for php 5.3 compliance
+            $facade = $this->getService('ps_accounts.facade');
+            Media::addJsDef([
+                'contextPsAccounts' => $facade->getPsAccountsPresenter()
+                    ->present($this->name),
+            ]);
+
+            //
+            $package = json_decode(Tools::file_get_contents(dirname(__FILE__)."/_dev/js/back/package.json"));
+            $this->context->smarty->assign('pathVendor', $this->getPathUri() . 'views/js/chunk-vendors.' . $package->version . '.js');
+            $this->context->smarty->assign('pathApp', $this->getPathUri() . 'views/js/app.' . $package->version . '.js');
+
+            try {
+                $psAccountsService = $facade->getPsAccountsService();
+                Media::addJsDef([
+                    'psBillingContext' => [
+                        'context' => [
+                            'versionPs' => _PS_VERSION_,
+                            'versionModule' => $this->version,
+                            'moduleName' => $this->name,
+                            'refreshToken' => $psAccountsService->getRefreshToken(),
+                            'emailSupport' => $this->emailSupport,
+                            'shop' => [
+                                'uuid' => $psAccountsService->getShopUuidV4()
+                            ],
+                            'i18n' => [
+                                'isoCode' => $this->getLanguageIsoCode()
+                            ],
+                            'user' => [
+                                'createdFromIp' => (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : '',
+                                'email' => $psAccountsService->getEmail()
+                            ],
+                            'moduleTosUrl' => $this->getTosLink()
+                        ]
+                    ]
+                ]);
+            } catch (ModuleNotInstalledException $e) {
+                // You handle exception here
+                die(dump($e->getMessage()));
+            } catch (ModuleVersionException $e) {
+                // You handle exception here
+                die(dump($e->getMessage()));
             }
 
             return (new \PayPlug\classes\AdminClass())->getContent();
@@ -143,6 +204,57 @@ class Payplug extends PaymentModule
             'paymentOptions',
             'registerGDPRConsent',
         ];
+    }
+
+    /**
+     * @description Get the isoCode from the context language, if null, send 'en' as default value
+     * todo: check if needed for psAccount
+     *
+     * @return string
+     */
+    public function getLanguageIsoCode()
+    {
+        return $this->context->language !== null ? $this->context->language->iso_code : 'en';
+    }
+
+    /**
+     * @description Retrieve service
+     *
+     * @param string $serviceName
+     *
+     * @return mixed
+     */
+    public function getService($serviceName)
+    {
+        if ($this->container === null) {
+            $this->container = new \PrestaShop\ModuleLibServiceContainer\DependencyInjection\ServiceContainer(
+                $this->name,
+                $this->getLocalPath()
+            );
+        }
+
+        return $this->container->getService($serviceName);
+    }
+
+    /**
+     * @description Get the TosLink
+     * todo: check if needed for psAccount
+     *
+     * @return string
+     */
+    public function getTosLink()
+    {
+        $iso_lang = $this->getLanguageIsoCode();
+        switch ($iso_lang) {
+            case 'fr':
+                $url = 'https://yoururl.ltd/mentions-legales';
+                break;
+            default:
+                $url = 'https://yoururl.ltd/legal-notice';
+                break;
+        }
+
+        return $url;
     }
 
     /**
@@ -411,7 +523,8 @@ class Payplug extends PaymentModule
             // Use for update module is not fully installed
             if (!$soft_install) {
                 $this->payplug_dependencies = null;
-                $flag = $flag && parent::install();
+                $flag = $flag && parent::install() &&
+                    $this->getService('ps_accounts.installer')->install();
                 $this->setDependencies();
             }
 

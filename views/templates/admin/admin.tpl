@@ -20,10 +20,11 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-
-
+<link href="{$pathVendor|escape:'htmlall':'UTF-8'}" rel=preload as=script>
+<link href="{$pathApp|escape:'htmlall':'UTF-8'}" rel=preload as=script>
 
 <form class="payplug" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
+    {*
     {if isset($updated_deferred_state) && $updated_deferred_state}
         <p class="alert alert-warning" style="width: 100%;">
             <span>
@@ -58,6 +59,15 @@
         </span>
     </p>
     {include file='./panel/show.tpl'}
+    *}
+
+    <div id="app"></div>
+
+    {*
     {include file='./panel/login.tpl'}
     {include file='./panel/settings.tpl'}
+    *}
 </form>
+
+<script src="{$pathVendor|escape:'htmlall':'UTF-8'}"></script>
+<script src="{$pathApp|escape:'htmlall':'UTF-8'}"></script>
