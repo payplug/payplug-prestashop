@@ -1,18 +1,15 @@
 <template>
   <div id="app">
     <PsAccount />
-    <Login />
   </div>
 </template>
 
 <script>
 import PsAccount from "@/components/PsAccount.vue";
-import Login from "@/components/Login.vue";
 
 export default {
   name: 'App',
   components: {
-    Login,
     PsAccount
   },
   setup() {

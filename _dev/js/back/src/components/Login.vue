@@ -4,40 +4,48 @@
       Connexion
     </div>
     <div class="panel-row">
-      <section class="loginForm">
+      <section id="loginForm">
         <div class="loginForm_row">
           <label>Email</label>
-          <input type="text" v-model="form.email">
+          <input type="text" v-model="email">
         </div>
-        <div class="loginForm_row">
-          <label>Password</label>
-          <input type="password" v-model="form.password">
-      </div>
         <button v-on:click="submit">Submit</button>
       </section>
     </div>
     <div class="panel-row">
-      <p>Votre login : {{ login.email }}</p>
-      <p>Votre login : {{ login.password }}</p>
+      <p>Votre login : {{ email }}</p>
     </div>
   </div>
 </template>
 
 <script>
+const axios = require('axios');
+
 export default {
+  name: 'Login',
   data: function(){
     return {
-      form: {
-        email: null,
-        password: null
-      }
-    };
+      email: null
+    }
   },
-  methods: {
+  methods:{
     submit: function (e) {
-      console.log(this.form);
       e.preventDefault();
+      this.testRequest(this.email)
+    },
+    testRequest (email) {
+      const ajaxUrl = 'https://d811-34-255-210-67.ngrok.io/admin-dev/index.php?controller=AdminModules&token=ffb8c68dec88d22405c121a4a6002923&configure=payplug&tab_module=payments_gateways&module_name=payplug';
+      axios.post(ajaxUrl, {
+          _ajax: 1,
+          email: email
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
   }
-})
+}
 </script>

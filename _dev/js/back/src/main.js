@@ -10,7 +10,7 @@ import "@/assets/_settings.scss";
 import "@/assets/index.css";
 
 Vue.use(BootstrapVue, BootstrapVueIcons);
-Vue.use(psAccountsVueComponents);
+Vue.use(psAccountsVueComponents, { locale: window.full_language_code });
 
 Vue.config.productionTip = false;
 Vue.config.debug = true;

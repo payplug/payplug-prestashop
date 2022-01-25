@@ -22,7 +22,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "lodash": "^4.17.21",
     "prestakit": "^1.2.3",
-    "prestashop_accounts_vue_components": "^1.5.6",
+    "prestashop_accounts_vue_components": "^3.0.4",
     "vue": "^2.6.11",
     "vue-content-loader": "^0.2.3",
     "vue-i18n": "^8.26.5",

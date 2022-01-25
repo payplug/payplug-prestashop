@@ -120,38 +120,6 @@ class Payplug extends PaymentModule
             $this->context->smarty->assign('pathVendor', $this->getPathUri() . 'views/js/chunk-vendors.' . $package->version . '.js');
             $this->context->smarty->assign('pathApp', $this->getPathUri() . 'views/js/app.' . $package->version . '.js');
 
-            try {
-                $psAccountsService = $facade->getPsAccountsService();
-                Media::addJsDef([
-                    'psBillingContext' => [
-                        'context' => [
-                            'versionPs' => _PS_VERSION_,
-                            'versionModule' => $this->version,
-                            'moduleName' => $this->name,
-                            'refreshToken' => $psAccountsService->getRefreshToken(),
-                            'emailSupport' => $this->emailSupport,
-                            'shop' => [
-                                'uuid' => $psAccountsService->getShopUuidV4()
-                            ],
-                            'i18n' => [
-                                'isoCode' => $this->getLanguageIsoCode()
-                            ],
-                            'user' => [
-                                'createdFromIp' => (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : '',
-                                'email' => $psAccountsService->getEmail()
-                            ],
-                            'moduleTosUrl' => $this->getTosLink()
-                        ]
-                    ]
-                ]);
-            } catch (ModuleNotInstalledException $e) {
-                // You handle exception here
-                die(dump($e->getMessage()));
-            } catch (ModuleVersionException $e) {
-                // You handle exception here
-                die(dump($e->getMessage()));
-            }
-
             return (new \PayPlug\classes\AdminClass())->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;

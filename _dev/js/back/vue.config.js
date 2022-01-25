@@ -52,5 +52,5 @@ module.exports = {
     filenameHashing: false,
     outputDir: "../../../views/build", // Outputs in module views folder
     assetsDir: "",
-    publicPath: "../../../modules/views/",
+    publicPath: "../modules/payplug/views/",
 };

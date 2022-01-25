@@ -99,6 +99,11 @@ class AdminClass extends \Payplug
      */
     public function getContent()
     {
+
+//        die(json_encode(
+//            array_merge($_GET, $_POST)
+//        ));
+
         if (Tools::getValue('_ajax')) {
             $this->adminAjaxController();
         }
