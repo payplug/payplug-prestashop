@@ -208,6 +208,14 @@
         left: calc(200% / 3 - 1px);
       }
     }
+
+    &.-disabled {
+      &:before,
+      input:checked + label{
+        border-color: darken(#colorMap[stroke], 5%);
+        background: #colorMap[stroke];
+      }
+    }
   }
 
   input {
