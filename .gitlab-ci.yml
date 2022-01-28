@@ -93,6 +93,8 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
+    - php ./ci/generate-upgrade.php
+    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
     - composer install --no-dev
     - rm webpack.config.js
@@ -117,6 +119,8 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
+    - php ./ci/generate-upgrade.php
+    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
     - composer install --no-dev
     - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
