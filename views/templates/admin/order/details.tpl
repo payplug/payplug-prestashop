@@ -63,7 +63,7 @@
             </li>
         {/if}
     {/if}
-    {if isset($payment.card_brand) && ($payment.card_brand)}
+    {if isset($payment.card_brand) && $payment.card_brand}
         <li>
             <span class="pp_col1">{l s='Credit card' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="card_brand">
@@ -72,7 +72,7 @@
         </li>
 
     {/if}
-    {if isset($payment.card_mask) && ($payment.card_mask|intval|count neq 0)}
+    {if isset($payment.card_mask) && $payment.card_mask}
         <li>
             <span class="pp_col1">{l s='Card mask' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="card_mask">
@@ -80,7 +80,7 @@
             </span>
         </li>
     {/if}
-    {if isset($payment.tds)}
+    {if isset($payment.tds) && $payment.tds}
         <li>
             <span class="pp_col1">{l s='3-D Secure' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="tds">{$payment.tds|escape:'htmlall':'UTF-8'}</span>
@@ -94,7 +94,7 @@
             </span>
         </li>
     {/if}
-    {if isset($payment.card_date) && ($payment.card_date|intval|count neq 0)}
+    {if isset($payment.card_date) && $payment.card_date}
         <li>
             <span class="pp_col1">{l s='Expiry Date' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="card_date">
@@ -102,7 +102,7 @@
             </span>
         </li>
     {/if}
-    {if isset($payment.mode)}
+    {if isset($payment.mode) && $payment.mode}
         <li>
             <span class="pp_col1">{l s='Mode' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="mode">{$payment.mode|escape:'htmlall':'UTF-8'}</span>
