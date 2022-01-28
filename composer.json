@@ -1,5 +1,6 @@
 {
     "name": "payplug/payplug-prestashop",
+    "moduleName": "payplug",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
     "version": "3.7.0",
     "require": {
@@ -32,7 +33,8 @@
             "test.php",
             "*.zip",
             "composer.*",
-            "features.json.dist"
+            "features.json.dist",
+            "upgrade/upgrade-methods.php"
         ]
     },
     "autoload": {
