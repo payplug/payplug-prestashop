@@ -137,6 +137,7 @@ class PrestashopSpecific17
         $this->contextSpecific->smarty->assign([
                 'integrated_payment_js_url' => $integrated_payment_js_url,
                 'is_one_click_activated' => (bool)Configuration::get('PAYPLUG_ONE_CLICK'),
+                'is_deferred_activated' => (bool)Configuration::get('PAYPLUG_DEFERRED'),
                 'placeholderCardholder' => $this->payplug->l(
                     'specific17.setIntegratedPaymentOption.placeholderCardholder',
                     'prestashopspecific17'
