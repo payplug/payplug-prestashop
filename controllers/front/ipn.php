@@ -31,9 +31,28 @@ require_once(_PS_MODULE_DIR_ . '../init.php');
  */
 class PayplugIPNModuleFrontController extends ModuleFrontController
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (version_compare(_PS_VERSION_, '1.7.6', '>=')) {
+            $this->setKernel();
+        }
+    }
+
     public function postProcess()
     {
         $notification = \PayPlug\classes\ConfigClass::setNotification();
         $notification->treat();
+    }
+
+    private function setKernel()
+    {
+        global $kernel;
+        if (!$kernel) {
+            require_once _PS_ROOT_DIR_.'/app/AppKernel.php';
+            $kernel = new \AppKernel('prod', false);
+            $kernel->boot();
+        }
     }
 }
