@@ -305,6 +305,15 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'message' =>  $message // specific error
                     ]));
                 }
+            } elseif ($tools->tool('getIsset', 'updatePublishableKey')) {
+                $result = $this->payplug->apiClass->setPublishableKeys();
+                $sandbox = (bool)$this->configurationSpecific->get('PAYPLUG_SANDBOX_MODE');
+                $result['key'] = (string)$this->configurationSpecific->get(
+                    'PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : '')
+                );
+                die(json_encode([
+                        'result' => $result
+                    ]));
             }
         }
     }

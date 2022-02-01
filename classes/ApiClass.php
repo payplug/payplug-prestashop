@@ -179,7 +179,10 @@ class ApiClass
             self::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
         }
 
-        return $flag;
+        return [
+            'result' => $flag,
+            'error' => []
+        ];
     }
 
     /**
