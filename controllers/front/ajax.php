@@ -306,14 +306,34 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
             } elseif ($tools->tool('getIsset', 'updatePublishableKey')) {
-                $result = $this->payplug->apiClass->setPublishableKeys();
+                $publishable_keys = $this->payplug->apiClass->setPublishableKeys();
+
+                if (!$publishable_keys['result']) {
+                    if (!empty($publishable_keys['error'])
+                        && 'EMPTY_PUBLISHABLE_KEY' == $publishable_keys['error']['name']) {
+                        $payment_options = [
+                            'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED'),
+                        ];
+                        $payment = $this->payplug->preparePayment($payment_options);
+                        if (!$payment['result']) {
+                            die(json_encode([
+                                'result' => false
+                            ]));
+                        }
+                        die(json_encode([
+                            'result' => false,
+                            'redirectUrl' => $payment['return_url']
+                        ]));
+                    }
+
+                    die(json_encode($publishable_keys));
+                }
+
                 $sandbox = (bool)$this->configurationSpecific->get('PAYPLUG_SANDBOX_MODE');
-                $result['key'] = (string)$this->configurationSpecific->get(
+                $publishable_keys['key'] = (string)$this->configurationSpecific->get(
                     'PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : '')
                 );
-                die(json_encode([
-                        'result' => $result
-                    ]));
+                die(json_encode($publishable_keys));
             }
         }
     }

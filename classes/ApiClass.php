@@ -136,18 +136,36 @@ class ApiClass
         // Set the publishable for the given sandbox configuration
         try {
             $response = \Payplug\Authentication::getPublishableKeys();
-            $publishable_key = $response['httpResponse']['publishable_key'];
+            $publishable_key = isset($response['httpResponse']['publishable_key'])
+            && $response['httpResponse']['publishable_key']
+                ? $response['httpResponse']['publishable_key']
+                : null;
+
+            if (!$publishable_key) {
+                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : ''));
+                Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected');
+                return [
+                    'result' => false,
+                    'error' => [
+                        'name' => 'EMPTY_PUBLISHABLE_KEY',
+                        'message' => ''
+                    ]
+                ];
+            }
+
             $flag = $flag
                 && Configuration::updateValue(
                     'PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : ''),
                     $publishable_key
                 );
         } catch (BadRequestException $e) {
-            json_encode([
-                'content' => null,
-                'error' => $e->getMessage()
-            ]);
-            return false;
+            return [
+                'result' => $flag,
+                'error' => [
+                    'name' => 'BAD_REQUEST_EXCEPTION',
+                    'message' => $e->getMessage()
+                ]
+            ];
         }
 
         if ($sandbox) {
@@ -159,18 +177,36 @@ class ApiClass
         // Set the publishable for the other sandbox configuration
         try {
             $response = \Payplug\Authentication::getPublishableKeys();
-            $publishable_key = $response['httpResponse']['publishable_key'];
+            $publishable_key = isset($response['httpResponse']['publishable_key'])
+                && $response['httpResponse']['publishable_key']
+                    ? $response['httpResponse']['publishable_key']
+                    : null;
+
+            if (!$publishable_key) {
+                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY' . (!$sandbox ? '_TEST' : ''));
+                Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected');
+                return [
+                    'result' => false,
+                    'error' => [
+                        'name' => 'EMPTY_PUBLISHABLE_KEY',
+                        'message' => ''
+                    ]
+                ];
+            }
+
             $flag = $flag
                 && Configuration::updateValue(
                     'PAYPLUG_PUBLISHABLE_KEY' . (!$sandbox ? '_TEST' : ''),
                     $publishable_key
                 );
         } catch (BadRequestException $e) {
-            json_encode([
-                'content' => null,
-                'error' => $e->getMessage()
-            ]);
-            return false;
+            return [
+                'result' => $flag,
+                'error' => [
+                    'name' => 'BAD_REQUEST_EXCEPTION',
+                    'message' => $e->getMessage()
+                ]
+            ];
         }
 
         if (!$sandbox) {
@@ -537,7 +573,8 @@ class ApiClass
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                return $this->setPublishableKeys();
+                $publishable_keys = $this->setPublishableKeys();
+                return $publishable_keys['result'];
             } else {
                 return false;
             }
