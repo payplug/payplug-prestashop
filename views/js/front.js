@@ -168,9 +168,13 @@ var $document, $window, payplugModule = {
                 }
 
                 // @todo remove testing generic error
-                // erreur provoquée en fonction d'un montant spécifique'
-                var error = 'GENERIC_ERROR : 1428';
-                console.log(error);
+                // liste des erreurs provoquée en fonction des montants en centimes
+                var errors = {
+                    'GENERIC_ERROR': 1428,
+                    'ANTHENTICATION_INVALID': 2856
+                };
+
+                console.log(JSON.stringify(errors, null, " "));
 
                 integrated.props.integratedPayment = integratedPayment;
                 integratedPayment.setDisplayMode3ds(api.DisplayMode3ds.LIGHTBOX);
@@ -231,25 +235,25 @@ var $document, $window, payplugModule = {
 
                 $form.addClass('-loaded');
 
-                $cardHolder.on('click', function(event){
+                $cardHolder.on('click', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     form.cardHolder.focus();
                 });
-                $scheme.find('input').on('click', function(event){
+                $scheme.find('input').on('click', function (event) {
                     integrated.props.scheme = $(this).val();
                 });
-                $pan.on('click', function(event){
+                $pan.on('click', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     form.pan.focus();
                 });
-                $exp.on('click', function(event){
+                $exp.on('click', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     form.exp.focus();
                 });
-                $cvv.on('click', function(event){
+                $cvv.on('click', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     form.cvv.focus();
@@ -299,6 +303,13 @@ var $document, $window, payplugModule = {
                                 "message": 'A generic error occured'
                             };
                         break;
+                        case '2856' :
+                            console.log('AUTHENTICATION_INVALID : ' + price);
+                            event.error = {
+                                "name": 'AUTHENTICATION_INVALID',
+                                "message": 'Invalid Authentication, your publishable key is surely bad or corrupted'
+                            };
+                            break;
                         default:
                             console.log('pas d\'erreur');
                     }
@@ -313,20 +324,50 @@ var $document, $window, payplugModule = {
                             event.error.message = 'A generic error occured';
                         }
                         addLogger(event.error.name + " : " + event.error.message);
+                        // Error specific on Invalid Key
+                        if (event.error.name == 'AUTHENTICATION_INVALID') {
+                            // On lance l'ajax pour executer setPublishableKeys
+                            integrated.form.updatePublishableKey();
+                        } else {
+                            $('.' + integrated.props.identifier + '_error.-api')
+                                .addClass('-show');
 
-                        $('.' + integrated.props.identifier + '_error.-api')
-                            .addClass('-show');
+                            $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
 
-                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
-
-                        integrated.form.clearIntPayment();
+                            integrated.form.clearIntPayment();
+                        }
                     } else {
                         integrated.form.confirmIntPayment(event.token);
                     }
                 });
             },
+            updatePublishableKey: function () {
+                $.ajax({
+                    type: 'POST',
+                    url: payplug_ajax_url,
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        updatePublishableKey: true
+                    },
+                    success: function (data) {
+                        if (data.result) {
+                            if (data.result.result) {
+                                payplug_publishable_key = data.result.key;
+                                payplugModule.integrated.form.resetIntPayment();
+                            } else {
+                                console.log(data.result);
+                            }
+                        } else {
+                            payplugModule.popup.set(integratedPaymentError);
+                            payplugModule.integrated.form.clearIntPayment();
+                            return false;
+                        }
+                    }
+                });
+            },
             field: {
-                init: function(){
+                init: function () {
                     var integrated = payplugModule.integrated,
                         field = integrated.form.field,
                         form = integrated.props.form;
@@ -364,33 +405,33 @@ var $document, $window, payplugModule = {
                         integrated.props.fieldsEmpty['exp'] = false;
                     });
 
-                    form.cardHolder.onFocus(function(event){
+                    form.cardHolder.onFocus(function (event) {
                         field.focus('cardHolder');
                     });
-                    form.pan.onFocus(function(){
+                    form.pan.onFocus(function () {
                         field.focus('pan');
                     });
-                    form.cvv.onFocus(function(){
+                    form.cvv.onFocus(function () {
                         field.focus('cvv');
                     });
-                    form.exp.onFocus(function(){
+                    form.exp.onFocus(function () {
                         field.focus('exp');
                     });
 
-                    form.cardHolder.onBlur(function(event){
+                    form.cardHolder.onBlur(function (event) {
                         field.blur('cardHolder');
                     });
-                    form.pan.onBlur(function(){
+                    form.pan.onBlur(function () {
                         field.blur('pan');
                     });
-                    form.cvv.onBlur(function(){
+                    form.cvv.onBlur(function () {
                         field.blur('cvv');
                     });
-                    form.exp.onBlur(function(){
+                    form.exp.onBlur(function () {
                         field.blur('exp');
                     });
                 },
-                error: function(type) {
+                error: function (type) {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
@@ -399,7 +440,7 @@ var $document, $window, payplugModule = {
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').removeClass('-hide');
                     $('.' + integrated.props.identifier + '_container.-' + type).addClass('-invalid');
                 },
-                blur: function(type){
+                blur: function (type) {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
@@ -409,7 +450,7 @@ var $document, $window, payplugModule = {
                         integrated.form.field.error(type);
                     }
                 },
-                focus: function(type){
+                focus: function (type) {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
@@ -420,7 +461,7 @@ var $document, $window, payplugModule = {
                     $('.' + integrated.props.identifier + '_error.-fields').removeClass('-show');
                     $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
                 },
-                valid: function(type) {
+                valid: function (type) {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
@@ -520,7 +561,7 @@ var $document, $window, payplugModule = {
                     integratedPayment = integrated.props.integratedPayment,
                     integratedPaymentScheme = null;
 
-                switch(integrated.props.scheme) {
+                switch (integrated.props.scheme) {
                     case 'cb':
                         integratedPaymentScheme = Payplug.Scheme.CARTE_BANCAIRE;
                         break;
@@ -576,7 +617,7 @@ var $document, $window, payplugModule = {
                     },
                 });
             },
-            clearIntPayment: function(clear){
+            clearIntPayment: function (clear) {
                 // confirm creation integrated paiement or show fail popup
                 var integrated = payplugModule.integrated;
                 integrated.props.submited = false;
@@ -594,6 +635,37 @@ var $document, $window, payplugModule = {
 
                 // unchecked tos
                 $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+            },
+            resetIntPayment: function () {
+                // confirm creation integrated paiement or show fail popup
+                var integrated = payplugModule.integrated,
+                    $form = $('.' + integrated.props.identifier),
+                    $cardHolder = $form.find('#cardholder'),
+                    $pan = $form.find('#pan'),
+                    $cvv = $form.find('#cvv'),
+                    $exp = $form.find('#exp');
+
+                    integrated.form.clearIntPayment();
+
+                    $cardHolder.remove();
+                    $pan.remove();
+                    $cvv.remove();
+                    $exp.remove();
+                    $form.removeClass('-loaded');
+
+                // unchecked tos
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+
+                try {
+                    integrated.form.set();
+                } catch (e) {
+                    // @todo find a solution if an error block IP form display
+                    if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
+                        addLogger(e.name + " : " + e.message);
+                    } else {
+                        addLogger("UNKNOW_ERROR: unable to generate IP form");
+                    }
+                }
             }
         },
     },
@@ -662,8 +734,9 @@ var $document, $window, payplugModule = {
         },
         clear: function () {
             for (i = 0; i < payplugModule.oney.props.queries.length; i++) {
-                if (typeof payplugModule.oney.props.queries[i] != 'undefined')
+                if (typeof payplugModule.oney.props.queries[i] != 'undefined') {
                     payplugModule.oney.props.queries[i].abort();
+                }
             }
             payplugModule.oney.props.queries = [];
         },
@@ -685,7 +758,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
-                };
+            };
 
             if (with_schedule) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
@@ -1002,7 +1075,7 @@ var $document, $window, payplugModule = {
                         _ajax: 1,
                         savePaymentData: 1,
                         payment_data: payment_data
-                    };
+                };
 
                 $('.' + identifier + '_message').removeClass('-success').removeClass('-error');
 
@@ -1025,9 +1098,11 @@ var $document, $window, payplugModule = {
                             }, 5000);
                         } else {
                             var errors = '';
-                            for (var error in data.message)
-                                if (error !== 'indexOf')
+                            for (var error in data.message) {
+                                if (error !== 'indexOf') {
                                     errors += $('<p />').html(data.message[error]).text() + "\n";
+                                }
+                            }
 
                             $('.' + identifier + '_message').addClass('-error').html(errors);
                         }
