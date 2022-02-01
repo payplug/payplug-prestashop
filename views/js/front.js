@@ -302,7 +302,7 @@ var $document, $window, payplugModule = {
                                 "name": 'GENERIC_ERROR',
                                 "message": 'A generic error occured'
                             };
-                        break;
+                            break;
                         case '2856' :
                             console.log('AUTHENTICATION_INVALID : ' + price);
                             event.error = {
@@ -352,16 +352,16 @@ var $document, $window, payplugModule = {
                     },
                     success: function (data) {
                         if (data.result) {
-                            if (data.result.result) {
-                                payplug_publishable_key = data.result.key;
-                                payplugModule.integrated.form.resetIntPayment();
-                            } else {
-                                console.log(data.result);
-                            }
+                            payplug_publishable_key = data.key;
+                            payplugModule.integrated.form.resetIntPayment();
                         } else {
-                            payplugModule.popup.set(integratedPaymentError);
-                            payplugModule.integrated.form.clearIntPayment();
-                            return false;
+                            if (typeof data.redirectUrl != 'defined' && data.redirectUrl) {
+                                window.location.href = data.redirectUrl;
+                            } else {
+                                payplugModule.popup.set(integratedPaymentError);
+                                payplugModule.integrated.form.clearIntPayment();
+                                return false;
+                            }
                         }
                     }
                 });
@@ -645,13 +645,13 @@ var $document, $window, payplugModule = {
                     $cvv = $form.find('#cvv'),
                     $exp = $form.find('#exp');
 
-                    integrated.form.clearIntPayment();
+                integrated.form.clearIntPayment();
 
-                    $cardHolder.remove();
-                    $pan.remove();
-                    $cvv.remove();
-                    $exp.remove();
-                    $form.removeClass('-loaded');
+                $cardHolder.remove();
+                $pan.remove();
+                $cvv.remove();
+                $exp.remove();
+                $form.removeClass('-loaded');
 
                 // unchecked tos
                 $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
@@ -758,7 +758,7 @@ var $document, $window, payplugModule = {
             var oney = payplugModule.oney,
                 data = {
                     _ajax: 1,
-            };
+                };
 
             if (with_schedule) {
                 data['getOneyPriceAndPaymentOptions'] = 1;
@@ -1075,7 +1075,7 @@ var $document, $window, payplugModule = {
                         _ajax: 1,
                         savePaymentData: 1,
                         payment_data: payment_data
-                };
+                    };
 
                 $('.' + identifier + '_message').removeClass('-success').removeClass('-error');
 
