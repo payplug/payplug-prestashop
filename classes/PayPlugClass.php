@@ -2458,7 +2458,7 @@ class PayPlugClass extends PaymentModule
      * @return mixed
      * @throws Exception
      */
-    public function preparePayment($options)
+    public function preparePayment($options = [])
     {
         if (!Validate::isLoadedObject($this->context->cart)) {
             // todo: add error log
