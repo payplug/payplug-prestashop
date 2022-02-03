@@ -254,13 +254,13 @@ class ConfigClass
     {
         $this->dependencies = $dependencies;
 
-        $this->amountCurrencyClass = $this->dependencies->getPlugins()->getAmountCurrencyClass();
-        $this->install = $this->dependencies->getPlugins()->getInstall();
-        $this->config = $this->dependencies->getPlugins()->getConfiguration();
-        $this->constant = $this->dependencies->getPlugins()->getConstant();
-        $this->context = $this->dependencies->getPlugins()->getContext()->get();
-        $this->oney = $this->dependencies->getPlugins()->getOney();
-        $this->module = $this->dependencies->getPlugins()->getModule();
+        $this->amountCurrencyClass = $this->dependencies->getPlugin()->getAmountCurrencyClass();
+        $this->install = $this->dependencies->getPlugin()->getInstall();
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->module = $this->dependencies->getPlugin()->getModule();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
