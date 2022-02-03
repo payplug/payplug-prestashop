@@ -161,20 +161,10 @@ var $document, $window, payplugModule = {
                 try {
                     var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
                 } catch (e) {
-                    // @todo find a solution if an error block IP form display
                     if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
                         addLogger(e.name + " : " + e.message);
                     }
                 }
-
-                // @todo remove testing generic error
-                // liste des erreurs provoquée en fonction des montants en centimes
-                var errors = {
-                    'GENERIC_ERROR': 1428,
-                    'ANTHENTICATION_INVALID': 2856
-                };
-
-                console.log(JSON.stringify(errors, null, " "));
 
                 integrated.props.integratedPayment = integratedPayment;
                 integratedPayment.setDisplayMode3ds(api.DisplayMode3ds.LIGHTBOX);
@@ -292,31 +282,9 @@ var $document, $window, payplugModule = {
                 // Once an attempt has been made
                 integratedPayment.onCompleted(function (event) {
 
-                    // @todo : remove generic error testing
-                    var price = $('.cart-total span.value').text().replace(/\D+/g, '');
-
-                    switch (price) {
-                        case '1428' :
-                            console.log('GENERIC_ERROR : ' + price);
-                            event.error = {
-                                "name": 'GENERIC_ERROR',
-                                "message": 'A generic error occured'
-                            };
-                            break;
-                        case '2856' :
-                            console.log('AUTHENTICATION_INVALID : ' + price);
-                            event.error = {
-                                "name": 'AUTHENTICATION_INVALID',
-                                "message": 'Invalid Authentication, your publishable key is surely bad or corrupted'
-                            };
-                            break;
-                        default:
-                            console.log('pas d\'erreur');
-                    }
-
-                    // @todo remove comment after IP is finished
-                    // Ici le code definitif :
                     if (typeof event.error != 'undefined' && event.error != null) {
+                        integrated.form.clearIntPayment(true);
+
                         if (!event.error.hasOwnProperty('name')) {
                             event.error.name = 'API_ERROR';
                         }
@@ -324,17 +292,13 @@ var $document, $window, payplugModule = {
                             event.error.message = 'A generic error occured';
                         }
                         addLogger(event.error.name + " : " + event.error.message);
-                        // Error specific on Invalid Key
-                        if (event.error.name == 'AUTHENTICATION_INVALID') {
-                            // On lance l'ajax pour executer setPublishableKeys
+                        // Error specific on Invalid Key (try to replace the one in DB)
+                        if (event.error.name === 'AUTHENTICATION_INVALID') {
+                            // Ajax request to execute setPublishableKeys
                             integrated.form.updatePublishableKey();
                         } else {
                             $('.' + integrated.props.identifier + '_error.-api')
                                 .addClass('-show');
-
-                            $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
-
-                            integrated.form.clearIntPayment();
                         }
                     } else {
                         integrated.form.confirmIntPayment(event.token);
@@ -663,7 +627,7 @@ var $document, $window, payplugModule = {
                     if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
                         addLogger(e.name + " : " + e.message);
                     } else {
-                        addLogger("UNKNOW_ERROR: unable to generate IP form");
+                        addLogger("UNKNOWN_ERROR: unable to generate IP form");
                     }
                 }
             }
