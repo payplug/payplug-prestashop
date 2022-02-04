@@ -27,7 +27,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     private $contextSpecific;
     private $dependencies;
     private $plugin;
-    private $module;
+    public $module;
 
     public function __construct()
     {
@@ -63,7 +63,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     public function renderCardList()
     {
         \Payplug\Payplug::init([
-            'secretKey' => $this->dependencies>apiClass->current_api_key,
+            'secretKey' => $this->dependencies->apiClass->current_api_key,
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
 
