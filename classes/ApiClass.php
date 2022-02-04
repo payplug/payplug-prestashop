@@ -138,7 +138,8 @@ class ApiClass
                 : null;
 
             if (!$publishable_key) {
-                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : ''));
+                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY');
+                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
                 Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected');
                 return [
                     'result' => false,
@@ -179,7 +180,8 @@ class ApiClass
                     : null;
 
             if (!$publishable_key) {
-                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY' . (!$sandbox ? '_TEST' : ''));
+                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY');
+                Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
                 Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected');
                 return [
                     'result' => false,
@@ -570,7 +572,7 @@ class ApiClass
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
                 $publishable_keys = $this->setPublishableKeys();
-                return $publishable_keys['result'];
+                return $publishable_keys;
             } else {
                 return false;
             }
