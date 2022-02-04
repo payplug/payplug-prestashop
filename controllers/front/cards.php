@@ -27,7 +27,6 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     private $contextSpecific;
     private $dependencies;
     private $plugin;
-    public $module;
 
     public function __construct()
     {
@@ -42,9 +41,8 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->plugin = $this->dependencies->getPlugin();
         $this->card = $this->plugin->getCard();
         $this->contextSpecific = $this->plugin->getContext();
-        $this->module = $this->dependencies->getPlugin()->getModule();
 
-        include_once($this->module->getLocalPath() . 'payplug.php');
+        include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
     }
 
     /**

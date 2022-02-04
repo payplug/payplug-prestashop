@@ -21,8 +21,17 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
+
 class AdminPayplugController extends ModuleAdminController
 {
+    private $dependencies;
+
+    public function __construct()
+    {
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+    }
+
     public function initProcess()
     {
         parent::initProcess();
@@ -33,20 +42,19 @@ class AdminPayplugController extends ModuleAdminController
 
     public function getContent()
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
         if (Tools::getValue('_ajax') == 1) {
-            (new \PayPlug\classes\AdminClass())->adminAjaxController();
+            $this->dependencies->adminClass->adminAjaxController();
         }
 
         $this->postProcess();
 
         if (Tools::getValue('uninstall_config') == 1) {
-            return (new \PayPlug\classes\ConfigClass())->getUninstallContent();
+            return $this->dependencies->configClass->getUninstallContent();
         }
 
         $this->html = '';
 
-        $payplug->configClass->checkConfiguration();
+        $this->dependencies->configClass->checkConfiguration();
 
         $PAYPLUG_EMAIL = Configuration::get('PAYPLUG_EMAIL');
         $PAYPLUG_TEST_API_KEY = Configuration::get('PAYPLUG_TEST_API_KEY');
@@ -58,21 +66,21 @@ class AdminPayplugController extends ModuleAdminController
             $connected = false;
         }
 
-        if (count($payplug->validationErrors && !$connected)) {
+        if (count($this->dependencies->configClass->validationErrors && !$connected)) {
             $this->context->smarty->assign([
-                'validationErrors' => $payplug->validationErrors,
+                'validationErrors' => $this->dependencies->configClass->validationErrors,
             ]);
         }
 
         $p_error = '';
         if (!$connected) {
-            if (isset($this->validationErrors['username_password'])) {
-                $p_error .= $this->validationErrors['username_password'];
-            } elseif (isset($this->validationErrors['login'])) {
-                if (isset($this->validationErrors['username_password'])) {
+            if (isset($this->dependencies->configClass->validationErrors['username_password'])) {
+                $p_error .= $this->dependencies->configClass->validationErrors['username_password'];
+            } elseif (isset($this->dependencies->configClass->validationErrors['login'])) {
+                if (isset($this->dependencies->configClass->validationErrors['username_password'])) {
                     $p_error .= ' ';
                 }
-                $p_error .= $this->validationErrors['login'];
+                $p_error .= $this->dependencies->configClass->validationErrors['login'];
             }
             $this->context->smarty->assign([
                 'p_error' => $p_error,
@@ -86,9 +94,9 @@ class AdminPayplugController extends ModuleAdminController
         $this->context->controller->addJS(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
         $this->context->controller->addCSS(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
 
-        $payplug->configClass->assignContentVar();
+        $this->dependencies->configClass->assignContentVar();
 
-        $this->html .= $payplug->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
+        $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
         return $this->html;
     }
