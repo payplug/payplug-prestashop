@@ -27,6 +27,8 @@ use Db;
 
 class CartClass
 {
+    private $logger;
+    private $dependencies;
     /**
      * @description Create a lock from a Cart ID
      * @param bool $id_cart
@@ -37,6 +39,8 @@ class CartClass
         if (!$id_cart) {
             return false;
         }
+        $this->dependencies = new DependenciesClass();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
 
         $this->logger->addLog('Lock creation', 'notice');
 
