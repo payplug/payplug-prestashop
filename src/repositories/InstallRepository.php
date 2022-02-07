@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\ConfigClass;
 use Db;
 
 class InstallRepository extends Repository
@@ -39,6 +38,9 @@ class InstallRepository extends Repository
 
     /** @var object */
     protected $dependencies;
+
+    /** @var array */
+    public $_errors;
 
     /** @var object */
     public $log;
@@ -373,7 +375,7 @@ class InstallRepository extends Repository
     public function setInstallError($error = '')
     {
         $this->log->error($error);
-        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
+        $this->_errors[] = $this->tools->tool('displayError', $error);
 
         $this->log->info('Install failed.');
         $this->log->info('Install error: ' . $error);
