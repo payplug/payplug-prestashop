@@ -230,8 +230,6 @@ class ConfigClass
     public $version;
     public $warning;
 
-//    private $amountCurrencyClass;
-//    private $apiClass;
     private $api_live;
     private $api_test;
     private $check_configuration;
@@ -243,7 +241,6 @@ class ConfigClass
     private $img_lang;
     private $install;
     private $oney;
-//    private $orderClass;
     private $payment_status;
     private $ssl_enable;
     private $validationErrors = [];

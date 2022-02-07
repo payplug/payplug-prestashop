@@ -101,7 +101,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 'title' => $this->l('PayPlug payment status'),
                 'callback' => 'getPaymentStatusById',
                 'type' => 'select',
-                'list' => $this->dependencies->configClass->payment_status,
+                'list' => $this->dependencies->configClass->getPaymentStatus(),
                 'filter_key' => 'a!status',
                 'filter_type' => 'int',
             ],

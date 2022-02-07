@@ -281,7 +281,7 @@ class InstallRepository extends Repository
         $this->log->info('Starting to install again.');
 
         // check requirement
-        $report = ConfigClass::checkRequirements();
+        $report = $this->dependencies->configClass->checkRequirements();
         if (!$report['php']['up2date']) {
             return $this->setInstallError('Install failed: PHP Requirement.');
         }

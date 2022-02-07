@@ -102,7 +102,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithValidDataProvider($parameter)
     {
         $field = ['shipping-' . $parameter => $this->tab[$parameter]];
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -138,7 +138,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidDataProvider($parameter, $expected)
     {
         $field = ['shipping-' . $parameter => null];
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => false
             ]);

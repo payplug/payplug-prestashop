@@ -116,6 +116,6 @@ class RepositoryBase extends TestCase
         $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
         $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools);
         $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
-        $this->configClass                  = \Mockery::mock('alias:Payplug\classes\ConfigClass');
+        $this->dependencies->configClass    = \Mockery::mock('alias:Payplug\classes\ConfigClass');
     }
 }
