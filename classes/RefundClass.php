@@ -24,6 +24,7 @@
 namespace PayPlug\classes;
 
 use Configuration;
+use Context;
 use Exception;
 use Order;
 use OrderHistory;

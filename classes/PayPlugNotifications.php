@@ -69,6 +69,7 @@ class PayPlugNotifications
     private $apiClass;
     private $dependencies;
     private $orderClass;
+    private $paymentClass;
     private $module;
     private $plugin;
 
@@ -880,9 +881,9 @@ class PayPlugNotifications
         $this->except = null;
         $this->resp = [];
         $this->dependencies = new DependenciesClass();
-        $this->apiClass = new ApiClass();
-        $this->orderClass = new OrderClass();
-        $this->paymentClass = new PaymentClass();
+        $this->apiClass = $this->dependencies->apiClass;
+        $this->orderClass =  $this->dependencies->orderClass;
+        $this->paymentClass =  $this->dependencies->paymentClass;
         $this->amountCurrencyClass = $this->dependencies->getPlugin()->getAmountCurrencyClass();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
