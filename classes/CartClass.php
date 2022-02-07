@@ -24,6 +24,7 @@
 namespace PayPlug\classes;
 
 Use DateTime;
+Use DateInterval;
 use Db;
 
 class CartClass
