@@ -238,7 +238,6 @@ class ConfigClass
     private $config;
     private $constant;
     private $context;
-    private $dependenciesClass;
     private $dependencies;
     private $html = '';
     private $img_lang;
@@ -316,7 +315,7 @@ class ConfigClass
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->dependenciesClass->l(
+            $this->warning = $this->dependencies->l(
                 'payplug.setConfigurationProperties.configureModule',
                 'configclass'
             );
