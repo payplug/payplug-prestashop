@@ -179,7 +179,6 @@ class PaymentClass
         }
 
         $this->assign->assign([
-            'this_path' => $this->module->getInstanceByName($this->dependencies->name)->_path,
             'this_path_ssl' => $path_ssl,
             'iso_lang' => $this->context->language->iso_code,
             'price2display' => $price2display,

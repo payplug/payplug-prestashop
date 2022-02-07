@@ -1010,7 +1010,6 @@ class HookClass
             'front_ajax_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true),
             'api_url' =>$this->dependencies->apiClass->getApiUrl(),
             'price2display' => $price2display,
-            'this_path' => $this->module->getInstanceByName($this->dependencies->name)->_path,
         ]);
 
         return$this->dependencies->configClass->fetchTemplate('checkout/payment/display.tpl');
