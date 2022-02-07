@@ -19,10 +19,9 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
 <div class="row">
     <div class="col-xs-12">
-        {include file=$payplug_module_dir|cat:'payplug/views/templates/hook/oney/payment/payment.tpl' oney_image=$payplug_payment_option['logo_url']}
+        {include file=$module_dir|cat:'views/templates/hook/oney/payment/payment.tpl' oney_image=$payplug_payment_option['logo_url']}
         <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>

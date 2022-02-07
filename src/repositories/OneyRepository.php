@@ -118,7 +118,6 @@ class OneyRepository extends Repository
             $is_elligible = $this->isValidOneyAmount($amount);
         }
         $this->assign->assign([
-            'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
             'payplug_oney' => true,
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_allowed' => $is_elligible['result'],
@@ -411,11 +410,6 @@ class OneyRepository extends Repository
 
             $this->assign->assign([
                 'use_fees' => $use_fees,
-                'payplug_module_dir' => str_replace(
-                    'payplug/payplug.php',
-                    '',
-                    $this->payplug->constantFile
-                ),
                 'payplug_oney_loading_msg' => $this->l('Loading'),
                 'oney_required_fields' => $this->getOneyRequiredFields(),
                 'iso_code' => $iso,
@@ -536,9 +530,7 @@ class OneyRepository extends Repository
     public function getOneyCTA($env = null)
     {
         $this->assign->assign([
-            'this_path' => str_replace('payplug.php', '', $this->payplug->constantFile),
             'env' => $env,
-            'payplug_module_dir' => str_replace('payplug/payplug.php', '', $this->payplug->constantFile),
             'payplug_oney_loading_msg' => $this->l('Loading')
         ]);
 

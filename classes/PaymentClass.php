@@ -158,10 +158,6 @@ class PaymentClass
             return false;
         }
 
-        $path_ssl = $this->tools->tool('getShopDomainSsl', true, true)
-            . $this->constant->get(__PS_BASE_URI__)
-            . 'modules/' . $this->name . '/';
-
         $payplug_cards = $this->card->getByCustomer((int)$cart->id_customer, true);
 
         $use_taxes = $this->config->get('PS_TAX');
@@ -179,7 +175,6 @@ class PaymentClass
         }
 
         $this->assign->assign([
-            'this_path_ssl' => $path_ssl,
             'iso_lang' => $this->context->language->iso_code,
             'price2display' => $price2display,
         ]);
