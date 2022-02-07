@@ -35,6 +35,7 @@ class PrestashopSpecific16
 {
     private $card;
     private $config;
+    private $dependencies;
     private $oney;
 
     public function __construct()
@@ -179,19 +180,19 @@ class PrestashopSpecific16
                         if ($error !== false) {
                             $oneyImage .= '_alt.svg';
                             $payment_option['logo'] = Media::getMediaPath(
-                                _PS_MODULE_DIR_ . $this->payplug->name . $oneyImageOptimized  . $oneyImage
+                                _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized  . $oneyImage
                             );
                         } else {
                             $oneyImage .= '.svg';
                             $payment_option['logo'] = [
                                 'optimized' => Media::getMediaPath(
-                                    _PS_MODULE_DIR_ . $this->payplug->name . $oneyImageOptimized  . $oneyImage
+                                    _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized  . $oneyImage
                                 ),
                                 'x3' => Media::getMediaPath(
-                                    _PS_MODULE_DIR_ . $this->payplug->name . $oneyImagex3 .$oneyImage
+                                    _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImagex3 .$oneyImage
                                 ),
                                 'x4' => Media::getMediaPath(
-                                    _PS_MODULE_DIR_ . $this->payplug->name  . $oneyImagex4 .$oneyImage
+                                    _PS_MODULE_DIR_ . $this->dependencies->name  . $oneyImagex4 .$oneyImage
                                 )
                             ];
                         }
