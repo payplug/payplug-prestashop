@@ -25,7 +25,6 @@ namespace PayPlug\src\repositories;
 
 class TranslationsRepository extends Repository
 {
-
     /**
      * @description
      * @return self
