@@ -23,8 +23,8 @@
 
 namespace PayPlug\classes;
 
-Use DateTime;
-Use DateInterval;
+use DateTime;
+use DateInterval;
 use Db;
 
 class CartClass
