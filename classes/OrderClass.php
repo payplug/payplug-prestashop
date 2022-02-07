@@ -132,7 +132,7 @@ class OrderClass
 
         $this->query
             ->select()
-            ->field('current_state')
+            ->fields('current_state')
             ->from($this->constant->get('_DB_PREFIX_') . 'orders')
             ->where('id_order = ' . (int)$id_order);
 
