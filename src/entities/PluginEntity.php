@@ -64,6 +64,9 @@ class PluginEntity
     private $configuration;
 
     /** @var object */
+    private $constant;
+
+    /** @var object */
     private $context;
 
     /** @var object */
@@ -71,6 +74,9 @@ class PluginEntity
 
     /** @var object */
     private $currency;
+
+    /** @var object */
+    private $customer;
 
     /** @var object */
     private $hook;
@@ -86,6 +92,9 @@ class PluginEntity
 
     /** @var object */
     private $myLogPHP;
+
+    /** @var object */
+    private $module;
 
     /** @var object */
     private $oney;
@@ -141,6 +150,14 @@ class PluginEntity
     public function getMyLogPHP()
     {
         return $this->myLogPHP;
+    }
+
+    /**
+     * @return object
+     */
+    public function getModule()
+    {
+        return $this->module;
     }
 
     /**
@@ -300,6 +317,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getConstant()
+    {
+        return $this->constant;
+    }
+
+    /**
+     * @return object
+     */
     public function getContext()
     {
         return $this->context;
@@ -319,6 +344,14 @@ class PluginEntity
     public function getCurrency()
     {
         return $this->currency;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
     }
 
     /**
@@ -369,6 +402,14 @@ class PluginEntity
     public function getProduct()
     {
         return $this->product;
+    }
+
+    /**
+     * @return object
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
     /**
@@ -574,6 +615,21 @@ class PluginEntity
      * @return self
      * @throws BadParameterException
      */
+    public function setConstant($constant)
+    {
+        if (!is_object($constant)) {
+            throw (new BadParameterException('Invalid argument, $constant must be a ConstantSpecific'));
+        }
+
+        $this->constant = $constant;
+        return $this;
+    }
+
+    /**
+     * @param object $context
+     * @return self
+     * @throws BadParameterException
+     */
     public function setContext($context)
     {
         if (!is_object($context)) {
@@ -618,6 +674,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $customer
+     * @return PluginEntity
+     */
+    public function setCustomer($customer)
+    {
+        if (!is_object($customer)) {
+            throw (
+            new BadParameterException(
+                'Invalid Currency object, param $customer must be a CurrencySpecific'
+            )
+            );
+        } else {
+            $this->customer = $customer;
+            return $this;
+        }
+    }
+
+    /**
      * @param object $hook
      * @return self
      * @throws BadParameterException
@@ -647,6 +721,16 @@ class PluginEntity
     }
 
     /**
+     * @param object $language
+     * @return PluginEntity
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+    /**
      * @param object $logger
      * @return self
      * @throws BadParameterException
@@ -658,6 +742,21 @@ class PluginEntity
         }
 
         $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @param object $module
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setModule($module)
+    {
+        if (!is_object($module)) {
+            throw (new BadParameterException('Invalid argument, $module must be a ModuleSpecific'));
+        }
+
+        $this->module = $module;
         return $this;
     }
 

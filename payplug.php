@@ -76,7 +76,7 @@ class Payplug extends PaymentModule
     public function disable($force_all = false)
     {
         if ($this->module) {
-            return $this->module->disable($force_all);
+            return parent::disable($force_all) && $this->payplug_dependencies->getDependency('configClass')->disable();
         }
     }
 
@@ -91,7 +91,7 @@ class Payplug extends PaymentModule
                 $this->install(true);
             }
 
-            return (new \PayPlug\classes\AdminClass())->getContent();
+            return (new \PayPlug\classes\AdminClass(new \Payplug\classes\DependenciesClass()))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
@@ -157,7 +157,7 @@ class Payplug extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
-     * @param $params
+     * @param $params   $this->setDependencies();
      * @return mixed
      */
     public function hookActionAdminPerformanceControllerAfter($params)
@@ -292,7 +292,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayAdminOrderMain($params)
     {
-        if ($this->module) {
+        if ($this->module && $this->active) {
             return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }
@@ -481,7 +481,7 @@ class Payplug extends PaymentModule
 
     private function setModule()
     {
-        $this->module = $this->payplug_dependencies->payplug;
+        $this->module = $this->payplug_dependencies->dependencies;
     }
 
     /**

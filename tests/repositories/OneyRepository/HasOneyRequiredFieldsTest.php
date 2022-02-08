@@ -38,7 +38,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($country, $phone) {
                 if (!$phone) {
@@ -91,7 +91,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingMobilePhone()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => 3500
             ]);
@@ -125,7 +125,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -153,7 +153,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -186,7 +186,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -219,7 +219,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                     'result' => true
                 ]
             ]);
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);

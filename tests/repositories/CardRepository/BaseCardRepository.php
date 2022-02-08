@@ -56,7 +56,6 @@ class BaseCardRepository extends RepositoryBase
             $this->config,
             $this->constant,
             $this->logger,
-            $this->payplug,
             $this->query,
             $this->tools,
         ])->makePartial();

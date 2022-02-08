@@ -49,7 +49,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         $this->country->shouldReceive('getCountry')
             ->andReturn(CountryMock::get());
 
-        $this->payplug->shouldReceive('isValidMobilePhoneNumber')
+        $this->dependencies->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($phone_number) {
                 return (!is_null($phone_number) && $phone_number !== '');
             });
@@ -102,7 +102,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithValidDataProvider($parameter)
     {
         $field = ['shipping-' . $parameter => $this->tab[$parameter]];
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => true
             ]);
@@ -138,7 +138,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidDataProvider($parameter, $expected)
     {
         $field = ['shipping-' . $parameter => null];
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'isValidMobilePhoneNumber' => false
             ]);

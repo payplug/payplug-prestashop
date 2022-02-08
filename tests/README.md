@@ -77,7 +77,7 @@ You can filter tests by groups:
 ```
 </details><br>
 
-***If whitelist is not added in phppunit.xml, phpunit produces errors.***
+***If whitelist is not added in phpunit.xml, phpunit produces errors.***
 
 ```
 Error: Incorrect whitelist config, no code coverage will be generated.

@@ -25,15 +25,6 @@ namespace PayPlug\src\repositories;
 
 class TranslationsRepository extends Repository
 {
-    protected $payplug;
-    protected $tools;
-
-    public function __construct($payplug, $tools)
-    {
-        $this->payplug = $payplug;
-        $this->tools = $tools;
-    }
-
     /**
      * @description
      * @return self
