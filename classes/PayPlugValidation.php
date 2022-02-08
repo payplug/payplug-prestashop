@@ -56,7 +56,11 @@ class PayPlugValidation
         $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
         $this->plugin = $this->dependencies->getPlugin();
         $this->setConfig();
-        $this->moduleInstance = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $this->moduleInstance = $this
+            ->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
     }
 
     public function setConfig()
@@ -162,7 +166,8 @@ class PayPlugValidation
                 $id_order = Order::getOrderByCartId($cart->id);
                 $customer = new Customer((int)$cart->id_customer);
                 $link_redirect = __PS_BASE_URI__ . $order_confirmation_url . 'id_cart=' . $cart->id
-                    . '&id_module=' . $this->moduleInstance->id . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
+                    . '&id_module=' . $this->moduleInstance->id . '&id_order=' . $id_order
+                    . '&key=' . $customer->secure_key;
                 if (!PayplugLock::deleteLockG2($cart->id)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {

@@ -155,7 +155,11 @@ class OrderClass
             ->select()
             ->fields('oh.id_order_state, osl.name')
             ->from($this->constant->get('_DB_PREFIX_') . 'order_history', 'oh')
-            ->leftJoin($this->constant->get('_DB_PREFIX_') . 'order_state_lang', 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
+            ->leftJoin(
+                $this->constant->get('_DB_PREFIX_') . 'order_state_lang',
+                'osl',
+                'osl.`id_order_state` = oh.`id_order_state`'
+            )
             ->where('oh.id_order = ' . $orderId)
             ->where('osl.id_lang = ' . $this->context->language->id)
             ->build();

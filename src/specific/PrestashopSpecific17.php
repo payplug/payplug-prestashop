@@ -166,7 +166,8 @@ class PrestashopSpecific17
                 ),
         ]);
 
-        $integrated['additionalInformation'] = $this->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
+        $integrated['additionalInformation'] =
+            $this->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
         $payment_options['standard'] = $integrated;
         return $payment_options;
@@ -283,7 +284,10 @@ class PrestashopSpecific17
         // show module to the customer
         $switch['show'] = [
             'name' => 'PAYPLUG_SHOW',
-            'label' => $this->dependencies->l('payplug.assignSwitchConfiguration.showPayplug', 'prestashopspecific17'),
+            'label' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.showPayplug',
+                'prestashopspecific17'
+            ),
             'active' => $connected,
             'small' => true,
             'checked' => $configurations['show'],
@@ -293,8 +297,14 @@ class PrestashopSpecific17
             'name' => 'payplug_sandbox',
             'active' => $connected,
             'checked' => $configurations['sandbox_mode'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.test', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.live', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.test',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.live',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['embedded'] = [
@@ -302,33 +312,60 @@ class PrestashopSpecific17
             'active' => $connected,
             'format' => true,
             'checked' => $configurations['embedded_mode'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.embedded', 'prestashopspecific17'),
-            'label_center' => $this->dependencies->l('payplug.assignSwitchConfiguration.popup', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.redirected', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.embedded',
+                'prestashopspecific17'
+            ),
+            'label_center' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.popup',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.redirected',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['one_click'] = [
             'name' => 'payplug_one_click',
             'active' => $connected,
             'checked' => $configurations['one_click'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['standard'] = [
             'name' => 'payplug_standard',
             'active' => $connected,
             'checked' => $configurations['standard'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['oney'] = [
             'name' => 'payplug_oney',
             'active' => $connected,
             'checked' => $configurations['oney'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['oney_optimized'] = [
@@ -349,32 +386,56 @@ class PrestashopSpecific17
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['installment'] = [
             'name' => 'payplug_inst',
             'active' => $connected,
             'checked' => $configurations['inst'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['deferred'] = [
             'name' => 'payplug_deferred',
             'active' => $connected,
             'checked' => $configurations['deferred'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $switch['deferred_auto'] = [
             'name' => 'payplug_deferred_auto',
             'active' => $connected,
             'checked' => $configurations['deferred_auto'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
+            'label_left' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.yes',
+                'prestashopspecific17'
+            ),
+            'label_right' => $this->dependencies->l(
+                'payplug.assignSwitchConfiguration.no',
+                'prestashopspecific17'
+            ),
         ];
 
         $this->context->smarty->assign([

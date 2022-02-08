@@ -21,7 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 class PayplugAjaxModuleAdminController extends ModuleAdminController
 {
 }
@@ -181,7 +180,7 @@ if (Tools::getValue('_ajax') == 1) {
                     if (!$cartClass->createLockFromCartId($order->id_cart)) {
                         die(json_encode([
                             'status' => 'error',
-                            'data' => $payplug->l('An error has occurred')
+                            'data' => $dependencies->l('An error has occurred')
                         ]));
                     }
 

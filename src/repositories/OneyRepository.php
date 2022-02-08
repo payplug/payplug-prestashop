@@ -481,7 +481,8 @@ class OneyRepository extends Repository
             'amount' => number_format($total_cost, 2),
             'value' => $tools->tool('displayPrice', $total_cost),
         ];
-        $down_payment_amount = $this->dependencies->amountCurrencyClass->convertAmount($resource['down_payment_amount'], true);
+        $down_payment_amount =
+            $this->dependencies->amountCurrencyClass->convertAmount($resource['down_payment_amount'], true);
         $resource['down_payment_amount'] = [
             'amount' => number_format($down_payment_amount, 2),
             'value' => $tools->tool('displayPrice', $down_payment_amount),
@@ -652,7 +653,7 @@ class OneyRepository extends Repository
         $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
         $use_fees = (bool)$this->configurationSpecific->get('PAYPLUG_ONEY_FEES');
-        foreach ($oney_simulations['simulations'] as $key => $oney_payment) {
+        foreach (array_keys($oney_simulations['simulations']) as $key) {
             $with_fees = (bool)strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($oney_simulations['simulations'][$key]);

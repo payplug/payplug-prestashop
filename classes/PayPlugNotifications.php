@@ -312,10 +312,16 @@ class PayPlugNotifications
                     $name = $this->dependencies->l('Oney 4x', 'payplugnotifications');
                     break;
                 case 'oney_x3_without_fees':
-                    $name = $this->dependencies->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
+                    $name = $this->dependencies->l(
+                        'notification.createOrder.oneyX3WithoutFees',
+                        'payplugnotifications'
+                    );
                     break;
                 case 'oney_x4_without_fees':
-                    $name = $this->dependencies->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
+                    $name = $this->dependencies->l(
+                        'notification.createOrder.oneyX4WithoutFees',
+                        'payplugnotifications'
+                    );
                     break;
                 default:
                     $name = $module_name;

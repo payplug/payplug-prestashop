@@ -68,7 +68,11 @@ class ApiClass
     {
         if (isset($_SERVER['SERVER_NAME'])
             && $_SERVER['SERVER_NAME'] == "localhost"
-            || preg_match("/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i", $_SERVER['SERVER_NAME'])) {
+            || preg_match(
+                "/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i",
+                $_SERVER['SERVER_NAME']
+            )
+        ) {
             $dotenv = new Dotenv();
             $dotenvFile = dirname(dirname(dirname(__FILE__))) . "/payplugroutes/.env";
             if (file_exists($dotenvFile)) {
@@ -523,7 +527,10 @@ class ApiClass
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->dependencies->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
+            $errors[$error_key] = $this->dependencies->l(
+                'payplug.catchErrorsFromApi.transactionNotCompleted',
+                'apiclass'
+            );
             return $errors;
         }
 
