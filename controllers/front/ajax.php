@@ -32,7 +32,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $contextSpecific;
     private $logger;
     private $oney;
-    private $payplug;
+    private $dependencies;
+    private $paymentClass;
     private $plugin;
     private $productSpecific;
     private $toolsSpecific;
@@ -56,8 +57,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
-        $this->payplug = new \PayPlug\classes\PayPlugClass();
-        $this->plugin = $this->payplug->getPlugin();
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->paymentClass = $this->dependencies->paymentClass;
+        $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
         $this->toolsSpecific = $this->plugin->getTools();
 
@@ -179,10 +181,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 die(json_encode($payment_options));
             } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
-                $errors = $this->payplug->getPaymentErrorsCookie();
+                $errors = $this->paymentClass->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die(json_encode(['result' => true, 'template' => $this->payplug->displayPaymentErrors($errors)]));
+                    die(json_encode(
+                        ['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors)]
+                    ));
                 }
 
                 die(json_encode(['result' => false]));
@@ -205,7 +209,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
-                $result = $this->payplug->setPaymentDataCookie($payment_data);
+                $result = $this->paymentClass->setPaymentDataCookie($payment_data);
                 die(json_encode([
                     'result' => $result,
                     'message' => [
@@ -226,7 +230,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         )
                     );
                 } else {
-                    $payment = $this->payplug->preparePayment([
+                    $payment = $this->paymentClass->preparePayment([
                         'is_integrated' => 1,
                         'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED')
                     ]);
@@ -255,7 +259,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Retrieve payment
-                $payment = $this->payplug->retrievePayment($payment_id);
+                $payment = $this->paymentClass->retrievePayment($payment_id);
 
                 // Check if payment has failure
                 if ($payment->failure != null) {
@@ -280,7 +284,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 $return_url = $context->link->getModuleLink(
-                    $this->payplug->name,
+                    $this->dependencies->name,
                     'validation',
                     ['ps' => 1, 'cartid' => (int)$cart_id],
                     true
@@ -306,7 +310,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
             } elseif ($tools->tool('getIsset', 'updatePublishableKey')) {
-                $publishable_keys = $this->payplug->apiClass->setPublishableKeys();
+                $publishable_keys = $this->dependencies->apiClass->setPublishableKeys();
 
                 if (!$publishable_keys['result']) {
                     if (!empty($publishable_keys['error'])
@@ -314,7 +318,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $payment_options = [
                             'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED'),
                         ];
-                        $payment = $this->payplug->preparePayment($payment_options);
+                        $payment = $this->paymentClass->preparePayment($payment_options);
                         if (!$payment['result']) {
                             die(json_encode([
                                 'result' => false

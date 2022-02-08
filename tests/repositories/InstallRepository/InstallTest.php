@@ -24,6 +24,8 @@
 
 namespace PayPlug\tests\repositories\InstallRepository;
 
+use Mockery\Mock;
+
 /**
  * @group unit
  * @group repository
@@ -47,7 +49,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidPHPRequirement()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -76,7 +78,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidCurlRequirement()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -99,7 +101,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidOpenSSLRequirement()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -122,7 +124,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidConfigInstall()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -150,7 +152,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidSqlInstall()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -183,7 +185,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidOrderStateInstall()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -217,7 +219,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidOrderStateTypeInstall()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -252,7 +254,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testWithInvalidTableInstall()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -279,8 +281,11 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $this->payplug->PrestashopSpecificObject = \Mockery::mock();
-        $this->payplug->PrestashopSpecificObject
+        $specific = \Mockery::mock();
+        $this->dependencies
+            ->shouldReceive('loadSpecificPresta')
+            ->andReturn($specific);
+        $specific
             ->shouldReceive([
                 'installTab' => false
             ]);
@@ -293,7 +298,7 @@ final class InstallTest extends BaseInstallRepository
 
     public function testValidInstallation()
     {
-        $this->configClass
+        $this->dependencies->configClass
             ->shouldReceive([
                 'checkRequirements' => [
                     'php' => [
@@ -320,8 +325,11 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $this->payplug->PrestashopSpecificObject = \Mockery::mock();
-        $this->payplug->PrestashopSpecificObject
+        $specific = \Mockery::mock();
+        $this->dependencies
+            ->shouldReceive('loadSpecificPresta')
+            ->andReturn($specific);
+        $specific
             ->shouldReceive([
                 'installTab' => true
             ]);

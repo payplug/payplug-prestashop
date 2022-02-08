@@ -31,7 +31,8 @@ use Payplug\Payment;
 
 class PaymentRepository extends Repository
 {
-    protected $payplug;
+    protected $dependencies;
+
     private $apiPayment;
     private $cartSpecific;
     private $confSpecific;
@@ -41,15 +42,15 @@ class PaymentRepository extends Repository
     private $constant;
 
     public function __construct(
-        $payplug,
         $cartSpecific,
         $confSpecific,
+        $dependencies,
         $logger,
         $paymentEntity,
         $query,
         $constant
     ) {
-        $this->payplug = $payplug;
+        $this->dependencies = $dependencies;
         $this->cartSpecific = $cartSpecific;
         $this->confSpecific = $confSpecific;
         $this->logger = $logger;
@@ -194,8 +195,11 @@ class PaymentRepository extends Repository
             $errorMessage = '[PaymentRepository] Error during payment creation process.';
         }
 
-        $this->payplug->setPaymentErrorsCookie([
-            $this->l('The transaction was not completed and your card was not charged.')
+        $this->dependencies->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->l(
+                'The transaction was not completed and your card was not charged.',
+                'paymentrepository'
+            )
         ]);
 
         $this->logger->setParams(['process' => 'paymentRepository']);
@@ -545,6 +549,9 @@ class PaymentRepository extends Repository
                     ['name' => 'paymentStored', 'value' => false],
                     '[getPaymentReturnUrl] Invalid payment method given'
                 );
+        }
+        if ($paymentDetails['isIntegrated']) {
+            $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
         }
 
         return [
