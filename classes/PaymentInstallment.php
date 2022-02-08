@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PPPaymentInstallment extends PPPayment
+class PaymentInstallment extends Payment
 {
     public function __construct($id = null)
     {
@@ -85,7 +85,7 @@ class PPPaymentInstallment extends PPPayment
     {
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
-            $payment = new PPPayment($payment_list[0]['pay_id']);
+            $payment = new Payment($payment_list[0]['pay_id']);
             return $payment;
         }
     }
@@ -94,7 +94,7 @@ class PPPaymentInstallment extends PPPayment
     {
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
-            $payment = new PPPayment($payment_list[0]['pay_id']);
+            $payment = new Payment($payment_list[0]['pay_id']);
             return $payment->isDeferred();
         }
         return false;

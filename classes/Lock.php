@@ -34,7 +34,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PayplugLock extends ObjectModel
+class Lock extends ObjectModel
 {
     /** @var int */
     const MAX_CHECK_TIME = 5;
@@ -160,10 +160,10 @@ class PayplugLock extends ObjectModel
     }
 
     /**
-     * Set instance of PayplugLock
+     * Set instance of Lock
      *
      * @param int $id_cart
-     * @return PayplugLock
+     * @return Lock
      */
     public static function getInstanceByCart($id_cart)
     {
@@ -177,7 +177,7 @@ class PayplugLock extends ObjectModel
             return false;
         }
 
-        return new PayplugLock($id);
+        return new Lock($id);
     }
 
     /**
@@ -188,7 +188,7 @@ class PayplugLock extends ObjectModel
      */
     public static function addLock($id_cart)
     {
-        $lock = new PayplugLock();
+        $lock = new Lock();
         $lock->id_cart = (int)$id_cart;
 
         return $lock->save();

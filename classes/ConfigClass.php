@@ -666,12 +666,12 @@ class ConfigClass
 
     public static function setNotification()
     {
-        return new PayPlugNotifications();
+        return new Notifications();
     }
 
     public static function setValidation()
     {
-        return new PayPlugValidation();
+        return new Validation();
     }
 
     /**
@@ -786,8 +786,8 @@ class ConfigClass
 
         $login_infos = [];
 
-        $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment';
-        $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
+        $installments_panel_url = 'index.php?controller=AdminInstallment';
+        $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminInstallment');
 
         $faq_links = $this->getFAQLinks($this->context->language->iso_code);
         $amounts = $this->oney->getOneyPriceLimit(false);

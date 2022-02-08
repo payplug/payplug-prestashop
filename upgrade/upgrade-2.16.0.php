@@ -32,12 +32,11 @@ function upgrade_module_2_16_0($object)
         return true;
     }
 
-    require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
     $flag = true;
 
-    if (!PayplugBackward::updateConfiguration('PAYPLUG_INST', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MODE', 3)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MIN_AMOUNT', 150)
+    if (!Configuration::updateValue('PAYPLUG_INST', 0)
+        || !Configuration::updateValue('PAYPLUG_INST_MODE', 3)
+        || !Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
     ) {
         $flag = false;
     }

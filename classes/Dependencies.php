@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PayPlugDependencies
+class Dependencies
 {
     /** @var ApiClass */
     private $apiClass;

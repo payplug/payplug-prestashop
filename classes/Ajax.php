@@ -29,13 +29,13 @@ use Exception;
 use Product;
 use Validate;
 
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
+require_once(_PS_MODULE_DIR_ . 'payplug/classes/Lock.php');
 
 /**
- * Class PayPlugAjax
+ * Class Ajax
  * use for treat ajax on prestashop 1.6
  */
-class PayPlugAjax
+class Ajax
 {
     private $address;
     private $card;

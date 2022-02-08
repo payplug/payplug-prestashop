@@ -242,7 +242,7 @@ class PrestashopSpecific16
     {
         $installed = true;
 
-        if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
+        if (!Tab::getIdFromClassName('AdminInstallment')) {
             $translations = [
                 'en' => 'Installment Plans',
                 'gb' => 'Installment Plans',
@@ -262,7 +262,7 @@ class PrestashopSpecific16
                 }
             }
 
-            $tab->class_name = 'AdminPayPlugInstallment';
+            $tab->class_name = 'AdminInstallment';
             $tab->module = $this->dependencies->name;
             $tab->id_parent = $adminPayPlugId;
             $installed = $installed && $tab->save();
@@ -276,7 +276,7 @@ class PrestashopSpecific16
     {
         $flag = true;
 
-        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        $idTab = Tab::getIdFromClassName('AdminInstallment');
         if ($idTab) {
             $tab = new Tab($idTab);
             $flag = $flag && $tab->delete();

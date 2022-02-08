@@ -180,10 +180,10 @@ class HookClass
             $cart = $this->cart->get((int)$order->id_cart);
             $payment_method =$this->dependencies->paymentClass->getPaymentMethodByCart($cart);
             if ($payment_method['type'] == 'installment') {
-                $installment = new PPPaymentInstallment($payment_method['id']);
+                $installment = new PaymentInstallment($payment_method['id']);
                 $payment = $installment->getFirstPayment();
             } else {
-                $payment = new PPPayment($payment_method['id']);
+                $payment = new Payment($payment_method['id']);
             }
             if (!$payment->isPaid()) {
                 $payment->capture();
@@ -414,7 +414,7 @@ class HookClass
                 'ongoing' :
                 ($installment->is_fully_paid ? 'paid' : 'suspended');
             $inst_aborted = !$installment->is_active;
-            $ppInstallment = new PPPaymentInstallment($installment->id);
+            $ppInstallment = new PaymentInstallment($installment->id);
             $instPaymentOne = $ppInstallment->getFirstPayment();
             $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
             $inst_paid = $installment->is_fully_paid;

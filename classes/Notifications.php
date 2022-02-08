@@ -41,10 +41,10 @@ use Tools;
 use Validate;
 
 /**
- * Class PayPlugNotifications
- * Use for treat notification from Payplug API
+ * Class Notifications
+ * Use for treat notification from API
  */
-class PayPlugNotifications
+class Notifications
 {
     public $api_key;
     public $cart = null;
@@ -140,7 +140,7 @@ class PayPlugNotifications
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {
-            if (!PayplugLock::deleteLockG2($this->lock_key)) {
+            if (!Lock::deleteLockG2($this->lock_key)) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -229,7 +229,7 @@ class PayPlugNotifications
         $is_paid = $this->resource->is_paid;
 
         if ($this->is_installment) {
-            $installment = new PPPaymentInstallment($this->resource->installment_plan_id);
+            $installment = new PaymentInstallment($this->resource->installment_plan_id);
             $first_payment = $installment->getFirstPayment();
             if ($first_payment->isDeferred()) {
                 $order_state = $this->order_states['auth'];
@@ -559,9 +559,9 @@ class PayPlugNotifications
 
             // Set lock Lock the process with id_cart from order object
             do {
-                $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+                $cart_lock = Lock::createLockG2($this->cart->id, 'ipn');
                 if (!$cart_lock) {
-                    $checkReturn = PayplugLock::check($this->cart->id);
+                    $checkReturn = Lock::check($this->cart->id);
                     if ($checkReturn == "stop ipn") {
                         $this->exitProcess('Lock cannot be created.', 500);
                     }
@@ -923,9 +923,9 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setLock');
         do {
-            $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+            $cart_lock = Lock::createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
-                $checkReturn = PayplugLock::check($this->cart->id);
+                $checkReturn = Lock::check($this->cart->id);
                 if ($checkReturn == "stop ipn") {
                     $this->exitProcess('Lock cannot be created.', 500);
                 }

@@ -52,7 +52,7 @@ class CartClass
         $end_of_life = $creation_date->add($lifetime);
 
         do {
-            $cart_lock = PayplugLock::createLockG2($id_cart, 'payplug');
+            $cart_lock = Lock::createLockG2($id_cart, 'payplug');
 
             if (!$cart_lock) {
                 $time = new DateTime('now');
@@ -81,7 +81,7 @@ class CartClass
         if (!$id_cart) {
             return false;
         }
-        return PayplugLock::deleteLockG2($id_cart);
+        return Lock::deleteLockG2($id_cart);
     }
 
     /**

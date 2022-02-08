@@ -469,7 +469,7 @@ class PaymentClass
         $this->logger->addLog('[Payplug] Start capture', 'notice');
         $pay_id = $this->tools->tool('getValue', 'pay_id');
         $id_order = $this->tools->tool('getValue', 'id_order');
-        $payment = new PPPayment($pay_id);
+        $payment = new Payment($pay_id);
         $capture = $payment->capture();
         $payment->refresh();
         if ($payment->resource->card->id !== null) {

@@ -204,8 +204,8 @@ class PrestashopSpecific17
             $installed = $installed && $tab->save();
         }
 
-        // Install tab AdminPayPlugInstallment
-        if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
+        // Install tab AdminInstallment
+        if (!Tab::getIdFromClassName('AdminInstallment')) {
             $translationsAdminPayPlugInstallment = [
                 'en' => 'Installment Plans',
                 'gb' => 'Installment Plans',
@@ -222,7 +222,7 @@ class PrestashopSpecific17
                     $tab->name[$id_lang] = $translationsAdminPayPlugInstallment['en'];
                 }
             }
-            $tab->class_name = 'AdminPayPlugInstallment';
+            $tab->class_name = 'AdminInstallment';
             $tab->module = $moduleName;
             $tab->id_parent = Tab::getIdFromClassName('AdminPayPlug');
 
@@ -244,7 +244,7 @@ class PrestashopSpecific17
             unset($idTab);
         }
 
-        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        $idTab = Tab::getIdFromClassName('AdminInstallment');
         if ($idTab) {
             $tab = new Tab($idTab);
             $flag = $flag && $tab->delete();

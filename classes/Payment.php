@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PPPayment
+class Payment
 {
     public $resource;
 

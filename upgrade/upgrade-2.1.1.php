@@ -32,6 +32,5 @@ function upgrade_module_2_1_1()
         return true;
     }
 
-    require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
-    return PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 1);
+    return Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1);
 }
