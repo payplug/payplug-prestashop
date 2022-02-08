@@ -25,6 +25,7 @@
 namespace PayPlug\tests\repositories;
 
 use PayPlug\classes\AmountCurrencyClass;
+use PayPlug\classes\DependenciesClass;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -34,7 +35,7 @@ class RepositoryBase extends TestCase
     use MockeryPHPUnitIntegration;
 
     protected $myLogPhp;
-    protected $payplug;
+    protected $dependencies;
     protected $repo;
 
     protected $arrayCache;
@@ -66,7 +67,7 @@ class RepositoryBase extends TestCase
     protected $sql;
 
     // temporary classes
-    protected $amountCurrencyClass;
+    //  protected $amountCurrencyClass;
 //    protected $amountCurrencyClass_static;
     protected $configClass;
 
@@ -76,7 +77,7 @@ class RepositoryBase extends TestCase
         $this->myLogPhp
             ->shouldReceive('info')
             ->andReturn(true);
-        $this->payplug      = \Mockery::mock('payplug');
+        $this->dependencies      = \Mockery::mock('dependencies');
 
         $this->setSpecific();
         $this->setRepository();
@@ -112,10 +113,9 @@ class RepositoryBase extends TestCase
 
     private function setTemporariesClasses()
     {
-        $this->amountCurrencyClass          = new AmountCurrencyClass($this->tools);
-        ;
-//        $this->amountCurrencyClass          = \Mockery::mock('Payplug\classes\AmountCurrencyClass');
-//        $this->amountCurrencyClass_static   = \Mockery::mock('alias:Payplug\classes\AmountCurrencyClass');
-        $this->configClass                  = \Mockery::mock('alias:Payplug\classes\ConfigClass');
+        $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
+        $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools);
+        $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
+        $this->dependencies->configClass    = \Mockery::mock('alias:Payplug\classes\ConfigClass');
     }
 }

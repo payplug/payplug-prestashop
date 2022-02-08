@@ -48,9 +48,9 @@ class BasePaymentRepository extends RepositoryBase
         ]);
 
         $this->repo = \Mockery::mock(PaymentRepository::class, [
-            $this->payplug,
             $this->cart,
             $this->config,
+            $this->dependencies,
             $this->logger,
             $this->payment,
             $this->query,
@@ -62,9 +62,12 @@ class BasePaymentRepository extends RepositoryBase
 
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
 
-        $this->payplug
+        $this->dependencies->paymentClass
             ->shouldReceive('setPaymentErrorsCookie')
             ->andReturn(true);
+
+        $this->dependencies
+            ->shouldReceive('l');
 
         $this->constant
             ->shouldReceive('get')

@@ -23,20 +23,17 @@
 
 namespace PayPlug\classes;
 
-use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\repositories\HookRepository;
-use PayPlug\src\repositories\InstallRepository;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\src\repositories\PluginRepository;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 class PayPlugDependencies
 {
-    /** @var AdminClass */
-    private $adminClass;
+    /** @var ApiClass */
+    private $apiClass;
+
+    /** @var ConfigClass */
+    private $configClass;
 
     /** @var HookRepository */
     private $hook;
@@ -51,7 +48,7 @@ class PayPlugDependencies
     public $oney;
 
     /** @var object */
-    public $payplug;
+    public $dependencies;
 
     /** @var object */
     public $payment;
@@ -66,27 +63,20 @@ class PayPlugDependencies
 
     private function initializeAccessors()
     {
-        $this->payplug = new PayPlugClass();
-        $this->setPlugin((new PluginRepository($this->payplug))->getEntity());
+        $this->dependencies = new DependenciesClass();
 
-        $this->api = new ApiClass($this->payplug);
-        $this->hook = $this->getPlugin()->getHook();
-        $this->hookClass = new HookClass($this->payplug);
-        $this->install = $this->getPlugin()->getInstall();
-        $this->oney = $this->getPlugin()->getOney();
-        $this->payment = $this->getPlugin()->getPayment();
+        $this->apiClass = $this->dependencies->apiClass;
+
+        $this->hook = $this->dependencies->getPlugin()->getHook();
+        $this->install = $this->dependencies->getPlugin()->getInstall();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->payment = $this->dependencies->getPlugin()->getPayment();
+
+        $this->hookClass = $this->dependencies->hookClass;
+
+        $this->configClass = $this->dependencies->configClass;
+
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . 'payplug/log/install-log.csv');
-    }
-
-    public function getPlugin()
-    {
-        return $this->plugin;
-    }
-
-    public function setPlugin($plugin)
-    {
-        $this->plugin = $plugin;
-        return $this;
     }
 
     public function getDependency($dependency)
