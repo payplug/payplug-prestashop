@@ -25,5 +25,6 @@ namespace PayPlug\src\interfaces;
 
 interface AddressInterface
 {
+    public function get($idAddress);
     public function getAddress($idAddress);
 }

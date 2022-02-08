@@ -24,6 +24,7 @@
 namespace PayPlug\classes;
 
 use Configuration;
+use Context;
 use Exception;
 use Order;
 use OrderHistory;
@@ -39,15 +40,16 @@ use PrestaShopException;
 use Tools;
 use Validate;
 
-class RefundClass extends \PaymentModule
+class RefundClass
 {
-    public $context;
-    private $payplug;
+    protected $context;
+    private $dependencies;
+    private $logger;
 
-    public function __construct($payplug)
+    public function __construct($dependencies)
     {
-        parent::__construct();
-        $this->payplug = $payplug;
+        $this->dependencies = $dependencies;
+        $this->logger =   $this->dependencies->getPlugin()->getLogger();
         $this->context = \Context::getContext();
     }
     /**
@@ -64,7 +66,7 @@ class RefundClass extends \PaymentModule
                                            'amount_available' => $amount_available,
                                        ]);
 
-        return $this->payplug->fetchTemplate('/views/templates/admin//order/refund_data.tpl');
+        return $this->dependencies->configClass->fetchTemplate('/views/templates/admin//order/refund_data.tpl');
     }
     /**
      * Get total amount already refunded
@@ -197,20 +199,20 @@ class RefundClass extends \PaymentModule
      */
     public function refundPayment()
     {
-        $this->payplug->logger->addLog('[Payplug] Start refund', 'notice');
+        $this->logger->addLog('[Payplug] Start refund', 'notice');
         $amount = str_replace(',', '.', Tools::getValue('amount'));
 
-        if (!$this->payplug->amountCurrencyClass->checkAmountToRefund($amount)) {
-            $this->payplug->logger->addLog('Incorrect amount to refund', 'notice');
+        if (!$this->dependencies->amountCurrencyClass->checkAmountToRefund($amount)) {
+            $this->logger->addLog('Incorrect amount to refund', 'notice');
             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.incorrectAmount', 'refundclass')
+                                'data' => $this->dependencies->l('payplug.refundPayment.incorrectAmount', 'refundclass')
                             ]));
-        } elseif ($this->payplug->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
-            $this->payplug->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
+        } elseif ($this->dependencies->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
+            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.amountAtLeast', 'refundclass')
+                                'data' => $this->dependencies->l('payplug.refundPayment.amountAtLeast', 'refundclass')
                             ]));
         } else {
             $amount = str_replace(',', '.', Tools::getValue('amount'));
@@ -230,8 +232,8 @@ class RefundClass extends \PaymentModule
         $refund = RefundClass::makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 
         if ($refund == 'error') {
-            $this->payplug->logger->addLog('Cannot refund that amount.', 'notice');
-            $this->payplug->logger->addLog(
+            $this->logger->addLog('Cannot refund that amount.', 'notice');
+            $this->logger->addLog(
                 '$pay_id : ' . $pay_id .
                 ' - $amount : ' . $amount .
                 ' - $metadata : ' . json_encode($metadata) . /* or implode() ? */
@@ -242,7 +244,7 @@ class RefundClass extends \PaymentModule
 
             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.cannotRefund', 'refundclass')
+                                'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass')
                             ]));
         } else {
             $new_state = 7;
@@ -278,34 +280,34 @@ class RefundClass extends \PaymentModule
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        if (!$this->payplug->createLockFromCartId($order->id_cart)) {
+                        if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
+                                'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass')
                             ]));
                         }
 
-                        $current_state = (int)$this->payplug->orderClass->getCurrentOrderState($order->id);
-                        $this->payplug->logger->addLog('Current order state: ' . $current_state, 'notice');
+                        $current_state = (int)$this->dependencies->orderClass->getCurrentOrderState($order->id);
+                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
-                            $this->payplug->logger->addLog('Change order state to ' . $new_state, 'notice');
+                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         }
 
-                        if (!$this->payplug->deleteLockFromCartId($order->id_cart)) {
-                            $this->payplug->logger->addLog('Lock cannot be deleted.', 'error');
+                        if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
-                            $this->payplug->logger->addLog('Lock deleted.', 'notice');
+                            $this->logger->addLog('Lock deleted.', 'notice');
                         }
                     }
                     $reload = true;
                 }
             } else {
                 //TODO: call retrievePayment from PaymentClass
-                $payment = $this->payplug->retrievePayment($refund->payment_id);
+                $payment = $this->dependencies->paymentClass->retrievePayment($refund->payment_id);
 
                 if ((int)Tools::getValue('id_state') != 0) {
                     $new_state = (int)Tools::getValue('id_state');
@@ -319,29 +321,29 @@ class RefundClass extends \PaymentModule
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        if (!$this->payplug->createLockFromCartId($order->id_cart)) {
+                        if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
-                                'data' => $this->payplug->l('payplug.refundPayment.errorOccurred', 'refundclass')
+                                'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass')
                             ]));
                         }
 
-                        $current_state = (int)$this->payplug->orderClass->getCurrentOrderState($order->id);
-                        $this->payplug->logger->addLog('Current order state: ' . $current_state, 'notice');
+                        $current_state = (int)$this->dependencies->orderClass->getCurrentOrderState($order->id);
+                        $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id);
                             $history->addWithemail();
-                            $this->payplug->logger->addLog('Change order state to ' . $new_state, 'notice');
+                            $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         } else {
-                            $this->payplug->logger->addLog('Order status is already \'refunded\'', 'notice');
+                            $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                         }
 
-                        if (!$this->payplug->deleteLockFromCartId($order->id_cart)) {
-                            $this->payplug->logger->addLog('Lock cannot be deleted.', 'error');
+                        if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
+                            $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
-                            $this->payplug->logger->addLog('Lock deleted.', 'notice');
+                            $this->logger->addLog('Lock deleted.', 'notice');
                         }
                     }
                     $reload = true;
@@ -359,8 +361,8 @@ class RefundClass extends \PaymentModule
             die(json_encode([
                 'status' => 'ok',
                 'data' => $data,
-                'template' => $this->payplug->hookClass->displayAdminOrderMain(['id_order' => $id_order]),
-                'message' => $this->payplug->l('payplug.refundPayment.success', 'refundclass'),
+                'template' => $this->dependencies->hookClass->displayAdminOrderMain(['id_order' => $id_order]),
+                'message' => $this->dependencies->l('payplug.refundPayment.success', 'refundclass'),
                 'reload' => $reload
             ]));
         }

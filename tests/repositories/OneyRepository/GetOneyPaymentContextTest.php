@@ -55,7 +55,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             ->with('PS_SHOP_NAME')
             ->andReturn('Payplug');
 
-        $this->payplug
+        $this->dependencies
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
                 if ($cent) {

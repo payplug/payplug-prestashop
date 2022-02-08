@@ -21,4 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+define('PAYPLUG_API_VERSION', '2019-08-06');
+define('PAYPLUG_NAME', 'payplug');
 define('PAYPLUG_VERSION', '3.7.0');

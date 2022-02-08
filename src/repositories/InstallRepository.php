@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\ConfigClass;
 use Db;
 
 class InstallRepository extends Repository
@@ -36,6 +35,12 @@ class InstallRepository extends Repository
 
     /** @var object */
     protected $context;
+
+    /** @var object */
+    protected $dependencies;
+
+    /** @var array */
+    public $errors;
 
     /** @var object */
     public $log;
@@ -61,13 +66,11 @@ class InstallRepository extends Repository
     /** @var object */
     protected $validate;
 
-    /** @var object */
-    protected $payplug;
-
     public function __construct(
         $config,
         $constant,
         $context,
+        $dependencies,
         $order_state,
         $order_state_entity,
         $order_state_specific,
@@ -75,12 +78,12 @@ class InstallRepository extends Repository
         $sql,
         $tools,
         $validate,
-        $payplug,
         $mylogphp
     ) {
         $this->config = $config;
         $this->constant = $constant;
         $this->context = $context;
+        $this->dependencies = $dependencies;
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
         $this->order_state_specific = $order_state_specific;
@@ -88,7 +91,6 @@ class InstallRepository extends Repository
         $this->sql = $sql;
         $this->tools = $tools;
         $this->validate = $validate;
-        $this->payplug = $payplug;
         $this->log = $mylogphp;
 
         $this->setParams();
@@ -187,10 +189,16 @@ class InstallRepository extends Repository
         $payplug_order_states_sql = [];
         foreach ($prestashop_order_states as $key => $type) {
             $id_order_state = $this->config->get($key);
-            $getTypeQuery = ' SELECT `type` FROM `' . _DB_PREFIX_ . 'payplug_order_state` WHERE  `id_order_state` = ' . $id_order_state;
+            $getTypeQuery = ' 
+                SELECT `type` 
+                FROM `' . _DB_PREFIX_ . 'payplug_order_state` 
+                WHERE  `id_order_state` = ' . $id_order_state;
             $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
             if ($sqlGetType  && $sqlGetType  != $type) {
-                $payplug_order_states_sql[] = ' UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` SET `type` = ' . "'$type'" . ' WHERE  `id_order_state` = ' . $id_order_state;
+                $payplug_order_states_sql[] = '
+                 UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` 
+                 SET `type` = ' . "'$type'" . ' 
+                 WHERE  `id_order_state` = ' . $id_order_state;
             } else {
                 $payplug_order_states_sql[] = '
             INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
@@ -199,7 +207,7 @@ class InstallRepository extends Repository
         }
         if ($payplug_order_states_sql) {
             foreach ($payplug_order_states_sql as $sql) {
-                $db = Db::getInstance()->execute($sql);
+                Db::getInstance()->execute($sql);
                 unset($sql);
             }
         }
@@ -279,7 +287,7 @@ class InstallRepository extends Repository
         $this->log->info('Starting to install again.');
 
         // check requirement
-        $report = ConfigClass::checkRequirements();
+        $report = $this->dependencies->configClass->checkRequirements();
         if (!$report['php']['up2date']) {
             return $this->setInstallError('Install failed: PHP Requirement.');
         }
@@ -316,7 +324,7 @@ class InstallRepository extends Repository
         }
 
         // Install tab
-        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
+        if (!$this->dependencies->loadSpecificPresta()->installTab()) {
             return $this->setInstallError('Install failed: Install Tab');
         }
 
@@ -373,7 +381,7 @@ class InstallRepository extends Repository
     public function setInstallError($error = '')
     {
         $this->log->error($error);
-        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
+        $this->errors[] = $this->tools->tool('displayError', $error);
 
         $this->log->info('Install failed.');
         $this->log->info('Install error: ' . $error);
@@ -568,7 +576,7 @@ class InstallRepository extends Repository
         if (!$keep_cards) {
             $this->log->info('Saved cards will be deleted.');
 
-            if (!$this->payplug->uninstallCards()) {
+            if (!$this->dependencies->cardClass->uninstallCards()) {
                 return $this->setUninstallError('Unable to delete saved cards.');
             }
 
@@ -585,7 +593,7 @@ class InstallRepository extends Repository
             return $this->setUninstallError('Uninstall failed: sql.');
         }
 
-        if (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
+        if (!$this->dependencies->loadSpecificPresta()->uninstallTab()) {
             return $this->setUninstallError('Uninstall failed: tab.');
         }
 

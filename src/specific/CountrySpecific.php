@@ -33,6 +33,14 @@ class CountrySpecific implements CountryInterface
         return new self();
     }
 
+    public function get($idCountry = false)
+    {
+        if (!is_int($idCountry)) {
+            $idCountry = false;
+        }
+        return new Country($idCountry);
+    }
+
     public function getByIso($idCurrency)
     {
         return Country::getByIso($idCurrency);
