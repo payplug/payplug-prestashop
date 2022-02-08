@@ -85,7 +85,10 @@ class HookClass
         // clear Language cache
         Language::loadLanguages();
 
-        $all_order_states = array_merge($this->configClass->orderStates, $this->dependencies->configClass->orderStatesOney);
+        $all_order_states = array_merge(
+            $this->configClass->orderStates,
+            $this->dependencies->configClass->orderStatesOney
+        );
         $id_order_states =$this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = explode(',', $id_order_states);
 
@@ -204,11 +207,15 @@ class HookClass
         $id_order_states =$this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = explode(',', $id_order_states);
 
-        if (empty($payplug_order_states) || !in_array($params['lang']->iso_code, $this->dependencies->configClass->payplugLanguages)) {
+        if (empty($payplug_order_states) ||
+            !in_array($params['lang']->iso_code, $this->dependencies->configClass->payplugLanguages)) {
             return true;
         }
 
-        $all_order_states = array_merge($this->dependencies->configClass->orderStates, $this->dependencies->configClass->orderStatesOney);
+        $all_order_states = array_merge(
+            $this->dependencies->configClass->orderStates,
+            $this->dependencies->configClass->orderStatesOney
+        );
 
         foreach ($all_order_states as $order_state) {
             foreach ($order_state['payplug_cfg'] as $payplug_conf) {
@@ -1036,7 +1043,8 @@ class HookClass
             'api_url' =>$this->dependencies->apiClass->getApiUrl(),
         ]);
 
-        $payment_options =$this->dependencies->paymentClass->getPaymentOptions($cart); // Données sous forme de tableau (pour 1.6 et 1.7)
+        // Données sous forme de tableau (pour 1.6 et 1.7)
+        $payment_options =$this->dependencies->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en object
         return $this->dependencies->loadSpecificPresta()->displayPaymentOption($payment_options);

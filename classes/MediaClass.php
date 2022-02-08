@@ -155,8 +155,6 @@ class MediaClass
 
                 $type = 'premium';
                 break;
-                $title = $this->dependencies->l('payplug.displayPopin.enableFeature', 'mediaclass');
-                break;
             case 'confirm':
                 $title = $this->dependencies->l('payplug.displayPopin.saveSettings', 'mediaclass');
                 break;

@@ -184,7 +184,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $errors = $this->paymentClass->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die(json_encode(['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors)]));
+                    die(json_encode(
+                        ['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors)]
+                    ));
                 }
 
                 die(json_encode(['result' => false]));

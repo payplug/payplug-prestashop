@@ -148,7 +148,6 @@ class PaymentClass
     {
         $standard = $this->config->get('PAYPLUG_STANDARD');
         $one_click = $standard && $this->config->get('PAYPLUG_ONE_CLICK');
-        $bancontact = $this->config->get('PAYPLUG_BANCONTACT');
         $installment = $this->config->get('PAYPLUG_INST');
         $installment_mode = $this->config->get('PAYPLUG_INST_MODE');
         $installment_min_amount = $this->config->get('PAYPLUG_INST_MIN_AMOUNT');
@@ -316,7 +315,9 @@ class PaymentClass
             && isset($card_details['brand'])
             && !empty($card_details['brand'])
             && ($card_details['brand'] !== 'none')) {
-            $card_brand = $this->dependencies->l('payplug.adminAjaxController.card', 'paymentclass') . ' ' . $card_details['brand'];
+            $card_brand = $this
+                    ->dependencies
+                    ->l('payplug.adminAjaxController.card', 'paymentclass') . ' ' . $card_details['brand'];
         }
 
         // Card Country
@@ -371,23 +372,38 @@ class PaymentClass
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX3WithFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies->l(
+                        'payplug.buildPaymentDetails.oneyX3WithFees',
+                        'paymentclass'
+                    );
                     break;
                 case 'oney_x4_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX4WithFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies->l(
+                        'payplug.buildPaymentDetails.oneyX4WithFees',
+                        'paymentclass'
+                    );
                     break;
                 case 'oney_x3_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX3WithoutFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies->l(
+                        'payplug.buildPaymentDetails.oneyX3WithoutFees',
+                        'paymentclass'
+                    );
                     break;
                 case 'oney_x4_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies->l(
+                        'payplug.buildPaymentDetails.oneyX4WithoutFees',
+                        'paymentclass'
+                    );
                     break;
                 case 'bancontact':
                     $is_bancontact = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies->l(
+                        'payplug.buildPaymentDetails.bancontact',
+                        'paymentclass'
+                    );
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -404,7 +420,9 @@ class PaymentClass
                 $payment_details['can_be_cancelled'] = false;
                 $payment_details['can_be_captured'] = false;
                 if (!isset($payment_details['type'])) {
-                    $payment_details['status_message'] = '(' . $this->dependencies->l('payplug.buildPaymentDetails.deferred', 'paymentclass') . ')';
+                    $payment_details['status_message'] = '(' . $this
+                            ->dependencies
+                            ->l('payplug.buildPaymentDetails.deferred', 'paymentclass') . ')';
                 }
             } else {
                 $expiration = date('d/m/Y', $payment->authorization->expires_at);
@@ -416,14 +434,19 @@ class PaymentClass
                         $payment_details['can_be_captured'] = true;
                         $payment_details['can_be_cancelled'] = true;
                         $payment_details['status_message'] = sprintf(
-                            '(' . $this->dependencies->l('payplug.buildPaymentDetails.captureAuthorizedBefore', 'paymentclass') . ')',
+                            '(' . $this
+                                ->dependencies
+                                ->l('payplug.buildPaymentDetails.captureAuthorizedBefore', 'paymentclass') . ')',
                             $expiration
                         );
                     }
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->dependencies->l('payplug.buildPaymentDetails.captureAuthorizedBeforeWarning', 'paymentclass'),
+                        $this->dependencies->l(
+                            'payplug.buildPaymentDetails.captureAuthorizedBeforeWarning',
+                            'paymentclass'
+                        ),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -799,11 +822,19 @@ class PaymentClass
                             [],
                             true
                         );
-                    $paymentOption[$payment_key]['logo'] = $card['brand'] != 'none' ? $this->dependencies->mediaClass->getMediaPath(
-                        $this->constant->get('_PS_MODULE_DIR_')
-                        . $this->name . '/views/img/'
-                        . $this->tools->tool('strtolower', $card['brand']) . '.svg'
-                    ) : '';
+                    $paymentOption[$payment_key]['logo'] =
+                        $card['brand'] != 'none' ?
+                        $this
+                            ->dependencies
+                            ->mediaClass
+                            ->getMediaPath(
+                                $this
+                                    ->constant
+                                    ->get('_PS_MODULE_DIR_') . $this->name . '/views/img/' . $this
+                                    ->tools
+                                    ->tool('strtolower', $card['brand']) . '.svg'
+                            )
+                        : '';
                     $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
                     $paymentOption[$payment_key]['expiry_date_card'] =
@@ -856,9 +887,11 @@ class PaymentClass
                 . $this->name . '/views/img/logos_schemes_' . $this->dependencies->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
-                $paymentOption['standard']['callToActionText'] = $this->dependencies->l('payplug.getPaymentOptions.payDifferentCard', 'paymentclass');
+                $paymentOption['standard']['callToActionText'] =
+                    $this->dependencies->l('payplug.getPaymentOptions.payDifferentCard', 'paymentclass');
             } else {
-                $paymentOption['standard']['callToActionText'] = $this->dependencies->l('payplug.getPaymentOptions.payCreditCard', 'paymentclass');
+                $paymentOption['standard']['callToActionText'] =
+                    $this->dependencies->l('payplug.getPaymentOptions.payCreditCard', 'paymentclass');
             }
             $paymentOption['standard']['action'] = $this->context->link->getModuleLink(
                 $this->name,
@@ -908,7 +941,9 @@ class PaymentClass
                 $paymentOption['installment']['logo'] = $this->dependencies->mediaClass->getMediaPath(
                     $this->constant->get('_PS_MODULE_DIR_')
                     . $this->name . '/views/img/logos_schemes_installment_'
-                    . $this->config->get('PAYPLUG_INST_MODE') . '_' . $this->dependencies->configClass->getImgLang() . '.png'
+                    . $this
+                        ->config->get('PAYPLUG_INST_MODE') . '_' . $this
+                        ->dependencies->configClass->getImgLang() . '.png'
                 );
                 $paymentOption['installment']['callToActionText'] = sprintf(
                     $this->dependencies->l('payplug.getPaymentOptions.payByCardInstallment', 'paymentclass'),
@@ -992,7 +1027,8 @@ class PaymentClass
 
                 switch ($error) {
                     case 'invalid_addresses':
-                        $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidAddresses', 'paymentclass');
+                        $err_label =
+                            $this->dependencies->l('payplug.getPaymentOptions.invalidAddresses', 'paymentclass');
                         break;
                     case 'invalid_amount_bottom':
                     case 'invalid_amount_top':
@@ -1704,7 +1740,10 @@ class PaymentClass
                         $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
                         return [
                             'result' => false,
-                            'response' => $this->dependencies->l('payplug.preparePayment.fieldsNotCompleted', 'paymentclass')
+                            'response' => $this->dependencies->l(
+                                'payplug.preparePayment.fieldsNotCompleted',
+                                'paymentclass'
+                            )
                         ];
                     }
                 } else {

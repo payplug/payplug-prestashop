@@ -261,8 +261,8 @@ class ConfigClass
         $this->setLoggers();
         $this->setConfigurationProperties();
 
-        if (file_exists(__DIR__."/../features.json")) {
-            $this->features_json = json_decode(file_get_contents(__DIR__."/../features.json"));
+        if (file_exists(dirname(__FILE__)."/../features.json")) {
+            $this->features_json = json_decode(Tools::file_get_contents(dirname(__FILE__)."/../features.json"));
         } else {
             $this->features_json = [];
         }
@@ -762,9 +762,15 @@ class ConfigClass
             ]);
         }
 
-        $this->context->controller->addJS($this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/admin.js');
-        $this->context->controller->addJS($this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/utilities.js');
-        $this->context->controller->addCSS($this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/css/admin.css');
+        $this->context->controller->addJS(
+            $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/admin.js'
+        );
+        $this->context->controller->addJS(
+            $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/utilities.js'
+        );
+        $this->context->controller->addCSS(
+            $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/css/admin.css'
+        );
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
@@ -1400,14 +1406,17 @@ class ConfigClass
     public function fetchTemplate($file)
     {
         if ($this->context->smarty->tpl_vars) {
-            foreach ($this->context->smarty->tpl_vars as $key => $value) {
+            foreach (array_keys($this->context->smarty->tpl_vars) as $key) {
                 if (strpos($key, 'feature_') !== false && !$this->isValidFeature($key)) {
                     unset($this->context->smarty->tpl_vars[$key]);
                 }
             }
         }
 
-        $output = $this->module->getInstanceByName($this->dependencies->name)->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
+        $output = $this
+            ->module
+            ->getInstanceByName($this->dependencies->name)
+            ->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
         return $output;
     }
 

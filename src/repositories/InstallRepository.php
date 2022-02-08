@@ -40,7 +40,7 @@ class InstallRepository extends Repository
     protected $dependencies;
 
     /** @var array */
-    public $_errors;
+    public $errors;
 
     /** @var object */
     public $log;
@@ -189,10 +189,16 @@ class InstallRepository extends Repository
         $payplug_order_states_sql = [];
         foreach ($prestashop_order_states as $key => $type) {
             $id_order_state = $this->config->get($key);
-            $getTypeQuery = ' SELECT `type` FROM `' . _DB_PREFIX_ . 'payplug_order_state` WHERE  `id_order_state` = ' . $id_order_state;
+            $getTypeQuery = ' 
+                SELECT `type` 
+                FROM `' . _DB_PREFIX_ . 'payplug_order_state` 
+                WHERE  `id_order_state` = ' . $id_order_state;
             $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
             if ($sqlGetType  && $sqlGetType  != $type) {
-                $payplug_order_states_sql[] = ' UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` SET `type` = ' . "'$type'" . ' WHERE  `id_order_state` = ' . $id_order_state;
+                $payplug_order_states_sql[] = '
+                 UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` 
+                 SET `type` = ' . "'$type'" . ' 
+                 WHERE  `id_order_state` = ' . $id_order_state;
             } else {
                 $payplug_order_states_sql[] = '
             INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
@@ -201,7 +207,7 @@ class InstallRepository extends Repository
         }
         if ($payplug_order_states_sql) {
             foreach ($payplug_order_states_sql as $sql) {
-                $db = Db::getInstance()->execute($sql);
+                Db::getInstance()->execute($sql);
                 unset($sql);
             }
         }
@@ -375,7 +381,7 @@ class InstallRepository extends Repository
     public function setInstallError($error = '')
     {
         $this->log->error($error);
-        $this->_errors[] = $this->tools->tool('displayError', $error);
+        $this->errors[] = $this->tools->tool('displayError', $error);
 
         $this->log->info('Install failed.');
         $this->log->info('Install error: ' . $error);
