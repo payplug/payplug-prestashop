@@ -93,6 +93,7 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
+    - php ./ci/generate-version.php
     - php ./ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
@@ -119,6 +120,7 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
+    - php ./ci/generate-version.php
     - php ./ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
@@ -138,3 +140,25 @@ build zip bancontact:
   artifacts:
     paths:
       - payplug_qa_bancontact_$CI_COMMIT_REF_NAME.zip
+
+build zip bnpl:
+  image: composer:1.9
+  stage: build
+  before_script:
+    - php ./ci/generate-version.php
+    - rm -r ./vendor
+    - composer install --no-dev
+    - ./ci/copy_translations.sh
+    - find ./vendor -type d -exec cp index.php {} \;
+    - git status
+    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
+    - cp features_bnpl.json.dist features.json
+    - mkdir payplug
+  script:
+    - shopt -s extglob
+    - mv !(payplug|composer.json) payplug
+    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+    - composer archive --file payplug_qa_bnpl_$CI_COMMIT_REF_NAME --format zip
+  artifacts:
+    paths:
+      - payplug_qa_bnpl_$CI_COMMIT_REF_NAME.zip
