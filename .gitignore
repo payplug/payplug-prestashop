@@ -5,6 +5,9 @@ php-cs-fixer-v2.phar
 .DS_Store
 .idea
 node_modules/
+composer.json
+composer.lock
+features.json
 vendor/
 views/css/*.css
 views/css/*.map
@@ -16,8 +19,6 @@ views/css/less/*/*/*.css
 views/css/less/*/*/*.map
 views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
-ci/translations.csv
-features.json
-features_bnpl.json
+_dev/ci/translations.csv
 html/
 phpunit.log
