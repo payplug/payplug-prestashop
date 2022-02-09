@@ -16,6 +16,7 @@ php cs fixer:
   image: composer:1.9
   stage: check php
   script:
+    - ./_dev/ci/dist-files.sh
     - composer install
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
   artifacts:
@@ -29,7 +30,7 @@ check php version:
     - >
       RED='\033[0;31m';
       ORANGE='\033[0;33m';
-      php ci/check_php.php || exit_code=$?;
+      php _dev/ci/check_php.php || exit_code=$?;
       if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING DETECTED!! \n"; exit 126 ; fi;
       if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR DETECTED!!!\n"; exit 1;
       elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
@@ -55,7 +56,7 @@ check module translations:
     - >
         RED='\033[0;31m';
         ORANGE='\033[0;33m';
-        php ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
+        php _dev/ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
         if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
         if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
         elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
@@ -63,7 +64,7 @@ check module translations:
     exit_codes: 126
   artifacts:
     paths:
-      - ci/translations.csv
+      - _dev/ci/translations.csv
 
 assets compile and revision:
   image: node:16
@@ -93,17 +94,17 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
-    - php ./ci/generate-version.php
-    - php ./ci/generate-upgrade.php
+    - php ./_dev/ci/generate-version.php
+    - php ./_dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
+    - ./_dev/ci/dist-files.sh
     - composer install --no-dev
     - rm webpack.config.js
-    - ./ci/copy_translations.sh
+    - ./_dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
-    - cp features.json.dist features.json
+    - chmod 777 ./_dev/ci/assets_revision.sh && ./_dev/ci/assets_revision.sh
     - mkdir payplug
   script:
     - shopt -s extglob
@@ -120,17 +121,17 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
-    - php ./ci/generate-version.php
-    - php ./ci/generate-upgrade.php
+    - php ./_dev/ci/generate-version.php
+    - php ./_dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
+    - ./_dev/ci/dist-files.sh
     - composer install --no-dev
     - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
-    - ./ci/copy_translations.sh
+    - ./_dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
-    - cp features.json.dist features.json
+    - chmod 777 ./_dev/ci/assets_revision.sh && ./_dev/ci/assets_revision.sh
     - mkdir payplug
   script:
     - shopt -s extglob
@@ -145,14 +146,14 @@ build zip bnpl:
   image: composer:1.9
   stage: build
   before_script:
-    - php ./ci/generate-version.php
+    - php ./_dev/ci/generate-version.php
     - rm -r ./vendor
+    - ./_dev/ci/dist-files.sh bnpl
     - composer install --no-dev
-    - ./ci/copy_translations.sh
+    - ./_dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
-    - cp features_bnpl.json.dist features.json
+    - chmod 777 ./_dev/ci/assets_revision.sh && ./_dev/ci/assets_revision.sh
     - mkdir payplug
   script:
     - shopt -s extglob
