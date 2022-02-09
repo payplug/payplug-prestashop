@@ -1,6 +1,7 @@
 log/*.csv
 config*.xml
 php-cs-fixer-v2.phar
+.php_cs.cache
 .DS_Store
 .idea
 node_modules/
