@@ -20,7 +20,7 @@ function getMethodContent($method_name = false)
     return $body;
 }
 
-$configuration = json_decode(file_get_contents(dirname(__FILE__)."/../composer.json"));
+$configuration = json_decode(file_get_contents(dirname(__FILE__)."/../../composer.json"));
 $moduleName = $configuration->moduleName;
 
 // get versions to create
