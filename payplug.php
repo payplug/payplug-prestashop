@@ -54,7 +54,6 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        // todo: automate module version in CI with constant value
         $this->version = '3.7.1';
 
         parent::__construct();
