@@ -22,8 +22,7 @@
  */
 
 $configuration = json_decode(file_get_contents(dirname(__FILE__)."/composer.json"));
-$moduleVersion = $configuration->version;
 
 define('PAYPLUG_API_VERSION', '2019-08-06');
-define('PAYPLUG_NAME', 'payplug');
-define('PAYPLUG_VERSION', $moduleVersion);
+define('PAYPLUG_NAME', $configuration->moduleName);
+define('PAYPLUG_VERSION', $configuration->version);
