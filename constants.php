@@ -21,6 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+$configuration = json_decode(file_get_contents(dirname(__FILE__)."/composer.json"));
+$moduleVersion = $configuration->version;
+
 define('PAYPLUG_API_VERSION', '2019-08-06');
 define('PAYPLUG_NAME', 'payplug');
-define('PAYPLUG_VERSION', '3.7.0');
+define('PAYPLUG_VERSION', $moduleVersion);
