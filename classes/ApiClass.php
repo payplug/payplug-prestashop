@@ -125,7 +125,7 @@ class ApiClass
      */
     public function getPublishableKeys()
     {
-        if ($this->current_api_key != null) {
+        if ($this->current_api_key != null && $this->payplug->isValidFeature('feature_integrated')) {
             if ($response = \Payplug\Authentication::getPublishableKeys()) {
                 return $response['httpResponse']['publishable_key'];
             }
