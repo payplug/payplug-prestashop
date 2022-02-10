@@ -1,6 +1,5 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../constants.php');
 require_once(dirname(__FILE__) . '/../upgrade/upgrade-methods.php');
 
 function getMethodContent($method_name = false)

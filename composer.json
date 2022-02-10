@@ -32,7 +32,8 @@
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "composer.*",
+            "/composer.json",
+            "composer.lock",
             "features.json.dist",
             "upgrade/upgrade-methods.php"
         ]
