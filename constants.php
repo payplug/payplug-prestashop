@@ -21,4 +21,4 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-define('PAYPLUG_VERSION', '3.6.2');
+define('PAYPLUG_VERSION', '3.6.3');
