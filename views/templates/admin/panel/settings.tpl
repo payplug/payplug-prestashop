@@ -34,22 +34,29 @@
     {/if}
 
     {include file='./settings/sandbox.tpl'}
-    {include file='./settings/embedded.tpl'}
+    {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
+        {include file='./settings/embedded.tpl'}
+    {/if}
 
     <div class="payplugSettings_separator">
         <p><strong>{l s='Advanced settings' mod='payplug'}</strong></p>
     </div>
 
     <div class="payplugSettings_advanced">
-        {include file='./settings/standard.tpl'}
+        {if $standard_isActivated}
+            {include file='./settings/standard.tpl'}
+        {/if}
         {include file='./settings/oney.tpl'}
 
         {if $bancontact}
             {include file='./settings/bancontact.tpl'}
         {/if}
-
-        {include file='./settings/installment.tpl'}
-        {include file='./settings/deferred.tpl'}
+        {if $installment_isActivated}
+            {include file='./settings/installment.tpl'}
+        {/if}
+        {if $deferred_isActivated && (($standard_isActivated || $installment_isActivated))}
+            {include file='./settings/deferred.tpl'}
+        {/if}
     </div>
 
     <div class="panel-footer">

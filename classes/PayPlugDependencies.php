@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 class PayPlugDependencies
 {
     /** @var ApiClass */
-    private $apiClass;
+    public $apiClass;
 
     /** @var ConfigClass */
     private $configClass;
