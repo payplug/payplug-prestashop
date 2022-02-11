@@ -56,11 +56,17 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->dependencies->configClass->checkConfiguration();
 
-        $PAYPLUG_EMAIL = Configuration::get('PAYPLUG_EMAIL');
-        $PAYPLUG_TEST_API_KEY = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $PAYPLUG_LIVE_API_KEY = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        $payplug_email = Configuration::get(
+            $this->dependencies->getConfigurationKey('email')
+        );
+        $payplug_test_api_key = Configuration::get(
+            $this->dependencies->getConfigurationKey('testApiKey')
+        );
+        $payplug_live_api_key = Configuration::get(
+            $this->dependencies->getConfigurationKey('liveApiKey')
+        );
 
-        if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
+        if (!empty($payplug_email) && (!empty($payplug_test_api_key) || !empty($payplug_live_api_key))) {
             $connected = true;
         } else {
             $connected = false;
@@ -87,7 +93,7 @@ class AdminPayplugController extends ModuleAdminController
             ]);
         } else {
             $this->context->smarty->assign([
-                'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
+                'payplug_email' => $payplug_email,
             ]);
         }
 

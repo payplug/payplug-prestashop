@@ -203,9 +203,13 @@ class PayPlugNotifications
         try {
             $resource = json_decode($body);
             $this->api_key = (bool)$resource->is_live ?
-                Configuration::get('PAYPLUG_LIVE_API_KEY') :
-                Configuration::get('PAYPLUG_TEST_API_KEY');
-            ApiClass::setSecretKey($this->api_key);
+                Configuration::get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                ) :
+                Configuration::get(
+                    $this->dependencies->getConfigurationKey('testApiKey')
+                );
+            $this->apiClass->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
@@ -719,7 +723,7 @@ class PayPlugNotifications
         // Check if order amount is valid
         $is_valid_amount = (bool)$this->payment->is_paid;
         if ($this->is_installment) {
-            $is_valid_amount = (bool)AmountCurrencyClass::checkAmountPaidIsCorrect(
+            $is_valid_amount = $this->amountCurrencyClass->checkAmountPaidIsCorrect(
                 $this->payment->amount / 100,
                 $this->order
             );
@@ -890,9 +894,9 @@ class PayPlugNotifications
         $this->apiClass = $this->dependencies->apiClass;
         $this->orderClass =  $this->dependencies->orderClass;
         $this->paymentClass =  $this->dependencies->paymentClass;
-        $this->amountCurrencyClass = $this->dependencies->getPlugin()->getAmountCurrencyClass();
+        $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-        $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $this->sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
 
         $this->setLogger();
         $this->getResource();
@@ -961,14 +965,30 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setOrderStates');
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
         $this->order_states = [
-            'pending' => Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
-            'paid' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'error' => Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
-            'auth' => Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
-            'expired' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
-            'oney' => Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
-            'cancelled' => Configuration::get('PAYPLUG_ORDER_STATE_CANCELED'),
-            'refund' => Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
+            'pending' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
+            ),
+            'paid' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+            ),
+            'error' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons
+            ),
+            'auth' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH') . $state_addons
+            ),
+            'expired' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_EXP') . $state_addons
+            ),
+            'oney' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG') . $state_addons
+            ),
+            'cancelled' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_CANCELED')
+            ),
+            'refund' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
+            )
         ];
     }
 

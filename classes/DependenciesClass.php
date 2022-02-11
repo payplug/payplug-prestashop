@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\repositories\PluginRepository;
 use PayPlug\src\specific\TranslationSpecific;
+use Tools;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -40,6 +41,148 @@ class DependenciesClass
     public $cardClass;
     public $cartClass;
     public $configClass;
+    public $configurationKeys = [
+        'alloSaveCard' => [
+            'name' => 'ALLOW_SAVE_CARD',
+            'defaultValue' => 0
+        ],
+        'bancontact' => [
+            'name' => 'BANCONTACT',
+            'defaultValue' => null
+        ],
+        'companyId' => [
+            'name' => 'COMPANY_ID',
+            'defaultValue' => null
+        ],
+        'companyStatus' => [
+            'name' => 'COMPANY_STATUS',
+            'defaultValue' => ''
+        ],
+        'companyIso' => [
+            'name' => 'COMPANY_ISO',
+            'defaultValue' => ''
+        ],
+        'currencies' => [
+            'name' => 'CURRENCIES',
+            'defaultValue' => 'EUR'
+        ],
+        'debugMode' => [
+            'name' => 'DEBUG_MODE',
+            'defaultValue' => 0
+        ],
+        'deferred' => [
+            'name' => 'DEFERRED',
+            'defaultValue' => 0
+        ],
+        'deferredAuto' => [
+            'name' => 'DEFERRED_AUTO',
+            'defaultValue' => 0
+        ],
+        'deferredState' => [
+            'name' => 'DEFERRED_STATE',
+            'defaultValue' => 0
+        ],
+        'email' => [
+            'name' => 'EMAIL',
+            'defaultValue' => null
+        ],
+        'embeddedMode' => [
+            'name' => 'EMBEDDED_MODE',
+            'defaultValue' => 'redirected'
+        ],
+        'inst' => [
+            'name' => 'INST',
+            'defaultValue' => null
+        ],
+        'instMinAmount' => [
+            'name' => 'INST_MIN_AMOUNT',
+            'defaultValue' => 150
+        ],
+        'instMode' => [
+            'name' => 'INST_MODE',
+            'defaultValue' => 3
+        ],
+        'keepCards' => [
+            'name' => 'KEEP_CARDS',
+            'defaultValue' => 0
+        ],
+        'liveApiKey' => [
+            'name' => 'LIVE_API_KEY',
+            'defaultValue' => null
+        ],
+        'maxAmounts' => [
+            'name' => 'MAX_AMOUNTS',
+            'defaultValue' => 'EUR:1000000'
+        ],
+        'minAmounts' => [
+            'name' => 'MIN_AMOUNTS',
+            'defaultValue' => 'EUR:1'
+        ],
+        'offer' => [
+            'name' => 'OFFER',
+            'defaultValue' => ''
+        ],
+        'oneClick' => [
+            'name' => 'ONE_CLICK',
+            'defaultValue' => null
+        ],
+        'oney' => [
+            'name' => 'ONEY',
+            'defaultValue' => null
+        ],
+        'oneyAllowedCountries' => [
+            'name' => 'ONEY_ALLOWED_COUNTRIES',
+            'defaultValue' => ''
+        ],
+        'oneyMaxAmounts' => [
+            'name' => 'ONEY_MAX_AMOUNTS',
+            'defaultValue' => 'EUR:300000'
+        ],
+        'oneyMinAmounts' => [
+            'name' => 'ONEY_MIN_AMOUNTS',
+            'defaultValue' => 'EUR:10000'
+        ],
+        'oneyCustomMaxAmounts' => [
+            'name' => 'ONEY_CUSTOM_MAX_AMOUNTS',
+            'defaultValue' => 'EUR:3000'
+        ],
+        'oneyCustomMinAmounts' => [
+            'name' => 'ONEY_CUSTOM_MIN_AMOUNTS',
+            'defaultValue' => 'EUR:100'
+        ],
+        'oneyFees' => [
+            'name' => 'ONEY_FEES',
+            'defaultValue' => 1
+        ],
+        'oneyOptimized' => [
+            'name' => 'ONEY_OPTIMIZED',
+            'defaultValue' => 0
+        ],
+        'publishableKey' => [
+            'name' => 'PUBLISHABLE_KEY',
+            'defaultValue' => null
+        ],
+        'publishableKeyTest' => [
+            'name' => 'PUBLISHABLE_KEY_TEST',
+            'defaultValue' => null
+        ],
+        'sandboxMode' => [
+            'name' => 'SANDBOX_MODE',
+            'defaultValue' => 1
+        ],
+        'show' => [
+            'name' => 'SHOW',
+            'defaultValue' => 0
+        ],
+        'standard' => [
+            'name' => 'STANDARD',
+            'defaultValue' => 1
+        ],
+        'testApiKey' => [
+            'name' => 'TEST_API_KEY',
+            'defaultValue' => null
+        ],
+    ];
     public $hookClass;
     public $mediaClass;
     public $name;
@@ -112,5 +255,35 @@ class DependenciesClass
         }
 
         return false;
+    }
+
+    /**
+     * Get configuration key name for specific module
+     * @param string $key
+     * @return string
+     */
+    public function getConfigurationKey($key)
+    {
+        return $this->concatenateModuleNameTo($this->configurationKeys[$key]['name']);
+    }
+
+    /**
+     * Get configuration default value for specific module
+     * @param string $key
+     * @return string
+     */
+    public function getConfigurationDefaultValue($key)
+    {
+        return $this->configurationKeys[$key]['defaultValue'];
+    }
+
+    /**
+     * Concatenate specific module name to configuration key
+     * @param string $string
+     * @return string
+     */
+    public function concatenateModuleNameTo($string)
+    {
+        return Tools::strtoupper($this->name) . "_" . $string;
     }
 }

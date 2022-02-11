@@ -53,7 +53,9 @@ class PayPlugValidation
         $this->dependencies = new DependenciesClass();
         $this->orderClass = $this->dependencies->orderClass;
         $this->paymentClass = $this->dependencies->paymentClass;
-        $this->debug = Configuration::get('PAYPLUG_DEBUG_MODE');
+        $this->debug = Configuration::get(
+            $this->dependencies->getConfigurationKey('debugMode')
+        );
         $this->plugin = $this->dependencies->getPlugin();
         $this->setConfig();
         $this->moduleInstance = $this
@@ -65,7 +67,7 @@ class PayPlugValidation
 
     public function setConfig()
     {
-        $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
+        $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
         $this->isDeferred = false;
         $this->isOney = false;
         $this->isBancontact = false;
@@ -182,8 +184,12 @@ class PayPlugValidation
                 try {
                     $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
                     $this->api_key = (bool)$installment->is_live ?
-                        Configuration::get('PAYPLUG_LIVE_API_KEY') :
-                        Configuration::get('PAYPLUG_TEST_API_KEY');
+                        Configuration::get(
+                            $this->dependencies->getConfigurationKey('liveApiKey')
+                        ) :
+                        Configuration::get(
+                            $this->dependencies->getConfigurationKey('testApiKey')
+                        );
                     if (isset($installment->schedule)) {
                         foreach ($installment->schedule as $schedule) {
                             $amount += (int)$schedule->amount;
@@ -228,8 +234,12 @@ class PayPlugValidation
             try {
                 $payment = \Payplug\Payment::retrieve($pay_id);
                 $this->api_key = (bool)$payment->is_live ?
-                    Configuration::get('PAYPLUG_LIVE_API_KEY') :
-                    Configuration::get('PAYPLUG_TEST_API_KEY');
+                    Configuration::get(
+                        $this->dependencies->getConfigurationKey('liveApiKey')
+                    ) :
+                    Configuration::get(
+                        $this->dependencies->getConfigurationKey('testApiKey')
+                    );
                 $this->logger->addLog('Retrieving payment: ' . $payment->id);
                 if (isset($payment->failure) && $payment->failure !== null) {
                     if (!PayplugLock::deleteLockG2($cart->id)) {
@@ -374,15 +384,25 @@ class PayPlugValidation
                 $state_addons = ($installment->is_live ? '' : '_TEST');
             }
 
-            $pending_state = Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons);
-            $paid_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $pending_state = Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
+            );
+            $paid_state = Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+            );
             /*
             * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
             * We keep this $inst_state to give more readability.
             */
-            $inst_state = Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
-            $auth_state = Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons);
-            $oney_state = Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons);
+            $inst_state = Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID' . $state_addons)
+            );
+            $auth_state = Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH' . $state_addons)
+            );
+            $oney_state = Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG' . $state_addons)
+            );
 
             if ($this->type == 'installment') {
                 $installment = new PPPaymentInstallment($inst_id);

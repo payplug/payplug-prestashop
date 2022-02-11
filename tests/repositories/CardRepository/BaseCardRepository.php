@@ -49,10 +49,10 @@ class BaseCardRepository extends RepositoryBase
         $this->constant
             ->shouldReceive('get');
 
-        $this->logger
-            ->shouldReceive('setParams');
+
 
         $this->repo = Mockery::mock(CardRepository::class, [
+            $this->dependencies,
             $this->config,
             $this->constant,
             $this->dependencies,
@@ -60,6 +60,9 @@ class BaseCardRepository extends RepositoryBase
             $this->query,
             $this->tools,
         ])->makePartial();
+
+        $this->repo
+            ->shouldReceive('setParams');
 
         $this->arrayLogger = [];
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);

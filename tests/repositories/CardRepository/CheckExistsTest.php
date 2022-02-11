@@ -62,6 +62,7 @@ final class CheckExistsTest extends BaseCardRepository
      * @dataProvider invalidDataProvider
      * @param $month
      * @param $year
+     * @group yolo
      */
     public function testWithInvalidParams($paymentId, $companyId)
     {

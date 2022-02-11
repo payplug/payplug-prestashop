@@ -124,7 +124,9 @@ class CacheRepository extends Repository
             (int)$amount . '_' .
             (string)$country . '_' .
             (string)implode('_', $operations) . '_' .
-            ($this->config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
+            ($this->config->get(
+                $this->dependencies->getConfigurationKey('sandboxMode')
+            ) ? 'test' : 'live');
 
         return [
             'result' => $cache_id,
