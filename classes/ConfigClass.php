@@ -42,6 +42,140 @@ use Validate;
 
 class ConfigClass
 {
+    public $configurationKeys = [
+        'alloSaveCard' => [
+            'name' => 'ALLOW_SAVE_CARD',
+            'defaultValue' => 0
+        ],
+        'bancontact' => [
+            'name' => 'BANCONTACT',
+            'defaultValue' => null
+        ],
+        'companyId' => [
+            'name' => 'COMPANY_ID',
+            'defaultValue' => null
+        ],
+        'companyStatus' => [
+            'name' => 'COMPANY_STATUS',
+            'defaultValue' => ''
+        ],
+        'companyIso' => [
+            'name' => 'COMPANY_ISO',
+            'defaultValue' => ''
+        ],
+        'currencies' => [
+            'name' => 'CURRENCIES',
+            'defaultValue' => 'EUR'
+        ],
+        'debugMode' => [
+            'name' => 'DEBUG_MODE',
+            'defaultValue' => 0
+        ],
+        'deffered' => [
+            'name' => 'DEFFERED',
+            'defaultValue' => 0
+        ],
+        'defferedAuto' => [
+            'name' => 'DEFFERED_AUTO',
+            'defaultValue' => 0
+        ],
+        'defferedState' => [
+            'name' => 'DEFFERED_STATE',
+            'defaultValue' => 0
+        ],
+        'email' => [
+            'name' => 'EMAIL',
+            'defaultValue' => null
+        ],
+        'embbededMode' => [
+            'name' => 'EMBEDDED_MODE',
+            'defaultValue' => 'redirected'
+        ],
+        'inst' => [
+            'name' => 'INST',
+            'defaultValue' => null
+        ],
+        'instMinAmount' => [
+            'name' => 'INST_MIN_AMOUNT',
+            'defaultValue' => 150
+        ],
+        'instMode' => [
+            'name' => 'INST_MODE',
+            'defaultValue' => 3
+        ],
+        'keepCards' => [
+            'name' => 'KEEP_CARDS',
+            'defaultValue' => 0
+        ],
+        'liveApiKey' => [
+            'name' => 'LIVE_API_KEY',
+            'defaultValue' => null
+        ],
+        'maxAmounts' => [
+            'name' => 'MAX_AMOUNTS',
+            'defaultValue' => 'EUR:1000000'
+        ],
+        'minAmounts' => [
+            'name' => 'MIN_AMOUNTS',
+            'defaultValue' => 'EUR:1'
+        ],
+        'minAmounts' => [
+            'name' => 'MIN_AMOUNTS',
+            'defaultValue' => 'EUR:1'
+        ],
+        'offer' => [
+            'name' => 'OFFER',
+            'defaultValue' => ''
+        ],
+        'oneClick' => [
+            'name' => 'ONE_CLICK',
+            'defaultValue' => null
+        ],
+        'oney' => [
+            'name' => 'ONEY',
+            'defaultValue' => null
+        ],
+        'oneyAllowedCountries' => [
+            'name' => 'ONEY_ALLOWED_COUNTRIES',
+            'defaultValue' => ''
+        ],
+        'oneyMaxAmounts' => [
+            'name' => 'ONEY_MAX_AMOUNTS',
+            'defaultValue' => 'EUR:300000'
+        ],
+        'oneyMinAmounts' => [
+            'name' => 'ONEY_MIN_AMOUNTS',
+            'defaultValue' => 'EUR:10000'
+        ],
+        'oneyCustomMaxAmounts' => [
+            'name' => 'ONEY_CUSTOM_MAX_AMOUNTS',
+            'defaultValue' => 'EUR:3000'
+        ],
+        'oneyCustomMinAmounts' => [
+            'name' => 'ONEY_CUSTOM_MIN_AMOUNTS',
+            'defaultValue' => 'EUR:100'
+        ],
+        'oneyFees' => [
+            'name' => 'ONEY_FEES',
+            'defaultValue' => 1
+        ],
+        'sandboxMode' => [
+            'name' => 'SANDBOX_MODE',
+            'defaultValue' => 1
+        ],
+        'show' => [
+            'name' => 'SHOW',
+            'defaultValue' => 0
+        ],
+        'standard' => [
+            'name' => 'STANDARD',
+            'defaultValue' => 1
+        ],
+        'testApiKey' => [
+            'name' => 'TEST_API_KEY',
+            'defaultValue' => null
+        ],
+    ];
     public $email;
     public $features_json;
     public $logger;
@@ -288,6 +422,17 @@ class ConfigClass
     public function getSpecificPrestaClasse()
     {
         return $this->dependencies->loadSpecificPresta();
+    }
+
+    /**
+     * Get configuration key name or default value for specific module
+     * @param string $key
+     * @param string $attribute ('name|defaultValue')
+     * @return string
+     */
+    public function getConfigurationKey($key, $attribute)
+    {
+        return Tools::uppercase($this->dependencies->name) . $this->configurationKeys[$key][$attribute];
     }
 
     /**
