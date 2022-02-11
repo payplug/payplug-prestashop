@@ -126,7 +126,7 @@ class ApiClass
      */
     public function setPublishableKeys()
     {
-        if (!$this->current_api_key || !$this->payplug->isValidFeature('feature_integrated')) {
+        if (!$this->current_api_key || !$this->dependencies->configClass->isValidFeature('feature_integrated')) {
             return false;
         }
 
