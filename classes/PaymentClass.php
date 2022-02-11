@@ -783,8 +783,9 @@ class PaymentClass
 
         $paymentOption = [];
 
-        // OneClick Payment
-        if ($this->config->get('PAYPLUG_STANDARD')) {
+        // Standard and OneClick Payment
+        if ($this->config->get('PAYPLUG_STANDARD') && $this->dependencies->configClass->isValidFeature('feature_standard')) {
+            //OneClick Payment
             if ($options['one_click'] && !empty($payplug_cards)) {
                 foreach ($payplug_cards as $card) {
                     $brand = ($card['brand'] != 'none')
@@ -903,7 +904,7 @@ class PaymentClass
         }
 
         // Installment Payment
-        if ($options['installment']) {
+        if ($options['installment'] && $this->dependencies->configClass->isValidFeature('feature_installment')) {
             $use_taxes = (bool)$this->config->get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
             if ($cart_amount >= $this->config->get('PAYPLUG_INST_MIN_AMOUNT')) {
