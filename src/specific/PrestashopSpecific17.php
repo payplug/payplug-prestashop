@@ -63,7 +63,8 @@ class PrestashopSpecific17
     public function displayPaymentOption($payment_options)
     {
         if ($this->configClass->isValidFeature('feature_integrated')
-            && (string)$this->config->get('PAYPLUG_EMBEDDED_MODE') == 'integrated') {
+            && (string)$this->config->get('PAYPLUG_EMBEDDED_MODE') == 'integrated'
+            && $this->dependencies->configClass->isValidFeature('feature_standard')) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
 

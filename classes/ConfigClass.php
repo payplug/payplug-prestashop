@@ -807,6 +807,7 @@ class ConfigClass
         if ($specific
             && (method_exists($specific, 'assignSwitchConfiguration'))
             && $this->isValidFeature('feature_integrated')
+            && $this->isValidFeature('feature_standard')
             && Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($configurations['sandbox_mode'] ? '_TEST' : ''))
         ) {
             $specific->assignSwitchConfiguration($configurations);
@@ -855,6 +856,10 @@ class ConfigClass
             'oney' => $configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
             'integrated' => $this->isValidFeature('feature_integrated'),
+            'display_mode_isActivated' => $this->isValidFeature('feature_display_mode'),
+            'standard_isActivated' => $this->isValidFeature('feature_standard'),
+            'installment_isActivated' => $this->isValidFeature('feature_installment'),
+            'deferred_isActivated' => $this->isValidFeature('feature_deferred'),
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->dependencies->orderClass->getOrderStates(),

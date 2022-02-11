@@ -70,7 +70,7 @@ function upgrade_module_3_7_0($object)
     }
 
     // Set PayPlug Publishable key if merchand account connected
-    $flag = $flag && $object->payplug_dependencies->api->setPublishableKeys();
+    $flag = $flag && $object->payplug_dependencies->apiClass->setPublishableKeys();
 
     return $flag;
 }
