@@ -19,6 +19,6 @@ views/css/less/*/*/*.css
 views/css/less/*/*/*.map
 views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
-_dev/ci/translations.csv
+dev/ci/translations.csv
 html/
 phpunit.log
