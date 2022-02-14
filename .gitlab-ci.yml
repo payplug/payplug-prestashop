@@ -94,11 +94,11 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
+    - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
-    - ./dev/ci/dist-files.sh
     - composer install --no-dev
     - rm webpack.config.js
     - ./dev/ci/copy_translations.sh
@@ -122,11 +122,11 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
+    - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
-    - ./dev/ci/dist-files.sh
     - composer install --no-dev
     - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
     - ./dev/ci/copy_translations.sh
@@ -148,6 +148,7 @@ build zip bnpl:
   image: composer:1.9
   stage: build
   before_script:
+    - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
     - rm -r ./vendor
     - ./dev/ci/dist-files.sh bnpl
