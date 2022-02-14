@@ -1,0 +1,13 @@
+{
+    "features": [
+        "feature_bancontact",
+        "feature_integrated",
+        "feature_sandbox_mode",
+        "feature_embedded_mode",
+        "feature_one_click",
+        "feature_installement",
+        "feature_show",
+        "feature_deferred",
+        "feature_oney"
+    ]
+}
