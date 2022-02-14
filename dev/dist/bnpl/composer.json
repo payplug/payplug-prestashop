@@ -25,7 +25,7 @@
             "!vendor/*",
             "!features.json",
             ".*",
-            "ci",
+            "dev",
             "*.sh",
             "test",
             "tests",
@@ -35,7 +35,7 @@
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "composer.*",
+            "!bnpl/composer.json",
             "features.json.dist",
             "upgrade/upgrade-methods.php"
         ]
@@ -51,13 +51,13 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "./_dev/ci/composer.sh"
+            "./dev/ci/composer.sh"
         ],
         "post-update-cmd": [
-            "./_dev/ci/composer.sh"
+            "./dev/ci/composer.sh"
         ],
         "install-dev": [
-            "./_dev/ci/composer_dev.sh"
+            "./dev/ci/composer_dev.sh"
         ]
     }
 }

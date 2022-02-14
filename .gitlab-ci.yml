@@ -94,11 +94,11 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
+    - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
-    - ./dev/ci/dist-files.sh
     - composer install --no-dev
     - rm webpack.config.js
     - ./dev/ci/copy_translations.sh
@@ -109,6 +109,7 @@ build zip release:
   script:
     - shopt -s extglob
     - mv !(payplug|composer.json) payplug
+    - cp composer.json ./payplug
     - composer archive --file payplug_$CI_COMMIT_REF_NAME --format zip
     - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
     - composer archive --file payplug_qa_$CI_COMMIT_REF_NAME --format zip
@@ -121,11 +122,11 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
+    - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
-    - ./dev/ci/dist-files.sh
     - composer install --no-dev
     - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
     - ./dev/ci/copy_translations.sh
@@ -136,6 +137,7 @@ build zip bancontact:
   script:
     - shopt -s extglob
     - mv !(payplug|composer.json) payplug
+    - cp composer.json ./payplug
     - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
     - composer archive --file payplug_qa_bancontact_$CI_COMMIT_REF_NAME --format zip
   artifacts:
@@ -146,6 +148,7 @@ build zip bnpl:
   image: composer:1.9
   stage: build
   before_script:
+    - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
     - rm -r ./vendor
     - ./dev/ci/dist-files.sh bnpl
@@ -158,6 +161,7 @@ build zip bnpl:
   script:
     - shopt -s extglob
     - mv !(payplug|composer.json) payplug
+    - cp composer.json ./payplug
     - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
     - composer archive --file payplug_qa_bnpl_$CI_COMMIT_REF_NAME --format zip
   artifacts:
