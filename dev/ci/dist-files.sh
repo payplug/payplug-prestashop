@@ -10,7 +10,7 @@ fi
 echo "Branch name: "$branch
 echo "------------------"
 
-path="./_dev/dist/$branch"
+path="./dev/dist/$branch"
 echo "Dist files will be in: "$path
 echo "------------------"
 
