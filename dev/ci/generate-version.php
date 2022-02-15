@@ -5,10 +5,10 @@ $moduleName = $configuration->moduleName;
 $moduleVersion = $configuration->version;
 
 echo 'Building module with version ' . $moduleVersion . "\n";
-
-$str = implode("\n", file(dirname(__FILE__)."/../".$moduleName.".php"));
-$fp = fopen(dirname(__FILE__)."/../".$moduleName.".php", 'w');
-$str = str_replace("PAYPLUG_VERSION", "'".$moduleVersion."'", $str);
+$path = dirname(__FILE__)."/../../".$moduleName.".php";
+$str = file_get_contents($path);
+$fp = fopen($path, 'w');
+$str = str_replace("MODULE_VERSION", "'" . $moduleVersion . "'", $str);
 fwrite($fp, $str, strlen($str));
 fclose($fp);
 
