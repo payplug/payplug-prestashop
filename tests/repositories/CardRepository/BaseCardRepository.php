@@ -53,6 +53,7 @@ class BaseCardRepository extends RepositoryBase
             ->shouldReceive('setParams');
 
         $this->repo = Mockery::mock(CardRepository::class, [
+            $this->dependencies,
             $this->config,
             $this->constant,
             $this->logger,

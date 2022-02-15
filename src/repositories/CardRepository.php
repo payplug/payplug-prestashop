@@ -485,7 +485,7 @@ class CardRepository extends Repository
     public function setParams()
     {
         $config = $this->configurationSpecific;
-        $configClass = $this->dependencies->configClass;
+
         $isSandbox = $config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );

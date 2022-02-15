@@ -77,7 +77,12 @@ class RepositoryBase extends TestCase
         $this->myLogPhp
             ->shouldReceive('info')
             ->andReturn(true);
-        $this->dependencies      = \Mockery::mock('dependencies');
+
+        $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
+
+        $this->dependencies
+            ->shouldReceive('getConfigurationKey')
+            ->andReturn(true);
 
         $this->setSpecific();
         $this->setRepository();
@@ -113,8 +118,9 @@ class RepositoryBase extends TestCase
 
     private function setTemporariesClasses()
     {
-        $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
-        $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->dependencies);
+
+
+        $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools, $this->dependencies);
         $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
         $this->dependencies->configClass    = \Mockery::mock('alias:Payplug\classes\ConfigClass');
     }

@@ -46,8 +46,9 @@ class BaseCacheRepository extends RepositoryBase
             $this->cacheEntity,
             $this->query,
             $this->config,
+            $this->dependencies,
             $this->logger,
-            $this->constant
+            $this->constant,
         ])->makePartial();
 
         $this->arrayCache = [];
