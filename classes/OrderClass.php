@@ -53,7 +53,7 @@ class OrderClass
     {
         $this->query
             ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
+            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
             ->fields('id_order')    ->values((int)$id_order)
             ->fields('id_payment')  ->values($id_payment);
 
@@ -95,7 +95,7 @@ class OrderClass
         $this->query
             ->select()
             ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
             ->where('id_order = ' . (int)$id_order);
 
         return $this->query->build('unique_value');
@@ -112,7 +112,7 @@ class OrderClass
     {
         $this->query
             ->select()
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_order_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
             ->where('id_order = ' . (int)$id_order);
 
         return $this->query->build();

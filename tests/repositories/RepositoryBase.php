@@ -27,6 +27,7 @@ namespace PayPlug\tests\repositories;
 use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\classes\DependenciesClass;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\mock\DependenciesMock;
 use PHPUnit\Framework\TestCase;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
@@ -114,6 +115,7 @@ class RepositoryBase extends TestCase
     private function setTemporariesClasses()
     {
         $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
+        $this->dependencies->name = DependenciesMock::get();
         $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools);
         $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
         $this->dependencies->configClass    = \Mockery::mock('alias:Payplug\classes\ConfigClass');

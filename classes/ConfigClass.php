@@ -1208,7 +1208,7 @@ class ConfigClass
         }
         $req_payplug_card = '
             SELECT pc.last4, pc.exp_month, pc.exp_year, pc.brand, pc.country
-            FROM ' . _DB_PREFIX_ . 'payplug_card pc
+            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_card pc
             WHERE pc.id_customer = ' . (int)$id_customer;
         $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
         if (!$res_payplug_card) {

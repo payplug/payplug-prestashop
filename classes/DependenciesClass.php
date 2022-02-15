@@ -52,8 +52,8 @@ class DependenciesClass
 
     public function __construct()
     {
-        $this->version = PAYPLUG_VERSION;
-        $this->name = PAYPLUG_NAME;
+        $this->version = MODULE_VERSION;
+        $this->name = MODULE_NAME;
 
         $this->initializeAccessors();
     }
@@ -71,7 +71,7 @@ class DependenciesClass
         $this->adminClass = new AdminClass($this);
         $this->apiClass = new ApiClass($this);
         $this->cardClass = new CardClass($this);
-        $this->cartClass = new CartClass();
+        $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);
         $this->hookClass = new HookClass($this);
         $this->mediaClass = new MediaClass($this);

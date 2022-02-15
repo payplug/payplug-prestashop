@@ -55,6 +55,7 @@ class BaseCardRepository extends RepositoryBase
         $this->repo = Mockery::mock(CardRepository::class, [
             $this->config,
             $this->constant,
+            $this->dependencies,
             $this->logger,
             $this->query,
             $this->tools,
