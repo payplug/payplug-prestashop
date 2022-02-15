@@ -34,10 +34,12 @@ class AmountCurrencyClass
 {
 
     private $toolsSpecific;
+    private $dependencies;
 
-    public function __construct($toolsSpecific)
+    public function __construct($toolsSpecific, $dependencies)
     {
         $this->toolsSpecific = $toolsSpecific;
+        $this->dependencies = $dependencies;
     }
 
     /**

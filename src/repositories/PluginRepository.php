@@ -160,7 +160,8 @@ class PluginRepository extends Repository
     private function setRepositories()
     {
         $this->amountCurrencyClass = new AmountCurrencyClass(
-            $this->tools
+            $this->tools,
+            $this->dependencies
         );
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
