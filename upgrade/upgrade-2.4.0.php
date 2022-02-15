@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_4_0()
+function upgrade_module_2_4_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -34,7 +34,7 @@ function upgrade_module_2_4_0()
 
     //sql
     $req_payplug_payment_cart = '
-        ALTER TABLE `'._DB_PREFIX_.'payplug_payment_cart`
+        ALTER TABLE `'._DB_PREFIX_.$object->name.'_payment_cart`
         ADD COLUMN `date_upd` DATETIME NULL
         AFTER `id_cart`';
     $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);

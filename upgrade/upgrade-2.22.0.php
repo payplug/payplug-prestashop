@@ -63,11 +63,11 @@ function upgrade_module_2_22_0($object)
 
     // Update payplug card table
     $sql_requests = [
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP PRIMARY KEY',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` DROP `position`',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
-        ADD PRIMARY KEY (`id_payplug_card`)',
+        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` CHANGE `id_'.$object->name.'_card` `position` INT(11) UNSIGNED NOT NULL',
+        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` DROP PRIMARY KEY',
+        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` DROP `position`',
+        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` ADD `id_'.$object->name.'_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+        ADD PRIMARY KEY (`id_'.$object->name.'_card`)',
     ];
 
     try {

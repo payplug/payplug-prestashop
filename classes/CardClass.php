@@ -48,17 +48,17 @@ class CardClass
      */
     public function uninstallCards()
     {
-        if ($this->sql->checkExistingTable('payplug_card', 1)) {
+        if ($this->sql->checkExistingTable($this->dependencies->name . '_card', 1)) {
             $cards = $this->query
                 ->select()
                 ->fields('*')
-                ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card')
+                ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
                 ->build();
 
             if ($cards) {
                 foreach ($cards as $card) {
                     $id_customer = $card['id_customer'];
-                    $id_payplug_card = $card['id_payplug_card'];
+                    $id_payplug_card = $card['id_' . $this->dependencies->name . '_card'];
                     if (!$this->card->deleteCard((int)$id_customer, (int)$id_payplug_card)) {
                         return false;
                     }

@@ -53,12 +53,12 @@ function upgrade_module_3_7_0($object)
         $id_order_state =  (int)Configuration::get(($key));
         $getTypeQuery = ' 
             SELECT `type` 
-            FROM `' . _DB_PREFIX_ . 'payplug_order_state` 
+            FROM `' . _DB_PREFIX_ . $object->name . '_order_state` 
             WHERE  `id_order_state` = ' . $id_order_state;
         $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
         if (!$sqlGetType) {
             $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
+            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
             VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
         }
     }
