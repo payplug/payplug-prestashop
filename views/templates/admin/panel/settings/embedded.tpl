@@ -25,7 +25,7 @@
     <div class="payplugPanel">
         <div class="payplugPanel_label">{l s='Payment page' mod='payplug'}</div>
         <div class="payplugPanel_content">
-            {if isset($payplug_switch.embedded.format) && $integrated}
+            {if isset($payplug_switch.embedded.format) && $integrated && $standard_isActivated}
                 <div class="payplugSwitch
                     {if $payplug_switch.embedded.checked == 'integrated'}-left{/if}
                     {if $payplug_switch.embedded.checked == 'popup'}-center{/if}

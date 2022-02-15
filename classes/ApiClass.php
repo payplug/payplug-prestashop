@@ -126,10 +126,11 @@ class ApiClass
      */
     public function setPublishableKeys()
     {
-        if (!$this->current_api_key || !$this->dependencies->configClass->isValidFeature('feature_integrated')) {
-            return false;
+        if (!isset($this->current_api_key)) {
+            return [
+                'result' => false,
+                ];
         }
-
         $sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
         $flag = true;
 
@@ -182,7 +183,6 @@ class ApiClass
                 && $response['httpResponse']['publishable_key']
                     ? $response['httpResponse']['publishable_key']
                     : null;
-
             if (!$publishable_key) {
                 Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY');
                 Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
@@ -216,7 +216,6 @@ class ApiClass
         } else {
             self::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
         }
-
         return [
             'result' => $flag,
             'error' => []
@@ -575,11 +574,16 @@ class ApiClass
     {
         try {
             $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                $publishable_keys = $this->setPublishableKeys();
-                return $publishable_keys;
+                if ($this->dependencies->configClass->isValidFeature('feature_integrated') && (version_compare(_PS_VERSION_, '1.7', '>='))) {
+                    $publishable_keys = $this->setPublishableKeys();
+                    return $publishable_keys['result'];
+                } else {
+                    return true;
+                }
             } else {
                 return false;
             }
