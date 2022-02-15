@@ -81,7 +81,7 @@ class InstallmentClass extends \PaymentModule
                         UPDATE `' . _DB_PREFIX_ . $dependencies->name . '_installment` 
                         SET `id_payment` = \'' . pSQL($pay_id) . '\', 
                         `status` = \'' . (int)$status . '\' 
-                        WHERE `id_payplug_installment` = ' . (int)$step2update['id_payplug_installment'];
+                        WHERE `id_' . $dependencies->name . '_installment` = ' . (int)$step2update['id_' . $dependencies->name . '_installment'];
                     $res_insert_installment = Db::getInstance()->Execute($req_insert_installment);
 
                     if (!$res_insert_installment) {
