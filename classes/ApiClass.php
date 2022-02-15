@@ -578,9 +578,14 @@ class ApiClass
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                if ($this->dependencies->configClass->isValidFeature('feature_integrated') && (version_compare(_PS_VERSION_, '1.7', '>='))) {
-                    $publishable_keys = $this->setPublishableKeys();
-                    return $publishable_keys['result'];
+                if ($this->dependencies->configClass->isValidFeature('feature_integrated') && (version_compare(
+                    _PS_VERSION_,
+                    '1.7',
+                    '>='
+                ))) {
+                    if ($this->setPublishableKeys()) {
+                        return true;
+                    }
                 } else {
                     return true;
                 }
