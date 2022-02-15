@@ -32,7 +32,6 @@ use Tools;
 
 class AmountCurrencyClass
 {
-
     private $toolsSpecific;
     private $dependencies;
 

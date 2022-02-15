@@ -361,8 +361,6 @@ class ConfigClass
      */
     public function getAvailableOptions($cart)
     {
-
-
         if (!$this->isAllowed()) {
             return false;
         }
