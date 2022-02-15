@@ -78,12 +78,6 @@ class RepositoryBase extends TestCase
             ->shouldReceive('info')
             ->andReturn(true);
 
-        $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
-
-        $this->dependencies
-            ->shouldReceive('getConfigurationKey')
-            ->andReturn(true);
-
         $this->setSpecific();
         $this->setRepository();
         $this->setTemporariesClasses();
@@ -118,7 +112,11 @@ class RepositoryBase extends TestCase
 
     private function setTemporariesClasses()
     {
+        $this->dependencies = MockHelper::createMockFactory('Payplug\classes\DependenciesClass');
 
+        $this->dependencies
+            ->shouldReceive('getConfigurationKey')
+            ->andReturn(true);
 
         $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools, $this->dependencies);
         $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
