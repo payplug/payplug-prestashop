@@ -5,6 +5,7 @@ $moduleName = $configuration->moduleName;
 $moduleVersion = $configuration->version;
 
 echo 'Building module with version ' . $moduleVersion . "\n";
+
 $path = dirname(__FILE__)."/../".$moduleName.".php";
 $str = file_get_contents($path);
 $fp = fopen($path, 'w');

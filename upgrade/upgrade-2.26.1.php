@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_26_1()
+function upgrade_module_2_26_1($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -36,8 +36,8 @@ function upgrade_module_2_26_1()
 
     // Update payplug lock table
     $sql_requests = [
-        'TRUNCATE TABLE `'._DB_PREFIX_.'payplug_lock`',
-        'ALTER TABLE `'._DB_PREFIX_.'payplug_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
+        'TRUNCATE TABLE `'._DB_PREFIX_.$object->name.'_lock`',
+        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
     ];
 
     try {

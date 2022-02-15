@@ -162,8 +162,9 @@ build zip bnpl:
     - shopt -s extglob
     - mv !(payplug|composer.json) payplug
     - cp composer.json ./payplug
+    - composer archive --file bnpl_$CI_COMMIT_REF_NAME --format zip
     - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file payplug_qa_bnpl_$CI_COMMIT_REF_NAME --format zip
+    - composer archive --file bnpl_qa_$CI_COMMIT_REF_NAME --format zip
   artifacts:
     paths:
       - payplug_qa_bnpl_$CI_COMMIT_REF_NAME.zip

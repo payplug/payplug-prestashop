@@ -76,11 +76,12 @@ class InstallmentClass extends \PaymentModule
                 $step = $index . '/' . $step_count;
 
                 if ($step2update = self::getStoredInstallmentTransaction($installment, $step)) {
+                    $dependencies = new DependenciesClass();
                     $req_insert_installment = '
-                        UPDATE `' . _DB_PREFIX_ . 'payplug_installment` 
+                        UPDATE `' . _DB_PREFIX_ . $dependencies->name . '_installment` 
                         SET `id_payment` = \'' . pSQL($pay_id) . '\', 
                         `status` = \'' . (int)$status . '\' 
-                        WHERE `id_payplug_installment` = ' . (int)$step2update['id_payplug_installment'];
+                        WHERE `id_' . $dependencies->name . '_installment` = ' . (int)$step2update['id_' . $dependencies->name . '_installment'];
                     $res_insert_installment = Db::getInstance()->Execute($req_insert_installment);
 
                     if (!$res_insert_installment) {
@@ -103,9 +104,10 @@ class InstallmentClass extends \PaymentModule
         if (!is_object($installment)) {
             $installment = InstallmentPlan::retrieve($installment);
         }
+        $dependencies = new DependenciesClass();
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi 
+            FROM `' . _DB_PREFIX_ . $dependencies->name . '_installment` pi 
             WHERE pi.id_installment = \'' . $installment->id . '\' 
             AND pi.step = ' . (int)$step;
         $res_installment = Db::getInstance()->getRow($req_installment);
@@ -135,6 +137,7 @@ class InstallmentClass extends \PaymentModule
             if (isset($installment->schedule)) {
                 $step_count = count($installment->schedule);
                 $index = 0;
+                $dependencies = new DependenciesClass();
                 foreach ($installment->schedule as $schedule) {
                     $index++;
                     $pay_id = '';
@@ -148,7 +151,7 @@ class InstallmentClass extends \PaymentModule
                     $step = $index . '/' . $step_count;
                     $date = $schedule->date;
                     $req_insert_installment = '
-                INSERT INTO `' . _DB_PREFIX_ . 'payplug_installment` (
+                INSERT INTO `' . _DB_PREFIX_ . $dependencies->name . '_installment` (
                     `id_installment`, 
                     `id_payment`, 
                     `id_order`, 
@@ -190,9 +193,10 @@ class InstallmentClass extends \PaymentModule
         if (!is_object($installment)) {
             $installment = InstallmentPlan::retrieve($installment);
         }
+        $dependencies = new DependenciesClass();
         $req_installment = '
             SELECT pi.*
-            FROM `' . _DB_PREFIX_ . 'payplug_installment` pi
+            FROM `' . _DB_PREFIX_ . $dependencies->name . '_installment` pi
             WHERE pi.id_payment = \'' . $installment->id . '\'';
         $res_installment = Db::getInstance()->executeS($req_installment);
 
@@ -212,9 +216,10 @@ class InstallmentClass extends \PaymentModule
      */
     public static function getInstallmentByCart($id_cart)
     {
+        $dependencies = new DependenciesClass();
         $req_installment_cart = '
             SELECT pic.id_payment 
-            FROM ' . _DB_PREFIX_ . 'payplug_payment pic 
+            FROM ' . _DB_PREFIX_ . $dependencies->name . '_payment pic 
             WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
         $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
         if (!$res_installment_cart) {

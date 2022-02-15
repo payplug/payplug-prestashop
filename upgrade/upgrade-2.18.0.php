@@ -42,8 +42,8 @@ function upgrade_module_2_18_0($object)
 
     //sql
     $req_payplug_installment = '
-            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'payplug_installment` (
-            `id_payplug_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.$object->name.'_installment` (
+            `id_'.$object->name.'_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_installment` VARCHAR(255) NOT NULL,
             `id_payment` VARCHAR(255) NULL,
             `id_order` INT(11) UNSIGNED NOT NULL,

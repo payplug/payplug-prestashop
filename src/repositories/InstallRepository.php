@@ -192,17 +192,17 @@ class InstallRepository extends Repository
             $id_order_state = $this->config->get($key);
             $getTypeQuery = ' 
                 SELECT `type` 
-                FROM `' . _DB_PREFIX_ . 'payplug_order_state` 
+                FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
                 WHERE  `id_order_state` = ' . $id_order_state;
             $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
             if ($sqlGetType  && $sqlGetType  != $type) {
                 $payplug_order_states_sql[] = '
-                 UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` 
+                 UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
                  SET `type` = ' . "'$type'" . ' 
                  WHERE  `id_order_state` = ' . $id_order_state;
             } else {
                 $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
+            INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
             VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
             }
         }
@@ -405,7 +405,7 @@ class InstallRepository extends Repository
                 'logable' => true,
                 'send_email' => true,
                 'paid' => true,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -424,7 +424,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -443,7 +443,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -462,7 +462,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -481,7 +481,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -500,7 +500,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => true,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -519,7 +519,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -538,7 +538,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,

@@ -33,6 +33,7 @@ class CardRepository extends Repository
     private $cardEntity;
     private $configurationSpecific;
     private $constant;
+    private $dependencies;
     private $query;
     private $logger;
     private $toolsSpecific;
@@ -40,6 +41,7 @@ class CardRepository extends Repository
     public function __construct(
         $configurationSpecific,
         $constant,
+        $dependencies,
         $logger,
         $query,
         $tools
@@ -47,6 +49,7 @@ class CardRepository extends Repository
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = $configurationSpecific;
         $this->constant = $constant;
+        $this->dependencies = $dependencies;
         $this->logger = $logger;
         $this->query = $query;
         $this->toolsSpecific = $tools;
@@ -312,15 +315,15 @@ class CardRepository extends Repository
             !is_int($id_payplug_card)
         ) {
             $this->logger->addLog('Error:  Bad parameters were passed to [getCard]'
-                . '$id_payplug_card: ' . json_encode($id_payplug_card));
+                . '$id_' . $this->dependencies->name . '_card: ' . json_encode($id_payplug_card));
             return false;
         }
 
         $this->query
             ->select()
             ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card')
-            ->where('`id_payplug_card` = ' . (int)$id_payplug_card);
+            ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
+            ->where('`id_' . $this->dependencies->name . '_card` = ' . (int)$id_payplug_card);
 
         try {
             $card = $this->query->build();
@@ -330,7 +333,7 @@ class CardRepository extends Repository
 
         if (empty($card)) {
             $this->logger->addLog('Error : No card found for these parameters [getCard]. $id_customer: '
-                . '$id_payplug_card: ' . json_encode($id_payplug_card));
+                . '$id_' . $this->dependencies->name . '_card: ' . json_encode($id_payplug_card));
             return false;
         }
 

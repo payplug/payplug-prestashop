@@ -168,6 +168,7 @@ class PluginRepository extends Repository
         $this->card = new CardRepository(
             $this->configuration,
             $this->constant,
+            $this->dependencies,
             $this->logger,
             $this->query,
             $this->tools
@@ -188,6 +189,7 @@ class PluginRepository extends Repository
             $this->cacheEntity,
             $this->query,
             $this->configuration,
+            $this->dependencies,
             $this->logger,
             $this->constant
         );

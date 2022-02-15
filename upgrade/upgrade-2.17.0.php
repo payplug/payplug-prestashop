@@ -25,14 +25,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_.'payplug/classes/MyLogPHP.php');
-
 function upgrade_module_2_17_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
         return true;
     }
+
+    require_once(_PS_MODULE_DIR_.$object->name.'/classes/MyLogPHP.php');
 
     $flag = true;
 
@@ -49,8 +49,8 @@ function upgrade_module_2_17_0($object)
 
     //sql
     $req_payplug_installment_cart = '
-            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'payplug_installment_cart` (
-            `id_payplug_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.$object->name.'_installment_cart` (
+            `id_'.$object->name.'_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_installment` VARCHAR(255) NOT NULL,
             `id_cart` INT(11) UNSIGNED NOT NULL,
             `is_pending` TINYINT(1) NOT NULL DEFAULT 0,

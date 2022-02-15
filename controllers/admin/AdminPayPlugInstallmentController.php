@@ -36,8 +36,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     {
         $this->dependencies = new \PayPlug\classes\DependenciesClass();
         $this->bootstrap = true;
-        $this->table = 'payplug_installment';
-        $this->id = 'id_payplug_installment';
+        $this->table = $this->dependencies->name . '_installment';
+        $this->id = 'id_' . $this->dependencies->name . '_installment';
         $this->lang = false;
         $this->addRowAction('view');
         $this->explicitSelect = true;
@@ -53,14 +53,14 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $this->_join = '
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`) 
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = a.`id_order`)';
-        $this->_orderBy = 'id_payplug_installment';
+        $this->_orderBy = 'id_' . $this->dependencies->name . '_installment';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
 
         parent::__construct();
 
         $this->fields_list = [
-            'id_payplug_installment' => [
+            'id_' . $this->dependencies->name . '_installment' => [
                 'title' => $this->l('ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs',
@@ -126,7 +126,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
     public function viewPayplugInstallment()
     {
-        $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
+        $id_payplug_installment = (int)(Tools::getValue('id_' . $this->dependencies->name . '_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
         Tools::redirectAdmin(
             'index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.
@@ -138,8 +138,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     {
         $req_order = '
             SELECT DISTINCT pi.id_order
-            FROM `'._DB_PREFIX_.'payplug_installment` pi 
-            WHERE pi.id_payplug_installment = '.pSQL($id_payplug_installment);
+            FROM `'._DB_PREFIX_.$this->table.'` pi
+            WHERE pi.id_'.$this->dependencies->name.'_installment = '.pSQL($id_payplug_installment);
         $res_order = DB::getInstance()->getValue($req_order);
 
         if (!$res_order) {
