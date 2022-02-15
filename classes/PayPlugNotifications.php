@@ -719,7 +719,7 @@ class PayPlugNotifications
         // Check if order amount is valid
         $is_valid_amount = (bool)$this->payment->is_paid;
         if ($this->is_installment) {
-            $is_valid_amount = (bool)AmountCurrencyClass::checkAmountPaidIsCorrect(
+            $is_valid_amount = $this->amountCurrencyClass->checkAmountPaidIsCorrect(
                 $this->payment->amount / 100,
                 $this->order
             );
@@ -890,7 +890,7 @@ class PayPlugNotifications
         $this->apiClass = $this->dependencies->apiClass;
         $this->orderClass =  $this->dependencies->orderClass;
         $this->paymentClass =  $this->dependencies->paymentClass;
-        $this->amountCurrencyClass = $this->dependencies->getPlugin()->getAmountCurrencyClass();
+        $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
 

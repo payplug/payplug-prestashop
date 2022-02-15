@@ -23,6 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
+use PayPlug\classes\ConfigClass;
 use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\classes\MyLogPHP;
 
@@ -165,18 +166,18 @@ class PluginRepository extends Repository
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
 
+
+        $this->sql = new SQLtableRepository(
+            $this->query
+        );
         $this->card = new CardRepository(
+            $this->dependencies,
             $this->configuration,
             $this->constant,
             $this->logger,
             $this->query,
             $this->tools
         );
-
-        $this->sql = new SQLtableRepository(
-            $this->query
-        );
-
         $this->hook = new HookRepository(
             $this->dependencies,
             $this->constant,
@@ -188,6 +189,7 @@ class PluginRepository extends Repository
             $this->cacheEntity,
             $this->query,
             $this->configuration,
+            $this->dependencies,
             $this->logger,
             $this->constant
         );

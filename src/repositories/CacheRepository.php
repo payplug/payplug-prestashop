@@ -30,6 +30,7 @@ class CacheRepository extends Repository
     public $cacheEntity;
     private $query;
     private $config;
+    private $dependencies;
     private $logger;
     private $constant;
 
@@ -37,11 +38,13 @@ class CacheRepository extends Repository
         $cacheEntity,
         $query,
         $config,
+        $dependencies,
         $logger,
         $constant
     ) {
         $this->cacheEntity = $cacheEntity;
         $this->config = $config;
+        $this->dependencies = $dependencies;
         $this->logger = $logger;
         $this->query = $query;
         $this->constant = $constant;
@@ -121,7 +124,9 @@ class CacheRepository extends Repository
             (int)$amount . '_' .
             (string)$country . '_' .
             (string)implode('_', $operations) . '_' .
-            ($this->config->get('PAYPLUG_SANDBOX_MODE') ? 'test' : 'live');
+            ($this->config->get(
+                $this->dependencies->configClass->getConfigurationKey('sandboxMode')
+            ) ? 'test' : 'live');
 
         return [
             'result' => $cache_id,

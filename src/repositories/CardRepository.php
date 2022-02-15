@@ -30,6 +30,8 @@ use PayPlug\src\entities\CardEntity;
 
 class CardRepository extends Repository
 {
+    protected $dependencies;
+
     private $cardEntity;
     private $configurationSpecific;
     private $constant;
@@ -38,6 +40,7 @@ class CardRepository extends Repository
     private $toolsSpecific;
 
     public function __construct(
+        $dependencies,
         $configurationSpecific,
         $constant,
         $logger,
@@ -50,6 +53,7 @@ class CardRepository extends Repository
         $this->logger = $logger;
         $this->query = $query;
         $this->toolsSpecific = $tools;
+        $this->dependencies = $dependencies;
         $this->setParams();
     }
 
@@ -416,6 +420,7 @@ class CardRepository extends Repository
         }
 
         $config = $this->configurationSpecific;
+        $configClass = $this->dependencies->configClass;
 
         $brand = $payment->card->brand;
         if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
@@ -427,8 +432,12 @@ class CardRepository extends Repository
         $customer_id = isset($payment->metadata['ID Client']) ?
             (int)$payment->metadata['ID Client'] :
             (int)$payment->metadata['Client'];
-        $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
-        $company_id = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
+        $is_sandbox = (int)$config->get(
+            $configClass->getConfigurationKey('sandboxMode')
+        );
+        $company_id = (int)$config->get(
+            $configClass->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
+        );
 
         $exists = $this->checkExists((string)$payment->card->id, (int)$company_id, (bool)$is_sandbox);
         if ($exists) {
@@ -473,12 +482,16 @@ class CardRepository extends Repository
         return true;
     }
 
-    private function setParams()
+    public function setParams()
     {
         $config = $this->configurationSpecific;
-        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
-        $idCompany = $config->get('PAYPLUG_COMPANY_ID' . ($isSandbox ? '_TEST' : ''));
-        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
+        $configClass = $this->dependencies->configClass;
+        $isSandbox = $config->get(
+            $configClass->getConfigurationKey('sandboxMode')
+        );
+        $idCompany = $config->get(
+            $configClass->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
+        );
         $this->logger->setParams(['process' => 'cardRepository']);
 
         $this->cardEntity

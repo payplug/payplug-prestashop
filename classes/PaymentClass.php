@@ -775,7 +775,7 @@ class PaymentClass
      */
     public function getPaymentOptions($cart)
     {
-        $options = ConfigClass::getAvailableOptions($cart);
+        $options = $this->dependencies->configClass->getAvailableOptions($cart);
 
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 

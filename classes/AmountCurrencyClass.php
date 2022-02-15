@@ -32,6 +32,7 @@ use Tools;
 
 class AmountCurrencyClass
 {
+
     private $toolsSpecific;
 
     public function __construct($toolsSpecific)
@@ -45,10 +46,10 @@ class AmountCurrencyClass
      * @param Cart $cart
      * @return bool
      */
-    public static function checkAmount($cart)
+    public function checkAmount($cart)
     {
         $currency = new Currency($cart->id_currency);
-        $amounts_by_currency = self::getAmountsByCurrency($currency->iso_code);
+        $amounts_by_currency = $this->getAmountsByCurrency($currency->iso_code);
         $amount = $cart->getOrderTotal(true, Cart::BOTH) * 100;
         if ($amount < $amounts_by_currency['min_amount'] || $amount > $amounts_by_currency['max_amount']) {
             return false;
@@ -64,7 +65,7 @@ class AmountCurrencyClass
      * @param Order $order
      * @return bool
      */
-    public static function checkAmountPaidIsCorrect($amount, $order)
+    public function checkAmountPaidIsCorrect($amount, $order)
     {
         $order_amount = $order->total_paid;
 
@@ -94,10 +95,10 @@ class AmountCurrencyClass
      * @param Cart $cart
      * @return bool
      */
-    public static function checkCurrency($cart)
+    public function checkCurrency($cart)
     {
         $currency_order = new Currency((int)($cart->id_currency));
-        if (!in_array(\Tools::strtoupper($currency_order->iso_code), self::getSupportedCurrencies())) {
+        if (!in_array(\Tools::strtoupper($currency_order->iso_code), $this->getSupportedCurrencies())) {
             return false;
         }
         return true;
@@ -126,10 +127,12 @@ class AmountCurrencyClass
      *
      * @return array
      */
-    private static function getSupportedCurrencies()
+    private function getSupportedCurrencies()
     {
         $currencies = [];
-        foreach (explode(';', Configuration::get('PAYPLUG_MIN_AMOUNTS')) as $amount_cur) {
+        foreach (explode(';', Configuration::get(
+            $this->dependencies->configClass->getConfigurationKey('minAmounts')
+        )) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $currencies[] = Tools::strtoupper($cur[1]);
@@ -144,12 +147,16 @@ class AmountCurrencyClass
      * @param string $iso_code
      * @return array
      */
-    public static function getAmountsByCurrency($iso_code)
+    public function getAmountsByCurrency($iso_code)
     {
         $min_amounts = [];
         $max_amounts = [];
-        $min = Configuration::get('PAYPLUG_MIN_AMOUNTS');
-        $max = Configuration::get('PAYPLUG_MAX_AMOUNTS');
+        $min = Configuration::get(
+            $this->dependencies->configClass->getConfigurationKey('minAmounts')
+        );
+        $max = Configuration::get(
+            $this->dependencies->configClass->getConfigurationKey('maxAmounts')
+        );
         foreach (explode(';', Tools::strtoupper($min)) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);

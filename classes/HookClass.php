@@ -95,9 +95,11 @@ class HookClass
         foreach ($all_order_states as $state) {
             foreach ($state['payplug_cfg'] as $config) {
                 $name = $state['name'][$language->iso_code];
-                $id_order_state = $this->config->get($config);
+                $id_order_state = $this->config->get(
+                    $this->dependencies->configClass->concatenateModuleNameTo($config)
+                );
                 if (in_array($id_order_state, $payplug_order_states)) {
-                    if (strpos($config, '_TEST')) {
+                    if (strpos($this->dependencies->configClass->concatenateModuleNameTo($config), '_TEST')) {
                         $name .= ' [TEST]';
                     } else {
                         $name .= ' [PayPlug]';
@@ -219,15 +221,21 @@ class HookClass
 
         foreach ($all_order_states as $order_state) {
             foreach ($order_state['payplug_cfg'] as $payplug_conf) {
-                if (in_array($this->config->get($payplug_conf), $payplug_order_states)) {
+                if (in_array($this->config->get(
+                    $this->dependencies->configClass->concatenateModuleNameTo($payplug_conf)
+                ), $payplug_order_states)) {
                     $ps_order_state_name = $order_state['name'][$params['lang']->iso_code];
-                    if (strpos($payplug_conf, '_TEST')) {
+                    if (strpos($this->dependencies->configClass->concatenateModuleNameTo(
+                        $payplug_conf
+                    ), '_TEST')) {
                         $ps_order_state_name .= ' [TEST]';
                     } else {
                         $ps_order_state_name .= ' [PayPlug]';
                     }
 
-                    $ps_order_state = new OrderState($this->config->get($payplug_conf));
+                    $ps_order_state = new OrderState($this->config->get(
+                        $this->dependencies->configClass->concatenateModuleNameTo($payplug_conf)
+                    ));
                     $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
                     $ps_order_state->save();
                 }
