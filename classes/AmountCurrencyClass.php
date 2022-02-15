@@ -131,7 +131,7 @@ class AmountCurrencyClass
     {
         $currencies = [];
         foreach (explode(';', Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('minAmounts')
+            $this->dependencies->getConfigurationKey('minAmounts')
         )) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
@@ -152,10 +152,10 @@ class AmountCurrencyClass
         $min_amounts = [];
         $max_amounts = [];
         $min = Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('minAmounts')
+            $this->dependencies->getConfigurationKey('minAmounts')
         );
         $max = Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('maxAmounts')
+            $this->dependencies->getConfigurationKey('maxAmounts')
         );
         foreach (explode(';', Tools::strtoupper($min)) as $amount_cur) {
             $cur = [];

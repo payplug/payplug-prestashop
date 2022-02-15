@@ -37,7 +37,6 @@ use Tools;
 class PrestashopSpecific17
 {
     private $config;
-    private $configClass;
     private $context;
     private $dependencies;
 
@@ -50,7 +49,6 @@ class PrestashopSpecific17
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
 
-        $this->configClass = $this->dependencies->configClass;
     }
 
     public function displayHeader()
@@ -62,9 +60,9 @@ class PrestashopSpecific17
 
     public function displayPaymentOption($payment_options)
     {
-        if ($this->configClass->isValidFeature('feature_integrated')
+        if ($this->dependencies->configClass->isValidFeature('feature_integrated')
             && (string)$this->config->get(
-                $this->configClass->getConfigurationKey('embeddedMode')
+                $this->dependencies->getConfigurationKey('embeddedMode')
             ) == 'integrated') {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
@@ -149,10 +147,10 @@ class PrestashopSpecific17
         $this->context->smarty->assign([
                 'integrated_payment_js_url' => $integrated_payment_js_url,
                 'is_one_click_activated' => (bool)$this->config->get(
-                    $this->configClass->getConfigurationKey('oneClick')
+                    $this->dependencies->getConfigurationKey('oneClick')
                 ),
                 'is_deferred_activated' => (bool)$this->config->get(
-                    $this->configClass->getConfigurationKey('deferred')
+                    $this->dependencies->getConfigurationKey('deferred')
                 ),
                 'placeholderCardholder' => $this->dependencies->l(
                     'specific17.setIntegratedPaymentOption.placeholderCardholder',
@@ -173,7 +171,7 @@ class PrestashopSpecific17
         ]);
 
         $integrated['additionalInformation'] =
-            $this->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
+            $this->dependencies->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
         $payment_options['standard'] = $integrated;
         return $payment_options;

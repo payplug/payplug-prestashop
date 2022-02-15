@@ -38,23 +38,23 @@ $logger = $dependencies->getPlugin()->logger();
 $module = $dependencies->getPlugin()->getModule();
 
 if (Tools::getValue('_ajax') == 1) {
-    if ((int)Tools::getValue('en') == 1 && (int)Configuration::get($configClass->getConfigurationKey('show')) == 0) {
-        Configuration::updateValue($configClass->getConfigurationKey('show'), 1);
+    if ((int)Tools::getValue('en') == 1 && (int)Configuration::get($dependencies->getConfigurationKey('show')) == 0) {
+        Configuration::updateValue($dependencies->getConfigurationKey('show'), 1);
         $module->getInstanceByName($dependencies->name)->enable();
         die(true);
     }
     if (Tools::getIsset('en')
         && (int)Tools::getValue('en') == 0
-        && (int)Configuration::get($configClass->getConfigurationKey('show')) == 1
+        && (int)Configuration::get($dependencies->getConfigurationKey('show')) == 1
     ) {
-        Configuration::updateValue($configClass->getConfigurationKey('show'), 0);
+        Configuration::updateValue($dependencies->getConfigurationKey('show'), 0);
         die(true);
     }
     if (Tools::getIsset('db')) {
         if (Tools::getValue('db') == 'on') {
-            Configuration::updateValue($configClass->getConfigurationKey('debugMode'), 1);
+            Configuration::updateValue($dependencies->getConfigurationKey('debugMode'), 1);
         } elseif (Tools::getValue('db') == 'off') {
-            Configuration::updateValue($configClass->getConfigurationKey('debugMode'), 0);
+            Configuration::updateValue($dependencies->getConfigurationKey('debugMode'), 0);
         }
         die(true);
     }
@@ -114,7 +114,7 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode(['content' => $content]));
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
-        $api_key = Configuration::get($configClass->getConfigurationKey('liveApiKey'));
+        $api_key = Configuration::get($dependencies->getConfigurationKey('liveApiKey'));
         die(json_encode($dependencies->apiClass->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {

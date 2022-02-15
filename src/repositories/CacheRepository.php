@@ -125,7 +125,7 @@ class CacheRepository extends Repository
             (string)$country . '_' .
             (string)implode('_', $operations) . '_' .
             ($this->config->get(
-                $this->dependencies->configClass->getConfigurationKey('sandboxMode')
+                $this->dependencies->getConfigurationKey('sandboxMode')
             ) ? 'test' : 'live');
 
         return [

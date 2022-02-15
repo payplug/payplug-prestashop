@@ -43,140 +43,6 @@ use Validate;
 class ConfigClass
 {
     public $amountCurrencyClass;
-    public $configurationKeys = [
-        'alloSaveCard' => [
-            'name' => 'ALLOW_SAVE_CARD',
-            'defaultValue' => 0
-        ],
-        'bancontact' => [
-            'name' => 'BANCONTACT',
-            'defaultValue' => null
-        ],
-        'companyId' => [
-            'name' => 'COMPANY_ID',
-            'defaultValue' => null
-        ],
-        'companyStatus' => [
-            'name' => 'COMPANY_STATUS',
-            'defaultValue' => ''
-        ],
-        'companyIso' => [
-            'name' => 'COMPANY_ISO',
-            'defaultValue' => ''
-        ],
-        'currencies' => [
-            'name' => 'CURRENCIES',
-            'defaultValue' => 'EUR'
-        ],
-        'debugMode' => [
-            'name' => 'DEBUG_MODE',
-            'defaultValue' => 0
-        ],
-        'deffered' => [
-            'name' => 'DEFFERED',
-            'defaultValue' => 0
-        ],
-        'defferedAuto' => [
-            'name' => 'DEFFERED_AUTO',
-            'defaultValue' => 0
-        ],
-        'defferedState' => [
-            'name' => 'DEFFERED_STATE',
-            'defaultValue' => 0
-        ],
-        'email' => [
-            'name' => 'EMAIL',
-            'defaultValue' => null
-        ],
-        'embbededMode' => [
-            'name' => 'EMBEDDED_MODE',
-            'defaultValue' => 'redirected'
-        ],
-        'inst' => [
-            'name' => 'INST',
-            'defaultValue' => null
-        ],
-        'instMinAmount' => [
-            'name' => 'INST_MIN_AMOUNT',
-            'defaultValue' => 150
-        ],
-        'instMode' => [
-            'name' => 'INST_MODE',
-            'defaultValue' => 3
-        ],
-        'keepCards' => [
-            'name' => 'KEEP_CARDS',
-            'defaultValue' => 0
-        ],
-        'liveApiKey' => [
-            'name' => 'LIVE_API_KEY',
-            'defaultValue' => null
-        ],
-        'maxAmounts' => [
-            'name' => 'MAX_AMOUNTS',
-            'defaultValue' => 'EUR:1000000'
-        ],
-        'minAmounts' => [
-            'name' => 'MIN_AMOUNTS',
-            'defaultValue' => 'EUR:1'
-        ],
-        'offer' => [
-            'name' => 'OFFER',
-            'defaultValue' => ''
-        ],
-        'oneClick' => [
-            'name' => 'ONE_CLICK',
-            'defaultValue' => null
-        ],
-        'oney' => [
-            'name' => 'ONEY',
-            'defaultValue' => null
-        ],
-        'oneyAllowedCountries' => [
-            'name' => 'ONEY_ALLOWED_COUNTRIES',
-            'defaultValue' => ''
-        ],
-        'oneyMaxAmounts' => [
-            'name' => 'ONEY_MAX_AMOUNTS',
-            'defaultValue' => 'EUR:300000'
-        ],
-        'oneyMinAmounts' => [
-            'name' => 'ONEY_MIN_AMOUNTS',
-            'defaultValue' => 'EUR:10000'
-        ],
-        'oneyCustomMaxAmounts' => [
-            'name' => 'ONEY_CUSTOM_MAX_AMOUNTS',
-            'defaultValue' => 'EUR:3000'
-        ],
-        'oneyCustomMinAmounts' => [
-            'name' => 'ONEY_CUSTOM_MIN_AMOUNTS',
-            'defaultValue' => 'EUR:100'
-        ],
-        'oneyFees' => [
-            'name' => 'ONEY_FEES',
-            'defaultValue' => 1
-        ],
-        'oneyOptimized' => [
-            'name' => 'ONEY_OPTIMIZED',
-            'defaultValue' => 0
-        ],
-        'sandboxMode' => [
-            'name' => 'SANDBOX_MODE',
-            'defaultValue' => 1
-        ],
-        'show' => [
-            'name' => 'SHOW',
-            'defaultValue' => 0
-        ],
-        'standard' => [
-            'name' => 'STANDARD',
-            'defaultValue' => 1
-        ],
-        'testApiKey' => [
-            'name' => 'TEST_API_KEY',
-            'defaultValue' => null
-        ],
-    ];
     public $email;
     public $features_json;
     public $logger;
@@ -377,7 +243,6 @@ class ConfigClass
     private $install;
     private $oney;
     private $payment_status;
-    private $ssl_enable;
     private $validationErrors = [];
 
 
@@ -426,45 +291,15 @@ class ConfigClass
     }
 
     /**
-     * Get configuration key name for specific module
-     * @param string $key
-     * @return string
-     */
-    public function getConfigurationKey($key)
-    {
-        return $this->concatenateModuleNameTo($this->configurationKeys[$key]['name']);
-    }
-
-    /**
-     * Get configuration default value for specific module
-     * @param string $key
-     * @return string
-     */
-    public function getConfigurationDefaultValue($key)
-    {
-        return $this->configurationKeys[$key]['defaultValue'];
-    }
-
-    /**
-     * Concatenate specific module name to configuration key
-     * @param string $string
-     * @return string
-     */
-    public function concatenateModuleNameTo($string)
-    {
-        return Tools::uppercase($this->dependencies->name) . "_" . $string;
-    }
-
-    /**
      * Set very specific properties
      *
      * @return void
      */
     private function setConfigurationProperties()
     {
-        $this->api_live = Configuration::get($this->getConfigurationKey('liveApiKey'));
-        $this->api_test = Configuration::get($this->getConfigurationKey('testApiKey'));
-        $this->email = Configuration::get($this->getConfigurationKey('email'));
+        $this->api_live = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
+        $this->api_test = Configuration::get($this->dependencies->getConfigurationKey('testApiKey'));
+        $this->email = Configuration::get($this->dependencies->getConfigurationKey('email'));
 
         $available_img_lang = [
             'fr',
@@ -516,7 +351,7 @@ class ConfigClass
      */
     public function disable()
     {
-        return $this->config->updateValue($this->getConfigurationKey('show'), 0);
+        return $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
     }
 
     /**
@@ -533,17 +368,17 @@ class ConfigClass
         $permissions = ApiClass::getAccountPermissions();
 
         $available_options = [
-            'standard' => (int)Configuration::get($this->getConfigurationKey('standard')) === 1,
-            'live' => (int)Configuration::get($this->getConfigurationKey('sandboxMode')) === 0,
-            'embedded' => (string)Configuration::get($this->getConfigurationKey('embeddedMode')),
-            'one_click' => (int)Configuration::get($this->getConfigurationKey('oneClick')) === 1,
-            'installment' => (int)Configuration::get($this->getConfigurationKey('inst')) === 1,
-            'deferred' => (int)Configuration::get($this->getConfigurationKey('deffered')) === 1,
-            'oney' => (int)Configuration::get($this->getConfigurationKey('oney')) === 1,
-            'bancontact' => (int)Configuration::get($this->getConfigurationKey('bancontact')) === 1,
+            'standard' => (int)Configuration::get($this->dependencies->getConfigurationKey('standard')) === 1,
+            'live' => (int)Configuration::get($this->dependencies->getConfigurationKey('sandboxMode')) === 0,
+            'embedded' => (string)Configuration::get($this->dependencies->getConfigurationKey('embeddedMode')),
+            'one_click' => (int)Configuration::get($this->dependencies->getConfigurationKey('oneClick')) === 1,
+            'installment' => (int)Configuration::get($this->dependencies->getConfigurationKey('inst')) === 1,
+            'deferred' => (int)Configuration::get($this->dependencies->getConfigurationKey('deferred')) === 1,
+            'oney' => (int)Configuration::get($this->dependencies->getConfigurationKey('oney')) === 1,
+            'bancontact' => (int)Configuration::get($this->dependencies->getConfigurationKey('bancontact')) === 1,
         ];
 
-        if (Configuration::get($this->getConfigurationKey('email')) === null
+        if (Configuration::get($this->dependencies->getConfigurationKey('email')) === null
             || !$this->amountCurrencyClass->checkCurrency($cart)
             || !$this->amountCurrencyClass->checkAmount($cart)
         ) {
@@ -557,7 +392,7 @@ class ConfigClass
             $available_options['bancontact'] = false;
         } else {
             if (!$permissions['use_live_mode']
-                || Configuration::get($this->getConfigurationKey('liveApiKey')) === null
+                || Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')) === null
             ) {
                 $available_options['live'] = false;
             }
@@ -588,7 +423,7 @@ class ConfigClass
      */
     public function isAllowed()
     {
-        if (!Module::isEnabled('payplug') || !Configuration::get($this->getConfigurationKey('show'))) {
+        if (!Module::isEnabled('payplug') || !Configuration::get($this->dependencies->getConfigurationKey('show'))) {
             return false;
         }
         return true;
@@ -621,9 +456,9 @@ class ConfigClass
      */
     public function checkConfiguration()
     {
-        $payplug_email = Configuration::get('PAYPLUG_EMAIL');
-        $payplug_test_api_key = Configuration::get($this->getConfigurationKey('testApiKey'));
-        $payplug_live_api_key = Configuration::get($this->getConfigurationKey('liveApiKey'));
+        $payplug_email = Configuration::get($this->dependencies->getConfigurationKey('email'));
+        $payplug_test_api_key = Configuration::get($this->dependencies->getConfigurationKey('testApiKey'));
+        $payplug_live_api_key = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
 
         $report = self::checkRequirements();
 
@@ -677,7 +512,7 @@ class ConfigClass
         $check_warning = $this->dependencies->l('payplug.checkConfiguration.issue', 'configclass');
         if ($is_payplug_configured) {
         } else {
-            Configuration::get($this->getConfigurationKey('show'), 0);
+            Configuration::get($this->dependencies->getConfigurationKey('show'), 0);
             $this->check_configuration['warning'][] .= $check_warning;
         }
 
@@ -741,23 +576,23 @@ class ConfigClass
         $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
 
-            $this->getConfigurationKey('deferred') => 'payplug_deferred',
-            $this->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
-            $this->getConfigurationKey('deferredState') => 'payplug_deferred_state',
-            $this->getConfigurationKey('show') => 'payplug_show',
-            $this->getConfigurationKey('embeddedMode') => 'payplug_embedded',
-            $this->getConfigurationKey('inst') => 'payplug_inst',
-            $this->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
-            $this->getConfigurationKey('instMode') => 'payplug_inst_mode',
-            $this->getConfigurationKey('oneClick') => 'payplug_one_click',
-            $this->getConfigurationKey('oney') => 'payplug_oney',
-            $this->getConfigurationKey('oneyOptimized') => 'payplug_oney_optimized',
-            $this->getConfigurationKey('oneyFees') => 'payplug_oney_fees',
-            $this->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
-            $this->getConfigurationKey('standard') => 'payplug_standard',
-            $this->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
-            $this->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
-            $this->getConfigurationKey('bancontact') => 'payplug_bancontact'
+            $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
+            $this->dependencies->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
+            $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
+            $this->dependencies->getConfigurationKey('show') => 'payplug_show',
+            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded',
+            $this->dependencies->getConfigurationKey('inst') => 'payplug_inst',
+            $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
+            $this->dependencies->getConfigurationKey('instMode') => 'payplug_inst_mode',
+            $this->dependencies->getConfigurationKey('oneClick') => 'payplug_one_click',
+            $this->dependencies->getConfigurationKey('oney') => 'payplug_oney',
+            $this->dependencies->getConfigurationKey('oneyOptimized') => 'payplug_oney_optimized',
+            $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney_fees',
+            $this->dependencies->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
+            $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
+            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
+            $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
+            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact'
         ];
 
         foreach ($configurationKeys as $key => $config) {
@@ -851,25 +686,25 @@ class ConfigClass
         $this->checkConfiguration();
 
         $configurations = [
-            'show' => Configuration::get($this->getConfigurationKey('show')),
-            'email' => Configuration::get($this->getConfigurationKey('email')),
-            'sandbox_mode' => Configuration::get($this->getConfigurationKey('sandboxMode')),
-            'embedded_mode' => Configuration::get($this->getConfigurationKey('embeddedMode')),
-            'standard' => Configuration::get($this->getConfigurationKey('standard')),
-            'one_click' => Configuration::get($this->getConfigurationKey('oneClick')),
-            'inst' => Configuration::get($this->getConfigurationKey('inst')),
-            'inst_mode' => Configuration::get($this->getConfigurationKey('instMode')),
-            'inst_min_amount' => Configuration::get($this->getConfigurationKey('instMinAmount')),
-            'test_api_key' => Configuration::get($this->getConfigurationKey('testApiKey')),
-            'live_api_key' => Configuration::get($this->getConfigurationKey('liveApiKey')),
-            'debug_mode' => Configuration::get($this->getConfigurationKey('debugMode')),
-            'deferred' => Configuration::get($this->getConfigurationKey('deferred')),
-            'deferred_auto' => Configuration::get($this->getConfigurationKey('deferredAuto')),
-            'deferred_state' => Configuration::get($this->getConfigurationKey('deferredState')),
-            'oney' => Configuration::get($this->getConfigurationKey('oney')),
-            'oney_fees' => Configuration::get($this->getConfigurationKey('oneyFees')),
-            'oney_optimized' => Configuration::get($this->getConfigurationKey('oneyOptimized')),
-            'bancontact' => Configuration::get($this->getConfigurationKey('bancontact'))
+            'show' => Configuration::get($this->dependencies->getConfigurationKey('show')),
+            'email' => Configuration::get($this->dependencies->getConfigurationKey('email')),
+            'sandbox_mode' => Configuration::get($this->dependencies->getConfigurationKey('sandboxMode')),
+            'embedded_mode' => Configuration::get($this->dependencies->getConfigurationKey('embeddedMode')),
+            'standard' => Configuration::get($this->dependencies->getConfigurationKey('standard')),
+            'one_click' => Configuration::get($this->dependencies->getConfigurationKey('oneClick')),
+            'inst' => Configuration::get($this->dependencies->getConfigurationKey('inst')),
+            'inst_mode' => Configuration::get($this->dependencies->getConfigurationKey('instMode')),
+            'inst_min_amount' => Configuration::get($this->dependencies->getConfigurationKey('instMinAmount')),
+            'test_api_key' => Configuration::get($this->dependencies->getConfigurationKey('testApiKey')),
+            'live_api_key' => Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')),
+            'debug_mode' => Configuration::get($this->dependencies->getConfigurationKey('debugMode')),
+            'deferred' => Configuration::get($this->dependencies->getConfigurationKey('deferred')),
+            'deferred_auto' => Configuration::get($this->dependencies->getConfigurationKey('deferredAuto')),
+            'deferred_state' => Configuration::get($this->dependencies->getConfigurationKey('deferredState')),
+            'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
+            'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
+            'oney_optimized' => Configuration::get($this->dependencies->getConfigurationKey('oneyOptimized')),
+            'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact'))
         ];
 
         $connected = !empty($configurations['email'])
@@ -923,7 +758,7 @@ class ConfigClass
             ]);
         } else {
             $this->context->smarty->assign([
-                'PAYPLUG_EMAIL' => $configurations['email'],
+                'payplug_email' => $configurations['email'],
             ]);
         }
 
@@ -1469,8 +1304,8 @@ class ConfigClass
          * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
          * Because pwd with special chars don't work
          */
-        $password = $_POST['PAYPLUG_PASSWORD'];
-        $email = Tools::getValue('PAYPLUG_EMAIL');
+        $password = $_POST['payplug_password'];
+        $email = Tools::getValue('payplug_email');
 
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             die(json_encode([
@@ -1479,8 +1314,11 @@ class ConfigClass
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
-                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
-                Configuration::updateValue('PAYPLUG_SHOW', 1);
+                Configuration::updateValue(
+                    $this->dependencies->getConfigurationKey('email'),
+                    Tools::getValue('payplug_email')
+                );
+                Configuration::updateValue($this->dependencies->getConfigurationKey('show'), 1);
 
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');

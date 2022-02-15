@@ -433,10 +433,10 @@ class CardRepository extends Repository
             (int)$payment->metadata['ID Client'] :
             (int)$payment->metadata['Client'];
         $is_sandbox = (int)$config->get(
-            $configClass->getConfigurationKey('sandboxMode')
+            $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $company_id = (int)$config->get(
-            $configClass->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
+            $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
         );
 
         $exists = $this->checkExists((string)$payment->card->id, (int)$company_id, (bool)$is_sandbox);
@@ -487,10 +487,10 @@ class CardRepository extends Repository
         $config = $this->configurationSpecific;
         $configClass = $this->dependencies->configClass;
         $isSandbox = $config->get(
-            $configClass->getConfigurationKey('sandboxMode')
+            $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $idCompany = $config->get(
-            $configClass->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
+            $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
         );
         $this->logger->setParams(['process' => 'cardRepository']);
 

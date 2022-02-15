@@ -54,7 +54,7 @@ class PayPlugValidation
         $this->orderClass = $this->dependencies->orderClass;
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->debug = Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('debugMode')
+            $this->dependencies->getConfigurationKey('debugMode')
         );
         $this->plugin = $this->dependencies->getPlugin();
         $this->setConfig();
@@ -185,10 +185,10 @@ class PayPlugValidation
                     $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
                     $this->api_key = (bool)$installment->is_live ?
                         Configuration::get(
-                            $this->dependencies->configClass->getConfigurationKey('liveApiKey')
+                            $this->dependencies->getConfigurationKey('liveApiKey')
                         ) :
                         Configuration::get(
-                            $this->dependencies->configClass->getConfigurationKey('testApiKey')
+                            $this->dependencies->getConfigurationKey('testApiKey')
                         );
                     if (isset($installment->schedule)) {
                         foreach ($installment->schedule as $schedule) {
@@ -235,10 +235,10 @@ class PayPlugValidation
                 $payment = \Payplug\Payment::retrieve($pay_id);
                 $this->api_key = (bool)$payment->is_live ?
                     Configuration::get(
-                        $this->dependencies->configClass->getConfigurationKey('liveApiKey')
+                        $this->dependencies->getConfigurationKey('liveApiKey')
                     ) :
                     Configuration::get(
-                        $this->dependencies->configClass->getConfigurationKey('testApiKey')
+                        $this->dependencies->getConfigurationKey('testApiKey')
                     );
                 $this->logger->addLog('Retrieving payment: ' . $payment->id);
                 if (isset($payment->failure) && $payment->failure !== null) {
@@ -385,23 +385,23 @@ class PayPlugValidation
             }
 
             $pending_state = Configuration::get(
-                $this->dependencies->configClass->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
             );
             $paid_state = Configuration::get(
-                $this->dependencies->configClass->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
             );
             /*
             * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
             * We keep this $inst_state to give more readability.
             */
             $inst_state = Configuration::get(
-                $this->dependencies->configClass->concatenateModuleNameTo('ORDER_STATE_PAID' . $state_addons)
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID' . $state_addons)
             );
             $auth_state = Configuration::get(
-                $this->dependencies->configClass->concatenateModuleNameTo('ORDER_STATE_AUTH' . $state_addons)
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH' . $state_addons)
             );
             $oney_state = Configuration::get(
-                $this->dependencies->configClass->concatenateModuleNameTo('ORDER_STATE_ONEY_PG' . $state_addons)
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG' . $state_addons)
             );
 
             if ($this->type == 'installment') {

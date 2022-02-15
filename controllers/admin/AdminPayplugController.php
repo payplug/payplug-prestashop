@@ -57,13 +57,13 @@ class AdminPayplugController extends ModuleAdminController
         $this->dependencies->configClass->checkConfiguration();
 
         $payplug_email = Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('email')
+            $this->dependencies->getConfigurationKey('email')
         );
         $payplug_test_api_key = Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('testApiKey')
+            $this->dependencies->getConfigurationKey('testApiKey')
         );
         $payplug_live_api_key = Configuration::get(
-            $this->dependencies->configClass->getConfigurationKey('liveApiKey')
+            $this->dependencies->getConfigurationKey('liveApiKey')
         );
 
         if (!empty($payplug_email) && (!empty($payplug_test_api_key) || !empty($payplug_live_api_key))) {
