@@ -120,7 +120,7 @@ class MediaClass
                 'display_mode_feature' => $this->dependencies->configClass->isValidFeature('feature_display_mode'),
                 'standard_feature' => $this->dependencies->configClass->isValidFeature('feature_standard'),
                 'installment_feature' => $this->dependencies->configClass->isValidFeature('feature_installment'),
-                'deferred_feature' => $this->dependencies->configClass->isValidFeature('deferred_feature'),
+                'deferred_feature' => $this->dependencies->configClass->isValidFeature('feature_deferred'),
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
