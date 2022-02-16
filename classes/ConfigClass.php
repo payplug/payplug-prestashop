@@ -365,7 +365,7 @@ class ConfigClass
             return false;
         }
 
-        $permissions = ApiClass::getAccountPermissions();
+        $permissions = $this->dependencies->apiClass->getAccountPermissions();
 
         $available_options = [
             'standard' => (int)Configuration::get($this->dependencies->getConfigurationKey('standard')) === 1,
@@ -717,7 +717,7 @@ class ConfigClass
         }
 
         $api_class = $this->dependencies->apiClass;
-        $valid_key = $api_class::setAPIKey();
+        $valid_key = $api_class->setAPIKey();
         if (!empty($valid_key)) {
             try {
                 $permissions = $this->dependencies->apiClass->getAccount($valid_key);

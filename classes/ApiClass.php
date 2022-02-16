@@ -55,7 +55,7 @@ class ApiClass
         $this->dependencies = $dependencies;
         $this->checkEnvironment();
         $this->setEnvironment();
-        self::setSecretKey();
+        $this->setSecretKey();
         $this->current_api_key = self::getCurrentApiKey();
 
         $this->setUserAgent();
@@ -91,10 +91,10 @@ class ApiClass
      * @return bool
      * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
      */
-    public static function getAccountPermissions($api_key = null)
+    public function getAccountPermissions($api_key = null)
     {
         if ($api_key == null) {
-            $api_key = self::setAPIKey();
+            $api_key = $this->setAPIKey();
         }
         return self::getAccount($api_key, false);
     }
@@ -166,9 +166,13 @@ class ApiClass
         }
 
         if ($sandbox) {
-            self::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+            self::setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApikey')
+            ));
         } else {
-            self::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+            self::setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('testApikey')
+            ));
         }
 
         // Set the publishable for the other sandbox configuration
@@ -208,9 +212,13 @@ class ApiClass
         }
 
         if (!$sandbox) {
-            self::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+            self::setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApikey')
+            ));
         } else {
-            self::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+            self::setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('testApikey')
+            ));
         }
 
         return [
@@ -345,12 +353,18 @@ class ApiClass
     /**
      * @return string
      */
-    public static function getCurrentApiKey()
+    public function getCurrentApiKey()
     {
-        if ((int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 1) {
-            return Configuration::get('PAYPLUG_TEST_API_KEY');
+        if ((int)Configuration::get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        ) === 1) {
+            return Configuration::get(
+                $this->dependencies->getConfigurationKey('testApikey')
+            );
         } else {
-            return Configuration::get('PAYPLUG_LIVE_API_KEY');
+            return Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApikey')
+            );
         }
     }
 
@@ -359,14 +373,20 @@ class ApiClass
      *
      * @return string
      */
-    public static function setAPIKey()
+    public function setAPIKey()
     {
-        $sandbox_mode = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $sandbox_mode = (int)Configuration::get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
         $valid_key = null;
         if ($sandbox_mode) {
-            $valid_key = Configuration::get('PAYPLUG_TEST_API_KEY');
+            $valid_key = Configuration::get(
+                $this->dependencies->getConfigurationKey('testApiKey')
+            );
         } else {
-            $valid_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+            $valid_key = Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
+            );
         }
 
         return $valid_key;
@@ -452,10 +472,10 @@ class ApiClass
      * @return Payplug\Payplug
      * @throws ConfigurationException
      */
-    public static function setSecretKey($token = false)
+    public function setSecretKey($token = false)
     {
-        if (!$token && self::getCurrentApiKey() != null) {
-            $token = self::getCurrentApiKey();
+        if (!$token && $this->getCurrentApiKey() != null) {
+            $token = $this->getCurrentApiKey();
         }
 
         if (!$token) {
