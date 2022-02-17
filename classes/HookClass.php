@@ -793,6 +793,9 @@ class HookClass
         $specific = $this->dependencies->loadSpecificPresta();
         if ($specific
             && (method_exists($specific, 'displayHeader'))) {
+            Media::addJsDef([
+                'module_name' => $this->dependencies->name
+            ]);
             $specific->displayHeader();
         }
 
