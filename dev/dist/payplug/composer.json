@@ -22,6 +22,7 @@
             "!vendor/*",
             "!features.json",
             ".*",
+            "!payplug/composer.json",
             "dev",
 	        "*.sh",
             "test",
@@ -33,7 +34,6 @@
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "!payplug/composer.json",
             "features.json.dist",
             "upgrade/upgrade-methods.php"
         ]

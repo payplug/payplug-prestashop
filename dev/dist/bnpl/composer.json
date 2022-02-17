@@ -25,6 +25,7 @@
             "!vendor/*",
             "!features.json",
             ".*",
+            "!bnpl/composer.json",
             "dev",
             "*.sh",
             "test",
@@ -36,7 +37,6 @@
             "views/templates/front/tools",
             "test.php",
             "*.zip",
-            "!bnpl/composer.json",
             "features.json.dist",
             "upgrade/upgrade-methods.php"
         ]
