@@ -19,21 +19,21 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
-    <button href="javascript:void(0);" class="oneyPayment_trigger">
+<div class="payment_module {$module_name}Payment {$module_name}OneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
+    <button href="javascript:void(0);" class="{$module_name}OneyPayment_trigger">
         {if isset($oney_image['optimized'])}
             {assign var=oney_logo value=$oney_image['optimized']}
         {else}
             {assign var=oney_logo value=$oney_image}
         {/if}
         <img src="{$oney_logo|escape:'htmlall':'UTF-8'}"
-                     alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}"
+                     alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod={$module_name}}{else}{l s='hook.oney.payment.paywithoney' mod={$module_name}}{/if}"
                     class="oneyLogo -optimized-16 {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
         <span class="oneyPayment_label">
             {if isset($use_fees) && !$use_fees}
-                {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}
+                {l s='hook.oney.payment.paywithoneywithoutfees' mod={$module_name}}
             {else}
-                {l s='hook.oney.payment.paywithoney' mod='payplug'}
+                {l s='hook.oney.payment.paywithoney' mod={$module_name}}
             {/if}
 
             {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
@@ -50,7 +50,7 @@
             <div class="oneyPayment_cta">
                 <button class="oneyPayment_button"></button>
                 {if $lang_iso == 'it' && $merchant_company_iso == 'IT'}
-                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
+                    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod={$module_name}}</a>
                 {/if}
             </div>
         {else}

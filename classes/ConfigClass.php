@@ -1418,6 +1418,10 @@ class ConfigClass
             }
         }
 
+        Media::addJsDef([
+            'module_name' => $this->dependencies->name
+        ]);
+
         $output = $this
             ->module
             ->getInstanceByName($this->dependencies->name)

@@ -19,17 +19,17 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugBancontact panel-row separate_margin_block{if $payplug_switch.sandbox.checked} -hide{/if}">
-    <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='admin.panel.settings.bancontact.label' mod='payplug'}</div>
-        <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.bancontact}</div>
+<div class="{$module_name}Bancontact panel-row separate_margin_block{if ${$module_name}_switch.sandbox.checked} -hide{/if}">
+    <div class="{$module_name}Panel">
+        <div class="{$module_name}Panel_label">{l s='admin.panel.settings.bancontact.label' mod={$module_name}}</div>
+        <div class="{$module_name}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.bancontact}</div>
     </div>
-    <div class="payplugPanel">
-        <div class="payplugPanel_content">
+    <div class="{$module_name}Panel">
+        <div class="{$module_name}Panel_content">
             <p>
-                {l s='admin.panel.settings.bancontact.content' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.bancontact|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
-                    {l s='admin.panel.settings.bancontact.link' mod='payplug'}
+                {l s='admin.panel.settings.bancontact.content' mod={$module_name}}
+                <a class="{$module_name}Link" href="{$faq_links.bancontact|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
+                    {l s='admin.panel.settings.bancontact.link' mod={$module_name}}
                 </a>
             </p>
         </div>

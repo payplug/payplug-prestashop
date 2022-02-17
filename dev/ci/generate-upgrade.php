@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../upgrade/upgrade-methods.php');
+require_once(dirname(__FILE__) . '/../../upgrade/upgrade-methods.php');
 
 function getMethodContent($method_name = false)
 {
@@ -92,7 +92,7 @@ foreach ($versions as $version) {
 ';
 
     echo 'Writing script ' . $file_name . '...' . "\n";
-    $path = dirname(__FILE__) . '/../upgrade/' . $file_name;
+    $path = dirname(__FILE__) . '/../../upgrade/' . $file_name;
     if ($file = fopen($path, 'w')) {
         fwrite($file, $content);
         fclose($file);

@@ -24,16 +24,16 @@
     {if $oney_payment_option}
         <ul>
             <li>
-                <span><b>{l s='Amount:' mod='payplug'}</b></span>
+                <span><b>{l s='Amount:' mod={$module_name}}</b></span>
                 <span><b>{$payplug_oney_amount.value|escape:'htmlall':'UTF-8'}</b></span>
             </li>
             <li>
-                <span>{l s='Contribution: ' mod='payplug'}</span>
+                <span>{l s='Contribution: ' mod={$module_name}}</span>
                 <span>{$oney_payment_option.down_payment_amount.value|escape:'htmlall':'UTF-8'}</span>
                 {if isset($use_fees) && $use_fees}
                     <small>
-                        ({l s='Financing cost:' mod='payplug'} <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
-                        {l s='TAEG:' mod='payplug'} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
+                        ({l s='Financing cost:' mod={$module_name}} <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
+                        {l s='TAEG:' mod={$module_name}} <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
                     </small>
                 {/if}
             </li>
@@ -41,11 +41,11 @@
                 <li>
                     <span>
                         {if $oney_inst_number == 0}
-                            {l s='hook.oney.schedule.installmentFirst' mod='payplug'}
+                            {l s='hook.oney.schedule.installmentFirst' mod={$module_name}}
                         {elseif $oney_inst_number == 1}
-                            {l s='hook.oney.schedule.installmentSecond' mod='payplug'}
+                            {l s='hook.oney.schedule.installmentSecond' mod={$module_name}}
                         {elseif $oney_inst_number == 2}
-                            {l s='hook.oney.schedule.installmentThird' mod='payplug'}
+                            {l s='hook.oney.schedule.installmentThird' mod={$module_name}}
                         {/if}
                     </span>
                     <span>{$oney_installment.value|escape:'htmlall':'UTF-8'}</span>
@@ -53,15 +53,15 @@
             {/foreach}
             {if isset($use_fees) && $use_fees}
                 <li>
-                    <span><b>{l s='Total:' mod='payplug'}</b></span>
+                    <span><b>{l s='Total:' mod={$module_name}}</b></span>
                     <span><b>{$oney_payment_option.total_amount.value|escape:'htmlall':'UTF-8'}</b></span>
                 </li>
             {else}
                 <li>
                     <span>
-                        {l s='Financing cost:' mod='payplug'}
+                        {l s='Financing cost:' mod={$module_name}}
                         {$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}
-                        {l s='TAEG:' mod='payplug'}
+                        {l s='TAEG:' mod={$module_name}}
                         {$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%
                     </span>
                 </li>
@@ -71,5 +71,5 @@
 </div>
 
 {if $language.iso_code == 'it' && $merchant_company_iso == 'IT'}
-    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank" class="oneyScheduleCGV">{l s='hook.oney.schedule.cgv' mod='payplug'}</a>
+    <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank" class="oneyScheduleCGV">{l s='hook.oney.schedule.cgv' mod={$module_name}}</a>
 {/if}

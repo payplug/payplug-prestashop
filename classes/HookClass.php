@@ -854,8 +854,8 @@ class HookClass
 
         if ($this->config->get('PAYPLUG_ONEY')) {
             Media::addJsDef([
-                'payplug_oney' => true,
-                'payplug_oney_loading_msg' => $this->dependencies->l('hook.header.loading', 'hookclass')
+                $this->dependencies->name . '_oney' => true,
+                $this->dependencies->name . '_oney_loading_msg' => $this->dependencies->l('hook.header.loading', 'hookclass')
             ]);
         }
 
@@ -881,7 +881,7 @@ class HookClass
 
         Media::addJsDef(
             [
-                'payplug_ajax_url' => $payplug_ajax_url,
+                $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
             ]
         );

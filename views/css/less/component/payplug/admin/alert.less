@@ -1,5 +1,5 @@
 /* Payplug Admin Alert */
-.payplugAlert {
+@{moduleClassName}Alert {
   .border(transparent, l, 3px);
   display: flex;
   background: #fff;
@@ -9,8 +9,8 @@
   line-height: 19px;
 
   &.-success {
-    background: fade(#colorMap[payplug], 15%);
-    border-color: #colorMap[payplug];
+    background: fade(#colorMap[module], 15%);
+    border-color: #colorMap[module];
 
     a {
       &,
@@ -18,7 +18,7 @@
       &:active,
       &:visited,
       &:focus {
-        color: #colorMap[payplug];
+        color: #colorMap[module];
       }
     }
   }

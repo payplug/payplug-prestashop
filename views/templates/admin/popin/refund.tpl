@@ -20,9 +20,9 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<p>{l s='You can refund your customer on his card from the Refund with Payplug section located on this page.' mod='payplug'}
-    <a href="{$faq_links.refund|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod='payplug'}</a>
+<p>{l s='You can refund your customer on his card from the Refund with Payplug section located on this page.' mod={$module_name}}
+    <a href="{$faq_links.refund|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod={$module_name}}</a>
 </p>
 <div class="block-button">
-    <input type="button" class="popin-button center-button ppclose green-button" value="{l s='Ok' mod='payplug'}">
+    <input type="button" class="popin-button center-button ppclose green-button" value="{l s='Ok' mod={$module_name}}">
 </div>

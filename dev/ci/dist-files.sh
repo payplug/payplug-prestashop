@@ -7,23 +7,40 @@ else
     branch="payplug"
 fi
 
+if [[ "$2" != "" ]]; then
+    file="$2"
+else
+    file=""
+fi
+
 echo "Branch name: "$branch
 echo "------------------"
 
 path="./dev/dist/$branch"
+
 echo "Dist files will be in: "$path
 echo "------------------"
 
-echo "Copy composer.json"
-cp $path/composer.json ./composer.json
-echo "------------------"
+if [[ "$2" != "" ]]; then
+    file="$2"
 
-echo "Copy composer.lock"
-cp $path/composer.lock ./composer.lock
-echo "------------------"
+    if [[ "$file" == "less" ]]; then
+        echo "Copy var.less"
+        cp $path/var.less ./views/css/less/var.less
+    else
+        echo "Copy $file"
+        cp $path/${file} ./${file}
+    fi
+else
+    export distFile="composer.json composer.lock features.json"
+    for file in $distFile
+      do
+        echo "Copy $file"
+        cp $path/${file} ./${file}
+      done
 
-echo "Copy features.json"
-cp $path/features.json ./features.json
-echo "------------------"
+    echo "Copy var.less"
+    cp $path/var.less ./views/css/less/var.less
+fi
 
 echo "End script dist-files"

@@ -10,6 +10,8 @@ stages:
   - translations
   - assets
   - build
+  - asset-bnpl
+  - build-bnpl
   - releasy-release
 
 php cs fixer:
@@ -73,6 +75,7 @@ assets compile and revision:
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
+    - ./dev/ci/dist-files.sh payplug less
   script:
     - npm run build
     - echo "Moving file in build dir"
@@ -144,9 +147,34 @@ build zip bancontact:
     paths:
       - payplug_qa_bancontact_$CI_COMMIT_REF_NAME.zip
 
+assets compile and revision for bnpl:
+  image: node:16
+  stage: asset-bnpl
+  before_script:
+    - npm --version
+    - npm init -y
+    - npm install --save-dev webpack
+    - ./dev/ci/dist-files.sh bnpl less
+  script:
+    - npm run build
+    - echo "Moving file in build dir"
+    - mkdir ./views/build-bnpl
+    - mkdir ./views/build-bnpl/css
+    - mkdir ./views/build-bnpl/js
+    - mv ./views/css/*.css ./views/build-bnpl/css
+    - cp ./views/templates/index.php ./views/build-bnpl/css
+    - mv ./views/js/* ./views/build-bnpl/js
+    - ls -l ./views/build-bnpl/css/*.css
+    - ls -l ./views/build-bnpl/css/*.php
+    - ls -l ./views/build-bnpl/js/*.js
+  artifacts:
+    paths:
+      - views/build-bnpl/*
+    expire_in: 1 day
+
 build zip bnpl:
   image: composer:1.9
-  stage: build
+  stage: build-bnpl
   before_script:
     - ./dev/ci/dist-files.sh
     - php ./dev/ci/generate-version.php
@@ -156,6 +184,7 @@ build zip bnpl:
     - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
+    - rm -rf views/build && mv views/build-bnpl views/build
     - chmod 777 ./dev/ci/assets_revision.sh && ./dev/ci/assets_revision.sh
     - mkdir payplug
   script:

@@ -31,6 +31,7 @@
             "tests",
             "controllers/tools",
             "views/build",
+            "views/build-bnpl",
             "!views/css/*.css",
             "views/templates/front/tools",
             "test.php",

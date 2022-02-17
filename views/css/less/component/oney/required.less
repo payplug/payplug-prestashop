@@ -1,5 +1,5 @@
 /* Oney Form */
-.oneyRequired {
+@{moduleClassName}OneyRequired {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -116,7 +116,7 @@
         max-width: 100%;
       }
 
-      .payplugPopin & {
+      @{moduleClassName}Popin & {
         @media (@mobile) {
           padding: 16px 0 0;
         }
@@ -126,7 +126,7 @@
     &_sectionName {
       margin: 0 0 4px;
       font-size: 15px;
-      color: #colorMap[payplug];
+      color: #colorMap[module];
       text-align: center;
     }
 
@@ -227,7 +227,7 @@
 
       &.-success {
         display: block;
-        color: #colorMap[payplug];
+        color: #colorMap[module];
       }
     }
 
