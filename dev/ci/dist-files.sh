@@ -1,17 +1,14 @@
 #!/bin/sh
 
-
-if [[ "$1" != "" ]]; then
-    branch="$1"
-else
-    branch="payplug"
-fi
-
-if [[ "$2" != "" ]]; then
-    file="$2"
-else
-    file=""
-fi
+branch="payplug"
+# Process all options supplied on the command line
+while getopts b: flag;
+do
+    case "${flag}" in
+        b) branch=${OPTARG};;
+        *) eval echo "Unrecognized arg \$${OPTARG}"; usage; exit ;;
+    esac
+done
 
 echo "Branch name: "$branch
 echo "------------------"
@@ -21,26 +18,15 @@ path="./dev/dist/$branch"
 echo "Dist files will be in: "$path
 echo "------------------"
 
-if [[ "$2" != "" ]]; then
-    file="$2"
+export distFile="composer.json composer.lock features.json"
+for file in $distFile
+  do
+    echo "Copy $file"
+    cp $path/${file} ./${file}
+  done
 
-    if [[ "$file" == "less" ]]; then
-        echo "Copy var.less"
-        cp $path/var.less ./views/css/less/var.less
-    else
-        echo "Copy $file"
-        cp $path/${file} ./${file}
-    fi
-else
-    export distFile="composer.json composer.lock features.json"
-    for file in $distFile
-      do
-        echo "Copy $file"
-        cp $path/${file} ./${file}
-      done
-
-    echo "Copy var.less"
-    cp $path/var.less ./views/css/less/var.less
-fi
+echo "Copy var.less"
+cp $path/var.less ./views/css/less/var.less
 
 echo "End script dist-files"
+echo "------------------"

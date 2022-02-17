@@ -18,7 +18,7 @@ php cs fixer:
   image: composer:1.9
   stage: check php
   script:
-    - ./dev/ci/dist-files.sh
+    - ./dev/ci/dist-files.sh -b payplug
     - composer install
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
   artifacts:
@@ -43,7 +43,6 @@ coverage test:
   image: php:7.2.1
   stage: coverage and tests
   before_script:
-    # Install Xdebug
     - pecl install xdebug
     - docker-php-ext-enable xdebug
   script:
@@ -75,7 +74,7 @@ assets compile and revision:
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
-    - ./dev/ci/dist-files.sh payplug less
+    - ./dev/ci/dist-files.sh -b payplug
   script:
     - npm run build
     - echo "Moving file in build dir"
@@ -97,7 +96,7 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
-    - ./dev/ci/dist-files.sh
+    - ./dev/ci/dist-files.sh -b payplug
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
@@ -107,7 +106,7 @@ build zip release:
     - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./dev/ci/assets_revision.sh && ./dev/ci/assets_revision.sh
+    - ./dev/ci/assets_revision.sh -b payplug
     - mkdir payplug
   script:
     - shopt -s extglob
@@ -125,7 +124,7 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
-    - ./dev/ci/dist-files.sh
+    - ./dev/ci/dist-files.sh -b payplug
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
@@ -135,7 +134,7 @@ build zip bancontact:
     - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./dev/ci/assets_revision.sh && ./dev/ci/assets_revision.sh
+    - ./dev/ci/assets_revision.sh -b payplug
     - mkdir payplug
   script:
     - shopt -s extglob
@@ -154,7 +153,7 @@ assets compile and revision for bnpl:
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
-    - ./dev/ci/dist-files.sh bnpl less
+    - ./dev/ci/dist-files.sh -b bnpl
   script:
     - npm run build
     - echo "Moving file in build dir"
@@ -176,24 +175,26 @@ build zip bnpl:
   image: composer:1.9
   stage: build-bnpl
   before_script:
-    - ./dev/ci/dist-files.sh
+    - ./dev/ci/dist-files.sh -b bnpl
     - php ./dev/ci/generate-version.php
+    - php ./dev/ci/generate-upgrade.php
+    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
-    - ./dev/ci/dist-files.sh bnpl
     - composer install --no-dev
     - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
     - rm -rf views/build && mv views/build-bnpl views/build
-    - chmod 777 ./dev/ci/assets_revision.sh && ./dev/ci/assets_revision.sh
-    - mkdir payplug
+    - ./dev/ci/assets_revision.sh -b bnpl
+    - mkdir bnpl
   script:
     - shopt -s extglob
-    - mv !(payplug|composer.json) payplug
-    - cp composer.json ./payplug
+    - mv !(bnpl|composer.json) bnpl
+    - cp composer.json ./bnpl
     - composer archive --file bnpl_$CI_COMMIT_REF_NAME --format zip
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./bnpl/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
     - composer archive --file bnpl_qa_$CI_COMMIT_REF_NAME --format zip
   artifacts:
     paths:
-      - payplug_qa_bnpl_$CI_COMMIT_REF_NAME.zip
+      - bnpl_$CI_COMMIT_REF_NAME.zip
+      - bnpl_qa_$CI_COMMIT_REF_NAME.zip

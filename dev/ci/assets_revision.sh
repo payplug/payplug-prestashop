@@ -1,5 +1,16 @@
 #!/bin/sh
 
+branch="payplug"
+# Process all options supplied on the command line
+
+while getopts b: flag;
+do
+    case "${flag}" in
+        b) branch=${OPTARG};;
+        *) eval echo "Unrecognized arg \$${OPTARG}"; usage; exit ;;
+    esac
+done
+
 versionning_assets() {
   extension=$1
   version=$2
@@ -15,8 +26,8 @@ versionning_assets() {
   done
 }
 
-echo "Looking for tag in payplug.php..."
-tag=`grep '$this->version =' payplug.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
+echo "Looking for tag in ${branch}.php..."
+tag=`grep '$this->version =' ${branch}.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
 
 echo "Moving file in views dir"
 rm -rf ./views/js ./views/css

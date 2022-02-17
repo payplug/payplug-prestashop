@@ -6,7 +6,7 @@ $moduleVersion = $configuration->version;
 
 echo 'Building module with version ' . $moduleVersion . "\n";
 
-$path = dirname(__FILE__)."/../".$moduleName.".php";
+$path = dirname(__FILE__)."/../../".$moduleName.".php";
 $str = file_get_contents($path);
 $fp = fopen($path, 'w');
 $str = str_replace("PAYPLUG_VERSION", "'" . $moduleVersion . "'", $str);
