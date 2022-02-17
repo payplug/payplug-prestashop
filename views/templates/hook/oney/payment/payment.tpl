@@ -28,15 +28,15 @@
         {/if}
         <img src="{$oney_logo|escape:'htmlall':'UTF-8'}"
                      alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod={$module_name}}{else}{l s='hook.oney.payment.paywithoney' mod={$module_name}}{/if}"
-                    class="oneyLogo -optimized-16 {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
-        <span class="oneyPayment_label">
+                    class="{$module_name}OneyLogo -optimized-16 {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
+        <span class="{$module_name}OneyPayment_label">
             {if isset($use_fees) && !$use_fees}
                 {l s='hook.oney.payment.paywithoneywithoutfees' mod={$module_name}}
             {else}
                 {l s='hook.oney.payment.paywithoney' mod={$module_name}}
             {/if}
 
-            {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
+            {if $payplug_oney_error}<span class="{$module_name}OneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
         </span>
     </button>
     {if $payplug_oney_allowed}

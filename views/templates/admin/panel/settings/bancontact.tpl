@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="{$module_name}Bancontact panel-row separate_margin_block{if ${$module_name}_switch.sandbox.checked} -hide{/if}">
+<div class="{$module_name}Bancontact panel-row separate_margin_block{if $payplug_switch.sandbox.checked} -hide{/if}">
     <div class="{$module_name}Panel">
         <div class="{$module_name}Panel_label">{l s='admin.panel.settings.bancontact.label' mod={$module_name}}</div>
         <div class="{$module_name}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.bancontact}</div>

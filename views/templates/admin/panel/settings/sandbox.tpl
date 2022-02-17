@@ -27,7 +27,7 @@
     <div class="{$module_name}Panel">
         <div class="{$module_name}Panel_content">
             <div class="{$module_name}Tips -{$payplug_switch.sandbox.name|escape:'htmlall':'UTF-8'}">
-                <div class="{$module_name}Tips_item -left {if !${$module_name}_switch.sandbox.checked}-hide{/if}">
+                <div class="{$module_name}Tips_item -left {if !$payplug_switch.sandbox.checked}-hide{/if}">
                     {l s='In TEST mode, all payments will be simulations and will not generate real transactions.' mod={$module_name}}
                     <a class="{$module_name}Link" href="http://support.payplug.com/customer/portal/articles/1701656" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod={$module_name}}</a>
                 </div>

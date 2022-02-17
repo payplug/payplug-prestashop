@@ -782,7 +782,7 @@ window[module_name+'Module'] = {
         },
         loader: {
             props: {
-                identifier: 'oneyLoader',
+                identifier: module_name + 'OneyLoader',
             },
             set: function (target) {
                 if (typeof target == 'undefined' || !target) {
@@ -797,7 +797,7 @@ window[module_name+'Module'] = {
         },
         cta: {
             props: {
-                identifier: 'oneyCta',
+                identifier: module_name + 'OneyCta',
                 loaded: false
             },
             init: function () {
@@ -820,7 +820,7 @@ window[module_name+'Module'] = {
             },
             popin: {
                 props: {
-                    identifier: 'oneyPopin',
+                    identifier: module_name + 'OneyPopin',
                     open: false,
                     loaded: false,
                 },
@@ -958,7 +958,7 @@ window[module_name+'Module'] = {
         },
         required: {
             props: {
-                identifier: 'oneyRequired'
+                identifier: module_name + 'OneyRequired'
             },
             init: function () {
                 var required = this,
