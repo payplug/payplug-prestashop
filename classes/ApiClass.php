@@ -126,7 +126,7 @@ class ApiClass
      */
     public function setPublishableKeys()
     {
-        if (!$this->current_api_key || !$this->payplug->isValidFeature('feature_integrated')) {
+        if (!isset($this->current_api_key)) {
             return false;
         }
 
@@ -575,16 +575,23 @@ class ApiClass
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                $publishable_keys = $this->setPublishableKeys();
-                return $publishable_keys;
+                if ($this->payplug->isValidFeature('feature_integrated')
+                    && (version_compare(_PS_VERSION_, '1.7', '>='))) {
+                    if ($this->setPublishableKeys()) {
+                        return true;
+                    }
+                }
+                return true;
             } else {
                 return false;
             }
         } catch (BadRequestException $e) {
-            json_encode([
-                'content' => null,
-                'error' => $e->getMessage()
-            ]);
+            json_encode(
+                [
+                    'content' => null,
+                    'error' => $e->getMessage()
+                ]
+            );
             return false;
         }
     }
