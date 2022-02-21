@@ -45,7 +45,7 @@ class Translations
     private function fillTranslations()
     {
         // get current file
-        $translation_dir = dirname(__FILE__) . '/../../translations/';
+        $translation_dir = dirname(__FILE__) . '/../../../translations/';
         $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
         foreach ($translation_files as $file) {
             if ($file[0] === '.'
@@ -186,7 +186,7 @@ class Translations
     private function setFiles()
     {
         $array_files = [];
-        $path = dirname(__FILE__) . '/../../';
+        $path = dirname(__FILE__) . '/../../../';
         $this->getRecursiveFiles($path, $array_files, 'payplug');
         return $this->files = $array_files;
     }
