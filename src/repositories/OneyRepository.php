@@ -21,14 +21,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\classes\ConfigClass;
+use PayPlugModule\classes\ConfigClass;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\UnexpectedAPIResponseException;
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlugModule\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
 class OneyRepository extends Repository
@@ -89,7 +89,7 @@ class OneyRepository extends Repository
     public function assignOneyJSVar()
     {
         $js_var = [
-            'loading_msg' => $this->l('Loading'),
+            'loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
             'can_use_oney' => $this->configurationSpecific->get('PAYPLUG_ONEY'),
         ];
         return \Media::addJsDef($js_var);
@@ -122,7 +122,7 @@ class OneyRepository extends Repository
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_allowed' => $is_elligible['result'],
             'payplug_oney_error' => $is_elligible['error'],
-            'payplug_oney_loading_msg' => $this->l('Loading'),
+            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
         ]);
     }
 
@@ -160,7 +160,9 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('oney.assignOneyPriceAndPaymentOptions.unavailable')
+            $oney_payment_options
+                ? false
+                : $this->dependencies->l('oney.assignOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
         $this->assign->assign([
@@ -211,7 +213,7 @@ class OneyRepository extends Repository
         $errors = [];
 
         if (!$payment_data || !is_array($payment_data)) {
-            return [$this->l('Please fill in the required fields')];
+            return [$this->dependencies->l('Please fill in the required fields', 'oneyrepository')];
         }
 
         foreach ($payment_data as $key => $data) {
@@ -236,50 +238,50 @@ class OneyRepository extends Repository
                     $country = $this->countrySpecific->getCountry($address->id_country);
                     $valid = ConfigClass::isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
-                        $errors[] = $this->l('Please enter your mobile phone number.');
+                        $errors[] = $this->dependencies->l('Please enter your mobile phone number.', 'oneyrepository');
                     }
                     break;
                 case 'first_name':
                     if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping firstname.') :
-                            $this->l('Please enter your billing firstname.');
+                            $this->dependencies->l('Please enter your shipping firstname.', 'oneyrepository') :
+                            $this->dependencies->l('Please enter your billing firstname.', 'oneyrepository');
                         $errors[] = $text;
                     }
                     break;
                 case 'last_name':
                     if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping lastname.') :
-                            $this->l('Please enter your billing lastname.');
+                            $this->dependencies->l('Please enter your shipping lastname.', 'oneyrepository') :
+                            $this->dependencies->l('Please enter your billing lastname.', 'oneyrepository');
                         $errors[] = $text;
                     }
                     break;
                 case 'address1':
                     if (!$validate->validate('isAddress', $data)) {
                         $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping address.') :
-                            $this->l('Please enter your billing address.');
+                            $this->dependencies->l('Please enter your shipping address.', 'oneyrepository') :
+                            $this->dependencies->l('Please enter your billing address.', 'oneyrepository');
                         $errors[] = $text;
                     }
                     break;
                 case 'postcode':
                     if (!$validate->validate('isPostCode', $data)) {
                         $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping postcode.') :
-                            $this->l('Please enter your billing postcode.');
+                            $this->dependencies->l('Please enter your shipping postcode.', 'oneyrepository') :
+                            $this->dependencies->l('Please enter your billing postcode.', 'oneyrepository');
                         $errors[] = $text;
                     }
                     break;
                 case 'city':
                     if (!$validate->validate('isCityName', $data)) {
                         $text = $type == 'shipping' ?
-                            $this->l('Please enter your shipping city.') :
-                            $this->l('Please enter your billing city.');
+                            $this->dependencies->l('Please enter your shipping city.', 'oneyrepository') :
+                            $this->dependencies->l('Please enter your billing city.', 'oneyrepository');
                         $errors[] = $text;
                     } elseif ($tools->tool('strlen', $data, 'UTF-8') > 32) {
-                        $text = $this->l('Your city name is too long (max 32 characters). ')
-                            . $this->l('Please change it to another one or select another payment method.');
+                        $text = $this->dependencies->l('Your city name is too long (max 32 characters). ', 'oneyrepository')
+                            . $this->dependencies->l('Please change it to another one or select another payment method.', 'oneyrepository');
                         $errors[] = $text;
                     }
                     break;
@@ -410,7 +412,7 @@ class OneyRepository extends Repository
 
             $this->assign->assign([
                 'use_fees' => $use_fees,
-                'payplug_oney_loading_msg' => $this->l('Loading'),
+                'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
                 'oney_required_fields' => $this->getOneyRequiredFields(),
                 'iso_code' => $iso,
                 'merchant_company_iso' => $merchant_company_iso,
@@ -473,7 +475,7 @@ class OneyRepository extends Repository
         $resource['effective_annual_percentage_rate'] = number_format($resource['effective_annual_percentage_rate'], 2);
 
         $resource['split'] = (int)str_replace('x', '', $type[0]);
-        $resource['title'] = sprintf($this->l('Payment in %sx'), $resource['split']);
+        $resource['title'] = sprintf($this->dependencies->l('Payment in %sx', 'oneyrepository'), $resource['split']);
 
         // format price
         $total_cost = $this->dependencies->amountCurrencyClass->convertAmount($resource['total_cost'], true);
@@ -532,7 +534,7 @@ class OneyRepository extends Repository
     {
         $this->assign->assign([
             'env' => $env,
-            'payplug_oney_loading_msg' => $this->l('Loading')
+            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository')
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
@@ -706,7 +708,9 @@ class OneyRepository extends Repository
         }
 
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
-            $oney_payment_options ? false : $this->l('oney.getOneyPriceAndPaymentOptions.unavailable')
+            $oney_payment_options
+                ? false
+                : $this->dependencies->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
         $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
@@ -1265,7 +1269,7 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'error' => sprintf(
-                    $this->l('The total amount of your order should be between %s and %s to pay with Oney.'),
+                    $this->dependencies->l('The total amount of your order should be between %s and %s to pay with Oney.', 'oneyrepository'),
                     $this->toolsSpecific->tool('displayPrice', $limits['min']),
                     $this->toolsSpecific->tool('displayPrice', $limits['max'])
                 )
@@ -1285,7 +1289,7 @@ class OneyRepository extends Repository
         if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
-                'error' => $this->l('The cart is unvalid')
+                'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository')
             ];
         }
 
@@ -1298,7 +1302,7 @@ class OneyRepository extends Repository
             $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
             return [
                 'result' => false,
-                'error' => $this->l($error)
+                'error' => $this->dependencies->l($error, 'oneyrepository')
             ];
         }
 
@@ -1320,7 +1324,7 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'type' => 'different',
-                'error' => $this->l($error)
+                'error' => $this->dependencies->l($error, 'oneyrepository')
             ];
         }
 
@@ -1334,7 +1338,7 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'type' => 'no_country',
-                'error' => $this->l('No countries are configured to use oney.')
+                'error' => $this->dependencies->l('No countries are configured to use oney.', 'oneyrepository')
             ];
         }
 
@@ -1354,15 +1358,15 @@ class OneyRepository extends Repository
                 );
             }
             */
-            $str_list = $this->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana');
+            $str_list = $this->dependencies->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana', 'oneyrepository');
             if (in_array('IT', $iso_list)) {
-                $str_list = $this->l('Italy');
+                $str_list = $this->dependencies->l('Italy', 'oneyrepository');
             }
 
             return [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in') . ' ' .
+                'error' => $this->dependencies->l('For a payment with Oney, delivery and billing addresses must be in', 'oneyrepository') . ' ' .
                     $str_list
             ];
         }
@@ -1382,15 +1386,15 @@ class OneyRepository extends Repository
         $error = false;
 
         if (!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
-            $error = $this->l('Your email address is not a valid email');
+            $error = $this->dependencies->l('Your email address is not a valid email', 'oneyrepository');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
             && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->l('Your email address is too long and the + character is not valid');
-            $error .= $this->l(' please change it to another address (max 100 characters).');
+            $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');
+            $error .= $this->dependencies->l(' please change it to another address (max 100 characters).', 'oneyrepository');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
-            $error = $this->l('Your email address is too long. Please change your email address (100 characters max).');
+            $error = $this->dependencies->l('Your email address is too long. Please change your email address (100 characters max).', 'oneyrepository');
         } elseif (strpos($email, '+') !== false) {
-            $error = $this->l('The + character is not valid. Please change your email address (100 characters max).');
+            $error = $this->dependencies->l('The + character is not valid. Please change your email address (100 characters max).', 'oneyrepository');
         }
 
         return [

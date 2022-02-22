@@ -34,7 +34,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
         $this->bootstrap = true;
         $this->table = $this->dependencies->name . '_installment';
         $this->id = 'id_' . $this->dependencies->name . '_installment';

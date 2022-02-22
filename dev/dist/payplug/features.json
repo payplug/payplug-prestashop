@@ -2,12 +2,10 @@
     "features": [
         "feature_bancontact",
         "feature_integrated",
-        "feature_sandbox_mode",
-        "feature_embedded_mode",
-        "feature_one_click",
-        "feature_installement",
-        "feature_show",
+        "feature_display_mode",
+        "feature_standard",
+        "feature_installment",
         "feature_deferred",
-        "feature_oney"
+        "feature_ps_account"
     ]
 }

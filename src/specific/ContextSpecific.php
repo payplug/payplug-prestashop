@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\ContextInterface;
+use PayPlugModule\src\interfaces\ContextInterface;
 use Context;
 
 class ContextSpecific implements ContextInterface

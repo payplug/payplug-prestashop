@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use OrderState;
 use Payplug\Exception\ConfigurationException;
@@ -791,6 +791,7 @@ class HookClass
         }
 
         $specific = $this->dependencies->loadSpecificPresta();
+
         if ($specific
             && (method_exists($specific, 'displayHeader'))) {
             Media::addJsDef([

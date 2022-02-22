@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
 use Configuration;
 use Language;
 use Media;
-use PayPlug\classes\DependenciesClass;
+use PayPlugModule\classes\DependenciesClass;
 use Validate;
 use Tab;
 use Tools;

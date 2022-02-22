@@ -22,12 +22,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories;
+namespace PayPlugModule\tests\repositories;
 
-use PayPlug\classes\AmountCurrencyClass;
-use PayPlug\classes\DependenciesClass;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\mock\DependenciesMock;
+use PayPlugModule\classes\AmountCurrencyClass;
+use PayPlugModule\classes\DependenciesClass;
+use PayPlugModule\tests\mock\MockHelper;
+use PayPlugModule\tests\mock\DependenciesMock;
 use PHPUnit\Framework\TestCase;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
@@ -74,7 +74,7 @@ class RepositoryBase extends TestCase
 
     public function setUp()
     {
-        $this->myLogPhp     = MockHelper::createMockFactory('Payplug\classes\MyLogPHP');
+        $this->myLogPhp     = MockHelper::createMockFactory('PayPlugModule\classes\MyLogPHP');
         $this->myLogPhp
             ->shouldReceive('info')
             ->andReturn(true);
@@ -87,37 +87,42 @@ class RepositoryBase extends TestCase
 
     private function setSpecific()
     {
-        $this->assign               = MockHelper::createAssignMock('Payplug\src\specific\AssignSpecific');
-        $this->address              = MockHelper::createAddressMock('Payplug\src\specific\AddressSpecific');
-        $this->carrier              = MockHelper::createMockFactory('Payplug\src\specific\CarrierSpecific');
-        $this->cart                 = MockHelper::createMockFactory('Payplug\src\specific\CartSpecific');
-        $this->config               = MockHelper::createMockFactory('Payplug\src\specific\ConfigurationSpecific');
-        $this->constant             = MockHelper::createMockFactory('Payplug\src\specific\ConstantSpecific');
-        $this->context              = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
-        $this->country              = MockHelper::createMockFactory('Payplug\src\specific\CountrySpecific');
-        $this->currency             = MockHelper::createMockFactory('Payplug\src\specific\CurrencySpecific');
-        $this->language             = MockHelper::createMockFactory('Payplug\src\specific\LanguageSpecific');
-        $this->order_state_specific = MockHelper::createMockFactory('Payplug\src\specific\OrderStateSpecific');
-        $this->product              = MockHelper::createMockFactory('Payplug\src\specific\ProductSpecific');
-        $this->shop                 = MockHelper::createMockFactory('Payplug\src\specific\ShopSpecific');
-        $this->tools                = MockHelper::createToolsMock('Payplug\src\specific\ToolsSpecific');
-        $this->translate            = MockHelper::createTranslateMock('Payplug\src\specific\TranslationSpecific');
-        $this->validate             = MockHelper::createValidateMock('Payplug\src\specific\ValidateSpecific');
+        $this->assign               = MockHelper::createAssignMock('PayPlugModule\src\specific\AssignSpecific');
+        $this->address              = MockHelper::createAddressMock('PayPlugModule\src\specific\AddressSpecific');
+        $this->carrier              = MockHelper::createMockFactory('PayPlugModule\src\specific\CarrierSpecific');
+        $this->cart                 = MockHelper::createMockFactory('PayPlugModule\src\specific\CartSpecific');
+        $this->config               = MockHelper::createMockFactory('PayPlugModule\src\specific\ConfigurationSpecific');
+        $this->constant             = MockHelper::createMockFactory('PayPlugModule\src\specific\ConstantSpecific');
+        $this->context              = MockHelper::createContextMock('PayPlugModule\src\specific\ContextSpecific');
+        $this->country              = MockHelper::createMockFactory('PayPlugModule\src\specific\CountrySpecific');
+        $this->currency             = MockHelper::createMockFactory('PayPlugModule\src\specific\CurrencySpecific');
+        $this->language             = MockHelper::createMockFactory('PayPlugModule\src\specific\LanguageSpecific');
+        $this->order_state_specific = MockHelper::createMockFactory('PayPlugModule\src\specific\OrderStateSpecific');
+        $this->product              = MockHelper::createMockFactory('PayPlugModule\src\specific\ProductSpecific');
+        $this->shop                 = MockHelper::createMockFactory('PayPlugModule\src\specific\ShopSpecific');
+        $this->tools                = MockHelper::createToolsMock('PayPlugModule\src\specific\ToolsSpecific');
+        $this->translate            = MockHelper::createTranslateMock('PayPlugModule\src\specific\TranslationSpecific');
+        $this->validate             = MockHelper::createValidateMock('PayPlugModule\src\specific\ValidateSpecific');
     }
 
     private function setRepository()
     {
-        $this->logger               = MockHelper::createMockFactory('Payplug\src\repositories\LoggerRepository');
-        $this->query                = MockHelper::createMockFactory('Payplug\src\repositories\QueryRepository');
-        $this->sql                  = MockHelper::createMockFactory('Payplug\src\repositories\SQLtableRepository');
+        $this->logger               = MockHelper::createMockFactory('PayPlugModule\src\repositories\LoggerRepository');
+        $this->query                = MockHelper::createMockFactory('PayPlugModule\src\repositories\QueryRepository');
+        $this->sql                  = MockHelper::createMockFactory('PayPlugModule\src\repositories\SQLtableRepository');
     }
 
     private function setTemporariesClasses()
     {
-        $this->dependencies = \Mockery::mock('alias:Payplug\classes\DependenciesClass');
+        $this->dependencies = \Mockery::mock('alias:PayPlugModule\classes\DependenciesClass');
+        $this->dependencies
+            ->shouldReceive('l')
+            ->andReturnUsing(function ($string, $name) {
+                return $string;
+            });
         $this->dependencies->name = DependenciesMock::get();
         $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools);
-        $this->dependencies->paymentClass   = \Mockery::mock('alias:Payplug\classes\PaymentClass');
-        $this->dependencies->configClass    = \Mockery::mock('alias:Payplug\classes\ConfigClass');
+        $this->dependencies->paymentClass   = \Mockery::mock('alias:PayPlugModule\classes\PaymentClass');
+        $this->dependencies->configClass    = \Mockery::mock('alias:PayPlugModule\classes\ConfigClass');
     }
 }

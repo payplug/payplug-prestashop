@@ -23,7 +23,7 @@
 
 namespace Payplug\classes;
 
-use PayPlug\src\repositories\CardRepository;
+use PayPlugModule\src\repositories\CardRepository;
 use Country;
 use Exception;
 use Product;

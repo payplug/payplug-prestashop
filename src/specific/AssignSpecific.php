@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\AssignInterface;
+use PayPlugModule\src\interfaces\AssignInterface;
 use Context;
 
 class AssignSpecific implements AssignInterface

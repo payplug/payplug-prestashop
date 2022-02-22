@@ -180,6 +180,7 @@ build zip bnpl:
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
+    - ./dev/ci/set_namespace.sh
     - composer install --no-dev
     - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;

@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Configuration;
 use Country;
@@ -30,13 +30,13 @@ use Language;
 use libphonenumberlight;
 use Media;
 use Module;
-use PayPlug\backward\PayPlugBackward;
+use PayPlugModule\backward\PayPlugBackward;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
-use PayPlug\src\repositories\LoggerRepository;
-use PayPlug\src\specific\ConstantSpecific;
-use PayPlug\src\specific\ContextSpecific;
+use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlugModule\src\specific\ConstantSpecific;
+use PayPlugModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
@@ -243,6 +243,7 @@ class ConfigClass
     private $oney;
     private $payment_status;
     private $ssl_enable;
+    private $tools;
     private $validationErrors = [];
 
 
@@ -257,6 +258,7 @@ class ConfigClass
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->module = $this->dependencies->getPlugin()->getModule();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
@@ -414,6 +416,23 @@ class ConfigClass
         }
 
         return $available_options;
+    }
+
+    public function getPluginConfiguration()
+    {
+        $json_path = dirname(__FILE__)."/../composer.json";
+        if (!file_exists($json_path)) {
+            return [];
+        }
+
+        $jsonContent = $this->tools->tool('file_get_contents', $json_path);
+        if (!$jsonContent) {
+            return [];
+        }
+
+        $return = $this->tools->tool('jsonDecode', $jsonContent);
+
+        return $return;
     }
 
     /**

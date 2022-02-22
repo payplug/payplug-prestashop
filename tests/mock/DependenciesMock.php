@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\mock;
+namespace PayPlugModule\tests\mock;
 
 class DependenciesMock
 {
@@ -30,5 +30,10 @@ class DependenciesMock
     {
         $name = true;
         return $name;
+    }
+
+    public function l($string = false, $name = false)
+    {
+        return $string;
     }
 }

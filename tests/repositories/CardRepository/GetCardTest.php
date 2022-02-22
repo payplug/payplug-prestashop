@@ -22,9 +22,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\CardRepository;
+namespace PayPlugModule\tests\repositories\CardRepository;
 
-use PayPlug\tests\mock\PayPlugCardMock;
+use PayPlugModule\tests\mock\PayPlugCardMock;
 
 /**
  * @group unit

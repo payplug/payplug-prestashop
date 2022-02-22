@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\CurrencyInterface;
+use PayPlugModule\src\interfaces\CurrencyInterface;
 use Currency;
 
 class CurrencySpecific implements CurrencyInterface

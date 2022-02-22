@@ -28,8 +28,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
 class BNPL extends PaymentModule
 {
@@ -90,7 +89,7 @@ class BNPL extends PaymentModule
                 $this->install(true);
             }
 
-            return (new \PayPlug\classes\AdminClass(new \Payplug\classes\DependenciesClass()))->getContent();
+            return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
@@ -475,7 +474,7 @@ class BNPL extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
     }
 
     private function setModule()

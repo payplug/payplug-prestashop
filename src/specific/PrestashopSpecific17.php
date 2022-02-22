@@ -21,13 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
 use Configuration;
 use Language;
-use PayPlug\classes\ConfigClass;
-use PayPlug\classes\DependenciesClass;
-use PayPlug\classes\MyLogPHP;
+use PayPlugModule\classes\ConfigClass;
+use PayPlugModule\classes\DependenciesClass;
+use PayPlugModule\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
 use Media;

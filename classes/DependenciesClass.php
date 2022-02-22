@@ -21,16 +21,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
-use PayPlug\src\repositories\PluginRepository;
-use PayPlug\src\specific\TranslationSpecific;
+use PayPlugModule\src\repositories\PluginRepository;
+use PayPlugModule\src\specific\TranslationSpecific;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
 
 class DependenciesClass
 {
@@ -52,9 +50,6 @@ class DependenciesClass
 
     public function __construct()
     {
-        $this->version = MODULE_VERSION;
-        $this->name = MODULE_NAME;
-
         $this->initializeAccessors();
     }
 
@@ -78,6 +73,10 @@ class DependenciesClass
         $this->orderClass = new OrderClass($this);
         $this->paymentClass = new PaymentClass($this);
         $this->refundClass = new RefundClass($this);
+
+        $configuration = $this->configClass->getPluginConfiguration();
+        $this->version = $configuration->version;
+        $this->name = $configuration->moduleName;
     }
 
     public function setPlugin($plugin)
@@ -106,7 +105,7 @@ class DependenciesClass
      */
     public function loadSpecificPresta()
     {
-        $PrestashopSpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        $PrestashopSpecificClass = '\PayPlugModule\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
         if (class_exists($PrestashopSpecificClass)) {
             return new $PrestashopSpecificClass();
         }

@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
 use Exception;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\NotFoundException;
-use PayPlug\src\entities\CardEntity;
+use PayPlugModule\src\entities\CardEntity;
 
 class CardRepository extends Repository
 {
@@ -105,7 +105,7 @@ class CardRepository extends Repository
      */
     public function confirmDeleteCardMessage()
     {
-        return $this->l('card.CardRepository.confirmDeleteCardMessage');
+        return $this->dependencies->l('card.CardRepository.confirmDeleteCardMessage', 'cardrepository');
     }
 
     /**
@@ -220,7 +220,7 @@ class CardRepository extends Repository
      */
     public function deleteCardMessage()
     {
-        return $this->l('card.CardRepository.deleteCardMessage');
+        return $this->dependencies->l('card.CardRepository.deleteCardMessage', 'cardrepository');
     }
 
     /**

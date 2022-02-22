@@ -22,12 +22,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\CacheRepository;
+namespace PayPlugModule\tests\repositories\CacheRepository;
 
-use PayPlug\src\entities\CardEntity;
-use PayPlug\src\repositories\CacheRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\RepositoryBase;
+use PayPlugModule\src\entities\CardEntity;
+use PayPlugModule\src\repositories\CacheRepository;
+use PayPlugModule\tests\mock\MockHelper;
+use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BaseCacheRepository extends RepositoryBase
 {

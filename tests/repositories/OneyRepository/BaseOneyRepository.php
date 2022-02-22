@@ -22,13 +22,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\OneyRepository;
+namespace PayPlugModule\tests\repositories\OneyRepository;
 
-use PayPlug\classes\AmountCurrencyClass;
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\RepositoryBase;
+use PayPlugModule\classes\AmountCurrencyClass;
+use PayPlugModule\src\entities\OneyEntity;
+use PayPlugModule\src\repositories\OneyRepository;
+use PayPlugModule\tests\mock\MockHelper;
+use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BaseOneyRepository extends RepositoryBase
 {

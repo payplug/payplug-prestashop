@@ -25,10 +25,13 @@ class PayplugAjaxModuleAdminController extends ModuleAdminController
 {
 }
 
+// @todo: Set a dump var to detect usage of this file from smoke test
+die(dump(__LINE__ . ' - ' . __FILE__));
+
 require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
 
-$dependencies = new \PayPlug\classes\DependenciesClass();
+$dependencies = new \PayPlugModule\classes\DependenciesClass();
 $adminClass = $dependencies->adminClass;
 $configClass = $dependencies->configClass;
 $cartClass = $dependencies->cartClass;

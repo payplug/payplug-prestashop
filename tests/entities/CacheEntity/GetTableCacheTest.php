@@ -23,7 +23,7 @@
 
 
 
-use PayPlug\src\entities\CacheEntity;
+use PayPlugModule\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
 /**

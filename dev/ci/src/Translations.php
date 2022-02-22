@@ -45,7 +45,7 @@ class Translations
     private function fillTranslations()
     {
         // get current file
-        $translation_dir = dirname(__FILE__) . '/../../translations/';
+        $translation_dir = dirname(__FILE__) . '/../../../translations/';
         $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
         foreach ($translation_files as $file) {
             if ($file[0] === '.'

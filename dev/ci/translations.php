@@ -61,6 +61,7 @@ if (isset($argv) && !empty($argv)) {
 
 // Return error message needed
 if (!empty($messages)) {
+    echo 'Translation missing' . "\n";
     foreach ($messages as $message) {
         echo $message . "\n";
     }
@@ -70,4 +71,5 @@ if (!empty($messages)) {
         exit(137);
     }
 }
+echo 'No translation missing' . "\n";
 exit(0);
