@@ -14,7 +14,8 @@ $language_index = [];
 $translations = [];
 
 // Hydrate $translations from CSV file
-$path = dirname(__FILE__) . '/translations.csv';
+$path = dirname(dirname(__FILE__)) . '/dist/' . $moduleName .'/translations.csv';
+
 if (file_exists($path)) {
     if ($csvfile = fopen($path, 'r')) {
         $count = 0;
@@ -60,7 +61,7 @@ if (!empty($translations)) {
                 $value = str_replace("’", "'", $value);
                 $t = addcslashes($value, "'");
                 if ($t && $t != '') {
-                    $row = '$_MODULE[\'<{' . $moduleName . '}prestashop>' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
+                    $row = '$_MODULE[\'' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
                     fwrite($files[$lang], $row);
                 }
             }
