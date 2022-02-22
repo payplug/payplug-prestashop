@@ -65,7 +65,8 @@ check module translations:
     exit_codes: 126
   artifacts:
     paths:
-      - dev/ci/translations.csv
+      - dev/dist/bnpl/translations.csv
+      - dev/dist/payplug/translations.csv
 
 assets compile and revision:
   image: node:16
