@@ -30,20 +30,20 @@
                 {*<label class="left-block">{l s='Keep cards' d='Modules.Payplug.Admin'}</label>*}
                 <div class="block-right">
                     <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" class="switch-input" name="PAYPLUG_KEEP_CARDS" value="1"
-                               id="payplug_keep_card_on" {if $PAYPLUG_KEEP_CARDS}checked="checked"{/if}>
+                        <input type="radio" class="switch-input" name="keep_cards" value="1"
+                               id="payplug_keep_card_on" {if $keep_cards}checked="checked"{/if}>
                         <label title="{l s='Enable Debug mode' mod={$module_name}}" for="payplug_keep_card_on"
                         {*label title="{l s='Enable Debug mode' d='Modules.Payplug.Admin'}" for="payplug_keep_card_on"*}
                                class="switch-label switch-label-on">{l s='YES' mod={$module_name}}</label>
                                {*class="switch-label switch-label-on">{l s='YES' d='Modules.Payplug.Admin'}</label>*}
-                        <input type="radio" class="switch-input" name="PAYPLUG_KEEP_CARDS" value="0" id="payplug_keep_card_off"
-                               {if !$PAYPLUG_KEEP_CARDS}checked="checked"{/if}>
+                        <input type="radio" class="switch-input" name="keep_cards" value="0" id="payplug_keep_card_off"
+                               {if !$keep_cards}checked="checked"{/if}>
                         <label title="{l s='Disable one click payment' mod={$module_name}}" for="payplug_keep_card_off"
                         {*<label title="{l s='Disable one click payment' d='Modules.Payplug.Admin'}" for="payplug_keep_card_off"*}
                                class="switch-label switch-label-off">{l s='NO' mod={$module_name}}</label>
                                {*class="switch-label switch-label-off">{l s='NO' d='Modules.Payplug.Admin'}</label>*}
                         <span class="switch-selection"></span>
-                        <a class="slide-button btn" {if !$PAYPLUG_KEEP_CARDS}style="left: 50%"{/if}></a>
+                        <a class="slide-button btn" {if !$keep_cards}style="left: 50%"{/if}></a>
                     </span>
                 </div>
             </div>

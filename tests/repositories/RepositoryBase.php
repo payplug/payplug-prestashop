@@ -78,7 +78,6 @@ class RepositoryBase extends TestCase
         $this->myLogPhp
             ->shouldReceive('info')
             ->andReturn(true);
-        $this->dependencies      = \Mockery::mock('dependencies');
 
         $this->setSpecific();
         $this->setRepository();
@@ -107,6 +106,7 @@ class RepositoryBase extends TestCase
 
     private function setRepository()
     {
+        $this->dependencies         = MockHelper::createMockFactory('PayplugModule\classes\DependenciesClass');
         $this->logger               = MockHelper::createMockFactory('PayPlugModule\src\repositories\LoggerRepository');
         $this->query                = MockHelper::createMockFactory('PayPlugModule\src\repositories\QueryRepository');
         $this->sql                  = MockHelper::createMockFactory('PayPlugModule\src\repositories\SQLtableRepository');
@@ -114,15 +114,33 @@ class RepositoryBase extends TestCase
 
     private function setTemporariesClasses()
     {
-        $this->dependencies = \Mockery::mock('alias:PayPlugModule\classes\DependenciesClass');
         $this->dependencies
             ->shouldReceive('l')
             ->andReturnUsing(function ($string, $name) {
                 return $string;
             });
+        $this->dependencies
+            ->shouldReceive('getConfigurationKey')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'oneyMinAmounts':
+                        return 'PAYPLUG_ONEY_MIN_AMOUNTS';
+                    case 'oneyMaxAmounts':
+                        return 'PAYPLUG_ONEY_MAX_AMOUNTS';
+                    case 'oneyCustomMinAmounts':
+                        return 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS';
+                    case 'oneyCustomMaxAmounts':
+                        return 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS';
+                    case 'oneyAllowedCountries':
+                        return 'PAYPLUG_ONEY_ALLOWED_COUNTRIES';
+                    default:
+                        return true;
+                }
+            });
         $this->dependencies->name = DependenciesMock::get();
-        $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools);
-        $this->dependencies->paymentClass   = \Mockery::mock('alias:PayPlugModule\classes\PaymentClass');
-        $this->dependencies->configClass    = \Mockery::mock('alias:PayPlugModule\classes\ConfigClass');
+
+        $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools, $this->dependencies);
+        $this->dependencies->paymentClass   = \Mockery::mock('alias:PayplugModule\classes\PaymentClass');
+        $this->dependencies->configClass    = \Mockery::mock('alias:PayplugModule\classes\ConfigClass');
     }
 }

@@ -439,7 +439,7 @@ class Payplug extends PaymentModule
     public function isValidInstallation()
     {
         if (Validate::isLoadedObject($this)) {
-            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
+            return Configuration::hasKey(Tools::strtoupper($this->name) . '_COMPANY_ID');
         }
         return true;
     }

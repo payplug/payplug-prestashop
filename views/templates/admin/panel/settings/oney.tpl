@@ -50,9 +50,9 @@
                             <label for="text">{l s='admin.panel.settings.oney.thresholds' mod={$module_name}}</label>
                         </div>
                         <div class="{$module_name}Oney_thresholdsInputs">
-                            <input type="text" id= "oney_min" name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS" value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">
+                            <input type="text" id= "oney_min" name="payplug_oney_custom_min_amounts" value="{$oney_custom_min_amounts|escape:'htmlall':'UTF-8'}">
                             <label>{l s='admin.panel.settings.oney.thresholds.and'  mod={$module_name}}</label>
-                            <input type="text" id= "oney_max" name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">
+                            <input type="text" id= "oney_max" name="payplug_oney_custom_max_amounts" value="{$oney_custom_max_amounts|escape:'htmlall':'UTF-8'}">
                             <label for="text">€.</label>
                             <div class="{$module_name}Oney_statement"><span data-e2e-error="oney_amount"></span></div>
                         </div>

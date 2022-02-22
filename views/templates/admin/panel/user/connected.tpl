@@ -22,7 +22,7 @@
 <div class="{$module_name}Panel">
     <div class="{$module_name}Panel_label">{l s='Account connected' mod={$module_name}}</div>
     <div class="{$module_name}Panel_content">
-        <p class="{$module_name}Login_email">{$PAYPLUG_EMAIL|escape:'htmlall':'UTF-8'}</p>
+        <p class="{$module_name}Login_email">{$payplug_email|escape:'htmlall':'UTF-8'}</p>
     </div>
 </div>
 <div class="{$module_name}Panel">

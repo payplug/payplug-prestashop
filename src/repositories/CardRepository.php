@@ -30,10 +30,11 @@ use PayPlugModule\src\entities\CardEntity;
 
 class CardRepository extends Repository
 {
+    protected $dependencies;
+
     private $cardEntity;
     private $configurationSpecific;
     private $constant;
-    private $dependencies;
     private $query;
     private $logger;
     private $toolsSpecific;
@@ -53,7 +54,29 @@ class CardRepository extends Repository
         $this->logger = $logger;
         $this->query = $query;
         $this->toolsSpecific = $tools;
-        $this->setParams();
+
+        $isSandbox = $this->configurationSpecific->get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
+        $idCompany = $this->configurationSpecific->get(
+            $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
+        );
+        $this->logger->setParams(['process' => 'cardRepository']);
+
+        $this->cardEntity
+            ->setAllowedBrand(['mastercard', 'visa'])
+            ->setFieldsRequired([])
+            ->setFieldsSize([])
+            ->setFieldsValidate([])
+            ->setTable('payplug_card')
+            ->setIdentifier('');
+        if ($idCompany && (!empty($idCompany))) {
+            $this->cardEntity->setIdCompany((int)$idCompany);
+        }
+
+        if ($isSandbox) {
+            $this->cardEntity->setIsSandbox((bool)$isSandbox);
+        }
     }
 
     /**
@@ -419,6 +442,7 @@ class CardRepository extends Repository
         }
 
         $config = $this->configurationSpecific;
+        $configClass = $this->dependencies->configClass;
 
         $brand = $payment->card->brand;
         if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
@@ -430,8 +454,12 @@ class CardRepository extends Repository
         $customer_id = isset($payment->metadata['ID Client']) ?
             (int)$payment->metadata['ID Client'] :
             (int)$payment->metadata['Client'];
-        $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
-        $company_id = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
+        $is_sandbox = (int)$config->get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
+        $company_id = (int)$config->get(
+            $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
+        );
 
         $exists = $this->checkExists((string)$payment->card->id, (int)$company_id, (bool)$is_sandbox);
         if ($exists) {
@@ -474,29 +502,5 @@ class CardRepository extends Repository
         }
 
         return true;
-    }
-
-    private function setParams()
-    {
-        $config = $this->configurationSpecific;
-        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
-        $idCompany = $config->get('PAYPLUG_COMPANY_ID' . ($isSandbox ? '_TEST' : ''));
-        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
-        $this->logger->setParams(['process' => 'cardRepository']);
-
-        $this->cardEntity
-            ->setAllowedBrand(['mastercard', 'visa'])
-            ->setFieldsRequired([])
-            ->setFieldsSize([])
-            ->setFieldsValidate([])
-            ->setTable('payplug_card')
-            ->setIdentifier('');
-        if ($idCompany && (!empty($idCompany))) {
-            $this->cardEntity->setIdCompany((int)$idCompany);
-        }
-
-        if ($isSandbox) {
-            $this->cardEntity->setIsSandbox((bool)$isSandbox);
-        }
     }
 }

@@ -22,7 +22,7 @@
 <div class="{$module_name}Panel">
     <div class="{$module_name}Panel_label">{l s='Email' mod={$module_name}}</div>
     <div class="{$module_name}Panel_content">
-        <input type="text" name="PAYPLUG_EMAIL" placeholder="{l s='E-mail address' mod={$module_name}}" value="{if isset($PAYPLUG_EMAIL)}{$PAYPLUG_EMAIL|escape:'htmlall':'UTF-8'}{/if}"/>
+        <input type="text" name="payplug_email" placeholder="{l s='E-mail address' mod={$module_name}}" value="{if isset($payplug_email)}{$payplug_email|escape:'htmlall':'UTF-8'}{/if}"/>
         <span class="input-error">
             <span class="error-email-input">{$p_error|escape:'htmlall':'UTF-8'}</span>
             <span id="error-email-regexp" class="hide">{l s='E-mail address is not valid.' mod={$module_name}}</span>
@@ -32,7 +32,7 @@
 <div class="{$module_name}Panel">
     <div class="{$module_name}Panel_label">{l s='Password' mod={$module_name}}</div>
     <div class="{$module_name}Panel_content">
-        <input type="password" name="PAYPLUG_PASSWORD" placeholder="{l s='Password' mod={$module_name}}" value=""/>
+        <input type="password" name="payplug_password" placeholder="{l s='Password' mod={$module_name}}" value=""/>
         <span class="input-error">
             <span class="error-password-input">{$p_error|escape:'htmlall':'UTF-8'}</span>
             <span id="error-password-regexp" class="hide">{l s='Password must be a least 8 caracters long.' mod={$module_name}}</span>

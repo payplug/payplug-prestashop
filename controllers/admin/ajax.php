@@ -41,23 +41,25 @@ $logger = $dependencies->getPlugin()->logger();
 $module = $dependencies->getPlugin()->getModule();
 
 if (Tools::getValue('_ajax') == 1) {
-    if ((int)Tools::getValue('en') == 1 && (int)Configuration::get('PAYPLUG_SHOW') == 0) {
-        Configuration::updateValue('PAYPLUG_SHOW', 1);
+    if ((int)Tools::getValue('en') == 1 &&
+        (int)Configuration::get($dependencies->getConfigurationKey('show')) == 0
+    ) {
+        Configuration::updateValue($dependencies->getConfigurationKey('show'), 1);
         $module->getInstanceByName($dependencies->name)->enable();
         die(true);
     }
     if (Tools::getIsset('en')
         && (int)Tools::getValue('en') == 0
-        && (int)Configuration::get('PAYPLUG_SHOW') == 1
+        && (int)Configuration::get($dependencies->getConfigurationKey('show')) == 1
     ) {
-        Configuration::updateValue('PAYPLUG_SHOW', 0);
+        Configuration::updateValue($dependencies->getConfigurationKey('show'), 0);
         die(true);
     }
     if (Tools::getIsset('db')) {
         if (Tools::getValue('db') == 'on') {
-            Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1);
+            Configuration::updateValue($dependencies->getConfigurationKey('debugMode'), 1);
         } elseif (Tools::getValue('db') == 'off') {
-            Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
+            Configuration::updateValue($dependencies->getConfigurationKey('debugMode'), 0);
         }
         die(true);
     }
@@ -117,7 +119,7 @@ if (Tools::getValue('_ajax') == 1) {
         die(json_encode(['content' => $content]));
     }
     if ((int)Tools::getValue('checkPremium') == 1) {
-        $api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        $api_key = Configuration::get($dependencies->getConfigurationKey('liveApiKey'));
         die(json_encode($dependencies->apiClass->getAccountPermissions($api_key)));
     }
     if ((int)Tools::getValue('refund') == 1) {
@@ -170,9 +172,11 @@ if (Tools::getValue('_ajax') == 1) {
                 $new_state = (int)Tools::getValue('id_state');
             } elseif ($payment->is_refunded == 1) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                    $new_state = (int)Configuration::get($configClass->concatenateModuleName('ORDER_STATE_REFUND'));
                 } else {
-                    $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                    $new_state = (int)Configuration::get(
+                        $configClass->concatenateModuleName('ORDER_STATE_REFUND_TEST')
+                    );
                 }
             }
 
@@ -233,15 +237,15 @@ if (Tools::getValue('_ajax') == 1) {
 
         if ((int)$payment->is_paid == 1) {
             if ($payment->is_live == 1) {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
+                $new_state = (int)Configuration::get($configClass->concatenateModuleName('ORDER_STATE_PAID'));
             } else {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID_TEST');
+                $new_state = (int)Configuration::get($configClass->concatenateModuleName('ORDER_STATE_PAID_TEST'));
             }
         } elseif ((int)$payment->is_paid == 0) {
             if ($payment->is_live == 1) {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR');
+                $new_state = (int)Configuration::get($configClass->concatenateModuleName('ORDER_STATE_ERROR'));
             } else {
-                $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_ERROR_TEST');
+                $new_state = (int)Configuration::get($configClass->concatenateModuleName('ORDER_STATE_ERROR_TEST'));
             }
         }
 

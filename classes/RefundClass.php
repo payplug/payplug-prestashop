@@ -108,14 +108,18 @@ class RefundClass
      * @return Refund | string
      * @throws ConfigurationException
      */
-    public static function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
+    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
         $logger = new LoggerRepository();
         $logger->setParams(['process' => 'refundClass']);
         if (Tools::strtoupper($pay_mode) == 'TEST') {
-            ApiClass::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
+            $this->dependencies->apiClass->setSecretKey(
+                $this->dependencies->getConfigurationKey('testApiKey')
+            );
         } else {
-            ApiClass::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
+            $this->dependencies->apiClass->setSecretKey(
+                $this->dependencies->getConfigurationKey('liveApiKey')
+            );
         }
         if ($pay_id == null) {
             if ($inst_id != null) {
@@ -229,7 +233,7 @@ class RefundClass
             'reason' => 'Refunded with Prestashop'
         ];
         $pay_mode = Tools::getValue('pay_mode');
-        $refund = RefundClass::makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+        $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 
         if ($refund == 'error') {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
@@ -273,9 +277,13 @@ class RefundClass
                     $new_state = (int)Tools::getValue('id_state');
                     if ($new_state == 0) {
                         if ($installment->is_live == 1) {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                            $new_state = (int)Configuration::get(
+                                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
+                            );
                         } else {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                            $new_state = (int)Configuration::get(
+                                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
+                            );
                         }
                     }
                     $order = new Order((int)$id_order);
@@ -313,9 +321,13 @@ class RefundClass
                     $new_state = (int)Tools::getValue('id_state');
                 } elseif ($payment->is_refunded == 1) {
                     if ($payment->is_live == 1) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                        $new_state = (int)Configuration::get(
+                            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
+                        );
                     } else {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                        $new_state = (int)Configuration::get(
+                            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
+                        );
                     }
                 }
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {

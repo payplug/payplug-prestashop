@@ -54,10 +54,27 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
     {
         $shipping_iso = $billing_iso = 'FR';
 
-        $this->config
-            ->shouldReceive('get')
-            ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            ->andReturn('');
+        $this->config->shouldReceive('get')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'PS_CURRENCY_DEFAULT':
+                        return 1;
+                    case 'PAYPLUG_ONEY_MIN_AMOUNTS':
+                        return 'EUR:10000';
+                    case 'PAYPLUG_ONEY_MAX_AMOUNTS':
+                        return 'EUR:300000';
+                    case 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS':
+                        return 'EUR:100';
+                    case 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS':
+                        return 'EUR:3000';
+                    case 'PS_SHOP_NAME':
+                        return 'Payplug';
+                    case 'PAYPLUG_ONEY_ALLOWED_COUNTRIES':
+                        return '';
+                    default:
+                        return true;
+                }
+            });
 
         $this->assertSame(
             [

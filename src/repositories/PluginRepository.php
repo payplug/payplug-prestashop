@@ -23,6 +23,7 @@
 
 namespace PayPlugModule\src\repositories;
 
+use PayPlugModule\classes\ConfigClass;
 use PayPlugModule\classes\AmountCurrencyClass;
 use PayPlugModule\classes\MyLogPHP;
 
@@ -159,12 +160,18 @@ class PluginRepository extends Repository
     private function setRepositories()
     {
         $this->amountCurrencyClass = new AmountCurrencyClass(
-            $this->tools
+            $this->tools,
+            $this->dependencies
         );
         $this->logger = new LoggerRepository();
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
 
+
+        $this->sql = new SQLtableRepository(
+            $this->dependencies,
+            $this->query
+        );
         $this->card = new CardRepository(
             $this->configuration,
             $this->constant,

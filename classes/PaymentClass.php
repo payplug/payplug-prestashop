@@ -93,15 +93,25 @@ class PaymentClass
         try {
             $abort = InstallmentPlan::abort($inst_id);
         } catch (Exception $e) {
-            $sandbox = (bool)$this->config->get('PAYPLUG_SANDBOX_MODE');
+            $sandbox = (bool)$this->config->get(
+                $this->dependencies->getConfigurationKey('sandboxMode')
+            );
             if ($sandbox) {
-                ApiClass::setSecretKey($this->config->get('PAYPLUG_LIVE_API_KEY'));
+                $this->dependencies->apiClass->setSecretKey($this->config->get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                ));
                 $abort = InstallmentPlan::abort($inst_id);
-                ApiClass::setSecretKey($this->config->get('PAYPLUG_TEST_API_KEY'));
+                $this->dependencies->apiClass->setSecretKey($this->config->get(
+                    $this->dependencies->getConfigurationKey('testApiKey')
+                ));
             } elseif (!$sandbox) {
-                ApiClass::setSecretKey($this->config->get('PAYPLUG_TEST_API_KEY'));
+                $this->dependencies->apiClass->setSecretKey($this->config->get(
+                    $this->dependencies->getConfigurationKey('testApiKey')
+                ));
                 $abort = InstallmentPlan::abort($inst_id);
-                ApiClass::setSecretKey($this->config->get('PAYPLUG_LIVE_API_KEY'));
+                $this->dependencies->apiClass->setSecretKey($this->config->get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                ));
             }
         }
 
@@ -146,11 +156,21 @@ class PaymentClass
      */
     public function assignPaymentOptions($cart)
     {
-        $standard = $this->config->get('PAYPLUG_STANDARD');
-        $one_click = $standard && $this->config->get('PAYPLUG_ONE_CLICK');
-        $installment = $this->config->get('PAYPLUG_INST');
-        $installment_mode = $this->config->get('PAYPLUG_INST_MODE');
-        $installment_min_amount = $this->config->get('PAYPLUG_INST_MIN_AMOUNT');
+        $standard = $this->config->get(
+            $this->dependencies->getConfigurationKey('standard')
+        );
+        $one_click = $standard && $this->config->get(
+            $this->dependencies->getConfigurationKey('oneClick')
+        );
+        $installment = $this->config->get(
+            $this->dependencies->getConfigurationKey('inst')
+        );
+        $installment_mode = $this->config->get(
+            $this->dependencies->getConfigurationKey('instMode')
+        );
+        $installment_min_amount = $this->config->get(
+            $this->dependencies->getConfigurationKey('instMinAmount')
+        );
 
         if (!$this->dependencies->amountCurrencyClass->checkCurrency($cart) ||
             !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
@@ -508,7 +528,9 @@ class PaymentClass
             ]));
         } else {
             $state_addons = ($payment->resource->is_live ? '' : '_TEST');
-            $new_state = (int)$this->config->get('PAYPLUG_ORDER_STATE_PAID' . $state_addons);
+            $new_state = (int)$this->config->get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+            );
 
             $order = $this->order->get((int)$id_order);
             if ($this->validate->validate('isLoadedObject', $order)) {
@@ -628,25 +650,33 @@ class PaymentClass
         ];
 
         if (!$this->active ||
-            !$this->config->get('PAYPLUG_SHOW') ||
+            !$this->config->get($this->dependencies->getConfigurationKey('show')) ||
             !$this->dependencies->amountCurrencyClass->checkCurrency($cart) ||
             !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return $options;
         }
 
         // check if installment allowed
-        $installment = $this->config->get('PAYPLUG_INST');
-        $installment_min_amount = $this->config->get('PAYPLUG_INST_MIN_AMOUNT');
+        $installment = $this->config->get(
+            $this->dependencies->getConfigurationKey('inst')
+        );
+        $installment_min_amount = $this->config->get(
+            $this->dependencies->getConfigurationKey('instMinAmount')
+        );
         $order_total = $cart->getOrderTotal(true);
         $installment = $installment && $order_total >= $installment_min_amount;
 
         // check if one click allowed
-        $one_click = $this->config->get('PAYPLUG_ONE_CLICK');
+        $one_click = $this->config->get(
+            $this->dependencies->getConfigurationKey('oneClick')
+        );
         $payplug_cards = $this->card->getByCustomer((int)$cart->id_customer, true);
         $one_click = (bool)($one_click && !empty($payplug_cards));
 
         // check if oney is allowed
-        $oney = $this->config->get('PAYPLUG_ONEY');
+        $oney = $this->config->get(
+            $this->dependencies->getConfigurationKey('oney')
+        );
 
         return [
             'standard' => true,
@@ -775,7 +805,7 @@ class PaymentClass
      */
     public function getPaymentOptions($cart)
     {
-        $options = ConfigClass::getAvailableOptions($cart);
+        $options = $this->dependencies->configClass->getAvailableOptions($cart);
 
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
@@ -784,7 +814,9 @@ class PaymentClass
         $paymentOption = [];
 
         // Standard and OneClick Payment
-        if ($this->config->get('PAYPLUG_STANDARD') && $this->dependencies->configClass->isValidFeature('feature_standard')) {
+        if ($this->config->get($this->dependencies->getConfigurationKey('standard'))
+            && $this->dependencies->configClass->isValidFeature('feature_standard')
+        ) {
             //OneClick Payment
             if ($options['one_click'] && !empty($payplug_cards)) {
                 foreach ($payplug_cards as $card) {
@@ -907,8 +939,12 @@ class PaymentClass
         if ($options['installment'] && $this->dependencies->configClass->isValidFeature('feature_installment')) {
             $use_taxes = (bool)$this->config->get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-            if ($cart_amount >= $this->config->get('PAYPLUG_INST_MIN_AMOUNT')) {
-                $installment_mode = $this->config->get('PAYPLUG_INST_MODE');
+            if ($cart_amount >= $this->config->get(
+                $this->dependencies->getConfigurationKey('instMinAmount')
+            )) {
+                $installment_mode = $this->config->get(
+                    $this->dependencies->getConfigurationKey('instMode')
+                );
                 $paymentOption['installment']['name'] = 'installment';
                 $paymentOption['installment']['inputs'] = [
                     'pc' => [
@@ -943,12 +979,16 @@ class PaymentClass
                     $this->constant->get('_PS_MODULE_DIR_')
                     . $this->name . '/views/img/logos_schemes_installment_'
                     . $this
-                        ->config->get('PAYPLUG_INST_MODE') . '_' . $this
+                        ->config->get(
+                            $this->dependencies->getConfigurationKey('instMode')
+                        ) . '_' . $this
                         ->dependencies->configClass->getImgLang() . '.png'
                 );
                 $paymentOption['installment']['callToActionText'] = sprintf(
                     $this->dependencies->l('payplug.getPaymentOptions.payByCardInstallment', 'paymentclass'),
-                    $this->config->get('PAYPLUG_INST_MODE')
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey('instMode')
+                    )
                 );
                 $paymentOption['installment']['action'] = $this->context->link->getModuleLink(
                     $this->name,
@@ -977,11 +1017,15 @@ class PaymentClass
             $is_elligible = $this->oney->isOneyElligible($this->context->cart, $cart_amount, true);
             $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
 
-            $optimized = $this->config->get('PAYPLUG_ONEY_OPTIMIZED')
+            $optimized = $this->config->get(
+                $this->dependencies->getConfigurationKey('oneyOptimized')
+            )
                 && !$error;
 
             $available_oney_payments = $this->oney->oneyEntity->getOperations();
-            $use_fees = (bool)$this->config->get('PAYPLUG_ONEY_FEES');
+            $use_fees = (bool)$this->config->get(
+                $this->dependencies->getConfigurationKey('oneyFees')
+            );
 
             foreach ($available_oney_payments as $oney_payment) {
                 $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
@@ -1057,7 +1101,9 @@ class PaymentClass
                 $oneyTpl = 'unified.tpl';
 
                 if ($iso != 'IT' && $iso != 'FR') {
-                    $iso = $this->config->get('PAYPLUG_COMPANY_ISO');
+                    $iso = $this->config->get(
+                        $this->dependencies->getConfigurationKey('companyIso')
+                    );
                 }
 
                 $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
@@ -1437,18 +1483,36 @@ class PaymentClass
             ];
         }
 
-        $is_sandbox = (int)$this->config->get('PAYPLUG_SANDBOX_MODE');
+        $is_sandbox = (int)$this->config->get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
 
         // get the config
         $config = [
-            'one_click' => (int)$this->config->get('PAYPLUG_ONE_CLICK'),
-            'installment' => (int)$this->config->get('PAYPLUG_INST'),
-            'company' => (int)$this->config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : '')),
-            'inst_mode' => (int)$this->config->get('PAYPLUG_INST_MODE'),
-            'deferred' => (int)$this->config->get('PAYPLUG_DEFERRED'),
-            'oney' => (int)$this->config->get('PAYPLUG_ONEY'),
-            'standard' => (int)$this->config->get('PAYPLUG_STANDARD'),
-            'bancontact' => (int)$this->config->get('PAYPLUG_BANCONTACT')
+            'one_click' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('oneClick')
+            ),
+            'installment' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('inst')
+            ),
+            'company' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
+            ),
+            'inst_mode' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('instMode')
+            ),
+            'deferred' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('deferred')
+            ),
+            'oney' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('oney')
+            ),
+            'standard' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('standard')
+            ),
+            'bancontact' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('bancontact')
+            )
         ];
 
         $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
@@ -1474,7 +1538,9 @@ class PaymentClass
 
         // Currency
         $currency = $this->currency->get((int)$cart->id_currency);
-        $supported_currencies = explode(';', $this->config->get('PAYPLUG_CURRENCIES'));
+        $supported_currencies = explode(';', $this->config->get(
+            $this->dependencies->getConfigurationKey('currencies')
+        ));
         $currency_iso_code = $currency->iso_code;
 
         // if unvalid iso code, return false
@@ -1792,7 +1858,9 @@ class PaymentClass
             'authorizedAt' => null,
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
-            'isEmbedded' => (string)$this->config->get('PAYPLUG_EMBEDDED_MODE') !== 'redirected',
+            'isEmbedded' => (string)$this->config->get(
+                $this->dependencies->getConfigurationKey('embeddedMode')
+            ) !== 'redirected',
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ConfigClass::isMobiledevice(),
             'cart' => $cart,

@@ -227,24 +227,6 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getConfigClass()
-    {
-        return $this->configClass;
-    }
-
-    /**
-     * @param object $configClass
-     * @return PluginEntity
-     */
-    public function setConfigClass($configClass)
-    {
-        $this->configClass = $configClass;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
     public function getAdmin()
     {
         return $this->admin;

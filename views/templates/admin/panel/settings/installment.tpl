@@ -48,15 +48,15 @@
                         <div class="{$module_name}Panel_label">{l s='Enable payments:' mod={$module_name}}</div>
                         <div class="{$module_name}Panel_content">
                             <label for="payplug_installment_mode_2">
-                                <input id="payplug_installment_mode_2" type="radio" name="PAYPLUG_INST_MODE" value="2" {if $inst_mode == 2}checked="checked"{/if}>
+                                <input id="payplug_installment_mode_2" type="radio" name="payplug_inst_mode" value="2" {if $inst_mode == 2}checked="checked"{/if}>
                                 {l s='in 2 installments' mod={$module_name}}
                             </label>
                             <label for="payplug_installment_mode_3">
-                                <input id="payplug_installment_mode_3" type="radio" name="PAYPLUG_INST_MODE" value="3" {if $inst_mode == 3}checked="checked"{/if}>
+                                <input id="payplug_installment_mode_3" type="radio" name="payplug_inst_mode" value="3" {if $inst_mode == 3}checked="checked"{/if}>
                                 {l s='in 3 installments' mod={$module_name}}
                             </label>
                             <label for="payplug_installment_mode_4">
-                                <input id="payplug_installment_mode_4" type="radio" name="PAYPLUG_INST_MODE" value="4" {if $inst_mode == 4}checked="checked"{/if}>
+                                <input id="payplug_installment_mode_4" type="radio" name="payplug_inst_mode" value="4" {if $inst_mode == 4}checked="checked"{/if}>
                                 {l s='in 4 installments' mod={$module_name}}
                             </label>
                         </div>
@@ -66,7 +66,7 @@
                         <div class="{$module_name}Panel_label">{l s='Enable this option from:' mod={$module_name}}</div>
                         <div class="{$module_name}Panel_content">
                             <div class="{$module_name}Installment_amount">
-                                <input type="text" name="PAYPLUG_INST_MIN_AMOUNT" value="{$inst_min_amount|escape:'htmlall':'UTF-8'}"> €
+                                <input type="text" name="payplug_inst_min_amount" value="{$inst_min_amount|escape:'htmlall':'UTF-8'}"> €
                                 <span style="display: none;" data-e2e-error="installment_amount">{l s='Amount must be greater than 4€ and lower than 20000€.' mod={$module_name}}</span>
                             </div>
                         </div>

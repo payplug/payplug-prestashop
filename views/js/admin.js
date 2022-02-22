@@ -413,7 +413,7 @@ window[module_name+'Module'] = {
             $document.on('click', '.' + identifier + '_login', login.login)
                 .on('click', '.' + identifier + '_logout', login.logout)
                 .on('click', 'button[name=password]', login.password)
-                .on('keyup', 'input[name=PAYPLUG_PASSWORD]', login.submit);
+                .on('keyup', 'input[name=payplug_password]', login.submit);
         },
         submit: function (event) {
             var {login} = window[module_name+'Module'],
@@ -425,8 +425,8 @@ window[module_name+'Module'] = {
             }
 
             var {tools} = window[module_name+'Module'],
-                email = $('input[name=PAYPLUG_EMAIL]').val(),
-                pwd = $('input[name=PAYPLUG_PASSWORD]').val();
+                email = $('input[name="payplug_email"]').val(),
+                pwd = $('input[name="payplug_password"]').val();
 
             if (!tools.validate.isEmail(email) || !pwd.length) {
                 return;
@@ -444,8 +444,8 @@ window[module_name+'Module'] = {
                     _ajax: 1,
                     log: 1,
                     submitAccount: 1,
-                    PAYPLUG_EMAIL: $('input[name=PAYPLUG_EMAIL]').val(),
-                    PAYPLUG_PASSWORD: $('input[name=PAYPLUG_PASSWORD]').val(),
+                    payplug_email: $('input[name="payplug_email"]').val(),
+                    payplug_password: $('input[name="payplug_password"]').val(),
                 }
 
             if (login.props.query != null) {
@@ -838,8 +838,8 @@ window[module_name+'Module'] = {
             var {oney} = window[module_name+'Module'],
                 {identifier} = oney.props;
             $document.on('change', '.' + identifier + 'Fees input', oney.selectFees)
-                .on('focusout', 'input[name="PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS"]', oney.checkMin)
-                .on('focusout', 'input[name="PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS"]', oney.checkMax);
+                .on('focusout', 'input[name="payplug_oney_custom_min_amounts"]', oney.checkMin)
+                .on('focusout', 'input[name="payplug_oney_custom_max_amounts"]', oney.checkMax);
         },
         checkMin: function (event) {
             var {oney} = window[module_name+'Module'],
@@ -926,8 +926,8 @@ window[module_name+'Module'] = {
         init: function () {
             var {installment, deferred} = window[module_name+'Module'],
                 {switcher} = installment.props;
-            $document.on('change', 'input[name=PAYPLUG_INST_MODE]', installment.select)
-                .on('keyup', 'input[name=PAYPLUG_INST_MIN_AMOUNT]', installment.check)
+            $document.on('change', 'input[name=payplug_inst_mode]', installment.select)
+                .on('keyup', 'input[name=payplug_inst_min_amount]', installment.check)
                 .on('switchSelected', 'input[name=' + switcher + ']', deferred.check);
         },
         select: function (event) {
@@ -937,7 +937,7 @@ window[module_name+'Module'] = {
             var {installment} = window[module_name+'Module'],
                 {identifier} = installment.props;
 
-            var inst = $('input[name=PAYPLUG_INST_MODE]:checked').val();
+            var inst = $('input[name=payplug_inst_mode]:checked').val();
 
             $('.' + identifier + '_schedule').removeClass('-select');
             $('.' + identifier + '_schedule.-x' + inst).addClass('-select');

@@ -21,7 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 /**
  * @description Dispatch payment method
  */
@@ -54,7 +53,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 return false;
             }
 
-            $options = \PayPlugModule\classes\ConfigClass::getAvailableOptions($cart);
+            $options = $dependencies->configClass->getAvailableOptions($cart);
 
             $embedded = $options['embedded'] != 'redirected';
             $error_url = 'index.php?controller=order&step=3&error=1';
