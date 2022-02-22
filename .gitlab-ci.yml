@@ -187,6 +187,7 @@ build zip bnpl:
     - rm -rf views/build && mv views/build-bnpl views/build
     - ./dev/ci/assets_revision.sh -b bnpl
     - mkdir bnpl
+    - php ./dev/ci/import-translations.php
   script:
     - shopt -s extglob
     - mv !(bnpl|composer.json) bnpl
