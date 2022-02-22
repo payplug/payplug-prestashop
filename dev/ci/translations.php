@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/src/Translations.php');
 
 $repo = new Translations();
 $translations = $repo->getTranslations();
+$moduleName = $repo->getModuleName();
 
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
@@ -17,7 +18,7 @@ $header = array_merge($header, $available_languages);
 if ($fp) {
     fputcsv($fp, $header, ';');
     foreach ($translations as $key => $trans) {
-        $key = str_replace("<{payplug}prestashop>", "", $key);
+        $key = str_replace("<{' . $moduleName . '}prestashop>", "", $key);
         $line = [$key, $trans['default'], $trans['tags']];
         foreach ($available_languages as $lang) {
             $line[] = stripcslashes($trans[$lang]);

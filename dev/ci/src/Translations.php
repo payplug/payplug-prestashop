@@ -140,12 +140,13 @@ class Translations
      */
     private function parseFile($content, $type_file = false)
     {
+
         // Parsing modules file
         if ($type_file == 'php') {
             $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
         } else {
             // In tpl file look for something that should contain mod='module_name' according to the documentation
-            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\'payplug\'.*\}/U';
+            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\{\$module_name\}\.*\}/U';
         }
 
         if (!is_array($regex)) {
@@ -175,7 +176,6 @@ class Translations
                 $strings[] = $string;
             }
         }
-
         return array_unique($strings, SORT_REGULAR);
     }
 
@@ -187,7 +187,7 @@ class Translations
     {
         $array_files = [];
         $path = dirname(__FILE__) . '/../../../';
-        $this->getRecursiveFiles($path, $array_files, 'payplug');
+        $this->getRecursiveFiles($path, $array_files, $this->getModuleName());
         return $this->files = $array_files;
     }
 
@@ -239,7 +239,7 @@ class Translations
                     }
 
                     $md5_key = md5($key);
-                    $trans_key = '<{payplug}prestashop>';
+                    $trans_key = '<{' . $this->getModuleName() . '}prestashop>';
                     $trans_key .= strtolower($template_name) . '_' . $md5_key;
 
                     // to avoid duplicate entry
@@ -253,5 +253,15 @@ class Translations
                 }
             }
         }
+    }
+
+    /***
+     * @description get the module Name from composer.json
+     * @return mixed
+     */
+    public function getModuleName()
+    {
+        $configuration = json_decode(file_get_contents(dirname(__FILE__)."/../../../composer.json"));
+        return $configuration->moduleName;
     }
 }
