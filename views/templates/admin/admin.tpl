@@ -58,3 +58,9 @@
     {include file='./panel/login.tpl'}
     {include file='./panel/settings.tpl'}
 </form>
+
+<div class="panel">
+    New UI component
+
+
+</div>
