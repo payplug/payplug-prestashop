@@ -6,12 +6,16 @@ global $_MODULE;
 $_MODULE = array();
 ';
 
+$configuration = json_decode(file_get_contents(dirname(__FILE__)."/../../composer.json"));
+$moduleName = $configuration->moduleName;
+
 $available_languages = ['fr', 'en', 'gb', 'it'];
 $language_index = [];
 $translations = [];
 
 // Hydrate $translations from CSV file
-$path = dirname(__FILE__) . '/translations.csv';
+$path = dirname(dirname(__FILE__)) . '/dist/' . $moduleName .'/translations.csv';
+
 if (file_exists($path)) {
     if ($csvfile = fopen($path, 'r')) {
         $count = 0;
@@ -42,7 +46,7 @@ if (file_exists($path)) {
 // Open translation files from available languages
 $files = [];
 foreach ($available_languages as $lang) {
-    $path_lang = dirname(__FILE__) . '/../translations/' . $lang . '.php';
+    $path_lang = dirname(__FILE__) . '/../../translations/' . $lang . '.php';
     $files[$lang] = fopen($path_lang, 'w');
     fwrite($files[$lang], $header);
 }
@@ -57,7 +61,7 @@ if (!empty($translations)) {
                 $value = str_replace("’", "'", $value);
                 $t = addcslashes($value, "'");
                 if ($t && $t != '') {
-                    $row = '$_MODULE[\'<{payplug}prestashop>' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
+                    $row = '$_MODULE[\'' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
                     fwrite($files[$lang], $row);
                 }
             }

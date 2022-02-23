@@ -47,7 +47,7 @@ class BNPL extends PaymentModule
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('payplug.construct.description');
+        $this->description = $this->l('bnpl.construct.description');
         $this->displayName = 'BNPL';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;

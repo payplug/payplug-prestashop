@@ -46,7 +46,7 @@
 </div>
 <div class="{$module_name}Panel">
     <div class="{$module_name}Panel_content">
-        <button type="button" class="{$module_name}Button -green payplugLogin_login" data-e2e-type="button" data-e2e-action="login">{l s='Connect account' mod={$module_name}}</button>
+        <button type="button" class="{$module_name}Button -green {$module_name}Login_login" data-e2e-type="button" data-e2e-action="login">{l s='Connect account' mod={$module_name}}</button>
     </div>
 </div>
 <div class="{$module_name}Panel">
