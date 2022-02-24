@@ -59,8 +59,9 @@
     {include file='./panel/settings.tpl'}
 </form>
 
-<div class="panel">
-    New UI component
+<div class="panel payplugUIComponent">
+    <p>New UI component</p>
 
-
+    <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/button.css">
+    {include file='./../components/atoms/button/button_stories.tpl'}
 </div>
