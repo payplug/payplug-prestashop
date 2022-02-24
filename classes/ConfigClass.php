@@ -935,6 +935,11 @@ class ConfigClass
 
         try {
             $iso_code = self::getIsoCodeByCountryId($country->id);
+
+            if (!$iso_code) {
+                return null;
+            }
+
             $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
