@@ -1,0 +1,63 @@
+@import "../../less/include";
+
+.payplugUIButton {
+  // default
+  .transition(~"background @{dur}, color @{dur}");
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+
+  height: 40px;
+  padding: 12px 20px;
+  background: #colorMap[purple];
+  border-radius: 4px;
+  border: none;
+
+  .Inter(14px, 600);
+  color: #colorMap[white];
+
+  &:hover,
+  &.-hover {
+    background: darken(#colorMap[purple], 10.5%);
+  }
+
+  &.-disabled {
+    opacity: .3;
+    cursor: default;
+    background: #colorMap[purple];
+  }
+
+  // secondary
+  &.-secondary {
+    .border(#colorMap[purple]);
+    background: #colorMap[white];
+    color: #colorMap[purple];
+
+    &:hover,
+    &.-hover {
+      background: #colorMap[purple];
+      color: #colorMap[white];
+    }
+    &.-disabled {
+      background: #colorMap[white];
+      color: #colorMap[purple];
+    }
+  }
+
+  // tertiary
+  &.-tertiary {
+    .border(#colorMap[border]);
+    background: #colorMap[white];
+    color: #colorMap[fontMainDefault];
+
+    &:hover,
+    &.-hover {
+      background: #colorMap[fontSecondary50];
+    }
+    &.-disabled {
+      background: #colorMap[white];
+    }
+  }
+}
