@@ -64,4 +64,7 @@
 
     <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/button.css">
     {include file='./../components/atoms/button/button_stories.tpl'}
+
+    <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/input.css">
+    {include file='./../components/atoms/input/input_stories.tpl'}
 </div>
