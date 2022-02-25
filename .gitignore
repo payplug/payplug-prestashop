@@ -11,6 +11,8 @@ features.json
 vendor/
 views/css/*.css
 views/css/*.map
+views/css/components/*/*.css
+views/css/components/*/*.map
 views/css/less/var.less
 views/css/components/atoms/*.css
 views/css/components/atoms/*.map
