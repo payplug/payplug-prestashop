@@ -531,7 +531,7 @@ class HookClass
                     $pay_error = '';
                 }
                 $display_refund = false;
-                if ($current_state != 0 && $current_state == $id_pending_order_state) {
+                if ($current_state != 0 && $current_state == $id_pending_order_state && !$is_bancontact) {
                     $show_menu_update = true;
                 }
             } elseif ((((int)$payment->amount_refunded > 0)
