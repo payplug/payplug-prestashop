@@ -12,6 +12,7 @@ vendor/
 views/css/*.css
 views/css/*.map
 views/css/less/var.less
+views/css/components/atoms/*.map
 views/css/less/*.css
 views/css/less/*.map
 views/css/less/*/*.css

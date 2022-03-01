@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Button component</h2>
+<h2>Input component</h2>
 
 <section style="justify-content: space-around;">
     <h3>Style par défaut</h3>
