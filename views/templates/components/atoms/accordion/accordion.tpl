@@ -20,9 +20,18 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<button type="button" name="{$buttonName|escape:'htmlall':'UTF-8'}" class="payplugUIButton
-    {if isset($buttonClassName) && $buttonClassName} {$buttonClassName|escape:'htmlall':'UTF-8'}{/if}
-    {if isset($buttonStyle) && $buttonStyle} -{$buttonStyle|escape:'htmlall':'UTF-8'}{/if}
-    {if isset($buttonDisabled) && $buttonDisabled} -disabled{/if}">
-    {$buttonText|escape:'htmlall':'UTF-8'}
-</button>
+
+<div class="payplugUIAccordion
+    {if isset($accordionClassName) && $accordionClassName} {$accordionClassName|escape:'htmlall':'UTF-8'}{/if}">
+    <input type="checkbox" id="{$accordionIdentifier|escape:'htmlall':'UTF-8'}"/>
+    <label for="{$accordionIdentifier|escape:'htmlall':'UTF-8'}">
+        {if isset($accordionLabel) && $accordionLabel}
+            {$accordionLabel|escape:'htmlall':'UTF-8'}
+        {/if}
+    </label>
+    <div class="payplugUIAccordion_contentWrapper">
+        <div class="payplugUIAccordion_content">
+            {$accordionContent}
+        </div>
+    </div>
+</div>

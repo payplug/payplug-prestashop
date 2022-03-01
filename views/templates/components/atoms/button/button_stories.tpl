@@ -28,7 +28,7 @@
         {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Default'}
     </div>
     <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Hover' buttonClassName='hover'}
+        {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Hover' buttonClassName='-hover'}
     </div>
     <div>
         {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Disabled' buttonDisabled=true}
@@ -41,7 +41,7 @@
         {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Default'}
     </div>
     <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Hover' buttonClassName='hover'}
+        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Hover' buttonClassName='-hover'}
     </div>
     <div>
         {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Disabled' buttonDisabled=true}
@@ -54,7 +54,7 @@
         {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Default'}
     </div>
     <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Hover' buttonClassName='hover'}
+        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Hover' buttonClassName='-hover'}
     </div>
     <div>
         {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Disabled' buttonDisabled=true}
