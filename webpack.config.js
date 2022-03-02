@@ -25,13 +25,18 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const path = require('path');
 
-
-const css_path = 'views/css';
+const dir_path = 'views';
 const lessFiles = ['front', 'front_1_6', 'admin', 'admin_order'];
+const jsFiles = ['accordion', 'button'];
 
 let entryFiles = {};
 lessFiles.map((file) => {
-    entryFiles[file] = path.resolve(__dirname, css_path + '/' + file + '.less');
+    entryFiles['css/' + file] = path.resolve(__dirname, dir_path + '/css/' + file + '.less');
+});
+
+entryFiles['js/components/atoms/components'] = [];
+jsFiles.map((file) => {
+    entryFiles['js/components/atoms/components'].push(path.resolve(__dirname, dir_path + '/js/components/atoms/' + file + '.js'));
 });
 
 const loaders = [
@@ -70,13 +75,17 @@ module.exports = {
     mode: 'production',
     entry: entryFiles,
     output: {
-        path: path.resolve(__dirname, css_path)
+        path: path.resolve(__dirname, dir_path)
     },
     module: {
         rules: [
             {
                 test: /\.less$/,
                 use: loaders,
+            },
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
             },
         ],
     },
