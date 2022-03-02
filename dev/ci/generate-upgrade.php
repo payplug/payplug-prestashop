@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../upgrade/upgrade-methods.php');
+require_once(dirname(__FILE__) . '/../../upgrade/upgrade-methods.php');
 
 function getMethodContent($method_name = false)
 {
@@ -20,7 +20,7 @@ function getMethodContent($method_name = false)
     return $body;
 }
 
-$configuration = json_decode(file_get_contents(dirname(__FILE__)."/../composer.json"));
+$configuration = json_decode(file_get_contents(dirname(__FILE__)."/../../composer.json"));
 $moduleName = $configuration->moduleName;
 
 // get versions to create
@@ -92,7 +92,7 @@ foreach ($versions as $version) {
 ';
 
     echo 'Writing script ' . $file_name . '...' . "\n";
-    $path = dirname(__FILE__) . '/../upgrade/' . $file_name;
+    $path = dirname(__FILE__) . '/../../upgrade/' . $file_name;
     if ($file = fopen($path, 'w')) {
         fwrite($file, $content);
         fclose($file);

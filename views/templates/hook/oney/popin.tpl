@@ -19,20 +19,20 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<span class="oneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if}">
+<span class="{$module_name}OneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if}">
     {if isset($payplug_oney_error) && $payplug_oney_error}
-        <p class="oneyPopin_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</p>
+        <p class="{$module_name}OneyPopin_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</p>
     {elseif isset($oney_payment_options) && $oney_payment_options}
-        <button class="oneyPopin_close">{l s='Close' mod='payplug'}</button>
-        <span class="oneyPopin_title">
-            {l s='hook.oney.popin.pay' mod='payplug'}
+        <button class="{$module_name}OneyPopin_close">{l s='Close' mod={$module_name}}</button>
+        <span class="{$module_name}OneyPopin_title">
+            {l s='hook.oney.popin.pay' mod={$module_name}}
             {if isset($use_fees) && !$use_fees && isset($iso_code) && $iso_code != 'IT'}
-                <u>{l s='hook.oney.popin.withoutFees' mod='payplug'}</u>
+                <u>{l s='hook.oney.popin.withoutFees' mod={$module_name}}</u>
             {/if}
-            <strong>{l s='hook.oney.popin.card' mod='payplug'}</strong>
+            <strong>{l s='hook.oney.popin.card' mod={$module_name}}</strong>
         </span>
 
-        <ul class="oneyPopin_navigation">
+        <ul class="{$module_name}OneyPopin_navigation">
             {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
                 <li{if $oney_payment_method == 'x3_with_fees'} class="selected"{/if}>
                     <button type="button"
@@ -45,24 +45,24 @@
         </ul>
 
         {foreach $oney_payment_options as $oney_payment_method => $oney_payment_option}
-            <span class="oneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}"
+            <span class="{$module_name}OneyPopin_option{if $oney_payment_method == 'x3_with_fees'} -show{/if}"
                   data-type="{$oney_payment_option.split|escape:'htmlall':'UTF-8'}x">
 			    {include file="./payment/detail.tpl" oney_payment_option=$oney_payment_option}
             </span>
         {/foreach}
 
         {assign "linkToOney" "<a href='{$oneyUrl|escape:'htmlall':'UTF-8'}' target='_blank'>"}
-        <span class="oneyPopin_legal">
+        <span class="{$module_name}OneyPopin_legal">
             {if $oneyWithFees}
-                {l s='hook.oney.popin.legalNoticeWithFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod='payplug'}
+                {l s='hook.oney.popin.legalNoticeWithFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod={$module_name}}
             {else}
-                {l s='hook.oney.popin.legalNoticeWithoutFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod='payplug'}
+                {l s='hook.oney.popin.legalNoticeWithoutFees' tags=[$linkToOney] sprintf=[$oneyMinAmounts, $oneyMaxAmounts] mod={$module_name}}
             {/if}
             {if isset($learnMoreLink) && $learnMoreLink}
-                <a class="oneyPopin_external" href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf"  target="_blank">{l s='hook.oney.popin.learnMore' mod='payplug'}</a>
+                <a class="{$module_name}OneyPopin_external" href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf"  target="_blank">{l s='hook.oney.popin.learnMore' mod={$module_name}}</a>
             {/if}
         </span>
     {else}
-        <p class="oneyPopin_error">{l s='hook.oney.popin.oneyUnavailable' mod='payplug'}</p>
+        <p class="{$module_name}OneyPopin_error">{l s='hook.oney.popin.oneyUnavailable' mod={$module_name}}</p>
     {/if}
 </span>

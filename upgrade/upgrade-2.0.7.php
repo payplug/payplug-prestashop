@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_0_7()
+function upgrade_module_2_0_7($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -34,7 +34,7 @@ function upgrade_module_2_0_7()
 
     //sql
     $req_payplug_lock = '
-        ALTER TABLE '._DB_PREFIX_.'payplug_lock 
+        ALTER TABLE '._DB_PREFIX_.$object->name.'_lock 
         ADD COLUMN `id_order` VARCHAR(100) 
         AFTER `id_cart`';
     $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);

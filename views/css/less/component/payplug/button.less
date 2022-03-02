@@ -1,5 +1,5 @@
 /* Payplug button */
-.payplugButton {
+@{moduleClassName}Button {
   .border(#cccccc);
   .borderRadius(.25em);
   .transition;
@@ -20,13 +20,13 @@
     font-weight: 700;
   }
   &.-green {
-    border-color: #colorMap[payplug];
-    background: #colorMap[payplug];
+    border-color: #colorMap[module];
+    background: #colorMap[module];
     color: #fff;
 
     &:hover {
-      border-color: darken(#colorMap[payplug], 5%);
-      background: darken(#colorMap[payplug], 5%);
+      border-color: darken(#colorMap[module], 5%);
+      background: darken(#colorMap[module], 5%);
       color: #fff;
     }
   }

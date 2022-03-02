@@ -34,9 +34,9 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
         $this->bootstrap = true;
-        $this->table = 'payplug_installment';
+        $this->table = $this->dependencies->name . '_installment';
         $this->id = 'id_payplug_installment';
         $this->lang = false;
         $this->addRowAction('view');
@@ -138,8 +138,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     {
         $req_order = '
             SELECT DISTINCT pi.id_order
-            FROM `'._DB_PREFIX_.'payplug_installment` pi 
-            WHERE pi.id_payplug_installment = '.pSQL($id_payplug_installment);
+            FROM `'._DB_PREFIX_.$this->table.'` pi
+            WHERE pi.id_'.$this->dependencies->name.'_installment = '.pSQL($id_payplug_installment);
         $res_order = DB::getInstance()->getValue($req_order);
 
         if (!$res_order) {

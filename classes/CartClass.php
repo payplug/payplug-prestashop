@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use DateTime;
 use DateInterval;
@@ -31,6 +31,12 @@ class CartClass
 {
     private $logger;
     private $dependencies;
+
+    public function __construct($dependencies)
+    {
+        $this->dependencies = $dependencies;
+    }
+
     /**
      * @description Create a lock from a Cart ID
      * @param bool $id_cart
@@ -41,7 +47,6 @@ class CartClass
         if (!$id_cart) {
             return false;
         }
-        $this->dependencies = new DependenciesClass();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
 
         $this->logger->addLog('Lock creation', 'notice');
@@ -52,7 +57,7 @@ class CartClass
         $end_of_life = $creation_date->add($lifetime);
 
         do {
-            $cart_lock = PayplugLock::createLockG2($id_cart, 'payplug');
+            $cart_lock = PayplugLock::createLockG2($id_cart, $this->dependencies->name);
 
             if (!$cart_lock) {
                 $time = new DateTime('now');
@@ -94,7 +99,7 @@ class CartClass
     {
         $req_cart_installment = '
             SELECT pic.id_payment
-            FROM ' . _DB_PREFIX_ . 'payplug_payment pic
+            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_payment pic
             WHERE pic.id_cart = ' . (int)$id_cart;
         $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
 
@@ -111,7 +116,7 @@ class CartClass
     {
         $req_cart_installment = '
             SELECT pic.id_installment
-            FROM ' . _DB_PREFIX_ . 'payplug_installment_cart pic
+            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_installment_cart pic
             WHERE pic.id_cart = ' . (int)$id_cart;
         $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
 

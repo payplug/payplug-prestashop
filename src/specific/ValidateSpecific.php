@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\ValidateInterface;
+use PayPlugModule\src\interfaces\ValidateInterface;
 use Validate;
 
 class ValidateSpecific implements ValidateInterface

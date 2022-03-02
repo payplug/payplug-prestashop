@@ -21,13 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
 use Configuration;
 use Language;
-use PayPlug\classes\ConfigClass;
-use PayPlug\classes\DependenciesClass;
-use PayPlug\classes\MyLogPHP;
+use PayPlugModule\classes\ConfigClass;
+use PayPlugModule\classes\DependenciesClass;
+use PayPlugModule\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
 use Media;
@@ -37,7 +37,6 @@ use Tools;
 class PrestashopSpecific17
 {
     private $config;
-    private $configClass;
     private $context;
     private $dependencies;
 
@@ -49,22 +48,23 @@ class PrestashopSpecific17
         $this->dependencies = new DependenciesClass();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-
-        $this->configClass = $this->dependencies->configClass;
     }
 
     public function displayHeader()
     {
-        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/front.css');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/front.js');
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/css/front.css');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/utilities.js');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/front.js');
     }
 
     public function displayPaymentOption($payment_options)
     {
-        if ($this->configClass->isValidFeature('feature_integrated')
-            && (string)$this->config->get('PAYPLUG_EMBEDDED_MODE') == 'integrated'
-            && $this->dependencies->configClass->isValidFeature('feature_standard')) {
+        if ($this->dependencies->configClass->isValidFeature('feature_integrated')
+            && (string)$this->config->get(
+                $this->dependencies->getConfigurationKey('embeddedMode')
+            ) == 'integrated'
+            && $this->dependencies->configClass->isValidFeature('feature_standard')
+        ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
 
@@ -147,8 +147,12 @@ class PrestashopSpecific17
         $integrated['extra_classes'] = 'payplug integrated';
         $this->context->smarty->assign([
                 'integrated_payment_js_url' => $integrated_payment_js_url,
-                'is_one_click_activated' => (bool)$this->config->get('PAYPLUG_ONE_CLICK'),
-                'is_deferred_activated' => (bool)$this->config->get('PAYPLUG_DEFERRED'),
+                'is_one_click_activated' => (bool)$this->config->get(
+                    $this->dependencies->getConfigurationKey('oneClick')
+                ),
+                'is_deferred_activated' => (bool)$this->config->get(
+                    $this->dependencies->getConfigurationKey('deferred')
+                ),
                 'placeholderCardholder' => $this->dependencies->l(
                     'specific17.setIntegratedPaymentOption.placeholderCardholder',
                     'prestashopspecific17'
@@ -168,7 +172,7 @@ class PrestashopSpecific17
         ]);
 
         $integrated['additionalInformation'] =
-            $this->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
+            $this->dependencies->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
         $payment_options['standard'] = $integrated;
         return $payment_options;
@@ -284,7 +288,7 @@ class PrestashopSpecific17
 
         // show module to the customer
         $switch['show'] = [
-            'name' => 'PAYPLUG_SHOW',
+            'name' => 'payplug_show',
             'label' => $this->dependencies->l(
                 'payplug.assignSwitchConfiguration.showPayplug',
                 'prestashopspecific17'

@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlugMock;
+namespace PayPlugModuleMock;
 
 use Payplug\Resource\Payment;
 use Payplug\Payplug;

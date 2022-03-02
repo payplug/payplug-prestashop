@@ -20,8 +20,8 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<p>{l s='Payplug will no longer be displayed as a payment option to your customers.' mod='payplug'}</p>
-<div class="payplugPopup_footer">
-    <button type="button" class="payplugButton -close" name="cancel_deactivate">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton -green" name="confirm_deactivate">{l s='SAVE SETTINGS' mod='payplug'}</button>
+<p>{l s='Payplug will no longer be displayed as a payment option to your customers.' mod={$module_name}}</p>
+<div class="{$module_name}Popup_footer">
+    <button type="button" class="{$module_name}Button -close" name="cancel_deactivate">{l s='Cancel' mod={$module_name}}</button>
+    <button type="button" class="{$module_name}Button -green" name="confirm_deactivate">{l s='SAVE SETTINGS' mod={$module_name}}</button>
 </div>

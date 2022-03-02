@@ -21,6 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+
 /**
  * @description
  * Treat ajax call
@@ -50,14 +51,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $ajax = new \PayPlug\classes\PayPlugAjax();
+            $ajax = new \PayPlugModule\classes\PayPlugAjax();
             $ajax->run();
             exit;
         }
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
-        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
@@ -248,7 +249,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $current_payment_id = $query
                     ->select()
                     ->fields('id_payment')
-                    ->from(_DB_PREFIX_ . 'payplug_payment')
+                    ->from(_DB_PREFIX_ . $this->dependencies->name . '_payment')
                     ->where('id_cart = ' . $cart_id)
                     ->build('unique_value');
                 if ($payment_id != $current_payment_id) {

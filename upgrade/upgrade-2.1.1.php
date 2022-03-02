@@ -25,13 +25,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_1_1()
+function upgrade_module_2_1_1($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
-    require_once(_PS_MODULE_DIR_.'payplug/classes/PayplugBackward.php');
+    require_once(_PS_MODULE_DIR_.$object->name.'/classes/PayplugBackward.php');
     return PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 1);
 }

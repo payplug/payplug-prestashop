@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlugTest;
+namespace PayPlugModuleTest;
 
 use PHPUnit\Framework\TestCase;
 

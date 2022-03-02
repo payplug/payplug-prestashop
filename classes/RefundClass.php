@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Configuration;
 use Context;
@@ -34,7 +34,7 @@ use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\InstallmentPlan;
 use Payplug\Payment;
 use Payplug\Resource\Refund;
-use PayPlug\src\repositories\LoggerRepository;
+use PayPlugModule\src\repositories\LoggerRepository;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use Tools;
@@ -108,27 +108,27 @@ class RefundClass
      * @return Refund | string
      * @throws ConfigurationException
      */
-    public static function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
+    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
-        $logger = new LoggerRepository();
-        $logger->setParams(['process' => 'refundClass']);
-        if (Tools::strtoupper($pay_mode) == 'TEST') {
-            ApiClass::setSecretKey(Configuration::get('PAYPLUG_TEST_API_KEY'));
-        } else {
-            ApiClass::setSecretKey(Configuration::get('PAYPLUG_LIVE_API_KEY'));
-        }
+        $this->logger->setParams(['process' => 'refundClass']);
+
+        $sandbox = Tools::strtoupper($pay_mode) == 'TEST';
+        $this->dependencies->apiClass->initializeApi($sandbox);
+
         if ($pay_id == null) {
             if ($inst_id != null) {
                 try {
-                    $installment = InstallmentPlan::retrieve($inst_id);
-                    if (isset($installment->schedule)) {
+                    $installment = InstallmentClass::retrieveInstallment($inst_id);
+                    $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $installment->id);
+                    if ($installment && isset($installment->schedule)) {
                         $total_amount = $amount;
                         $refund_to_go = [];
                         $truly_refundable_amount = 0;
                         foreach ($installment->schedule as $schedule) {
                             if (!empty($schedule->payment_ids)) {
                                 foreach ($schedule->payment_ids as $p_id) {
-                                    $payment = Payment::retrieve($p_id);
+                                    $payment = $this->dependencies->paymentClass->retrievePayment($p_id);
+                                    $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve payment id: ' . $payment->id);
                                     if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
                                         $amount_refundable = (int)($payment->amount - $payment->amount_refunded);
                                         $truly_refundable_amount += $amount_refundable;
@@ -164,8 +164,14 @@ class RefundClass
                                 }
                             }
                         }
+                    } else {
+                        $error = 'error [PayPlugClass - makeRefund()]: Can\'t retrieve InstallmentPlan with given id: ' . $inst_id;
+                        $this->logger->addLog($error, 'error');
+                        return ('error');
                     }
                 } catch (Exception $e) {
+                    $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
+                    $this->logger->addLog($error, 'error');
                     return ('error');
                 }
                 InstallmentClass::updatePayplugInstallment($installment);
@@ -182,7 +188,7 @@ class RefundClass
                 $refund = Refund::create($pay_id, $data);
             } catch (Exception $e) {
                 $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
-                $logger->addLog($error, 'error');
+                $this->logger->addLog($error, 'error');
                 return 'error';
             }
         }
@@ -229,7 +235,7 @@ class RefundClass
             'reason' => 'Refunded with Prestashop'
         ];
         $pay_mode = Tools::getValue('pay_mode');
-        $refund = RefundClass::makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+        $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 
         if ($refund == 'error') {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
@@ -273,9 +279,13 @@ class RefundClass
                     $new_state = (int)Tools::getValue('id_state');
                     if ($new_state == 0) {
                         if ($installment->is_live == 1) {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                            $new_state = (int)Configuration::get(
+                                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
+                            );
                         } else {
-                            $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                            $new_state = (int)Configuration::get(
+                                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
+                            );
                         }
                     }
                     $order = new Order((int)$id_order);
@@ -313,9 +323,13 @@ class RefundClass
                     $new_state = (int)Tools::getValue('id_state');
                 } elseif ($payment->is_refunded == 1) {
                     if ($payment->is_live == 1) {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND');
+                        $new_state = (int)Configuration::get(
+                            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
+                        );
                     } else {
-                        $new_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_REFUND_TEST');
+                        $new_state = (int)Configuration::get(
+                            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
+                        );
                     }
                 }
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {

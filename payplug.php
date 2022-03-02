@@ -28,14 +28,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
 class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
 
-    /**
+    /**z
      * Constructor
      *
      * @return void
@@ -90,7 +89,7 @@ class Payplug extends PaymentModule
                 $this->install(true);
             }
 
-            return (new \PayPlug\classes\AdminClass(new \Payplug\classes\DependenciesClass()))->getContent();
+            return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
@@ -99,10 +98,10 @@ class Payplug extends PaymentModule
             $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
             $this->context->smarty->assign('faq_url', $faq_url);
 
-            $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
+            $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
             $this->context->smarty->assign('url_logo', $logo_url);
 
-            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin.css');
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
@@ -440,7 +439,7 @@ class Payplug extends PaymentModule
     public function isValidInstallation()
     {
         if (Validate::isLoadedObject($this)) {
-            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
+            return Configuration::hasKey(Tools::strtoupper($this->name) . '_COMPANY_ID');
         }
         return true;
     }
@@ -475,7 +474,7 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
     }
 
     private function setModule()

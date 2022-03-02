@@ -26,14 +26,14 @@ if (!defined('_PS_VERSION_')) {
 }
 
 
-function upgrade_module_2_27_0()
+function upgrade_module_2_27_0($object)
 {
     $flag = true;
 
     // install table `payplug_logger`
     $sql = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
-            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_logger` (
+            `id_'.$object->name.'_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `process` VARCHAR(255) NOT NULL,
             `content` TEXT NOT NULL,
             `date_add` DATETIME NULL,

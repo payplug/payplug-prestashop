@@ -22,13 +22,13 @@
 {assign var=parse_3x_4x value="_"|explode:$payplug_payment_option.logo_url}
 <div class="row">
     <div class="col-xs-12">
-        <p class="payment_module payplugPayment oneyPayment">
+        <p class="payment_module {$module_name}Payment {$module_name}OneyPayment">
             <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}">
                 <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"
-                     class="{$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'} oneyLogo  -with{if isset($use_fees) && !$use_fees}out{/if}Fees {if $payplug_payment_option.oney_error}{$payplug_payment_option.oney_error|escape:'htmlall':'UTF-8'}{/if}"/>
+                     class="{$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'} {$module_name}OneyLogo  -with{if isset($use_fees) && !$use_fees}out{/if}Fees {if $payplug_payment_option.oney_error}{$payplug_payment_option.oney_error|escape:'htmlall':'UTF-8'}{/if}"/>
                 {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
             </a>
         </p>
-        <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
+        <p class="{$module_name}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>
