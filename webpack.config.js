@@ -23,7 +23,9 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
+const fs = require('fs');
 
 const dir_path = 'views';
 const lessFiles = ['front', 'front_1_6', 'admin', 'admin_order'];
@@ -31,12 +33,18 @@ const jsFiles = ['accordion', 'button'];
 
 let entryFiles = {};
 lessFiles.map((file) => {
-    entryFiles['css/' + file] = path.resolve(__dirname, dir_path + '/css/' + file + '.less');
+    if (fs.existsSync(path.resolve(__dirname, dir_path + '/css/' + file + '.less'))) {
+        entryFiles['css/' + file] = path.resolve(__dirname, dir_path + '/css/' + file + '.less');
+    }
 });
 
-entryFiles['js/components/atoms/components'] = [];
 jsFiles.map((file) => {
-    entryFiles['js/components/atoms/components'].push(path.resolve(__dirname, dir_path + '/js/components/atoms/' + file + '.js'));
+    if (fs.existsSync(path.resolve(__dirname, dir_path + '/js/components/atoms/' + file + '.js'))) {
+        if (typeof entryFiles['js/components/atoms/components'] == 'undefined') {
+            entryFiles['js/components/atoms/components'] = [];
+        }
+        entryFiles['js/components/atoms/components'].push(path.resolve(__dirname, dir_path + '/js/components/atoms/' + file + '.js'));
+    }
 });
 
 const loaders = [
@@ -60,6 +68,7 @@ const loaders = [
 const optimization = {
     minimizer: [
         new CssMinimizerPlugin(),
+        new TerserPlugin(),
     ],
     minimize: true,
 };
