@@ -22,17 +22,17 @@
 {if $oney_payment_option}
     <ul>
         <li>
-            <span><b>{l s='hook.oney.popin.payment.detail.amount' mod='payplug'}</b></span>
+            <span><b>{l s='hook.oney.popin.payment.detail.amount' mod={$module_name}}</b></span>
             <span><b>{$payplug_oney_amount.value|escape:'htmlall':'UTF-8'}</b></span>
         </li>
         <li>
-            <span>{l s='hook.oney.popin.payment.detail.contribution' mod='payplug'}</span>
+            <span>{l s='hook.oney.popin.payment.detail.contribution' mod={$module_name}}</span>
             <span><b>{$oney_payment_option.down_payment_amount.value|escape:'htmlall':'UTF-8'}</b></span>
             {if isset($use_fees) && $use_fees}
                 <small>
-                    ({l s='hook.oney.popin.payment.detail.cost' mod='payplug'}
+                    ({l s='hook.oney.popin.payment.detail.cost' mod={$module_name}}
                     <b>{$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}</b>
-                    {l s='hook.oney.popin.payment.detail.taeg' mod='payplug'}
+                    {l s='hook.oney.popin.payment.detail.taeg' mod={$module_name}}
                     <b>{$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%</b>)
                 </small>
             {/if}
@@ -41,11 +41,11 @@
             <li>
                 <span>
                     {if $oney_inst_number == 0}
-                        {l s='hook.oney.payment.detail.installmentFirst' mod='payplug'}
+                        {l s='hook.oney.payment.detail.installmentFirst' mod={$module_name}}
                     {elseif $oney_inst_number == 1}
-                        {l s='hook.oney.payment.detail.installmentSecond' mod='payplug'}
+                        {l s='hook.oney.payment.detail.installmentSecond' mod={$module_name}}
                     {elseif $oney_inst_number == 2}
-                        {l s='hook.oney.payment.detail.installmentThird' mod='payplug'}
+                        {l s='hook.oney.payment.detail.installmentThird' mod={$module_name}}
                     {/if}
                 </span>
                 <span>{$oney_installment.value|escape:'htmlall':'UTF-8'}</span>
@@ -53,15 +53,15 @@
         {/foreach}
         {if isset($use_fees) && $use_fees}
             <li>
-                <span><b>{l s='hook.oney.popin.payment.detail.total' mod='payplug'}</b></span>
+                <span><b>{l s='hook.oney.popin.payment.detail.total' mod={$module_name}}</b></span>
                 <span><b>{$oney_payment_option.total_amount.value|escape:'htmlall':'UTF-8'}</b></span>
             </li>
         {else}
             <li>
                 <span>
-                    {l s='hook.oney.popin.payment.detail.cost' mod='payplug'}
+                    {l s='hook.oney.popin.payment.detail.cost' mod={$module_name}}
                     {$oney_payment_option.total_cost.value|escape:'htmlall':'UTF-8'}
-                    {l s='hook.oney.popin.payment.detail.taeg' mod='payplug'}
+                    {l s='hook.oney.popin.payment.detail.taeg' mod={$module_name}}
                     {$oney_payment_option.effective_annual_percentage_rate|escape:'htmlall':'UTF-8'}%
                 </span>
             </li>

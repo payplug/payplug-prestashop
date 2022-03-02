@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\entities;
+namespace PayPlugModule\src\entities;
 
-use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlugModule\src\specific\ConfigurationSpecific;
 
 class ConfigurationEntity
 {

@@ -79,9 +79,9 @@
  * ->build()
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\src\specific\QuerySpecific;
+use PayPlugModule\src\specific\QuerySpecific;
 
 class QueryRepository extends Repository
 {

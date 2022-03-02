@@ -70,8 +70,8 @@ function upgrade_module_2_28_0($object)
 
     // install table `payplug_order_payment`
     $req_payplug_order_payment = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
-            `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_order_payment` (
+            `id_'.$object->name.'_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_order` INT(11) UNSIGNED NOT NULL,
             `id_payment` VARCHAR(255) NOT NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
@@ -84,8 +84,8 @@ function upgrade_module_2_28_0($object)
 
     // install table `payplug_cache`
     $req_payplug_cache = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_cache` (
-            `id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_cache` (
+            `id_'.$object->name.'_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `cache_key` VARCHAR(255) NOT NULL,
             `cache_value` TEXT NOT NULL,
             `date_add` DATETIME NULL,

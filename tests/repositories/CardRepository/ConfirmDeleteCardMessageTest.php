@@ -22,12 +22,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\CardRepository;
+namespace PayPlugModule\tests\repositories\CardRepository;
 
 /**
  * @group unit
  * @group repository
  * @group card_repository
+ * @group dev
  *
  * @runTestsInSeparateProcesses
  */

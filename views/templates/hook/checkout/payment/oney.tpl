@@ -22,6 +22,6 @@
 <div class="row">
     <div class="col-xs-12">
         {include file='./../../oney/payment/payment.tpl' oney_image=$payplug_payment_option['logo_url']}
-        <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
+        <p class="{$module_name}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>

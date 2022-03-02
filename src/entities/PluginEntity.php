@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\entities;
+namespace PayPlugModule\src\entities;
 
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlugModule\src\exceptions\BadParameterException;
 
 class PluginEntity
 {
@@ -221,24 +221,6 @@ class PluginEntity
     public function setOrderHistory($orderHistory)
     {
         $this->orderHistory = $orderHistory;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getConfigClass()
-    {
-        return $this->configClass;
-    }
-
-    /**
-     * @param object $configClass
-     * @return PluginEntity
-     */
-    public function setConfigClass($configClass)
-    {
-        $this->configClass = $configClass;
         return $this;
     }
 

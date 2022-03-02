@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\CacheRepository;
+namespace PayPlugModule\tests\repositories\CacheRepository;
 
 /**
  * @group unit

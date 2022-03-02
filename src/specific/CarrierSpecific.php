@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\CarrierInterface;
+use PayPlugModule\src\interfaces\CarrierInterface;
 use Carrier;
 
 class CarrierSpecific implements CarrierInterface

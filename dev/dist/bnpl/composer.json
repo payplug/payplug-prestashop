@@ -1,13 +1,16 @@
 {
-    "name": "payplug/payplug-prestashop",
-    "moduleName": "payplug",
-    "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "3.7.0",
+    "name": "payplug/bnpl-prestashop",
+    "moduleName": "bnpl",
+    "description": "BNPL: The online payment solution combining simplicity and first-rate support to boost your sales",
+    "version": "0.1.0",
     "require": {
-	"php": "5.6.*",
+        "php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
         "payplug/payplug-php": "3.*",
-        "symfony/dotenv": "3.4.*"
+        "symfony/dotenv": "3.4.*",
+        "symfony/http-foundation": "^3.4",
+        "prestashop/prestashop-accounts-installer": "^1.0",
+        "prestashop/module-lib-service-container": "^1.4"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",
@@ -22,25 +25,26 @@
             "!vendor/*",
             "!features.json",
             ".*",
-            "ci",
-	        "*.sh",
+            "!bnpl/composer.json",
+            "dev",
+            "*.sh",
             "test",
             "tests",
             "controllers/tools",
             "views/build",
+            "views/build-bnpl",
             "!views/css/*.css",
             "views/templates/front/tools",
+            "payplug.php",
             "test.php",
             "*.zip",
-            "/composer.json",
-            "composer.lock",
             "features.json.dist",
             "upgrade/upgrade-methods.php"
         ]
     },
     "autoload": {
         "psr-4": {
-            "PayPlug\\": "./",
+            "PayLaterModule\\": "./",
             "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
         }
     },
@@ -49,13 +53,13 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "./ci/composer.sh"
+            "./dev/ci/composer.sh"
         ],
         "post-update-cmd": [
-            "./ci/composer.sh"
+            "./dev/ci/composer.sh"
         ],
         "install-dev": [
-            "./ci/composer_dev.sh"
+            "./dev/ci/composer_dev.sh"
         ]
     }
 }

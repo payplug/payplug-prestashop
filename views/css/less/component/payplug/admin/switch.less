@@ -1,5 +1,5 @@
 /* Payplug Admin Switch */
-.payplugSwitch {
+@{moduleClassName}Switch {
   .borderRadius(.25em);
   .boxShadow(rgba(0, 0, 0, .15) 0 1px 4px 1px inset);
   background: rgba(0, 0, 0, .1);
@@ -37,14 +37,14 @@
     .borderRadius(.25em);
     .transition(left @dur);
     //.boxShadow(rgba(0,0,0,.15) 0 1px 4px 1px inset);
-    .border(darken(#colorMap[payplug], 5%));
+    .border(darken(#colorMap[module], 5%));
     border-bottom-width: 2px;
     display: block;
     position: absolute;
     top: 0;
     left: 0;
     content: "";
-    background: #colorMap[payplug];
+    background: #colorMap[module];
     width: 50%;
     height: 100%;
 
@@ -55,7 +55,7 @@
   }
 
   &.-right {
-    .payplugSwitch_label {
+    @{moduleClassName}Switch_label {
       &.-left {
         color: inherit;
       }
@@ -88,7 +88,7 @@
     height: 20px;
     margin: 0 8px 0 0;
     cursor: pointer;
-    background: #colorMap[payplug];
+    background: #colorMap[module];
 
     label {
       display: none;
@@ -150,7 +150,7 @@
     &:before {
       background: none;
       .borderRadius(.25em);
-      .border(darken(#colorMap[payplug], 5%));
+      .border(darken(#colorMap[module], 5%));
       width: calc(100% / 3);
       z-index: 1;
       border: none;
@@ -176,7 +176,7 @@
     }
 
     &.-center {
-      .payplugSwitch_label {
+      @{moduleClassName}Switch_label {
         &.-left, &.-right {
           color: inherit;
         }
@@ -192,7 +192,7 @@
     }
 
     &.-right {
-      .payplugSwitch_label {
+      @{moduleClassName}Switch_label {
         &.-left,
         &.-center {
           color: inherit;

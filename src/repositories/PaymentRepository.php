@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
 use DateTime;
 use Exception;
@@ -239,7 +239,7 @@ class PaymentRepository extends Repository
         $reqCheck = $this->query
             ->select()
             ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
             ->where('id_cart = ' . (int)$idCart);
 
         $resCheck = $reqCheck->build();
@@ -387,7 +387,7 @@ class PaymentRepository extends Repository
             );
         }
 
-        $table = $this->constant->get('_DB_PREFIX_') . 'payplug_payment';
+        $table = $this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment';
 
         $this->query
             ->update()
@@ -591,7 +591,7 @@ class PaymentRepository extends Repository
 
         $this->query
             ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . 'payplug_payment')
+            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
             ->fields('id_payment')->values($paymentDetails['paymentId'])
             ->fields('payment_method')->values($paymentDetails['paymentMethod'])
             ->fields('payment_url')->values($paymentDetails['paymentUrl'])

@@ -20,28 +20,28 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {if isset($oney_required_fields) && $oney_required_fields}
-    <form class="oneyRequired"{if isset($oney_type) && $oney_type} data-oney_type="{$oney_type|escape:'htmlall':'UTF-8'}"{/if}>
+    <form class="{$module_name}OneyRequired"{if isset($oney_type) && $oney_type} data-oney_type="{$oney_type|escape:'htmlall':'UTF-8'}"{/if}>
         {if isset($is_popin_tpl) && $is_popin_tpl}
-            <p class="oneyRequired_title">{l s='Missing information(s)' mod='payplug'}</p>
+            <p class="{$module_name}OneyRequired_title">{l s='Missing information(s)' mod={$module_name}}</p>
         {/if}
-        <div class="oneyRequired_content">
+        <div class="{$module_name}OneyRequired_content">
             {foreach $oney_required_fields as $fieldset_type => $fieldset}
-                <div class="oneyRequired_fieldset -{$fieldset_type|escape:'htmlall':'UTF-8'}">
+                <div class="{$module_name}OneyRequired_fieldset -{$fieldset_type|escape:'htmlall':'UTF-8'}">
                     {if $oney_required_fields|count > 1}
-                        <p class="oneyRequired_sectionName">
+                        <p class="{$module_name}OneyRequired_sectionName">
                             {if $fieldset_type == 'billing'}
-                                {l s='Your billing address:' mod='payplug'}
+                                {l s='Your billing address:' mod={$module_name}}
                             {else}
-                                {l s='Your shipping address:' mod='payplug'}
+                                {l s='Your shipping address:' mod={$module_name}}
                             {/if}
                         </p>
                     {/if}
                     {foreach $fieldset as $name => $field}
-                        <div class="oneyRequired_group -{$name|escape:'htmlall':'UTF-8'}">
+                        <div class="{$module_name}OneyRequired_group -{$name|escape:'htmlall':'UTF-8'}">
                             <p>{$field.text|escape:'htmlall':'UTF-8'}</p>
                             {foreach $field.input as $input}
-                                <div class="oneyRequired_field -{$input.name|escape:'htmlall':'UTF-8'}">
-                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="oneyRequired_input{if $name==$input.name} -tocheck -error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type|escape:'htmlall':'UTF-8'}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
+                                <div class="{$module_name}OneyRequired_field -{$input.name|escape:'htmlall':'UTF-8'}">
+                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="{$module_name}OneyRequired_input{if $name==$input.name} -tocheck -error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type|escape:'htmlall':'UTF-8'}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
                                 </div>
                             {/foreach}
                         </div>
@@ -50,14 +50,14 @@
             {/foreach}
         </div>
         {if isset($is_popin_tpl) && $is_popin_tpl}
-            <p class="oneyRequired_message"></p>
-            <button type="submit" class="oneyRequired_submit">{l s='Validate and restart' mod='payplug'}</button>
-            <div class="oneyRequired_validation">
-                <span>{l s='Informations saved' mod='payplug'}</span>
-                <span>{l s='Click Oney again to continue' mod='payplug'}</span>
-                <button type="button" class="oneyRequired_close -button">{l s='Ok' mod='payplug'}</button>
+            <p class="{$module_name}OneyRequired_message"></p>
+            <button type="submit" class="{$module_name}OneyRequired_submit">{l s='Validate and restart' mod={$module_name}}</button>
+            <div class="{$module_name}OneyRequired_validation">
+                <span>{l s='Informations saved' mod={$module_name}}</span>
+                <span>{l s='Click Oney again to continue' mod={$module_name}}</span>
+                <button type="button" class="{$module_name}OneyRequired_close -button">{l s='Ok' mod={$module_name}}</button>
             </div>
         {/if}
-        <button type="button" class="oneyRequired_close">{l s='Cancel' mod='payplug'}</button>
+        <button type="button" class="{$module_name}OneyRequired_close">{l s='Cancel' mod={$module_name}}</button>
     </form>
 {/if}

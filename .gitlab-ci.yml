@@ -10,12 +10,15 @@ stages:
   - translations
   - assets
   - build
+  - asset-bnpl
+  - build-bnpl
   - releasy-release
 
 php cs fixer:
   image: composer:1.9
   stage: check php
   script:
+    - ./dev/ci/dist_files.sh -b payplug
     - composer install
     - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
   artifacts:
@@ -29,7 +32,7 @@ check php version:
     - >
       RED='\033[0;31m';
       ORANGE='\033[0;33m';
-      php ci/check_php.php || exit_code=$?;
+      php dev/ci/check_php.php || exit_code=$?;
       if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING DETECTED!! \n"; exit 126 ; fi;
       if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR DETECTED!!!\n"; exit 1;
       elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
@@ -40,7 +43,6 @@ coverage test:
   image: php:7.2.1
   stage: coverage and tests
   before_script:
-    # Install Xdebug
     - pecl install xdebug
     - docker-php-ext-enable xdebug
   script:
@@ -49,13 +51,15 @@ coverage test:
     - vendor/bin/phpunit --coverage-text --colors=never
 
 check module translations:
-  image: php:7.4
+  image: composer:1.9
   stage: translations
   script:
+    - ./dev/ci/dist_files.sh -b payplug
+    - composer install
     - >
         RED='\033[0;31m';
         ORANGE='\033[0;33m';
-        php ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
+        php dev/ci/translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
         if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
         if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
         elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
@@ -63,7 +67,8 @@ check module translations:
     exit_codes: 126
   artifacts:
     paths:
-      - ci/translations.csv
+      - dev/dist/bnpl/translations.csv
+      - dev/dist/payplug/translations.csv
 
 assets compile and revision:
   image: node:16
@@ -72,6 +77,7 @@ assets compile and revision:
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
+    - ./dev/ci/dist_files.sh -b payplug
   script:
     - npm run build
     - echo "Moving file in build dir"
@@ -93,17 +99,17 @@ build zip release:
   image: composer:1.9
   stage: build
   before_script:
-    - php ./ci/generate-version.php
-    - php ./ci/generate-upgrade.php
+    - ./dev/ci/dist_files.sh -b payplug
+    - php ./dev/ci/generate-version.php
+    - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
     - composer install --no-dev
     - rm webpack.config.js
-    - ./ci/copy_translations.sh
+    - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
-    - cp features.json.dist features.json
+    - ./dev/ci/assets_revision.sh -b payplug
     - mkdir payplug
   script:
     - shopt -s extglob
@@ -121,17 +127,17 @@ build zip bancontact:
   image: composer:1.9
   stage: build
   before_script:
-    - php ./ci/generate-version.php
-    - php ./ci/generate-upgrade.php
+    - ./dev/ci/dist_files.sh -b payplug
+    - php ./dev/ci/generate-version.php
+    - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
     - composer install --no-dev
     - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
-    - ./ci/copy_translations.sh
+    - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
-    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
-    - cp features.json.dist features.json
+    - ./dev/ci/assets_revision.sh -b payplug
     - mkdir payplug
   script:
     - shopt -s extglob
@@ -143,25 +149,57 @@ build zip bancontact:
     paths:
       - payplug_qa_bancontact_$CI_COMMIT_REF_NAME.zip
 
-build zip bnpl:
-  image: composer:1.9
-  stage: build
+assets compile and revision for bnpl:
+  image: node:16
+  stage: asset-bnpl
   before_script:
-    - php ./ci/generate-version.php
-    - rm -r ./vendor
-    - composer install --no-dev
-    - ./ci/copy_translations.sh
-    - find ./vendor -type d -exec cp index.php {} \;
-    - git status
-    - chmod 777 ./ci/assets_revision.sh && ./ci/assets_revision.sh
-    - cp features_bnpl.json.dist features.json
-    - mkdir payplug
+    - npm --version
+    - npm init -y
+    - npm install --save-dev webpack
+    - ./dev/ci/dist_files.sh -b bnpl
   script:
-    - shopt -s extglob
-    - mv !(payplug|composer.json) payplug
-    - cp composer.json ./payplug
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file payplug_qa_bnpl_$CI_COMMIT_REF_NAME --format zip
+    - npm run build
+    - echo "Moving file in build dir"
+    - mkdir ./views/build-bnpl
+    - mkdir ./views/build-bnpl/css
+    - mkdir ./views/build-bnpl/js
+    - mv ./views/css/*.css ./views/build-bnpl/css
+    - cp ./views/templates/index.php ./views/build-bnpl/css
+    - mv ./views/js/* ./views/build-bnpl/js
+    - ls -l ./views/build-bnpl/css/*.css
+    - ls -l ./views/build-bnpl/css/*.php
+    - ls -l ./views/build-bnpl/js/*.js
   artifacts:
     paths:
-      - payplug_qa_bnpl_$CI_COMMIT_REF_NAME.zip
+      - views/build-bnpl/*
+    expire_in: 1 day
+
+build zip bnpl:
+  image: composer:1.9
+  stage: build-bnpl
+  before_script:
+    - ./dev/ci/dist_files.sh -b bnpl
+    - php ./dev/ci/generate-version.php
+    - php ./dev/ci/generate-upgrade.php
+    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
+    - rm -r ./vendor
+    - ./dev/ci/set_namespace.sh
+    - composer install --no-dev
+    - ./dev/ci/copy_translations.sh
+    - find ./vendor -type d -exec cp index.php {} \;
+    - git status
+    - rm -rf views/build && mv views/build-bnpl views/build
+    - ./dev/ci/assets_revision.sh -b bnpl
+    - mkdir bnpl
+    - php ./dev/ci/import-translations.php
+  script:
+    - shopt -s extglob
+    - mv !(bnpl|composer.json) bnpl
+    - cp composer.json ./bnpl
+    - composer archive --file bnpl_$CI_COMMIT_REF_NAME --format zip
+    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./bnpl/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+    - composer archive --file bnpl_qa_$CI_COMMIT_REF_NAME --format zip
+  artifacts:
+    paths:
+      - bnpl_$CI_COMMIT_REF_NAME.zip
+      - bnpl_qa_$CI_COMMIT_REF_NAME.zip

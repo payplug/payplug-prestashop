@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Db;
 use DbQuery;
@@ -167,9 +167,11 @@ class PayplugLock extends ObjectModel
      */
     public static function getInstanceByCart($id_cart)
     {
+        $dependencies = new DependenciesClass();
+
         $req_lock = new DbQuery();
         $req_lock->select('pl.id_payplug_lock');
-        $req_lock->from('payplug_lock', 'pl');
+        $req_lock->from($dependencies->name . '_lock', 'pl');
         $req_lock->where('id_cart = ' . (int)$id_cart);
         $id = (int)Db::getInstance()->getValue($req_lock);
 
@@ -242,7 +244,9 @@ class PayplugLock extends ObjectModel
             }
         }
 
-        $req_lock = 'INSERT INTO ' . _DB_PREFIX_ . 'payplug_lock (id_cart, id_order, date_add, date_upd)
+        $dependencies = new DependenciesClass();
+
+        $req_lock = 'INSERT INTO ' . _DB_PREFIX_ . $dependencies->name . '_lock (id_cart, id_order, date_add, date_upd)
             VALUE (
                 ' . (int)$id_cart . ',
                 \'' . pSQL($process_print) . '\', 
@@ -270,9 +274,11 @@ class PayplugLock extends ObjectModel
 
     public static function deleteLockG2($id_cart)
     {
+        $dependencies = new DependenciesClass();
+
         $req_lock = '
             DELETE 
-            FROM '._DB_PREFIX_.'payplug_lock 
+            FROM '._DB_PREFIX_ . $dependencies->name . '_lock 
             WHERE id_cart = '.(int)$id_cart;
         $res_lock = Db::getInstance()->execute($req_lock);
         if (!$res_lock) {
@@ -283,9 +289,11 @@ class PayplugLock extends ObjectModel
 
     public static function existsLockG2($id_cart)
     {
+        $dependencies = new DependenciesClass();
+
         $req_lock = '
             SELECT pl.*  
-            FROM '._DB_PREFIX_.'payplug_lock pl 
+            FROM '._DB_PREFIX_ . $dependencies->name . '_lock pl 
             WHERE pl.id_cart = '.(int)$id_cart;
         $res_lock = Db::getInstance()->getRow($req_lock);
         if (!$res_lock) {

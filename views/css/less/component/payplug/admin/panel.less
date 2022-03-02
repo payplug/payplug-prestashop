@@ -1,5 +1,5 @@
 /* Payplug Admin Panel */
-.payplugPanel {
+@{moduleClassName}Panel {
   display: flex;
   padding: 0 0 15px;
 
@@ -13,7 +13,7 @@
     text-align: right;
 
     // todo: rework this section, we should use modifier
-    .payplugInstallment_fieldset & {
+    @{moduleClassName}Installment_fieldset & {
       width: 185px;
     }
   }
@@ -58,22 +58,22 @@
     }
   }
 
-  .-payplug_standard & {
+  .-@{moduleName}_standard & {
     padding: 16px 0 8px;
 
-    .payplugPanel_label,
-    .payplugPanel_content {
+    @{moduleClassName}Panel_label,
+    @{moduleClassName}Panel_content {
       margin: 0;
       padding: 0;
       width: auto;
     }
 
-    .payplugPanel_content {
+    @{moduleClassName}Panel_content {
       padding: 0 0 0 16px;
     }
 
-    & + .payplugPanel {
-      .payplugPanel_content {
+    & + @{moduleClassName}Panel {
+      @{moduleClassName}Panel_content {
         margin: 0;
         padding: 0;
         width: 100%;

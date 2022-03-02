@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_1_4()
+function upgrade_module_3_1_4($object)
 {
     $flag = true;
 
@@ -35,8 +35,8 @@ function upgrade_module_3_1_4()
         }
     }
 
-    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_payment` (
-    `id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_payment` (
+    `id_'.$object->name.'_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `id_payment` VARCHAR(255) NULL,
     `payment_method` VARCHAR(255) NULL,
     `payment_url` VARCHAR(255) NULL,
