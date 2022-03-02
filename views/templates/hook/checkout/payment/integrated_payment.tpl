@@ -20,73 +20,73 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<form class="payplugIntegratedPayment">
-    <div class="payplugIntegratedPayment_container -cardHolder"></div>
-    <div class="payplugIntegratedPayment_error -cardHolder">
-        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}</span>
-        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+<form class="{$module_name}IntegratedPayment">
+    <div class="{$module_name}IntegratedPayment_container -cardHolder"></div>
+    <div class="{$module_name}IntegratedPayment_error -cardHolder">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardholder.error' mod={$module_name}}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod={$module_name}}</span>
     </div>
 
-    <div class="payplugIntegratedPayment_container -scheme">
-        <div>{l s='hook.integratedPayment.scheme' mod='payplug'}</div>
-        <div class="payplugIntegratedPayment_schemes">
-            <label class="payplugIntegratedPayment_scheme -visa">
+    <div class="{$module_name}IntegratedPayment_container -scheme">
+        <div>{l s='hook.integratedPayment.scheme' mod={$module_name}}</div>
+        <div class="{$module_name}IntegratedPayment_schemes">
+            <label class="{$module_name}IntegratedPayment_scheme -visa">
                 <input type="radio" name="schemeOptions" value="visa" />
                 <span></span>
             </label>
-            <label class="payplugIntegratedPayment_scheme -mastercard">
+            <label class="{$module_name}IntegratedPayment_scheme -mastercard">
                 <input type="radio" name="schemeOptions" value="mastercard" />
                 <span></span>
             </label>
-            <label class="payplugIntegratedPayment_scheme -cb">
+            <label class="{$module_name}IntegratedPayment_scheme -cb">
                 <input type="radio" name="schemeOptions" value="cb" />
                 <span></span>
             </label>
         </div>
     </div>
 
-    <div class="payplugIntegratedPayment_container -pan"></div>
-    <div class="payplugIntegratedPayment_error -pan">
-        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}</span>
-        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    <div class="{$module_name}IntegratedPayment_container -pan"></div>
+    <div class="{$module_name}IntegratedPayment_error -pan">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardpan.error' mod={$module_name}}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod={$module_name}}</span>
     </div>
 
-    <div class="payplugIntegratedPayment_container -exp"></div>
-    <div class="payplugIntegratedPayment_container -cvv"></div>
+    <div class="{$module_name}IntegratedPayment_container -exp"></div>
+    <div class="{$module_name}IntegratedPayment_container -cvv"></div>
 
-    <div class="payplugIntegratedPayment_error -exp">
-        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}</span>
-        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    <div class="{$module_name}IntegratedPayment_error -exp">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardexp.error' mod={$module_name}}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod={$module_name}}</span>
     </div>
-    <div class="payplugIntegratedPayment_error -cvv">
-        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}</span>
-        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    <div class="{$module_name}IntegratedPayment_error -cvv">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardcvv.error' mod={$module_name}}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod={$module_name}}</span>
     </div>
 
 
     {if isset($is_one_click_activated) && $is_one_click_activated }
-        <div class="payplugIntegratedPayment_container -saveCard">
+        <div class="{$module_name}IntegratedPayment_container -saveCard">
             <label>
                 <input type="checkbox" name="savecard">
                 <span></span>
-                {l s='hook.integratedPayment.savecard' mod='payplug'}
+                {l s='hook.integratedPayment.savecard' mod={$module_name}}
             </label>
         </div>
     {/if}
 
     {if isset($is_deferred_activated) && $is_deferred_activated }
-        <div class="payplugIntegratedPayment_container -deferred">
-            {l s='hook.integratedPayment.deferred' mod='payplug'}
+        <div class="{$module_name}IntegratedPayment_container -deferred">
+            {l s='hook.integratedPayment.deferred' mod={$module_name}}
         </div>
     {/if}
 
-    <div class="payplugIntegratedPayment_error -fields">
-        {l s='hook.checkout.payment.integrated.fields.error' mod='payplug'}
+    <div class="{$module_name}IntegratedPayment_error -fields">
+        {l s='hook.checkout.payment.integrated.fields.error' mod={$module_name}}
     </div>
-    <div class="payplugIntegratedPayment_error -payment">
+    <div class="{$module_name}IntegratedPayment_error -payment">
     </div>
-    <div class="payplugIntegratedPayment_error -api">
-        {l s='hook.header.integratedPayment.api.genericError' tags=['<br>'] mod='payplug'}
+    <div class="{$module_name}IntegratedPayment_error -api">
+        {l s='hook.header.integratedPayment.api.genericError' tags=['<br>'] mod={$module_name}}
     </div>
 </form>
 <script type="text/javascript">

@@ -22,25 +22,26 @@
             "!vendor/*",
             "!features.json",
             ".*",
-            "ci",
+            "!payplug/composer.json",
+            "dev",
 	        "*.sh",
             "test",
             "tests",
             "controllers/tools",
             "views/build",
+            "views/build-bnpl",
             "!views/css/*.css",
             "views/templates/front/tools",
+            "bnpl.php",
             "test.php",
             "*.zip",
-            "/composer.json",
-            "composer.lock",
             "features.json.dist",
             "upgrade/upgrade-methods.php"
         ]
     },
     "autoload": {
         "psr-4": {
-            "PayPlug\\": "./",
+            "PayPlugModule\\": "./",
             "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
         }
     },
@@ -49,13 +50,13 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "./ci/composer.sh"
+            "./dev/ci/composer.sh"
         ],
         "post-update-cmd": [
-            "./ci/composer.sh"
+            "./dev/ci/composer.sh"
         ],
         "install-dev": [
-            "./ci/composer_dev.sh"
+            "./dev/ci/composer_dev.sh"
         ]
     }
 }

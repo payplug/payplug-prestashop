@@ -1,5 +1,5 @@
 /* Payplug Admin Config */
-.payplugOneyFees {
+@{moduleClassName}OneyFees {
   display: flex;
   padding: 16px 0;
 
@@ -19,7 +19,7 @@
     }
 
     &.-selected {
-      .border(#colorMap[payplug]);
+      .border(#colorMap[module]);
     }
   }
 
@@ -54,7 +54,7 @@
     font-size: 14px;
 
     .-selected & {
-      background: #colorMap[payplug];
+      background: #colorMap[module];
     }
   }
 
@@ -67,7 +67,7 @@
     left: -7px;
     width: 18px;
     height: 18px;
-    background: #colorMap[payplug];
+    background: #colorMap[module];
 
     &:before {
       .border(#fff, bl, 2px);

@@ -21,15 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Configuration;
 use OrderHistory;
 use OrderState;
-use Order;
-use PayPlug\backward\PayPlugBackward;
-use PayPlug\src\specific\ContextSpecific;
-use PayPlug\classes\PayPlugClass;
+use PayPlugModule\backward\PayPlugBackward;
+use PayPlugModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
@@ -55,10 +53,13 @@ class AdminClass
      */
     public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
+        $dependencies = new DependenciesClass();
         $context = (new ContextSpecific())->getContext();
+
         if ($controller_name == 'AdminModules') {
             $admin_ajax_url = $context->link->getAdminLink($controller_name)
-                . '&configure=payplug&tab_module=payments_gateways&module_name=payplug';
+                . '&configure=' . $dependencies->name .
+                '&tab_module=payments_gateways&module_name=' . $dependencies->name;
         } elseif ($controller_name == 'AdminOrders') {
             $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
@@ -146,7 +147,9 @@ class AdminClass
 
         if (Tools::getValue('submitSettings')) {
             if (Tools::getValue('payplug_deferred_state')
-                && Tools::getValue('payplug_deferred_state') != $this->config->get('PAYPLUG_DEFERRED_STATE')) {
+                && Tools::getValue('payplug_deferred_state') != $this->config->get(
+                    $this->dependencies->getConfigurationKey('deferredState')
+                )) {
                 $id_order_state = Tools::getValue('payplug_deferred_state');
                 $order_state = new OrderState($id_order_state, $this->context->language->id);
                 if (Tools::getValue('payplug_deferred')
@@ -191,12 +194,15 @@ class AdminClass
                 ]));
             }
 
-            $email = $this->config->get('PAYPLUG_EMAIL');
-
+            $email = $this->config->get(
+                $this->dependencies->getConfigurationKey('email')
+            );
             if ($this->dependencies->apiClass->login($email, $password)) {
-                $api_key = $this->config->get('PAYPLUG_LIVE_API_KEY');
+                $api_key = $this->config->get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                );
                 if ((bool)$api_key) {
-                    $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 0);
+                    $this->config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
                     $this->dependencies->configClass->assignContentVar();
                     $content = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
                     die(json_encode(['content' => $content]));
@@ -230,7 +236,7 @@ class AdminClass
             die(json_encode(['content' => $content]));
         }
         if ((int)Tools::getValue('checkPremium') == 1) {
-            $api_key = $this->config->get('PAYPLUG_LIVE_API_KEY');
+            $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
             $return = [
                 'payplug_sandbox' => $permissions['use_live_mode'],
@@ -243,7 +249,7 @@ class AdminClass
             die(json_encode($return));
         }
         if (Tools::getValue('has_live_key')) {
-            die(json_encode(['result' => ApiClass::hasLiveKey()]));
+            die(json_encode(['result' => $this->dependencies->apiClass->hasLiveKey()]));
         }
         if ((int)Tools::getValue('refund') == 1) {
             $this->dependencies->refundClass->refundPayment();
@@ -262,15 +268,23 @@ class AdminClass
 
             if ((int)$payment->is_paid == 1) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int)$this->config->get('PAYPLUG_ORDER_STATE_PAID');
+                    $new_state = (int)$this->config->get(
+                        $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID')
+                    );
                 } else {
-                    $new_state = (int)$this->config->get('PAYPLUG_ORDER_STATE_PAID_TEST');
+                    $new_state = (int)$this->config->get(
+                        $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID_TEST')
+                    );
                 }
             } elseif ((int)$payment->is_paid == 0) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int)$this->config->get('PAYPLUG_ORDER_STATE_ERROR');
+                    $new_state = (int)$this->config->get(
+                        $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR')
+                    );
                 } else {
-                    $new_state = (int)$this->config->get('PAYPLUG_ORDER_STATE_ERROR_TEST');
+                    $new_state = (int)$this->config->get(
+                        $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR_TEST')
+                    );
                 }
             }
 
@@ -300,15 +314,15 @@ class AdminClass
      */
     public function submitPopinPwd($pwd)
     {
-        $email = $this->config->get('PAYPLUG_EMAIL');
+        $email = $this->config->get($this->dependencies->getConfigurationKey('email'));
         $connected = $this->dependencies->apiClass->login($email, $pwd);
         $use_live_mode = false;
 
         if ($connected) {
-            if ($this->config->get('PAYPLUG_LIVE_API_KEY') != '') {
+            if ($this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) != '') {
                 $use_live_mode = true;
 
-                $valid_key = $this->config->get('PAYPLUG_LIVE_API_KEY');
+                $valid_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
                 $permissions = $this->dependencies->apiClass->getAccount($valid_key);
                 $can_save_cards = $permissions['can_save_cards'];
                 $can_create_installment_plan = $permissions['can_create_installment_plan'];

@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace Payplug\classes;
+namespace PayPlugModule\classes;
 
-use PayPlug\src\repositories\CardRepository;
+use PayPlugModule\src\repositories\CardRepository;
 use Country;
 use Exception;
 use Product;
@@ -88,7 +88,9 @@ class PayPlugAjax
                 if ((int)$tools->tool('getValue', 'pay') == 1) {
                     $is_installment = $tools->tool('getValue', 'i');
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
-                    $is_deferred = $this->config->get('PAYPLUG_DEFERRED') == 1;
+                    $is_deferred = $this->config->get(
+                        $this->dependencies->getConfigurationKey('deferred')
+                    ) == 1;
                     $is_oney = $tools->tool('getValue', 'io');
                     $is_bancontact = $tools->tool('getValue', 'bancontact');
                     $options = [
@@ -117,7 +119,9 @@ class PayPlugAjax
                     }
                 }
             } elseif ($tools->tool('getIsset', 'checkOneyAddresses')) {
-                if (!$this->config->get('PAYPLUG_ONEY')) {
+                if (!$this->config->get(
+                    $this->dependencies->getConfigurationKey('oney')
+                )) {
                     die($tools->tool('jsonEncode', ['result' => false, 'error' => false]));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');

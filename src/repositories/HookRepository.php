@@ -21,9 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\classes\MediaClass;
+use PayPlugModule\classes\MediaClass;
+use Media;
 
 class HookRepository extends Repository
 {
@@ -44,7 +45,11 @@ class HookRepository extends Repository
 
     public function actionAdminControllerSetMedia()
     {
-        $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/';
+        $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
+
+        Media::addJsDef([
+            'module_name' => $this->dependencies->name
+        ]);
 
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
             $this->dependencies->mediaClass->setMedia([
@@ -56,6 +61,7 @@ class HookRepository extends Repository
             $this->dependencies->mediaClass->setMedia([
                 $module_url . 'views/js/admin.js',
                 $module_url . 'views/css/admin.css',
+                $module_url . 'views/js/utilities.js',
             ]);
         }
     }

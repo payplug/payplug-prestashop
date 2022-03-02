@@ -21,19 +21,21 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\src\entities\LoggerEntity;
+use PayPlugModule\src\entities\LoggerEntity;
 
 class LoggerRepository extends Repository
 {
+    private $dependencies;
     private $loggerEntity;
     private $query;
 
-    public function __construct()
+    public function __construct($dependencies)
     {
         $this->loggerEntity = new loggerEntity();
         $this->query = new QueryRepository();
+        $this->dependencies = $dependencies;
         $this->setStdParams();
     }
 
@@ -48,12 +50,12 @@ class LoggerRepository extends Repository
     public function setStdParams()
     {
         $this->loggerEntity
-            ->setTable('payplug_logger')
+            ->setTable($this->dependencies->name . '_logger')
             ->setLimitNumber((int)4000)
             ->setLimitDate('P1M')
             ->setDefinition([
                 'table' => $this->loggerEntity->getTable(),
-                'primary' => 'id_'.$this->loggerEntity->getTable(),
+                'primary' => 'id_payplug_logger',
                 'fields' => [
                     /*
                      * Different types,
@@ -186,10 +188,10 @@ class LoggerRepository extends Repository
         $this->query
             ->update()
             ->table($table)
-            ->set($table.'.process =  \''.pSQL($logger->getProcess()).'\'')
-            ->set($table.'.content =  \''.pSQL($logger->getContent()).'\'')
-            ->set($table.'.date_upd = \''.pSQL($logger->getDateUpd()).'\'')
-            ->where($table.'.id_'.$logger->getTable().' = '.(int)$logger->getId())
+            ->set('process =  \''.pSQL($logger->getProcess()).'\'')
+            ->set('content =  \''.pSQL($logger->getContent()).'\'')
+            ->set('date_upd = \''.pSQL($logger->getDateUpd()).'\'')
+            ->where('id_payplug_logger = '.(int)$logger->getId())
             ;
 
         if (!$this->query->build()) {

@@ -22,17 +22,17 @@
 
 <div>
     <p class="{if $inst_paid}ppinstsucces{else}{if $inst_aborted}ppinsterror{else}ppwarning{/if}{/if}">
-        {l s='This order is subjected to an installment plan, whose status is' mod='payplug'}
+        {l s='This order is subjected to an installment plan, whose status is' mod={$module_name}}
         <span class="pp_inst_status" data-e2e-payment-details="inst_status" data-e2e-payment-details-inst-state="{$inst_status_code|escape:'htmlall':'UTF-8'}">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
-    <p>{l s='Payment schedule ID' mod='payplug'} : <span data-e2e-payment-details="inst_id">{$inst_id|escape:'htmlall':'UTF-8'}</span></p>
+    <p>{l s='Payment schedule ID' mod={$module_name}} : <span data-e2e-payment-details="inst_id">{$inst_id|escape:'htmlall':'UTF-8'}</span></p>
 </div>
 <div class="table-responsive half-width">
     <table class="table">
         <thead>
         <tr>
-            <th><span class="title_box ">{l s='Date' mod='payplug'}</span></th>
-            <th><span class="title_box ">{l s='Amount' mod='payplug'}</span></th>
-            <th><span class="title_box ">{l s='Status' mod='payplug'}</span></th>
+            <th><span class="title_box ">{l s='Date' mod={$module_name}}</span></th>
+            <th><span class="title_box ">{l s='Amount' mod={$module_name}}</span></th>
+            <th><span class="title_box ">{l s='Status' mod={$module_name}}</span></th>
             <th></th>
         </tr>
         </thead>
@@ -46,7 +46,7 @@
                     <td class="actions">
                         <button class="btn btn-default open_payment_information">
                             <i class="icon-search"></i>
-                            {l s='Details' mod='payplug'}
+                            {l s='Details' mod={$module_name}}
                         </button>
                     </td>
                 {/if}
@@ -63,12 +63,12 @@
     </table>
     {if !$inst_paid}
         {if $inst_aborted}
-            <input class="payplugButton -disabled" type="submit" name="submitPPAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
+            <input class="{$module_name}Button -disabled" type="submit" name="submitPPAbort" value="{l s='Aborted' mod={$module_name}}" disabled="disabled" />
         {elseif $inst_can_be_aborted}
             <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
             <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
             <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
-            <input class="payplugButton -green" type="submit" name="submitPPAbort" value="{l s='Abort' mod='payplug'}"/>
+            <input class="{$module_name}Button -green" type="submit" name="submitPPAbort" value="{l s='Abort' mod={$module_name}}"/>
         {/if}
         <br class="clear" />
     {/if}

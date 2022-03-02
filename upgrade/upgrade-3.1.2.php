@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_1_2()
+function upgrade_module_3_1_2($object)
 {
     $flag = true;
 
@@ -38,19 +38,19 @@ function upgrade_module_3_1_2()
     $sql_requests = [];
 
     try {
-        $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'payplug_card"');
+        $exists = Db::getInstance()->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . $object->name . '_card"');
     } catch (Exception $e) {
         return $flag;
     }
 
     if ($exists) {
         $sql_payplug_card = [
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` 
-                CHANGE `id_payplug_card` `position` INT(11) UNSIGNED NOT NULL',
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` DROP PRIMARY KEY',
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` DROP `position`',
-            'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_card` ADD `id_payplug_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
-                ADD PRIMARY KEY (`id_payplug_card`)',
+            'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` 
+                CHANGE `id_'.$object->name.'_card` `position` INT(11) UNSIGNED NOT NULL',
+            'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP PRIMARY KEY',
+            'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP `position`',
+            'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` ADD `id_'.$object->name.'_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+                ADD PRIMARY KEY (`id_'.$object->name.'_card`)',
         ];
 
         $sql_requests = array_merge($sql_requests, $sql_payplug_card);

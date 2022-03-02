@@ -23,8 +23,8 @@
 
 
 
-use PayPlug\src\entities\PluginEntity;
-use PayPlug\src\exceptions\BadParameterException;
+use PayPlugModule\src\entities\PluginEntity;
+use PayPlugModule\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
 /**

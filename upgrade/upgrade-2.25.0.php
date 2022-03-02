@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_25_0()
+function upgrade_module_2_25_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
@@ -33,7 +33,7 @@ function upgrade_module_2_25_0()
     }
 
     // Blank every CSV file if we don't have permission to "rm *"
-    $csv_files = _PS_MODULE_DIR_ . 'payplug/log/*.csv';
+    $csv_files = _PS_MODULE_DIR_ . $object->name . '/log/*.csv';
     foreach (glob($csv_files) as $path) {
         $file = fopen($path, "w");
         ftruncate($file, 0);

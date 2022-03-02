@@ -21,15 +21,17 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
 use Exception;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\NotFoundException;
-use PayPlug\src\entities\CardEntity;
+use PayPlugModule\src\entities\CardEntity;
 
 class CardRepository extends Repository
 {
+    protected $dependencies;
+
     private $cardEntity;
     private $configurationSpecific;
     private $constant;
@@ -40,6 +42,7 @@ class CardRepository extends Repository
     public function __construct(
         $configurationSpecific,
         $constant,
+        $dependencies,
         $logger,
         $query,
         $tools
@@ -47,10 +50,33 @@ class CardRepository extends Repository
         $this->cardEntity = new CardEntity();
         $this->configurationSpecific = $configurationSpecific;
         $this->constant = $constant;
+        $this->dependencies = $dependencies;
         $this->logger = $logger;
         $this->query = $query;
         $this->toolsSpecific = $tools;
-        $this->setParams();
+
+        $isSandbox = $this->configurationSpecific->get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
+        $idCompany = $this->configurationSpecific->get(
+            $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
+        );
+        $this->logger->setParams(['process' => 'cardRepository']);
+
+        $this->cardEntity
+            ->setAllowedBrand(['mastercard', 'visa'])
+            ->setFieldsRequired([])
+            ->setFieldsSize([])
+            ->setFieldsValidate([])
+            ->setTable($this->dependencies->name . '_card')
+            ->setIdentifier('');
+        if ($idCompany && (!empty($idCompany))) {
+            $this->cardEntity->setIdCompany((int)$idCompany);
+        }
+
+        if ($isSandbox) {
+            $this->cardEntity->setIsSandbox((bool)$isSandbox);
+        }
     }
 
     /**
@@ -102,7 +128,7 @@ class CardRepository extends Repository
      */
     public function confirmDeleteCardMessage()
     {
-        return $this->l('card.CardRepository.confirmDeleteCardMessage');
+        return $this->dependencies->l('card.CardRepository.confirmDeleteCardMessage', 'cardrepository');
     }
 
     /**
@@ -217,7 +243,7 @@ class CardRepository extends Repository
      */
     public function deleteCardMessage()
     {
-        return $this->l('card.CardRepository.deleteCardMessage');
+        return $this->dependencies->l('card.CardRepository.deleteCardMessage', 'cardrepository');
     }
 
     /**
@@ -312,14 +338,14 @@ class CardRepository extends Repository
             !is_int($id_payplug_card)
         ) {
             $this->logger->addLog('Error:  Bad parameters were passed to [getCard]'
-                . '$id_payplug_card: ' . json_encode($id_payplug_card));
+                . '$id_' . $this->dependencies->name . '_card: ' . json_encode($id_payplug_card));
             return false;
         }
 
         $this->query
             ->select()
             ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
             ->where('`id_payplug_card` = ' . (int)$id_payplug_card);
 
         try {
@@ -330,7 +356,7 @@ class CardRepository extends Repository
 
         if (empty($card)) {
             $this->logger->addLog('Error : No card found for these parameters [getCard]. $id_customer: '
-                . '$id_payplug_card: ' . json_encode($id_payplug_card));
+                . '$id_' . $this->dependencies->name . '_card: ' . json_encode($id_payplug_card));
             return false;
         }
 
@@ -416,6 +442,7 @@ class CardRepository extends Repository
         }
 
         $config = $this->configurationSpecific;
+        $configClass = $this->dependencies->configClass;
 
         $brand = $payment->card->brand;
         if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
@@ -427,8 +454,12 @@ class CardRepository extends Repository
         $customer_id = isset($payment->metadata['ID Client']) ?
             (int)$payment->metadata['ID Client'] :
             (int)$payment->metadata['Client'];
-        $is_sandbox = (int)$config->get('PAYPLUG_SANDBOX_MODE');
-        $company_id = (int)$config->get('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''));
+        $is_sandbox = (int)$config->get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
+        $company_id = (int)$config->get(
+            $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
+        );
 
         $exists = $this->checkExists((string)$payment->card->id, (int)$company_id, (bool)$is_sandbox);
         if ($exists) {
@@ -471,29 +502,5 @@ class CardRepository extends Repository
         }
 
         return true;
-    }
-
-    private function setParams()
-    {
-        $config = $this->configurationSpecific;
-        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
-        $idCompany = $config->get('PAYPLUG_COMPANY_ID' . ($isSandbox ? '_TEST' : ''));
-        $isSandbox = $config->get('PAYPLUG_SANDBOX_MODE');
-        $this->logger->setParams(['process' => 'cardRepository']);
-
-        $this->cardEntity
-            ->setAllowedBrand(['mastercard', 'visa'])
-            ->setFieldsRequired([])
-            ->setFieldsSize([])
-            ->setFieldsValidate([])
-            ->setTable('payplug_card')
-            ->setIdentifier('');
-        if ($idCompany && (!empty($idCompany))) {
-            $this->cardEntity->setIdCompany((int)$idCompany);
-        }
-
-        if ($isSandbox) {
-            $this->cardEntity->setIsSandbox((bool)$isSandbox);
-        }
     }
 }

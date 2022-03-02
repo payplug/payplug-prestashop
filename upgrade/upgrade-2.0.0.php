@@ -26,7 +26,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 
-function upgrade_module_2_0_0($module)
+function upgrade_module_2_0_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -35,7 +35,7 @@ function upgrade_module_2_0_0($module)
 
     //sql
     $req_payplug_lock = '
-      DROP TABLE IF EXISTS '._DB_PREFIX_.'payplug_lock';
+      DROP TABLE IF EXISTS '._DB_PREFIX_.$object->name.'_lock';
     $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 
     //configurations
@@ -60,7 +60,7 @@ function upgrade_module_2_0_0($module)
         $conf = true;
     }
 
-    $install = $module->install(false);
+    $install = $object->install(false);
 
     return ($res_payplug_lock && $conf && $install);
 }

@@ -21,9 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-$configuration = json_decode(file_get_contents(dirname(__FILE__)."/composer.json"));
-$moduleVersion = $configuration->version;
+//require_once(_PS_ROOT_DIR_."/classes/Tools.php");
 
-define('PAYPLUG_API_VERSION', '2019-08-06');
-define('PAYPLUG_NAME', 'payplug');
-define('PAYPLUG_VERSION', $moduleVersion);
+//$configuration = Tools::jsonDecode(Tools::file_get_contents(dirname(__FILE__)."/composer.json"));
+//$moduleVersion = $configuration->version;
+//$moduleName = $configuration->moduleName;
+
+//define('PAYPLUG_API_VERSION', '2019-08-06');
+//define('MODULE_NAME', $moduleName);
+//define('MODULE_VERSION', $moduleVersion);

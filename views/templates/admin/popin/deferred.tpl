@@ -20,8 +20,8 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <p>
-    {l s='admin.popin.deferred.text' tags=['<strong>', '<em>']  mod='payplug'}
+    {l s='admin.popin.deferred.text' tags=['<strong>', '<em>']  mod={$module_name}}
 </p>
-<div class="payplugPopup_footer -right">
-    <button type="button" class="payplugButton -close">{l s='admin.popin.deferred.submit' mod='payplug'}</button>
+<div class="{$module_name}Popup_footer -right">
+    <button type="button" class="{$module_name}Button -close">{l s='admin.popin.deferred.submit' mod={$module_name}}</button>
 </div>
