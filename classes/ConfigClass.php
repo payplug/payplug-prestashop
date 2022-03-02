@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Configuration;
 use Country;
@@ -30,18 +30,19 @@ use Language;
 use libphonenumberlight;
 use Media;
 use Module;
-use PayPlug\backward\PayPlugBackward;
+use PayPlugModule\backward\PayPlugBackward;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
-use PayPlug\src\repositories\LoggerRepository;
-use PayPlug\src\specific\ConstantSpecific;
-use PayPlug\src\specific\ContextSpecific;
+use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlugModule\src\specific\ConstantSpecific;
+use PayPlugModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
 class ConfigClass
 {
+    public $amountCurrencyClass;
     public $email;
     public $features_json;
     public $logger;
@@ -50,8 +51,8 @@ class ConfigClass
         'paid' => [
             'cfg' => 'PS_OS_PAYMENT',
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_PAID',
-                'PAYPLUG_ORDER_STATE_PAID_TEST'
+                'ORDER_STATE_PAID',
+                'ORDER_STATE_PAID_TEST'
             ],
             'template' => 'payment',
             'logable' => true,
@@ -72,8 +73,8 @@ class ConfigClass
         'refund' => [
             'cfg' => 'PS_OS_REFUND',
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_REFUND',
-                'PAYPLUG_ORDER_STATE_REFUND_TEST'
+                'ORDER_STATE_REFUND',
+                'ORDER_STATE_REFUND_TEST'
             ],
             'template' => 'refund',
             'logable' => false,
@@ -94,8 +95,8 @@ class ConfigClass
         'pending' => [
             'cfg' => 'PS_OS_PENDING',
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_PENDING',
-                'PAYPLUG_ORDER_STATE_PENDING_TEST'
+                'ORDER_STATE_PENDING',
+                'ORDER_STATE_PENDING_TEST'
             ],
             'template' => null,
             'logable' => false,
@@ -116,8 +117,8 @@ class ConfigClass
         'error' => [
             'cfg' => 'PS_OS_ERROR',
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_ERROR',
-                'PAYPLUG_ORDER_STATE_ERROR_TEST'
+                'ORDER_STATE_ERROR',
+                'ORDER_STATE_ERROR_TEST'
             ],
             'template' => 'payment_error',
             'logable' => false,
@@ -138,8 +139,8 @@ class ConfigClass
         'cancelled' => [
             'cfg' => 'PS_OS_CANCELED',
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_CANCELLED',
-                'PAYPLUG_ORDER_STATE_CANCELLED_TEST'
+                'ORDER_STATE_CANCELLED',
+                'ORDER_STATE_CANCELLED_TEST'
             ],
             'template' => 'order_canceled',
             'logable' => false,
@@ -160,8 +161,8 @@ class ConfigClass
         'auth' => [
             'cfg' => null,
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_AUTH',
-                'PAYPLUG_ORDER_STATE_AUTH_TEST'
+                'ORDER_STATE_AUTH',
+                'ORDER_STATE_AUTH_TEST'
             ],
             'template' => null,
             'logable' => false,
@@ -182,8 +183,8 @@ class ConfigClass
         'exp' => [
             'cfg' => null,
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_EXP',
-                'PAYPLUG_ORDER_STATE_EXP_TEST'
+                'ORDER_STATE_EXP',
+                'ORDER_STATE_EXP_TEST'
             ],
             'template' => null,
             'logable' => false,
@@ -206,8 +207,8 @@ class ConfigClass
         'oney_pg' => [
             'cfg' => null,
             'payplug_cfg' => [
-                'PAYPLUG_ORDER_STATE_ONEY_PG',
-                'PAYPLUG_ORDER_STATE_ONEY_PG_TEST'
+                'ORDER_STATE_ONEY_PG',
+                'ORDER_STATE_ONEY_PG_TEST'
             ],
             'template' => null,
             'logable' => false,
@@ -242,7 +243,7 @@ class ConfigClass
     private $install;
     private $oney;
     private $payment_status;
-    private $ssl_enable;
+    private $tools;
     private $validationErrors = [];
 
 
@@ -257,6 +258,7 @@ class ConfigClass
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->module = $this->dependencies->getPlugin()->getModule();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
@@ -275,7 +277,7 @@ class ConfigClass
      */
     private function setLoggers()
     {
-        $this->logger = new LoggerRepository();
+        $this->logger = new LoggerRepository($this->dependencies);
         $this->myLogPHP = new MyLogPHP();
 
         $this->logger->setParams(['process' => 'payplug.php']);
@@ -297,9 +299,9 @@ class ConfigClass
      */
     private function setConfigurationProperties()
     {
-        $this->api_live = Configuration::get('PAYPLUG_LIVE_API_KEY');
-        $this->api_test = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $this->email = Configuration::get('PAYPLUG_EMAIL');
+        $this->api_live = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
+        $this->api_test = Configuration::get($this->dependencies->getConfigurationKey('testApiKey'));
+        $this->email = Configuration::get($this->dependencies->getConfigurationKey('email'));
 
         $available_img_lang = [
             'fr',
@@ -351,7 +353,7 @@ class ConfigClass
      */
     public function disable()
     {
-        return $this->config->updateValue('PAYPLUG_SHOW', 0);
+        return $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
     }
 
     /**
@@ -359,28 +361,28 @@ class ConfigClass
      * @param $cart
      * @return array
      */
-    public static function getAvailableOptions($cart)
+    public function getAvailableOptions($cart)
     {
-        if (!self::isAllowed()) {
+        if (!$this->isAllowed()) {
             return false;
         }
 
-        $permissions = ApiClass::getAccountPermissions();
+        $permissions = $this->dependencies->apiClass->getAccountPermissions();
 
         $available_options = [
-            'standard' => (int)Configuration::get('PAYPLUG_STANDARD') === 1,
-            'live' => (int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 0,
-            'embedded' => (string)Configuration::get('PAYPLUG_EMBEDDED_MODE'),
-            'one_click' => (int)Configuration::get('PAYPLUG_ONE_CLICK') === 1,
-            'installment' => (int)Configuration::get('PAYPLUG_INST') === 1,
-            'deferred' => (int)Configuration::get('PAYPLUG_DEFERRED') === 1,
-            'oney' => (int)Configuration::get('PAYPLUG_ONEY') === 1,
-            'bancontact' => (int)Configuration::get('PAYPLUG_BANCONTACT') === 1,
+            'standard' => (int)Configuration::get($this->dependencies->getConfigurationKey('standard')) === 1,
+            'live' => (int)Configuration::get($this->dependencies->getConfigurationKey('sandboxMode')) === 0,
+            'embedded' => (string)Configuration::get($this->dependencies->getConfigurationKey('embeddedMode')),
+            'one_click' => (int)Configuration::get($this->dependencies->getConfigurationKey('oneClick')) === 1,
+            'installment' => (int)Configuration::get($this->dependencies->getConfigurationKey('inst')) === 1,
+            'deferred' => (int)Configuration::get($this->dependencies->getConfigurationKey('deferred')) === 1,
+            'oney' => (int)Configuration::get($this->dependencies->getConfigurationKey('oney')) === 1,
+            'bancontact' => (int)Configuration::get($this->dependencies->getConfigurationKey('bancontact')) === 1,
         ];
 
-        if (Configuration::get('PAYPLUG_EMAIL') === null
-            || !AmountCurrencyClass::checkCurrency($cart)
-            || !AmountCurrencyClass::checkAmount($cart)
+        if (Configuration::get($this->dependencies->getConfigurationKey('email')) === null
+            || !$this->amountCurrencyClass->checkCurrency($cart)
+            || !$this->amountCurrencyClass->checkAmount($cart)
         ) {
             $available_options['standard'] = false;
             $available_options['sandbox'] = false;
@@ -392,7 +394,7 @@ class ConfigClass
             $available_options['bancontact'] = false;
         } else {
             if (!$permissions['use_live_mode']
-                || Configuration::get('PAYPLUG_LIVE_API_KEY') === null
+                || Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')) === null
             ) {
                 $available_options['live'] = false;
             }
@@ -421,9 +423,9 @@ class ConfigClass
      * Check if Payplug is allowed
      * @return bool
      */
-    public static function isAllowed()
+    public function isAllowed()
     {
-        if (!Module::isEnabled('payplug') || !Configuration::get('PAYPLUG_SHOW')) {
+        if (!Module::isEnabled($this->dependencies->name) || !Configuration::get($this->dependencies->getConfigurationKey('show'))) {
             return false;
         }
         return true;
@@ -456,9 +458,9 @@ class ConfigClass
      */
     public function checkConfiguration()
     {
-        $payplug_email = Configuration::get('PAYPLUG_EMAIL');
-        $payplug_test_api_key = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $payplug_live_api_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        $payplug_email = Configuration::get($this->dependencies->getConfigurationKey('email'));
+        $payplug_test_api_key = Configuration::get($this->dependencies->getConfigurationKey('testApiKey'));
+        $payplug_live_api_key = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
 
         $report = self::checkRequirements();
 
@@ -512,7 +514,7 @@ class ConfigClass
         $check_warning = $this->dependencies->l('payplug.checkConfiguration.issue', 'configclass');
         if ($is_payplug_configured) {
         } else {
-            Configuration::get('PAYPLUG_SHOW', 0);
+            Configuration::get($this->dependencies->getConfigurationKey('show'), 0);
             $this->check_configuration['warning'][] .= $check_warning;
         }
 
@@ -576,23 +578,23 @@ class ConfigClass
         $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
 
-            'PAYPLUG_DEFERRED' => 'payplug_deferred',
-            'PAYPLUG_DEFERRED_AUTO' => 'payplug_deferred_auto',
-            'PAYPLUG_DEFERRED_STATE' => 'payplug_deferred_state',
-            'PAYPLUG_SHOW' => 'PAYPLUG_SHOW',
-            'PAYPLUG_EMBEDDED_MODE' => 'payplug_embedded',
-            'PAYPLUG_INST' => 'payplug_inst',
-            'PAYPLUG_INST_MIN_AMOUNT' => 'PAYPLUG_INST_MIN_AMOUNT',
-            'PAYPLUG_INST_MODE' => 'PAYPLUG_INST_MODE',
-            'PAYPLUG_ONE_CLICK' => 'payplug_one_click',
-            'PAYPLUG_ONEY' => 'payplug_oney',
-            'PAYPLUG_ONEY_OPTIMIZED' => 'payplug_oney_optimized',
-            'PAYPLUG_ONEY_FEES' => 'payplug_oney_fees',
-            'PAYPLUG_SANDBOX_MODE' => 'payplug_sandbox',
-            'PAYPLUG_STANDARD' => 'payplug_standard',
-            'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS' => 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS',
-            'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS' => 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS',
-            'PAYPLUG_BANCONTACT' => 'payplug_bancontact'
+            $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
+            $this->dependencies->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
+            $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
+            $this->dependencies->getConfigurationKey('show') => 'payplug_show',
+            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded',
+            $this->dependencies->getConfigurationKey('inst') => 'payplug_inst',
+            $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
+            $this->dependencies->getConfigurationKey('instMode') => 'payplug_inst_mode',
+            $this->dependencies->getConfigurationKey('oneClick') => 'payplug_one_click',
+            $this->dependencies->getConfigurationKey('oney') => 'payplug_oney',
+            $this->dependencies->getConfigurationKey('oneyOptimized') => 'payplug_oney_optimized',
+            $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney_fees',
+            $this->dependencies->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
+            $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
+            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
+            $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
+            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact'
         ];
 
         foreach ($configurationKeys as $key => $config) {
@@ -612,38 +614,38 @@ class ConfigClass
                             Configuration::updateValue($key, $value);
                         }
                         break;
-                    case 'PAYPLUG_INST_MIN_AMOUNT':
-                    case 'PAYPLUG_INST_MODE':
+                    case 'payplug_inst_min_amount':
+                    case 'payplug_inst_mode':
                         if ((int)Tools::getValue('payplug_inst') === 1) {
                             Configuration::updateValue($key, $value);
                         }
                         break;
-                    case 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS':
+                    case 'payplug_oney_custom_max_amounts':
                         if ($this->validateCustomOneyMax(
                             (int)Tools::getValue('payplug_oney'),
-                            Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS'),
+                            Tools::getValue($config),
                             $limit_oney['min'],
                             $limit_oney['max']
                         )) {
                             Configuration::updateValue(
                                 $key,
                                 $this->oney->setCustomOneyLimit(
-                                    (int)Tools::getValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
+                                    (int)Tools::getValue($config)
                                 )
                             );
                         }
                         break;
-                    case 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS':
+                    case 'payplug_oney_custom_min_amounts':
                         if ($this->validateCustomOneyMin(
                             (int)Tools::getValue('payplug_oney'),
-                            (int)Tools::getValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS'),
+                            (int)Tools::getValue($config),
                             $limit_oney['min'],
                             $limit_oney['max']
                         )) {
                             Configuration::updateValue(
                                 $key,
                                 $this->oney->setCustomOneyLimit(
-                                    (int)Tools::getValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS')
+                                    (int)Tools::getValue($config)
                                 )
                             );
                         }
@@ -658,7 +660,7 @@ class ConfigClass
                         Configuration::updateValue($key, $value);
                 }
             }
-            if ($key == 'PAYPLUG_SHOW' && $value) {
+            if ($key == 'payplug_show' && $value) {
                 $this->module->getInstanceByName($this->dependencies->name)->enable();
             }
         }
@@ -686,25 +688,25 @@ class ConfigClass
         $this->checkConfiguration();
 
         $configurations = [
-            'show' => Configuration::get('PAYPLUG_SHOW'),
-            'email' => Configuration::get('PAYPLUG_EMAIL'),
-            'sandbox_mode' => Configuration::get('PAYPLUG_SANDBOX_MODE'),
-            'embedded_mode' => Configuration::get('PAYPLUG_EMBEDDED_MODE'),
-            'standard' => Configuration::get('PAYPLUG_STANDARD'),
-            'one_click' => Configuration::get('PAYPLUG_ONE_CLICK'),
-            'inst' => Configuration::get('PAYPLUG_INST'),
-            'inst_mode' => Configuration::get('PAYPLUG_INST_MODE'),
-            'inst_min_amount' => Configuration::get('PAYPLUG_INST_MIN_AMOUNT'),
-            'test_api_key' => Configuration::get('PAYPLUG_TEST_API_KEY'),
-            'live_api_key' => Configuration::get('PAYPLUG_LIVE_API_KEY'),
-            'debug_mode' => Configuration::get('PAYPLUG_DEBUG_MODE'),
-            'deferred' => Configuration::get('PAYPLUG_DEFERRED'),
-            'deferred_auto' => Configuration::get('PAYPLUG_DEFERRED_AUTO'),
-            'deferred_state' => Configuration::get('PAYPLUG_DEFERRED_STATE'),
-            'oney' => Configuration::get('PAYPLUG_ONEY'),
-            'oney_fees' => Configuration::get('PAYPLUG_ONEY_FEES'),
-            'oney_optimized' => Configuration::get('PAYPLUG_ONEY_OPTIMIZED'),
-            'bancontact' => Configuration::get('PAYPLUG_BANCONTACT')
+            'show' => Configuration::get($this->dependencies->getConfigurationKey('show')),
+            'email' => Configuration::get($this->dependencies->getConfigurationKey('email')),
+            'sandbox_mode' => Configuration::get($this->dependencies->getConfigurationKey('sandboxMode')),
+            'embedded_mode' => Configuration::get($this->dependencies->getConfigurationKey('embeddedMode')),
+            'standard' => Configuration::get($this->dependencies->getConfigurationKey('standard')),
+            'one_click' => Configuration::get($this->dependencies->getConfigurationKey('oneClick')),
+            'inst' => Configuration::get($this->dependencies->getConfigurationKey('inst')),
+            'inst_mode' => Configuration::get($this->dependencies->getConfigurationKey('instMode')),
+            'inst_min_amount' => Configuration::get($this->dependencies->getConfigurationKey('instMinAmount')),
+            'test_api_key' => Configuration::get($this->dependencies->getConfigurationKey('testApiKey')),
+            'live_api_key' => Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')),
+            'debug_mode' => Configuration::get($this->dependencies->getConfigurationKey('debugMode')),
+            'deferred' => Configuration::get($this->dependencies->getConfigurationKey('deferred')),
+            'deferred_auto' => Configuration::get($this->dependencies->getConfigurationKey('deferredAuto')),
+            'deferred_state' => Configuration::get($this->dependencies->getConfigurationKey('deferredState')),
+            'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
+            'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
+            'oney_optimized' => Configuration::get($this->dependencies->getConfigurationKey('oneyOptimized')),
+            'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact'))
         ];
 
         $connected = !empty($configurations['email'])
@@ -717,7 +719,7 @@ class ConfigClass
         }
 
         $api_class = $this->dependencies->apiClass;
-        $valid_key = $api_class::setAPIKey();
+        $valid_key = $api_class->setAPIKey();
         if (!empty($valid_key)) {
             try {
                 $permissions = $this->dependencies->apiClass->getAccount($valid_key);
@@ -758,18 +760,18 @@ class ConfigClass
             ]);
         } else {
             $this->context->smarty->assign([
-                'PAYPLUG_EMAIL' => $configurations['email'],
+                'payplug_email' => $configurations['email'],
             ]);
         }
 
         $this->context->controller->addJS(
-            $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/admin.js'
+            $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/js/admin.js'
         );
         $this->context->controller->addJS(
-            $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/js/utilities.js'
+            $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/js/utilities.js'
         );
         $this->context->controller->addCSS(
-            $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/css/admin.css'
+            $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/css/admin.css'
         );
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
@@ -808,7 +810,10 @@ class ConfigClass
             && (method_exists($specific, 'assignSwitchConfiguration'))
             && $this->isValidFeature('feature_integrated')
             && $this->isValidFeature('feature_standard')
-            && Configuration::get('PAYPLUG_PUBLISHABLE_KEY' . ($configurations['sandbox_mode'] ? '_TEST' : ''))
+            && Configuration::get(
+                $this->dependencies->getConfigurationKey('publishableKey')
+                . ($configurations['sandbox_mode'] ? '_TEST' : '')
+            )
         ) {
             $specific->assignSwitchConfiguration($configurations);
         } else {
@@ -832,7 +837,7 @@ class ConfigClass
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => $this->constant->get('__PS_BASE_URI__') . 'modules/payplug/views/img/logo_payplug.png',
+            'url_logo' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->dependencies->version,
@@ -913,7 +918,7 @@ class ConfigClass
 
         // show module to the customer
         $switch['show'] = [
-            'name' => 'PAYPLUG_SHOW',
+            'name' => 'payplug_show',
             'label' => $this->dependencies->l('payplug.assignSwitchConfiguration.showPayplug', 'configclass'),
             'active' => $connected,
             'small' => true,
@@ -1155,7 +1160,8 @@ class ConfigClass
      */
     public static function getIsoCodeList()
     {
-        $country_list_path = _PS_MODULE_DIR_ . 'payplug/lib/iso_3166-1_alpha-2/data.csv';
+        $dependencies = new DependenciesClass();
+        $country_list_path = _PS_MODULE_DIR_ . $dependencies->name . '/lib/iso_3166-1_alpha-2/data.csv';
         $iso_code_list = [];
         if (($handle = fopen($country_list_path, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
@@ -1208,7 +1214,7 @@ class ConfigClass
         }
         $req_payplug_card = '
             SELECT pc.last4, pc.exp_month, pc.exp_year, pc.brand, pc.country
-            FROM ' . _DB_PREFIX_ . 'payplug_card pc
+            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_card pc
             WHERE pc.id_customer = ' . (int)$id_customer;
         $res_payplug_card = Db::getInstance()->ExecuteS($req_payplug_card);
         if (!$res_payplug_card) {
@@ -1306,11 +1312,11 @@ class ConfigClass
         $openssl_exists = extension_loaded('openssl');
 
         /*
-         * We can't use $password = Tools::getValue('PAYPLUG_PASSWORD');
+         * We can't use $password = Tools::getValue('payplug_password');
          * Because pwd with special chars don't work
          */
-        $password = $_POST['PAYPLUG_PASSWORD'];
-        $email = Tools::getValue('PAYPLUG_EMAIL');
+        $password = $_POST['payplug_password'];
+        $email = Tools::getValue('payplug_email');
 
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             die(json_encode([
@@ -1319,8 +1325,11 @@ class ConfigClass
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
-                Configuration::updateValue('PAYPLUG_EMAIL', Tools::getValue('PAYPLUG_EMAIL'));
-                Configuration::updateValue('PAYPLUG_SHOW', 1);
+                Configuration::updateValue(
+                    $this->dependencies->getConfigurationKey('email'),
+                    Tools::getValue('payplug_email')
+                );
+                Configuration::updateValue($this->dependencies->getConfigurationKey('show'), 1);
 
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
@@ -1340,7 +1349,7 @@ class ConfigClass
      */
     public function submitDisable()
     {
-        Configuration::updateValue('PAYPLUG_SHOW', false);
+        Configuration::updateValue($this->dependencies->getConfigurationKey('show'), false);
 
         $this->assignContentVar();
         $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
@@ -1360,7 +1369,7 @@ class ConfigClass
     public function submitDisconnect()
     {
         $this->install->setConfig();
-        Configuration::updateValue('PAYPLUG_SHOW', 0);
+        Configuration::updateValue($this->dependencies->getConfigurationKey('show'), 0);
 
         // force reload configuration to be sure all config are reset
         Configuration::loadConfiguration();
@@ -1376,7 +1385,7 @@ class ConfigClass
      */
     public function submitSettings()
     {
-        if (Tools::getValue('PAYPLUG_INST_MIN_AMOUNT') < 4) {
+        if (Tools::getValue($this->dependencies->getConfigurationKey('instMinAmount')) < 4) {
             $this->module->getInstanceByName($this->dependencies->name)->displayError(
                 $this->dependencies->l('payplug.submitSettings.settingsNotUpdated', 'configclass')
             );
@@ -1390,7 +1399,10 @@ class ConfigClass
      */
     public function submitUninstallSettings()
     {
-        Configuration::updateValue('PAYPLUG_KEEP_CARDS', Tools::getValue('PAYPLUG_KEEP_CARDS'));
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('keepCards'),
+            Tools::getValue($this->dependencies->getConfigurationKey('keepCards'))
+        );
     }
 
     public function isValidFeature($name)
@@ -1418,10 +1430,14 @@ class ConfigClass
             }
         }
 
+        $this->context->smarty->assign([
+            'module_name' => $this->dependencies->name
+        ]);
+
         $output = $this
             ->module
             ->getInstanceByName($this->dependencies->name)
-            ->display(_PS_MODULE_DIR_ . 'payplug/payplug.php', $file);
+            ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file);
         return $output;
     }
 
@@ -1433,16 +1449,16 @@ class ConfigClass
         $this->configClass->postProcess();
         $this->html = '';
 
-        $PAYPLUG_KEEP_CARDS = (int)$this->config->get('PAYPLUG_KEEP_CARDS');
+        $KEEP_CARDS = (int)$this->config->get($this->dependencies->getConfigurationKey('keepCards'));
 
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/admin.js');
-        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin.js');
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/css/admin.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png',
+            'url_logo' => __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/logo_payplug.png',
             'site_url' => $this->dependencies->apiClass->getSiteUrl(),
-            'PAYPLUG_KEEP_CARDS' => $PAYPLUG_KEEP_CARDS,
+            $this->dependencies->getConfigurationKey('keepCards') => $KEEP_CARDS,
         ]);
 
         $this->html .= $this->fetchTemplate('/views/templates/admin/admin_uninstall_configuration.tpl');

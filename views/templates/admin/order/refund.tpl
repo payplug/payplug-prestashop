@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' mod='payplug'}</p>
+<p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' mod={$module_name}}</p>
 <form method="post" action="{$admin_ajax_url|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
     {if isset($pay_id)}
@@ -35,27 +35,27 @@
     <div class="pp_list">
         <ul>
             <li>
-                {l s='Amount already refunded with Payplug : ' mod='payplug'}
+                {l s='Amount already refunded with Payplug : ' mod={$module_name}}
                 <span id="amount_refunded_payplug">{displayPrice price=$amount_refunded_payplug}</span>
             </li>
             <li>
-                {l s='Amount still refundable with Payplug : ' mod='payplug'}
+                {l s='Amount still refundable with Payplug : ' mod={$module_name}}
                 <span id="amount_available">{displayPrice price=$amount_available}</span>
             </li>
         </ul>
     </div>
 
     <div class="form-group">
-        <label class="control-label" for="pp_amount2refund">{l s='Amount to be refunded' mod='payplug'} ({$currency->name|escape:'htmlall':'UTF-8'}) :</label>
+        <label class="control-label" for="pp_amount2refund">{l s='Amount to be refunded' mod={$module_name}} ({$currency->name|escape:'htmlall':'UTF-8'}) :</label>
         <input type="text" name="pp_amount2refund" value="{$amount_suggested|escape:'htmlall':'UTF-8'}" />
-        <label for="change_order_state">{l s='Change Prestashop order state to Refunded' mod='payplug'}</label>
+        <label for="change_order_state">{l s='Change Prestashop order state to Refunded' mod={$module_name}}</label>
         <input class="control-label" type="checkbox" value="{$id_new_order_state|escape:'htmlall':'UTF-8'}" name="change_order_state" >
     </div>
 
     <div class="form-group">
-        {include file='./button.tpl' button_disable=$refund_delay_oney e2e_action='refund' submitName='submitPPRefund' submitValue={l s='Refund' mod='payplug'}}
+        {include file='./button.tpl' button_disable=$refund_delay_oney e2e_action='refund' submitName='submitPPRefund' submitValue={l s='Refund' mod={$module_name}}}
         {if $refund_delay_oney}
-            <div class="payplugOrder_delay">{l s='The refund will be possible 48h after the last payment or refund transaction.' mod='payplug'}</div>
+            <div class="{$module_name}Order_delay">{l s='The refund will be possible 48h after the last payment or refund transaction.' mod={$module_name}}</div>
         {/if}
     </div>
 </form>

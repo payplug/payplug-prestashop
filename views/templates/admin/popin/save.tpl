@@ -19,7 +19,7 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<p>{l s='Your configuration have been saved' mod='payplug'}</p>
-<div class="payplugPopup_footer -center">
-    <button type="button" class="payplugButton -close -green">{l s='Ok' mod='payplug'}</button>
+<p>{l s='Your configuration have been saved' mod={$module_name}}</p>
+<div class="{$module_name}Popup_footer -center">
+    <button type="button" class="{$module_name}Button -close -green">{l s='Ok' mod={$module_name}}</button>
 </div>

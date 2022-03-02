@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\ConfigurationInterface;
+use PayPlugModule\src\interfaces\ConfigurationInterface;
 use Configuration;
 
 class ConfigurationSpecific implements ConfigurationInterface

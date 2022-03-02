@@ -4,25 +4,27 @@ require_once(dirname(__FILE__) . '/src/Translations.php');
 
 $repo = new Translations();
 $translations = $repo->getTranslations();
+$moduleName = $repo->getModuleName();
 
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
 $messages = [];
 
 // Open a file in write mode ('w')
-$fp = fopen(dirname(__FILE__) . '/translations.csv', 'w');
+$fp = fopen(dirname(__FILE__) . '../../dist/' . $moduleName . '/translations.csv', 'w');
 $header = ['key', 'default', 'tags'];
 $header = array_merge($header, $available_languages);
 
 if ($fp) {
     fputcsv($fp, $header, ';');
     foreach ($translations as $key => $trans) {
-        $key = str_replace("<{payplug}prestashop>", "", $key);
+        $key = str_replace("<{'. $moduleName .'}prestashop>", "", $key);
+
         $line = [$key, $trans['default'], $trans['tags']];
         foreach ($available_languages as $lang) {
             $line[] = stripcslashes($trans[$lang]);
 
-            if (!$trans[$lang]) {
+            if (!$trans[$lang] && strpos($key, 'bnpl') == false && $moduleName != 'bnpl') {
                 $missing_translations[$lang][$key] = $trans['default'];
             }
         }
@@ -61,6 +63,7 @@ if (isset($argv) && !empty($argv)) {
 
 // Return error message needed
 if (!empty($messages)) {
+    echo 'Translation missing' . "\n";
     foreach ($messages as $message) {
         echo $message . "\n";
     }
@@ -70,4 +73,5 @@ if (!empty($messages)) {
         exit(137);
     }
 }
+echo 'No translation missing' . "\n";
 exit(0);

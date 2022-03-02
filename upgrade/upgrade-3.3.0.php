@@ -30,8 +30,8 @@ function upgrade_module_3_3_0($object)
     $flag = true;
 
     // Create new table to qualify order state
-    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_state` (
-                `id_payplug_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name.'_order_state` (
+                `id_'.$object->name.'_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `id_order_state` INT(11) UNSIGNED NOT NULL,
                 `type` VARCHAR(64) NOT NULL,
                 `date_add` DATETIME NULL,
@@ -60,13 +60,13 @@ function upgrade_module_3_3_0($object)
         // update live status
         $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key));
         $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
+            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
             VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
 
         // update sandbox status
         $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key) . '_TEST');
         $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
+            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
             VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
     }
 

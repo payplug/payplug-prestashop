@@ -21,9 +21,9 @@
 *}
 
 <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}"/>
-<p>{l s='Are you sure you want to suspend the installment plan on this order?' mod='payplug'}</p>
-<p>{l s='Your customer won’t be charged on the due dates.' mod='payplug'}</p>
-<div class="payplugPopup_footer">
-    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton -green" name="confirmPayplugAbort">{l s='Suspend' mod='payplug'}</button>
+<p>{l s='Are you sure you want to suspend the installment plan on this order?' mod={$module_name}}</p>
+<p>{l s='Your customer won’t be charged on the due dates.' mod={$module_name}}</p>
+<div class="{$module_name}Popup_footer">
+    <button type="button" class="{$module_name}Button -close">{l s='Cancel' mod={$module_name}}</button>
+    <button type="button" class="{$module_name}Button -green" name="confirmPayplugAbort">{l s='Suspend' mod={$module_name}}</button>
 </div>

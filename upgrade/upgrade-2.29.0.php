@@ -32,7 +32,7 @@ if (!defined('_PS_VERSION_')) {
  *
  * @return boolean
  */
-function upgrade_module_2_29_0()
+function upgrade_module_2_29_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
@@ -43,8 +43,8 @@ function upgrade_module_2_29_0()
 
     // install table `payplug_cache`
     $sql = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_cache` (
-            `id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_cache` (
+            `id_'.$object->name.'_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `cache_key` VARCHAR(255) NOT NULL,
             `cache_value` TEXT NOT NULL,
             `date_add` DATETIME NULL,

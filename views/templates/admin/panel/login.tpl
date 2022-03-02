@@ -19,14 +19,14 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel payplugLogin{if $connected} -logged{/if}">
-    <div class="panel-heading">{l s='CONNECT' mod='payplug'}</div>
+<div class="panel {$module_name}Login{if $connected} -logged{/if}">
+    <div class="panel-heading">{l s='CONNECT' mod={$module_name}}</div>
     <div class="panel-row">
         {if $connected}
             {include file='./user/connected.tpl'}
         {else}
             {include file='./user/disconnected.tpl'}
         {/if}
-        <img class="payplugLoader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
+        <img class="{$module_name}Loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
     </div>
 </div>

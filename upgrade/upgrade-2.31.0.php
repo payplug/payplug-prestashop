@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_31_0()
+function upgrade_module_2_31_0($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
@@ -74,8 +74,8 @@ function upgrade_module_2_31_0()
 
     // install table `payplug_order_payment`
     $req_payplug_order_payment = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_order_payment` (
-            `id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_order_payment` (
+            `id_'.$object->name.'_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_order` INT(11) UNSIGNED NOT NULL,
             `id_payment` VARCHAR(255) NOT NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
@@ -88,7 +88,7 @@ function upgrade_module_2_31_0()
 
     try {
         // check if lock exists on id_cart
-        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+        $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . $object->name . '_lock;';
         $res_describe = Db::getInstance()->executeS($req_describe);
         $lock_exists = false;
         if ($res_describe) {
@@ -101,13 +101,13 @@ function upgrade_module_2_31_0()
 
         // check doesn't exist then add it
         if (!$lock_exists) {
-            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . 'payplug_lock`;';
+            $req_truncate = 'TRUNCATE `' . _DB_PREFIX_ . $object->name . '_lock`;';
             $res_truncate = Db::getInstance()->execute($req_truncate);
             if (!$res_truncate) {
                 $flag = false;
             }
             if ($flag) {
-                $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_lock` 
+                $sql = 'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_lock` 
                         ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)';
                 $res_alter = Db::getInstance()->execute($sql);
                 if (!$res_alter) {
@@ -115,7 +115,7 @@ function upgrade_module_2_31_0()
                 }
             }
             if ($flag) {
-                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . 'payplug_lock;';
+                $req_describe = 'DESCRIBE ' . _DB_PREFIX_ . $object->name . '_lock;';
                 $res_describe = Db::getInstance()->executeS($req_describe);
                 if ($res_describe) {
                     foreach ($res_describe as $field) {

@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
 use Configuration;
 use Language;
 use Media;
-use PayPlug\classes\DependenciesClass;
+use PayPlugModule\classes\DependenciesClass;
 use Validate;
 use Tab;
 use Tools;
@@ -50,9 +50,9 @@ class PrestashopSpecific16
 
     public function displayHeader()
     {
-        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/css/front_1_6.css');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/front_1_6.js');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/utilities.js');
 
         Media::addJsDef([
             'payplug_ajax_url' => $this->context->link->getModuleLink('payplug', 'ajax', [], true),
@@ -62,7 +62,7 @@ class PrestashopSpecific16
 
     public function customerAccount()
     {
-        $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
+        $payplug_icon_url = 'modules/' . $this->dependencies->name . '/views/img/logo26.png';
 
         $this->context->smarty->assign([
             'payplug_icon_url' => $payplug_icon_url
@@ -206,7 +206,7 @@ class PrestashopSpecific16
                             $payment_options['standard']['logo'] :
                             $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
-                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
+                        'tpl' => _PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/hook/checkout/payment/' .
                             $payment_option['tpl'],
                         'oney_error' => $payment_option['oney_error'],
                     ];

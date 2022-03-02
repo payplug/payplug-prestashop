@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 class CardClass
 {
@@ -48,11 +48,11 @@ class CardClass
      */
     public function uninstallCards()
     {
-        if ($this->sql->checkExistingTable('payplug_card', 1)) {
+        if ($this->sql->checkExistingTable($this->dependencies->name . '_card', 1)) {
             $cards = $this->query
                 ->select()
                 ->fields('*')
-                ->from($this->constant->get('_DB_PREFIX_') . 'payplug_card')
+                ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
                 ->build();
 
             if ($cards) {

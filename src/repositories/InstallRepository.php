@@ -21,8 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
+use PayPlugModule\classes\ConfigClass;
 use Db;
 
 class InstallRepository extends Repository
@@ -105,7 +106,7 @@ class InstallRepository extends Repository
 
         foreach ($order_states_list as $key => $state) {
             // Check live OrderState
-            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
+            $key_config_live = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_') . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = (int)$this->config->get($key_config_live);
             $order_state_live = $this->order_state_specific->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
@@ -191,17 +192,17 @@ class InstallRepository extends Repository
             $id_order_state = $this->config->get($key);
             $getTypeQuery = ' 
                 SELECT `type` 
-                FROM `' . _DB_PREFIX_ . 'payplug_order_state` 
+                FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
                 WHERE  `id_order_state` = ' . $id_order_state;
             $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
             if ($sqlGetType  && $sqlGetType  != $type) {
                 $payplug_order_states_sql[] = '
-                 UPDATE `' . _DB_PREFIX_ . 'payplug_order_state` 
+                 UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
                  SET `type` = ' . "'$type'" . ' 
                  WHERE  `id_order_state` = ' . $id_order_state;
             } else {
                 $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . 'payplug_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
+            INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
             VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
             }
         }
@@ -221,59 +222,12 @@ class InstallRepository extends Repository
      */
     private function deleteConfig()
     {
-        return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
-            && $this->config->deleteByName('PAYPLUG_BANCONTACT')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ISO')
-            && $this->config->deleteByName('PAYPLUG_CONFIGURATION_OK')
-            && $this->config->deleteByName('PAYPLUG_CURRENCIES')
-            && $this->config->deleteByName('PAYPLUG_DEBUG_MODE')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED_AUTO')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED_STATE')
-            && $this->config->deleteByName('PAYPLUG_EMAIL')
-            && $this->config->deleteByName('PAYPLUG_EMBEDDED_MODE')
-            && $this->config->deleteByName('PAYPLUG_INST')
-            && $this->config->deleteByName('PAYPLUG_INST_MIN_AMOUNT')
-            && $this->config->deleteByName('PAYPLUG_INST_MODE')
-            && $this->config->deleteByName('PAYPLUG_KEEP_CARDS')
-            && $this->config->deleteByName('PAYPLUG_LIVE_API_KEY')
-            && $this->config->deleteByName('PAYPLUG_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_OFFER')
-            && $this->config->deleteByName('PAYPLUG_ONE_CLICK')
-            && $this->config->deleteByName('PAYPLUG_ONEY')
-            && $this->config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && $this->config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_FEES')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_CANCELLED')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_CANCELLED_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
-            && $this->config->deleteByName('PAYPLUG_PUBLISHABLE_KEY')
-            && $this->config->deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST')
-            && $this->config->deleteByName('PAYPLUG_SANDBOX_MODE')
-            && $this->config->deleteByName('PAYPLUG_SHOW')
-            && $this->config->deleteByName('PAYPLUG_STANDARD')
-            && $this->config->deleteByName('PAYPLUG_TEST_API_KEY')
-        );
+        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
+            $this->config->deleteByName(
+                $this->dependencies->getConfigurationKey($key)
+            );
+        };
+        return true;
     }
 
     /**
@@ -338,39 +292,15 @@ class InstallRepository extends Repository
      */
     public function setConfig()
     {
-        return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
-            && $this->config->updateValue('PAYPLUG_BANCONTACT', null)
-            && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
-            && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
-            && $this->config->updateValue('PAYPLUG_COMPANY_ISO', '')
-            && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
-            && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
-            && $this->config->updateValue('PAYPLUG_EMAIL', null)
-            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected')
-            && $this->config->updateValue('PAYPLUG_INST', null)
-            && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
-            && $this->config->updateValue('PAYPLUG_INST_MODE', 3)
-            && $this->config->updateValue('PAYPLUG_KEEP_CARDS', 0)
-            && $this->config->updateValue('PAYPLUG_LIVE_API_KEY', null)
-            && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
-            && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
-            && $this->config->updateValue('PAYPLUG_OFFER', '')
-            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
-            && $this->config->updateValue('PAYPLUG_ONEY', null)
-            && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
-            && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:300000')
-            && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:10000')
-            && $this->config->updateValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS', 'EUR:3000')
-            && $this->config->updateValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS', 'EUR:100')
-            && $this->config->updateValue('PAYPLUG_ONEY_FEES', 1)
-            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
-            && $this->config->updateValue('PAYPLUG_SHOW', 0)
-            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
-            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
-        );
+        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
+            if ($this->dependencies->getConfigurationKeyOption($key, 'setConf')) {
+                $this->config->updateValue(
+                    $this->dependencies->getConfigurationKey($key),
+                    $this->dependencies->getConfigurationKeyOption($key, 'defaultValue')
+                );
+            }
+        };
+        return true;
     }
 
     /**
@@ -404,7 +334,7 @@ class InstallRepository extends Repository
                 'logable' => true,
                 'send_email' => true,
                 'paid' => true,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -423,7 +353,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -442,7 +372,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -461,7 +391,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -480,7 +410,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -499,7 +429,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => true,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -518,7 +448,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -537,7 +467,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,

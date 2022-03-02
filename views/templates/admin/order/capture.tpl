@@ -26,6 +26,6 @@
         <input type="hidden" name="pay_id" value="{$payment.id|escape:'htmlall':'UTF-8'}" />
     {/if}
     <div class="form-group">
-        {include file='./button.tpl' e2e_action='capture' submitName='submitPPCapture' submitValue={l s='Capture' mod='payplug'}}
+        {include file='./button.tpl' e2e_action='capture' submitName='submitPPCapture' submitValue={l s='Capture' mod={$module_name}}}
     </div>
 </form>

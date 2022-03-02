@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_2_26_2()
+function upgrade_module_2_26_2($object)
 {
     //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
@@ -36,8 +36,8 @@ function upgrade_module_2_26_2()
 
     // install table `payplug_logger`
     $sql = '
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_logger` (
-            `id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_logger` (
+            `id_'.$object->name.'_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `process` VARCHAR(255) NOT NULL,
             `content` TEXT NOT NULL,
             `date_add` DATETIME NULL,

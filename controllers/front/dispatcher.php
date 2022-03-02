@@ -37,7 +37,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         if ($method = Tools::getValue('method')) {
-            $dependencies = new \PayPlug\classes\DependenciesClass();
+            $dependencies = new \PayPlugModule\classes\DependenciesClass();
             $paymentClass = $dependencies->paymentClass;
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
@@ -53,7 +53,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 return false;
             }
 
-            $options = \PayPlug\classes\ConfigClass::getAvailableOptions($cart);
+            $options = $dependencies->configClass->getAvailableOptions($cart);
 
             $embedded = $options['embedded'] != 'redirected';
             $error_url = 'index.php?controller=order&step=3&error=1';

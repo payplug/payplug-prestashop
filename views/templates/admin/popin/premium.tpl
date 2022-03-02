@@ -19,17 +19,17 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<p class="payplugPopup_text">
+<p class="{$module_name}Popup_text">
     {assign "premiumLink" "<a href='{$premiumContent.link|escape:'htmlall':'UTF-8'}' target='_blank'>"}
-    {l s='admin.popin.premium.featureUnavailable' mod='payplug'}<br>
+    {l s='admin.popin.premium.featureUnavailable' mod={$module_name}}<br>
     {if 'oneyPremium' == $premiumContent.use}
-        {l s='admin.popin.premium.activateFeatureOney' tags=[$premiumLink] mod='payplug'}
+        {l s='admin.popin.premium.activateFeatureOney' tags=[$premiumLink] mod={$module_name}}
     {elseif 'bancontactPremium' == $premiumContent.use}
-        {l s='admin.popin.premium.activateFeatureBancontact' tags=[$premiumLink] mod='payplug'}
+        {l s='admin.popin.premium.activateFeatureBancontact' tags=[$premiumLink] mod={$module_name}}
     {else}
-        {l s='admin.popin.premium.activateFeature' tags=[$premiumLink] mod='payplug'}
+        {l s='admin.popin.premium.activateFeature' tags=[$premiumLink] mod={$module_name}}
     {/if}
 </p>
-<div class="payplugPopup_footer -center">
-    <button type="button" class="payplugButton -green -close">{l s='admin.popin.premium.ok' mod='payplug'}</button>
+<div class="{$module_name}Popup_footer -center">
+    <button type="button" class="{$module_name}Button -green -close">{l s='admin.popin.premium.ok' mod={$module_name}}</button>
 </div>

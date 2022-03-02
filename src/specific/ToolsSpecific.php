@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\ToolsInterface;
+use PayPlugModule\src\interfaces\ToolsInterface;
 use Tools;
 
 class ToolsSpecific implements ToolsInterface
