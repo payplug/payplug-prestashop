@@ -762,6 +762,7 @@ class PayPlugNotifications
         // Add prestashop OrderPayment if need
         $this->logger->addLog('Has order payments ' . ($order_payments ? 'ok' : 'ko'));
         if (!$order_payments) {
+            $this->logger->addLog('Create new order payment');
             $this->order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
         }
 
