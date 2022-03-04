@@ -707,7 +707,7 @@ class HookClass
     public function displayBackOfficeFooter()
     {
         if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->payplug->assignContentVar();
+            $this->payplug->configClass->assignContentVar();
             $this->assign->assign([
                 'js_def' => Media::getJsDef(),
             ]);
