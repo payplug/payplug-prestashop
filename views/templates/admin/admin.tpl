@@ -73,4 +73,7 @@
 
     <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/title.css">
     {include file='./../components/atoms/title/title_stories.tpl'}
+
+    <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/paragraph.css">
+    {include file='./../components/atoms/paragraph/paragraph_stories.tpl'}
 </div>
