@@ -269,16 +269,6 @@ class PayPlugValidation
                     }
                 }
 
-                if ($this->isBancontact && !$is_paid) {
-                    $this->payplug->setPaymentErrorsCookie([
-                        $this->payplug->l(
-                            'The transaction was not completed and your card was not charged.',
-                            'payplugvalidation'
-                        )
-                    ]);
-                    Tools::redirect($redirect_url_error);
-                }
-
                 $amount = $payment->amount;
             } catch (Exception $e) {
                 $this->logger->addLog('Payment cannot be retrieved. Exception : '.$e->getMessage(), 'error');
