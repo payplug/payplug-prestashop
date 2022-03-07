@@ -80,3 +80,6 @@
     <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/link.css">
     {include file='./../components/atoms/link/link_stories.tpl'}
 </div>
+
+<link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/block.css">
+{include file='./../components/atoms/block/block_stories.tpl'}

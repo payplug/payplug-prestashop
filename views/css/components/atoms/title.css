@@ -29,6 +29,13 @@
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Me5Q.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
   font-weight: 700;
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/roboto/v29/KFOlCnqEu92Fr1MmWUlvAw.ttf) format('truetype');
@@ -54,7 +61,7 @@
   font-size: 14px;
   font-weight: 700;
   color: #363A41;
-  line-height: calc(20em 14);
+  line-height: calc(20em/14);
   margin: 0 0 calc(8em/14);
 }
 .payplugUITitle.-disabled {
