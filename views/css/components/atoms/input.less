@@ -1,89 +1,95 @@
 @import "../../less/include";
 
-.payplugUIInput {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 
-  label {
-    .Roboto(14px, 700);
-    line-height: 20px;
-    margin: 0 0 4px;
-  }
-  input {
-    &[type=text],
-    &[type=password] {
-      .border(#colorMap[borderMain]);
-      border-radius: 4px;
+.bootstrap {
+  .payplugUIInput {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 
-      width: 100%;
-      height: 36px;
-      padding: 8px 12px;
+    label {
+      .Roboto(14px, 700);
+      line-height: 20px;
+      margin: 0 0 4px;
+    }
 
-      background: inherit;
-      cursor: pointer;
+    input {
+      &[type=text],
+      &[type=password] {
+        .border(#colorMap[borderMain]);
+        border-radius: 4px;
 
-      &::placeholder {
-        color: fade(#colorMap[fontMainDefault], 80%);
-        opacity: 1;
-      }
+        width: 100%;
+        height: 36px;
+        padding: 8px 12px;
 
-      &:focus,
-      &:hover {
-        border-color: #colorMap[purple];
-      }
-
-      &:focus {
         background: inherit;
-      }
+        cursor: pointer;
 
-      &:disabled {
-        background: #colorMap[grey];
         &::placeholder {
-          color: #colorMap[fontMainDisabled];
+          color: fade(#colorMap[fontMainDefault], 80%);
           opacity: 1;
         }
+
+        &:focus,
         &:hover {
-          border-color: #colorMap[borderMain];
+          border-color: #colorMap[purple];
+        }
+
+        &:focus {
+          background: inherit;
+        }
+
+        &:disabled {
+          background: #colorMap[grey];
+
+          &::placeholder {
+            color: #colorMap[fontMainDisabled];
+            opacity: 1;
+          }
+
+          &:hover {
+            border-color: #colorMap[borderMain];
+          }
         }
       }
     }
-  }
 
-  &.-focus,
-  &.-hover {
-    input {
-      &[type=text],
-      &[type=password] {
-        border-color: #colorMap[purple];
+    &.-focus,
+    &.-hover {
+      input {
+        &[type=text],
+        &[type=password] {
+          border-color: #colorMap[purple];
+        }
       }
     }
-  }
 
-  &.-error {
-    input {
-      &[type=text],
-      &[type=password] {
-        border-color: #colorMap[red];
+    &.-error {
+      input {
+        &[type=text],
+        &[type=password] {
+          border-color: #colorMap[red];
+        }
       }
     }
-  }
 
-  //&.-disabled {
-  //  input {
-  //    &[type=text],
-  //    &[type=password] {
-  //      cursor: default;
-  //      background: #colorMap[grey];
-  //
-  //      &::placeholder {
-  //        color: #colorMap[fontMainDisabled];
-  //        opacity: 1;
-  //      }
-  //      &:hover {
-  //        border-color: #colorMap[borderMain];
-  //      }
-  //    }
-  //  }
-  //}
+    //&.-disabled {
+    //  input {
+    //    &[type=text],
+    //    &[type=password] {
+    //      cursor: default;
+    //      background: #colorMap[grey];
+    //
+    //      &::placeholder {
+    //        color: #colorMap[fontMainDisabled];
+    //        opacity: 1;
+    //      }
+    //      &:hover {
+    //        border-color: #colorMap[borderMain];
+    //      }
+    //    }
+    //  }
+    //}
+  }
 }

@@ -1,0 +1,26 @@
+@import "../../less/include";
+
+.bootstrap {
+  .payplugUILink {
+    @size: 14;
+    .Roboto(~"@{size}px", 400);
+    display: flex;
+    text-decoration: none;
+    color: #colorMap[purple];
+    line-height: calc(20em / ~"@{size}");
+    margin: 0 0 calc(8em / ~"@{size}");
+    letter-spacing: 0.25px;
+
+    &:hover,
+    &.-hover {
+      color: darken(#colorMap[purple], 10.5%);
+      text-decoration: none;
+    }
+
+    &.-disabled {
+      opacity: .3;
+      cursor: default;
+      color: #colorMap[purple];
+    }
+  }
+}

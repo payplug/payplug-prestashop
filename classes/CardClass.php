@@ -58,7 +58,7 @@ class CardClass
             if ($cards) {
                 foreach ($cards as $card) {
                     $id_customer = $card['id_customer'];
-                    $id_payplug_card = $card['id_' . $this->dependencies->name . '_card'];
+                    $id_payplug_card = $card['id_payplug_card'];
                     if (!$this->card->deleteCard((int)$id_customer, (int)$id_payplug_card)) {
                         return false;
                     }
