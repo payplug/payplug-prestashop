@@ -24,6 +24,11 @@ views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
 views/js/components.js
 dev/ci/translations.csv
+dev/css/components/atoms/*.map
+dev/css/components/atoms/*.css
+views/js/components/atoms/components.js.LICENSE.txt
+dev/css/*.css
+dev/css/*.map
 features.json
 features_bnpl.json
 html/
