@@ -214,12 +214,12 @@ class PrestashopSpecific16
                         'payment_controller_url' => $payment_option['payment_controller_url'],
                     ]);
                 }
-
-                // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
-                if ($oneyOptimized && $payment_method == 'oney') {
-                    break;
-                }
             }
+        }
+
+        // Pour qu'il n'y ait qu'Oney avec échéancier 3x 4x
+        if ($oneyOptimized) {
+            unset($paymentOptions['oney-oney4x']);
         }
 
         return $paymentOptions;
