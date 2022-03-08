@@ -128,5 +128,6 @@ module.exports = {
         ],
     },
     optimization: optimization,
-    plugins: plugins
+    plugins: plugins,
+    watch: true
 };
