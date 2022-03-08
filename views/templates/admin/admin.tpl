@@ -55,9 +55,15 @@
         </span>
     </p>
     {include file='./panel/show.tpl'}
-    {include file='./panel/login.tpl'}
+
+    <prestashop-accounts>
+        {* your module template goes here *}
+        {include file='./panel/login.tpl'}
+    </prestashop-accounts>
+
     {include file='./panel/settings.tpl'}
 </form>
+
 
 <div class="panel payplugUIComponent">
     <p>New UI component</p>
@@ -77,3 +83,18 @@
     <link rel="stylesheet" href="/modules/payplug/views/css/components/atoms/paragraph.css">
     {include file='./../components/atoms/paragraph/paragraph_stories.tpl'}
 </div>
+
+
+<script type="text/javascript">
+    {literal}
+        // todo: Set custom language iso code
+        // window.iso_user = 'en';
+    {/literal}
+</script>
+
+{if isset($urlAccountsCdn) && $urlAccountsCdn}
+    <link href="{$urlAccountsCdn|escape:'htmlall':'UTF-8'}" rel=preload as=script>
+    <script src="{$urlAccountsCdn|escape:'htmlall':'UTF-8'}" type="text/javascript"></script>
+{/if}
+
+<script type="text/javascript" src="/modules/payplug/views/js/components/atoms/components.js"></script>

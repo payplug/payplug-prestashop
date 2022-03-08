@@ -28,7 +28,8 @@
     "style-loader": "^3.3.1",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1",
-    "webpack-fix-style-only-entries": "^0.6.1"
+    "webpack-fix-style-only-entries": "^0.6.1",
+    "prestashop_accounts_vue_components": "^4.0.0"
   },
   "dependencies": {
     "webpack-remove-empty-scripts": "^0.8.0-alpha"

@@ -30,9 +30,15 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
+// todo: bnpl.php
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException;
+
 class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
+
+    private $container;
 
     /**z
      * Constructor
@@ -63,6 +69,14 @@ class Payplug extends PaymentModule
             $this->setDependencies();
             $this->setModule();
         }
+
+        // todo: report service installation to bnpl.php
+        if ($this->container === null) {
+            $this->container = new \PrestaShop\ModuleLibServiceContainer\DependencyInjection\ServiceContainer(
+                $this->name,
+                $this->getLocalPath()
+            );
+        }
     }
 
     /**
@@ -87,6 +101,35 @@ class Payplug extends PaymentModule
         if ($this->module) {
             if (!$this->isValidInstallation()) {
                 $this->install(true);
+            }
+
+            // todo: move to bnpl.php
+            try {
+                // Install service if not done
+                $this->getService('ps_accounts.installer')->install();
+
+                // Account
+                $accountsFacade = $this->getService('ps_accounts.facade');
+                $accountsService = $accountsFacade->getPsAccountsService();
+                $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->name);
+
+                // todo: update modal language
+                $contextPsAccounts['accountsUiUrl'] = str_replace('/en', '/fr', $contextPsAccounts['accountsUiUrl']);
+
+                Media::addJsDef([
+                    'contextPsAccounts' => $contextPsAccounts,
+                ]);
+
+                // Retrieve Account CDN
+                $this->context->smarty->assign('urlAccountsCdn', $accountsService->getAccountsCdn());
+            } catch (ModuleNotInstalledException $e) {
+                // You handle exception here
+                dump($e->getMessage());
+                die(dump(__LINE__));
+            } catch (ModuleVersionException $e) {
+                // You handle exception here
+                dump($e->getMessage());
+                die(dump(__LINE__));
             }
 
             return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
@@ -426,10 +469,28 @@ class Payplug extends PaymentModule
                 }
             }
 
+            // todo: report service installation to bnpl.php
+            if ($flag) {
+                $this->getService('ps_accounts.installer')->install();
+            }
+
             return $flag;
         }
 
         return parent::install();
+    }
+
+    /**
+     * Retrieve service
+     *
+     * todo: report service installation to bnpl.php
+     * @param string $serviceName
+     *
+     * @return mixed
+     */
+    public function getService($serviceName)
+    {
+        return $this->container->getService($serviceName);
     }
 
     /**
