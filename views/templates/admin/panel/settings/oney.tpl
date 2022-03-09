@@ -27,7 +27,7 @@
     <div class="{$module_name}Panel">
         <div class="{$module_name}Panel_content">
             <p>
-                {l s='Allow customers to spread out payments over 3 or 4 installments from %d € to %d €.' mod={$module_name} sprintf=[$oney_min_amounts, $oney_max_amounts]}
+                {l s='Allow customers to spread out payments over 3 or 4 installments from %d € to %d €.'  sprintf=[$oney_min_amounts, $oney_max_amounts] mod={$module_name}}
                 <a class="{$module_name}Link" href="{$faq_links.oney|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='Learn more.' mod={$module_name}}</a>
             </p>
             <div class="{$module_name}Tips -{$payplug_switch.oney.name|escape:'htmlall':'UTF-8'}">
