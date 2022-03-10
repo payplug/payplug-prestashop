@@ -34,9 +34,9 @@ for file in $distFile
 
 echo -n "Copy var.less "
   if [ -d "$modules" ]; then
-    cp -v $path/var.less $PWD/${modules}/views/css/less/var.less
+    cp -v $path/var.less $PWD/${modules}/dev/css/less/var.less
   else
-    cp -v $path/var.less $PWD/views/css/less/var.less
+    cp -v $path/var.less $PWD/dev/css/less/var.less
   fi
 
 
