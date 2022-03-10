@@ -26,8 +26,10 @@ namespace PayPlug\classes;
 use Configuration;
 use OrderHistory;
 use OrderState;
+use Order;
 use PayPlug\backward\PayPlugBackward;
 use PayPlug\src\specific\ContextSpecific;
+use PayPlug\classes\PayPlugClass;
 use Tools;
 use Validate;
 
@@ -261,7 +263,8 @@ class AdminClass extends \Payplug
         }
         if ((int)Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
-            $payment = $this->apiClass->retrievePayment($pay_id);
+            $payplug = new PayPlugClass();
+            $payment = $payplug->retrievePayment($pay_id);
             $id_order = Tools::getValue('id_order');
 
             if ((int)$payment->is_paid == 1) {

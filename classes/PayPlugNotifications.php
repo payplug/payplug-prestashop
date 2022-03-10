@@ -97,7 +97,7 @@ class PayPlugNotifications
      */
     private function checkIsValidPaymentResource()
     {
-        if (!$this->payment->is_paid && !$this->is_deferred) {
+        if (!$this->payment->is_paid && !$this->is_deferred && !$this->is_bancontact) {
             $this->logger->addLog('The transaction is not paid yet.');
             $this->logger->addLog('No action will be done.');
             $this->exitProcess('The transaction is not paid.');
@@ -762,6 +762,7 @@ class PayPlugNotifications
         // Add prestashop OrderPayment if need
         $this->logger->addLog('Has order payments ' . ($order_payments ? 'ok' : 'ko'));
         if (!$order_payments) {
+            $this->logger->addLog('Create new order payment');
             $this->order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
         }
 

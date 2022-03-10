@@ -29,6 +29,7 @@ use DateInterval;
 use DateTime;
 use ObjectModel;
 use Validate;
+use PrestaShopDatabaseException;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -253,6 +254,8 @@ class PayplugLock extends ObjectModel
         // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
         try {
             $res_lock = Db::getInstance()->execute($req_lock);
+        } catch (PrestaShopDatabaseException $e) {
+            $res_lock = false;
         } catch (Exception $e) {
             $res_lock = false;
         }

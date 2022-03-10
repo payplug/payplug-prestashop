@@ -531,7 +531,7 @@ class HookClass
                     $pay_error = '';
                 }
                 $display_refund = false;
-                if ($current_state != 0 && $current_state == $id_pending_order_state) {
+                if ($current_state != 0 && $current_state == $id_pending_order_state && !$is_bancontact) {
                     $show_menu_update = true;
                 }
             } elseif ((((int)$payment->amount_refunded > 0)
@@ -707,7 +707,7 @@ class HookClass
     public function displayBackOfficeFooter()
     {
         if (version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->payplug->assignContentVar();
+            $this->payplug->configClass->assignContentVar();
             $this->assign->assign([
                 'js_def' => Media::getJsDef(),
             ]);

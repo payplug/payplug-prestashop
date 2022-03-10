@@ -165,7 +165,7 @@ class PayPlugClass extends PaymentModule
             'module_name' => 'payplug',
             'hidden' => false,
             'delivery' => false,
-            'invoice' => true,
+            'invoice' => false,
             'color' => '#a1f8a1',
             'name' => [
                 'en' => 'Payment in progress',
