@@ -23,16 +23,64 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
+const fs = require('fs');
 
+const dir_path = 'dev';
+const cssViewsFolder = 'css';
+const cssComponentsFolder = 'css/components';
+const jsComponentsFolder = 'js/components/atoms';
 
-const css_path = 'views/css';
-const lessFiles = ['front', 'front_1_6', 'admin', 'admin_order'];
+const dirJsFinalPath = 'views/js/';
+const dirViewsFinalPath = 'views/';
 
 let entryFiles = {};
-lessFiles.map((file) => {
-    entryFiles[file] = path.resolve(__dirname, css_path + '/' + file + '.less');
-});
+
+function _getAllFilesFromFolder(dir) {
+    if (!fs.existsSync(dir_path + '/' + dir)) {
+        return;
+    }
+
+    fs.readdirSync(dir_path + '/' + dir).forEach(function(file) {
+        var wpFile = '../' + dirViewsFinalPath + dir + '/' + path.parse(file).name;
+        file = dir_path + '/' + dir + '/' + file;
+
+        // compilation des fichiers .less
+        if (path.extname(file).toLowerCase() == '.less') {
+            var stat = fs.statSync(file);
+
+            if (stat && stat.isDirectory()) {
+                _getAllFilesFromFolder(file);
+            } else {
+                entryFiles[wpFile] = path.resolve(__dirname, file);
+            }
+        }
+
+        // compilation des fichiers .js
+        if (path.extname(file).toLowerCase() == '.js') {
+            var stat = fs.statSync(file);
+
+            if (stat && stat.isDirectory()) {
+                _getAllFilesFromFolder(file);
+            } else {
+                switch (dir) {
+                    // compilation des fichiers "components" .js
+                    case jsComponentsFolder:
+                        if (typeof entryFiles['../' + dirJsFinalPath + 'components'] == 'undefined') {
+                            entryFiles['../' + dirJsFinalPath + 'components'] = [];
+                        }
+
+                        entryFiles['../' + dirJsFinalPath + 'components'].push(path.resolve(__dirname, file));
+                        break;
+                }
+            }
+        }
+    });
+};
+_getAllFilesFromFolder(cssViewsFolder);
+// _getAllFilesFromFolder(cssComponentsFolder);
+_getAllFilesFromFolder(jsComponentsFolder);
 
 const loaders = [
     MiniCssExtractPlugin.loader,
@@ -54,7 +102,8 @@ const loaders = [
 ];
 const optimization = {
     minimizer: [
-        new CssMinimizerPlugin(),
+        // new CssMinimizerPlugin(), // todo: uncomment for prod compilation
+        new TerserPlugin(),
     ],
     minimize: true,
 };
@@ -65,18 +114,21 @@ const plugins = [
         chunkFilename: '[id].css'
     })
 ];
-
 module.exports = {
     mode: 'production',
     entry: entryFiles,
     output: {
-        path: path.resolve(__dirname, css_path)
+        path: path.resolve(__dirname, dir_path)
     },
     module: {
         rules: [
             {
                 test: /\.less$/,
                 use: loaders,
+            },
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
             },
         ],
     },

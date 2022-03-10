@@ -23,7 +23,6 @@
 
 namespace PayPlugModule\classes;
 
-use Configuration;
 use OrderHistory;
 use OrderState;
 use PayPlugModule\backward\PayPlugBackward;
@@ -64,6 +63,7 @@ class AdminClass
             $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
         }
+
         return $admin_ajax_url;
     }
 
@@ -82,7 +82,7 @@ class AdminClass
         $admin_url = $context->link->getAdminLink($controller_name);
         if (!empty($params)) {
             foreach ($params as $key => $value) {
-                $admin_url .= '&' . $key . (empty($value) ? '' : '='.$value);
+                $admin_url .= '&' . $key . (empty($value) ? '' : '=' . $value);
             }
         }
 
@@ -103,6 +103,10 @@ class AdminClass
         $this->dependencies->configClass->postProcess();
 
         $this->dependencies->configClass->assignContentVar();
+
+        if ($this->dependencies->getPlugin()->getTools()->tool('getValue', 'show_components')) {
+            return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/components.tpl');
+        }
 
         $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
@@ -136,9 +140,9 @@ class AdminClass
                 $args = [];
                 foreach ($keys as $key) {
                     if ($key !== 'embedded') {
-                        $args[$key] = (int)Tools::getValue($key);
+                        $args[$key] = (int) Tools::getValue($key);
                     } else {
-                        $args[$key] = (string)Tools::getValue($key);
+                        $args[$key] = (string) Tools::getValue($key);
                     }
                 }
             }
@@ -201,7 +205,7 @@ class AdminClass
                 $api_key = $this->config->get(
                     $this->dependencies->getConfigurationKey('liveApiKey')
                 );
-                if ((bool)$api_key) {
+                if ((bool) $api_key) {
                     $this->config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
                     $this->dependencies->configClass->assignContentVar();
                     $content = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
@@ -227,15 +231,15 @@ class AdminClass
         if (Tools::getValue('submit') == 'submitPopin_abort') {
             $this->dependencies->paymentClass->abortPayment();
         }
-        if ((int)Tools::getValue('check') == 1) {
+        if ((int) Tools::getValue('check') == 1) {
             $content = $this->dependencies->configClass->getCheckFieldset();
             die(json_encode(['content' => $content]));
         }
-        if ((int)Tools::getValue('log') == 1) {
+        if ((int) Tools::getValue('log') == 1) {
             $content = $this->getLogin();
             die(json_encode(['content' => $content]));
         }
-        if ((int)Tools::getValue('checkPremium') == 1) {
+        if ((int) Tools::getValue('checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
             $return = [
@@ -251,50 +255,50 @@ class AdminClass
         if (Tools::getValue('has_live_key')) {
             die(json_encode(['result' => $this->dependencies->apiClass->hasLiveKey()]));
         }
-        if ((int)Tools::getValue('refund') == 1) {
+        if ((int) Tools::getValue('refund') == 1) {
             $this->dependencies->refundClass->refundPayment();
         }
-        if ((int)Tools::getValue('capture') == 1) {
+        if ((int) Tools::getValue('capture') == 1) {
             $this->dependencies->paymentClass->capturePayment();
         }
-        if ((int)Tools::getValue('popinRefund') == 1) {
+        if ((int) Tools::getValue('popinRefund') == 1) {
             $popin = $this->dependencies->mediaClass->displayPopin('refund');
             die(json_encode(['content' => $popin]));
         }
-        if ((int)Tools::getValue('update') == 1) {
+        if ((int) Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
             $payment = $this->dependencies->paymentClass->retrievePayment($pay_id);
             $id_order = Tools::getValue('id_order');
 
-            if ((int)$payment->is_paid == 1) {
+            if ((int) $payment->is_paid == 1) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int)$this->config->get(
+                    $new_state = (int) $this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID')
                     );
                 } else {
-                    $new_state = (int)$this->config->get(
+                    $new_state = (int) $this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID_TEST')
                     );
                 }
-            } elseif ((int)$payment->is_paid == 0) {
+            } elseif ((int) $payment->is_paid == 0) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int)$this->config->get(
+                    $new_state = (int) $this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR')
                     );
                 } else {
-                    $new_state = (int)$this->config->get(
+                    $new_state = (int) $this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR_TEST')
                     );
                 }
             }
 
-            $order = new Order((int)$id_order);
+            $order = new Order((int) $id_order);
             if (Validate::isLoadedObject($order)) {
-                $current_state = (int)$order->getCurrentState();
+                $current_state = (int) $order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
                     $history = new OrderHistory();
-                    $history->id_order = (int)$order->id;
-                    $history->changeIdOrderState($new_state, (int)$order->id);
+                    $history->id_order = (int) $order->id;
+                    $history->changeIdOrderState($new_state, (int) $order->id);
                     $history->addWithemail();
                 }
             }
