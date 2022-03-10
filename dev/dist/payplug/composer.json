@@ -54,10 +54,12 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "./dev/ci/composer.sh"
+            "./dev/ci/composer.sh",
+            "npm install"
         ],
         "post-update-cmd": [
-            "./dev/ci/composer.sh"
+            "./dev/ci/composer.sh",
+            "npm install"
         ],
         "install-dev": [
             "./dev/ci/composer_dev.sh"

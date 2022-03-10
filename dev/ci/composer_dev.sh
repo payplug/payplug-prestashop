@@ -20,3 +20,9 @@ fi;
 
 # Generate optimized classes
 composer dump-autoload -o;
+
+# Install webpack
+echo "installing webpack"
+nvm install
+npm install --save-dev webpack
+npm install --save-dev webpack-cli

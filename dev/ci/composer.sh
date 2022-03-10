@@ -13,3 +13,9 @@ grep -rl 'libphonenumber' ./vendor/giggsey/libphonenumberlight/ | xargs sed -i '
 
 # Generate optimized classes
 composer dump-autoload -o;
+
+# Install webpack
+echo "installing webpack"
+nvm install
+npm install --save-dev webpack
+npm install --save-dev webpack-cli

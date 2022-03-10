@@ -36,9 +36,9 @@ const jsMoleculesFolder = 'js/components/molecules';
 const dirJsFinalPath = 'views/js/';
 const dirViewsFinalPath = 'views/';
 
-const congifuration = require('./composer.json');
-const moduleVersion = congifuration.version;
-const moduleName = congifuration.moduleName;
+const configuration = require('./composer.json');
+const moduleVersion = configuration.version;
+const moduleName = configuration.moduleName;
 
 let entryFiles = {};
 
