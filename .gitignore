@@ -11,7 +11,9 @@ features.json
 vendor/
 views/css/*.css
 views/css/*.map
-views/css/less/var.less
+dev/css/less/var.less
+views/css/components/atoms/*.css
+views/css/components/atoms/*.map
 views/css/less/*.css
 views/css/less/*.map
 views/css/less/*/*.css
@@ -20,6 +22,7 @@ views/css/less/*/*/*.css
 views/css/less/*/*/*.map
 views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
+views/js/components.js
 dev/ci/translations.csv
 html/
 phpunit.log

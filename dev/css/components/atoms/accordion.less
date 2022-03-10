@@ -1,0 +1,71 @@
+@import "../../less/include";
+
+.payplugUIAccordion {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  .border(#colorMap[border]);
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+
+  input {
+    display: none;
+
+    &:checked {
+      ~ label {
+        &:after {
+          .transform(translateY(-50%) rotate(-180deg));
+        }
+      }
+
+      ~ div {
+        max-height: 100vh;
+      }
+    }
+  }
+
+  label {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 30px 72px 30px 24px;
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 20px;
+    color: #colorMap[purple];
+
+    cursor: pointer;
+
+    &:after {
+      .transition(~"transform @{dur}");
+      .transform(translateY(-50%));
+
+      position: absolute;
+      top: 50%;
+      left: calc(100% - 48px);
+
+      display: block;
+      width: 12px;
+      height: 8px;
+
+      content: "";
+      background-size: 100%;
+      background-image: url(~"@{img_icons}keyboard_arrow_down_24px.svg");
+    }
+  }
+
+  &_content {
+    &Wrapper {
+      padding: 0 24px;
+      max-height: 0;
+      overflow: hidden;
+      transition: all .35s;
+    }
+
+    padding: 0 0 30px;
+  }
+}
