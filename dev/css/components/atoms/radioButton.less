@@ -1,0 +1,60 @@
+@import "../../less/include";
+.payplugUIIRadioButton{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  margin:20px 0;
+
+  label {
+    div {
+      .transition(~"background-color @{dur}, color @{dur}");
+      margin: 10px;
+      padding: 10px 40px 10px 10pX;
+      border: 1px solid #D7D8D9;
+      border-radius: 4px;
+      background-color: #colorMap[radioButtonBackroundColor];
+      cursor: pointer;
+      font-weight: normal;
+      font-size: 14px;
+
+      p {
+        font-size: 12px;
+        margin-bottom: 0;
+      }
+
+      &:hover,
+      &.-hover {
+
+        background: #colorMap[radioButtonBackground];
+      }
+      &[hover="hover"] {
+        background: #colorMap[radioButtonBackground];
+      }
+
+      &[disabled="disabled"] {
+        background: #colorMap[radioButtonDisabled];
+        cursor: not-allowed;
+      }
+
+    }
+
+    input[type="radio"] {
+      display:none;
+      &:checked {
+        ~ div {
+          background: #colorMap[radioButtonBackground] url(~"@{img_icons}check_24px.svg") no-repeat top 15px right 13px;
+          color:#colorMap[purple];
+          p {
+           color:#colorMap[iris];
+          }
+        }
+      }
+    }
+
+    &[hover="hover"] {
+      background: #colorMap[radioButtonBackground];
+
+    }
+  }
+
+}
