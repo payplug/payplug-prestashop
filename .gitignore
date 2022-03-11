@@ -24,5 +24,7 @@ views/css/less/*/*/*/*.css
 views/css/less/*/*/*/*.map
 views/js/components.js
 dev/ci/translations.csv
+features.json
+features_bnpl.json
 html/
 phpunit.log
