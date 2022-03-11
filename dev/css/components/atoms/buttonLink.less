@@ -1,0 +1,69 @@
+@import "../../less/include";
+@import "button";
+//
+.payplugUIButtonLink {
+  .payplugUIButton ();
+
+  text-decoration: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px 20px;
+
+  &:hover,
+  &.-hover {
+    color: #colorMap[white];
+    text-decoration: none;
+  }
+  &:visited, &:active, &:link {
+    color: #colorMap[white];
+  }
+
+  &.-icon {
+    padding-left: 15px;
+
+    .buttonIcon {
+      fill: #colorMap[white];
+      margin-top: 5px;
+      margin-right: 5px;
+      transition: all @dur;
+    }
+  }
+  // secondary
+  &.-secondary {
+    color: #colorMap[purple];
+    vertical-align: middle;
+
+    &.-icon {
+      .buttonIcon {
+        fill: #colorMap[purple];
+      }
+    }
+
+    &:hover,
+    &.-hover {
+      color: #colorMap[white];
+      &.-icon {
+        .buttonIcon {
+          fill: #colorMap[white];
+        }
+      }
+    }
+    &.-disabled {
+      color: #colorMap[purple];
+    }
+  }
+
+  // tertiary
+  &.-tertiary {
+    color: #colorMap[fontMainDefault];
+    &.-icon {
+      .buttonIcon {
+        fill: #colorMap[fontMainDefault];
+      }
+    }
+    &:hover,
+    &.-hover {
+      color: #colorMap[fontMainDefault];
+    }
+  }
+}

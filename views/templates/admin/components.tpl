@@ -44,4 +44,7 @@
 
     {* block stories *}
     {include file='./../components/atoms/block/block_stories.tpl'}
+
+    {* buttonLink stories *}
+    {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
 </div>
