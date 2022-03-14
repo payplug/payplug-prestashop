@@ -1,0 +1,87 @@
+@import "../../less/include";
+
+input[type="checkbox"] {
+  display:none;
+  &:checked~.payplugUIModal, &:checked~.modal-background {
+    display: block;
+  }
+
+}
+.modal-background {
+  background-color: rgba(0,0,0,0.5);
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9998;
+}
+
+
+.payplugUIModal {
+  background-color: #colorMap[white];
+  bottom: 0;
+  box-sizing: border-box;
+  display: none;
+  height: max-content;
+  left: 0;
+  margin: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 500px;
+  z-index: 9999;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  &_header{
+    border-bottom: 1px solid  #dddddd;
+    box-sizing: border-box;
+    height: 50px;
+    .modal-title {
+      //background-color: red !important;
+      position: absolute;
+      @size: 14;
+      .Roboto(~"@{size}px", 700);
+      box-sizing: border-box;
+      color: #363A41;
+      display: inline-block;
+      margin: 0;
+      padding: 15px;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0.25px;
+
+    }
+    .modal-close {
+      &.-icon {
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        &:hover {
+          opacity:0.6;
+        }
+        ~:after {
+          display:none;
+        }
+      }
+    }
+  }
+  &_body {
+    margin: 10px;
+  }
+
+
+}
+.modal-label {
+  background-color: #colorMap[purple];
+  box-sizing: border-box;
+  color: #colorMap[lightGray];
+  cursor: pointer;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px;
+
+}

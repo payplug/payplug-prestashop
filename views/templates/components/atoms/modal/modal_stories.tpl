@@ -1,0 +1,57 @@
+{*
+* 2022 PayPlug
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0).
+* It is available through the world-wide-web at this URL:
+* https://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please send an email
+* to contact@payplug.com so we can send you a copy immediately.
+*
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+*
+*  @author PayPlug SAS
+*  @copyright 2022 PayPlug SAS
+*  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*  International Registered Trademark & Property of PayPlug SAS
+*}
+
+<h2>Modal component</h2>
+{capture assign="modalContent"}
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+{/capture}
+<section>
+    <h3>Default</h3>
+    <div>
+        <label style="text-align:center"></label>
+        <input type="checkbox" id="modal">
+        <label for="modal" class="modal-label">Open Modal</label>
+        <label for="modal"></label>
+        {include file='./modal.tpl'
+        content=$modalContent
+        dataName='modalData'
+        title='Modal Title'
+        }
+    </div>
+</section>
+
+<section>
+    props:
+    <ul>
+        <li>title: string</li>
+        <li>data-e2e:string</li>
+        <li>className: string</li>
+        <li>content</li>
+    </ul>
+</section>
+<section>
+    state :
+    <ul>
+        <li>default</li>
+        <li>open</li>
+    </ul>
+</section>
