@@ -53,4 +53,8 @@
 
     {* tooltip stories *}
     {include file='./../components/molecules/tooltip/tooltip_stories.tpl'}
+
+    {* Modal stories *}
+    {include file='./../components/atoms/modal/modal_stories.tpl'}
+
 </div>
