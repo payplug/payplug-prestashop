@@ -47,6 +47,10 @@
 
     {* buttonLink stories *}
     {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
+
     {* Radio Button stories *}
     {include file='./../components/atoms/radio_button/radioButton_stories.tpl'}
+
+    {* tooltip stories *}
+    {include file='./../components/molecules/tooltip/tooltip_stories.tpl'}
 </div>

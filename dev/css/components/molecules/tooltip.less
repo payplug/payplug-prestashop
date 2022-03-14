@@ -1,0 +1,35 @@
+@import "../../less/include";
+
+.payplugUITooltip {
+  position: relative;
+
+  input[type="checkbox"] {
+      display:none;
+  }
+
+  input[type="checkbox"]:checked ~ .tooltip-modal{
+      display: block;
+  }
+
+  .tooltip-modal {
+      position: absolute;
+      top: 5px;
+      left: 20px;
+      margin: auto;
+      display: none;
+      background-color: #fff;
+      box-sizing: border-box;
+      z-index: 9999;
+      padding: 8px;
+      border-radius: 4px;
+
+    .tooltip-modal-content {
+      border-radius: 4px;
+      padding: 5px 10px;
+
+      &:hover {
+        background: #E9E6F8;
+      }
+    }
+  }
+}
