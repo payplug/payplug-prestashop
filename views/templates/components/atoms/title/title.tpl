@@ -21,6 +21,7 @@
 *}
 
 <div class="payplugUITitle
+    {if isset($titleClassName) && $titleClassName} {$titleClassName|escape:'htmlall':'UTF-8'}{/if}
     {if isset($titleDisabled) && $titleDisabled} -disabled{/if}">
     {$titleText|escape:'htmlall':'UTF-8'}
 </div>

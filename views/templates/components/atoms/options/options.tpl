@@ -19,18 +19,19 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugUIIRadioButton">
+<div class="payplugUIIOptions
+    {if isset($optionsClassName) && $optionsClassName} {$optionsClassName|escape:'htmlall':'UTF-8'}{/if}">
     {foreach $items as $item}
         <label>
-            <input {if isset($item.className) && $item.className} class="payplugUIIRadioButton {$item.className|escape:'htmlall':'UTF-8'}"{/if}
-                    type="radio" name={$radioButtonName|escape:'htmlall':'UTF-8'}
+            <input {if isset($item.className) && $item.className} class="payplugUIIOptions {$item.className|escape:'htmlall':'UTF-8'}"{/if}
+                    type="radio" name={$optionsName|escape:'htmlall':'UTF-8'}
                     {if isset($item.dataName) && $item.dataName} data-e2e-name="{$item.dataName|escape:'htmlall':'UTF-8'}"{/if}
                     value="{$item.value|escape:'htmlall':'UTF-8'}"
-                    {if isset($radioButtonSelected) && isset($item.value) && $radioButtonSelected == $item.value } checked="checked" {/if}
+                    {if isset($optionsSelected) && isset($item.value) && $optionsSelected == $item.value } checked="checked" {/if}
                     {if isset($item.disabled) && $item.disabled} disabled{/if}>
-            <div {if isset($item.className)} class="payplugUIIRadioButton {$item.className|escape:'htmlall':'UTF-8'}"{/if} {if isset($item.disabled) && $item.disabled} disabled="disabled"{/if}>
+            <div {if isset($item.className)} class="payplugUIIOptions {$item.className|escape:'htmlall':'UTF-8'}"{/if} {if isset($item.disabled) && $item.disabled} disabled="disabled"{/if}>
                 {if isset($item.text) && $item.text}{$item.text} {/if}
-                <p>{if isset($item.subText) && $item.subText}{$item.subText} {/if}</p>
+                {if isset($item.subText) && $item.subText}<p>{$item.subText}</p>{/if}
             </div>
         </label>
     {/foreach}

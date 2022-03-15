@@ -486,3 +486,23 @@ Per favore, riprova."
 <{payplug}prestashop>cards_1_6_1069362eee49306ddabce2fbe4411835;"You have no card registered yet.";;"Aucune carte n'est enregistrée pour le moment.";"You have no card registered yet.";"You have no card registered yet.";"Non hai ancora una carta registrata."
 <{payplug}prestashop>cards_1_6_0b3db27bc15f682e92ff250ebb167d4b;"Back to Your Account";;"Retour à Mon Compte";"Back to Your Account";"Back to Your Account";"Torna al tuo conto"
 <{payplug}prestashop>cards_1_6_8cf04a9734132302f96da8e113e80ce5;Home;;Accueil;Home;Home;Home
+<{payplug}prestashop>general_02c2853df73ff849f1e5af6d5b160405;general.subscribe.title;;Général;;;
+<{payplug}prestashop>general_862bd822ce29739374b74968b3753ce6;general.subscribe.description;;Inscription;;;
+<{payplug}prestashop>general_3c331962e1925abe207ed57bd8652c41;general.subscribe.createAccountDescription;<strong>;"Créez votre compte chez notre partenaire de paiement [1]PayPlug[/1] pour utiliser le module Prestashop Paylater.";;;
+<{payplug}prestashop>general_5bfe966fd2eed3f6dfd5aec5f3840342;general.subscribe.createAccount;;"Inscription PayPlug";;;
+<{payplug}prestashop>general_227ad4ce598dd9b7f3277ecd1e47f7ab;general.subscribe.showLogin;;"J'ai déjà un compte PayPlug";;;
+<{payplug}prestashop>general_38a2f038cf16a3f0ac1657a150d559ea;general.login.title;;Général;;;
+<{payplug}prestashop>general_1cb22938f8ec8aa15aa6b79bcca79808;general.login.description;<strong>;"Connectez-vous à votre compte de notre partenaire de paiement [1]PayPlug[/1] pour utiliser le module Paylater.";;;
+<{payplug}prestashop>general_9f95d4bf8039f750e7de71b44aa004ff;general.login.userEmail;;"Adresse Email";;;
+<{payplug}prestashop>general_f4cb4bea829ac30678975c099c5d1aca;general.login.userPassword;;"Mot de passe";;;
+<{payplug}prestashop>general_72f9b15631d504bad309fa0f2fe07d2e;general.login.connexion;;Connexion;;;
+<{payplug}prestashop>general_4eba69f436b76b5c81271eccc139eb8a;general.login.createAccount;;"Pas encore de compte PayPlug ?";;;
+<{payplug}prestashop>general_c7b54640dfa0d86d75b5de9f15bcfb7b;general.login.forgottenPassword;;"Mot de passe oublié ?";;;
+<{payplug}prestashop>general_353349a8c0cefb8016744b9a99f1b49a;general.logged.title;;Général;;;
+<{payplug}prestashop>general_fe3c438eb8185ea899ffb4ee430c0f60;general.logged.description;;"Configurations générales du module.";;;
+<{payplug}prestashop>general_200a2eb202d987fef11c10e40483cb63;general.logged.logout;;"Se déconnecter";;;
+<{payplug}prestashop>general_a54a1b67351ec4a293e7f56f98126b25;general.logged.goToPortal;;"Accéder à mon portail PayPlug";;;
+<{payplug}prestashop>general_4a461e6658a5059ef7a4deb045e8c149;general.logged.modeTitle;;Mode;;;
+<{payplug}prestashop>general_38f36e15301b66300db75d4a35febaaf;general.logged.sandBoxDescriptionTest;$faq_sandboxMode;"En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles. [1]En savoir plus[/1].";;;
+<{payplug}prestashop>general_00a2615a503724afddb33fcf34bd90e8;general.logged.sandBoxDescriptionLive;$faq_sandboxMode;"En mode LIVE, vous acceptez des paiements réels. [1]En savoir plus[/1].";;;
+<{payplug}prestashop>error_f71260ff0525374d9caca3b86b31a9ab;popin.error.submit;;ok;;;

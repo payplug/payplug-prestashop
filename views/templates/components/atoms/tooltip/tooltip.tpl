@@ -20,32 +20,17 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>ToolTip component</h2>
-
-{capture assign="tooltipContent"}
-    <span>tooltip content</span>
-{/capture}
-
-<section style="flex-direction: column">
-    <h3>Style par défaut</h3>
-    <div>
-        {include file='./tooltip.tpl' tooltipContent=$tooltipContent}
-    </div>
-</section>
-
-<section>
-    props :
-    <ul>
-        <li>icon</li>
-        <li>content</li>
-        <li>className</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>default</li>
-        <li>open</li>
-    </ul>
-</section>
+<div class="payplugUITooltip
+    {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}"
+    {if isset($blockData) && $blockData} data-e2e-name={$blockData}{/if}>
+    <label>
+        <input type="checkbox">
+        <span class="_icon">{include file="../../_svg/icon-{$tooltipIcon|escape:'htmlall':'UTF-8'}.tpl"}</span>
+        <span class="_overlay"></span>
+        <span class="_modal">
+            <div class="_content">
+                {$tooltipContent}
+            </div>
+        </span>
+    </label>
+</div>

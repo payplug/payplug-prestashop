@@ -20,13 +20,32 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="payplugUITooltip">
-    <input type="checkbox" id="tooltip-modal">
-    <label for="tooltip-modal" class="tooltip-label">{include file="../../_svg/icon-tooltip.tpl"}</label>
-    <div class="tooltip-modal">
-        {*{include file="../../atoms/block/block.tpl" blockContent="tooltip content"}*}
-        <div class="tooltip-modal-content">
-            {$tooltipContent}
-        </div>
+<h2>ToolTip component</h2>
+
+{capture assign="tooltipContent"}
+    <span>tooltip content</span>
+{/capture}
+
+<section style="flex-direction: column">
+    <h3>Style par défaut</h3>
+    <div>
+        {include file='./tooltip.tpl' tooltipContent=$tooltipContent tooltipIcon='tooltip'}
     </div>
-</div>
+</section>
+
+<section>
+    props :
+    <ul>
+        <li>icon</li>
+        <li>content</li>
+        <li>className</li>
+    </ul>
+</section>
+
+<section>
+    state :
+    <ul>
+        <li>default</li>
+        <li>open</li>
+    </ul>
+</section>

@@ -3,17 +3,27 @@
 .payplugUiBlock {
   .border(#colorMap[borderMain]);
   .borderRadius(4px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+
   width: 100%;
-  max-width: 100%;
+  max-width: 1000px;
   position: relative;
   padding: 40px 64px;
   margin: 0 auto 24px;
+  overflow: hidden;
   background: #colorMap[white];
 
-  &_title {
+  @media (@mobile) {
+    padding: 24px;
+  }
+
+  ._title {
     @size: 20;
     .Inter(~"@{size}px", 700);
-    line-height: calc(30em/~"@{size}");
+    line-height: calc(29em/~"@{size}");
     position: relative;
     margin: 0 0 21px;
 
@@ -29,12 +39,18 @@
     }
   }
 
-  &_description {
+  ._description {
     @size: 14;
     .Roboto(~"@{size}px");
     line-height: calc(20em/~"@{size}");
     color: #colorMap[fontSecondaryDefault];
     margin: 0 0 24px;
+  }
+
+  ._content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
 
   &.-disabled {
@@ -50,6 +66,12 @@
       background: fade(@bg, 70%);
       z-index: 1;
       border-radius: inherit;
+    }
+  }
+
+  &.-center {
+    ._content {
+      align-items: center;
     }
   }
 }

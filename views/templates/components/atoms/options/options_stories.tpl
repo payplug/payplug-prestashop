@@ -28,9 +28,9 @@
     <div>
         <label style="text-align:center"></label>
         {assign var=items value=[['value'=>"on", "dataName" =>"dataLeftButton","text" => 'button gauche', "subText" => 'lorem ipsum'],['value'=>"off","dataName" =>"dataRightButton", "text" => 'button droit', "subText" => 'sit amet dolor']]}
-        {include file='./radioButton.tpl'
-        radioButtonSelected='on'
-        radioButtonName='radioButtonName1'
+        {include file='./options.tpl'
+        optionsSelected='on'
+        optionsName='optionsName1'
         }
     </div>
 </section>
@@ -39,9 +39,9 @@
     <div>
         {assign var=items value=[['value'=>"on", "dataName" =>"dataLeftButton","text" => 'button gauche', "className"=>"-hover"],
         ['value'=>"off","dataName" =>"dataRightButton", "text" => 'button droit', "className"=>"-hover"]]}
-        {include file='./radioButton.tpl'
-        radioButtonSelected='on'
-        radioButtonName='radioButtonName2'
+        {include file='./options.tpl'
+        optionsSelected='on'
+        optionsName='optionsName2'
         }
     </div>
 </section>
@@ -49,9 +49,9 @@
     <h3>Disabled Radio Button</h3>
     <div>
         {assign var=items value=[['value'=>"off", "dataName" =>"dataLeftButton","text" => 'button gauche', 'disabled'=>true],['value'=>"off","dataName" =>"dataRightButton", "text" => 'button droit','disabled'=>true]]}
-        {include file='./radioButton.tpl'
-        radioButtonSelected='on'
-        radioButtonName='radioButtonName3'
+        {include file='./options.tpl'
+        optionsSelected='on'
+        optionsName='optionsName3'
         }
     </div>
 

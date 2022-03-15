@@ -20,25 +20,25 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="payplugUiBlock
+<section class="payplugUiBlock
     {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}
     {if isset($blockDisabled) && $blockDisabled} -disabled{/if}"
     {if isset($blockData) && $blockData} data-e2e-name={$blockData}{/if}>
     {if isset($blockTitle) && $blockTitle}
-        <div class="payplugUiBlock_title">
+        <h2 class="_title">
             {$blockTitle}
-        </div>
+        </h2>
     {/if}
     {if isset($blockDescription) && $blockDescription}
-        <div class="payplugUiBlock_description">
+        <p class="_description">
             {$blockDescription}
-        </div>
+        </p>
     {/if}
     {if isset($blockContent) && $blockContent}
-        <div class="payplugUiBlock_content">
+        <div class="_content">
             {$blockContent}
         </div>
     {/if}
-</div>
+</section>
 
 

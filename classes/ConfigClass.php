@@ -1324,9 +1324,14 @@ class ConfigClass
         $email = Tools::getValue('payplug_email');
 
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
+            $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
+            $this->context->smarty->assign([
+                'errorMessage' => $errorMessage
+            ]);
             die(json_encode([
                 'content' => false,
-                'error' => $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
+                'modal' => $this->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                'error' => $errorMessage
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
@@ -1341,9 +1346,14 @@ class ConfigClass
 
                 die(json_encode(['content' => $content]));
             } else {
+                $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
+                $this->context->smarty->assign([
+                    'errorMessage' => $errorMessage
+                ]);
                 die(json_encode([
                     'content' => false,
-                    'error' => $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass')
+                    'modal' => $this->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                    'error' => $errorMessage
                 ]));
             }
         }

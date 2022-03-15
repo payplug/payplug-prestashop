@@ -404,10 +404,7 @@ class PaymentClass
                     break;
                 case 'oney_x3_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l(
-                        'payplug.buildPaymentDetails.oneyX3WithoutFees',
-                        'paymentclass'
-                    );
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX3WithoutFees', 'paymentclass');
                     break;
                 case 'oney_x4_without_fees':
                     $is_oney = true;

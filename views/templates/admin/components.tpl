@@ -27,6 +27,9 @@
     {* button stories *}
     {include file='./../components/atoms/button/button_stories.tpl'}
 
+    {* buttonLink stories *}
+    {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
+
     {* accordion stories *}
     {include file='./../components/atoms/accordion/accordion_stories.tpl'}
 
@@ -45,16 +48,18 @@
     {* block stories *}
     {include file='./../components/atoms/block/block_stories.tpl'}
 
-    {* buttonLink stories *}
-    {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
-
     {* Radio Button stories *}
-    {include file='./../components/atoms/radio_button/radioButton_stories.tpl'}
+    {include file='./../components/atoms/options/options_stories.tpl'}
 
     {* tooltip stories *}
-    {include file='./../components/molecules/tooltip/tooltip_stories.tpl'}
+    {include file='./../components/atoms/tooltip/tooltip_stories.tpl'}
+
+    {* tooltip stories *}
+    {include file='./../components/atoms/loader/loader_stories.tpl'}
 
     {* Modal stories *}
     {include file='./../components/atoms/modal/modal_stories.tpl'}
 
+    {* Modal stories *}
+    {include file='./../components/atoms/action/action_stories.tpl'}
 </div>

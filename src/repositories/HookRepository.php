@@ -62,6 +62,7 @@ class HookRepository extends Repository
                 $module_url . 'views/js/admin.js',
                 $module_url . 'views/css/admin.css',
                 $module_url . 'views/js/utilities.js',
+                $module_url . 'views/js/components.js',
             ]);
         }
     }

@@ -3,7 +3,9 @@
 .payplugUIInput {
   display: flex;
   flex-direction: column;
+  flex-wrap: nowrap;
   align-items: flex-start;
+  margin: 0 0 24px;
 
   label {
     .Roboto(14px, 700);
@@ -71,22 +73,4 @@
       }
     }
   }
-
-  //&.-disabled {
-  //  input {
-  //    &[type=text],
-  //    &[type=password] {
-  //      cursor: default;
-  //      background: #colorMap[grey];
-  //
-  //      &::placeholder {
-  //        color: #colorMap[fontMainDisabled];
-  //        opacity: 1;
-  //      }
-  //      &:hover {
-  //        border-color: #colorMap[borderMain];
-  //      }
-  //    }
-  //  }
-  //}
 }

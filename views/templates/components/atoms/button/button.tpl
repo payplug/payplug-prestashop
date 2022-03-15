@@ -23,6 +23,8 @@
 <button type="button" name="{$buttonName|escape:'htmlall':'UTF-8'}" class="payplugUIButton
     {if isset($buttonClassName) && $buttonClassName} {$buttonClassName|escape:'htmlall':'UTF-8'}{/if}
     {if isset($buttonStyle) && $buttonStyle} -{$buttonStyle|escape:'htmlall':'UTF-8'}{/if}
-    {if isset($buttonDisabled) && $buttonDisabled} -disabled{/if}">
+    {if isset($buttonDisabled) && $buttonDisabled} -disabled{/if}"
+    {if isset($buttonData) && $buttonData} data-e2e-name="{$buttonData|escape:'htmlall':'UTF-8'}"{/if}
+    {if isset($buttonDisabled) && $buttonDisabled} disabled="disabled"{/if}>
     {$buttonText|escape:'htmlall':'UTF-8'}
 </button>

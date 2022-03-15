@@ -3,11 +3,9 @@
 .payplugUILink {
   @size: 14;
   .Roboto(~"@{size}px", 400);
-  display: flex;
   text-decoration: none;
   color: #colorMap[purple];
-  line-height: calc(20em / ~"@{size}");
-  margin: 0 0 calc(8em / ~"@{size}");
+  line-height: calc(15em / ~"@{size}");
   letter-spacing: 0.25px;
 
   &:hover,
@@ -16,7 +14,8 @@
     text-decoration: none;
   }
 
-  &.-disabled {
+  &.-disabled,
+  &[disabled="disabled"] {
     opacity: .3;
     cursor: default;
     color: #colorMap[purple];

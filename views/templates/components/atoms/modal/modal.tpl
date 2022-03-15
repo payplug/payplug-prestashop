@@ -19,14 +19,24 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<label for="modal" class="modal-background"></label>
+<div class="payplugUIModal">
+    <input type="checkbox" name="modalTriggered" id="modalTriggered" />
+    <label class="_overlay" for="modalTriggered"></label>
+    <div class="_modal
+        {if !isset($modalTitle) || !$modalTitle} -noTitle{/if}
+        {if isset($modalClassName) && $modalClassName} {$modalClassName|escape:'htmlall':'UTF-8'}{/if}"
+        {if isset($modalData) && $modalData} data-e2e-name="{$modalData|escape:'htmlall':'UTF-8'}"{/if}>
 
-<div id="test" class="payplugUIModal" {if isset($dataName) && $dataName} data-e2e-name="{$dataName|escape:'htmlall':'UTF-8'}"{/if}>
-    <div class="payplugUIModal_header">
+        <label for="modalTriggered" class="_close" >{include file="../../_svg/icon-close.tpl"} </label>
 
-        <h3 class="modal-title">{if isset($title) && $title} {$title|escape:'htmlall':'UTF-8'}{/if}</h3>
-{*        <a href="#" class="modal-close -icon" > {include file="../../_svg/icon-close.tpl"}</a>*}
-        <label for="modal" class="modal-close -icon" > {include file="../../_svg/icon-close.tpl"} </label>
+        {if isset($modalTitle) && $modalTitle}
+            <div class="_header">
+                {if isset($modalTitle) && $modalTitle} {$modalTitle|escape:'htmlall':'UTF-8'}{/if}
+            </div>
+        {/if}
+
+        <div class="_body">
+            {$modalContent}
+        </div>
     </div>
-    <div class="payplugUIModal_body">{$content}</div>
 </div>
