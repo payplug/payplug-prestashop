@@ -38,6 +38,9 @@
     {* buttonLink stories *}
     {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
 
+    {* Image stories *}
+    {include file='./../components/atoms/image/image_stories.tpl'}
+
     {* input stories *}
     {include file='./../components/atoms/input/input_stories.tpl'}
 
