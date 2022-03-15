@@ -34,11 +34,9 @@
             {$blockDescription}
         </p>
     {/if}
-    {if isset($blockContent) && $blockContent}
-        <div class="_content">
-            {$blockContent}
-        </div>
-    {/if}
+    <div class="_content">
+        {$blockContent}
+    </div>
 </section>
 
 

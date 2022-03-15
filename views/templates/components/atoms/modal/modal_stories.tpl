@@ -20,34 +20,33 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Modal component</h2>
-{capture assign="modalContent"}
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-{/capture}
 <section>
-    <h3>Default</h3>
+    <p class="_title -sub">Modal component</p>
     <div>
-        <label for="modalTriggered">Open Modal</label>
+        <label class="payplugUIButton" for="modalTriggered">Open Modal</label>
+        {capture assign="modalContent"}
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        {/capture}
         {include file='./modal.tpl'
             modalContent=$modalContent
             modalData='modalData'
             modalTitle='Modal Title'}
     </div>
-</section>
 
-<section>
-    props:
-    <ul>
-        <li>title: string</li>
-        <li>data-e2e:string</li>
-        <li>className: string</li>
-        <li>content</li>
-    </ul>
-</section>
-<section>
-    state :
-    <ul>
-        <li>default</li>
-        <li>open</li>
-    </ul>
+    <div class="_props">
+        <div>
+            props:
+            <ul>
+                <li>title: string (optional)</li>
+                <li>content: html (mandatory)</li>
+            </ul>
+        </div>
+        <div>
+            state :
+            <ul>
+                <li>default</li>
+                <li>open</li>
+            </ul>
+        </div>
+    </div>
 </section>

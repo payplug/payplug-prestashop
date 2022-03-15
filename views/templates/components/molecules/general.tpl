@@ -31,7 +31,7 @@
         {/capture}
         {include file='./../atoms/buttonLink/buttonLink.tpl'
             buttonLinkData='payplugRegistration'
-            buttonLinkLink=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal/signup?sponsor=22101'
+            buttonLinkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal/signup?sponsor=22101'
             buttonLinkName='createAccount'
             buttonLinkText=$generalSubscribe_createAccount}
 
@@ -134,7 +134,7 @@
             {capture assign="generalLogged_goToPortal"}{l s='general.logged.goToPortal' mod={$module_name}}{/capture}
             {include file='./../atoms/buttonLink/buttonLink.tpl'
                 buttonLinkClassName='_userPortal'
-                buttonLinkLink=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal'
+                buttonLinkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal'
                 buttonLinkName='logged_goToPortal'
                 buttonLinkText=$generalLogged_goToPortal
                 buttonLinkIcon='link'}

@@ -20,30 +20,27 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Title component</h2>
-
-<section style="flex-direction: column">
-    <h3>Style par défaut</h3>
+<section>
+    <p class="_title -sub">Title component</p>
     <div>
         {include file='./title.tpl' titleText='component title'}
     </div>
-    <div style="margin:0;">
+    <div>
         {include file='./title.tpl' titleText='component title disabled' titleDisabled=true}
     </div>
-</section>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>text (mandatory)</li>
+            </ul>
+        </div>
 
-<section>
-    props :
-    <ul>
-        <li>text</li>
-        <li>style</li>
-        <li>className</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>disabled</li>
-    </ul>
+        <div>
+            state :
+            <ul>
+                <li>disabled</li>
+            </ul>
+        </div>
+    </div>
 </section>

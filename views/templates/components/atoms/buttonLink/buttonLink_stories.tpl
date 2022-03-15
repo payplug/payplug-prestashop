@@ -20,81 +20,73 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Button Link component</h2>
-
 <section>
-    <h3>Style par défaut</h3>
+    <p class="_title -sub">Button Link component</p>
     <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Default' buttonLinkLink='https://payplug.com' buttonLinkIcon='link'}
+        <p class="_subtitle">Primary Style (default):</p>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Default' buttonLinkHref='https://payplug.com' buttonLinkIcon='link'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Default' buttonLinkHref='https://payplug.com'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Hover' buttonLinkHref='https://payplug.com' buttonLinkClassName='-hover'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Disabled' buttonLinkHref='https://payplug.com' buttonLinkDisabled=true}
+        </div>
     </div>
     <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Default' buttonLinkLink='https://payplug.com'}
+        <p class="_subtitle">Secondary Style:</p>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Default' buttonLinkHref='https://payplug.com' buttonLinkIcon='link'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Default' buttonLinkHref='https://payplug.com'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Hover' buttonLinkHref='https://payplug.com' buttonLinkClassName='-hover'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Disabled' buttonLinkHref='https://payplug.com' buttonLinkDisabled=true}
+        </div>
     </div>
     <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Hover' buttonLinkLink='https://payplug.com' buttonLinkClassName='-hover'}
+        <p class="_subtitle">Tertiary Style:</p>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Default' buttonLinkHref='https://payplug.com' buttonLinkIcon='link'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Default' buttonLinkHref='https://payplug.com'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Hover' buttonLinkHref='https://payplug.com' buttonLinkClassName='-hover'}
+        </div>
+        <div>
+            {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Disabled' buttonLinkHref='https://payplug.com' buttonLinkDisabled=true}
+        </div>
     </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkText='Disabled' buttonLinkLink='https://payplug.com' buttonLinkDisabled=true}
-    </div>
-</section>
+    <div class="_props">
 
-<section>
-    <h3>Style secondaire</h3>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Default' buttonLinkLink='https://payplug.com' buttonLinkIcon='link'}
-    </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Default' buttonLinkLink='https://payplug.com'}
-    </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Hover' buttonLinkLink='https://payplug.com' buttonLinkClassName='-hover'}
-    </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='secondary' buttonLinkText='Disabled' buttonLinkLink='https://payplug.com' buttonLinkDisabled=true}
-    </div>
-</section>
+        <div>
+            props :
+            <ul>
+                <li>style (primary:default|secondary|tertiary)</li>
+                <li>href (mandatory)</li>
+                <li>target (optional _blank:default)</li>
+                <li>text (mandatory)</li>
+                <li>title (optional)</li>
+                <li>icon (optional)</li>
+            </ul>
+        </div>
 
-<section>
-    <h3>Style tertiaire</h3>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Default' buttonLinkLink='https://payplug.com' buttonLinkIcon='link'}
+        <div>
+            state :
+            <ul>
+                <li>hover</li>
+                <li>disabled</li>
+            </ul>
+        </div>
     </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Default' buttonLinkLink='https://payplug.com'}
-    </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Hover' buttonLinkLink='https://payplug.com' buttonLinkClassName='-hover'}
-    </div>
-    <div>
-        {include file='./buttonLink.tpl' buttonLinkName='payplugUIButtonLink' buttonLinkStyle='tertiary' buttonLinkText='Disabled' buttonLinkLink='https://payplug.com' buttonLinkDisabled=true}
-    </div>
-
-</section>
-
-<section>
-    props :
-    <ul>
-        <li>style</li>
-        <li>text</li>
-        <li>target</li>
-        <li>className</li>
-        <li>name</li>
-        <li>datae2e</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>default</li>
-        <li>hover</li>
-        <li>disabled</li>
-    </ul>
-</section>
-
-<section>
-    icon :
-    <ul>
-        <li>icon</li>
-    </ul>
 </section>

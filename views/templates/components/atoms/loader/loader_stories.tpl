@@ -21,26 +21,48 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Loader component</h2>
-
-<section style="position: relative;height: 80px;">
-    <h3>Loader de taille 30</h3>
-    {include file='./loader.tpl' loaderSize='30'}
-</section>
-
-<section style="position: relative;height: 120px;">
-    <h3>Loader par défaut</h3>
-    {include file='./loader.tpl'}
-</section>
-
-<section style="position: relative;height: 140px;">
-    <h3>Loader de taille 70</h3>
-    {include file='./loader.tpl' loaderSize='70'}
-</section>
-
 <section>
-    props :
-    <ul>
-        <li>size</li>
-    </ul>
+    <p class="_title -sub">Loader component</p>
+    <div>
+        <div style="flex:1;">
+            <p class="_subtitle">Loader sized 10</p>
+            <div style="position:relative;height:100px;width:100px;">
+                {include file='./loader.tpl' loaderSize='10'}
+            </div>
+        </div>
+        <div style="flex:1;">
+            <p class="_subtitle">Loader sized 30</p>
+            <div style="position:relative;height:100px;width:100px;">
+                {include file='./loader.tpl' loaderSize='30'}
+            </div>
+        </div>
+        <div style="flex:1;text-align: center;">
+            <p class="_subtitle">Loader sized 50 (default)</p>
+            <div style="position:relative;height:100px;width:100px;">
+                {include file='./loader.tpl' loaderSize='50'}
+            </div>
+        </div>
+        <div style="flex:1;">
+            <p class="_subtitle">Loader sized 70</p>
+            <div style="position:relative;height:100px;width:100px;">
+                {include file='./loader.tpl' loaderSize='70'}
+            </div>
+        </div>
+        <div style="flex:1;">
+            <p class="_subtitle">Loader sized 90</p>
+            <div style="position:relative;height:100px;width:100px;">
+                {include file='./loader.tpl' loaderSize='90'}
+            </div>
+        </div>
+    </div>
+
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>size</li>
+            </ul>
+        </div>
+    </div>
 </section>
+

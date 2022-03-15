@@ -20,84 +20,84 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Input component</h2>
-
-<section style="justify-content: space-between;">
-    <h3>Style par défaut</h3>
-    <div style="width:30%;margin:0 0 8px;">
-        {include file='./input.tpl'
-            inputPlaceholder='Input par défaut'
-            inputValue=''
-            inputName='input.default'
-            inputLabel='Champs texte par défaut'}
-    </div>
-    <div style="width:30%;margin:0 0 8px;">
-        <p style="height: 24px;margin: 0;">Champs sans label :</p>
-        {include file='./input.tpl'
-            inputPlaceholder='Input par défaut sans label'
+<section>
+    <p class="_title -sub">Input component</p>
+    <div>
+        <div>
+            {include file='./input.tpl'
+                inputPlaceholder='Default field text'
+                inputValue=''
+                inputName='input.default'
+                inputLabel='Default field text:'}
+        </div>
+        <div style="flex-direction: column; align-items: start">
+            <p style="height: 24px;margin: 0;">Input without label:</p>
+            {include file='./input.tpl'
+            inputPlaceholder='Field without label'
             inputValue=''
             inputName='input.withoutLabel'}
-    </div>
-    <div style="width:30%;margin:0 0 8px;">
-        {include file='./input.tpl'
-            inputType='password'
-            inputPlaceholder='Input par défaut'
-            inputValue=''
-            inputName='input.password'
-            inputLabel='Champs mot de passe par défaut : '}
-    </div>
-    <div style="width:30%;margin:0 0 8px;">
-        {include file='./input.tpl'
-            inputPlaceholder='Input focus'
-            inputValue=''
-            inputName='input.focus'
-            inputLabel='Champs texte focus :'
-            inputClassName='-focus'}
-    </div>
-    <div style="width:30%;margin:0 0 8px;">
-        {include file='./input.tpl'
-            inputPlaceholder='Input hover'
+        </div>
+        <div>
+            {include file='./input.tpl'
+                inputType='password'
+                inputPlaceholder='Default field password'
+                inputValue=''
+                inputName='input.password'
+                inputLabel='Default field password:'}
+        </div>
+        <div>
+            {include file='./input.tpl'
+                inputPlaceholder='Focused field'
+                inputValue=''
+                inputName='input.focus'
+                inputLabel='Default field text focused:'
+                inputClassName='-focus'}
+        </div>
+        <div>
+            {include file='./input.tpl'
+            inputPlaceholder='Hovered field'
             inputValue=''
             inputName='input.hover'
-            inputLabel='Champs texte hover :'
+            inputLabel='Default field text hovered:'
             inputClassName='-hover'}
-    </div>
-    <div style="width:30%;margin:0 0 8px;">
-        {include file='./input.tpl'
-            inputPlaceholder='Input error'
-            inputValue=''
-            inputName='input.error'
-            inputLabel='Champs texte error :'
-            inputClassName='-error'}
-    </div>
-    <div style="width:30%;margin:0 0 8px;">
-        {include file='./input.tpl'
-            inputPlaceholder='Input disabled'
+        </div>
+        <div>
+            {include file='./input.tpl'
+                inputPlaceholder='Error field'
+                inputValue=''
+                inputName='input.error'
+                inputLabel='Default field text error'
+                inputClassName='-error'}
+        </div>
+        <div>
+            {include file='./input.tpl'
+            inputPlaceholder='Disabled fields'
             inputValue=''
             inputName='input.disabled'
-            inputLabel='Champs texte disabled :'
+            inputLabel='Default field disabled:'
             inputDisabled=true}
+        </div>
     </div>
-</section>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>type (text:default|password|number(soon))</li>
+                <li>placeholder (optional)</li>
+                <li>value (optional)</li>
+                <li>name (mandatory)</li>
+                <li>label (optional)</li>
+            </ul>
+        </div>
 
-<section>
-    props :
-    <ul>
-        <li>type</li>
-        <li>placeholder</li>
-        <li>value</li>
-        <li>name</li>
-        <li>label</li>
-        <li>className</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>focus</li>
-        <li>hover</li>
-        <li>error</li>
-        <li>disabled</li>
-    </ul>
+        <div>
+            state :
+            <ul>
+                <li>focus</li>
+                <li>hover</li>
+                <li>error</li>
+                <li>disabled</li>
+            </ul>
+        </div>
+    </div>
 </section>

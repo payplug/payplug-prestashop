@@ -20,32 +20,28 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>ToolTip component</h2>
-
-{capture assign="tooltipContent"}
-    <span>tooltip content</span>
-{/capture}
-
-<section style="flex-direction: column">
-    <h3>Style par défaut</h3>
+<section>
+    <p class="_title -sub">ToolTip component</p>
     <div>
+        {capture assign="tooltipContent"}
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <div class="payplugUIAction">Action lien</div>
+        {/capture}
         {include file='./tooltip.tpl' tooltipContent=$tooltipContent tooltipIcon='tooltip'}
     </div>
-</section>
-
-<section>
-    props :
-    <ul>
-        <li>icon</li>
-        <li>content</li>
-        <li>className</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>default</li>
-        <li>open</li>
-    </ul>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>icon (mandatory)</li>
+                <li>content (mandatory)</li>
+            </ul>
+        </div>
+        <div>
+            state :
+            <ul>
+                <li>open</li>
+            </ul>
+        </div>
+    </div>
 </section>
