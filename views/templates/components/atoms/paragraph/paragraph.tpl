@@ -21,6 +21,7 @@
 *}
 
 <p class="payplugUIParagraph
-    {if isset($paragraphDisabled) && $paragraphDisabled} -disabled{/if}">
-    {$paragraphText|escape:'htmlall':'UTF-8'}
+    {if isset($paragraphDisabled) && $paragraphDisabled} -disabled{/if}
+    {if isset($paragraphClassName) && $paragraphClassName} {$paragraphClassName|escape:'htmlall':'UTF-8'}{/if}">
+    {$paragraphText}
 </p>

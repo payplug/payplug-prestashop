@@ -27,15 +27,11 @@
 <section>
     <h3>Default</h3>
     <div>
-        <label style="text-align:center"></label>
-        <input type="checkbox" id="modal">
-        <label for="modal" class="modal-label">Open Modal</label>
-        <label for="modal"></label>
+        <label for="modalTriggered">Open Modal</label>
         {include file='./modal.tpl'
-        content=$modalContent
-        dataName='modalData'
-        title='Modal Title'
-        }
+            modalContent=$modalContent
+            modalData='modalData'
+            modalTitle='Modal Title'}
     </div>
 </section>
 

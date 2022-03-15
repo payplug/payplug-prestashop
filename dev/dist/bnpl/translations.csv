@@ -193,8 +193,8 @@ key;default;tags;fr;en;gb;it
 <{bnpl}prestashop>prestashopspecific17_8deca510ddb96ce73b4b888f1ac6bf45;payplug.assignSwitchConfiguration.yes;;oui;yes;yes;si
 <{bnpl}prestashop>prestashopspecific17_5c8c18e98173556b72b7967275b7167e;payplug.assignSwitchConfiguration.no;;non;no;no;no
 <{bnpl}prestashop>php_version_6880cdbc64b3ac7fbaa8db1c93d8ce0f;admin.phpversion.wrongPhpVersion;<br>,$link_to_php_version_support_page;"La version de PHP que vous utilisez est trop ancienne (antérieure à 5.6), ce qui empêche le bon fonctionnement du dernier module PayPlug que vous venez d'installer.[1]
-Rendez-vous sur notre [2]page support[/2] pour récupérer une version du module PayPlug compatible avec votre boutique et l'installer en quelques clics.";"The PHP version you are using is too old (prior to 5.6). It prevents the last PayPlug module you have just installed from working properly.[1] 
-Please visit our [2]support page[/2] to download a version of the PayPlug module compatible with your store, and install it in a few clicks.";"The PHP version you are using is too old (prior to 5.6). It prevents the last PayPlug module you have just installed from working properly.[1] 
+Rendez-vous sur notre [2]page support[/2] pour récupérer une version du module PayPlug compatible avec votre boutique et l'installer en quelques clics.";"The PHP version you are using is too old (prior to 5.6). It prevents the last PayPlug module you have just installed from working properly.[1]
+Please visit our [2]support page[/2] to download a version of the PayPlug module compatible with your store, and install it in a few clicks.";"The PHP version you are using is too old (prior to 5.6). It prevents the last PayPlug module you have just installed from working properly.[1]
 Please visit our [2]support page[/2] to download a version of the PayPlug module compatible with your store, and install it in a few clicks.";"La versione PHP che stai utilizzando è obsoleta (anteriore alla 5.6). Il modulo PayPlug appena installato non può quindi funzionare correttamente.[1]
 Consulta la nostra [2]pagina di supporto[/2] per ottenere una versione del modulo PayPlug compatibile con il tuo negozio online e installala in pochi click."
 <{bnpl}prestashop>php_version_484e842f99d03422fa10151e75ab98b9;admin.phpversion.heading;;PRÉSENTATION;PRESENTATION;PRESENTATION;PRESENTAZIONE
@@ -487,3 +487,23 @@ Per favore, riprova."
 <{bnpl}prestashop>cards_1_6_1069362eee49306ddabce2fbe4411835;"You have no card registered yet.";;"Aucune carte n'est enregistrée pour le moment.";"You have no card registered yet.";"You have no card registered yet.";"Non hai ancora una carta registrata."
 <{bnpl}prestashop>cards_1_6_0b3db27bc15f682e92ff250ebb167d4b;"Back to Your Account";;"Retour à Mon Compte";"Back to Your Account";"Back to Your Account";"Torna al tuo conto"
 <{bnpl}prestashop>cards_1_6_8cf04a9734132302f96da8e113e80ce5;Home;;Accueil;Home;Home;Home
+<{bnpl}prestashop>general_02c2853df73ff849f1e5af6d5b160405;general.subscribe.title;;Général;;;
+<{bnpl}prestashop>general_862bd822ce29739374b74968b3753ce6;general.subscribe.description;;Inscription;;;
+<{bnpl}prestashop>general_3c331962e1925abe207ed57bd8652c41;general.subscribe.createAccountDescription;<strong>;"Créez votre compte chez notre partenaire de paiement [1]PayPlug[/1] pour utiliser le module Prestashop Paylater.";;;
+<{bnpl}prestashop>general_5bfe966fd2eed3f6dfd5aec5f3840342;general.subscribe.createAccount;;"Inscription PayPlug";;;
+<{bnpl}prestashop>general_227ad4ce598dd9b7f3277ecd1e47f7ab;general.subscribe.showLogin;;"J'ai déjà un compte PayPlug";;;
+<{bnpl}prestashop>general_38a2f038cf16a3f0ac1657a150d559ea;general.login.title;;Général;;;
+<{bnpl}prestashop>general_1cb22938f8ec8aa15aa6b79bcca79808;general.login.description;<strong>;"Connectez-vous à votre compte de notre partenaire de paiement [1]PayPlug[/1] pour utiliser le module Paylater.";;;
+<{bnpl}prestashop>general_9f95d4bf8039f750e7de71b44aa004ff;general.login.userEmail;;"Adresse Email";;;
+<{bnpl}prestashop>general_f4cb4bea829ac30678975c099c5d1aca;general.login.userPassword;;"Mot de passe";;;
+<{bnpl}prestashop>general_72f9b15631d504bad309fa0f2fe07d2e;general.login.connexion;;Connexion;;;
+<{bnpl}prestashop>general_4eba69f436b76b5c81271eccc139eb8a;general.login.createAccount;;"Pas encore de compte PayPlug ?";;;
+<{bnpl}prestashop>general_c7b54640dfa0d86d75b5de9f15bcfb7b;general.login.forgottenPassword;;"Mot de passe oublié ?";;;
+<{bnpl}prestashop>general_353349a8c0cefb8016744b9a99f1b49a;general.logged.title;;Général;;;
+<{bnpl}prestashop>general_fe3c438eb8185ea899ffb4ee430c0f60;general.logged.description;;"Configurations générales du module.";;;
+<{bnpl}prestashop>general_200a2eb202d987fef11c10e40483cb63;general.logged.logout;;"Se déconnecter";;;
+<{bnpl}prestashop>general_a54a1b67351ec4a293e7f56f98126b25;general.logged.goToPortal;;"Accéder à mon portail PayPlug";;;
+<{bnpl}prestashop>general_4a461e6658a5059ef7a4deb045e8c149;general.logged.modeTitle;;Mode;;;
+<{bnpl}prestashop>general_38f36e15301b66300db75d4a35febaaf;general.logged.sandBoxDescriptionTest;$faq_sandboxMode;"En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles. [1]En savoir plus[/1].";;;
+<{bnpl}prestashop>general_00a2615a503724afddb33fcf34bd90e8;general.logged.sandBoxDescriptionLive;$faq_sandboxMode;"En mode LIVE, vous acceptez des paiements réels. [1]En savoir plus[/1].";;;
+<{bnpl}prestashop>error_f71260ff0525374d9caca3b86b31a9ab;popin.error.submit;;ok;;;

@@ -33,7 +33,8 @@
             type="{$inputType|escape:'htmlall':'UTF-8'}"
             id="{$inputName|escape:'htmlall':'UTF-8'}"
             name="{$inputName|escape:'htmlall':'UTF-8'}"
-            value="{$inputValue|escape:'htmlall':'UTF-8'}"
-            placeholder="{$inputPlaceholder|escape:'htmlall':'UTF-8'}"
+            {if isset($inputData) && $inputData} data-e2e-name="{$inputData|escape:'htmlall':'UTF-8'}"{/if}
+            {if isset($inputValue) && $inputValue} value="{$inputValue|escape:'htmlall':'UTF-8'}"{/if}
+            {if isset($inputPlaceholder) && $inputPlaceholder} placeholder="{$inputPlaceholder|escape:'htmlall':'UTF-8'}"{/if}
             {if isset($inputDisabled) && $inputDisabled} disabled{/if}>
 </div>

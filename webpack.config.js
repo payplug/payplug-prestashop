@@ -29,8 +29,9 @@ const fs = require('fs');
 
 const dir_path = 'dev';
 const cssViewsFolder = 'css';
-const cssComponentsFolder = 'css/components';
-const jsComponentsFolder = 'js/components/atoms';
+
+const jsAtomsFolder = 'js/components/atoms';
+const jsMoleculesFolder = 'js/components/molecules';
 
 const dirJsFinalPath = 'views/js/';
 const dirViewsFinalPath = 'views/';
@@ -66,7 +67,8 @@ function _getAllFilesFromFolder(dir) {
             } else {
                 switch (dir) {
                     // compilation des fichiers "components" .js
-                    case jsComponentsFolder:
+                    case jsAtomsFolder:
+                    case jsMoleculesFolder:
                         if (typeof entryFiles['../' + dirJsFinalPath + 'components'] == 'undefined') {
                             entryFiles['../' + dirJsFinalPath + 'components'] = [];
                         }
@@ -78,9 +80,10 @@ function _getAllFilesFromFolder(dir) {
         }
     });
 };
+
 _getAllFilesFromFolder(cssViewsFolder);
-// _getAllFilesFromFolder(cssComponentsFolder);
-_getAllFilesFromFolder(jsComponentsFolder);
+_getAllFilesFromFolder(jsAtomsFolder);
+_getAllFilesFromFolder(jsMoleculesFolder);
 
 const loaders = [
     MiniCssExtractPlugin.loader,

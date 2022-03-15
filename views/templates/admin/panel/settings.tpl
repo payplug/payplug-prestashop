@@ -33,7 +33,6 @@
         </div>
     {/if}
 
-    {include file='./settings/sandbox.tpl'}
     {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
         {include file='./settings/embedded.tpl'}
     {/if}

@@ -1,87 +1,79 @@
-@import "../../less/include";
-
-input[type="checkbox"] {
-  display:none;
-  &:checked~.payplugUIModal, &:checked~.modal-background {
-    display: block;
-  }
-
-}
-.modal-background {
-  background-color: rgba(0,0,0,0.5);
-  display: none;
-  height: 100%;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 9998;
-}
-
-
 .payplugUIModal {
-  background-color: #colorMap[white];
-  bottom: 0;
-  box-sizing: border-box;
-  display: none;
-  height: max-content;
-  left: 0;
-  margin: auto;
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 500px;
-  z-index: 9999;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  &_header{
-    border-bottom: 1px solid  #dddddd;
-    box-sizing: border-box;
-    height: 50px;
-    .modal-title {
-      //background-color: red !important;
-      position: absolute;
-      @size: 14;
-      .Roboto(~"@{size}px", 700);
-      box-sizing: border-box;
-      color: #363A41;
-      display: inline-block;
-      margin: 0;
-      padding: 15px;
-      font-style: normal;
-      line-height: 20px;
-      letter-spacing: 0.25px;
+  input {
+    display:none;
 
-    }
-    .modal-close {
-      &.-icon {
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        &:hover {
-          opacity:0.6;
-        }
-        ~:after {
-          display:none;
-        }
+    &:checked {
+      & ~ ._modal,
+      & ~ ._overlay {
+        display: block;
       }
     }
   }
-  &_body {
-    margin: 10px;
+
+  ._overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,.3);
+    z-index: 999;
   }
 
+  ._modal {
+    .transform(translate(-50%, -50%));
+    .border(#colorMap[fontMainDisabled]);
+    .borderRadius(4px);
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 24px 16px;
+    background: #colorMap[white];
+    z-index: 999;
+    width: 100%;
+    max-width: 500px;
 
-}
-.modal-label {
-  background-color: #colorMap[purple];
-  box-sizing: border-box;
-  color: #colorMap[lightGray];
-  cursor: pointer;
-  display: inline-block;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 10px;
+    &.-noTitle {
+      padding: 48px 16px 24px;
+    }
 
+    ._close {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 24px;
+      width: 24px;
+
+      margin: 0;
+      cursor: pointer;
+      position: absolute;
+      top: 14px;
+      left: calc(100% - 33px);
+
+      svg {
+        .transition(~"fill @{dur}");
+        fill: #colorMap[fontMainDefault];
+      }
+
+      &:hover {
+        svg {
+          fill: #colorMap[purple];
+        }
+      }
+    }
+    ._header {
+      @size: 14;
+      .border(#colorMap[fontSecondary50], b);
+      .Roboto(~"@{size}px", 700);
+      line-height: calc(20em / ~"@{size}");
+      margin: 0 0 24px;
+      padding: 0 0 16px;
+    }
+    ._body {
+      padding: 0 40px;
+      margin: 0;
+    }
+  }
 }

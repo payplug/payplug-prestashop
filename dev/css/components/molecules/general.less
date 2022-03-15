@@ -1,0 +1,157 @@
+.generalBlock {
+  position: relative;
+  min-height: 424px;
+
+  &.-hide {
+    display: none;
+  }
+
+  &.-subscribe {
+    ._content {
+      padding: 0 0 60px;
+
+      p {
+        text-align: center;
+        margin: 40px 0;
+      }
+
+      .payplugUIButton {
+        margin: 10px 0 0;
+
+        &,
+        &Link {
+          width: 250px;
+        }
+      }
+    }
+  }
+
+  &.-login {
+    ._loginForm {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      > div {
+        display: flex;
+        flex-direction: row-reverse;
+        width: 100%;
+
+        @media (@mobile) {
+          flex-direction: column-reverse;
+        }
+      }
+    }
+
+    ._email,
+    ._password {
+      width: 100%;
+    }
+
+    ._subscribe,
+    ._connexion {
+      margin: 16px 0 12px 8px;
+
+      @media (@mobile) {
+        margin: 0 0 8px;
+      }
+    }
+
+    ._forgotPassword {
+      font-size: 13px;
+      color: #colorMap[fontSecondaryDefault];
+      margin: 0 0 -2px;
+    }
+  }
+
+  &.-logged {
+    ._user {
+      width: 100%;
+      max-width: 400px;
+      padding: 16px 0 40px;
+
+      @media (@mobile) {
+        padding: 8px 0 32px;
+      }
+
+      &Informations {
+        .border(#colorMap[borderMain]);
+        border-radius: 4px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 36px;
+        width: 100%;
+        padding: 0 12px;
+        margin: 0 0 8px;
+
+        .Roboto(14px);
+      }
+
+      &Portal {
+        @size: 12;
+        .Inter(~"@{size}px", 700);
+        color: #colorMap[purple];
+
+        height: calc(36em / ~"@{size}");
+        padding: 0 ~"@{size}px";
+        background: #colorMap[backgroundGrey];
+        justify-content: start;
+
+        &.-icon {
+          .buttonIcon {
+            height: calc(18em / ~"@{size}");
+            width: calc(18em / ~"@{size}");
+            fill: #colorMap[purple];
+          }
+        }
+      }
+
+      &Logout {
+        border: none;
+
+        &:hover {
+          color: #colorMap[purple];
+          background: #colorMap[radioButtonBackground];
+        }
+      }
+    }
+
+    ._sandbox {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin: 0 0 36px;
+
+      @media (@mobile) {
+        flex-direction: column;
+      }
+
+      &Title {
+        width: 100%;
+      }
+
+      &Description {
+        &.-hide {
+          display: none;
+        }
+        min-height: 40px;
+        max-width: calc(100% - 232px);
+
+        @media (@mobile) {
+          max-width: 100%;
+        }
+      }
+
+      &RadioButton {
+        @media (@mobile) {
+          margin: 8px 0 0;
+        }
+        div {
+          min-width: 100px;
+        }
+      }
+    }
+  }
+}

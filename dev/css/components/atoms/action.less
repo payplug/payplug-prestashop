@@ -1,0 +1,38 @@
+.payplugUIAction {
+  @size: 14;
+
+  display: flex;
+  align-items: center;
+  min-width: calc(200em / ~"@{size}");
+  height: calc(36em / ~"@{size}");
+  padding: 0 8px;
+
+  .borderRadius(4px);
+  border: none;
+
+  &,
+  &:focus,
+  &:active {
+    .transition(~"color @{dur}, background @{dur}");
+    color: #colorMap[fontMainDefault];
+    background: transparent;
+    text-decoration: none;
+  }
+
+  .Roboto(~"@{size}px", 400);
+  line-height: calc(20em / ~"@{size}");
+
+  &:hover {
+    color: #colorMap[purple];
+    background: #colorMap[purple50];
+    text-decoration: none;
+  }
+
+  &.-disabled,
+  &[disabled="disabled"]{
+    opacity: .3;
+    cursor: default;
+    color: #colorMap[fontMainDefault];
+    background: transparent;
+  }
+}
