@@ -20,10 +20,9 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Action component</h2>
-
-<section style="flex-direction: column">
-    <div style="margin: 0 0 8px;">
+<section>
+    <p class="_title -sub">Action component</p>
+    <div>
         {include file='./action.tpl'
             actionType='button'
             actionName='action_name'
@@ -31,47 +30,47 @@
             actionDisabled=''
             actionText='Default action example'}
     </div>
-    <div style="margin: 0 0 8px;">
+    <div>
         {include file='./action.tpl'
             actionType='button'
             actionName='action_name'
-            actionClassname='-hover'
+            actionClassName='-hover'
             actionDisabled=''
-            actionText='Hover action example'}
+            actionText='Hovered action example'}
     </div>
-    <div style="margin: 0 0 8px;">
+    <div>
         {include file='./action.tpl'
             actionType='a'
             actionTitle='Action link'
             actionHref='https://www.google.com'
             actionText='Action link example'}
     </div>
-    <div style="margin: 0 0 8px;">
+    <div>
         {include file='./action.tpl'
-        actionType='button'
-        actionName='action_name'
-        actionDisabled='true'
-        actionText='Disabled action example'}
+            actionType='button'
+            actionName='action_name'
+            actionDisabled='true'
+            actionText='Disabled action example'}
     </div>
-</section>
 
-<section>
-    props :
-    <ul>
-        <li>type(button:default|a)</li>
-        <li>title</li>
-        <li>href</li>
-        <li>name</li>
-        <li>classname</li>
-        <li>data</li>
-        <li>disabled</li>
-        <li>text</li>
-    </ul>
-</section>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>type (button:default|a)</li>
+                <li>title (optional) </li>
+                <li>href (optional) </li>
+                <li>name (optional) </li>
+                <li>text (mandatory)</li>
+            </ul>
+        </div>
 
-<section>
-    state :
-    <ul>
-        <li>disabled</li>
-    </ul>
+        <div>
+            state :
+            <ul>
+                <li>hover</li>
+                <li>disabled</li>
+            </ul>
+        </div>
+    </div>
 </section>

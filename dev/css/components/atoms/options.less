@@ -8,7 +8,33 @@
   label {
     @size: 14;
     font-size: ~"@{size}px";
+    cursor: pointer;
     margin: 0;
+
+    &:hover,
+    &.-hover {
+      div {
+        background: #colorMap[fontSecondary100];
+      }
+    }
+
+    &.-disabled {
+      cursor: default;
+
+      div {
+        color: #colorMap[fontMainDefault];
+        background: #colorMap[fontSecondary50];
+        opacity: .3;
+      }
+
+      &:hover,
+      &.-hover {
+        div {
+          color: #colorMap[fontMainDefault];
+          background: #colorMap[fontSecondary50];
+        }
+      }
+    }
 
     div {
       .transition(~"background-color @{dur}, color @{dur}");
@@ -17,25 +43,13 @@
 
       color: #colorMap[fontMainDefault];
       background: #colorMap[fontSecondary50];
-      padding: 10px 40px 10px 10pX;
-      cursor: pointer;
+
+      padding: 10px 40px 10px 10px;
       font-weight: normal;
 
       p {
         font-size: calc(12em / ~"@{size}");
         margin: 0;
-      }
-
-      &:hover,
-      &.-hover {
-        background: #colorMap[fontSecondary100];
-      }
-
-      &.-disabled,
-      &[disabled="disabled"] {
-        color: #colorMap[fontMainDefault];
-        background: #colorMap[fontSecondary50];
-        opacity: .3;
       }
     }
 

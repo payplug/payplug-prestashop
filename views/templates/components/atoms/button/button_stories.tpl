@@ -20,63 +20,60 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Button component</h2>
-
 <section>
-    <h3>Style par défaut</h3>
+    <p class="_title -sub">Button component</p>
     <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Default'}
+        <p class="_subtitle">Primary Style (default):</p>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Default'}
+        </div>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Hover' buttonClassName='-hover'}
+        </div>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Disabled' buttonDisabled=true}
+        </div>
     </div>
     <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Hover' buttonClassName='-hover'}
+        <p class="_subtitle">Secondary Style:</p>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Default'}
+        </div>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Hover' buttonClassName='-hover'}
+        </div>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Disabled' buttonDisabled=true}
+        </div>
     </div>
     <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonText='Disabled' buttonDisabled=true}
+        <p class="_subtitle">Tertiary Style:</p>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Default'}
+        </div>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Hover' buttonClassName='-hover'}
+        </div>
+        <div>
+            {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Disabled' buttonDisabled=true}
+        </div>
     </div>
-</section>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>style (primary:default|secondary|tertiary)</li>
+                <li>text (mandatory)</li>
+                <li>name (mandatory)</li>
+            </ul>
+        </div>
 
-<section>
-    <h3>Style secondaire</h3>
-    <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Default'}
+        <div>
+            state :
+            <ul>
+                <li>hover</li>
+                <li>disabled</li>
+            </ul>
+        </div>
     </div>
-    <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Hover' buttonClassName='-hover'}
-    </div>
-    <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='secondary' buttonText='Disabled' buttonDisabled=true}
-    </div>
-</section>
-
-<section>
-    <h3>Style tertiaire</h3>
-    <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Default'}
-    </div>
-    <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Hover' buttonClassName='-hover'}
-    </div>
-    <div>
-        {include file='./button.tpl' buttonName='payplugUIButton' buttonStyle='tertiary' buttonText='Disabled' buttonDisabled=true}
-    </div>
-</section>
-
-<section>
-    props :
-    <ul>
-        <li>style</li>
-        <li>text</li>
-        <li>className</li>
-        <li>name: string</li>
-        <li>data-e2e</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>default</li>
-        <li>hover</li>
-        <li>disabled</li>
-    </ul>
 </section>

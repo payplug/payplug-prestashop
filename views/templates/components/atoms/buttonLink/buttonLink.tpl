@@ -20,8 +20,8 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<a href="{$buttonLinkLink|escape:'htmlall':'UTF-8'}"
-   title="{$buttonLinkText|escape:'htmlall':'UTF-8'}"
+<a href="{$buttonLinkHref|escape:'htmlall':'UTF-8'}"
+   title="{if isset($buttonLinkTitle) && $buttonLinkTitle}{$buttonLinkTitle|escape:'htmlall':'UTF-8'}{else}{$buttonLinkText|escape:'htmlall':'UTF-8'}{/if}"
    target="{if isset($buttonLinkTarget) && $buttonLinkTarget}{$buttonLinkTarget|escape:'htmlall':'UTF-8'}{else}_blank{/if}"
     {if isset($buttonLinkData) && $buttonLinkData} data-e2e-name="{$buttonLinkData|escape:'htmlall':'UTF-8'}"{/if}
     class="payplugUIButtonLink

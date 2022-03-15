@@ -21,60 +21,61 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Radio Button component</h2>
-
 <section>
-    <h3>Default: All states</h3>
+    <p class="_title -sub">Options component</p>
     <div>
-        <label style="text-align:center"></label>
-        {assign var=items value=[['value'=>"on", "dataName" =>"dataLeftButton","text" => 'button gauche', "subText" => 'lorem ipsum'],['value'=>"off","dataName" =>"dataRightButton", "text" => 'button droit', "subText" => 'sit amet dolor']]}
-        {include file='./options.tpl'
-        optionsSelected='on'
-        optionsName='optionsName1'
-        }
+        <p class="_subtitle">Without description:</p>
+        <div>
+            {assign var=items value=[
+            ['value'=>"0", "text" => 'Selected option'],
+            ['value'=>"1", "text" => 'Default option'],
+            ['value'=>"2", "text" => 'Hovered option', "className" => "-hover"],
+            ['value'=>"3", "text" => 'Disabled option', "disabled" =>  true]
+            ]}
+            {include file='./options.tpl'
+            optionsSelected='0'
+            optionsName='options_1'}
+        </div>
+    </div>
+    <div>
+        <p class="_subtitle">With description:</p>
+        <div>
+            {assign var=items value=[
+            ['value'=>"0", "text" => 'Selected option', "subText" => 'Lorem ipsum dolor sit amet'],
+            ['value'=>"1", "text" => 'Default option', "subText" => 'Consectetur adipiscing elit'],
+            ['value'=>"2", "text" => 'Hovered option', "className" => "-hover", "subText" => 'Mauris vehicula suscipit neque'],
+            ['value'=>"3", "text" => 'Disabled option', "disabled" =>  true, "subText" => 'Nec fringilla est vestibulum faucibus']
+            ]}
+            {include file='./options.tpl'
+            optionsSelected='0'
+            optionsName='options_2'}
+        </div>
+    </div>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>name (mandatory)</li>
+                <li>selected (mandatory)</li>
+            </ul>
+        </div>
+        <div>
+            items props :
+            <ul>
+                <li>value (mandatory)</li>
+                <li>text (mandatory)</li>
+                <li>subText (optional)</li>
+            </ul>
+        </div>
+
+        <div>
+            state :
+            <ul>
+                <li>hover</li>
+                <li>selected</li>
+                <li>disabled</li>
+            </ul>
+        </div>
     </div>
 </section>
-<section>
-    <h3>Hover applied</h3>
-    <div>
-        {assign var=items value=[['value'=>"on", "dataName" =>"dataLeftButton","text" => 'button gauche', "className"=>"-hover"],
-        ['value'=>"off","dataName" =>"dataRightButton", "text" => 'button droit', "className"=>"-hover"]]}
-        {include file='./options.tpl'
-        optionsSelected='on'
-        optionsName='optionsName2'
-        }
-    </div>
-</section>
-<section>
-    <h3>Disabled Radio Button</h3>
-    <div>
-        {assign var=items value=[['value'=>"off", "dataName" =>"dataLeftButton","text" => 'button gauche', 'disabled'=>true],['value'=>"off","dataName" =>"dataRightButton", "text" => 'button droit','disabled'=>true]]}
-        {include file='./options.tpl'
-        optionsSelected='on'
-        optionsName='optionsName3'
-        }
-    </div>
 
-
-
-</section>
-
-<section>
-    props :
-    <ul>
-        <li>state: string</li>
-        <li>text: string</li>
-        <li>sub-text: string</li>
-        <li>data-e2e</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>default (can be selected)</li>
-        <li>hover</li>
-        <li>selected</li>
-        <li>disabled</li>
-    </ul>
-</section>

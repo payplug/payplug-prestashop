@@ -22,15 +22,15 @@
 <div class="payplugUIIOptions
     {if isset($optionsClassName) && $optionsClassName} {$optionsClassName|escape:'htmlall':'UTF-8'}{/if}">
     {foreach $items as $item}
-        <label>
-            <input {if isset($item.className) && $item.className} class="payplugUIIOptions {$item.className|escape:'htmlall':'UTF-8'}"{/if}
+        <label class="{if isset($item.className) && $item.className} {$item.className|escape:'htmlall':'UTF-8'}{/if}{if isset($item.disabled) && $item.disabled} -disabled{/if}">
+            <input
                     type="radio" name={$optionsName|escape:'htmlall':'UTF-8'}
                     {if isset($item.dataName) && $item.dataName} data-e2e-name="{$item.dataName|escape:'htmlall':'UTF-8'}"{/if}
                     value="{$item.value|escape:'htmlall':'UTF-8'}"
                     {if isset($optionsSelected) && isset($item.value) && $optionsSelected == $item.value } checked="checked" {/if}
                     {if isset($item.disabled) && $item.disabled} disabled{/if}>
-            <div {if isset($item.className)} class="payplugUIIOptions {$item.className|escape:'htmlall':'UTF-8'}"{/if} {if isset($item.disabled) && $item.disabled} disabled="disabled"{/if}>
-                {if isset($item.text) && $item.text}{$item.text} {/if}
+            <div>
+                {if isset($item.text) && $item.text}{$item.text}{/if}
                 {if isset($item.subText) && $item.subText}<p>{$item.subText}</p>{/if}
             </div>
         </label>

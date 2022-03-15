@@ -20,24 +20,14 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<section style="flex-direction: column">
-    <h2>Block component</h2>
+<section>
+    <p class="_title -sub">Block component</p>
 
     {capture assign="blockContent"}
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         <p>Mauris vehicula suscipit neque, nec fringilla est vestibulum faucibus.</p>
         <p>Cras nisi ligula, suscipit quis nunc eget, elementum iaculis velit.</p>
         <p>Donec nunc lorem, consequat ac aliquet vel, porta a leo.</p>
-        <ul>
-            <li>Maecenas dui ligula, venenatis at magna quis, fringilla sollicitudin nisi.</li>
-            <li>Phasellus rhoncus tellus in nisl fringilla facilisis.</li>
-        </ul>
-        <p>Donec nunc lorem, consequat ac aliquet vel, porta a leo.</p>
-        <ol>
-            <li>Nunc pretium, turpis eget ultrices feugiat, elit felis convallis risus, quis pulvinar sapien lacus id dolor.</li>
-            <li>Donec sed velit non justo placerat tempor ut consequat diam. Nullam mollis eget lacus id consequat.</li>
-            <li>Integer at metus at libero aliquet semper sit amet eget dolor.</li>
-        </ol>
     {/capture}
 
     <div>
@@ -57,22 +47,21 @@
             blockDisabled=true}
     </div>
 
-    <hr>
-</section>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>title (optional)</li>
+                <li>description (optional)</li>
+                <li>content (mandatory)</li>
+            </ul>
+        </div>
 
-<section>
-    props :
-    <ul>
-        <li>title</li>
-        <li>description</li>
-        <li>content</li>
-        <li>className</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>disabled</li>
-    </ul>
+        <div>
+            state :
+            <ul>
+                <li>disabled</li>
+            </ul>
+        </div>
+    </div>
 </section>

@@ -20,35 +20,38 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Accordion component</h2>
-
 <section>
-    {capture assign="accordionContent"}
-        <p>Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...</p>
-        <p>Je ne sais pas vraiment ce que ça veut dire, mais je trouve cela... approprié</p>
-    {/capture}
-    {include file='./accordion.tpl'
+    <p class="_title -sub">Accordion component</p>
+
+    <div>
+        {capture assign="accordionContent"}
+            <p>Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...</p>
+            <p>Je ne sais pas vraiment ce que ça veut dire, mais je trouve cela... approprié</p>
+        {/capture}
+        {include file='./accordion.tpl'
         accordionIdentifier='payplugUIAccordion.identifier'
         accordionClassName='-test'
         accordionLabel='Default Accordion'
         accordionContent=$accordionContent}
+    </div>
+
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>label (optional)</li>
+                <li>identifier (mandatory)</li>
+                <li>content (mandatory)</li>
+            </ul>
+        </div>
+
+        <div>
+            state :
+            <ul>
+                <li>default</li>
+                <li>open</li>
+            </ul>
+        </div>
+    </div>
 </section>
 
-<section>
-    props :
-    <ul>
-        <li>label</li>
-        <li>identifier</li>
-        <li>content</li>
-        <li>className</li>
-        <li>data-e2e</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>default</li>
-        <li>open</li>
-    </ul>
-</section>

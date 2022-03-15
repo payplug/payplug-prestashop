@@ -20,10 +20,8 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h2>Link component</h2>
-
-<section style="flex-direction: column">
-    <h3>Style par défaut</h3>
+<section>
+    <p class="_title -sub">Link component</p>
     <div>
         {include
             file='./link.tpl'
@@ -33,7 +31,7 @@
             linkData='data-link'
         }
     </div>
-    <div style="margin:0;">
+    <div>
         {include
             file='./link.tpl'
             linkText='component link on hover'
@@ -43,7 +41,7 @@
             linkClassName='-hover'
         }
     </div>
-    <div style="margin:0;">
+    <div>
         {include
             file='./link.tpl'
             linkText='component link disabled'
@@ -53,23 +51,22 @@
             linkDisabled=true
         }
     </div>
-</section>
-
-<section>
-    props :
-    <ul>
-        <li>text</li>
-        <li>style</li>
-        <li>link</li>
-        <li>linkTarget</li>
-        <li>data-e2e</li>
-    </ul>
-</section>
-
-<section>
-    state :
-    <ul>
-        <li>disabled</li>
-        <li>hover</li>
-    </ul>
+    <div class="_props">
+        <div>
+            props :
+            <ul>
+                <li>text (mandatory)</li>
+                <li>href (mandatory)</li>
+                <li>linkTarget (optional)</li>
+                <li>noTag (optional for translation)</li>
+            </ul>
+        </div>
+        <div>
+            state :
+            <ul>
+                <li>disabled</li>
+                <li>hover</li>
+            </ul>
+        </div>
+    </div>
 </section>

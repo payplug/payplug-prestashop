@@ -20,39 +20,29 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<h1>Payplug UI component</h1>
-<p>Find all our component bellow :</p>
+<div class="payplugUIComponentsList">
+    <div class="_title">Payplug UI components</div>
 
-<div class="payplugUIComponent">
+    {* accordion stories *}
+    {include file='./../components/atoms/accordion/accordion_stories.tpl'}
+
+    {* Modal stories *}
+    {include file='./../components/atoms/action/action_stories.tpl'}
+
+    {* block stories *}
+    {include file='./../components/atoms/block/block_stories.tpl'}
+
     {* button stories *}
     {include file='./../components/atoms/button/button_stories.tpl'}
 
     {* buttonLink stories *}
     {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
 
-    {* accordion stories *}
-    {include file='./../components/atoms/accordion/accordion_stories.tpl'}
-
     {* input stories *}
     {include file='./../components/atoms/input/input_stories.tpl'}
 
-    {* title stories *}
-    {include file='./../components/atoms/title/title_stories.tpl'}
-
-    {* paragraph stories *}
-    {include file='./../components/atoms/paragraph/paragraph_stories.tpl'}
-
     {* link stories *}
     {include file='./../components/atoms/link/link_stories.tpl'}
-
-    {* block stories *}
-    {include file='./../components/atoms/block/block_stories.tpl'}
-
-    {* Radio Button stories *}
-    {include file='./../components/atoms/options/options_stories.tpl'}
-
-    {* tooltip stories *}
-    {include file='./../components/atoms/tooltip/tooltip_stories.tpl'}
 
     {* tooltip stories *}
     {include file='./../components/atoms/loader/loader_stories.tpl'}
@@ -60,6 +50,15 @@
     {* Modal stories *}
     {include file='./../components/atoms/modal/modal_stories.tpl'}
 
-    {* Modal stories *}
-    {include file='./../components/atoms/action/action_stories.tpl'}
+    {* Radio Button stories *}
+    {include file='./../components/atoms/options/options_stories.tpl'}
+
+    {* paragraph stories *}
+    {include file='./../components/atoms/paragraph/paragraph_stories.tpl'}
+
+    {* title stories *}
+    {include file='./../components/atoms/title/title_stories.tpl'}
+
+    {* tooltip stories *}
+    {include file='./../components/atoms/tooltip/tooltip_stories.tpl'}
 </div>
