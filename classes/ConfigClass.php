@@ -600,7 +600,6 @@ class ConfigClass
         foreach ($configurationKeys as $key => $config) {
             $value = Tools::getValue($config);
 
-
             if ($value != null) {
                 switch ($config) {
                     case 'payplug_one_click':

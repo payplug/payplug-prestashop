@@ -503,3 +503,7 @@ $_MODULE['<{payplug}prestashop>type_66329ddfb8a6bcfba7aa72f602bc4abc'] = 'Config
 $_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'L\'option que vous choisirez ci-dessus permettra au module de paiement PayPlug d\'intérpreter avec précision votre statut de commande de façon automatisée. [1]En savoir plus[/1]';
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Mettre à jour';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Mettre à jour cette commande';
+$_MODULE['<{payplug}prestashop>footer_70dd012dd52dc568533b14c5a467d0a9'] = 'Sauvegarder les changements';
+$_MODULE['<{payplug}prestashop>footer_84b122e7fd10d7cbfd0b301129e05fd2'] = 'mailto:support@payplug.com';
+$_MODULE['<{payplug}prestashop>footer_8c34903a0769d39c12a12095b4aaa050'] = 'https://support.payplug.com/hc/fr/requests/new';
+$_MODULE['<{payplug}prestashop>footer_f511bc90c80e3afee9c5a2e89e692216'] = 'Un problème ? Une question ?[1] Rendez-vous sur notre [2]centre d\'assistance PayPlug[/2] ou contactez-nous à [3]support@payplug.com[/3]';

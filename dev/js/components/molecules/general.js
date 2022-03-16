@@ -19,7 +19,8 @@ class General {
     }
 
     closePopin(event) {
-        $('input[name=modalTriggered]').trigger('click');
+        const $container = $('.' + general.props.container);
+        $container.find('input[name=modalTriggered]').trigger('click');
     }
 
     hideLogin(event) {
@@ -64,13 +65,13 @@ class General {
             url: admin_ajax_url,
             dataType: 'json',
             data: queryData,
-            beforeSend: function () {
+            beforeSend: () => {
                 $button.addClass('-disabled').attr('disabled', 'disabled');
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: (jqXHR, textStatus, errorThrown) => {
                 $button.removeClass('-disabled').removeAttr('disabled');
             },
-            success: function (result) {
+            success: (result) => {
                 if (result.content) {
                     general.reloadFromContent(result.content);
                 } else {
@@ -81,7 +82,7 @@ class General {
                         } else {
                             $container.append(result.modal);
                         }
-                        $('input[name=modalTriggered]').trigger('click');
+                        $container.find('input[name=modalTriggered]').trigger('click');
                     }
                 }
             }
