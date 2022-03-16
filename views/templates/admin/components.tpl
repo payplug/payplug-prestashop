@@ -62,6 +62,9 @@
     {* paragraph stories *}
     {include file='./../components/atoms/paragraph/paragraph_stories.tpl'}
 
+    {* select stories *}
+    {include file='./../components/atoms/select/select_stories.tpl'}
+
     {* title stories *}
     {include file='./../components/atoms/title/title_stories.tpl'}
 
