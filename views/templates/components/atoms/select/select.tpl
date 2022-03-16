@@ -1,0 +1,55 @@
+{*
+* 2022 PayPlug
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0).
+* It is available through the world-wide-web at this URL:
+* https://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please send an email
+* to contact@payplug.com so we can send you a copy immediately.
+*
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+*
+*  @author PayPlug SAS
+*  @copyright 2022 PayPlug SAS
+*  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*  International Registered Trademark & Property of PayPlug SAS
+*}
+
+{if !isset($selectValue)}
+    {assign var='firstOptions' value=$selectOptions|reset}
+    {assign var='selectValue' value=$firstOptions.key}
+{/if}
+
+<div class="payplugUISelect
+    {if isset($selectDisabled) && $selectDisabled} -disabled{/if}
+    {if isset($selectClassName) && $selectClassName} {$selectClassName|escape:'htmlall':'UTF-8'}{/if}"
+        {if isset($selectData) && $selectData} data-e2e-name="{$selectData|escape:'htmlall':'UTF-8'}"{/if}>
+    <div class="_current" {if !isset($selectDisabled) || !$selectDisabled} tabindex="1"{/if}>
+        {foreach $selectOptions as $option}
+            <div class="_value">
+                <input
+                        class="_input"
+                        type="radio"
+                        id="{$selectName}-{$option.key}"
+                        value="{$option.key}"
+                        name="{$selectName}"
+                        {if $selectValue == $option.key} checked{/if}>
+                <p class="_text">{$option.value}</p>
+            </div>
+        {/foreach}
+    </div>
+    <div class="_list">
+        <ul>
+            {foreach $selectOptions as $option}
+                <li>
+                    <label class="_option" for="{$selectName}-{$option.key}" aria-hidden="aria-hidden">{$option.value}</label>
+                </li>
+            {/foreach}
+        </ul>
+    </div>
+</div>

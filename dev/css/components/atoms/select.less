@@ -1,0 +1,112 @@
+.payplugUISelect {
+  @size: 14;
+
+  .border(#colorMap[borderMain]);
+  .borderRadius(4px);
+  background: #colorMap[white];
+  position: relative;
+  display: block;
+  width: 145px;
+  height: calc(36em / ~"@{size}");
+  margin: 0 auto;
+  cursor: pointer;
+
+  ._current {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 100%;
+    padding: 0 40px 0 12px;
+
+    &:after {
+      .transition(~"transform @{dur}");
+      .transform(translateY(-50%));
+
+      position: absolute;
+      top: 50%;
+      left: calc(100% - 20px);
+
+      display: block;
+      width: 12px;
+      height: 8px;
+
+      content: "";
+      background-size: 100%;
+      background-image: url(~"@{img_icons}keyboard_arrow_down_24px.svg");
+    }
+
+    &:focus {
+      &:after {
+        .transform(translateY(-50%) rotate(-180deg));
+      }
+      & + ._list {
+        max-height: 100vh;
+      }
+    }
+  }
+
+  ._value {
+    display: flex;
+  }
+
+  ._input {
+    display: none;
+
+    &:checked + ._text {
+      display: block;
+    }
+  }
+
+  ._text {
+    .Roboto(~"@{size}px", 400);
+    display: none;
+    margin: 0;
+  }
+
+  ._list {
+    .transition(~"max-height @{dur}");
+    .transform(translateX(-50%));
+    overflow: hidden;
+    max-height: 0;
+
+    position: absolute;
+    top: calc(100% - 2px);
+    left: 50%;
+
+    width: calc(100% + 2px);
+    z-index: 999;
+
+    ul {
+      .border(#colorMap[borderMain], rbl);
+      .borderRadius(0 0 4px 4px);
+      background: #colorMap[white];
+      list-style: none;
+      padding: 0;
+    }
+  }
+
+  ._option {
+    .Roboto(~"@{size}px", 400);
+    .transition(~"background @{dur}");
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: calc(36em / ~"@{size}");
+    margin: 0;
+    padding: 0 12px;
+    background: #colorMap[white];
+    color: inherit;
+    cursor: pointer;
+    z-index: 1;
+
+    &:hover {
+      color: #colorMap[purple];
+      background: #colorMap[purple50];
+    }
+  }
+
+  &.-disabled {
+    opacity: .3;
+    cursor: default;
+  }
+}
