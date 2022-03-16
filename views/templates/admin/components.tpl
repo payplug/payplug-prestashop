@@ -29,6 +29,9 @@
     {* Modal stories *}
     {include file='./../components/atoms/action/action_stories.tpl'}
 
+    {* alert stories *}
+    {include file='./../components/atoms/alert/alert_stories.tpl'}
+
     {* block stories *}
     {include file='./../components/atoms/block/block_stories.tpl'}
 
