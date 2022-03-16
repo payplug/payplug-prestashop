@@ -21,6 +21,7 @@
 *}
 
 <div class="{$module_name}Configuration">
+    {* Configuration saving button *}
     {include file='./../components/molecules/general.tpl'}
 
     <form class="{$module_name}" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
@@ -63,4 +64,7 @@
 
         {include file='./panel/settings.tpl'}
     </form>
+
+    {* Configuration footer *}
+    {include file='./../components/molecules/configuration/footer.tpl'}
 </div>

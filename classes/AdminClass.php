@@ -32,17 +32,20 @@ use Validate;
 
 class AdminClass
 {
+    private $assign;
     private $dependencies;
     private $config;
     private $html = '';
     private $paymentRepository;
+    private $tools;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
-        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
     }
 
     /**
@@ -306,6 +309,24 @@ class AdminClass
             die(json_encode([
                 'message' => $this->dependencies->l('payplug.adminAjaxController.orderUpdated', 'adminclass'),
                 'reload' => true
+            ]));
+        }
+
+        if ($this->tools->tool('getValue', 'modal')) {
+            switch ($this->tools->tool('getValue', 'type')) {
+                case 'error':
+                    $this->assign->assign([
+                        'errorMessage' => $this->tools->tool('getValue', 'errorMessage')
+                    ]);
+                    die(json_encode([
+                        'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                    ]));
+            }
+        }
+        if ($this->tools->tool('getValue', 'save')) {
+            $this->dependencies->configClass->saveConfiguration();
+            die(json_encode([
+                'result' => true
             ]));
         }
     }

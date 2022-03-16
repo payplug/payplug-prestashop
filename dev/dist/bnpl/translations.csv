@@ -507,3 +507,4 @@ Per favore, riprova."
 <{bnpl}prestashop>general_38f36e15301b66300db75d4a35febaaf;general.logged.sandBoxDescriptionTest;$faq_sandboxMode;"En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles. [1]En savoir plus[/1].";;;
 <{bnpl}prestashop>general_00a2615a503724afddb33fcf34bd90e8;general.logged.sandBoxDescriptionLive;$faq_sandboxMode;"En mode LIVE, vous acceptez des paiements réels. [1]En savoir plus[/1].";;;
 <{bnpl}prestashop>error_f71260ff0525374d9caca3b86b31a9ab;popin.error.submit;;ok;;;
+<{bnpl}prestashop>footer_70dd012dd52dc568533b14c5a467d0a9;configuration.footer.save;;Sauvegarder les changements;;;

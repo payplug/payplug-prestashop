@@ -19,17 +19,13 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
-{capture assign="modalContent"}
-    <p>{$errorMessage|escape:'all':'UTF-8'}</p>
-    {capture assign="popinErrorSubmit"}{l s='popin.error.submit' mod={$module_name}}{/capture}
+<div class="_footer">
+    {capture assign="footerConfiguration_save"}{l s='configuration.footer.save' mod={$module_name}}{/capture}
     {include file='./../../atoms/button/button.tpl'
-        buttonData='closePopin'
-        buttonName='closePopin'
-        buttonText=$popinErrorSubmit}
-{/capture}
-
-{include file='./../../atoms/modal/modal.tpl'
-    modalClassName='modalError'
-    modalContent=$modalContent
-    modalData='popinConnexionFailed'}
+        buttonClassName='_save'
+        buttonData='saveConfiguration'
+        buttonName='saveConfiguration'
+        buttonStyle='default'
+        buttonDisabled=!$connected
+        buttonText=$footerConfiguration_save}
+</div>
