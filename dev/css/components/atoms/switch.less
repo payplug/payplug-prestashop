@@ -1,0 +1,81 @@
+@import "../../less/include";
+
+.payplugUISwitch {
+  ._switch {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    height: 20px;
+    width: 36px;
+
+
+    input {
+      display: none;
+    }
+
+  }
+
+  ._label {
+    @size: 14;
+    .Roboto(~"@{size}px", 400);
+    right:calc(100% + 8px);
+    position: absolute;
+    top: 0;
+    margin: 0;
+    &::before {
+      content: attr(data-disable-text);
+    }
+
+  }
+
+  ._slider {
+    -webkit-transition: 0.4s;
+    background-color: #697180;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: 0.4s;
+    border-radius: 34px;
+
+    &:before {
+      -webkit-transition: 0.4s;
+      background-color: white;
+      bottom: 2px;
+      content: "";
+      height: 16px;
+      left: 2px;
+      position: absolute;
+      transition: 0.4s;
+      width: 16px;
+      border-radius: 50%;
+    }
+  }
+
+  input {
+    &:disabled + ._slider {
+      background-color: #colorMap[fontMainDisabled];
+      cursor: not-allowed;
+    }
+
+    &:checked + ._slider {
+      background-color: #colorMap[purple];
+
+      &:before {
+        -ms-transform: translateX(16px);
+        -webkit-transform: translateX(16px);
+        transform: translateX(16px);
+      }
+    }
+
+    &:checked ~ ._label {
+
+      &::before {
+        content: attr(data-enable-text);
+      }
+    }
+
+  }
+}
