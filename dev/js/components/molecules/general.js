@@ -129,7 +129,7 @@ class General {
     }
 
     reloadFromContent(content) {
-        $('.payplugConfiguration').replaceWith(content);
+        $('.'+module_name+'Configuration').replaceWith(content);
     }
 
     toggleDescription(event) {
