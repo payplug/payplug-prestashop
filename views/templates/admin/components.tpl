@@ -64,4 +64,8 @@
 
     {* tooltip stories *}
     {include file='./../components/atoms/tooltip/tooltip_stories.tpl'}
+
+    {* Switch stories *}
+    {include file='./../components/atoms/switch/switch_stories.tpl'}
+
 </div>
