@@ -1,6 +1,6 @@
 class Configuration {
     props = {
-        'container': 'payplugConfiguration',
+        'container': module_name + 'Configuration',
         'query': null,
         'data': {}
     };
