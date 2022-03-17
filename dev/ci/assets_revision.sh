@@ -30,6 +30,7 @@ echo "Looking for tag in ${branch}.php..."
 tag=`grep '$this->version =' ${branch}.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
 
 echo "Moving file in views dir"
+cp -r ./views/css/components ./views/build/css
 rm -rf ./views/js ./views/css
 cp ./views/templates/index.php ./views/css/index.php
 cp -r ./views/build/css ./views/
