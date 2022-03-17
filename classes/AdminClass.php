@@ -234,14 +234,17 @@ class AdminClass
         if (Tools::getValue('submit') == 'submitPopin_abort') {
             $this->dependencies->paymentClass->abortPayment();
         }
+
         if ((int) Tools::getValue('check') == 1) {
             $content = $this->dependencies->configClass->getCheckFieldset();
             die(json_encode(['content' => $content]));
         }
+
         if ((int) Tools::getValue('log') == 1) {
             $content = $this->getLogin();
             die(json_encode(['content' => $content]));
         }
+
         if ((int) Tools::getValue('checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
@@ -255,19 +258,24 @@ class AdminClass
             ];
             die(json_encode($return));
         }
+
         if (Tools::getValue('has_live_key')) {
             die(json_encode(['result' => $this->dependencies->apiClass->hasLiveKey()]));
         }
+
         if ((int) Tools::getValue('refund') == 1) {
             $this->dependencies->refundClass->refundPayment();
         }
+
         if ((int) Tools::getValue('capture') == 1) {
             $this->dependencies->paymentClass->capturePayment();
         }
+
         if ((int) Tools::getValue('popinRefund') == 1) {
             $popin = $this->dependencies->mediaClass->displayPopin('refund');
             die(json_encode(['content' => $popin]));
         }
+
         if ((int) Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
             $payment = $this->dependencies->paymentClass->retrievePayment($pay_id);
@@ -316,6 +324,7 @@ class AdminClass
             switch ($this->tools->tool('getValue', 'type')) {
                 case 'error':
                     $this->assign->assign([
+                        'errorData' => 'popinErrorConfiguration',
                         'errorMessage' => $this->tools->tool('getValue', 'errorMessage')
                     ]);
                     die(json_encode([
@@ -323,9 +332,11 @@ class AdminClass
                     ]));
             }
         }
+
         if ($this->tools->tool('getValue', 'save')) {
             $this->dependencies->configClass->saveConfiguration();
             die(json_encode([
+                'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/confirmation.tpl'),
                 'result' => true
             ]));
         }

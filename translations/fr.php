@@ -507,3 +507,5 @@ $_MODULE['<{payplug}prestashop>footer_70dd012dd52dc568533b14c5a467d0a9'] = 'Sauv
 $_MODULE['<{payplug}prestashop>footer_84b122e7fd10d7cbfd0b301129e05fd2'] = 'mailto:support@payplug.com';
 $_MODULE['<{payplug}prestashop>footer_8c34903a0769d39c12a12095b4aaa050'] = 'https://support.payplug.com/hc/fr/requests/new';
 $_MODULE['<{payplug}prestashop>footer_f511bc90c80e3afee9c5a2e89e692216'] = 'Un problème ? Une question ?[1] Rendez-vous sur notre [2]centre d\'assistance PayPlug[/2] ou contactez-nous à [3]support@payplug.com[/3]';
+$_MODULE['<{payplug}prestashop>confirmation_07bb7f32f76744da1c21ee0a663bfd60'] = "ok";
+$_MODULE['<{payplug}prestashop>confirmation_d11c27ae4aabbce80818767e66a1f4b6'] = "Votre configuration a bien été enregistrée.";

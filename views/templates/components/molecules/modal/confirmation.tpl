@@ -21,16 +21,18 @@
 *}
 
 {capture assign="modalContent"}
-    <p>{$errorMessage|escape:'all':'UTF-8'}</p>
-    {capture assign="popinErrorSubmit"}{l s='popin.error.submit' mod={$module_name}}{/capture}
+    {capture assign="popinConfirmationText"}{l s='popin.confirmation.text' mod={$module_name}}{/capture}
+    {include file='./../../atoms/paragraph/paragraph.tpl'
+        paragraphText=$popinConfirmationText}
+
+    {capture assign="popinConfirmSubmit"}{l s='popin.confirmation.submit' mod={$module_name}}{/capture}
     {include file='./../../atoms/button/button.tpl'
-        buttonData='closePopin'
+        buttonData='submit'
         buttonName='closePopin'
-        buttonText=$popinErrorSubmit}
+        buttonText=$popinConfirmSubmit}
 {/capture}
 
 {include file='./../../atoms/modal/modal.tpl'
-    modalClassName='modalError'
+    modalClassName='modalConfirmation'
     modalContent=$modalContent
-    modalData='popinConnexionFailed'}
-modalData=$errorData|escape:'all':'UTF-8'}
+    modalData='popinConfirmConfiguration'}
