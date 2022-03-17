@@ -31,6 +31,7 @@
             "views/build",
             "views/build-bnpl",
             "!views/css/*.css",
+            "!views/js/*.js",
             "views/templates/front/tools",
             "bnpl.php",
             "test.php",
