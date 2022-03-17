@@ -33,7 +33,7 @@
             "!views/css/*.css",
             "!views/js/*.js",
             "views/templates/front/tools",
-            "bnpl.php",
+            "pspaylater.php",
             "test.php",
             "*.zip",
             "features.json.dist",
