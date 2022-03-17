@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
-class BNPL extends PaymentModule
+class PsPaylater extends PaymentModule
 {
     public $payplug_dependencies;
 
@@ -42,13 +42,13 @@ class BNPL extends PaymentModule
      */
     public function __construct()
     {
-        $this->name = 'bnpl';
+        $this->name = 'pspaylater';
         $this->author = 'PayPlug';
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('bnpl.construct.description');
-        $this->displayName = 'BNPL';
+        $this->displayName = 'Paylater';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];

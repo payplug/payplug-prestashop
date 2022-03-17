@@ -24,7 +24,7 @@ if ($fp) {
         foreach ($available_languages as $lang) {
             $line[] = stripcslashes($trans[$lang]);
 
-            if (!$trans[$lang] && strpos($key, 'bnpl') == false && $moduleName != 'bnpl') {
+            if (!$trans[$lang] && strpos($key, 'pspaylater') == false && $moduleName != 'pspaylater') {
                 $missing_translations[$lang][$key] = $trans['default'];
             }
         }

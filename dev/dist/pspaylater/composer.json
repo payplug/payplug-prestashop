@@ -1,7 +1,7 @@
 {
     "name": "payplug/bnpl-prestashop",
-    "moduleName": "bnpl",
-    "description": "BNPL: The online payment solution combining simplicity and first-rate support to boost your sales",
+    "moduleName": "pspaylater",
+    "description": "Paylater: The online payment solution combining simplicity and first-rate support to boost your sales",
     "version": "0.1.0",
     "require": {
         "php": "5.6.*",
@@ -25,7 +25,7 @@
             "!vendor/*",
             "!features.json",
             ".*",
-            "!bnpl/composer.json",
+            "!pspaylater/composer.json",
             "dev",
             "*.sh",
             "test",

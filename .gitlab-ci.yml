@@ -67,7 +67,7 @@ check module translations:
     exit_codes: 126
   artifacts:
     paths:
-      - dev/dist/bnpl/translations.csv
+      - dev/dist/pspaylater/translations.csv
       - dev/dist/payplug/translations.csv
 
 assets compile and revision:
@@ -123,32 +123,6 @@ build zip release:
       - payplug_$CI_COMMIT_REF_NAME.zip
       - payplug_qa_$CI_COMMIT_REF_NAME.zip
 
-build zip bancontact:
-  image: composer:1.9
-  stage: build
-  before_script:
-    - ./dev/ci/dist_files.sh -b payplug
-    - php ./dev/ci/generate-version.php
-    - php ./dev/ci/generate-upgrade.php
-    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
-    - rm -r ./vendor
-    - composer install --no-dev
-    - composer require payplug/payplug-php:dev-wip-bancontact --ignore-platform-reqs php
-    - ./dev/ci/copy_translations.sh
-    - find ./vendor -type d -exec cp index.php {} \;
-    - git status
-    - ./dev/ci/assets_revision.sh -b payplug
-    - mkdir payplug
-  script:
-    - shopt -s extglob
-    - mv !(payplug|composer.json) payplug
-    - cp composer.json ./payplug
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file payplug_qa_bancontact_$CI_COMMIT_REF_NAME --format zip
-  artifacts:
-    paths:
-      - payplug_qa_bancontact_$CI_COMMIT_REF_NAME.zip
-
 assets compile and revision for bnpl:
   image: node:16
   stage: asset-bnpl
@@ -156,7 +130,7 @@ assets compile and revision for bnpl:
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
-    - ./dev/ci/dist_files.sh -b bnpl
+    - ./dev/ci/dist_files.sh -b pspaylater
   script:
     - npm run build
     - echo "Moving file in build dir"
@@ -174,11 +148,11 @@ assets compile and revision for bnpl:
       - views/build-bnpl/*
     expire_in: 1 day
 
-build zip bnpl:
+build zip pspaylater:
   image: composer:1.9
   stage: build-bnpl
   before_script:
-    - ./dev/ci/dist_files.sh -b bnpl
+    - ./dev/ci/dist_files.sh -b pspaylater
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
@@ -189,17 +163,17 @@ build zip bnpl:
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
     - rm -rf views/build && mv views/build-bnpl views/build
-    - ./dev/ci/assets_revision.sh -b bnpl
-    - mkdir bnpl
+    - ./dev/ci/assets_revision.sh -b pspaylater
+    - mkdir pspaylater
     - php ./dev/ci/import-translations.php
   script:
     - shopt -s extglob
-    - mv !(bnpl|composer.json) bnpl
-    - cp composer.json ./bnpl
-    - composer archive --file bnpl_$CI_COMMIT_REF_NAME --format zip
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./bnpl/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file bnpl_qa_$CI_COMMIT_REF_NAME --format zip
+    - mv !(pspaylater|composer.json) pspaylater
+    - cp composer.json ./pspaylater
+    - composer archive --file pspaylater_$CI_COMMIT_REF_NAME --format zip
+    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./pspaylater/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+    - composer archive --file pspaylater_qa_$CI_COMMIT_REF_NAME --format zip
   artifacts:
     paths:
-      - bnpl_$CI_COMMIT_REF_NAME.zip
-      - bnpl_qa_$CI_COMMIT_REF_NAME.zip
+      - pspaylater_$CI_COMMIT_REF_NAME.zip
+      - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
