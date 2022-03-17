@@ -129,6 +129,7 @@ class Configuration {
             ...currentConfiguration
         };
 
+        const $container = $('.' + configuration.props.container);
         const $button = $(this);
 
         if (configuration.props.query != null) {
@@ -149,8 +150,14 @@ class Configuration {
             },
             success: (result) => {
                 $button.removeClass('-disabled').removeAttr('disabled');
-                // todo: show popin confirmation
-                alert('configuration save');
+                if (result.modal) {
+                    if ($('.payplugUIModal').length) {
+                        $('.payplugUIModal').replaceWith(result.modal);
+                    } else {
+                        $container.append(result.modal);
+                    }
+                    $container.find('input[name=modalTriggered]').trigger('click');
+                }
             }
         });
     }

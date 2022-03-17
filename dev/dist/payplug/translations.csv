@@ -507,3 +507,5 @@ Per favore, riprova."
 <{payplug}prestashop>general_00a2615a503724afddb33fcf34bd90e8;general.logged.sandBoxDescriptionLive;$faq_sandboxMode;"En mode LIVE, vous acceptez des paiements réels. [1]En savoir plus[/1].";;;
 <{payplug}prestashop>error_f71260ff0525374d9caca3b86b31a9ab;popin.error.submit;;ok;;;
 <{payplug}prestashop>footer_70dd012dd52dc568533b14c5a467d0a9;configuration.footer.save;;Sauvegarder les changements;;;
+<{payplug}prestashop>confirmation_07bb7f32f76744da1c21ee0a663bfd60;popin.confirmation.submit;;ok;;;
+<{payplug}prestashop>confirmation_d11c27ae4aabbce80818767e66a1f4b6;popin.confirmation.text;;Votre configuration a bien été enregistrée.;Your configuration have been saved;Your configuration have been saved;La tua configurazione è stata salvata

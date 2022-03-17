@@ -1325,7 +1325,8 @@ class ConfigClass
         if (!Validate::isEmail($email) || !PayPlugBackward::isPlaintextPassword($password)) {
             $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
             $this->context->smarty->assign([
-                'errorMessage' => $errorMessage
+                'errorMessage' => $errorMessage,
+                'errorData' => 'popinConnexionFailed',
             ]);
             die(json_encode([
                 'content' => false,
@@ -1347,6 +1348,7 @@ class ConfigClass
             } else {
                 $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
                 $this->context->smarty->assign([
+                    'errorData' => 'popinConnexionFailed',
                     'errorMessage' => $errorMessage
                 ]);
                 die(json_encode([
