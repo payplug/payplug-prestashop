@@ -1079,7 +1079,7 @@ window[module_name+'Module'] = {
                 event.stopPropagation();
 
                 var payment_data = {},
-                    $required = $('.oneyRequired'),
+                    $required = $('.' + module_name + 'OneyRequired'),
                     $fields = $required.find('input');
 
                 $fields.each(function () {
