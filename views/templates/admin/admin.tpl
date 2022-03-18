@@ -21,10 +21,7 @@
 *}
 
 <div class="{$module_name}Configuration">
-    {* Configuration saving button *}
-    {include file='./../components/molecules/general.tpl'}
-
-    <form class="{$module_name}" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
+    <div class="{$module_name}" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
         {if isset($updated_deferred_state) && $updated_deferred_state}
             <p class="alert alert-warning" style="width: 100%;">
                 <span>
@@ -60,10 +57,11 @@
         </p>
         {include file='./panel/show.tpl'}
 
-        {include file='./panel/login.tpl'}
+        {* Configuration saving button *}
+        {include file='./../components/molecules/general.tpl'}
 
         {include file='./panel/settings.tpl'}
-    </form>
+    </div>
 
     {* Configuration footer *}
     {include file='./../components/molecules/configuration/footer.tpl'}
