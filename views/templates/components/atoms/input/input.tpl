@@ -25,7 +25,8 @@
 {/if}
 
 <div class="payplugUIInput
-    {if isset($inputClassName) && $inputClassName} {$inputClassName|escape:'htmlall':'UTF-8'}{/if}">
+    {if isset($inputClassName) && $inputClassName} {$inputClassName|escape:'htmlall':'UTF-8'}{/if}
+    {if isset($inputIcon) && $inputIcon} -icon -icon{$inputIcon|escape:'htmlall':'UTF-8'}{/if}">
     {if isset($inputLabel) && $inputLabel}
         <label for="{$inputName|escape:'htmlall':'UTF-8'}">{$inputLabel|escape:'htmlall':'UTF-8'}</label>
     {/if}
@@ -36,5 +37,10 @@
             {if isset($inputData) && $inputData} data-e2e-name="{$inputData|escape:'htmlall':'UTF-8'}"{/if}
             {if isset($inputValue) && $inputValue} value="{$inputValue|escape:'htmlall':'UTF-8'}"{/if}
             {if isset($inputPlaceholder) && $inputPlaceholder} placeholder="{$inputPlaceholder|escape:'htmlall':'UTF-8'}"{/if}
+            {if $inputType=='number'}
+                step="{if isset($inputStep)}{$inputStep|escape:'htmlall':'UTF-8'}{else}1{/if}"
+                min="{if isset($inputMin)}{$inputMin|escape:'htmlall':'UTF-8'}{else}0{/if}"
+                max="{if isset($inputMax)}{$inputMax|escape:'htmlall':'UTF-8'}{else}3000{/if}"
+            {/if}
             {if isset($inputDisabled) && $inputDisabled} disabled{/if}>
 </div>

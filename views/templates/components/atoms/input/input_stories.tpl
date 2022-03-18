@@ -47,6 +47,15 @@
         </div>
         <div>
             {include file='./input.tpl'
+            inputType='number'
+            inputPlaceholder='Number'
+            inputValue=''
+            inputIcon='Euro'
+            inputName='input.number'
+            inputLabel='Default field number:'}
+        </div>
+        <div>
+            {include file='./input.tpl'
                 inputPlaceholder='Focused field'
                 inputValue=''
                 inputName='input.focus'
@@ -82,11 +91,15 @@
         <div>
             props :
             <ul>
-                <li>type (text:default|password|number(soon))</li>
+                <li>type (text:default|password|number)</li>
                 <li>placeholder (optional)</li>
                 <li>value (optional)</li>
                 <li>name (mandatory)</li>
                 <li>label (optional)</li>
+                <li>icon (optional | allowed values: Euro)</li>
+                <li>step (optional | only applies to number type)</li>
+                <li>min (optional | only applies to number type)</li>
+                <li>max (optional | only applies to number type)</li>
             </ul>
         </div>
 

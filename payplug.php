@@ -34,7 +34,7 @@ class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
 
-    /**z
+    /**
      * Constructor
      *
      * @return void
