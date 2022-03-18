@@ -20,7 +20,7 @@ class General {
 
     closePopin(event) {
         const $container = $('.' + general.props.container);
-        $container.find('input[name=modalTriggered]').trigger('click');
+        $container.find('input[name=modalTriggered]').prop('checked', 'false');
     }
 
     hideLogin(event) {

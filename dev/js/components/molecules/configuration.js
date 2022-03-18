@@ -65,7 +65,7 @@ class Configuration {
 
     closePopin(event) {
         const $container = $('.' + configuration.props.container);
-        $container.find('input[name=modalTriggered]').trigger('click');
+        $container.find('input[name=modalTriggered]').prop('checked', 'false');
     }
 
     showError() {
