@@ -133,6 +133,7 @@ $_MODULE['<{payplug}prestashop>confirm_d04a199a844296a12712bb4b1f486918'] = 'Ins
 $_MODULE['<{payplug}prestashop>confirm_d6b71909b1a4285e2b113d3684bb1477'] = 'REDIRECTED';
 $_MODULE['<{payplug}prestashop>confirm_d9221ad9f319acf615f618586dc168ed'] = 'One-click payments:';
 $_MODULE['<{payplug}prestashop>confirm_f3b1983a230908617267407749a2e40e'] = 'Payment page :';
+$_MODULE['<{payplug}prestashop>confirmation_d11c27ae4aabbce80818767e66a1f4b6'] = 'Your configuration have been saved';
 $_MODULE['<{payplug}prestashop>connected_42ae25231906c83927831e0ef7c317ac'] = 'Disconnect';
 $_MODULE['<{payplug}prestashop>connected_627e1b1426e5db88ee6b79d9c5ccc332'] = 'Account connected';
 $_MODULE['<{payplug}prestashop>connected_e70f93a6ad1c65d2b6dc8ac7569e8ebd'] = 'PayPlug Portal';
