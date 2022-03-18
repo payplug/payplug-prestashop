@@ -154,7 +154,7 @@
             {capture assign='faq_sandboxMode'}
                 {include file='./../atoms/link/link.tpl'
                     linkText=''
-                    linkHref='http://support.payplug.com/customer/portal/articles/1701656'
+                    linkHref=$faq_links.sandbox
                     linkData='faq'
                     linkNoTag=true}
             {/capture}
