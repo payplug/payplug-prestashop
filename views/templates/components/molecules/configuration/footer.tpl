@@ -28,4 +28,27 @@
         buttonStyle='default'
         buttonDisabled=!$connected
         buttonText=$footerConfiguration_save}
+
+    {capture assign="footerConfiguration_help"}
+        {capture assign="footerConfiguration_supportLink"}{l s='configuration.footer.supportLink' mod={$module_name}}{/capture}
+        {capture assign='supportLink'}
+            {include file='./../../atoms/link/link.tpl'
+                linkText=''
+                linkHref=$footerConfiguration_supportLink
+                linkData='faq'
+                linkNoTag=true}
+        {/capture}
+        {capture assign="footerConfiguration_helpCenter"}{l s='configuration.footer.helpCenter' mod={$module_name}}{/capture}
+        {capture assign='helpCenter'}
+            {include file='./../../atoms/link/link.tpl'
+                linkText=''
+                linkHref=$footerConfiguration_helpCenter
+                linkData='faq'
+                linkNoTag=true}
+        {/capture}
+        {l s='configuration.footer.needHelp' tags=['<br>',$helpCenter,$supportLink] mod={$module_name}}
+    {/capture}
+    {include file='./../../atoms/paragraph/paragraph.tpl'
+        paragraphClassName='_needHelp'
+        paragraphText=$footerConfiguration_help}
 </div>
