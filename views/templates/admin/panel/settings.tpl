@@ -35,11 +35,11 @@
 
     {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
         {include file='./settings/embedded.tpl'}
+        <div class="{$module_name}Settings_separator">
+            <p><strong>{l s='Advanced settings' mod={$module_name}}</strong></p>
+        </div>
     {/if}
 
-    <div class="{$module_name}Settings_separator">
-        <p><strong>{l s='Advanced settings' mod={$module_name}}</strong></p>
-    </div>
 
     <div class="{$module_name}Settings_advanced">
         {if $standard_isActivated}
@@ -56,9 +56,5 @@
         {if $deferred_isActivated && (($standard_isActivated || $installment_isActivated))}
             {include file='./settings/deferred.tpl'}
         {/if}
-    </div>
-
-    <div class="panel-footer">
-        <button type="submit" name="submitSettings" class="{$module_name}Button -green{if !$connected} -disabled{/if}">{l s='Update settings' mod={$module_name}}</button>
     </div>
 </div>
