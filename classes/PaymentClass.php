@@ -874,7 +874,7 @@ class PaymentClass
                         ['def' => (int)$options['deferred']],
                         true
                     );
-                    $paymentOption[$payment_key]['moduleName'] = 'payplug';
+                    $paymentOption[$payment_key]['moduleName'] = $this->dependencies->name;
                 }
             }
 
@@ -927,7 +927,7 @@ class PaymentClass
                 ['def' => (int)$options['deferred']],
                 true
             );
-            $paymentOption['standard']['moduleName'] = 'payplug';
+            $paymentOption['standard']['moduleName'] = $this->dependencies->name;
         }
 
         // Installment Payment
@@ -991,7 +991,7 @@ class PaymentClass
                     ['def' => (int)$options['deferred']],
                     true
                 );
-                $paymentOption['installment']['moduleName'] = 'payplug';
+                $paymentOption['installment']['moduleName'] = $this->dependencies->name;
 
                 $this->assign->assign([
                     'installment_controller_url' => $this->context->link->getModuleLink(
@@ -1139,7 +1139,7 @@ class PaymentClass
                     [],
                     true
                 );
-                $paymentOption[$payment_key]['moduleName'] = 'payplug';
+                $paymentOption[$payment_key]['moduleName'] = $this->dependencies->name;
                 $paymentOption[$payment_key]['err_label'] = $err_label;
             }
         }
@@ -1169,7 +1169,7 @@ class PaymentClass
                 ['type' => 'bancontact'],
                 true
             );
-            $paymentOption['bancontact']['moduleName'] = 'payplug';
+            $paymentOption['bancontact']['moduleName'] = $this->dependencies->name;
             $paymentOption['bancontact']['inputs'] = [
                 'pc' => [
                     'name' => 'pc',
