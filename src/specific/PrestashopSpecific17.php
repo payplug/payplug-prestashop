@@ -39,7 +39,7 @@ class PrestashopSpecific17
     private $config;
     private $context;
     private $dependencies;
-
+    private $oney;
 
     public $payplug;
 
@@ -48,6 +48,7 @@ class PrestashopSpecific17
         $this->dependencies = new DependenciesClass();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
     }
 
     public function displayHeader()
