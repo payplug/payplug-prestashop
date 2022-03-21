@@ -13,18 +13,18 @@
     margin: 0 0 4px;
   }
 
-
   &.-icon {
-   input {
-     background-size: 8px;
-     background-repeat: no-repeat;
-     background-position: 12px 12px;
-     &[type=text],
-     &[type=password],
-     &[type=number] {
-       padding-left: 28px;
-     }
-   }
+    input {
+      background-size: 8px;
+      background-repeat: no-repeat;
+      background-position: 12px 12px;
+
+      &[type=text],
+      &[type=password],
+      &[type=number] {
+        padding-left: 28px;
+      }
+    }
   }
 
   &.-iconEuro {
@@ -32,8 +32,6 @@
       background-image: url(~"@{img_icons}euro_symbol_24px.svg");
     }
   }
-
-
 
   input {
     &[type=text],
@@ -58,18 +56,17 @@
       &:hover {
         border-color: #colorMap[purple];
       }
+
       &:focus-visible {
         outline: none;
       }
-
-
 
       &:focus {
         background-color: inherit;
       }
 
       &:disabled {
-        background-color: #colorMap[grey];
+        background-color: #colorMap[backgroundGrey];
 
         &::placeholder {
           color: #colorMap[fontMainDisabled];
