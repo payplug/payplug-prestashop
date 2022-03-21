@@ -392,14 +392,14 @@ class PaymentRepository extends Repository
         $this->query
             ->update()
             ->table($table)
-            ->set('id_payment =         \'' . $paymentDetails['paymentId'] . '\'')
-            ->set('payment_method =     \'' . $paymentDetails['paymentMethod'] . '\'')
-            ->set('payment_url =        \'' . $paymentDetails['paymentUrl'] . '\'')
-            ->set('payment_return_url = \'' . $paymentDetails['paymentReturnUrl'] . '\'')
-            ->set('cart_hash =          \'' . $cartHash . '\'')
-            ->set('authorized_at =      \'' . $paymentDetails['authorizedAt'] . '\'')
-            ->set('is_paid =            \'' . $paymentDetails['isPaid'] . '\'')
-            ->set('date_upd =           \'' . $paymentDate . '\'')
+            ->set('id_payment =         "' . $this->query->escape($paymentDetails['paymentId']) . '"')
+            ->set('payment_method =     "' . $this->query->escape($paymentDetails['paymentMethod']) . '"')
+            ->set('payment_url =        "' . $this->query->escape($paymentDetails['paymentUrl']) . '"')
+            ->set('payment_return_url = "' . $this->query->escape($paymentDetails['paymentReturnUrl']) . '"')
+            ->set('cart_hash =          "' . $this->query->escape($cartHash) . '"')
+            ->set('authorized_at =      "' . $this->query->escape($paymentDetails['authorizedAt']) . '"')
+            ->set('is_paid =            "' . $this->query->escape($paymentDetails['isPaid']) . '"')
+            ->set('date_upd =           "' . $this->query->escape($paymentDate) . '"')
             ->where('id_cart =          ' . (int)$paymentDetails['cartId']);
 
         try {
@@ -592,15 +592,15 @@ class PaymentRepository extends Repository
         $this->query
             ->insert()
             ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->fields('id_payment')->values($paymentDetails['paymentId'])
-            ->fields('payment_method')->values($paymentDetails['paymentMethod'])
-            ->fields('payment_url')->values($paymentDetails['paymentUrl'])
-            ->fields('payment_return_url')->values($paymentDetails['paymentReturnUrl'])
-            ->fields('id_cart')->values($paymentDetails['cartId'])
-            ->fields('cart_hash')->values($cartHash)
+            ->fields('id_payment')->values($this->query->escape($paymentDetails['paymentId']))
+            ->fields('payment_method')->values($this->query->escape($paymentDetails['paymentMethod']))
+            ->fields('payment_url')->values($this->query->escape($paymentDetails['paymentUrl']))
+            ->fields('payment_return_url')->values($this->query->escape($paymentDetails['paymentReturnUrl']))
+            ->fields('id_cart')->values((int)$paymentDetails['cartId'])
+            ->fields('cart_hash')->values($this->query->escape($cartHash))
             ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
             ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
-            ->fields('date_upd')->values($paymentDate);
+            ->fields('date_upd')->values($this->query->escape($paymentDate));
 
         try {
             if (!$this->query->build()) {

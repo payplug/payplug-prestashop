@@ -105,7 +105,7 @@ class CardRepository extends Repository
             ->select()
             ->fields('id_card')
             ->from($this->constant->get('_DB_PREFIX_') . $this->cardEntity->getTable())
-            ->where('id_card = "' . $paymentId . '"')
+            ->where('id_card = "' . $this->query->escape($paymentId) . '"')
             ->where('id_company = ' . (int)$companyId)
             ->where('is_sandbox = ' . (int)$isSandbox);
 
@@ -475,13 +475,13 @@ class CardRepository extends Repository
             ->fields('id_customer')->values((int)$customer_id)
             ->fields('id_company')->values((int)$company_id)
             ->fields('is_sandbox')->values((int)$is_sandbox)
-            ->fields('id_card')->values((string)$payment->card->id)
-            ->fields('last4')->values((string)$payment->card->last4)
-            ->fields('exp_month')->values((string)$payment->card->exp_month)
-            ->fields('exp_year')->values((string)$payment->card->exp_year)
-            ->fields('brand')->values((string)$brand)
-            ->fields('country')->values((string)$payment->card->country)
-            ->fields('metadata')->values((string)serialize($payment->card->metadata));
+            ->fields('id_card')->values($this->query->escape($payment->card->id))
+            ->fields('last4')->values($this->query->escape($payment->card->last4))
+            ->fields('exp_month')->values($this->query->escape($payment->card->exp_month))
+            ->fields('exp_year')->values($this->query->escape($payment->card->exp_year))
+            ->fields('brand')->values($this->query->escape($brand))
+            ->fields('country')->values($this->query->escape($payment->card->country))
+            ->fields('metadata')->values($this->query->escape(serialize($payment->card->metadata)));
         try {
             if (!$this->query->build()) {
                 $this->logger->addLog(

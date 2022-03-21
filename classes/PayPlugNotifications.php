@@ -844,7 +844,7 @@ class PayPlugNotifications
         if ($this->is_installment) {
             $sql = 'SELECT `id_cart` 
                     FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_payment` 
-                    WHERE `id_payment` = "' . $this->payment->installment_plan_id . '"';
+                    WHERE `id_payment` = "' . pSQL($this->payment->installment_plan_id) . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
@@ -859,7 +859,7 @@ class PayPlugNotifications
         } else {
             $sql = 'SELECT `id_cart` 
                     FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_payment` 
-                    WHERE `id_payment` = "' . $this->resource->id . '"';
+                    WHERE `id_payment` = "' . pSQL($this->resource->id) . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {

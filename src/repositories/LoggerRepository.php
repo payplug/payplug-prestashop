@@ -299,7 +299,7 @@ class LoggerRepository extends Repository
         $this->query
             ->delete()
             ->from(_DB_PREFIX_.$logger->getTable())
-            ->where('`id_payplug_logger` < ' . $last_logs_valid[0]['id_payplug_logger'])
+            ->where('`id_payplug_logger` < ' . (int)$last_logs_valid[0]['id_payplug_logger'])
         ;
 
         if (!$this->query->build()) {

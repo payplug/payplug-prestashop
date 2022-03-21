@@ -153,7 +153,7 @@ class CacheRepository extends Repository
             ->select()
             ->fields('*')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_cache')
-            ->where('`cache_key` = \'' . (string)$cache_key . '\'');
+            ->where('`cache_key` = \'' . $this->query->escape($cache_key) . '\'');
 
         $result = $this->query->build();
 
@@ -195,7 +195,7 @@ class CacheRepository extends Repository
         $this->query
             ->delete()
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_cache')
-            ->where('`cache_key` = \'' . (string)$cache_key . '\'')
+            ->where('`cache_key` = \'' . $this->query->escape($cache_key) . '\'')
             ->build()
         ;
     }
