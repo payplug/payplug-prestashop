@@ -63,6 +63,9 @@
         {* Configuration saving button *}
         {include file='./../components/molecules/general.tpl'}
 
+        {* paylater block*}
+        {include file='./../components/molecules/paylater.tpl'}
+
         {include file='./panel/settings.tpl'}
     </div>
 

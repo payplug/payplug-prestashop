@@ -45,7 +45,6 @@
         {if $standard_isActivated}
             {include file='./settings/standard.tpl'}
         {/if}
-        {include file='./settings/oney.tpl'}
 
         {if $bancontact}
             {include file='./settings/bancontact.tpl'}
