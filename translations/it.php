@@ -328,6 +328,7 @@ $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Detta
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'L\'avvio di questo pagamento è autorizzato prima del %s. Successivamente, non potrai più ricevere questo pagamento';
 $_MODULE['<{payplug}prestashop>order_state_87b9c32cfe0d587a0a635bc846380859'] = 'ATTENZIONE: lo stato dell\'ordine [1]%s[/1] non è configurato per essere identificato dal modulo PayPlug. Affinché i pagamenti associati al modulo siano correttamente elaborati, ti consigliamo di modificare la [2]Configurazione via il modulo PayPlug[/2] dalle impostazioni dell\'ordine, cliccando [3]QUI[/3].';
 $_MODULE['<{payplug}prestashop>order_state_da2fde2b954058fb173a89c89416e4e4'] = 'Per ulteriori informazioni, puoi consultare le FAQ, cliccando [1]QUI[/1].';
+$_MODULE['<{payplug}prestashop>paylater_a89597ac9fa68018f8edf15ca13dee0f'] = 'PayLater';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Pagamento in 3x o 4x senza nessuna commissione con Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = 'Scopri di più';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Pagamento in 3x o 4x con Carta di Credito con Oney';

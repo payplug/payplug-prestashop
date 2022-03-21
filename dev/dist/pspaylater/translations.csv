@@ -513,3 +513,11 @@ Per favore, riprova."
 <{pspaylater}prestashop>footer_84b122e7fd10d7cbfd0b301129e05fd2;configuration.footer.supportLink;;mailto:support@payplug.com;;;
 <{pspaylater}prestashop>footer_8c34903a0769d39c12a12095b4aaa050;configuration.footer.helpCenter;;https://support.payplug.com/hc/fr/requests/new;;;
 <{pspaylater}prestashop>footer_f511bc90c80e3afee9c5a2e89e692216;configuration.footer.needHelp;<br>,$helpCenter,$supportLink;Un problème ? Une question ?[1] Rendez-vous sur notre [2]centre d'assistance PayPlug[/2] ou contactez-nous à [3]support@payplug.com[/3];;;
+<{pspaylater}prestashop>paylater_a89597ac9fa68018f8edf15ca13dee0f;paylater.block.title;;PayLater;PayLater;PayLater;PayLater
+<{pspaylater}prestashop>paylater_0f6ba158a6c94cb2beb80d802f0cc9dc;paylater.block.description;;"Sélectionnez vos préférences de paramétrage du PayLater pour afficher le 3x 4x Oney sur votre boutique.";;;
+<{pspaylater}prestashop>paylater_8034690a81787782c699be7078f5e19d;paylater.block.detailsTitle;;"Paiements 3x 4x Oney";;;
+<{pspaylater}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3;paylater.block.detailsDescription;faq_oneyBlock;"Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Choisissez ci-dessous de prendre (ou non) l'ensemble des frais à votre charge. [1]En savoir plus[/1].";;;
+<{pspaylater}prestashop>paylater_88faf5140e46519b6202e754c59a3f73;paylater.block.oneyWithFeesTitle;;"Avec frais";;;
+<{pspaylater}prestashop>paylater_851b0aeddc3b21f358b122f0181e51d7;paylater.block.oneyWithoutFeesTitle;;"Sans frais";;;
+<{pspaylater}prestashop>paylater_b97ce6e200faff80eda5840137ec3323;paylater.block.oneyWithFeesDescription;;"Les frais sont répartis entre vous et vos clients. ";;;
+<{pspaylater}prestashop>paylater_e6e132699f77505baebb35d39d2430a2;paylater.block.oneyWithoutFeesDescription;;"Les frais sont à votre charge.";;;

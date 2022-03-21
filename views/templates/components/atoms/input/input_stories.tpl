@@ -91,7 +91,7 @@
         <div>
             props :
             <ul>
-                <li>type (text:default|password|number)</li>
+                <li>type (text:default|password|number|hidden)</li>
                 <li>placeholder (optional)</li>
                 <li>value (optional)</li>
                 <li>name (mandatory)</li>

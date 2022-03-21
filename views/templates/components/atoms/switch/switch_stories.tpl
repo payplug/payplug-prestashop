@@ -30,6 +30,9 @@
         switchDisabledLabel='Off'
         switchDataName='switchData'
         switchValue='0'
+        switchName='test'
+        checked=true
+
         }
 
     </div>
@@ -40,6 +43,7 @@
         switchDisabledLabel='Off'
         switchDataName='switchData'
         disabled=true
+        switchName='test'
         }
     </div>
 

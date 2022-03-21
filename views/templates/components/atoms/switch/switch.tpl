@@ -24,7 +24,7 @@
 
 
     <label class="_switch">
-        <input id="toggle" type="checkbox" {if isset($disabled) && $disabled} disabled{/if}>
+        <input id="toggle"  name ={$switchName} type="checkbox" {if isset($disabled) && $disabled} disabled{/if} {if isset($checked) && $checked}checked{/if}>
         <span class="_slider"></span>
         <span class="_label" data-enable-text={$switchEnabledLabel} data-disable-text={$switchDisabledLabel}></span>
     </label>
