@@ -19,41 +19,42 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel {$module_name}Settings">
-    <div class="panel-heading">{l s='SETTINGS' mod={$module_name}}</div>
+{if $standard_isActivated || $installment_isActivated || $bancontact || $installment_isActivated || $deferred_isActivated}
+    <div class="panel {$module_name}Settings">
+        <div class="panel-heading">{l s='SETTINGS' mod={$module_name}}</div>
 
-    {if $connected && !$verified}
-        <div class="panel-row">
-            <p class="{$module_name}Alert -warning">
-                <span>
-                    {l s='You are able to perform only TEST transactions.' mod={$module_name}} {l s='Please activate your account to perform LIVE transactions.' mod={$module_name}}
-                    <a href="{$faq_links.activation|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod={$module_name}}</a>
-                </span>
-            </p>
+        {if $connected && !$verified}
+            <div class="panel-row">
+                <p class="{$module_name}Alert -warning">
+                    <span>
+                        {l s='You are able to perform only TEST transactions.' mod={$module_name}} {l s='Please activate your account to perform LIVE transactions.' mod={$module_name}}
+                        <a href="{$faq_links.activation|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod={$module_name}}</a>
+                    </span>
+                </p>
+            </div>
+        {/if}
+
+        {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
+            {include file='./settings/embedded.tpl'}
+            <div class="{$module_name}Settings_separator">
+                <p><strong>{l s='Advanced settings' mod={$module_name}}</strong></p>
+            </div>
+        {/if}
+
+        <div class="{$module_name}Settings_advanced">
+            {if $standard_isActivated}
+                {include file='./settings/standard.tpl'}
+            {/if}
+
+            {if $bancontact}
+                {include file='./settings/bancontact.tpl'}
+            {/if}
+            {if $installment_isActivated}
+                {include file='./settings/installment.tpl'}
+            {/if}
+            {if $deferred_isActivated && (($standard_isActivated || $installment_isActivated))}
+                {include file='./settings/deferred.tpl'}
+            {/if}
         </div>
-    {/if}
-
-    {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
-        {include file='./settings/embedded.tpl'}
-        <div class="{$module_name}Settings_separator">
-            <p><strong>{l s='Advanced settings' mod={$module_name}}</strong></p>
-        </div>
-    {/if}
-
-
-    <div class="{$module_name}Settings_advanced">
-        {if $standard_isActivated}
-            {include file='./settings/standard.tpl'}
-        {/if}
-
-        {if $bancontact}
-            {include file='./settings/bancontact.tpl'}
-        {/if}
-        {if $installment_isActivated}
-            {include file='./settings/installment.tpl'}
-        {/if}
-        {if $deferred_isActivated && (($standard_isActivated || $installment_isActivated))}
-            {include file='./settings/deferred.tpl'}
-        {/if}
     </div>
-</div>
+{/if}

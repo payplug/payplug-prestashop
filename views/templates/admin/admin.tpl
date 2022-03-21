@@ -21,7 +21,7 @@
 *}
 
 <div class="{$module_name}Configuration">
-    <div class="{$module_name}" action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
+    <div class="{$module_name}">
         {if isset($updated_deferred_state) && $updated_deferred_state}
             <p class="alert alert-warning" style="width: 100%;">
                 <span>
