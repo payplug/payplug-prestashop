@@ -57,6 +57,9 @@
         </p>
         {include file='./panel/show.tpl'}
 
+        {* Banner *}
+        {include file='./../components/molecules/banner.tpl'}
+
         {* Configuration saving button *}
         {include file='./../components/molecules/general.tpl'}
 
