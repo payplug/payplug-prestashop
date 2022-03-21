@@ -9,7 +9,7 @@ git grep -rl `basename PayPlugModule` . ':!dev/ci/set_namespace.sh' | xargs sed 
 
 echo "Renaming the front controllers files to begin with bnpl"
 
-git grep -rl 'class Payplug' ./controllers/front | xargs sed -i -e 's/class Payplug/class bnpl/g';
+git grep -rl 'class Payplug' ./controllers/front | xargs sed -i -e 's/class Payplug/class PsPayLater/g';
 
 echo "Remove temporay file";
 rm ./*.php-e ./*/*.php-e ./*/*/*.php-e ./*/*/*/*.php-e;
