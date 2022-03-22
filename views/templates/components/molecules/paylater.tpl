@@ -24,7 +24,7 @@
 {capture assign="payLaterBlock_description"}{l s='paylater.block.description' mod={$module_name}}{/capture}
 {capture assign="paylaterBlock_content"}
     {capture assign="detailsTitle"}{l s='paylater.block.detailsTitle' mod={$module_name}}{/capture}
-    {include file='./../atoms/title/title.tpl' titleText=$detailsTitle}
+    {include file='./../atoms/title/title.tpl' titleClassName='_paylaterTitle' titleText=$detailsTitle}
     <div class="_details">
         {capture assign='faq_oneyBlock'}
             {include file='./../atoms/link/link.tpl'
@@ -34,7 +34,9 @@
             linkNoTag=true}
         {/capture}
         {capture assign="detailsDescription"}{l s='paylater.block.detailsDescription' tags=[$faq_oneyBlock] mod={$module_name}}{/capture}
-        {include file='./../atoms/paragraph/paragraph.tpl' paragraphText=$detailsDescription}
+        {include file='./../atoms/paragraph/paragraph.tpl'
+        paragraphClassName='_paylaterParagraph'
+        paragraphText=$detailsDescription }
         {* Hide PayLater switch if module_name is pspaylater *}
         <div class="_detailsSwitch">
             {if $module_name=='pspaylater'}
