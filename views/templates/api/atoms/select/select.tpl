@@ -35,11 +35,11 @@
                 <input
                         class="_input"
                         type="radio"
-                        id="{$selectName}-{$option.key}"
-                        value="{$option.key}"
-                        name="{$selectName}"
+                        id="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
+                        value="{$option.key|escape:'htmlall':'UTF-8'}"
+                        name="{$selectName|escape:'htmlall':'UTF-8'}"
                         {if $selectValue == $option.key} checked{/if}>
-                <p class="_text">{$option.value}</p>
+                <p class="_text">{$option.value|escape:'htmlall':'UTF-8'}</p>
             </div>
         {/foreach}
     </div>
@@ -47,7 +47,7 @@
         <ul>
             {foreach $selectOptions as $option}
                 <li>
-                    <label class="_option" for="{$selectName}-{$option.key}" aria-hidden="aria-hidden">{$option.value}</label>
+                    <label class="_option" for="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}" aria-hidden="aria-hidden">{$option.value|escape:'htmlall':'UTF-8'}</label>
                 </li>
             {/foreach}
         </ul>

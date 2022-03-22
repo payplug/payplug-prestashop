@@ -20,23 +20,17 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<section class="payplugUiBlock
-    {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}
-    {if isset($blockDisabled) && $blockDisabled} -disabled{/if}"
-    {if isset($blockData) && $blockData} data-e2e-name={$blockData}{/if}>
-    {if isset($blockTitle) && $blockTitle}
-        <h2 class="_title">
-            {$blockTitle}
-        </h2>
-    {/if}
-    {if isset($blockDescription) && $blockDescription}
-        <p class="_description">
-            {$blockDescription}
-        </p>
-    {/if}
-    <div class="_content">
-        {$blockContent}
-    </div>
-</section>
-
-
+<div class="payplugUITooltip
+    {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}"
+    {if isset($blockData) && $blockData} data-e2e-name="{$blockData|escape:'htmlall':'UTF-8'}"{/if}>
+    <label>
+        <input type="checkbox">
+        <span class="_icon">{include file="../../_svg/icon-{$tooltipIcon|escape:'htmlall':'UTF-8'}.tpl"}</span>
+        <span class="_overlay"></span>
+        <span class="_modal">
+            <div class="_content">
+                {$tooltipContent}
+            </div>
+        </span>
+    </label>
+</div>

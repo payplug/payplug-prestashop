@@ -24,54 +24,54 @@
     <div class="_title">Payplug UI components</div>
 
     {* accordion stories *}
-    {include file='./../components/atoms/accordion/accordion_stories.tpl'}
+    {include file='./../api/atoms/accordion/accordion_stories.tpl'}
 
     {* Modal stories *}
-    {include file='./../components/atoms/action/action_stories.tpl'}
+    {include file='./../api/atoms/action/action_stories.tpl'}
 
     {* alert stories *}
-    {include file='./../components/atoms/alert/alert_stories.tpl'}
+    {include file='./../api/atoms/alert/alert_stories.tpl'}
 
     {* block stories *}
-    {include file='./../components/atoms/block/block_stories.tpl'}
+    {include file='./../api/atoms/block/block_stories.tpl'}
 
     {* button stories *}
-    {include file='./../components/atoms/button/button_stories.tpl'}
+    {include file='./../api/atoms/button/button_stories.tpl'}
 
     {* buttonLink stories *}
-    {include file='./../components/atoms/buttonLink/buttonLink_stories.tpl'}
+    {include file='./../api/atoms/buttonLink/buttonLink_stories.tpl'}
 
     {* Image stories *}
-    {include file='./../components/atoms/image/image_stories.tpl'}
+    {include file='./../api/atoms/image/image_stories.tpl'}
 
     {* input stories *}
-    {include file='./../components/atoms/input/input_stories.tpl'}
+    {include file='./../api/atoms/input/input_stories.tpl'}
 
     {* link stories *}
-    {include file='./../components/atoms/link/link_stories.tpl'}
+    {include file='./../api/atoms/link/link_stories.tpl'}
 
     {* tooltip stories *}
-    {include file='./../components/atoms/loader/loader_stories.tpl'}
+    {include file='./../api/atoms/loader/loader_stories.tpl'}
 
     {* Modal stories *}
-    {include file='./../components/atoms/modal/modal_stories.tpl'}
+    {include file='./../api/atoms/modal/modal_stories.tpl'}
 
     {* Radio Button stories *}
-    {include file='./../components/atoms/options/options_stories.tpl'}
+    {include file='./../api/atoms/options/options_stories.tpl'}
 
     {* paragraph stories *}
-    {include file='./../components/atoms/paragraph/paragraph_stories.tpl'}
+    {include file='./../api/atoms/paragraph/paragraph_stories.tpl'}
 
     {* select stories *}
-    {include file='./../components/atoms/select/select_stories.tpl'}
+    {include file='./../api/atoms/select/select_stories.tpl'}
 
     {* title stories *}
-    {include file='./../components/atoms/title/title_stories.tpl'}
+    {include file='./../api/atoms/title/title_stories.tpl'}
 
     {* tooltip stories *}
-    {include file='./../components/atoms/tooltip/tooltip_stories.tpl'}
+    {include file='./../api/atoms/tooltip/tooltip_stories.tpl'}
 
     {* Switch stories *}
-    {include file='./../components/atoms/switch/switch_stories.tpl'}
+    {include file='./../api/atoms/switch/switch_stories.tpl'}
 
 </div>

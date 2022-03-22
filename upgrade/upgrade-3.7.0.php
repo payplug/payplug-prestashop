@@ -58,7 +58,8 @@ function upgrade_module_3_7_0($object)
         $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
         if (!$sqlGetType) {
             $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
+            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` 
+            (`id_order_state`, `type`, `date_add`, `date_upd`)
             VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
         }
     }

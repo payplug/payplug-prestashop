@@ -20,22 +20,22 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {if isset($messages) && $messages}
-    <div class="{$module_name}Msg_wrapper">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Msg_wrapper">
         {foreach $messages as $message}
             {if $message.type == 'string'}
-                <p {if isset($is_error_message) && $is_error_message} class="{$module_name}Msg_error" {else} class="{$module_name}Msg_text" {/if}>{$message.value|escape:'htmlall':'UTF-8'}</p>
+                <p {if isset($is_error_message) && $is_error_message} class="{$module_name|escape:'htmlall':'UTF-8'}Msg_error" {else} class="{$module_name|escape:'htmlall':'UTF-8'}Msg_text" {/if}>{$message.value|escape:'htmlall':'UTF-8'}</p>
             {elseif $message.type == 'template'}
                 {include file="../"|cat:$message.value}
             {/if}
         {/foreach}
         {if isset($with_msg_button) && $with_msg_button}
-            <button type="button" class="{$module_name}Msg_button" name="card_deleted">{l s='hook.partials.message.ok' mod={$module_name}}</button>
+            <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Msg_button" name="card_deleted">{l s='hook.partials.message.ok' mod='payplug'}</button>
         {/if}
 
         {if isset($with_yes_no_buttons) && $with_yes_no_buttons}
-        <div class="{$module_name}Popup_footer">
-            <button type="button" class="{$module_name}Msg_button {$module_name}Msg_confirmButton" name="confirm_delete">{l s='hook.partials.message.yes' mod={$module_name}}</button>
-            <button type="button" class="{$module_name}Msg_button {$module_name}Msg_declineButton">{l s='hook.partials.message.no' mod={$module_name}}</button>
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_footer">
+            <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Msg_button {$module_name|escape:'htmlall':'UTF-8'}Msg_confirmButton" name="confirm_delete">{l s='hook.partials.message.yes' mod='payplug'}</button>
+            <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Msg_button {$module_name|escape:'htmlall':'UTF-8'}Msg_declineButton">{l s='hook.partials.message.no' mod='payplug'}</button>
         </div>
         {/if}
     </div>

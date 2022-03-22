@@ -21,22 +21,22 @@
 *}
 <p class="alert alert-danger" data-e2e-error="php_version">
     {assign "link_to_php_version_support_page" "<a href ='$faq_url'>"}
-    {l s='admin.phpversion.wrongPhpVersion' tags=['<br>',$link_to_php_version_support_page] mod={$module_name}} <br>
+    {l s='admin.phpversion.wrongPhpVersion' tags=['<br>',$link_to_php_version_support_page] mod='payplug'} <br>
 </p>
 <div class="panel panel-show">
-    <div class="panel-heading">{l s='admin.phpversion.heading' mod={$module_name}}</div>
+    <div class="panel-heading">{l s='admin.phpversion.heading' mod='payplug'}</div>
     <div class="panel-row">
         <img src="{$url_logo|escape:'htmlall':'UTF-8'}" />
-        <p class="block-title">{l s='admin.phpversion.title' mod={$module_name}}</p>
-        <p>{l s='admin.phpversion.headlist' mod={$module_name}}</p>
+        <p class="block-title">{l s='admin.phpversion.title' mod='payplug'}</p>
+        <p>{l s='admin.phpversion.headlist' mod='payplug'}</p>
         <ul>
-            <li>{l s='admin.phpversion.card' mod={$module_name}}</li>
-            <li>{l s='admin.phpversion.integrated' mod={$module_name}}</li>
-            <li>{l s='admin.phpversion.custom' mod={$module_name}}</li>
-            <li>{l s='admin.phpversion.secure' mod={$module_name}}</li>
-            <li>{l s='admin.phpversion.automatic' mod={$module_name}}</li>
-            <li>{l s='admin.phpversion.history' mod={$module_name}}</li>
-            <li>{l s='admin.phpversion.fast' mod={$module_name}}</li>
+            <li>{l s='admin.phpversion.card' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.integrated' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.custom' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.secure' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.automatic' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.history' mod='payplug'}</li>
+            <li>{l s='admin.phpversion.fast' mod='payplug'}</li>
         </ul>
     </div>
 </div>

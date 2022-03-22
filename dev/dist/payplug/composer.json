@@ -36,7 +36,7 @@
             "pspaylater.php",
             "test.php",
             "*.zip",
-            "features.json.dist",
+            "webpack.config.js",
             "upgrade/upgrade-methods.php"
         ]
     },

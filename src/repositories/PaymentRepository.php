@@ -196,10 +196,7 @@ class PaymentRepository extends Repository
         }
 
         $this->dependencies->paymentClass->setPaymentErrorsCookie([
-            $this->dependencies->l(
-                'The transaction was not completed and your card was not charged.',
-                'paymentrepository'
-            )
+            $this->dependencies->l('The transaction was not completed and your card was not charged.', 'paymentrepository')
         ]);
 
         $this->logger->setParams(['process' => 'paymentRepository']);

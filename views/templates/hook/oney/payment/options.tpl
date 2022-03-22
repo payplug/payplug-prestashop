@@ -22,13 +22,13 @@
 {if isset($oney_payment_options) && $oney_payment_options}
     {foreach $oney_payment_options as $oney_type=>$oney_payment_option}
         {assign var=split value="x{$oney_payment_option.split}"}
-        <label class="{$module_name}OneyOption -{$oney_type|escape:'htmlall':'UTF-8'}{if !isset($oney_payment_option.installments) || !$oney_payment_option.installments} -withoutSchedule{/if}">
-            <div class="{$module_name}OneyOption_title">
-                    <img src="{$oney_image.$split|escape:'htmlall':'UTF-8'}" class="{$module_name}OneyLogo -optimized-16" />
+        <label class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption -{$oney_type|escape:'htmlall':'UTF-8'}{if !isset($oney_payment_option.installments) || !$oney_payment_option.installments} -withoutSchedule{/if}">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption_title">
+                    <img src="{$oney_image.$split|escape:'htmlall':'UTF-8'}" class="{$module_name|escape:'htmlall':'UTF-8'}OneyLogo -optimized-16" />
                    {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
             </div>
             {if isset($oney_payment_option.installments) && $oney_payment_option.installments}
-                <div class="{$module_name}OneyOption_prices">
+                <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption_prices">
                     {include file="./detail.tpl" oney_payment_option=$oney_payment_option}
                 </div>
             {/if}
@@ -37,6 +37,6 @@
     {/foreach}
 {else}
     <span class="oneyError">
-        {l s='hook.oney.payment.options.unavailable' mod={$module_name}}
+        {l s='hook.oney.payment.options.unavailable' mod='payplug'}
     </span>
 {/if}

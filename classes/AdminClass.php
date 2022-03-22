@@ -327,8 +327,9 @@ class AdminClass
                         'errorData' => 'popinErrorConfiguration',
                         'errorMessage' => $this->tools->tool('getValue', 'errorMessage')
                     ]);
+                    $tpl = '/views/templates/api/molecules/modal/error.tpl';
                     die(json_encode([
-                        'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                        'modal' => $this->dependencies->configClass->fetchTemplate($tpl),
                     ]));
             }
         }
@@ -340,8 +341,9 @@ class AdminClass
 
             if ($connected) {
                 $this->dependencies->configClass->saveConfiguration();
+                $tpl = '/views/templates/api/molecules/modal/confirmation.tpl';
                 die(json_encode([
-                    'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/confirmation.tpl'),
+                    'modal' => $this->dependencies->configClass->fetchTemplate($tpl),
                     'result' => true
                 ]));
             }
@@ -350,8 +352,9 @@ class AdminClass
                 'errorData' => 'popinErrorConfiguration',
                 'errorMessage' => $this->dependencies->l('payplug.adminAjaxController.needLogin', 'adminclass')
             ]);
+            $tpl = '/views/templates/api/molecules/modal/error.tpl';
             die(json_encode([
-                'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                'modal' => $this->dependencies->configClass->fetchTemplate($tpl),
                 'result' => false
             ]));
         }

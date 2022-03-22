@@ -19,20 +19,11 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
-{capture assign="modalContent"}
-    {capture assign="popinConfirmationText"}{l s='popin.confirmation.text' mod={$module_name}}{/capture}
-    {include file='./../../atoms/paragraph/paragraph.tpl'
-        paragraphText=$popinConfirmationText}
-
-    {capture assign="popinConfirmSubmit"}{l s='popin.confirmation.submit' mod={$module_name}}{/capture}
-    {include file='./../../atoms/button/button.tpl'
-        buttonData='submit'
-        buttonName='closePopin'
-        buttonText=$popinConfirmSubmit}
-{/capture}
-
-{include file='./../../atoms/modal/modal.tpl'
-    modalClassName='modalConfirmation'
-    modalContent=$modalContent
-    modalData='popinConfirmConfiguration'}
+<div class="payplugUISwitch {if isset($switchClassName) && $switchClassName} {$switchClassName|escape:'htmlall':'UTF-8'}{/if}"
+        {if isset($switchDataName) && $switchDataName} data-e2e-name="{$switchDataName|escape:'htmlall':'UTF-8'}"{/if}>
+    <label class="_switch">
+        <input name="{$switchName|escape:'htmlall':'UTF-8'}" type="checkbox" {if isset($disabled) && $disabled} disabled{/if} {if isset($checked) && $checked}checked{/if}>
+        <span class="_slider"></span>
+        <span class="_label" data-enable-text="{$switchEnabledLabel|escape:'htmlall':'UTF-8'}" data-disable-text="{$switchDisabledLabel|escape:'htmlall':'UTF-8'}"></span>
+    </label>
+</div>

@@ -20,15 +20,15 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {if $standard_isActivated || $installment_isActivated || $bancontact || $installment_isActivated || $deferred_isActivated}
-    <div class="panel {$module_name}Settings">
-        <div class="panel-heading">{l s='SETTINGS' mod={$module_name}}</div>
+    <div class="panel {$module_name|escape:'htmlall':'UTF-8'}Settings">
+        <div class="panel-heading">{l s='SETTINGS' mod='payplug'}</div>
 
         {if $connected && !$verified}
             <div class="panel-row">
-                <p class="{$module_name}Alert -warning">
+                <p class="{$module_name|escape:'htmlall':'UTF-8'}Alert -warning">
                     <span>
-                        {l s='You are able to perform only TEST transactions.' mod={$module_name}} {l s='Please activate your account to perform LIVE transactions.' mod={$module_name}}
-                        <a href="{$faq_links.activation|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod={$module_name}}</a>
+                        {l s='You are able to perform only TEST transactions.' mod='payplug'} {l s='Please activate your account to perform LIVE transactions.' mod='payplug'}
+                        <a href="{$faq_links.activation|escape:'htmlall':'UTF-8'}" target="_blank">{l s='More information' mod='payplug'}</a>
                     </span>
                 </p>
             </div>
@@ -36,12 +36,12 @@
 
         {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
             {include file='./settings/embedded.tpl'}
-            <div class="{$module_name}Settings_separator">
-                <p><strong>{l s='Advanced settings' mod={$module_name}}</strong></p>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Settings_separator">
+                <p><strong>{l s='Advanced settings' mod='payplug'}</strong></p>
             </div>
         {/if}
 
-        <div class="{$module_name}Settings_advanced">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Settings_advanced">
             {if $standard_isActivated}
                 {include file='./settings/standard.tpl'}
             {/if}
