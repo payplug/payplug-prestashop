@@ -22,11 +22,10 @@
 <div class="payplugUIIOptions
     {if isset($optionsClassName) && $optionsClassName} {$optionsClassName|escape:'htmlall':'UTF-8'}{/if}">
     {foreach $items as $item}
-        <label class="{if isset($item.className) && $item.className} {$item.className|escape:'htmlall':'UTF-8'}{/if}{if isset($item.disabled) && $item.disabled} -disabled{/if}">
+        <label class="{if isset($item.className) && $item.className} {$item.className|escape:'htmlall':'UTF-8'}{/if}{if isset($item.disabled) && $item.disabled} -disabled{/if}" {if isset($item.dataName) && $item.dataName} data-e2e-name="{$item.dataName|escape:'htmlall':'UTF-8'}"{/if}>
             <input
                     type="radio" name={$optionsName|escape:'htmlall':'UTF-8'}
-                    {if isset($item.dataName) && $item.dataName} data-e2e-name="{$item.dataName|escape:'htmlall':'UTF-8'}"{/if}
-                    value="{$item.value|escape:'htmlall':'UTF-8'}"
+            value="{$item.value|escape:'htmlall':'UTF-8'}"
                     {if isset($optionsSelected) && isset($item.value) && $optionsSelected == $item.value } checked="checked" {/if}
                     {if isset($item.disabled) && $item.disabled} disabled{/if}>
             <div>
