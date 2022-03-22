@@ -24,14 +24,14 @@
     {foreach $items as $item}
         <label class="{if isset($item.className) && $item.className} {$item.className|escape:'htmlall':'UTF-8'}{/if}{if isset($item.disabled) && $item.disabled} -disabled{/if}" {if isset($item.dataName) && $item.dataName} data-e2e-name="{$item.dataName|escape:'htmlall':'UTF-8'}"{/if}>
             <input
-                    type="radio" name={$optionsName|escape:'htmlall':'UTF-8'}
+                    type="radio" name="{$optionsName|escape:'htmlall':'UTF-8'}"
             value="{$item.value|escape:'htmlall':'UTF-8'}"
                     {if isset($optionsSelected) && isset($item.value) && $optionsSelected == $item.value } checked="checked" {/if}
                     {if isset($item.disabled) && $item.disabled} disabled{/if}>
-            <div>
-                {if isset($item.text) && $item.text}{$item.text}{/if}
-                {if isset($item.subText) && $item.subText}<p>{$item.subText}</p>{/if}
-            </div>
+            <span>
+                {if isset($item.text) && $item.text}{$item.text|escape:'htmlall':'UTF-8'}{/if}
+                {if isset($item.subText) && $item.subText}<span>{$item.subText}</span>{/if}
+            </span>
         </label>
     {/foreach}
 </div>

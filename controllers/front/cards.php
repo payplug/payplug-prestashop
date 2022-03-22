@@ -21,7 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
     private $card;
@@ -100,7 +99,8 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             ]);
             $this->setTemplate('customer/cards_1_6.tpl');
         } else {
-            $this->setTemplate('module:' . $this->dependencies->name . '/views/templates/front/customer/cards_list.tpl');
+            $tpl = 'module:' . $this->dependencies->name . '/views/templates/front/customer/cards_list.tpl';
+            $this->setTemplate($tpl);
         }
     }
 }

@@ -728,7 +728,9 @@ class HookClass
         }
 
         if ($show_popin && $display_refund) {
-            $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin_order_popin.js');
+            $this->context->controller->addJS(
+                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin_order_popin.js'
+            );
         }
 
         // check order state history
@@ -850,7 +852,9 @@ class HookClass
                 return;
             }
 
-            $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/embedded.js');
+            $this->context->controller->addJS(
+                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/embedded.js'
+            );
 
             $payment_options = [
                 'id_card' => $this->tools->tool('getValue', 'pc', 'new_card'),

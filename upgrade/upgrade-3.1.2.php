@@ -49,7 +49,8 @@ function upgrade_module_3_1_2($object)
                 CHANGE `id_'.$object->name.'_card` `position` INT(11) UNSIGNED NOT NULL',
             'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP PRIMARY KEY',
             'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP `position`',
-            'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` ADD `id_'.$object->name.'_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+            'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` 
+                ADD `id_'.$object->name.'_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
                 ADD PRIMARY KEY (`id_'.$object->name.'_card`)',
         ];
 

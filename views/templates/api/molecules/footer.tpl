@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="_footer">
-    {capture assign="footerConfiguration_save"}{l s='configuration.footer.save' mod={$module_name}}{/capture}
+    {capture assign="footerConfiguration_save"}{l s='configuration.footer.save' mod='payplug'}{/capture}
     {include file='./../atoms/button/button.tpl'
         buttonClassName='_save'
         buttonData='saveConfiguration'

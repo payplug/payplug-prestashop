@@ -128,7 +128,8 @@ class RefundClass
                             if (!empty($schedule->payment_ids)) {
                                 foreach ($schedule->payment_ids as $p_id) {
                                     $payment = $this->dependencies->paymentClass->retrievePayment($p_id);
-                                    $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve payment id: ' . $payment->id);
+                                    $this->logger->addLog('[PayPlugClass - makeRefund()] '
+                                        . 'Retrieve payment id: ' . $payment->id);
                                     if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
                                         $amount_refundable = (int)($payment->amount - $payment->amount_refunded);
                                         $truly_refundable_amount += $amount_refundable;
@@ -165,7 +166,8 @@ class RefundClass
                             }
                         }
                     } else {
-                        $error = 'error [PayPlugClass - makeRefund()]: Can\'t retrieve InstallmentPlan with given id: ' . $inst_id;
+                        $error = 'error [PayPlugClass - makeRefund()]: '
+                            . 'Can\'t retrieve InstallmentPlan with given id: ' . $inst_id;
                         $this->logger->addLog($error, 'error');
                         return ('error');
                     }

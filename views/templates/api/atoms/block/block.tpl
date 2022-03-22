@@ -19,15 +19,24 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugUISwitch {if isset($switchClassName) && $switchClassName} {$switchClassName|escape:'htmlall':'UTF-8'}{/if}"
-        {if isset($switchDataName) && $switchDataName} data-e2e-name="{$switchDataName|escape:'htmlall':'UTF-8'}"{/if}>
+
+<section class="payplugUiBlock
+    {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}
+    {if isset($blockDisabled) && $blockDisabled} -disabled{/if}"
+    {if isset($blockData) && $blockData} data-e2e-name="{$blockData}"{/if}>
+    {if isset($blockTitle) && $blockTitle}
+        <h2 class="_title">
+            {$blockTitle|escape:'htmlall':'UTF-8'}
+        </h2>
+    {/if}
+    {if isset($blockDescription) && $blockDescription}
+        <p class="_description">
+            {$blockDescription}
+        </p>
+    {/if}
+    <div class="_content">
+        {$blockContent}
+    </div>
+</section>
 
 
-    <label class="_switch">
-        <input id="toggle"  name ={$switchName} type="checkbox" {if isset($disabled) && $disabled} disabled{/if} {if isset($checked) && $checked}checked{/if}>
-        <span class="_slider"></span>
-        <span class="_label" data-enable-text={$switchEnabledLabel} data-disable-text={$switchDisabledLabel}></span>
-    </label>
-
-
-</div>

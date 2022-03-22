@@ -35,6 +35,7 @@ class PrestashopSpecific16
 {
     private $card;
     private $config;
+    private $constant;
     private $dependencies;
     private $oney;
 
@@ -43,6 +44,7 @@ class PrestashopSpecific16
         $this->dependencies = new DependenciesClass();
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->oney = $this->dependencies->getPlugin()->getOney();
     }
@@ -50,9 +52,10 @@ class PrestashopSpecific16
 
     public function displayHeader()
     {
-        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/css/front_1_6.css');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/front_1_6.js');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/utilities.js');
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addCSS($views_path . '/css/front_1_6.css');
+        $this->context->controller->addJS($views_path . '/js/front_1_6.js');
+        $this->context->controller->addJS($views_path . '/js/utilities.js');
 
         Media::addJsDef([
             'payplug_ajax_url' => $this->context->link->getModuleLink('payplug', 'ajax', [], true),

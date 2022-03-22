@@ -20,10 +20,10 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {* paylater Block *}
-{capture assign="paylaterBlock_title"}{l s='paylater.block.title' mod={$module_name}}{/capture}
-{capture assign="payLaterBlock_description"}{l s='paylater.block.description' mod={$module_name}}{/capture}
+{capture assign="paylaterBlock_title"}{l s='paylater.block.title' mod='payplug'}{/capture}
+{capture assign="payLaterBlock_description"}{l s='paylater.block.description' mod='payplug'}{/capture}
 {capture assign="paylaterBlock_content"}
-    {capture assign="detailsTitle"}{l s='paylater.block.detailsTitle' mod={$module_name}}{/capture}
+    {capture assign="detailsTitle"}{l s='paylater.block.detailsTitle' mod='payplug'}{/capture}
     {include file='./../atoms/title/title.tpl' titleClassName='_paylaterTitle' titleText=$detailsTitle}
     <div class="_details">
         {capture assign='faq_oneyBlock'}
@@ -33,10 +33,10 @@
             linkData='faqOney'
             linkNoTag=true}
         {/capture}
-        {capture assign="detailsDescription"}{l s='paylater.block.detailsDescription' tags=[$faq_oneyBlock] mod={$module_name}}{/capture}
+        {capture assign="detailsDescription"}{l s='paylater.block.detailsDescription' tags=[$faq_oneyBlock] mod='payplug'}{/capture}
         {include file='./../atoms/paragraph/paragraph.tpl'
-        paragraphClassName='_paylaterParagraph'
-        paragraphText=$detailsDescription }
+            paragraphClassName='_paylaterParagraph'
+            paragraphText=$detailsDescription }
         {* Hide PayLater switch if module_name is pspaylater *}
         <div class="_detailsSwitch">
             {if $module_name=='pspaylater'}
@@ -55,10 +55,10 @@
         </div>
     </div>
     {* PayLater Options: oney with or without fees *}
-    {capture assign="oneyWithFeesTitle"}{l s='paylater.block.oneyWithFeesTitle' mod={$module_name}}{/capture}
-    {capture assign="oneyWithFeesDescription"}{l s='paylater.block.oneyWithFeesDescription' mod={$module_name}}{/capture}
-    {capture assign="oneyWithoutFeesTitle"}{l s='paylater.block.oneyWithoutFeesTitle' mod={$module_name}}{/capture}
-    {capture assign="oneyWithoutFeesDescription"}{l s='paylater.block.oneyWithoutFeesDescription' mod={$module_name}}{/capture}
+    {capture assign="oneyWithFeesTitle"}{l s='paylater.block.oneyWithFeesTitle' mod='payplug'}{/capture}
+    {capture assign="oneyWithFeesDescription"}{l s='paylater.block.oneyWithFeesDescription' mod='payplug'}{/capture}
+    {capture assign="oneyWithoutFeesTitle"}{l s='paylater.block.oneyWithoutFeesTitle' mod='payplug'}{/capture}
+    {capture assign="oneyWithoutFeesDescription"}{l s='paylater.block.oneyWithoutFeesDescription' mod='payplug'}{/capture}
     {assign var=items value=[
     ['value'=>"1", "dataName" =>'oneyWithFees' ,"text" => $oneyWithFeesTitle, "subText" => $oneyWithFeesDescription, className=>'_paylaterLabel'],
     ['value'=>"0", "dataName" =>'oneyWithoutFees' ,"text" => $oneyWithoutFeesTitle, "subText" => $oneyWithoutFeesDescription, className=>'_paylaterLabel']

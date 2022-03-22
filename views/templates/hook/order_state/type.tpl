@@ -25,8 +25,8 @@
     <div id="tpl" style="display:block">
 
         <label class="control-label col-lg-3">
-            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='hook.order_state.type.tooltips' mod={$module_name}}">
-                {l s='hook.order_state.type.label' mod={$module_name}}
+            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='hook.order_state.type.tooltips' mod='payplug'}">
+                {l s='hook.order_state.type.label' mod='payplug'}
             </span>
         </label>
         <div class="col-lg-9">
@@ -40,7 +40,7 @@
                     <div class="col-lg-9">
                         <div class="alert alert-info">
                             {assign "payplug_order_state_link" "<a href='{$payplug_order_state_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
-                            {l s='hook.order_state.type.info' tags=[$payplug_order_state_link] mod={$module_name}}
+                            {l s='hook.order_state.type.info' tags=[$payplug_order_state_link] mod='payplug'}
                         </div>
                     </div>
                 </div>

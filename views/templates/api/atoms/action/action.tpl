@@ -23,7 +23,7 @@
     {assign var='actionType' value='button'}
 {/if}
 
-<{$actionType} class="payplugUIAction
+<{$actionType|escape:'htmlall':'UTF-8'} class="payplugUIAction
     {if isset($actionDisabled) && $actionDisabled} -disabled{/if}
     {if isset($actionClassName) && $actionClassName} {$actionClassName|escape:'htmlall':'UTF-8'}{/if}"
     {if isset($actionTitle) && $actionTitle} title="{$actionTitle|escape:'htmlall':'UTF-8'}"{/if}
@@ -31,5 +31,5 @@
     {if isset($actionName) && $actionName} name="{$actionName|escape:'htmlall':'UTF-8'}"{/if}
     {if isset($actionData) && $actionData} data-e2e-name="{$actionData|escape:'htmlall':'UTF-8'}"{/if}
     {if isset($actionDisabled) && $actionDisabled} disabled="disabled"{/if}>
-    {$actionText}
-</{$actionType}>
+    {$actionText|escape:'htmlall':'UTF-8'}
+</{$actionType|escape:'htmlall':'UTF-8'}>

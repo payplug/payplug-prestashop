@@ -288,13 +288,8 @@ class OneyRepository extends Repository
                             $this->dependencies->l('Please enter your billing city.', 'oneyrepository');
                         $errors[] = $text;
                     } elseif ($tools->tool('strlen', $data, 'UTF-8') > 32) {
-                        $text = $this->dependencies->l(
-                            'Your city name is too long (max 32 characters). ',
-                            'oneyrepository'
-                        ) . $this->dependencies->l(
-                            'Please change it to another one or select another payment method.',
-                            'oneyrepository'
-                        );
+                        $text = $this->dependencies->l('Your city name is too long (max 32 characters). ', 'oneyrepository')
+                            . $this->dependencies->l('Please change it to another one or select another payment method.', 'oneyrepository');
                         $errors[] = $text;
                     }
                     break;
@@ -1309,10 +1304,7 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'error' => sprintf(
-                    $this->dependencies->l(
-                        'The total amount of your order should be between %s and %s to pay with Oney.',
-                        'oneyrepository'
-                    ),
+                    $this->dependencies->l('The total amount of your order should be between %s and %s to pay with Oney.', 'oneyrepository'),
                     $this->toolsSpecific->tool('displayPrice', $limits['min']),
                     $this->toolsSpecific->tool('displayPrice', $limits['max'])
                 )
@@ -1403,10 +1395,7 @@ class OneyRepository extends Repository
                 );
             }
             */
-            $str_list = $this->dependencies->l(
-                'France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana',
-                'oneyrepository'
-            );
+            $str_list = $this->dependencies->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana', 'oneyrepository');
             if (in_array('IT', $iso_list)) {
                 $str_list = $this->dependencies->l('Italy', 'oneyrepository');
             }
@@ -1414,10 +1403,7 @@ class OneyRepository extends Repository
             return [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => $this->dependencies->l(
-                    'For a payment with Oney, delivery and billing addresses must be in',
-                    'oneyrepository'
-                ) . ' ' .
+                'error' => $this->dependencies->l('For a payment with Oney, delivery and billing addresses must be in', 'oneyrepository') . ' ' .
                 $str_list
             ];
         }
@@ -1440,24 +1426,12 @@ class OneyRepository extends Repository
             $error = $this->dependencies->l('Your email address is not a valid email', 'oneyrepository');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
             && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->dependencies->l(
-                'Your email address is too long and the + character is not valid',
-                'oneyrepository'
-            );
-            $error .= $this->dependencies->l(
-                ' please change it to another address (max 100 characters).',
-                'oneyrepository'
-            );
+            $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');
+            $error .= $this->dependencies->l(' please change it to another address (max 100 characters).', 'oneyrepository');
         } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
-            $error = $this->dependencies->l(
-                'Your email address is too long. Please change your email address (100 characters max).',
-                'oneyrepository'
-            );
+            $error = $this->dependencies->l('Your email address is too long. Please change your email address (100 characters max).', 'oneyrepository');
         } elseif (strpos($email, '+') !== false) {
-            $error = $this->dependencies->l(
-                'The + character is not valid. Please change your email address (100 characters max).',
-                'oneyrepository'
-            );
+            $error = $this->dependencies->l('The + character is not valid. Please change your email address (100 characters max).', 'oneyrepository');
         }
 
         return [

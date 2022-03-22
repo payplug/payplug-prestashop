@@ -20,17 +20,4 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="payplugUITooltip
-    {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}"
-    {if isset($blockData) && $blockData} data-e2e-name={$blockData}{/if}>
-    <label>
-        <input type="checkbox">
-        <span class="_icon">{include file="../../_svg/icon-{$tooltipIcon|escape:'htmlall':'UTF-8'}.tpl"}</span>
-        <span class="_overlay"></span>
-        <span class="_modal">
-            <div class="_content">
-                {$tooltipContent}
-            </div>
-        </span>
-    </label>
-</div>
+<div class="payplugUILoader"{if isset($loaderSize) && $loaderSize} style="font-size:{$loaderSize|escape:'htmlall':'UTF-8'}px"{/if}><span></span></div>

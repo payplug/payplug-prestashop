@@ -20,17 +20,17 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel-row separate_margin_block payplugTips -payplug_standard">
-    <div class="{$module_name}Tips_item -left {if !$payplug_switch.standard.checked} -hide{/if}">
-        <div class="{$module_name}Panel">
-            <div class="{$module_name}Panel_label">{l s='admin.panel.setting.oneclick.label' mod={$module_name}}</div>
-            <div class="{$module_name}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Tips_item -left {if !$payplug_switch.standard.checked} -hide{/if}">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='admin.panel.setting.oneclick.label' mod='payplug'}</div>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
         </div>
-        <div class="{$module_name}Panel">
-            <div class="{$module_name}Panel_content">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
                 <p>
-                    {l s='admin.panel.setting.oneclick.content' mod={$module_name}}
-                    <a class="{$module_name}Link" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
-                        {l s='admin.panel.setting.oneclick.link' mod={$module_name}}
+                    {l s='admin.panel.setting.oneclick.content' mod='payplug'}
+                    <a class="{$module_name|escape:'htmlall':'UTF-8'}Link" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
+                        {l s='admin.panel.setting.oneclick.link' mod='payplug'}
                     </a>
                 </p>
             </div>

@@ -24,7 +24,7 @@
     {assign var='alertType' value='success'}
 {/if}
 
-<div class="payplugUIAlert -{$alertType}
+<div class="payplugUIAlert -{$alertType|escape:'htmlall':'UTF-8'}
     {if isset($alertClassName) && $alertClassName} {$alertClassName|escape:'htmlall':'UTF-8'}{/if}"
     {if isset($alertData) && $alertData} data-e2e-name="{$alertData|escape:'htmlall':'UTF-8'}"{/if}>
     <div class="_icon">
@@ -39,5 +39,5 @@
     {if isset($alertTitle) && $alertTitle}
         <div class="_title">{$alertTitle|escape:'htmlall':'UTF-8'}</div>
     {/if}
-    <div class="_content">{$alertContent|escape:'all':'UTF-8'}</div>
+    <div class="_content">{$alertContent}</div>
 </div>

@@ -23,24 +23,24 @@
 <div id="payplug_admin_form">
     <form action="{$form_action|escape:'htmlall':'UTF-8'}" method="post">
         <div class="panel">
-            <div class="panel-heading">{l s='Uninstall configuration' mod={$module_name}}</div>
+            <div class="panel-heading">{l s='Uninstall configuration' mod='payplug'}</div>
             {*<div class="panel-heading">{l s='Uninstall configuration' d='Modules.Payplug.Admin'}</div>*}
             <div class="panel-row">
-                <label class="left-block">{l s='Keep cards' mod={$module_name}}</label>
+                <label class="left-block">{l s='Keep cards' mod='payplug'}</label>
                 {*<label class="left-block">{l s='Keep cards' d='Modules.Payplug.Admin'}</label>*}
                 <div class="block-right">
                     <span class="switch prestashop-switch fixed-width-lg">
                         <input type="radio" class="switch-input" name="keep_cards" value="1"
                                id="payplug_keep_card_on" {if $keep_cards}checked="checked"{/if}>
-                        <label title="{l s='Enable Debug mode' mod={$module_name}}" for="payplug_keep_card_on"
+                        <label title="{l s='Enable Debug mode' mod='payplug'}" for="payplug_keep_card_on"
                         {*label title="{l s='Enable Debug mode' d='Modules.Payplug.Admin'}" for="payplug_keep_card_on"*}
-                               class="switch-label switch-label-on">{l s='YES' mod={$module_name}}</label>
+                               class="switch-label switch-label-on">{l s='YES' mod='payplug'}</label>
                                {*class="switch-label switch-label-on">{l s='YES' d='Modules.Payplug.Admin'}</label>*}
                         <input type="radio" class="switch-input" name="keep_cards" value="0" id="payplug_keep_card_off"
                                {if !$keep_cards}checked="checked"{/if}>
-                        <label title="{l s='Disable one click payment' mod={$module_name}}" for="payplug_keep_card_off"
+                        <label title="{l s='Disable one click payment' mod='payplug'}" for="payplug_keep_card_off"
                         {*<label title="{l s='Disable one click payment' d='Modules.Payplug.Admin'}" for="payplug_keep_card_off"*}
-                               class="switch-label switch-label-off">{l s='NO' mod={$module_name}}</label>
+                               class="switch-label switch-label-off">{l s='NO' mod='payplug'}</label>
                                {*class="switch-label switch-label-off">{l s='NO' d='Modules.Payplug.Admin'}</label>*}
                         <span class="switch-selection"></span>
                         <a class="slide-button btn" {if !$keep_cards}style="left: 50%"{/if}></a>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="block-button">
-                <input id="submitUninstallSettings" class="green-button" type="submit" name="submitUninstallSettings" value="{l s='Update settings' mod={$module_name}}">
+                <input id="submitUninstallSettings" class="green-button" type="submit" name="submitUninstallSettings" value="{l s='Update settings' mod='payplug'}">
                 {*<input id="submitUninstallSettings" class="green-button" type="submit" name="submitUninstallSettings" value="{l s='Update settings' d='Modules.Payplug.Admin'}">*}
             </div>
         </div>

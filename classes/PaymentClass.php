@@ -212,8 +212,18 @@ class PaymentClass
 
         $payment_url = 'index.php?controller=order&step=3';
 
-        $payment_controller_url = $this->context->link->getModuleLink($this->dependencies->name, 'payment', [], true);
-        $installment_controller_url = $this->context->link->getModuleLink($this->dependencies->name, 'payment', ['i' => 1], true);
+        $payment_controller_url = $this->context->link->getModuleLink(
+            $this->dependencies->name,
+            'payment',
+            [],
+            true
+        );
+        $installment_controller_url = $this->context->link->getModuleLink(
+            $this->dependencies->name,
+            'payment',
+            ['i' => 1],
+            true
+        );
         $current_lang = explode('-', $this->context->language->language_code);
         $current_lang = $current_lang[0];
         if (in_array($current_lang, ['it', 'en'], true)) {
@@ -390,17 +400,11 @@ class PaymentClass
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l(
-                        'payplug.buildPaymentDetails.oneyX3WithFees',
-                        'paymentclass'
-                    );
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX3WithFees', 'paymentclass');
                     break;
                 case 'oney_x4_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l(
-                        'payplug.buildPaymentDetails.oneyX4WithFees',
-                        'paymentclass'
-                    );
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX4WithFees', 'paymentclass');
                     break;
                 case 'oney_x3_without_fees':
                     $is_oney = true;
@@ -408,17 +412,11 @@ class PaymentClass
                     break;
                 case 'oney_x4_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l(
-                        'payplug.buildPaymentDetails.oneyX4WithoutFees',
-                        'paymentclass'
-                    );
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'paymentclass');
                     break;
                 case 'bancontact':
                     $is_bancontact = true;
-                    $payment_details['type'] = $this->dependencies->l(
-                        'payplug.buildPaymentDetails.bancontact',
-                        'paymentclass'
-                    );
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -458,10 +456,7 @@ class PaymentClass
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->dependencies->l(
-                            'payplug.buildPaymentDetails.captureAuthorizedBeforeWarning',
-                            'paymentclass'
-                        ),
+                        $this->dependencies->l('payplug.buildPaymentDetails.captureAuthorizedBeforeWarning', 'paymentclass'),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -912,7 +907,8 @@ class PaymentClass
 
             $paymentOption['standard']['logo'] = $this->dependencies->mediaClass->getMediaPath(
                 $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/logos_schemes_' . $this->dependencies->configClass->getImgLang() . '.svg'
+                . $this->dependencies->name . '/views/img/logos_schemes_'
+                . $this->dependencies->configClass->getImgLang() . '.svg'
             );
             if (count($payplug_cards) > 0) {
                 $paymentOption['standard']['callToActionText'] =
@@ -1803,10 +1799,7 @@ class PaymentClass
                         $this->setPaymentErrorsCookie(['oney_required_field_' . $options['is_oney']]);
                         return [
                             'result' => false,
-                            'response' => $this->dependencies->l(
-                                'payplug.preparePayment.fieldsNotCompleted',
-                                'paymentclass'
-                            )
+                            'response' => $this->dependencies->l('payplug.preparePayment.fieldsNotCompleted', 'paymentclass')
                         ];
                     }
                 } else {

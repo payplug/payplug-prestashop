@@ -442,7 +442,6 @@ class CardRepository extends Repository
         }
 
         $config = $this->configurationSpecific;
-        $configClass = $this->dependencies->configClass;
 
         $brand = $payment->card->brand;
         if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'

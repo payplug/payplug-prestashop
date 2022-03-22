@@ -20,10 +20,10 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<p>{l s='Please enter your Payplug account password' mod={$module_name}}</p>
+<p>{l s='Please enter your Payplug account password' mod='payplug'}</p>
 <input type="password" name="reload_password"/>
-<p class="{$module_name}Popup_error"></p>
-<div class="{$module_name}Popup_footer">
-    <button type="button" class="{$module_name}Button -close">{l s='Cancel' mod={$module_name}}</button>
-    <button type="button" class="{$module_name}Button -green" name="password">{l s='Ok' mod={$module_name}}</button>
+<p class="{$module_name|escape:'htmlall':'UTF-8'}Popup_error"></p>
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_footer">
+    <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" name="password">{l s='Ok' mod='payplug'}</button>
 </div>

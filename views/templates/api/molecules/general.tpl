@@ -21,13 +21,13 @@
 *}
 {if !$connected}
     {* Block general subscribe *}
-    {capture assign="generalSubscribe_title"}{l s='general.subscribe.title' mod={$module_name}}{/capture}
-    {capture assign="generalSubscribe_description"}{l s='general.subscribe.description' mod={$module_name}}{/capture}
+    {capture assign="generalSubscribe_title"}{l s='general.subscribe.title' mod='payplug'}{/capture}
+    {capture assign="generalSubscribe_description"}{l s='general.subscribe.description' mod='payplug'}{/capture}
     {capture assign="generalSubscribe_content"}
-        <p>{l s='general.subscribe.createAccountDescription' tags=['<strong>'] mod={$module_name}}</p>
+        <p>{l s='general.subscribe.createAccountDescription' tags=['<strong>'] mod='payplug'}</p>
 
         {capture assign="generalSubscribe_createAccount"}
-            {l s='general.subscribe.createAccount' mod={$module_name}}
+            {l s='general.subscribe.createAccount' mod='payplug'}
         {/capture}
         {include file='./../atoms/buttonLink/buttonLink.tpl'
             buttonLinkData='payplugRegistration'
@@ -36,7 +36,7 @@
             buttonLinkText=$generalSubscribe_createAccount}
 
         {capture assign="generalSubscribe_showLogin"}
-            {l s='general.subscribe.showLogin' mod={$module_name}}
+            {l s='general.subscribe.showLogin' mod='payplug'}
         {/capture}
         {include file='./../atoms/button/button.tpl'
             buttonData='payplugCustomer'
@@ -53,12 +53,12 @@
         blockClassName=$generalSubscribe_className}
 
     {* Block general login *}
-    {capture assign="generalLogin_title"}{l s='general.login.title' mod={$module_name}}{/capture}
-    {capture assign="generalLogin_description"}{l s='general.login.description' tags=['<strong>'] mod={$module_name}}{/capture}
+    {capture assign="generalLogin_title"}{l s='general.login.title' mod='payplug'}{/capture}
+    {capture assign="generalLogin_description"}{l s='general.login.description' tags=['<strong>'] mod='payplug'}{/capture}
     {capture assign="generalLogin_content"}
         <form action="#" class="_loginForm">
             <div>
-                {capture assign="inputUserEmail"}{l s='general.login.userEmail' mod={$module_name}}{/capture}
+                {capture assign="inputUserEmail"}{l s='general.login.userEmail' mod='payplug'}{/capture}
                 {include file='./../atoms/input/input.tpl'
                     inputData='payplugEmail'
                     inputClassName='_email'
@@ -67,7 +67,7 @@
                     inputLabel=$inputUserEmail}
             </div>
             <div>
-                {capture assign="inputUserPassword"}{l s='general.login.userPassword' mod={$module_name}}{/capture}
+                {capture assign="inputUserPassword"}{l s='general.login.userPassword' mod='payplug'}{/capture}
                 {include file='./../atoms/input/input.tpl'
                     inputData='payplugPassword'
                     inputClassName='_password'
@@ -77,7 +77,7 @@
                     inputLabel=$inputUserPassword}
             </div>
             <div>
-                {capture assign="generalLogin_button_connect"}{l s='general.login.connexion' mod={$module_name}}{/capture}
+                {capture assign="generalLogin_button_connect"}{l s='general.login.connexion' mod='payplug'}{/capture}
                 {include file='./../atoms/button/button.tpl'
                     buttonData='payplugConnexion'
                     buttonClassName='_connexion'
@@ -85,7 +85,7 @@
                     buttonText=$generalLogin_button_connect}
 
 
-                {capture assign="generalLogin_createAccount"}{l s='general.login.createAccount' mod={$module_name}}{/capture}
+                {capture assign="generalLogin_createAccount"}{l s='general.login.createAccount' mod='payplug'}{/capture}
                 {include file='./../atoms/button/button.tpl'
                     buttonData='payplugShowRegistration'
                     buttonName='hideLogin'
@@ -94,7 +94,7 @@
                     buttonText=$generalLogin_createAccount}
             </div>
             <div>
-                {capture assign="generalLogin_link_password"}{l s='general.login.forgottenPassword' mod={$module_name}}{/capture}
+                {capture assign="generalLogin_link_password"}{l s='general.login.forgottenPassword' mod='payplug'}{/capture}
                 {include file='./../atoms/link/link.tpl'
                     linkData='payplugForgotPassword'
                     linkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal/forgot_password'
@@ -112,14 +112,14 @@
         blockClassName=$generalLogin_className}
 {else}
     {* Block general logged *}
-    {capture assign="generalLogged_title"}{l s='general.logged.title' mod={$module_name}}{/capture}
-    {capture assign="generalLogged_description"}{l s='general.logged.description' mod={$module_name}}{/capture}
+    {capture assign="generalLogged_title"}{l s='general.logged.title' mod='payplug'}{/capture}
+    {capture assign="generalLogged_description"}{l s='general.logged.description' mod='payplug'}{/capture}
     {capture assign="generalLogged_content"}
         <div class="_user">
             <div class="_userInformations">
                 {$payplug_email|escape:'htmlall':'UTF-8'}
                 {capture assign="tooltipLogoutContent"}
-                    {capture assign='generalLogged_logout'}{l s='general.logged.logout' mod={$module_name}}{/capture}
+                    {capture assign='generalLogged_logout'}{l s='general.logged.logout' mod='payplug'}{/capture}
                     {include file='./../atoms/action/action.tpl'
                         actionClassName='_userLogout'
                         actionData='payplugLogout'
@@ -131,7 +131,7 @@
                     tooltipIcon='tooltip'
                     tooltipContent=$tooltipLogoutContent}
             </div>
-            {capture assign="generalLogged_goToPortal"}{l s='general.logged.goToPortal' mod={$module_name}}{/capture}
+            {capture assign="generalLogged_goToPortal"}{l s='general.logged.goToPortal' mod='payplug'}{/capture}
             {include file='./../atoms/buttonLink/buttonLink.tpl'
                 buttonLinkClassName='_userPortal'
                 buttonLinkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal'
@@ -140,7 +140,7 @@
                 buttonLinkIcon='link'}
         </div>
         <div class="_sandbox">
-            {capture assign="generalLogged_modeTitle"}{l s='general.logged.modeTitle' mod={$module_name}}{/capture}
+            {capture assign="generalLogged_modeTitle"}{l s='general.logged.modeTitle' mod='payplug'}{/capture}
             {include file='./../atoms/title/title.tpl' titleText=$generalLogged_modeTitle titleClassName="_sandboxTitle"}
 
             {if $payplug_switch.sandbox.checked}
@@ -159,14 +159,14 @@
                     linkNoTag=true}
             {/capture}
             {capture assign="generalLogged_sandBoxDescription"}
-                {l s='general.logged.sandBoxDescriptionTest' tags=[$faq_sandboxMode] mod={$module_name}}
+                {l s='general.logged.sandBoxDescriptionTest' tags=[$faq_sandboxMode] mod='payplug'}
             {/capture}
             {include file='./../atoms/paragraph/paragraph.tpl'
                 paragraphText=$generalLogged_sandBoxDescription
                 paragraphClassName=$generalLogged_sandBoxTestClassName}
 
             {capture assign="generalLogged_liveDescription"}
-                {l s='general.logged.sandBoxDescriptionLive' tags=[$faq_sandboxMode] mod={$module_name}}
+                {l s='general.logged.sandBoxDescriptionLive' tags=[$faq_sandboxMode] mod='payplug'}
             {/capture}
             {include file='./../atoms/paragraph/paragraph.tpl'
                 paragraphText=$generalLogged_liveDescription
