@@ -31,6 +31,7 @@ $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976ca001437662708'] = 'Disattiva il pagamento one click';
 $_MODULE['<{payplug}prestashop>adminclass_3b13b7b1ada74ffc106c25a47078e387'] = 'La password inserita non é corretta';
 $_MODULE['<{payplug}prestashop>adminclass_60b031efb994d5c853cfc4816fab262e'] = 'L\'indirizzo mail e/o la password sono errati.';
+$_MODULE['<{payplug}prestashop>adminclass_780725f4d0e549e4e9e28d70f98e809c'] = 'Devi connetterti al tuo conto PayPlug';
 $_MODULE['<{payplug}prestashop>adminclass_9a456bd25825e3c4d0f7a85105724f88'] = 'Ordine aggiornato correttamente.';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_0095a9fa74d1713e43e370a7d7846224'] = 'Export';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_1e63d1811556fc2dad106dcbd4217a69'] = 'Pagamento ID';
