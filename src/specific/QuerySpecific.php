@@ -78,4 +78,9 @@ class QuerySpecific implements QueryInterface
     {
         return $this->db->getValue($id);
     }
+
+    public function escape($string, $htmlOK = false)
+    {
+        return $this->db->escape($string, $htmlOK);
+    }
 }

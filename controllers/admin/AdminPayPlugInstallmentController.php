@@ -136,18 +136,13 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
     {
-        $req_order = '
-            SELECT DISTINCT pi.id_order
-            FROM `'._DB_PREFIX_.$this->table.'` pi
-            WHERE pi.id_'.$this->dependencies->name.'_installment = '.pSQL($id_payplug_installment);
-        $res_order = DB::getInstance()->getValue($req_order);
+        $sql = 'SELECT DISTINCT pi.id_order
+                FROM `'._DB_PREFIX_.$this->table.'`
+                WHERE `id_'.$this->dependencies->name.'_installment` = ' . (int)$id_payplug_installment;
 
-        if (!$res_order) {
-            return false;
-        } else {
-            return (int)$res_order;
-        }
+        return Db::getInstance()->getValue($sql);
     }
+
     public function postProcess()
     {
         if (Tools::isSubmit('viewpayplug_installment')) {

@@ -250,7 +250,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ->select()
                     ->fields('id_payment')
                     ->from(_DB_PREFIX_ . $this->dependencies->name . '_payment')
-                    ->where('id_cart = ' . $cart_id)
+                    ->where('id_cart = ' . (int)$cart_id)
                     ->build('unique_value');
                 if ($payment_id != $current_payment_id) {
                     die(json_encode([

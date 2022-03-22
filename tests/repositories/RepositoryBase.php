@@ -108,7 +108,7 @@ class RepositoryBase extends TestCase
     {
         $this->dependencies         = MockHelper::createMockFactory('PayplugModule\classes\DependenciesClass');
         $this->logger               = MockHelper::createMockFactory('PayPlugModule\src\repositories\LoggerRepository');
-        $this->query                = MockHelper::createMockFactory('PayPlugModule\src\repositories\QueryRepository');
+        $this->query                = MockHelper::createQueryMock('PayPlugModule\src\repositories\QueryRepository');
         $this->sql                  = MockHelper::createMockFactory('PayPlugModule\src\repositories\SQLtableRepository');
     }
 

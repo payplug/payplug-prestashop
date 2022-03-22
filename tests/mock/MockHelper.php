@@ -157,4 +157,15 @@ class MockHelper extends Mockery
             ->andReturn(true);
         return $assign;
     }
+
+    public static function createQueryMock($classPathname)
+    {
+        $query = self::createMockFactory($classPathname);
+        $query
+            ->shouldReceive('escape')
+            ->andReturnUsing(function ($string, $htmlOk = false) {
+                return $string;
+            });
+        return $query;
+    }
 }

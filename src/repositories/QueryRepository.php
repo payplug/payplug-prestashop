@@ -469,4 +469,9 @@ class QueryRepository extends Repository
     {
         return $this->build();
     }
+
+    public function escape($string, $htmlOK = false)
+    {
+        return $this->specific_class->escape($string, $htmlOK);
+    }
 }

@@ -108,7 +108,7 @@ class InstallmentClass extends \PaymentModule
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . $dependencies->name . '_installment` pi 
-            WHERE pi.id_installment = \'' . $installment->id . '\' 
+            WHERE pi.id_installment = "' . pSQL($installment->id) . '" 
             AND pi.step = ' . (int)$step;
         $res_installment = Db::getInstance()->getRow($req_installment);
 
@@ -162,15 +162,15 @@ class InstallmentClass extends \PaymentModule
                     `status`, 
                     `scheduled_date`
                 ) VALUES (
-                    \'' . $installment->id . '\', 
-                    \'' . $pay_id . '\', 
-                    \'' . $order->id . '\', 
-                    \'' . $order->id_customer . '\', 
+                    \'' . pSQL($installment->id) . '\', 
+                    \'' . pSQL($pay_id) . '\', 
+                    \'' . (int)$order->id . '\', 
+                    \'' . (int)$order->id_customer . '\', 
                     \'' . (int)(($order->total_paid * 1000) / 10) . '\', 
-                    \'' . $step . '\', 
-                    \'' . $amount . '\', 
-                    \'' . $status . '\', 
-                    \'' . $date . '\'
+                    \'' . pSQL($step) . '\', 
+                    \'' . (int)$amount . '\', 
+                    \'' . (int)$status . '\', 
+                    \'' . pSQL($date) . '\'
                 )';
 
                     $res_insert_installment = Db::getInstance()->Execute($req_insert_installment);
@@ -197,7 +197,7 @@ class InstallmentClass extends \PaymentModule
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . $dependencies->name . '_installment` pi
-            WHERE pi.id_payment = \'' . $installment->id . '\'';
+            WHERE pi.id_payment = "' . pSQL($installment->id) . '"';
         $res_installment = Db::getInstance()->executeS($req_installment);
 
         if (!$res_installment) {

@@ -350,7 +350,7 @@ class OrderStateRepository extends Repository
             ->select()
             ->fields('DISTINCT `id_order_state`')
             ->from($this->constant->get('_DB_PREFIX_') . 'order_state_lang')
-            ->where('template = \'' . $template . '\'')
+            ->where('template = "' . $this->query->escape($template) . '"')
             ->limit(1, 1);
 
         return $this->query->build('unique_value');
@@ -440,8 +440,8 @@ class OrderStateRepository extends Repository
         $this->query
             ->update()
             ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->set('type = \'' . $type . '\'')
-            ->set('date_upd = \'' . $date . '\'')
+            ->set('type = \'' . $this->query->escape($type) . '\'')
+            ->set('date_upd = \'' . $this->query->escape($date) . '\'')
             ->where('id_order_state = ' . (int)$id_order_state);
 
         return $this->query->build();
