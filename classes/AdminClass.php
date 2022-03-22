@@ -334,10 +334,25 @@ class AdminClass
         }
 
         if ($this->tools->tool('getValue', 'save')) {
-            $this->dependencies->configClass->saveConfiguration();
+            $connected = $this->config->get($this->dependencies->getConfigurationKey('email'))
+                && ($this->config->get($this->dependencies->getConfigurationKey('testApiKey'))
+                || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')));
+
+            if ($connected) {
+                $this->dependencies->configClass->saveConfiguration();
+                die(json_encode([
+                    'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/confirmation.tpl'),
+                    'result' => true
+                ]));
+            }
+
+            $this->assign->assign([
+                'errorData' => 'popinErrorConfiguration',
+                'errorMessage' => $this->dependencies->l('payplug.adminAjaxController.needLogin', 'adminclass')
+            ]);
             die(json_encode([
-                'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/confirmation.tpl'),
-                'result' => true
+                'modal' => $this->dependencies->configClass->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                'result' => false
             ]));
         }
     }
