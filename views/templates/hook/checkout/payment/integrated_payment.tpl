@@ -91,13 +91,13 @@
 </form>
 <script type="text/javascript">
     {literal}
-        var placeholderCardholder = '{/literal}{$placeholderCardholder|escape:'htmlall':'UTF-8'}{literal}';
-        var placeholderPan = '{/literal}{$placeholderPan|escape:'htmlall':'UTF-8'}{literal}';
-        var placeholderCvv = '{/literal}{$placeholderCvv|escape:'htmlall':'UTF-8'}{literal}';
-        var placeholderExp = '{/literal}{$placeholderExp|escape:'htmlall':'UTF-8'}{literal}';
+        var placeholderCardholder = '{/literal}{$placeholderCardholder|escape:'javascript':'UTF-8'}{literal}';
+        var placeholderPan = '{/literal}{$placeholderPan|escape:'javascript':'UTF-8'}{literal}';
+        var placeholderCvv = '{/literal}{$placeholderCvv|escape:'javascript':'UTF-8'}{literal}';
+        var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
         var loadIntegrated = function() {
             if (typeof payplug_utilities != 'undefined') {
-                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url|escape:'htmlall':'UTF-8'}{literal}', function() {
+                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
                     if(typeof payplugModule != 'undefined') {
                         payplugModule.integrated.init();
                     } else {
