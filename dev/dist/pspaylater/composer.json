@@ -9,7 +9,7 @@
         "payplug/payplug-php": "3.*",
         "symfony/dotenv": "3.4.*",
         "symfony/http-foundation": "^3.4",
-        "prestashop/prestashop-accounts-installer": "^1.0",
+        "prestashop/prestashop-accounts-installer": "^1.0.0",
         "prestashop/module-lib-service-container": "^1.4"
     },
     "require-dev": {

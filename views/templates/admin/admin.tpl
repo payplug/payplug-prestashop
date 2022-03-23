@@ -60,6 +60,10 @@
         {* Banner *}
         {include file='./../components/molecules/banner.tpl'}
 
+        {if isset($ps_account_isActivated) && $ps_account_isActivated}
+            {include file='./panel/ps_account.tpl'}
+        {/if}
+
         {* Configuration saving button *}
         {include file='./../components/molecules/general.tpl'}
 
