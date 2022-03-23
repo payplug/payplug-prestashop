@@ -65,6 +65,7 @@
                 <li>value (mandatory)</li>
                 <li>text (mandatory)</li>
                 <li>subText (optional)</li>
+                <li>notallowed (optional)</li>
             </ul>
         </div>
 

@@ -20,16 +20,14 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{capture assign="modalContent"}
-    <p>{$errorMessage}</p>
-    {capture assign="popinErrorSubmit"}{l s='popin.error.submit' mod='payplug'}{/capture}
-    {include file='./../../atoms/button/button.tpl'
-        buttonData='closePopin'
-        buttonName='closePopin'
-        buttonText=$popinErrorSubmit}
+{* Alert banner *}
+{assign "modeTestLink" "<a href='{$faq_links.sandbox|escape:'htmlall':'UTF-8'}' target='_blank' class='alertTestMode'>"}
+{assign "sandboxLiveButton" "<button type='button' name='alertLiveButton' class='alertLiveButton'>"}
+{capture assign="alertOnboardingTitle"}{l s='alert.onboarding.title' mod='payplug'}{/capture}
+{capture assign="alertContent"}
+    {l s='alert.onboarding.content' tags=[$modeTestLink, $sandboxLiveButton] mod='payplug'}
 {/capture}
-
-{include file='./../../atoms/modal/modal.tpl'
-    modalClassName='modalError'
-    modalContent=$modalContent
-    modalData='popinConnexionFailed'}
+{include file='./../atoms/alert/alert.tpl'
+    alertType='warning'
+    alertTitle=$alertOnboardingTitle
+    alertContent=$alertContent}

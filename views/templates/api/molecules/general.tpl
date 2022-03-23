@@ -184,7 +184,8 @@
                     'value' => 0,
                     "dataName" =>"sandboxLive",
                     "text" => $payplug_switch.sandbox.label_right|capitalize|escape:'htmlall':'UTF-8',
-                    'disabled'=> !$payplug_switch.sandbox.active
+                    'disabled' => !$payplug_switch.sandbox.active,
+                    'notallowed' => !$onboardingOneyCompleted
                 ]
             ]}
             {include file='./../atoms/options/options.tpl'

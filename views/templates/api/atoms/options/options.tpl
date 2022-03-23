@@ -27,7 +27,8 @@
                     type="radio" name="{$optionsName|escape:'htmlall':'UTF-8'}"
             value="{$item.value|escape:'htmlall':'UTF-8'}"
                     {if isset($optionsSelected) && isset($item.value) && $optionsSelected == $item.value } checked="checked" {/if}
-                    {if isset($item.disabled) && $item.disabled} disabled{/if}>
+                    {if isset($item.disabled) && $item.disabled} disabled{/if}
+                    data-notallowed="{if isset($item.notallowed) && $item.notallowed}{$item.notallowed|escape:'htmlall':'UTF-8'}{else}0{/if}">
             <span>
                 {if isset($item.text) && $item.text}{$item.text|escape:'htmlall':'UTF-8'}{/if}
                 {if isset($item.subText) && $item.subText}<span>{$item.subText}</span>{/if}

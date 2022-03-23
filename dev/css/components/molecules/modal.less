@@ -11,4 +11,39 @@
       }
     }
   }
+  &Checkonboarding {
+    .modalSandboxInput {
+      padding-top: 24px;
+    }
+    .modalSandboxFooter {
+      display: flex;
+      justify-content: space-between;
+    }
+    .modalSandboxBody {
+      text-align: center;
+      .payplugUITitle {
+        padding-top: 50px;
+      }
+      .payplugUIButton {
+        display: initial;
+      }
+      .payplugUIParagraph {
+        padding-bottom: 33px;
+      }
+    }
+    button {
+      width: 150px;
+    }
+    .errorMessage {
+      color: #colorMap[error];
+      position: relative;
+      top: -13px;
+      svg {
+        .transition(~"fill @{dur}");
+        fill: #colorMap[error];
+        vertical-align: middle;
+      }
+    }
+  }
+
 }
