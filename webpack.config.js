@@ -36,6 +36,9 @@ const jsMoleculesFolder = 'js/components/molecules';
 const dirJsFinalPath = 'views/js/';
 const dirViewsFinalPath = 'views/';
 
+const PACKAGE = require('./package.json');
+const moduleVersion = PACKAGE.version;
+
 let entryFiles = {};
 
 function _getAllFilesFromFolder(dir) {
@@ -54,7 +57,7 @@ function _getAllFilesFromFolder(dir) {
             if (stat && stat.isDirectory()) {
                 _getAllFilesFromFolder(file);
             } else {
-                entryFiles[wpFile] = path.resolve(__dirname, file);
+                entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, file);
             }
         }
 
@@ -70,10 +73,10 @@ function _getAllFilesFromFolder(dir) {
                     case jsAtomsFolder:
                     case jsMoleculesFolder:
                         if (typeof entryFiles['../' + dirJsFinalPath + 'components'] == 'undefined') {
-                            entryFiles['../' + dirJsFinalPath + 'components'] = [];
+                            entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion] = [];
                         }
 
-                        entryFiles['../' + dirJsFinalPath + 'components'].push(path.resolve(__dirname, file));
+                        entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion].push(path.resolve(__dirname, file));
                         break;
                 }
             }
