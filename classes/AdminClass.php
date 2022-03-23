@@ -192,6 +192,10 @@ class AdminClass
             $this->dependencies->configClass->submitAccount();
         }
 
+        if (Tools::isSubmit('checkOnboarding')) {
+            $this->dependencies->configClass->checkOnboarding();
+        }
+
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
             if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {

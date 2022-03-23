@@ -353,6 +353,22 @@ class ApiClass
             $can_use_bancontact = true;
         }
 
+        if (isset($json_answer['payment_methods'])) {
+            $oney_methods = [];
+            $onboardingOneyCompleted = false;
+
+            foreach ($json_answer['payment_methods'] as $key => $val) {
+                if (substr($key, 0, 5) == 'oney_') {
+                    $oney_methods[] = $val["enabled"];
+                }
+            }
+            foreach ($oney_methods as $value) {
+                if ($value == 'true') {
+                    $onboardingOneyCompleted = true;
+                }
+            }
+        }
+
         $permissions = [
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
@@ -360,6 +376,7 @@ class ApiClass
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_use_bancontact' => $can_use_bancontact,
+            'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ];
 
         // If sandbox mode active, no allowed countries sent

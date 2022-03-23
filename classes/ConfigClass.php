@@ -743,6 +743,12 @@ class ConfigClass
             $connected = false;
         }
 
+        $onboardingOneyCompleted = false;
+        $livepermissions = $this->getLivePermissions();
+        if ($livepermissions != [] && isset($livepermissions['onboardingOneyCompleted'])) {
+            $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
+        }
+
         if (count($this->validationErrors) && !$connected) {
             $this->context->smarty->assign([
                 'validationErrors' => $this->validationErrors,
@@ -890,13 +896,32 @@ class ConfigClass
             'order_states' => $this->dependencies->orderClass->getOrderStates(),
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
-            'oney_custom_max_amounts' => $oney_custom_max_amounts ,
-            'oney_custom_min_amounts' => $oney_custom_min_amounts  ,
+            'oney_custom_max_amounts' => $oney_custom_max_amounts,
+            'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
+            'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ]);
 
         return $this->html;
+    }
+
+    /**
+     * Get live permissions
+     * @return array
+     */
+    public function getLivePermissions()
+    {
+        $live_api_key = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
+        $livepermissions = [];
+        try {
+            $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
+        } catch (ConfigurationNotSetException $e) {
+//                @todo Add Log
+        } catch (ConfigurationException $e) {
+//                @todo Add Log
+        }
+        return $livepermissions;
     }
 
     /**
@@ -1209,6 +1234,9 @@ class ConfigClass
         if (Tools::isSubmit('submitAccount')) {
             $this->submitAccount();
         }
+        if (Tools::isSubmit('submitSandbox')) {
+            $this->submitSandbox();
+        }
 
         if (Tools::getValue('submitDisable')) {
             $this->submitDisable();
@@ -1348,7 +1376,7 @@ class ConfigClass
             ]);
             die(json_encode([
                 'content' => false,
-                'modal' => $this->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/error.tpl'),
                 'error' => $errorMessage
             ]));
         } elseif ($curl_exists && $openssl_exists) {
@@ -1371,12 +1399,82 @@ class ConfigClass
                 ]);
                 die(json_encode([
                     'content' => false,
-                    'modal' => $this->fetchTemplate('/views/templates/components/molecules/modal/error.tpl'),
+                    'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/error.tpl'),
                     'error' => $errorMessage
                 ]));
             }
         }
     }
+
+    /**
+     * @description Process password submit to access Live mode
+     * @throws BadRequestException
+     */
+    public function submitSandbox()
+    {
+        $curl_exists = extension_loaded('curl');
+        $openssl_exists = extension_loaded('openssl');
+
+        /*
+         * We can't use $password = Tools::getValue('payplug_password');
+         * Because pwd with special chars don't work
+         */
+        $password = $_POST['payplug_password'];
+        $email = $this->config->get($this->dependencies->getConfigurationKey('email'));
+
+        if (!PayPlugBackward::isPlaintextPassword($password)) {
+            $errorMessage = $this->dependencies->l('payplug.submitSandbox.passwordError', 'configclass');
+            $this->context->smarty->assign([
+                'errorMessage' => $errorMessage,
+                'errorClass' => '-error'
+            ]);
+            die(json_encode([
+                'content' => false,
+                'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/sandbox.tpl'),
+            ]));
+        } elseif ($curl_exists && $openssl_exists) {
+            if ($this->dependencies->apiClass->login($email, $password)) {
+                $onboardingOneyCompleted = false;
+                $livepermissions = $this->getLivePermissions();
+                if ($livepermissions != [] && isset($livepermissions['onboardingOneyCompleted'])) {
+                    $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
+                }
+
+                $this->context->smarty->assign([
+                    'isOnboardedCompleted' => $onboardingOneyCompleted
+                ]);
+                die(json_encode([
+                    'content' => false,
+                    'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/sandbox.tpl'),
+                ]));
+            } else {
+                $errorMessage = $this->dependencies->l('payplug.submitSandbox.passwordError', 'configclass');
+                $this->context->smarty->assign([
+                    'errorMessage' => $errorMessage,
+                    'errorClass' => '-error'
+                ]);
+                die(json_encode([
+                    'content' => false,
+                    'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/sandbox.tpl'),
+                ]));
+            }
+        }
+    }
+
+
+    /**
+     * @description Process check onBoarding is finished
+     * @throws BadRequestException
+     */
+    public function checkOnboarding()
+    {
+        die(json_encode([
+            'content' => false,
+            'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/sandbox.tpl'),
+        ]));
+    }
+
+
 
     /**
      * @description Process disable plugin submit

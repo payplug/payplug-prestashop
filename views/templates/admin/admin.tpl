@@ -67,6 +67,11 @@
         {* description block *}
         {include file='./../api/molecules/description.tpl'}
 
+        {* Alert banner *}
+        {if $connected && !$verified || $connected && !$onboardingOneyCompleted}
+            {include file='./../api/molecules/alert.tpl'}
+        {/if}
+
         {* Configuration saving button *}
         {include file='./../api/molecules/general.tpl'}
 

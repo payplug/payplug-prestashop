@@ -13,9 +13,104 @@ class General {
             .on('click', 'button[name=showLogin]', this.showLogin)
             .on('click', 'button[name=hideLogin]', this.hideLogin)
             .on('click', 'button[name=login]', this.login)
-            .on('click', 'input[name=payplug_sandbox]', this.toggleDescription)
+            .on('click', 'input[name=payplug_sandbox]', this.handleSandbox)
             .on('click', 'button[name=logout]', this.logout)
             .on('click', 'button[name=closePopin]', this.closePopin)
+            .on('click', '.alertLiveButton', this.handleAlertLiveButton)
+            .on('click', 'button[name=submitSandbox]', this.submitSandbox)
+            .on('click', 'button[name=validateLive]', this.validateLive)
+    }
+
+    handleAlertLiveButton(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $('input[name="payplug_sandbox"][value="0"]').trigger('click');
+    }
+
+    checkOnboarding() {
+        const $container = $('.' + general.props.container);
+
+        const queryData = {
+            _ajax: 1,
+            log: 1,
+            checkOnboarding: 1
+        };
+
+        if (general.props.query != null) {
+            general.props.query.abort();
+            general.props.query = null;
+        }
+
+        general.props.query = $.ajax({
+            type: 'POST',
+            url: admin_ajax_url,
+            dataType: 'json',
+            data: queryData,
+            success: (result) => {
+                if (result.content) {
+                    general.reloadFromContent(result.content);
+                } else {
+                    if (result.modal) {
+                        if ($('.payplugUIModal').length) {
+                            $('.payplugUIModal').replaceWith(result.modal);
+                        } else {
+                            $container.append(result.modal);
+                        }
+                        $container.find('input[name=modalTriggered]').trigger('click');
+                    }
+                }
+            }
+        });
+    }
+
+    submitSandbox(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const queryData = {
+            _ajax: 1,
+            log: 1,
+            submitSandbox: 1,
+            payplug_password: $('input[name="password"]').val(),
+        };
+        const $button = $(this);
+        const $container = $button.parents('.' + general.props.container);
+
+        if ($button.is('-disabled')) {
+            return;
+        }
+
+        if (general.props.query != null) {
+            general.props.query.abort();
+            general.props.query = null;
+        }
+        general.props.query = $.ajax({
+            type: 'POST',
+            url: admin_ajax_url,
+            dataType: 'json',
+            data: queryData,
+            beforeSend: () => {
+                $button.addClass('-disabled').attr('disabled', 'disabled');
+            },
+            error: (jqXHR, textStatus, errorThrown) => {
+                $button.removeClass('-disabled').removeAttr('disabled');
+            },
+            success: (result) => {
+                if (result.content) {
+                    general.reloadFromContent(result.content);
+                } else {
+                    $button.removeClass('-disabled').removeAttr('disabled');
+                    if (result.modal) {
+                        if ($('.payplugUIModal').length) {
+                            $('.payplugUIModal').replaceWith(result.modal);
+                        } else {
+                            $container.append(result.modal);
+                        }
+                        $container.find('input[name=modalTriggered]').trigger('click');
+                    }
+                }
+            }
+        });
+
     }
 
     closePopin(event) {
@@ -128,14 +223,40 @@ class General {
         });
     }
 
+    validateLive(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const $button = $(this);
+        const $container = $button.parents('.' + general.props.container);
+        $container.find('input[name=modalTriggered]').trigger('click');
+        const $buttonLive = $('input[name="payplug_sandbox"][value="0"]');
+        $buttonLive.data("notallowed", 0);
+        $buttonLive.trigger('click');
+    }
+
+    handleSandbox(event) {
+        const $sandbox = $(event.currentTarget);
+        const sandBoxValue = parseInt($sandbox.val());
+
+        if (!sandBoxValue && $sandbox.data('notallowed')) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            return general.checkOnboarding();
+        }
+
+        return general.toggleDescription(event);
+    }
+
     reloadFromContent(content) {
         $('.'+module_name+'Configuration').replaceWith(content);
     }
 
     toggleDescription(event) {
-        const sandbox = parseInt($(this).val());
+        const $sandbox = $(event.currentTarget);
+        const sandBoxValue = parseInt($sandbox.val());
         $('._sandboxDescription').removeClass('-hide');
-        if (sandbox) {
+        if (sandBoxValue) {
             $('._sandboxDescription.-live').addClass('-hide');
         } else {
             $('._sandboxDescription.-test').addClass('-hide');
