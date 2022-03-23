@@ -21,7 +21,7 @@
 *}
 <div class="_footer">
     {capture assign="footerConfiguration_save"}{l s='configuration.footer.save' mod={$module_name}}{/capture}
-    {include file='./../../atoms/button/button.tpl'
+    {include file='./../atoms/button/button.tpl'
         buttonClassName='_save'
         buttonData='saveConfiguration'
         buttonName='saveConfiguration'
