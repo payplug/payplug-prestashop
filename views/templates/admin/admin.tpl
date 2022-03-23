@@ -74,5 +74,5 @@
     </div>
 
     {* Configuration footer *}
-    {include file='./../components/molecules/configuration/footer.tpl'}
+    {include file='./../components/molecules/footer.tpl'}
 </div>
