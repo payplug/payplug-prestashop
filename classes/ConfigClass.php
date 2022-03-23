@@ -520,6 +520,23 @@ class ConfigClass
     }
 
     /**
+     * @description check if account
+     * is linked to Psaccount
+     * @return bool
+     */
+    public function checkPsAccount()
+    {
+        if ($this->dependencies->name == 'pspaylater') {
+            $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+            $accountsFacade = $module->getService('ps_accounts.facade');
+            $accountsService = $accountsFacade->getPsAccountsService();
+            return $accountsService->isAccountLinked();
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Get iso code from language code
      * @param $language
      * @return string
@@ -826,6 +843,7 @@ class ConfigClass
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->dependencies->version,
             'connected' => $connected,
+            'ps_account' => $this->checkPsAccount(),
             'verified' => $verified,
             'premium' => $premium,
             'is_active' => $is_active,

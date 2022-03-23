@@ -50,6 +50,7 @@
         blockDescription=$generalSubscribe_description
         blockContent=$generalSubscribe_content
         blockData='generalSubscribe'
+        blockDisabled=!$ps_account
         blockClassName=$generalSubscribe_className}
 
     {* Block general login *}
