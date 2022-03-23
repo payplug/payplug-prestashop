@@ -74,10 +74,10 @@ assets compile and revision:
   image: node:16
   stage: assets
   before_script:
+    - ./dev/ci/dist_files.sh -b payplug
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
-    - ./dev/ci/dist_files.sh -b payplug
   script:
     - npm run build
     - echo "Moving file in build dir"
@@ -127,10 +127,10 @@ assets compile and revision for bnpl:
   image: node:16
   stage: asset-bnpl
   before_script:
+    - ./dev/ci/dist_files.sh -b pspaylater
     - npm --version
     - npm init -y
     - npm install --save-dev webpack
-    - ./dev/ci/dist_files.sh -b pspaylater
   script:
     - npm run build
     - echo "Moving file in build dir"
