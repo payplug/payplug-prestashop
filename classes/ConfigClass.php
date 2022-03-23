@@ -864,6 +864,7 @@ class ConfigClass
             'standard_isActivated' => $this->isValidFeature('feature_standard'),
             'installment_isActivated' => $this->isValidFeature('feature_installment'),
             'deferred_isActivated' => $this->isValidFeature('feature_deferred'),
+            'ps_account_isActivated' => $this->isValidFeature('feature_ps_account'),
             'login_infos' => $login_infos,
             'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->dependencies->orderClass->getOrderStates(),

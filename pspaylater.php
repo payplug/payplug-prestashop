@@ -30,9 +30,13 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException;
+
 class PsPaylater extends PaymentModule
 {
     public $payplug_dependencies;
+    private $container;
 
     /**
      * Constructor
@@ -63,6 +67,14 @@ class PsPaylater extends PaymentModule
             $this->setDependencies();
             $this->setModule();
         }
+
+        if ($this->payplug_dependencies->getDependency('configClass')->isValidFeature('feature_ps_account')
+            && $this->container === null) {
+            $this->container = new \PrestaShop\ModuleLibServiceContainer\DependencyInjection\ServiceContainer(
+                $this->name,
+                $this->getLocalPath()
+            );
+        }
     }
 
     /**
@@ -87,6 +99,36 @@ class PsPaylater extends PaymentModule
         if ($this->module) {
             if (!$this->isValidInstallation()) {
                 $this->install(true);
+            }
+
+            if ($this->payplug_dependencies->getDependency('configClass')->isValidFeature('feature_ps_account')) {
+                $dependencies = new \PayPlugModule\classes\DependenciesClass();
+                $logger = $dependencies->getPlugin()->getLogger();
+
+                try {
+                    // Install service if not done
+                    $this->getService('ps_accounts.installer')->install();
+
+                    // Account
+                    $accountsFacade = $this->getService('ps_accounts.facade');
+                    $accountsService = $accountsFacade->getPsAccountsService();
+                    $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->name);
+
+                    // update modal language
+                    $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' . $this->context->language->iso_code . '/link-shop';
+
+                    Media::addJsDef([
+                        'contextPsAccounts' => $contextPsAccounts,
+                        'admin_iso_code' => $this->context->language->iso_code
+                    ]);
+
+                    // Retrieve Account CDN
+                    $this->context->smarty->assign('urlAccountsCdn', $accountsService->getAccountsCdn());
+                } catch (ModuleNotInstalledException $e) {
+                    $logger->addLog($e->getMessage(), 'error');
+                } catch (ModuleVersionException $e) {
+                    $logger->addLog($e->getMessage(), 'error');
+                }
             }
 
             return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
@@ -426,10 +468,28 @@ class PsPaylater extends PaymentModule
                 }
             }
 
+            if ($this->payplug_dependencies->getDependency('configClass')->isValidFeature('feature_ps_account')
+                && $flag) {
+                $this->getService('ps_accounts.installer')->install();
+            }
+
             return $flag;
         }
 
         return parent::install();
+    }
+
+    /**
+     * Retrieve service
+     *
+     * todo: report service installation to bnpl.php
+     * @param string $serviceName
+     *
+     * @return mixed
+     */
+    public function getService($serviceName)
+    {
+        return $this->container->getService($serviceName);
     }
 
     /**
