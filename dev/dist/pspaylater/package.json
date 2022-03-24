@@ -1,6 +1,6 @@
 {
   "name": "modules",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "======================================== Prestashop paiement module using PayLater ========================================",
   "private": true,
   "directories": {
