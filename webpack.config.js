@@ -29,6 +29,7 @@ const fs = require('fs');
 
 const dir_path = 'dev';
 const cssViewsFolder = 'css';
+const jsViewsFolder = 'js';
 
 const jsAtomsFolder = 'js/components/atoms';
 const jsMoleculesFolder = 'js/components/molecules';
@@ -78,6 +79,11 @@ function _getAllFilesFromFolder(dir) {
 
                         entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion].push(path.resolve(__dirname, file));
                         break;
+
+                    // compilation des fichiers .js
+                    case jsViewsFolder:
+                        entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, file);
+                        break;
                 }
             }
         }
@@ -87,6 +93,7 @@ function _getAllFilesFromFolder(dir) {
 _getAllFilesFromFolder(cssViewsFolder);
 _getAllFilesFromFolder(jsAtomsFolder);
 _getAllFilesFromFolder(jsMoleculesFolder);
+_getAllFilesFromFolder(jsViewsFolder);
 
 const loaders = [
     MiniCssExtractPlugin.loader,
