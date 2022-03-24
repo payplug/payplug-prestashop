@@ -1,1 +1,0 @@
-<div class="payplugUILoader"{if isset($loaderSize) && $loaderSize} style="font-size:{$loaderSize}px"{/if}><span></span></div>

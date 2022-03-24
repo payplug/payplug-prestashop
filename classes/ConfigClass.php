@@ -314,10 +314,7 @@ class ConfigClass
         $this->ssl_enable = Configuration::get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
-            $this->warning = $this->dependencies->l(
-                'payplug.setConfigurationProperties.configureModule',
-                'configclass'
-            );
+            $this->warning = $this->dependencies->l('payplug.setConfigurationProperties.configureModule', 'configclass');
         }
 
         $this->payment_status = [
@@ -425,7 +422,8 @@ class ConfigClass
      */
     public function isAllowed()
     {
-        if (!Module::isEnabled($this->dependencies->name) || !Configuration::get($this->dependencies->getConfigurationKey('show'))) {
+        if (!Module::isEnabled($this->dependencies->name)
+            || !Configuration::get($this->dependencies->getConfigurationKey('show'))) {
             return false;
         }
         return true;
@@ -763,15 +761,10 @@ class ConfigClass
             ]);
         }
 
-        $this->context->controller->addJS(
-            $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/js/admin.js'
-        );
-        $this->context->controller->addJS(
-            $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/js/utilities.js'
-        );
-        $this->context->controller->addCSS(
-            $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/css/admin.css'
-        );
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addJS($views_path . '/js/admin.js');
+        $this->context->controller->addJS($views_path . '/js/utilities.js');
+        $this->context->controller->addCSS($views_path . '/css/admin.css');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
@@ -781,14 +774,8 @@ class ConfigClass
             'error_installment' => $this->dependencies->l('payplug.assignContentVar.installment', 'configclass'),
             'error_deferred' => $this->dependencies->l('payplug.assignContentVar.deferred', 'configclass'),
             'error_oney' => $this->dependencies->l('payplug.assignContentVar.oney', 'configclass'),
-            'errorOneyMax' => addslashes($this->dependencies->l(
-                'config.assignContentVar.oney.thresholdsMaxError',
-                'configclass'
-            )),
-            'errorOneyMin' => addslashes($this->dependencies->l(
-                'config.assignContentVar.oney.thresholdsMinError',
-                'configclass'
-            )),
+            'errorOneyMax' => addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass')),
+            'errorOneyMin' => addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMinError', 'configclass')),
         ]);
 
         $login_infos = [];
@@ -822,10 +809,7 @@ class ConfigClass
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    addslashes($this->dependencies->l(
-                        'config.assignContentVar.oney.thresholdsError',
-                        'configclass'
-                    )),
+                    addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass')),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),
@@ -836,7 +820,8 @@ class ConfigClass
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
-            'url_logo' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/logo_payplug.png',
+            'url_logo' => $this->constant->get('__PS_BASE_URI__')
+                . 'modules/' . $this->dependencies->name . '/views/img/logo_payplug.png',
             'admin_ajax_url' => $admin_ajax_url,
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->dependencies->version,
@@ -1236,10 +1221,7 @@ class ConfigClass
                     '#' => $i,
                     $this->dependencies->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
                     $this->dependencies->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
-                    $this->dependencies->l(
-                        'payplug.gdprCardExport.card',
-                        'configclass'
-                    ) => '**** **** **** ' . $card['last4'],
+                    $this->dependencies->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
                     $this->dependencies->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date']
                 ];
                 $i++;
@@ -1468,8 +1450,9 @@ class ConfigClass
 
         $KEEP_CARDS = (int)$this->config->get($this->dependencies->getConfigurationKey('keepCards'));
 
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin.js');
-        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/css/admin.css');
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addJS($views_path . '/js/admin.js');
+        $this->context->controller->addCSS($views_path . '/css/admin.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),

@@ -19,9 +19,9 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel panel-1-6 {$module_name}Order card mt-2 d-print-none" id="pppanel">
+<div class="panel panel-1-6 {$module_name|escape:'htmlall':'UTF-8'}Order card mt-2 d-print-none" id="pppanel">
     <h3 class="panel-heading card-header">
-        <i class="icon-money"></i> {l s='Payplug payment details' mod={$module_name}}
+        <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
     </h3>
     <div class="card-body">
         <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
@@ -35,7 +35,7 @@
 
         {if $display_single_payment}
             {if $single_payment.can_be_captured && isset($single_payment.date)}
-                <span class="{$module_name}Alert -warning">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod={$module_name}}</span>
+                <span class="{$module_name|escape:'htmlall':'UTF-8'}Alert -warning">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
             {/if}
             {include file='./details.tpl' payment=$single_payment}
         {/if}

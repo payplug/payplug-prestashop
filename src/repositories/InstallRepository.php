@@ -106,7 +106,8 @@ class InstallRepository extends Repository
 
         foreach ($order_states_list as $key => $state) {
             // Check live OrderState
-            $key_config_live = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_') . $this->tools->tool('strtoupper', $key);
+            $key_config_live = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_')
+                . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = (int)$this->config->get($key_config_live);
             $order_state_live = $this->order_state_specific->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
@@ -187,7 +188,7 @@ class InstallRepository extends Repository
             'PS_OS_DELIVERED'=>'nothing',
         ];
         $date = date('Y-m-d');
-        $payplug_order_states_sql = [];
+        $queries = [];
         foreach ($prestashop_order_states as $key => $type) {
             $id_order_state = $this->config->get($key);
             $getTypeQuery = ' 
@@ -196,18 +197,17 @@ class InstallRepository extends Repository
                 WHERE  `id_order_state` = ' . $id_order_state;
             $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
             if ($sqlGetType  && $sqlGetType  != $type) {
-                $payplug_order_states_sql[] = '
-                 UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                 SET `type` = ' . "'$type'" . ' 
-                 WHERE  `id_order_state` = ' . $id_order_state;
+                $queries[] = 'UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
+                                 SET `type` = ' . "'$type'" . ' 
+                                 WHERE  `id_order_state` = ' . $id_order_state;
             } else {
-                $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`)
-            VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
+                $queries[] = 'INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
+                                (`id_order_state`, `type`, `date_add`, `date_upd`)
+                                VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
             }
         }
-        if ($payplug_order_states_sql) {
-            foreach ($payplug_order_states_sql as $sql) {
+        if ($queries) {
+            foreach ($queries as $sql) {
                 Db::getInstance()->execute($sql);
                 unset($sql);
             }

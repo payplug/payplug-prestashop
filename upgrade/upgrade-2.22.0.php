@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2022 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -63,11 +63,13 @@ function upgrade_module_2_22_0($object)
 
     // Update payplug card table
     $sql_requests = [
-        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` CHANGE `id_'.$object->name.'_card` `position` INT(11) UNSIGNED NOT NULL',
-        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` DROP PRIMARY KEY',
-        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` DROP `position`',
-        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_card` ADD `id_'.$object->name.'_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
-        ADD PRIMARY KEY (`id_'.$object->name.'_card`)',
+        'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` 
+            CHANGE `id_' . $object->name . '_card` `position` INT(11) UNSIGNED NOT NULL',
+        'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP PRIMARY KEY',
+        'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP `position`',
+        'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` 
+            ADD `id_' . $object->name . '_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+            ADD PRIMARY KEY (`id_' . $object->name . '_card`)',
     ];
 
     try {

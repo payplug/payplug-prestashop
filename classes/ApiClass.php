@@ -572,7 +572,8 @@ class ApiClass
         if ($sandbox === null && $this->current_api_key) {
             $payplug_key = $this->current_api_key;
         } else {
-            $payplug_key = Configuration::get($this->dependencies->concatenateModuleNameTo(($sandbox ? 'TEST' : 'LIVE') . '_API_KEY'));
+            $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
+            $payplug_key = Configuration::get($this->dependencies->concatenateModuleNameTo($configuration_key));
         }
 
         try {

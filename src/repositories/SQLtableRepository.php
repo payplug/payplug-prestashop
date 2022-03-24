@@ -309,12 +309,14 @@ class SQLtableRepository
             ->table($table);
         if (!$this->query->build()) {
             if ($log) {
-                $log->error('[SQLtableRepository] checkExistingTable() : Error during send request in DB for given table ' . $table);
+                $log->error('[SQLtableRepository] checkExistingTable() : '
+                    . 'Error during send request in DB for given table ' . $table);
             }
 
             if ($canUsePayplugLogger) {
                 $logger->addLog(
-                    '[SQLtableRepository] checkExistingTable() : Error during send request in DB for given table ' . $table,
+                    '[SQLtableRepository] checkExistingTable() : '
+                    . 'Error during send request in DB for given table ' . $table,
                     'error'
                 );
             }

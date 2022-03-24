@@ -146,7 +146,7 @@ class Translations
             $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
         } else {
             // In tpl file look for something that should contain mod='module_name' according to the documentation
-            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\{\$module_name\}\.*\}/U';
+            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\'payplug\'\.*\}/U';
         }
 
         if (!is_array($regex)) {

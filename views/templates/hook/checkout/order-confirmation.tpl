@@ -21,27 +21,27 @@
 *}
 <p><strong>
 {if $state == 'pending'}
-    {l s='Your payment is pending, it should validated by Payplug in a few seconds.' mod={$module_name}}<br>
+    {l s='Your payment is pending, it should validated by Payplug in a few seconds.' mod='payplug'}<br>
     {*{l s='Your payment is pending, it should validated by Payplug in a few seconds.' d='Modules.Payplug.Shop'}<br>*}
-    {l s='An email will be sent to your email address to confirm payment.' mod={$module_name}}
+    {l s='An email will be sent to your email address to confirm payment.' mod='payplug'}
     {*{l s='An email will be sent to your email address to confirm payment.' d='Modules.Payplug.Shop'}*}
 {elseif $state == 'paid'}
-    {l s='Your payment has been validated !' mod={$module_name}}<br>
+    {l s='Your payment has been validated !' mod='payplug'}<br>
     {*{l s='Your payment has been validated !' d='Modules.Payplug.Shop'}<br>*}
-    {l s='An email has been sent to your email address to confirm payment.' mod={$module_name}}
+    {l s='An email has been sent to your email address to confirm payment.' mod='payplug'}
     {*{l s='An email has been sent to your email address to confirm payment.' d='Modules.Payplug.Shop'}*}
 {/if}
 
 </strong></p>
 <p>
-{l s='Order summary :' mod={$module_name}}<br>
+{l s='Order summary :' mod='payplug'}<br>
 {*{l s='Order summary :' d='Modules.Payplug.Shop'}<br>*}
 <ul>
 {if isset($reference)}
-    <li>{l s='Reference : ' mod={$module_name}}<span id="pp_ref">{$reference|escape:'htmlall':'UTF-8'}</span></li>
+    <li>{l s='Reference : ' mod='payplug'}<span id="pp_ref">{$reference|escape:'htmlall':'UTF-8'}</span></li>
     {*<li>{l s='Reference : ' d='Modules.Payplug.Shop'}<span id="pp_ref">{$reference|escape:'htmlall':'UTF-8'}</span></li>*}
 {/if}
-    <li>{l s='Total amount : ' mod={$module_name}}<span id="pp_amount">{$totalPaid|escape:'htmlall':'UTF-8'} €</span></li>
+    <li>{l s='Total amount : ' mod='payplug'}<span id="pp_amount">{$totalPaid|escape:'htmlall':'UTF-8'} €</span></li>
     {*<li>{l s='Total amount : ' d='Modules.Payplug.Shop'}<span id="pp_amount">{$totalPaid|escape:'htmlall':'UTF-8'} €</span></li>*}
 </ul>
 </p>

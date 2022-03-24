@@ -80,6 +80,7 @@ assets compile and revision:
     - npm install --save-dev webpack
   script:
     - npm run build
+    - ./dev/ci/set_licenses.sh
     - echo "Moving file in build dir"
     - mkdir ./views/build
     - mkdir ./views/build/css
@@ -133,6 +134,7 @@ assets compile and revision for bnpl:
     - npm install --save-dev webpack
   script:
     - npm run build
+    - ./dev/ci/set_licenses.sh
     - echo "Moving file in build dir"
     - mkdir ./views/build-bnpl
     - mkdir ./views/build-bnpl/css
@@ -158,6 +160,7 @@ build zip pspaylater:
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -r ./vendor
     - ./dev/ci/set_namespace.sh
+    - ./dev/ci/set_translation.sh
     - composer install --no-dev
     - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;

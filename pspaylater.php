@@ -131,7 +131,9 @@ class PsPaylater extends PaymentModule
                 }
             }
 
-            return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
+            return (new \PayPlugModule\classes\AdminClass(
+                new \PayPlugModule\classes\DependenciesClass()
+            ))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
@@ -143,7 +145,9 @@ class PsPaylater extends PaymentModule
             $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
             $this->context->smarty->assign('url_logo', $logo_url);
 
-            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin.css');
+            $this->context->controller->addCSS(
+                __PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin.css'
+            );
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
@@ -178,7 +182,6 @@ class PsPaylater extends PaymentModule
             'displayAdminStatusesForm',
             'header',
             'moduleRoutes',
-            'payment',
             'paymentReturn',
             'paymentOptions',
             'registerGDPRConsent',
@@ -399,19 +402,6 @@ class PsPaylater extends PaymentModule
     {
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->displayHeader($params);
-        }
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     *
-     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
-     */
-    public function hookPayment($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->payment($params);
         }
     }
 

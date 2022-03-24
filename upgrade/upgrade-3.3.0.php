@@ -60,13 +60,15 @@ function upgrade_module_3_3_0($object)
         // update live status
         $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key));
         $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
+            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` 
+            (`id_order_state`, `type`, `date_add`, `date_upd`) 
             VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
 
         // update sandbox status
         $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key) . '_TEST');
         $payplug_order_states_sql[] = '
-            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` (`id_order_state`, `type`, `date_add`, `date_upd`) 
+            INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` 
+            (`id_order_state`, `type`, `date_add`, `date_upd`) 
             VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
     }
 
