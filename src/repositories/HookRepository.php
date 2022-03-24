@@ -53,16 +53,16 @@ class HookRepository extends Repository
 
         if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
             $this->dependencies->mediaClass->setMedia([
-                $module_url . 'views/css/admin_order.css',
+                $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
                 $module_url . 'views/js/admin_order.js',
                 $module_url . 'views/js/utilities.js',
             ]);
         } else {
             $this->dependencies->mediaClass->setMedia([
                 $module_url . 'views/js/admin.js',
-                $module_url . 'views/css/admin.css',
+                $module_url . 'views/css/admin-v'.$this->dependencies->version.'.css',
                 $module_url . 'views/js/utilities.js',
-                $module_url . 'views/js/components.js',
+                $module_url . 'views/js/components-v'.$this->dependencies->version.'.js',
             ]);
         }
     }
