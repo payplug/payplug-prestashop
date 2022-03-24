@@ -13,7 +13,7 @@ package.json
 vendor/
 views/css/*.css
 views/css/*.map
-views/js/components.js
+views/js/*.js
 dev/ci/translations.csv
 dev/css/less/var.less
 dev/css/components/atoms/*.map
