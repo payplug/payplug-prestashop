@@ -527,10 +527,16 @@ class ConfigClass
     public function checkPsAccount()
     {
         if ($this->dependencies->name == 'pspaylater') {
-            $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-            $accountsFacade = $module->getService('ps_accounts.facade');
-            $accountsService = $accountsFacade->getPsAccountsService();
-            return $accountsService->isAccountLinked();
+            try {
+                $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+                $accountsFacade = $module->getService('ps_accounts.facade');
+                $accountsService = $accountsFacade->getPsAccountsService();
+                return $accountsService->isAccountLinked();
+            } catch (ModuleNotInstalledException $e) {
+                return false;
+            } catch (ModuleVersionException $e) {
+                return false;
+            }
         } else {
             return true;
         }
