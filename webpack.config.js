@@ -73,7 +73,7 @@ function _getAllFilesFromFolder(dir) {
                     // compilation des fichiers "components" .js
                     case jsAtomsFolder:
                     case jsMoleculesFolder:
-                        if (typeof entryFiles['../' + dirJsFinalPath + 'components'] == 'undefined') {
+                        if (typeof entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion] == 'undefined') {
                             entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion] = [];
                         }
 
