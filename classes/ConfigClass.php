@@ -764,7 +764,7 @@ class ConfigClass
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $this->context->controller->addJS($views_path . '/js/admin.js');
         $this->context->controller->addJS($views_path . '/js/utilities.js');
-        $this->context->controller->addCSS($views_path . '/css/admin.css');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
@@ -1452,7 +1452,7 @@ class ConfigClass
 
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $this->context->controller->addJS($views_path . '/js/admin.js');
-        $this->context->controller->addCSS($views_path . '/css/admin.css');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
