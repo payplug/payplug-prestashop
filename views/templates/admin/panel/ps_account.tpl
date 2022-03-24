@@ -29,5 +29,5 @@
     <script src="{$urlAccountsCdn|escape:'htmlall':'UTF-8'}" type="text/javascript"></script>
 {/if}
 
-<link href="/modules/pspaylater/views/js/psAccountsVue.js" rel=preload as=script>
-<script type="text/javascript" src="/modules/pspaylater/views/js/psAccountsVue.js"></script>
+<link href="/modules/pspaylater/views/js/psAccountsVue-v{$pp_version|escape:'htmlall':'UTF-8'}.js" rel=preload as=script>
+<script type="text/javascript" src="/modules/pspaylater/views/js/psAccountsVue-v{$pp_version|escape:'htmlall':'UTF-8'}.js"></script>
