@@ -52,7 +52,7 @@ class PsPaylater extends PaymentModule
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('bnpl.construct.description');
-        $this->displayName = 'Paylater';
+        $this->displayName = $this->l('pspaylater.construct.displayName');
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
