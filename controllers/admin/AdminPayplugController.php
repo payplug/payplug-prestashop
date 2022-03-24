@@ -101,7 +101,7 @@ class AdminPayplugController extends ModuleAdminController
             __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/js/admin.js'
         );
         $this->context->controller->addCSS(
-            __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/css/admin.css'
+            __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/css/admin-v'.$this->dependencies->version.'.css'
         );
 
         $this->dependencies->configClass->assignContentVar();
