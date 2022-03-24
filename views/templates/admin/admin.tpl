@@ -64,6 +64,9 @@
             {include file='./panel/ps_account.tpl'}
         {/if}
 
+        {* description block *}
+        {include file='./../api/molecules/description.tpl'}
+
         {* Configuration saving button *}
         {include file='./../api/molecules/general.tpl'}
 

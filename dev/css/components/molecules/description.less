@@ -1,0 +1,47 @@
+.payplugConfiguration .descriptionBlock {
+  background: #colorMap[darkBlue];
+
+  ._header {
+    ._logo {
+      margin-bottom: 40px;
+      display: inline-block;
+      width: 49%;
+    }
+
+    ._version {
+      display: inline-block;
+      vertical-align: top;
+      text-align: right;
+      width: 49%;
+      margin-top: 12px;
+    }
+
+    ._descriptionVersion {
+      @size: 14;
+      color: #colorMap[white];
+      .Roboto(~"@{size}px", 400);
+      letter-spacing: 0.25px;
+      opacity: 0.8;
+    }
+  }
+
+  ._descriptionTitle {
+    @size: 20;
+    color: #colorMap[white];
+    .Inter(~"@{size}px", 700);
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.33px;
+    margin-bottom: 24px;
+  }
+
+  ._descriptionText {
+    @size: 14;
+    color: #colorMap[white];
+    .Roboto(~"@{size}px", 400);
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    opacity: 0.8;
+  }
+}
