@@ -183,7 +183,7 @@ class DependenciesClass
         'oneyOptimized' => [
             'name' => 'ONEY_OPTIMIZED',
             'defaultValue' => 0,
-            'setConf' => 0
+            'setConf' => 1
         ],
         'orderStateAuth' => [
             'name' => 'ORDER_STATE_AUTH',
