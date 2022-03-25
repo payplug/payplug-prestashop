@@ -294,10 +294,22 @@ class InstallRepository extends Repository
     {
         foreach (array_keys($this->dependencies->configurationKeys) as $key) {
             if ($this->dependencies->getConfigurationKeyOption($key, 'setConf')) {
-                $this->config->updateValue(
-                    $this->dependencies->getConfigurationKey($key),
-                    $this->dependencies->getConfigurationKeyOption($key, 'defaultValue')
-                );
+                if ($key == 'oney' && $this->dependencies->name == 'pspaylater') {
+                    $this->config->updateValue(
+                        $this->dependencies->getConfigurationKey($key),
+                        1
+                    );
+                } elseif ($key == 'oneyOptimized' && $this->dependencies->name == 'pspaylater') {
+                    $this->config->updateValue(
+                        $this->dependencies->getConfigurationKey($key),
+                        1
+                    );
+                } else {
+                    $this->config->updateValue(
+                        $this->dependencies->getConfigurationKey($key),
+                        $this->dependencies->getConfigurationKeyOption($key, 'defaultValue')
+                    );
+                }
             }
         };
         return true;
