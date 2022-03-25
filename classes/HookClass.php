@@ -729,7 +729,7 @@ class HookClass
 
         if ($show_popin && $display_refund) {
             $this->context->controller->addJS(
-                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin_order_popin.js'
+                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin_order_popin-v'.$this->dependencies->version.'.js'
             );
         }
 
@@ -853,7 +853,7 @@ class HookClass
             }
 
             $this->context->controller->addJS(
-                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/embedded.js'
+                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/embedded-v'.$this->dependencies->version.'.js'
             );
 
             $payment_options = [
