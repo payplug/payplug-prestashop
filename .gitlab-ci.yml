@@ -180,4 +180,4 @@ build zip pspaylater:
   artifacts:
     paths:
       - pspaylater_$CI_COMMIT_REF_NAME.zip
-      - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
+      - pspaylater_qa_$CI_COMMIT_REF_NAME_$(date +%Y%m%d%H%M%S).zip
