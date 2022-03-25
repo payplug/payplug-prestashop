@@ -560,7 +560,7 @@ class ApiClass
     {
         if ($this->current_api_key != null) {
             HttpClient::setDefaultUserAgentProduct(
-                'PayPlug-Prestashop',
+                $this->dependencies->name .'-Prestashop',
                 $this->dependencies->version,
                 'Prestashop/' . _PS_VERSION_
             );
