@@ -468,6 +468,11 @@ class ConfigClass
             $is_payplug_connected = true;
         }
 
+        $psAccountConnected = $this->checkPsAccount();
+        if ($is_payplug_connected && !$psAccountConnected) {
+            $is_payplug_connected = false;
+        }
+
         if ($report['curl']['installed'] &&
             $report['php']['up2date'] &&
             $report['openssl']['installed'] &&
@@ -732,6 +737,12 @@ class ConfigClass
         $connected = !empty($configurations['email'])
             && (!empty($configurations['test_api_key']) || !empty($configurations['live_api_key']));
 
+        $psAccountConnected = $this->checkPsAccount();
+        if ($connected && !$psAccountConnected) {
+            $this->logout();
+            $connected = false;
+        }
+
         if (count($this->validationErrors) && !$connected) {
             $this->context->smarty->assign([
                 'validationErrors' => $this->validationErrors,
@@ -849,7 +860,7 @@ class ConfigClass
             'check_configuration' => $this->check_configuration,
             'pp_version' => $this->dependencies->version,
             'connected' => $connected,
-            'ps_account' => $this->checkPsAccount(),
+            'ps_account' => $psAccountConnected,
             'verified' => $verified,
             'premium' => $premium,
             'is_active' => $is_active,
@@ -1391,11 +1402,7 @@ class ConfigClass
      */
     public function submitDisconnect()
     {
-        $this->install->setConfig();
-        Configuration::updateValue($this->dependencies->getConfigurationKey('show'), 0);
-
-        // force reload configuration to be sure all config are reset
-        Configuration::loadConfiguration();
+        $this->logout();
 
         $this->assignContentVar();
         $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
@@ -1488,5 +1495,15 @@ class ConfigClass
         $this->html .= $this->fetchTemplate('/views/templates/admin/admin_uninstall_configuration.tpl');
 
         return $this->html;
+    }
+
+    /**
+     * @description Disconnect user
+     */
+    public function logout()
+    {
+        $this->install->setConfig();
+        Configuration::updateValue($this->dependencies->getConfigurationKey('show'), 0);
+        Configuration::loadConfiguration();
     }
 }
