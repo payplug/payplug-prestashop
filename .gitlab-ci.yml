@@ -107,11 +107,12 @@ build zip release:
     - rm -r ./vendor
     - composer install --no-dev
     - rm webpack.config.js
-    - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
     - ./dev/ci/assets_revision.sh -b payplug
     - mkdir payplug
+    - php ./dev/ci/import-translations.php
+    - ./dev/ci/copy_translations.sh
   script:
     - shopt -s extglob
     - mv !(payplug|composer.json) payplug
@@ -162,13 +163,13 @@ build zip pspaylater:
     - ./dev/ci/set_namespace.sh
     - ./dev/ci/set_translation.sh
     - composer install --no-dev
-    - ./dev/ci/copy_translations.sh
     - find ./vendor -type d -exec cp index.php {} \;
     - git status
     - rm -rf views/build && mv views/build-bnpl views/build
     - ./dev/ci/assets_revision.sh -b pspaylater
     - mkdir pspaylater
     - php ./dev/ci/import-translations.php
+    - ./dev/ci/copy_translations.sh
   script:
     - shopt -s extglob
     - mv !(pspaylater|composer.json) pspaylater
