@@ -115,10 +115,10 @@ const loaders = [
 ];
 const optimization = {
     minimizer: [
-        // new CssMinimizerPlugin(), // todo: uncomment for prod compilation
-        new TerserPlugin(),
+        new CssMinimizerPlugin(), // todo: uncomment for prod compilation
+        //new TerserPlugin(),
     ],
-    minimize: true,
+    //minimize: true,
 };
 const plugins = [
     new RemoveEmptyScriptsPlugin(),

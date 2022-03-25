@@ -57,8 +57,8 @@ class PrestashopSpecific17
     {
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $this->context->controller->addCSS($views_path . '/css/front-v'.$this->dependencies->version.'.css');
-        $this->context->controller->addJS($views_path . '/js/utilities.js');
-        $this->context->controller->addJS($views_path . '/js/front.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
     }
 
     public function displayPaymentOption($payment_options)
