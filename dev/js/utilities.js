@@ -20,7 +20,7 @@
  *  @version   3.4.0
  *  International Registered Trademark & Property of PayPlug SAS
  */
-function getHtmlTags (html) {
+getHtmlTags = function(html) {
     var htmlContent =  document.createElement('div');
     htmlContent.innerHTML = html;
     allTags = htmlContent.getElementsByTagName("*");
@@ -34,7 +34,7 @@ function getHtmlTags (html) {
     return tags;
 }
 
-function sanitizePopupHtml (str) {
+sanitizePopupHtml = function(str) {
     if (str.match(/ on\w+="[^"]*"/g)) {
         return;
     }
@@ -78,7 +78,7 @@ var payplug_utilities = {
     }
 };
 
-function addLogger(message)
+addLogger = function(message)
 {
     $.ajax({
         url: payplug_ajax_url,
