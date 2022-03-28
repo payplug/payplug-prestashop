@@ -1,18 +1,20 @@
 @{moduleClassName}Configuration .descriptionBlock {
   background: #colorMap[darkBlue];
+  padding: 64px;
+  box-sizing: border-box;
 
   ._header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0 40px;
+
     ._logo {
-      margin-bottom: 40px;
-      display: inline-block;
-      width: 49%;
+      svg {
+        display: block;
+      }
     }
 
     ._version {
-      display: inline-block;
-      vertical-align: top;
-      text-align: right;
-      width: 49%;
       margin-top: 12px;
     }
 
@@ -33,7 +35,7 @@
     display: flex;
     align-items: center;
     letter-spacing: -0.33px;
-    margin-bottom: 24px;
+    margin: 0 0 16px;
   }
 
   ._descriptionText {
@@ -43,5 +45,6 @@
     line-height: 20px;
     letter-spacing: 0.25px;
     opacity: 0.8;
+    margin: 0px;
   }
 }
