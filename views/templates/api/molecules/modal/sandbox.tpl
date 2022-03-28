@@ -69,11 +69,13 @@
                 {include file='./../../atoms/paragraph/paragraph.tpl'
                 paragraphText=$modalSandboxOnboardingProcessingText}
 
-                {capture assign="popinCheckonboardingCancel"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
-                {include file='./../../atoms/button/button.tpl'
-                buttonData='cancel'
-                buttonName='closePopin'
-                buttonText=$popinCheckonboardingCancel}
+                <div class="modalSandboxFooter modalSandboxFooterSolo">
+                    {capture assign="popinCheckonboardingCancel"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
+                    {include file='./../../atoms/button/button.tpl'
+                    buttonData='cancel'
+                    buttonName='closePopin'
+                    buttonText=$popinCheckonboardingCancel}
+                </div>
 
             {else}
 
@@ -84,11 +86,13 @@
                 {include file='./../../atoms/paragraph/paragraph.tpl'
                 paragraphText=$modalSandboxOnboardingProcessedText}
 
-                {capture assign="popinCheckonboardingSuccess"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
-                {include file='./../../atoms/button/button.tpl'
-                buttonData='success'
-                buttonName='validateLive'
-                buttonText=$popinCheckonboardingSuccess}
+                <div class="modalSandboxFooter modalSandboxFooterSolo">
+                    {capture assign="popinCheckonboardingSuccess"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
+                    {include file='./../../atoms/button/button.tpl'
+                    buttonData='success'
+                    buttonName='validateLive'
+                    buttonText=$popinCheckonboardingSuccess}
+                </div>
 
             {/if}
         </div>

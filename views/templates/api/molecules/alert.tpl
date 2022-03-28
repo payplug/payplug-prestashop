@@ -30,4 +30,5 @@
 {include file='./../atoms/alert/alert.tpl'
     alertType='warning'
     alertTitle=$alertOnboardingTitle
+    alertClassName='onboardingAlert'
     alertContent=$alertContent}
