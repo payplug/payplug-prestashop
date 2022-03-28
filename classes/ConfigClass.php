@@ -745,7 +745,7 @@ class ConfigClass
 
         $onboardingOneyCompleted = false;
         $livepermissions = $this->getLivePermissions();
-        if ($livepermissions != [] && isset($livepermissions['onboardingOneyCompleted'])) {
+        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
             $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
         }
 
@@ -1436,7 +1436,7 @@ class ConfigClass
             if ($this->dependencies->apiClass->login($email, $password)) {
                 $onboardingOneyCompleted = false;
                 $livepermissions = $this->getLivePermissions();
-                if ($livepermissions != [] && isset($livepermissions['onboardingOneyCompleted'])) {
+                if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
                     $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
                 }
 

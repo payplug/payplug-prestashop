@@ -353,12 +353,15 @@ class ApiClass
             $can_use_bancontact = true;
         }
 
-        if (isset($json_answer['payment_methods'])) {
+        $onboardingOneyCompleted = false;
+        if (isset($json_answer['payment_methods']) && !empty(
+            Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
+            )
+        )) {
             $oney_methods = [];
-            $onboardingOneyCompleted = false;
-
             foreach ($json_answer['payment_methods'] as $key => $val) {
-                if (substr($key, 0, 5) == 'oney_') {
+                if (Tools::substr($key, 0, 5) == 'oney_') {
                     $oney_methods[] = $val["enabled"];
                 }
             }
