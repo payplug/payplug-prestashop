@@ -50,6 +50,8 @@ class ApiClass
      */
     private $site_url;
 
+    private $tools;
+
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
@@ -57,6 +59,7 @@ class ApiClass
         $this->setEnvironment();
         $this->setSecretKey();
         $this->current_api_key = $this->getCurrentApiKey();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->setUserAgent();
     }
@@ -361,7 +364,7 @@ class ApiClass
         )) {
             $oney_methods = [];
             foreach ($json_answer['payment_methods'] as $key => $val) {
-                if (Tools::substr($key, 0, 5) == 'oney_') {
+                if ($this->tools->substr($key, 0, 5) == 'oney_') {
                     $oney_methods[] = $val["enabled"];
                 }
             }

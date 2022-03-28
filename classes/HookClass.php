@@ -39,6 +39,7 @@ class HookClass
     private $cache;
     private $card;
     private $config;
+    private $constant;
     private $context;
     private $dependencies;
     private $html;
@@ -60,6 +61,7 @@ class HookClass
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
         $this->module = $this->dependencies->getPlugin()->getModule();
@@ -728,8 +730,9 @@ class HookClass
         }
 
         if ($show_popin && $display_refund) {
+            $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
             $this->context->controller->addJS(
-                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/admin_order_popin-v'.$this->dependencies->version.'.js'
+                $views_path . 'js/admin_order_popin-v'.$this->dependencies->version.'.js'
             );
         }
 
@@ -851,10 +854,8 @@ class HookClass
             if (!$this->validate->validate('isLoadedObject', $cart)) {
                 return;
             }
-
-            $this->context->controller->addJS(
-                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/js/embedded-v'.$this->dependencies->version.'.js'
-            );
+            $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+            $this->context->controller->addJS($views_path . 'js/embedded-v'.$this->dependencies->version.'.js');
 
             $payment_options = [
                 'id_card' => $this->tools->tool('getValue', 'pc', 'new_card'),

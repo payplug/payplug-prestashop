@@ -1,7 +1,22 @@
+#!/bin/sh
 
+branch="payplug"
+# Process all options supplied on the command line
+
+while getopts b: flag;
+do
+    case "${flag}" in
+        b) branch=${OPTARG};;
+        *) eval echo "Unrecognized arg \$${OPTARG}"; usage; exit ;;
+    esac
+done
+
+echo "Looking for tag in ${branch}.php..."
+tag=`grep '$this->version =' ${branch}.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
 
 jsPath="./views/js/"
-export jsFile="components"
+#export jsFile="components"
+export jsFile="components psAccountsVue"
 
 licenseText="/**
   * 2013 - 2022 PayPlug SAS
@@ -28,8 +43,9 @@ licenseText="/**
 
 for file in $jsFile
   do
-    echo "Adding license tag to ${jsFile}.js"
-    { echo "${licenseText}"; cat ${jsPath}${jsFile}.js; } > ${jsPath}${jsFile}.tmp.js
-    rm ${jsPath}${jsFile}.js
-    mv ${jsPath}${jsFile}.tmp.js ${jsPath}${jsFile}.js
+    echo "Adding license tag to ${file}-v${tag}.js"
+    echo "path => ${jsPath}${file}-v${tag}.js"
+    { echo "${licenseText}"; cat ${jsPath}${file}-v${tag}.js; } > ${jsPath}${file}.tmp.js
+    rm ${jsPath}${file}.js
+    mv ${jsPath}${file}.tmp.js ${jsPath}${file}-v${tag}.js
   done
