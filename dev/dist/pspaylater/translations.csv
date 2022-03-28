@@ -1,5 +1,5 @@
 key;default;tags;fr;en;gb;it
-<{pspaylater}prestashop>pspaylater_dc85896edd5acb57eb4e884d0e490a08;bnpl.construct.description;;;;;
+<{pspaylater}prestashop>pspaylater_dc85896edd5acb57eb4e884d0e490a08;bnpl.construct.description;;Proposer le paiement en 3 et 4 fois sur votre boutique.;;;
 <{pspaylater}prestashop>payplug_a24854748a79644ea78a127748b9e081;payplug.construct.description;;La solution de paiement en ligne alliant simplicité et accompagnement de premier ordre pour booster vos ventes.;The online payment solution combining simplicity and first-rate support to boost your sales.;The online payment solution combining simplicity and first-rate support to boost your sales.;La soluzione di pagamento online che ti assiste con facilità e ti aiuta ad aumentare le vendite.
 <{pspaylater}prestashop>adminclass_3b13b7b1ada74ffc106c25a47078e387;payplug.adminAjaxController.passwordInvalid;;Le mot de passe saisi n'est pas valide;The password you entered is invalid;The password you entered is invalid;La password inserita non é corretta
 <{pspaylater}prestashop>adminclass_60b031efb994d5c853cfc4816fab262e;payplug.adminAjaxController.credentialsNotCorrect;;L'e-mail ou le mot de passe saisi est incorrect.;The email and/or password was not correct.;The email and/or password was not correct.;L'indirizzo mail e/o la password sono errati.
