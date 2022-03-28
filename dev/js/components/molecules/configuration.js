@@ -97,6 +97,11 @@ class Configuration {
                 $button.addClass('-disabled').attr('disabled', 'disabled');
             },
             error: (jqXHR, textStatus, errorThrown) => {
+                alert('An error occurred while trying to checking your premium status. ' +
+                    'Maybe you clicked too fast before scripts are fully loaded ' +
+                    'or maybe you have a different back-office url than expected.' +
+                    'You will find more explanation in JS console.');
+                console.log(jqXHR, textStatus, errorThrown);
                 $button.removeClass('-disabled').removeAttr('disabled');
             },
             success: (result) => {
@@ -146,6 +151,11 @@ class Configuration {
                 $button.addClass('-disabled').attr('disabled', 'disabled');
             },
             error: (jqXHR, textStatus, errorThrown) => {
+                alert('An error occurred while trying to checking your premium status. ' +
+                    'Maybe you clicked too fast before scripts are fully loaded ' +
+                    'or maybe you have a different back-office url than expected.' +
+                    'You will find more explanation in JS console.');
+                console.log(jqXHR, textStatus, errorThrown);
                 $button.removeClass('-disabled').removeAttr('disabled');
             },
             success: (result) => {
