@@ -1,5 +1,5 @@
 key;default;tags;fr;en;gb;it
-<{pspaylater}prestashop>pspaylater_dc85896edd5acb57eb4e884d0e490a08;bnpl.construct.description;;Proposer le paiement en 3 et 4 fois sur votre boutique.;;;
+<{pspaylater}prestashop>pspaylater_f78df788fa811a2d431266535633199b;pspaylater.construct.description;;Proposer le paiement en 3 et 4 fois sur votre boutique.;;;
 <{pspaylater}prestashop>payplug_a24854748a79644ea78a127748b9e081;payplug.construct.description;;La solution de paiement en ligne alliant simplicité et accompagnement de premier ordre pour booster vos ventes.;The online payment solution combining simplicity and first-rate support to boost your sales.;The online payment solution combining simplicity and first-rate support to boost your sales.;La soluzione di pagamento online che ti assiste con facilità e ti aiuta ad aumentare le vendite.
 <{pspaylater}prestashop>adminclass_3b13b7b1ada74ffc106c25a47078e387;payplug.adminAjaxController.passwordInvalid;;Le mot de passe saisi n'est pas valide;The password you entered is invalid;The password you entered is invalid;La password inserita non é corretta
 <{pspaylater}prestashop>adminclass_60b031efb994d5c853cfc4816fab262e;payplug.adminAjaxController.credentialsNotCorrect;;L'e-mail ou le mot de passe saisi est incorrect.;The email and/or password was not correct.;The email and/or password was not correct.;L'indirizzo mail e/o la password sono errati.
@@ -517,7 +517,7 @@ Consulta la nostra [2]pagina di supporto[/2] per ottenere una versione del modul
 <{pspaylater}prestashop>sandbox_87eff7c9713e27c37f3f3bedb7501df6;popin.checkonboarding.password;;Mot de passe;;;
 <{pspaylater}prestashop>sandbox_9d234ec385d946d2ef673ec280cc5a0a;popin.checkonboarding.cancel;;Annuler;;;
 <{pspaylater}prestashop>sandbox_795482c6dbcc9a480e0ec9e3bfcba73e;popin.checkonboarding.submit;;OK;;;
-<{pspaylater}prestashop>sandbox_33ded670a21a66fddc14990a735fe104;popin.checkonboarding.title;;Mode Live;;;
+<{pspaylater}prestashop>sandbox_33ded670a21a66fddc14990a735fe104;popin.checkonboarding.title;;Mode LIVE;;;
 <{pspaylater}prestashop>sandbox_f5b6f70af08c2bf62bc16a5d2970247f;modal.sandbox.onboarding.processing.title;;Votre dossier est en cours de traitement.;;;
 <{pspaylater}prestashop>sandbox_1718b1bf75e01735779ae55c7d44f6b6;modal.sandbox.onboarding.processing.text;$supportLink;Si vous souhaitez plus d’informations,  contactez-nous à l’adresse [1]support@payplug.com[/1];;;
 <{pspaylater}prestashop>sandbox_841de40d60a8ce1a99fac5e2e41953a1;modal.sandbox.onboarding.processed.title;;Félicitations, votre dossier est accepté !;;;

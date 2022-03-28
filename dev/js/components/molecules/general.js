@@ -24,7 +24,13 @@ class General {
     handleAlertLiveButton(event) {
             event.preventDefault();
             event.stopPropagation();
-            $('input[name="payplug_sandbox"][value="0"]').trigger('click');
+
+        const $sandbox = $('input[name="payplug_sandbox"][value="0"]');
+        if ($sandbox.data('notallowed')) {
+            return general.checkOnboarding();
+        } else {
+            return $sandbox.trigger('click');
+        }
     }
 
     checkOnboarding() {
