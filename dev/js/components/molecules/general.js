@@ -248,6 +248,7 @@ class General {
         const $buttonLive = $('input[name="payplug_sandbox"][value="0"]');
         $buttonLive.data("notallowed", 0);
         $buttonLive.trigger('click');
+        $('div.onboardingAlert').remove();
     }
 
     handleSandbox(event) {
