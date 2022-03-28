@@ -28,7 +28,7 @@
         <div class="_version">
             {assign var='description_descriptionVersionClassName' value='_descriptionVersion'}
             {capture assign="description_descriptionVersion"}
-                V {$pp_version}
+                V {$pp_version|escape:'htmlall':'UTF-8'}
             {/capture}
             {include file='./../atoms/paragraph/paragraph.tpl'
                 paragraphText=$description_descriptionVersion

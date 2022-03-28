@@ -80,7 +80,7 @@ assets compile and revision:
     - npm install --save-dev webpack
   script:
     - npm run build
-    - ./dev/ci/set_licenses.sh
+    - ./dev/ci/set_licenses.sh -b payplug
     - echo "Moving file in build dir"
     - mkdir ./views/build
     - mkdir ./views/build/css
@@ -135,7 +135,7 @@ assets compile and revision for bnpl:
     - npm install --save-dev webpack
   script:
     - npm run build
-    - ./dev/ci/set_licenses.sh
+    - ./dev/ci/set_licenses.sh -b pspaylater
     - echo "Moving file in build dir"
     - mkdir ./views/build-bnpl
     - mkdir ./views/build-bnpl/css

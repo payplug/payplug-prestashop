@@ -23,7 +23,7 @@
 <section class="payplugUiBlock
     {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}
     {if isset($blockDisabled) && $blockDisabled} -disabled{/if}"
-    {if isset($blockData) && $blockData} data-e2e-name="{$blockData}"{/if}>
+    {if isset($blockData) && $blockData} data-e2e-name="{$blockData|escape:'htmlall':'UTF-8'}"{/if}>
     {if isset($blockTitle) && $blockTitle}
         <h2 class="_title">
             {$blockTitle|escape:'htmlall':'UTF-8'}
