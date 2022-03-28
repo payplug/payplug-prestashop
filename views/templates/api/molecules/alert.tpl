@@ -25,7 +25,7 @@
 {assign "sandboxLiveButton" "<button type='button' name='alertLiveButton' class='alertLiveButton'>"}
 {capture assign="alertOnboardingTitle"}{l s='alert.onboarding.title' mod='payplug'}{/capture}
 {capture assign="alertContent"}
-    {l s='alert.onboarding.content' tags=[$modeTestLink, $sandboxLiveButton] mod='payplug'}
+    {l s='alert.onboarding.content' tags=[$modeTestLink, '<br>', $sandboxLiveButton] mod='payplug'}
 {/capture}
 {include file='./../atoms/alert/alert.tpl'
     alertType='warning'
