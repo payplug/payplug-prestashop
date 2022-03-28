@@ -512,3 +512,15 @@ Per favore, riprova."
 <{payplug}prestashop>hookrepository_940ffc0c6f00a6dd8b8435de55aa4752;hook.displayAdminStatusesForm.orderStateTypePaid;;"PayPlug interprétera ce statut comme une commande Acceptée";"PayPlug will interpret this status as an Accepted order";"PayPlug will interpret this status as an Accepted order";"PayPlug identificherà lo stato dell'ordine come Accettato"
 <{payplug}prestashop>hookrepository_de812fb7f12df1b0d1d568575b09e71d;hook.displayAdminStatusesForm.orderStateTypePending;;"PayPlug interprétera ce statut comme une commande En attente";"PayPlug will interpret this status as a Pending order";"PayPlug will interpret this status as a Pending order";"PayPlug identificherà lo stato dell'ordine come In attesa"
 <{payplug}prestashop>hookrepository_f0cae2731f2d834467f3abd7d340411e;hook.displayAdminStatusesForm.orderStateTypeRefund;;"PayPlug interprétera ce statut comme une commande Remboursée";"PayPlug will interpret this status as a Refunded order";"PayPlug will interpret this status as a Refunded order";"PayPlug identificherà lo stato dell'ordine come Rimborsato"
+<{payplug}prestashop>alert_f11a2c6bdb67fea2bbdbac1215a03361;alert.onboarding.title;;Félicitations, votre compte est connecté !;;;
+<{payplug}prestashop>alert_eda33afc4c30ecdc0e6567f46326175f;alert.onboarding.content;$modeTestLink, $sandboxLiveButton;Pendant l'étude de votre dossier, vous pouvez utiliser le [1]mode TEST[/1] pour découvrir notre module.  [2]Cliquez-ici[/2] pour passer au mode LIVE et encaisser les paiements de vos clients.;;;
+<{payplug}prestashop>sandbox_04aee6dba48905e2332f1bbf2d083de5;popin.checkonboarding.text;;Veuillez saisir le mot de passe de votre compte PayPlug;;;
+<{payplug}prestashop>sandbox_87eff7c9713e27c37f3f3bedb7501df6;popin.checkonboarding.password;;Mot de passe;;;
+<{payplug}prestashop>sandbox_9d234ec385d946d2ef673ec280cc5a0a;popin.checkonboarding.cancel;;Annuler;;;
+<{payplug}prestashop>sandbox_795482c6dbcc9a480e0ec9e3bfcba73e;popin.checkonboarding.submit;;OK;;;
+<{payplug}prestashop>sandbox_33ded670a21a66fddc14990a735fe104;popin.checkonboarding.title;;Mode Live;;;
+<{payplug}prestashop>sandbox_f5b6f70af08c2bf62bc16a5d2970247f;modal.sandbox.onboarding.processing.title;;Votre dossier est en cours de traitement.;;;
+<{payplug}prestashop>sandbox_1718b1bf75e01735779ae55c7d44f6b6;modal.sandbox.onboarding.processing.text;$supportLink;Si vous souhaitez plus d’informations,  contactez-nous à l’adresse [1]support@payplug.com[/1];;;
+<{payplug}prestashop>sandbox_841de40d60a8ce1a99fac5e2e41953a1;modal.sandbox.onboarding.processed.title;;Félicitations, votre dossier est accepté !;;;
+<{payplug}prestashop>sandbox_2ff56f53ba4da4e48c33e66e42577a7b;modal.sandbox.onboarding.processed.text;;Vous pouvez désormais utiliser le mode LIVE  et encaisser des paiements dès maintenant.;;;
+<{payplug}prestashop>configclass_b4bf3f83ac86dbe1e01346a2343a003b;payplug.submitSandbox.passwordError;;Le mot de passe saisi n'est pas valide.;;;
