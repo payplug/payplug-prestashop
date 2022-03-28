@@ -12,23 +12,37 @@
     }
   }
   &Checkonboarding {
-    .modalSandboxInput {
-      padding-top: 24px;
-    }
-    .modalSandboxFooter {
-      display: flex;
-      justify-content: space-between;
-    }
-    .modalSandboxBody {
-      text-align: center;
-      .payplugUITitle {
-        padding-top: 50px;
+    .modalSandbox
+    {
+      &Input {
+        padding-top: 24px;
       }
-      .payplugUIButton {
-        display: initial;
+      &Footer {
+        display: flex;
+        justify-content: space-between;
       }
-      .payplugUIParagraph {
-        padding-bottom: 33px;
+      &Body {
+        text-align: center;
+        .payplugUI {
+          &Title {
+            padding-top: 27px;
+          }
+          &Button {
+            display: initial;
+          }
+          &Paragraph {
+            padding-bottom: 33px;
+            a {
+              &:link,
+              &:hover,
+              &:visited,
+              &:active {
+                color: #colorMap[fontSecondaryDefault];
+                text-decoration: underline;
+              }
+            }
+          }
+        }
       }
     }
     button {
