@@ -19,6 +19,7 @@ class General {
             .on('click', '.alertLiveButton', this.handleAlertLiveButton)
             .on('click', 'button[name=submitSandbox]', this.submitSandbox)
             .on('click', 'button[name=validateLive]', this.validateLive)
+            .on('click', 'input[name=modalTriggered]', this.handleModal)
     }
 
     handleAlertLiveButton(event) {
@@ -30,6 +31,14 @@ class General {
             return general.checkOnboarding();
         } else {
             return $sandbox.trigger('click');
+        }
+    }
+
+    handleModal(event) {
+        const $checkbox = $(event.target);
+        const $modal = $('.payplugUIModal');
+        if (!$checkbox.prop('checked') && $modal.find('button[name=validateLive]').length) {
+            return general.setSandboxAllowed();
         }
     }
 
@@ -78,8 +87,8 @@ class General {
             submitSandbox: 1,
             payplug_password: $('input[name="password"]').val(),
         };
+        const $container = $('.' + general.props.container);
         const $button = $(this);
-        const $container = $button.parents('.' + general.props.container);
 
         if ($button.is('-disabled')) {
             return;
@@ -149,8 +158,8 @@ class General {
             payplug_email: $('input[name="userEmail"]').val(),
             payplug_password: $('input[name="userPassword"]').val(),
         };
+        const $container = $('.' + general.props.container);
         const $button = $(this);
-        const $container = $button.parents('.' + general.props.container);
 
         if ($button.is('-disabled')) {
             return;
@@ -242,13 +251,21 @@ class General {
     validateLive(event) {
         event.preventDefault();
         event.stopPropagation();
-        const $button = $(this);
-        const $container = $button.parents('.' + general.props.container);
+
+        // close the modal
+        const $container = $('.' + general.props.container);
         $container.find('input[name=modalTriggered]').trigger('click');
-        const $buttonLive = $('input[name="payplug_sandbox"][value="0"]');
-        $buttonLive.data("notallowed", 0);
-        $buttonLive.trigger('click');
-        $('div.onboardingAlert').remove();
+
+        general.setSandboxAllowed();
+    }
+
+    setSandboxAllowed() {
+        // set sandbox value
+        const $sandBoxLive = $('input[name="payplug_sandbox"][value="0"]');
+        $sandBoxLive.data("notallowed", 0).trigger('click');
+
+        // remove alert block
+        $('.onboardingAlert').remove();
     }
 
     handleSandbox(event) {
