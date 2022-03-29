@@ -31,7 +31,7 @@
         {/capture}
         {include file='./../atoms/buttonLink/buttonLink.tpl'
             buttonLinkData='payplugRegistration'
-            buttonLinkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal/signup?sponsor=22101'
+            buttonLinkHref=$portal_url|escape:'htmlall':'UTF-8'|cat:'/signup?sponsor=22101'
             buttonLinkName='createAccount'
             buttonLinkText=$generalSubscribe_createAccount}
 
