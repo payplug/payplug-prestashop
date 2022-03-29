@@ -22,78 +22,74 @@
 
 {capture assign="modalContent"}
     {if !isset($isOnboardedCompleted)}
-        {capture assign="popinCheckonboardingText"}{l s='popin.checkonboarding.text' mod='payplug'}{/capture}
-        {include file='./../../atoms/paragraph/paragraph.tpl' paragraphText=$popinCheckonboardingText}
-
-        <div class="modalSandboxInput">
-            {capture assign="popinCheckonboardingPassword"}{l s='popin.checkonboarding.password' mod='payplug'}{/capture}
-            {include file='./../../atoms/input/input.tpl'
-                inputType='password'
-                inputName='password'
-                inputLabel=$popinCheckonboardingPassword
-                inputClassName=$errorClass}
-
-            {if isset($errorMessage)}<div class="errorMessage">
-                {include file='./../../_svg/icon_error.tpl'
+        <div class="sandboxBody">
+            {capture assign="popinCheckonboardingText"}{l s='popin.checkonboarding.text' mod='payplug'}{/capture}
+            {include file='./../../atoms/paragraph/paragraph.tpl' paragraphText=$popinCheckonboardingText}
+            <div class="sandboxInput">
+                {capture assign="popinCheckonboardingPassword"}{l s='popin.checkonboarding.password' mod='payplug'}{/capture}
+                {include file='./../../atoms/input/input.tpl'
                     inputType='password'
                     inputName='password'
                     inputLabel=$popinCheckonboardingPassword
                     inputClassName=$errorClass}
 
-                {$errorMessage|escape:'htmlall':'UTF-8'}</div>
-            {/if}
-        </div>
-        <div class="modalSandboxFooter">
-            {capture assign="popinCheckonboardingCancel"}{l s='popin.checkonboarding.cancel' mod='payplug'}{/capture}
-            {include file='./../../atoms/button/button.tpl'
-            buttonData='cancel'
-            buttonName='closePopin'
-            buttonText=$popinCheckonboardingCancel
-            buttonStyle='tertiary'}
-            {capture assign="popinCheckonboardingSubmit"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
-            {include file='./../../atoms/button/button.tpl'
-            buttonData='submit'
-            buttonName='submitSandbox'
-            buttonText=$popinCheckonboardingSubmit}
+                {if isset($errorMessage)}
+                    <div class="sandboxError">
+                        {include file='./../../_svg/icon_error.tpl'
+                            inputType='password'
+                            inputName='password'
+                            inputLabel=$popinCheckonboardingPassword
+                            inputClassName=$errorClass}
+                        {$errorMessage|escape:'htmlall':'UTF-8'}
+                    </div>
+                {/if}
+            </div>
+            <div class="sandboxFooter">
+                {capture assign="popinCheckonboardingCancel"}{l s='popin.checkonboarding.cancel' mod='payplug'}{/capture}
+                {include file='./../../atoms/button/button.tpl'
+                    buttonData='cancel'
+                    buttonName='closePopin'
+                    buttonText=$popinCheckonboardingCancel
+                    buttonStyle='tertiary'}
+                {capture assign="popinCheckonboardingSubmit"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
+                {include file='./../../atoms/button/button.tpl'
+                    buttonData='submit'
+                    buttonName='submitSandbox'
+                    buttonText=$popinCheckonboardingSubmit}
+            </div>
         </div>
     {else}
-        <div class="modalSandboxBody">
+        <div class="sandboxBody -center">
             {if $isOnboardedCompleted == false}
-
                 {capture assign="modalSandboxOnboardingProcessingTitle"}{l s='modal.sandbox.onboarding.processing.title' mod='payplug'}{/capture}
                 {include file='./../../atoms/title/title.tpl'
-                titleText=$modalSandboxOnboardingProcessingTitle}
-
+                    titleText=$modalSandboxOnboardingProcessingTitle}
                 {assign "supportLink" "<a href='mailto:support@payplug.com' target='_blank'>"}
                 {capture assign="modalSandboxOnboardingProcessingText"}{l s='modal.sandbox.onboarding.processing.text' tags=[$supportLink] mod='payplug'}{/capture}
                 {include file='./../../atoms/paragraph/paragraph.tpl'
-                paragraphText=$modalSandboxOnboardingProcessingText}
-
-                <div class="modalSandboxFooter modalSandboxFooterSolo">
+                    paragraphText=$modalSandboxOnboardingProcessingText}
+                <div class="sandboxFooter">
                     {capture assign="popinCheckonboardingCancel"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
                     {include file='./../../atoms/button/button.tpl'
-                    buttonData='cancel'
-                    buttonName='closePopin'
-                    buttonText=$popinCheckonboardingCancel}
+                        buttonData='cancel'
+                        buttonName='closePopin'
+                        buttonText=$popinCheckonboardingCancel}
                 </div>
-
             {else}
-
                 {capture assign="modalSandboxOnboardingProcessedTitle"}{l s='modal.sandbox.onboarding.processed.title' mod='payplug'}{/capture}
                 {include file='./../../atoms/title/title.tpl'
-                titleText=$modalSandboxOnboardingProcessedTitle}
+                    titleText=$modalSandboxOnboardingProcessedTitle}
                 {capture assign="modalSandboxOnboardingProcessedText"}{l s='modal.sandbox.onboarding.processed.text' mod='payplug'}{/capture}
                 {include file='./../../atoms/paragraph/paragraph.tpl'
-                paragraphText=$modalSandboxOnboardingProcessedText}
+                    paragraphText=$modalSandboxOnboardingProcessedText}
 
-                <div class="modalSandboxFooter modalSandboxFooterSolo">
+                <div class="sandboxFooter">
                     {capture assign="popinCheckonboardingSuccess"}{l s='popin.checkonboarding.submit' mod='payplug'}{/capture}
                     {include file='./../../atoms/button/button.tpl'
-                    buttonData='success'
-                    buttonName='validateLive'
-                    buttonText=$popinCheckonboardingSuccess}
+                        buttonData='success'
+                        buttonName='validateLive'
+                        buttonText=$popinCheckonboardingSuccess}
                 </div>
-
             {/if}
         </div>
     {/if}

@@ -11,63 +11,67 @@
       }
     }
   }
+
   &Checkonboarding {
-    .modalSandbox {
-      &Input {
-        padding-top: 24px;
-      }
-      &Footer {
-        display: flex;
-        justify-content: space-between;
-        padding: 16px 0 0;
-        .payplugUIButton {
-          width: 150px;
-          max-width: calc(50% - 8px);
-        }
-        &Solo {
-          justify-content: center;
-        }
-      }
-      &Body {
-        text-align: center;
-        .payplugUI {
-          &Title {
-            padding-top: 27px;
-          }
-          &Paragraph {
-            padding-bottom: 33px;
-            a {
-              &:link,
-              &:hover,
-              &:visited,
-              &:active {
-                color: #colorMap[fontSecondaryDefault];
-                text-decoration: underline;
-              }
+    .sandboxBody {
+      padding: 16px 0 0;
+
+      .payplugUI {
+        &Paragraph {
+          margin: 0 0 24px;
+
+          a {
+            &:link,
+            &:hover,
+            &:visited,
+            &:active {
+              color: #colorMap[fontSecondaryDefault];
+              text-decoration: underline;
             }
           }
         }
       }
-    }
 
-    ._body {
-      .payplugUIParagraph {
-        padding: 16px 0 0;
-        margin: 0px;
+      &.-center {
+        padding: 16px 0;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+
+        .sandboxFooter {
+          .payplugUIButton {
+            max-width: 100%;
+          }
+        }
+      }
+    }
+    .sandboxFooter {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      padding: 16px 0 0;
+      margin: 0;
+
+      .payplugUIButton {
+        width: 150px;
+        max-width: calc(50% - 8px);
       }
     }
 
-    .errorMessage {
+    .sandboxError {
       display: block;
       color: #colorMap[error];
       font-size: 12px;
-      margin: -20px 0 -6px;
-      line-height: 2em;
+      margin: -20px 0 -2px;
+      line-height: 18px;
 
       svg {
         .transition(~"fill @{dur}");
         fill: #colorMap[error];
         vertical-align: middle;
+        max-height: 100%;
       }
     }
   }
