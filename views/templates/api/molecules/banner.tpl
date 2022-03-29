@@ -23,15 +23,15 @@
 {* Block banner *}
 {if $iso == 'fr'}
     {capture assign="blockContent"}
-        <img alt="banner-img" src="/modules/pspaylater/views/img/banner.png">
+        <img alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
     {/capture}
 {elseif $iso == 'it'}
     {capture assign="blockContent"}
-        <img alt="banner-img" src="/modules/pspaylater/views/img/banner.png">
+        <img alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
     {/capture}
 {else}
     {capture assign="blockContent"}
-        <img alt="banner-img" src="/modules/pspaylater/views/img/banner.png">
+        <img alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
     {/capture}
 {/if}
 
