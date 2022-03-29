@@ -22,11 +22,17 @@
 
 {* Block banner *}
 {if $iso == 'fr'}
-    {assign var='blockContent' value='banner FR'}
+    {capture assign="blockContent"}
+        <img alt="banner-img" src="/modules/pspaylater/views/img/banner.png">
+    {/capture}
 {elseif $iso == 'it'}
-    {assign var='blockContent' value='banner IT'}
+    {capture assign="blockContent"}
+        <img alt="banner-img" src="/modules/pspaylater/views/img/banner.png">
+    {/capture}
 {else}
-    {assign var='blockContent' value='banner EN'}
+    {capture assign="blockContent"}
+        <img alt="banner-img" src="/modules/pspaylater/views/img/banner.png">
+    {/capture}
 {/if}
 
 {assign var='bannerBlock_className' value='bannerBlock'}
