@@ -45,6 +45,9 @@ class ApiClass
     /** var DependenciesClass */
     public $dependencies;
 
+    /** @var string */
+    private $portal_url;
+
     /**
      * @var mixed
      */
@@ -534,6 +537,12 @@ class ApiClass
         } else {
             $this->site_url = 'https://www.payplug.com';
         }
+
+        if (isset($_SERVER['PAYPLUG_PORTAL_URL'])) {
+            $this->portal_url = $_SERVER['PAYPLUG_PORTAL_URL'];
+        } else {
+            $this->portal_url = 'https://portal.payplug.com';
+        }
     }
 
     /**
@@ -717,5 +726,10 @@ class ApiClass
     public function getSiteUrl()
     {
         return $this->site_url;
+    }
+
+    public function getPortalUrl()
+    {
+        return $this->portal_url;
     }
 }

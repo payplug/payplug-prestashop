@@ -871,6 +871,7 @@ class ConfigClass
             'premium' => $premium,
             'is_active' => $is_active,
             'site_url' => $this->dependencies->apiClass->getSiteUrl(),
+            'portal_url' => $this->dependencies->apiClass->getPortalUrl(),
             'sandbox_mode' => $configurations['sandbox_mode'],
             'embedded_mode' => $configurations['embedded_mode'],
             'one_click' => $configurations['one_click'],
