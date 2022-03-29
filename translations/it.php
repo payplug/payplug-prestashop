@@ -44,6 +44,8 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'Rata ID';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Cliente';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Rata #';
+$_MODULE['<{payplug}prestashop>alert_eda33afc4c30ecdc0e6567f46326175f'] = 'Mentre il tuo dossier è in fase di elaborazione, puoi utilizzare la [1]modalità TEST[/1] per scoprire il nostro modulo.[2] [3]Clicca qui[/3] per passare alla modalità LIVE e iniziare ad incassare i pagamenti dei tuoi clienti.';
+$_MODULE['<{payplug}prestashop>alert_f11a2c6bdb67fea2bbdbac1215a03361'] = 'Congratulazioni, il tuo account è già connesso!';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>bancontact_4c72b15e8f81999a38e124f4a0a5423f'] = 'Attiva i pagamenti Bancontact (BETA)';
 $_MODULE['<{payplug}prestashop>bancontact_617ecf9a36aeb297a68f7de6e7ae952b'] = 'Permetti ai tuoi clienti di pagare con le carte Bancontact.';
@@ -97,6 +99,7 @@ $_MODULE['<{payplug}prestashop>configclass_922fcab664e04e713b84bbd0d8a5c422'] = 
 $_MODULE['<{payplug}prestashop>configclass_ac98647d8ff4a9a12280d177a7320510'] = 'l\'estensione PHP cURL deve essere abilitata sul tuo server';
 $_MODULE['<{payplug}prestashop>configclass_af839f228c4f4ed3419092c5fbe8a2fa'] = 'rediretta';
 $_MODULE['<{payplug}prestashop>configclass_b17f424277b3ae648edcead5333a7fca'] = 'annullato';
+$_MODULE['<{payplug}prestashop>configclass_b4bf3f83ac86dbe1e01346a2343a003b'] = 'La password inserita non é corretta';
 $_MODULE['<{payplug}prestashop>configclass_c3041f00ca79d002013f230bd5140f1a'] = 'Potresti incontrare una difficoltà usando PayPlug. Aggiorna la pagina o clicca "Verifica" una volta corretti';
 $_MODULE['<{payplug}prestashop>configclass_c9e5fd656b62ace2dbbae8cceab0a860'] = 'live';
 $_MODULE['<{payplug}prestashop>configclass_ddcc63743cfcc2a3eca41e43343236ad'] = 'Attenzione, l\'importo massimo inserito è inferiore all\'importo minimo inserito.';
@@ -267,7 +270,8 @@ $_MODULE['<{payplug}prestashop>integrated_payment_135d8119e3d51e37c192ec3aa6cb07
 $_MODULE['<{payplug}prestashop>integrated_payment_31025818b7246ef6978773c7f97cdbba'] = 'Cognome e/o nome non valido(i).';
 $_MODULE['<{payplug}prestashop>integrated_payment_51828e2fbedf61f6e4056a798e92f1ec'] = 'Salva i dati della mia carta di credito';
 $_MODULE['<{payplug}prestashop>integrated_payment_58679831fad529b286ea96e1b0fe14ed'] = 'Voce non valida. Per favore, correggi per continuare.';
-$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'La transazione non è stata conclusa[1]e non è stato effettuato alcun[1]addebito sulla tua carta.[1]Per favore, riprova.';
+$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'La transazione non è stata conclusa[1]e non è stato effettuato alcun[1]addebito sulla tua carta.[1]
+Per favore, riprova.';
 $_MODULE['<{payplug}prestashop>integrated_payment_76921e9f92347ff287c289e7b676bf88'] = 'Campo obbligatorio.';
 $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e50508313c'] = 'L\'addebito sarà effettuato al momento dell\'elaborazione dell\'ordine.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Numero di carta non valido.';
@@ -443,7 +447,6 @@ $_MODULE['<{payplug}prestashop>prestashopspecific17_be68eac79ad39a8e98bfd7c15b9f
 $_MODULE['<{payplug}prestashop>prestashopspecific17_c9e5fd656b62ace2dbbae8cceab0a860'] = 'live';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_ed32bfa1899dc3505c064504bc13ab82'] = 'Pagamento con carta di credito';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_f40145536110051efd072d7d3c6a56ea'] = 'Mostra PayPlug ai clienti';
-$_MODULE['<{payplug}prestashop>pspaylater_f4fdba2d9126020a419d9ec4b955fe07'] = 'PrestaShop Paylater with PayPlug & Oney';
 $_MODULE['<{payplug}prestashop>pwd_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>pwd_d698469a293eb8d935d4e9496c53caed'] = 'Si prega di inserire la password del tuo conto PayPlug';
 $_MODULE['<{payplug}prestashop>pwd_ea4788705e6873b424c65e91c2846b19'] = 'Cancella';
@@ -475,9 +478,18 @@ $_MODULE['<{payplug}prestashop>required_a60852f204ed8028c1c58808b746d115'] = 'Ok
 $_MODULE['<{payplug}prestashop>required_ca74a33411999c3a84468c9c26e1d7c7'] = 'Tuo indirizzo di fatturazione';
 $_MODULE['<{payplug}prestashop>required_ea4788705e6873b424c65e91c2846b19'] = 'Annullare';
 $_MODULE['<{payplug}prestashop>required_f76579ec7d7a4822123b03b53b8bee13'] = 'Fare di nuovo clic su Oney per continuare';
+$_MODULE['<{payplug}prestashop>sandbox_04aee6dba48905e2332f1bbf2d083de5'] = 'Si prega di inserire la password del tuo conto PayPlug';
 $_MODULE['<{payplug}prestashop>sandbox_0bcd992a2481b78d045f59b6b59da440'] = 'In modalità LIVE, i pagamenti generano transazioni reali.';
+$_MODULE['<{payplug}prestashop>sandbox_1718b1bf75e01735779ae55c7d44f6b6'] = 'Per ricevere ulteriori informazioni, contattaci al seguente indirizzo e-mail: [1]supporto@payplug.com[/1]';
+$_MODULE['<{payplug}prestashop>sandbox_2ff56f53ba4da4e48c33e66e42577a7b'] = 'Puoi utilizzare fin d\'ora la modalità LIVE e iniziare a incassare i pagamenti.';
+$_MODULE['<{payplug}prestashop>sandbox_33ded670a21a66fddc14990a735fe104'] = 'modalità LIVE';
 $_MODULE['<{payplug}prestashop>sandbox_650be61892bf690026089544abbd9d26'] = 'Modalità';
 $_MODULE['<{payplug}prestashop>sandbox_77c3eb6aeafe60a4d58c65b6823b2dec'] = 'Pagamenti in modalità TEST, sono simulazioni e non generano transazioni reali.';
+$_MODULE['<{payplug}prestashop>sandbox_795482c6dbcc9a480e0ec9e3bfcba73e'] = 'OK';
+$_MODULE['<{payplug}prestashop>sandbox_841de40d60a8ce1a99fac5e2e41953a1'] = 'Congratulazioni, il tuo dossier è stato accettato!';
+$_MODULE['<{payplug}prestashop>sandbox_87eff7c9713e27c37f3f3bedb7501df6'] = 'Password';
+$_MODULE['<{payplug}prestashop>sandbox_9d234ec385d946d2ef673ec280cc5a0a'] = 'Annulla';
+$_MODULE['<{payplug}prestashop>sandbox_f5b6f70af08c2bf62bc16a5d2970247f'] = 'Il tuo dossier è in fase di elaborazione.';
 $_MODULE['<{payplug}prestashop>sandbox_f990e553cdc4c29c2efffba33e08a8c7'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>save_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>save_a6489557b8e386d5c51fb94e856981ea'] = 'La tua configurazione è stata salvata';
