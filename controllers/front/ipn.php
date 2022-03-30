@@ -25,11 +25,11 @@
  * @description
  * Treat notification received
  */
-class PayplugIPNModuleFrontController extends ModuleFrontController
+class PsPayLaterIPNModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $notification = \PayPlugModule\classes\ConfigClass::setNotification();
+        $notification = \PayLaterModule\classes\ConfigClass::setNotification();
         $notification->treat();
     }
 }

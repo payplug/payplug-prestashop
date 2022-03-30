@@ -21,11 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-class PayplugValidationModuleFrontController extends ModuleFrontController
+class PsPayLaterValidationModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $validation = \PayPlugModule\classes\ConfigClass::setValidation();
+        $validation = \PayLaterModule\classes\ConfigClass::setValidation();
         $validation->treat();
     }
 }

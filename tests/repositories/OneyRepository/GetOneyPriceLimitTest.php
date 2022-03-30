@@ -22,9 +22,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\OneyRepository;
+namespace PayLaterModule\tests\repositories\OneyRepository;
 
-use PayPlugModule\tests\mock\CurrencyMock;
+use PayLaterModule\tests\mock\CurrencyMock;
 
 /**
  * @group unit

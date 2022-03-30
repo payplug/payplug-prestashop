@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayLaterModule\src\repositories;
 
-use PayPlugModule\classes\MediaClass;
+use PayLaterModule\classes\MediaClass;
 use Media;
 
 class HookRepository extends Repository

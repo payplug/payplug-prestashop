@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayLaterModule\src\specific;
 
-use PayPlugModule\src\interfaces\ModuleInterface;
+use PayLaterModule\src\interfaces\ModuleInterface;
 use Module;
 
 class ModuleSpecific implements ModuleInterface

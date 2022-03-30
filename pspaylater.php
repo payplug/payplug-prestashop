@@ -102,7 +102,7 @@ class PsPaylater extends PaymentModule
             }
 
             if ($this->payplug_dependencies->getDependency('configClass')->isValidFeature('feature_ps_account')) {
-                $dependencies = new \PayPlugModule\classes\DependenciesClass();
+                $dependencies = new \PayLaterModule\classes\DependenciesClass();
                 $logger = $dependencies->getPlugin()->getLogger();
 
                 try {
@@ -131,8 +131,8 @@ class PsPaylater extends PaymentModule
                 }
             }
 
-            return (new \PayPlugModule\classes\AdminClass(
-                new \PayPlugModule\classes\DependenciesClass()
+            return (new \PayLaterModule\classes\AdminClass(
+                new \PayLaterModule\classes\DependenciesClass()
             ))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
@@ -524,7 +524,7 @@ class PsPaylater extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayLaterModule\classes\PayPlugDependencies();
     }
 
     private function setModule()

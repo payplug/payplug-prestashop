@@ -23,8 +23,8 @@
 
 
 
-use PayPlugModule\src\entities\CardEntity;
-use PayPlugModule\src\entities\PluginEntity;
+use PayLaterModule\src\entities\CardEntity;
+use PayLaterModule\src\entities\PluginEntity;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayLaterModule\src\specific;
 
-use PayPlugModule\src\interfaces\HookInterface;
+use PayLaterModule\src\interfaces\HookInterface;
 
 class HookSpecific implements HookInterface
 {

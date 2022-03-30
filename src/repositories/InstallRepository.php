@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayLaterModule\src\repositories;
 
-use PayPlugModule\classes\ConfigClass;
+use PayLaterModule\classes\ConfigClass;
 use Db;
 
 class InstallRepository extends Repository

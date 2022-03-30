@@ -22,11 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\OneyRepository;
+namespace PayLaterModule\tests\repositories\OneyRepository;
 
-use PayPlugModule\tests\mock\CartMock;
-use PayPlugModule\tests\mock\CarrierMock;
-use PayPlugModule\tests\mock\ContextMock;
+use PayLaterModule\tests\mock\CartMock;
+use PayLaterModule\tests\mock\CarrierMock;
+use PayLaterModule\tests\mock\ContextMock;
 
 /**
  * @group unit

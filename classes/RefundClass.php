@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayLaterModule\classes;
 
 use Configuration;
 use Context;
@@ -34,7 +34,7 @@ use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\InstallmentPlan;
 use Payplug\Payment;
 use Payplug\Resource\Refund;
-use PayPlugModule\src\repositories\LoggerRepository;
+use PayLaterModule\src\repositories\LoggerRepository;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use Tools;

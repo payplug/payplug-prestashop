@@ -22,11 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\OrderStateRepository;
+namespace PayLaterModule\tests\repositories\OrderStateRepository;
 
-use PayPlugModule\src\repositories\OrderStateRepository;
-use PayPlugModule\tests\mock\MockHelper;
-use PayPlugModule\tests\repositories\RepositoryBase;
+use PayLaterModule\src\repositories\OrderStateRepository;
+use PayLaterModule\tests\mock\MockHelper;
+use PayLaterModule\tests\repositories\RepositoryBase;
 
 class BaseOrderStateRepository extends RepositoryBase
 {

@@ -22,14 +22,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\PaymentRepository;
+namespace PayLaterModule\tests\repositories\PaymentRepository;
 
 use Mockery;
 use Payplug\Payment;
-use PayPlugModule\src\entities\PaymentEntity;
-use PayPlugModule\src\repositories\PaymentRepository;
-use PayPlugModule\tests\mock\MockHelper;
-use PayPlugModule\tests\repositories\RepositoryBase;
+use PayLaterModule\src\entities\PaymentEntity;
+use PayLaterModule\src\repositories\PaymentRepository;
+use PayLaterModule\tests\mock\MockHelper;
+use PayLaterModule\tests\repositories\RepositoryBase;
 
 class BasePaymentRepository extends RepositoryBase
 {

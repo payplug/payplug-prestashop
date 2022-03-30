@@ -21,37 +21,37 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayLaterModule\src\repositories;
 
-use PayPlugModule\classes\ConfigClass;
-use PayPlugModule\classes\AmountCurrencyClass;
-use PayPlugModule\classes\MyLogPHP;
+use PayLaterModule\classes\ConfigClass;
+use PayLaterModule\classes\AmountCurrencyClass;
+use PayLaterModule\classes\MyLogPHP;
 
-use PayPlugModule\src\entities\CacheEntity;
-use PayPlugModule\src\entities\OneyEntity;
-use PayPlugModule\src\entities\PaymentEntity;
-use PayPlugModule\src\entities\PluginEntity;
-use PayPlugModule\src\entities\OrderStateEntity;
+use PayLaterModule\src\entities\CacheEntity;
+use PayLaterModule\src\entities\OneyEntity;
+use PayLaterModule\src\entities\PaymentEntity;
+use PayLaterModule\src\entities\PluginEntity;
+use PayLaterModule\src\entities\OrderStateEntity;
 
-use PayPlugModule\src\specific\AddressSpecific;
-use PayPlugModule\src\specific\AssignSpecific;
-use PayPlugModule\src\specific\CarrierSpecific;
-use PayPlugModule\src\specific\CartSpecific;
-use PayPlugModule\src\specific\ConfigurationSpecific;
-use PayPlugModule\src\specific\ConstantSpecific;
-use PayPlugModule\src\specific\ContextSpecific;
-use PayPlugModule\src\specific\CountrySpecific;
-use PayPlugModule\src\specific\CurrencySpecific;
-use PayPlugModule\src\specific\CustomerSpecific;
-use PayPlugModule\src\specific\LanguageSpecific;
-use PayPlugModule\src\specific\ModuleSpecific;
-use PayPlugModule\src\specific\OrderSpecific;
-use PayPlugModule\src\specific\OrderHistorySpecific;
-use PayPlugModule\src\specific\OrderStateSpecific;
-use PayPlugModule\src\specific\ProductSpecific;
-use PayPlugModule\src\specific\ShopSpecific;
-use PayPlugModule\src\specific\ToolsSpecific;
-use PayPlugModule\src\specific\ValidateSpecific;
+use PayLaterModule\src\specific\AddressSpecific;
+use PayLaterModule\src\specific\AssignSpecific;
+use PayLaterModule\src\specific\CarrierSpecific;
+use PayLaterModule\src\specific\CartSpecific;
+use PayLaterModule\src\specific\ConfigurationSpecific;
+use PayLaterModule\src\specific\ConstantSpecific;
+use PayLaterModule\src\specific\ContextSpecific;
+use PayLaterModule\src\specific\CountrySpecific;
+use PayLaterModule\src\specific\CurrencySpecific;
+use PayLaterModule\src\specific\CustomerSpecific;
+use PayLaterModule\src\specific\LanguageSpecific;
+use PayLaterModule\src\specific\ModuleSpecific;
+use PayLaterModule\src\specific\OrderSpecific;
+use PayLaterModule\src\specific\OrderHistorySpecific;
+use PayLaterModule\src\specific\OrderStateSpecific;
+use PayLaterModule\src\specific\ProductSpecific;
+use PayLaterModule\src\specific\ShopSpecific;
+use PayLaterModule\src\specific\ToolsSpecific;
+use PayLaterModule\src\specific\ValidateSpecific;
 
 class PluginRepository extends Repository
 {

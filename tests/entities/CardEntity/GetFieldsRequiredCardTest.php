@@ -23,7 +23,7 @@
 
 
 
-use PayPlugModule\src\entities\CardEntity;
+use PayLaterModule\src\entities\CardEntity;
 use PHPUnit\Framework\TestCase;
 
 /**

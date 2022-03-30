@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayLaterModule\classes;
 
-use PayPlugModule\src\repositories\CardRepository;
+use PayLaterModule\src\repositories\CardRepository;
 use Country;
 use Exception;
 use Product;

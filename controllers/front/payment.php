@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-class PayplugPaymentModuleFrontController extends ModuleFrontController
+class PsPayLaterPaymentModuleFrontController extends ModuleFrontController
 {
     private $dependencies;
     private $logger;
@@ -31,7 +31,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->dependencies = new \PayLaterModule\classes\DependenciesClass();
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();

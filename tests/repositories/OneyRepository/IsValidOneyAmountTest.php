@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\OneyRepository;
+namespace PayLaterModule\tests\repositories\OneyRepository;
 
 /**
  * @group unit

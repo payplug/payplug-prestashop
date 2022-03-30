@@ -89,7 +89,7 @@ class Payplug extends PaymentModule
                 $this->install(true);
             }
 
-            return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
+            return (new \PayLaterModule\classes\AdminClass(new \PayLaterModule\classes\DependenciesClass()))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
@@ -474,7 +474,7 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayLaterModule\classes\PayPlugDependencies();
     }
 
     private function setModule()

@@ -21,14 +21,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayLaterModule\src\repositories;
 
-use PayPlugModule\classes\ConfigClass;
+use PayLaterModule\classes\ConfigClass;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ConnectionException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\UnexpectedAPIResponseException;
-use PayPlugModule\src\exceptions\BadParameterException;
+use PayLaterModule\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
 class OneyRepository extends Repository

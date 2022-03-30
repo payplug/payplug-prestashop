@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayLaterModule\src\specific;
 
-use PayPlugModule\src\interfaces\OrderInterface;
+use PayLaterModule\src\interfaces\OrderInterface;
 use Order;
 
 class OrderSpecific implements OrderInterface

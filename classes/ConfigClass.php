@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayLaterModule\classes;
 
 use Configuration;
 use Country;
@@ -30,13 +30,13 @@ use Language;
 use libphonenumberlight;
 use Media;
 use Module;
-use PayPlugModule\backward\PayPlugBackward;
+use PayLaterModule\backward\PayPlugBackward;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
-use PayPlugModule\src\repositories\LoggerRepository;
-use PayPlugModule\src\specific\ConstantSpecific;
-use PayPlugModule\src\specific\ContextSpecific;
+use PayLaterModule\src\repositories\LoggerRepository;
+use PayLaterModule\src\specific\ConstantSpecific;
+use PayLaterModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 

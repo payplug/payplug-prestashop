@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlugModule\tests\mock;
+namespace PayLaterModule\tests\mock;
 
 use Payplug\Resource\Payment;
 

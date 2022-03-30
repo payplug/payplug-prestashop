@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayLaterModule\classes;
 
 use OrderHistory;
 use OrderState;
-use PayPlugModule\backward\PayPlugBackward;
-use PayPlugModule\src\specific\ContextSpecific;
+use PayLaterModule\backward\PayPlugBackward;
+use PayLaterModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 

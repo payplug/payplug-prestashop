@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayLaterModule\src\repositories;
 
 use Exception;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\NotFoundException;
-use PayPlugModule\src\entities\CardEntity;
+use PayLaterModule\src\entities\CardEntity;
 
 class CardRepository extends Repository
 {

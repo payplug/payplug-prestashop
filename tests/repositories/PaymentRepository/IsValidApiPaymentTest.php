@@ -22,9 +22,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\PaymentRepository;
+namespace PayLaterModule\tests\repositories\PaymentRepository;
 
-use PayPlugModule\tests\mock\PaymentMock;
+use PayLaterModule\tests\mock\PaymentMock;
 
 final class IsValidApiPaymentTest extends BasePaymentRepository
 {

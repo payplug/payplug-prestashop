@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayLaterModule\classes;
 
 use Authentication;
 use Configuration;
@@ -29,8 +29,8 @@ use Payplug\Core\HttpClient;
 use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
-use PayPlugModule\src\exceptions\BadParameterException;
-use PayPlugModule\src\repositories\PluginRepository;
+use PayLaterModule\src\exceptions\BadParameterException;
+use PayLaterModule\src\repositories\PluginRepository;
 use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 

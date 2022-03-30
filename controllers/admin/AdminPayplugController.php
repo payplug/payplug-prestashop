@@ -29,7 +29,7 @@ class AdminPayplugController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->dependencies = new \PayLaterModule\classes\DependenciesClass();
     }
 
     public function initProcess()

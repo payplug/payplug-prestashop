@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayLaterModule\src\specific;
 
-use PayPlugModule\src\interfaces\CartInterface;
+use PayLaterModule\src\interfaces\CartInterface;
 use Cart;
 
 class CartSpecific implements CartInterface

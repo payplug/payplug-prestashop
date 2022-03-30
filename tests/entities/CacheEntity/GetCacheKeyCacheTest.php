@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlugModule\src\entities\CacheEntity;
+use PayLaterModule\src\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
 /**

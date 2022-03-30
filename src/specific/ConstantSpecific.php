@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayLaterModule\src\specific;
 
-use PayPlugModule\src\interfaces\ConstantInterface;
+use PayLaterModule\src\interfaces\ConstantInterface;
 
 class ConstantSpecific implements ConstantInterface
 {

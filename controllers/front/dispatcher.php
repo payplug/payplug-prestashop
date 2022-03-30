@@ -24,7 +24,7 @@
 /**
  * @description Dispatch payment method
  */
-class PayplugDispatcherModuleFrontController extends ModuleFrontController
+class PsPayLaterDispatcherModuleFrontController extends ModuleFrontController
 {
     /**
      * @description
@@ -37,7 +37,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         if ($method = Tools::getValue('method')) {
-            $dependencies = new \PayPlugModule\classes\DependenciesClass();
+            $dependencies = new \PayLaterModule\classes\DependenciesClass();
             $paymentClass = $dependencies->paymentClass;
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
