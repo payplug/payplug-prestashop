@@ -26,7 +26,7 @@ namespace PayPlugModule\classes;
 use Exception;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\InstallmentPlan;
-use Payplug\Payment;
+use Payplug\Payment as PaymentLib;
 use Db;
 
 class InstallmentClass extends \PaymentModule
@@ -64,7 +64,7 @@ class InstallmentClass extends \PaymentModule
                 $pay_id = '';
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
-                    $payment = Payment::retrieve($pay_id);
+                    $payment = PaymentLib::retrieve($pay_id);
                     $status = PaymentClass::getPaymentStatusByPayment($payment);
                 } else {
                     if ((int)$installment->is_active == 1) {

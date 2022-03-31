@@ -23,7 +23,7 @@
 
 namespace PayPlugModule\classes;
 
-use PayPlugModule\src\repositories\PluginRepository;
+use PayPlugModule\src\PluginConstructor;
 use PayPlugModule\src\specific\TranslationSpecific;
 use Tools;
 
@@ -322,7 +322,7 @@ class DependenciesClass
 
     public function initializeAccessors()
     {
-        $this->setPlugin((new PluginRepository($this))->getEntity());
+        $this->setPlugin((new PluginConstructor($this))->getEntity());
 
         $this->amountCurrencyClass = $this->getPlugin()->getAmountCurrencyClass();
 

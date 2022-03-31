@@ -34,7 +34,7 @@ use PayPlugModule\backward\PayPlugBackward;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
-use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlugModule\src\services\Logger;
 use PayPlugModule\src\specific\ConstantSpecific;
 use PayPlugModule\src\specific\ContextSpecific;
 use Tools;
@@ -277,7 +277,7 @@ class ConfigClass
      */
     private function setLoggers()
     {
-        $this->logger = new LoggerRepository($this->dependencies);
+        $this->logger = new Logger($this->dependencies);
         $this->myLogPHP = new MyLogPHP();
 
         $this->logger->setParams(['process' => 'payplug.php']);

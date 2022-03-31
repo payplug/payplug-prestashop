@@ -30,7 +30,7 @@ use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use PayPlugModule\src\exceptions\BadParameterException;
-use PayPlugModule\src\repositories\PluginRepository;
+use PayPlugModule\src\PluginConstructor;
 use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 

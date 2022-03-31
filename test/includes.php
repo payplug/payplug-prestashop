@@ -2,7 +2,6 @@
 
 // get PHP Payplug Lib
 $files = [
-    '/../lib/init.php',
     '/tests/mock/PaymentMock.php',
     '/tests/mock/PayPlugCacheMock.php',
 ];

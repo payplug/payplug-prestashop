@@ -1,0 +1,186 @@
+<?php
+
+/**
+ * 2013 - 2021 PayPlug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+
+namespace PayPlugModule\tests\services\Oney;
+
+use PayPlugModule\tests\mock\OneySimulationsMock;
+
+/**
+ * @group unit
+ * @group repository
+ * @group oney
+ * @group format_oney_repository
+ *
+ * @runTestsInSeparateProcesses
+ */
+final class FormatOneyResourceTest extends BaseOney
+{
+    protected $repo;
+    protected $tab;
+
+    protected $operation;
+    protected $resource;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->repo
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive([
+                'getMethods' => [
+                    'x3_with_fees',
+                ]
+            ]);
+
+        $this->operation = 'x3_with_fees';
+        $this->resource = OneySimulationsMock::get()[$this->operation];
+    }
+
+    public function testWithInvalidMethod()
+    {
+        $method = 'wrong method';
+        $this->assertSame(
+            false,
+            $this->repo->formatOneyResource($method, $this->resource, $total_amount = false)
+        );
+    }
+
+    public function testWithInvalidResource()
+    {
+        $resource = 'wrong resource';
+        $this->assertSame(
+            false,
+            $this->repo->formatOneyResource($this->operation, $resource, $total_amount = false)
+        );
+    }
+
+    public function testGetValidSplit()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = 3;
+        $this->assertSame(
+            $expected_value,
+            $response['split']
+        );
+    }
+
+    public function testGetValidTitle()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = 'Payment in 3x';
+        $this->assertSame(
+            $expected_value,
+            $response['title']
+        );
+    }
+
+    public function testGetValidTotalCost()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = [
+            'amount'=> number_format(3.5, 2),
+            'value'=> '3,50 €'
+        ];
+        $this->assertSame(
+            $expected_value,
+            $response['total_cost']
+        );
+    }
+
+    public function testGetValidDownPaymentAmount()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = [
+            'amount' => number_format(83.92, 2),
+            'value' => '83,92 €'
+        ];
+        $this->assertSame(
+            $expected_value,
+            $response['down_payment_amount']
+        );
+    }
+
+    public function testGetValidInstallments()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+
+        // check installments count
+        $this->assertSame(
+            2,
+            count($response['installments'])
+        );
+
+        $this->assertSame(
+            [
+                'date' => '2021-02-19T01:00:00.000Z',
+                'amount' => number_format(80.42, 2),
+                'value' => '80,42 €'
+            ],
+            $response['installments'][0]
+        );
+        $this->assertSame(
+            [
+                'date' => '2021-03-19T01:00:00.000Z',
+                'amount' => number_format(80.41, 2),
+                'value' => '80,41 €'
+            ],
+            $response['installments'][1]
+        );
+    }
+
+    public function testWithInvalidAmount()
+    {
+        $this->assertSame(
+            false,
+            $this->repo->formatOneyResource($this->operation, $this->resource, 'wrong params')
+        );
+    }
+
+    public function testGetValidTotalAmountWithEmptyValue()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
+        $expected_value = [
+            'amount' => number_format(3.5, 2),
+            'value' => '3,50 €'
+        ];
+        $this->assertSame(
+            $expected_value,
+            $response['total_amount']
+        );
+    }
+
+    public function testGetValidTotalAmount()
+    {
+        $response = $this->repo->formatOneyResource($this->operation, $this->resource, 100);
+        $expected_value = [
+            'amount' => number_format(4.5, 2),
+            'value' => '4,50 €'
+        ];
+        $this->assertSame(
+            $expected_value,
+            $response['total_amount']
+        );
+    }
+}

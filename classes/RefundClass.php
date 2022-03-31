@@ -32,7 +32,7 @@ use OrderSlip;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\InstallmentPlan;
-use Payplug\Payment;
+use Payplug\Payment as PaymentLib;
 use Payplug\Resource\Refund;
 use PayPlugModule\src\repositories\LoggerRepository;
 use PrestaShopDatabaseException;
@@ -266,7 +266,7 @@ class RefundClass
                     foreach ($installment->schedule as $schedule) {
                         if (!empty($schedule->payment_ids)) {
                             foreach ($schedule->payment_ids as $p_id) {
-                                $payment = Payment::retrieve($p_id);
+                                $payment = PaymentLib::retrieve($p_id);
                                 if ($payment->is_paid && !$payment->is_refunded) {
                                     $amount_available += (int)($payment->amount - $payment->amount_refunded);
                                 }
