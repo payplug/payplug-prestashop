@@ -19,10 +19,7 @@
     }
 
     ._descriptionVersion {
-      @size: 14;
       color: #colorMap[white];
-      .Roboto(~"@{size}px", 400);
-      letter-spacing: 0.25px;
       opacity: 0.8;
     }
   }
@@ -31,6 +28,7 @@
     @size: 20;
     color: #colorMap[white];
     .Inter(~"@{size}px", 700);
+    letter-spacing: calc(-0.33em / ~"@{size}");
     line-height: 30px;
     display: flex;
     align-items: center;
@@ -39,11 +37,7 @@
   }
 
   ._descriptionText {
-    @size: 14;
     color: #colorMap[white];
-    .Roboto(~"@{size}px", 400);
-    line-height: 20px;
-    letter-spacing: 0.25px;
     opacity: 0.8;
     margin: 0px;
   }

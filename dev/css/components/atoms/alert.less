@@ -1,5 +1,4 @@
 .payplugUIAlert {
-  @size: 14;
   .borderRadius(4px);
 
   display: flex;
@@ -23,15 +22,11 @@
   }
 
   ._title {
-    .Roboto(~"@{size}px", 700);
-    line-height: calc(20em / ~"@{size}");
+    font-weight: 700;
     margin: 0 0 10px;
   }
 
   ._content {
-    .Roboto(~"@{size}px", 400);
-    line-height: calc(20em / ~"@{size}");
-
     p {
       font: inherit;
       margin: 0;

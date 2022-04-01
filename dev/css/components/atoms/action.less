@@ -1,10 +1,8 @@
 .payplugUIAction {
-  @size: 14;
-
   display: flex;
   align-items: center;
-  min-width: calc(200em / ~"@{size}");
-  height: calc(36em / ~"@{size}");
+  min-width: 200px;
+  height: 36px;
   padding: 0 8px;
 
   .borderRadius(4px);
@@ -18,9 +16,6 @@
     background: transparent;
     text-decoration: none;
   }
-
-  .Roboto(~"@{size}px", 400);
-  line-height: calc(20em / ~"@{size}");
 
   &.-hover,
   &:hover {
