@@ -35,11 +35,7 @@
 
                 {if isset($errorMessage)}
                     <div class="sandboxError">
-                        {include file='./../../_svg/icon_error.tpl'
-                            inputType='password'
-                            inputName='password'
-                            inputLabel=$popinCheckonboardingPassword
-                            inputClassName=$errorClass}
+                        {include file='./../../atoms/icon/icon.tpl' iconName='error'}
                         {$errorMessage|escape:'htmlall':'UTF-8'}
                     </div>
                 {/if}

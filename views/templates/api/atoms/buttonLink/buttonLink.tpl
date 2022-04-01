@@ -31,6 +31,7 @@
         {if isset($buttonLinkDisabled) && $buttonLinkDisabled} -disabled{/if}"
         {if isset($buttonLinkDisabled) && $buttonLinkDisabled} disabled="disabled"{/if}>
     {if isset($buttonLinkIcon) && $buttonLinkIcon}
-        {include file="../../_svg/icon-{$buttonLinkIcon|escape:'htmlall':'UTF-8'}.tpl"}
+        {include file='./../icon/icon.tpl'
+        iconName=$buttonLinkIcon}
     {/if} {$buttonLinkText|escape:'htmlall':'UTF-8'}
 </a>
