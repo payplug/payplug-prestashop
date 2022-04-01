@@ -25,7 +25,7 @@
     {if isset($tooltipData) && $tooltipData} data-e2e-name="{$tooltipData|escape:'htmlall':'UTF-8'}"{/if}>
     <label>
         <input type="checkbox">
-        <span class="_icon">{include file="../../_svg/icon-{$tooltipIcon|escape:'htmlall':'UTF-8'}.tpl"}</span>
+        <span class="_icon">{include file='./../icon/icon.tpl' iconName='tooltip'}</span>
         <span class="_overlay"></span>
         <span class="_modal">
             <div class="_content">

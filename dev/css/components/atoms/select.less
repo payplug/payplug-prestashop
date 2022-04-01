@@ -29,8 +29,11 @@
       height: 8px;
 
       content: "";
-      background-size: 100%;
-      background-image: url(~"@{img_icons}keyboard_arrow_down_24px.svg");
+      -webkit-mask-image: url(~"@{img_icons}arrow_down.svg");
+      mask-image: url(~"@{img_icons}arrow_down.svg");
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      background-color: #697180;
     }
 
     &:focus {

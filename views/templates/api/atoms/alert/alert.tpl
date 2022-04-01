@@ -29,11 +29,14 @@
     {if isset($alertData) && $alertData} data-e2e-name="{$alertData|escape:'htmlall':'UTF-8'}"{/if}>
     <div class="_icon">
         {if $alertType == 'success'}
-            {include file="../../_svg/icon-check.tpl"}
+            {include file='./../icon/icon.tpl'
+            iconName='check'}
         {elseif $alertType == 'warning'}
-            {include file="../../_svg/icon-lightbulb.tpl"}
+            {include file='./../icon/icon.tpl'
+            iconName='lightbulb'}
         {elseif $alertType == 'error'}
-            {include file="../../_svg/icon-lock.tpl"}
+            {include file='./../icon/icon.tpl'
+            iconName='lock'}
         {/if}
     </div>
     {if isset($alertTitle) && $alertTitle}

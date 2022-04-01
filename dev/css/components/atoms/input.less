@@ -13,26 +13,6 @@
     color: #colorMap[fontMainDefault];
   }
 
-  &.-icon {
-    input {
-      background-size: 8px;
-      background-repeat: no-repeat;
-      background-position: 12px 12px;
-
-      &[type=text],
-      &[type=password],
-      &[type=number] {
-        padding-left: 28px;
-      }
-    }
-  }
-
-  &.-iconEuro {
-    input {
-      background-image: url(~"@{img_icons}euro_symbol_24px.svg");
-    }
-  }
-
   input {
     &[type=text],
     &[type=password],
@@ -76,6 +56,38 @@
         &:hover {
           border-color: #colorMap[borderMain];
         }
+      }
+    }
+  }
+
+  &.-icon {
+    position: relative;
+    &:before {
+      background-color: #697180;
+      content: "";
+      display: block;
+      position: absolute;
+      top: 33px;
+      left: 12px;
+      width: 24px;
+      height: 24px;
+      z-index: 1;
+    }
+    input {
+      &[type=text],
+      &[type=password],
+      &[type=number] {
+        padding-left: 28px;
+        z-index: 2;
+      }
+    }
+    &Euro {
+      &:before {
+        -webkit-mask-image: url(~"@{img_icons}euro_symbol.svg");
+        mask-image: url(~"@{img_icons}euro_symbol.svg");
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        background-color: #697180;
       }
     }
   }
