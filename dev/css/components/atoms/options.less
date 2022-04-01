@@ -6,9 +6,7 @@
   align-items: stretch;
 
   label {
-    @size: 14;
     display: flex;
-    font-size: ~"@{size}px";
     cursor: pointer;
     max-width: 200px;
     margin: 0;
@@ -31,10 +29,9 @@
       background: #colorMap[fontSecondary50];
       padding: 7px 40px 7px 10px;
       font-weight: normal;
-      line-height: calc(20em / ~"@{size}");
 
       > span {
-        font-size: calc(12em / ~"@{size}");
+        font-size: 12px;
         line-height: 1.5em;
         display: block;
         color: inherit;

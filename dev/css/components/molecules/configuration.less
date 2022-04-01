@@ -1,5 +1,12 @@
 
 @{moduleClassName}Configuration {
+  @size: 14;
+
+  .Roboto(~"@{size}px", 400);
+  line-height: calc(20em / ~"@{size}");
+  letter-spacing: calc(0.25em / ~"@{size}");
+  color: #colorMap[fontSecondaryDefault];
+
   ._footer {
     display: flex;
     align-items: center;

@@ -1,13 +1,11 @@
 .payplugUISelect {
-  @size: 14;
-
   .border(#colorMap[borderMain]);
   .borderRadius(4px);
   background: #colorMap[white];
   position: relative;
   display: block;
   width: 145px;
-  height: calc(36em / ~"@{size}");
+  height: 36px;
   margin: 0 auto;
   cursor: pointer;
 
@@ -58,7 +56,6 @@
   }
 
   ._text {
-    .Roboto(~"@{size}px", 400);
     display: none;
     margin: 0;
   }
@@ -86,12 +83,11 @@
   }
 
   ._option {
-    .Roboto(~"@{size}px", 400);
     .transition(~"background @{dur}");
     position: relative;
     display: flex;
     align-items: center;
-    min-height: calc(36em / ~"@{size}");
+    min-height: 36px;
     margin: 0;
     padding: 0 12px;
     background: #colorMap[white];

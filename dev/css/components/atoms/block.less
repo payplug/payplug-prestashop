@@ -23,7 +23,9 @@
   ._title {
     @size: 20;
     .Inter(~"@{size}px", 700);
+    letter-spacing: calc(-0.33em / ~"@{size}");
     line-height: calc(29em/~"@{size}");
+    color: #colorMap[fontMainDefault];
     position: relative;
     margin: 0 0 21px;
 
@@ -40,10 +42,6 @@
   }
 
   ._description {
-    @size: 14;
-    .Roboto(~"@{size}px");
-    line-height: calc(20em/~"@{size}");
-    color: #colorMap[fontSecondaryDefault];
     margin: 0 0 24px;
   }
 

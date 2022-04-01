@@ -86,14 +86,13 @@
         width: 100%;
         padding: 0 12px;
         margin: 0 0 8px;
-
-        .Roboto(14px);
       }
 
       &Portal {
         @size: 12;
         .Inter(~"@{size}px", 700);
         color: #colorMap[purple];
+        letter-spacing: calc(1em / ~"@{size}");
 
         height: calc(36em / ~"@{size}");
         padding: 0 ~"@{size}px";
