@@ -194,7 +194,7 @@ $_MODULE['<{payplug}prestashop>fieldset_5f241c8c8f985b3c51e05d39cf030f4c'] = 'É
 $_MODULE['<{payplug}prestashop>footer_70dd012dd52dc568533b14c5a467d0a9'] = 'Mettre à jour les paramètres';
 $_MODULE['<{payplug}prestashop>general_00a2615a503724afddb33fcf34bd90e8'] = 'En mode LIVE, vous acceptez des paiements réels. [1]En savoir plus[/1].';
 $_MODULE['<{payplug}prestashop>general_02c2853df73ff849f1e5af6d5b160405'] = 'Général';
-$_MODULE['<{payplug}prestashop>general_1cb22938f8ec8aa15aa6b79bcca79808'] = 'Connectez-vous à votre compte de notre partenaire de paiement [1]PayPlug[/1] pour utiliser le module Paylater.';
+$_MODULE['<{payplug}prestashop>general_1cb22938f8ec8aa15aa6b79bcca79808'] = 'Connectez-vous à votre compte de notre partenaire de paiement [1]PayPlug[/1] pour utiliser le module PrestaShop Paylater.';
 $_MODULE['<{payplug}prestashop>general_200a2eb202d987fef11c10e40483cb63'] = 'Se déconnecter';
 $_MODULE['<{payplug}prestashop>general_227ad4ce598dd9b7f3277ecd1e47f7ab'] = 'J\'ai déjà un compte PayPlug';
 $_MODULE['<{payplug}prestashop>general_353349a8c0cefb8016744b9a99f1b49a'] = 'Général';
@@ -270,8 +270,7 @@ $_MODULE['<{payplug}prestashop>integrated_payment_135d8119e3d51e37c192ec3aa6cb07
 $_MODULE['<{payplug}prestashop>integrated_payment_31025818b7246ef6978773c7f97cdbba'] = 'Nom et/ou Prénom invalide(s).';
 $_MODULE['<{payplug}prestashop>integrated_payment_51828e2fbedf61f6e4056a798e92f1ec'] = 'Enregistrer ma carte bancaire';
 $_MODULE['<{payplug}prestashop>integrated_payment_58679831fad529b286ea96e1b0fe14ed'] = 'Saisie invalide, veuillez corriger pour continuer.';
-$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'La transaction n\'a pas pu aboutir,[1] et votre carte n\'a pas été débitée.[1]
- Veuillez réessayer.';
+$_MODULE['<{payplug}prestashop>integrated_payment_5f6e2043845beacd3b98f8004720e2b1'] = 'La transaction n\'a pas pu aboutir,[1] et votre carte n\'a pas été débitée.[1] Veuillez réessayer.';
 $_MODULE['<{payplug}prestashop>integrated_payment_76921e9f92347ff287c289e7b676bf88'] = 'Champ obligatoire.';
 $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e50508313c'] = 'Vous serez prélevé(e) lors du traitement de votre commande.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Numéro de carte invalide.';
@@ -447,6 +446,8 @@ $_MODULE['<{payplug}prestashop>prestashopspecific17_be68eac79ad39a8e98bfd7c15b9f
 $_MODULE['<{payplug}prestashop>prestashopspecific17_c9e5fd656b62ace2dbbae8cceab0a860'] = 'live';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_ed32bfa1899dc3505c064504bc13ab82'] = 'Payer par carte bancaire';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_f40145536110051efd072d7d3c6a56ea'] = 'Afficher le module PayPlug à mes clients';
+$_MODULE['<{payplug}prestashop>pspaylater_f4fdba2d9126020a419d9ec4b955fe07'] = 'PrestaShop Paylater with PayPlug and Oney';
+$_MODULE['<{payplug}prestashop>pspaylater_f78df788fa811a2d431266535633199b'] = 'Proposer le paiement en 3 et 4 fois sur votre boutique.';
 $_MODULE['<{payplug}prestashop>pwd_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>pwd_d698469a293eb8d935d4e9496c53caed'] = 'Veuillez saisir votre mot de passe de votre compte PayPlug';
 $_MODULE['<{payplug}prestashop>pwd_ea4788705e6873b424c65e91c2846b19'] = 'Annuler';
