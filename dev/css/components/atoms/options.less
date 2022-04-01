@@ -43,8 +43,23 @@
       display: none;
       &:checked {
         ~ span {
-          background: #colorMap[radioButtonBackground] url(~"@{img_icons}check_24px.svg") no-repeat top 13px right 13px;
+          background: #colorMap[radioButtonBackground];
           color: #colorMap[purple];
+          position: relative;
+          &:before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 5px;
+            left: calc(100% - 30px);
+            width: 24px;
+            height: 24px;
+            -webkit-mask-image: url(~"@{img_icons}check.svg");
+            mask-image: url(~"@{img_icons}check.svg");
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            background-color: #442CC7;
+          }
 
           > span {
             color: #colorMap[iris];
