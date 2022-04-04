@@ -835,7 +835,8 @@ class HookClass
             return false;
         }
 
-        if ($this->tools->tool('getValue', 'error')) {
+        if ($this->tools->tool('getValue', 'error')
+            && $this->dependencies->name == $this->tools->tool('getValue', 'modulename')) {
             Media::addJsDef(['payment_errors' => true]);
         }
 
