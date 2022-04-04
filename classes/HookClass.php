@@ -708,9 +708,13 @@ class HookClass
             ]);
         }
 
+        $views_path = __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/';
         $display_single_payment = $show_menu_payment;
         $this->assign->assign([
-            'logo_url' => __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/logo_payplug.png',
+            'logo_url' => [
+                'payplug' => $views_path . 'img/payplug.svg',
+                'pspaylater' => $views_path . 'img/pspaylater.svg',
+            ],
             'admin_ajax_url' => $admin_ajax_url,
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
