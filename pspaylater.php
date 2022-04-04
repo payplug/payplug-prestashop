@@ -55,7 +55,7 @@ class PsPaylater extends PaymentModule
         $this->displayName = $this->l('pspaylater.construct.displayName');
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
+        $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
         $this->version = '0.1.0';
 
