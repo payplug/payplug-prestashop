@@ -243,6 +243,10 @@ class PrestashopSpecific16
     // todo: set Tab install process in a specific
     public function installTab()
     {
+        if ('payplug' != $this->dependencies->name) {
+            return true;
+        }
+
         $installed = true;
 
         if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
@@ -277,6 +281,10 @@ class PrestashopSpecific16
     // todo: set Tab uninstall process in a specific
     public function uninstallTab()
     {
+        if ('payplug' != $this->dependencies->name) {
+            return true;
+        }
+
         $flag = true;
 
         $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
