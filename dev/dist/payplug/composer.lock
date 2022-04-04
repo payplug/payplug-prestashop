@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6e4d23112a795f2663181692e143caf7",
+    "content-hash": "53d4fff7b5853494ec1ebe783ce53bea",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -125,16 +125,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "3.5.3",
+            "version": "3.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "fa2533b281bddcea1bdccf985b9278893bf65728"
+                "reference": "9fe3787e8ad98500141168447bb2b84c47c43be2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/fa2533b281bddcea1bdccf985b9278893bf65728",
-                "reference": "fa2533b281bddcea1bdccf985b9278893bf65728",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/9fe3787e8ad98500141168447bb2b84c47c43be2",
+                "reference": "9fe3787e8ad98500141168447bb2b84c47c43be2",
                 "shasum": ""
             },
             "require": {
@@ -168,72 +168,6 @@
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
             "time": "2015-05-06T00:00:00+00:00"
-        },
-        {
-            "name": "symfony/dotenv",
-            "version": "v3.4.47",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/dotenv.git",
-                "reference": "1022723ac4f56b001d99691d96c6025dbf1404f1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dotenv/zipball/1022723ac4f56b001d99691d96c6025dbf1404f1",
-                "reference": "1022723ac4f56b001d99691d96c6025dbf1404f1",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9|>=7.0.8"
-            },
-            "require-dev": {
-                "symfony/process": "^3.4.2|^4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Dotenv\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Registers environment variables from a .env file",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "dotenv",
-                "env",
-                "environment"
-            ],
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/dotenv",
