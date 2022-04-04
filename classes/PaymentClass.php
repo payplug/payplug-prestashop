@@ -2002,9 +2002,14 @@ class PaymentClass
     {
         try {
             $payment = Payment::retrieve($pay_id);
-        } catch (Exception $e) {
+        } catch (ConfigurationNotSetException $e) {
+            return false;
+        } catch (NotFoundException $e) {
+            return false;
+        } catch (UndefinedAttributeException $e) {
             return false;
         }
+
 
         return $payment;
     }
