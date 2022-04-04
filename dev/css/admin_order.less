@@ -288,10 +288,24 @@ span.ppclose {
   text-align: left;
 }
 
-#pppanel img.logo {
-  width: 150px;
-  height: auto;
-  margin: 0 0 15px 0;
+#pppanel .logo {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  margin: 0 0 24px;
+
+  img {
+    display: block;
+    width: 150px;
+    height: auto;
+  }
+  span {
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: #colorMap[borderMain];
+    margin: 0 19px;
+  }
 }
 
 #pppanel .form-group {
