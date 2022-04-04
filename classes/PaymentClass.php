@@ -25,6 +25,8 @@ namespace PayPlugModule\classes;
 
 use Media;
 use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\NotFoundException;
+use Payplug\Exception\UndefinedAttributeException;
 use Payplug\InstallmentPlan;
 use Payplug\Resource\Payment;
 
@@ -2002,7 +2004,11 @@ class PaymentClass
     {
         try {
             $payment = Payment::retrieve($pay_id);
-        } catch (Exception $e) {
+        } catch (ConfigurationNotSetException $e) {
+            return false;
+        } catch (NotFoundException $e) {
+            return false;
+        } catch (UndefinedAttributeException $e) {
             return false;
         }
 
