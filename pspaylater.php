@@ -78,19 +78,6 @@ class PsPaylater extends PaymentModule
     }
 
     /**
-     * @param bool $force_all
-     * @return bool
-     * @see Module::disable()
-     *
-     */
-    public function disable($force_all = false)
-    {
-        if ($this->module) {
-            return parent::disable($force_all) && $this->payplug_dependencies->getDependency('configClass')->disable();
-        }
-    }
-
-    /**
      * @return string
      * @see Module::getContent()
      */
