@@ -90,7 +90,7 @@ class PayPlugValidation
 
     public function postProcess()
     {
-        $redirect_url_error = 'index.php?controller=order&step=3&error=1';
+        $redirect_url_error = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependencies->name;
         $cancel_url = 'index.php?controller=order&step=3';
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 

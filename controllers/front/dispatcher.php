@@ -56,7 +56,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $options = $dependencies->configClass->getAvailableOptions($cart);
 
             $embedded = $options['embedded'] != 'redirected';
-            $error_url = 'index.php?controller=order&step=3&error=1&modulename=' . $dependencies->name;
+            $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $dependencies->name;
 
             if ($options['oney'] && $is_oney) {
                 $payment = $paymentClass->preparePayment(['is_oney' => $oney_type]);
