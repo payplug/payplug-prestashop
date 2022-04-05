@@ -25,6 +25,8 @@ namespace PayPlugModule\classes;
 
 use Media;
 use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\NotFoundException;
+use Payplug\Exception\UndefinedAttributeException;
 use Payplug\InstallmentPlan;
 use Payplug\Resource\Payment;
 

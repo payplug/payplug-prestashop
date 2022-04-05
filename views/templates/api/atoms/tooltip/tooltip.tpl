@@ -21,8 +21,8 @@
 *}
 
 <div class="payplugUITooltip
-    {if isset($blockClassName) && $blockClassName} {$blockClassName|escape:'htmlall':'UTF-8'}{/if}"
-    {if isset($blockData) && $blockData} data-e2e-name="{$blockData|escape:'htmlall':'UTF-8'}"{/if}>
+    {if isset($tooltipClassName) && $tooltipClassName} {$tooltipClassName|escape:'htmlall':'UTF-8'}{/if}"
+    {if isset($tooltipData) && $tooltipData} data-e2e-name="{$tooltipData|escape:'htmlall':'UTF-8'}"{/if}>
     <label>
         <input type="checkbox">
         <span class="_icon">{include file="../../_svg/icon-{$tooltipIcon|escape:'htmlall':'UTF-8'}.tpl"}</span>
