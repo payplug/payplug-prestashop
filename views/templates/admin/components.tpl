@@ -65,6 +65,9 @@
     {* select stories *}
     {include file='./../api/atoms/select/select_stories.tpl'}
 
+    {* text alert stories *}
+    {include file='./../api/atoms/textAlert/textAlert_stories.tpl'}
+
     {* title stories *}
     {include file='./../api/atoms/title/title_stories.tpl'}
 
