@@ -214,7 +214,7 @@ var $document,
                 }
             },
             checkerrors: function () {
-                if (typeof payment_errors == 'undefined' || !payment_errors) {
+                if (typeof check_errors == 'undefined' || !check_errors) {
                     return;
                 }
 

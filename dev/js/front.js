@@ -57,7 +57,7 @@ window[module_name+'Module'] = {
             $document.on('click', '.' + module_name + 'Msg_declineButton', window[module_name+'Module'].popup.close);
         },
         checkErrors: function () {
-            if (typeof payment_errors == 'undefined' || !payment_errors) {
+            if (typeof check_errors == 'undefined' || !check_errors) {
                 return;
             }
 

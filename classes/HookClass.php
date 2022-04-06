@@ -853,7 +853,7 @@ class HookClass
 
         if ($this->tools->tool('getValue', 'has_error')
             && $this->dependencies->name == $this->tools->tool('getValue', 'modulename')) {
-            Media::addJsDef(['payment_errors' => true]);
+            Media::addJsDef(['check_errors' => true]);
         }
 
         $specific = $this->dependencies->loadSpecificPresta();
