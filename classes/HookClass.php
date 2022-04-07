@@ -596,6 +596,9 @@ class HookClass
                     || $amount_refunded_presta > 0)
                 && (int) $payment->is_refunded != 1) {
                 $display_refund = true;
+                if ($is_oney) {
+                    $refund_delay_oney = \time() <= $payment->refundable_after;
+                }
             } elseif ((int) $payment->is_refunded == 1) {
                 $show_menu_refunded = true;
                 $display_refund = false;
