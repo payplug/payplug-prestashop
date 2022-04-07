@@ -7,7 +7,7 @@
  * It is available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  * If you are unable to obtain it through the world-wide-web, please send an email
- * to contact@window[module_name+'Module'].com so we can send you a copy immediately.
+ * to contact@payplug.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
@@ -19,8 +19,7 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-var $document, $window;
-window[module_name+'Module'] = {
+var $document, $window, __moduleName__Module = {
     init: function () {
         $document = $(document);
         $window = $(window);
@@ -32,16 +31,16 @@ window[module_name+'Module'] = {
     },
     form: {
         props: {
-            identifier: module_name,
+            identifier: '__moduleName__',
             query: null,
             data: {},
         },
         init: function () {
-            var {form} = window[module_name+'Module'];
+            var {form} = __moduleName__Module;
             var {identifier} = form.props;
 
             $document.on('click', 'form.' + identifier + ' button[type="submit"]', form.submit)
-                .on('click', '.' + module_name +'Button[name="confirmConfiguration"]', form.save);
+                .on('click', '.__moduleName__Button[name="confirmConfiguration"]', form.save);
         },
         submit: function (event) {
             event.preventDefault();
@@ -52,13 +51,13 @@ window[module_name+'Module'] = {
                 return false;
             }
 
-            var {form} = window[module_name+'Module'];
+            var {form} = __moduleName__Module;
 
             form.hydrate();
 
             var error = form.check();
             if (error) {
-                return window[module_name+'Module'].tools.popup.error(error);
+                return __moduleName__Module.tools.popup.error(error);
             }
 
             var data = {
@@ -97,14 +96,14 @@ window[module_name+'Module'] = {
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.content, 'submit');
                     }
                 }
             });
         },
         hydrate: function () {
-            var {form} = window[module_name+'Module'];
+            var {form} = __moduleName__Module;
             var {identifier} = form.props;
             var data = {};
             var $form = $('form.' + identifier);
@@ -146,7 +145,7 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {form} = window[module_name+'Module'];
+            var {form} = __moduleName__Module;
             var {data, identifier} = form.props;
 
             data['_ajax'] = 1;
@@ -173,10 +172,10 @@ window[module_name+'Module'] = {
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.popin, 'confirm');
                         $('form.' + identifier).replaceWith(result.content);
-                        var {oney, deferred,settings} = window[module_name+'Module'];
+                        var {oney, deferred,settings} = __moduleName__Module;
                         settings.load();
                         $window.trigger('load');
                         if (deferred.props.stateChanged != null && deferred.props.active == true && $('input[name=' + deferred.props.switcher + ']:checked').val() == 1) {
@@ -190,7 +189,7 @@ window[module_name+'Module'] = {
 
             var error = '';
 
-            var {installment, oney, deferred, form} = window[module_name+'Module'];
+            var {installment, oney, deferred, form} = __moduleName__Module;
             if (installment.props.error && form.props.data['payplug_inst'] === 1) {
                 error = error_installment + installment.props.error;
             } else {
@@ -214,21 +213,21 @@ window[module_name+'Module'] = {
     },
     config: {
         props: {
-            identifier: module_name+'Config',
+            identifier: '__moduleName__Config',
             query: null
         },
         init: function () {
-            var {config} = window[module_name+'Module'],
+            var {config} = __moduleName__Module,
                 {identifier} = config.props;
             $document.on('click', '.' + identifier + '_check', config.check);
         },
         check: function (event) {
             event.preventDefault();
-            var {config}= window[module_name+'Module'];
+            var {config}= __moduleName__Module;
             config.refresh();
         },
         refresh: function () {
-            var {config} = window[module_name+'Module'],
+            var {config} = __moduleName__Module,
                 {identifier} = config.props;
 
             if (config.props.query != null) {
@@ -245,7 +244,7 @@ window[module_name+'Module'] = {
                     check: 1,
                 },
                 beforeSend: function () {
-                    window[module_name+'Module'].tools.loader.show($('.' + identifier));
+                    __moduleName__Module.tools.loader.show($('.' + identifier));
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (textStatus != 'abort') {
@@ -254,30 +253,30 @@ window[module_name+'Module'] = {
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
                         console.log(jqXHR, textStatus, errorThrown);
-                        window[module_name+'Module'].tools.loader.hide($('.' + identifier));
+                        __moduleName__Module.tools.loader.hide($('.' + identifier));
                     }
                 },
                 success: function (result) {
                     $('.' + identifier).replaceWith(result.content);
-                    window[module_name+'Module'].tools.loader.hide($('.' + identifier));
+                    __moduleName__Module.tools.loader.hide($('.' + identifier));
                 }
             });
         },
     },
     show: {
         props: {
-            identifier: module_name+'Show',
+            identifier: '__moduleName__Show',
             query: null,
         },
         init: function () {
-            var {show} = window[module_name+'Module'],
+            var {show} = __moduleName__Module,
                 {identifier} = show.props;
             $document.on('switchSelected', '.' + identifier + ' input', show.change)
                 .on('click', 'button[name="cancel_deactivate"]', show.cancel)
                 .on('click', 'button[name="confirm_deactivate"]', show.deactivate);
         },
         change: function (event) {
-            var {show} = window[module_name+'Module'],
+            var {show} = __moduleName__Module,
                 $input = $(this),
                 enable = parseInt($input.val());
 
@@ -290,14 +289,14 @@ window[module_name+'Module'] = {
             }
         },
         enable: function () {
-            var {form} = window[module_name+'Module'],
+            var {form} = __moduleName__Module,
                 {identifier} = form.props,
                 $submit = $('form.' + identifier).find('button[type="submit"]');
 
             $submit.trigger('click');
         },
         disable: function () {
-            var {show} = window[module_name+'Module'],
+            var {show} = __moduleName__Module,
                 data = {
                     _ajax: 1,
                     popin: 1,
@@ -325,7 +324,7 @@ window[module_name+'Module'] = {
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.content, 'deactivate');
                     }
                 }
@@ -335,7 +334,7 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {show, tools} = window[module_name+'Module'],
+            var {show, tools} = __moduleName__Module,
                 {switcher} = tools,
                 showIdentifier = show.props.identifier,
                 switcherIdentifier = switcher.props.identifier,
@@ -347,7 +346,7 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {show} = window[module_name+'Module'],
+            var {show} = __moduleName__Module,
                 {identifier} = show.props,
                 data = {
                     _ajax: 1,
@@ -365,7 +364,7 @@ window[module_name+'Module'] = {
                 dataType: 'json',
                 data: data,
                 beforeSend: function () {
-                    window[module_name+'Module'].tools.loader.show($('.' + identifier));
+                    __moduleName__Module.tools.loader.show($('.' + identifier));
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (textStatus != 'abort') {
@@ -374,14 +373,14 @@ window[module_name+'Module'] = {
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
                         console.log(jqXHR, textStatus, errorThrown);
-                        window[module_name+'Module'].tools.loader.hide($('.' + identifier));
+                        __moduleName__Module.tools.loader.hide($('.' + identifier));
                     }
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.popin, 'confirm');
-                        $('form.' + module_name).replaceWith(result.content);
+                        $('form.__moduleName__').replaceWith(result.content);
                         $window.trigger('load');
                     }
                 }
@@ -390,12 +389,12 @@ window[module_name+'Module'] = {
     },
     login: {
         props: {
-            identifier: module_name+'Login',
+            identifier: '__moduleName__Login',
             query: null,
             logged: false
         },
         init: function () {
-            var {login} = window[module_name+'Module'],
+            var {login} = __moduleName__Module,
                 {identifier} = login.props;
             // check if user is logged
             login.props.logged = $('.' + identifier).is('.-logged');
@@ -405,7 +404,7 @@ window[module_name+'Module'] = {
                 .on('keyup', 'input[name=payplug_password]', login.submit);
         },
         submit: function (event) {
-            var {login} = window[module_name+'Module'],
+            var {login} = __moduleName__Module,
                 {identifier} = login.props;
 
             // Only validate the login form if key "Enter" press
@@ -413,7 +412,7 @@ window[module_name+'Module'] = {
                 return;
             }
 
-            var {tools} = window[module_name+'Module'],
+            var {tools} = __moduleName__Module,
                 email = $('input[name="payplug_email"]').val(),
                 pwd = $('input[name="payplug_password"]').val();
 
@@ -427,7 +426,7 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {login, settings} = window[module_name+'Module'],
+            var {login, settings} = __moduleName__Module,
                 {identifier} = login.props,
                 data = {
                     _ajax: 1,
@@ -448,7 +447,7 @@ window[module_name+'Module'] = {
                 dataType: 'json',
                 data: data,
                 beforeSend: function () {
-                    window[module_name+'Module'].tools.loader.show($('.' + identifier));
+                    __moduleName__Module.tools.loader.show($('.' + identifier));
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (textStatus != 'abort') {
@@ -457,18 +456,18 @@ window[module_name+'Module'] = {
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
                         console.log(jqXHR, textStatus, errorThrown);
-                        window[module_name+'Module'].tools.loader.hide($('.' + identifier));
+                        __moduleName__Module.tools.loader.hide($('.' + identifier));
                     }
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined' && result.content) {
-                        $('form.' + module_name).replaceWith(result.content);
+                        $('form.__moduleName__').replaceWith(result.content);
                         login.props.logged = true;
                         settings.load();
                         $window.trigger('load');
                     } else if (typeof result.error != 'undefined' && result.error) {
-                        window[module_name+'Module'].tools.popup.error(result.error);
-                        window[module_name+'Module'].tools.loader.hide($('.' + identifier));
+                        __moduleName__Module.tools.popup.error(result.error);
+                        __moduleName__Module.tools.loader.hide($('.' + identifier));
                     }
                 }
             });
@@ -477,7 +476,7 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {login} = window[module_name+'Module'],
+            var {login} = __moduleName__Module,
                 {identifier} = login.props,
                 data = {
                     _ajax: 1,
@@ -495,7 +494,7 @@ window[module_name+'Module'] = {
                 dataType: 'json',
                 data: data,
                 beforeSend: function () {
-                    window[module_name+'Module'].tools.loader.show($('.' + identifier));
+                    __moduleName__Module.tools.loader.show($('.' + identifier));
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (textStatus != 'abort') {
@@ -504,11 +503,11 @@ window[module_name+'Module'] = {
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
                         console.log(jqXHR, textStatus, errorThrown);
-                        window[module_name+'Module'].tools.loader.hide($('.' + identifier));
+                        __moduleName__Module.tools.loader.hide($('.' + identifier));
                     }
                 },
                 success: function (result) {
-                    $('form.' + module_name).replaceWith(result.content);
+                    $('form.__moduleName__').replaceWith(result.content);
                     login.props.logged = false;
                 }
             });
@@ -517,9 +516,9 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            $('.' + module_name + 'Popup_error').html('');
+            $('.__moduleName__Popup_error').html('');
 
-            var {login}= window[module_name+'Module'];
+            var {login}= __moduleName__Module;
             var data = {
                 _ajax: 1,
                 submitPwd: 1,
@@ -545,19 +544,19 @@ window[module_name+'Module'] = {
                 },
                 success: function (result) {
                     if (typeof result.error != 'undefined' && result.error) {
-                        $('.' + module_name + 'Popup_error').html(result.error);
+                        $('.__moduleName__Popup_error').html(result.error);
                     } else if (typeof result.popin != 'undefined' && result.popin) {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.popin, 'activate');
                     } else if (typeof result.content != 'undefined' && result.content) {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.close();
                     }
                 }
             });
         },
         reload: function () {
-            var {login}= window[module_name+'Module'];
+            var {login}= __moduleName__Module;
 
             var data = {
                 _ajax: 1,
@@ -584,7 +583,7 @@ window[module_name+'Module'] = {
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.content, 'password');
                     }
                 }
@@ -612,11 +611,11 @@ window[module_name+'Module'] = {
     },
     settings: {
         props: {
-            identifier: module_name+'Settings',
+            identifier: '__moduleName__Settings',
             query: null,
         },
         init: function () {
-            var {settings, login} = window[module_name+'Module'],
+            var {settings, login} = __moduleName__Module,
                 {identifier} = settings.props;
             // call load in order to get permission's information when reloading the page
             this.load();
@@ -624,7 +623,7 @@ window[module_name+'Module'] = {
         },
         load: function () {
 
-            var {settings, login}= window[module_name+'Module'];
+            var {settings, login}= __moduleName__Module;
 
             if (!login.props.logged) {
                 return false;
@@ -651,7 +650,7 @@ window[module_name+'Module'] = {
                     for (permission in result) {
                         var $input = $('input[name=' + permission + ']');
                         if ($input.length) {
-                            var {switcher} = window[module_name+'Module'].tools,
+                            var {switcher} = __moduleName__Module.tools,
                                 $switcher = $input.parents('.' + switcher.props.identifier),
                                 is_allowed = result[permission];
                             $switcher.attr('data-allowed', (is_allowed ? 1 : 0));
@@ -661,8 +660,8 @@ window[module_name+'Module'] = {
             });
         },
         change: function () {
-            var {switcher} = window[module_name+'Module'].tools,
-                {settings} = window[module_name+'Module'],
+            var {switcher} = __moduleName__Module.tools,
+                {settings} = __moduleName__Module,
                 {identifier} = switcher.props;
 
             var $input = $(this),
@@ -674,7 +673,7 @@ window[module_name+'Module'] = {
             var is_sandbox = parseInt($('input[name=payplug_sandbox]:checked').val());
 
             // Toggle bancontact only for live configuration
-            var {bancontact} = window[module_name+'Module'],
+            var {bancontact} = __moduleName__Module,
                 {identifier} = bancontact.props,
                 $bancontact = $('.' + identifier);
 
@@ -694,8 +693,8 @@ window[module_name+'Module'] = {
             }
         },
         reset: function () {
-            var {switcher} = window[module_name+'Module'].tools,
-                {settings} = window[module_name+'Module'],
+            var {switcher} = __moduleName__Module.tools,
+                {settings} = __moduleName__Module,
                 {identifier} = settings.props,
                 s_identifier = switcher.props.identifier;
 
@@ -710,7 +709,7 @@ window[module_name+'Module'] = {
             });
         },
         live: function () {
-            var {settings}= window[module_name+'Module'];
+            var {settings}= __moduleName__Module;
 
             if (settings.props.query != null) {
                 settings.props.query.abort();
@@ -734,22 +733,22 @@ window[module_name+'Module'] = {
                 success: function (response) {
                     if (response.result) {
                         settings.reset();
-                        var {tools, bancontact} = window[module_name+'Module'],
+                        var {tools, bancontact} = __moduleName__Module,
                             $bancontact = $('.' + bancontact.props.identifier),
                             {switcher} = tools,
                             $switcher = $('input[name=payplug_sandbox]').parents('.' + switcher.props.identifier);
                         switcher.right($switcher, true);
                         $bancontact.removeClass('-hide');
                     } else {
-                        var {login}= window[module_name+'Module'];
+                        var {login}= __moduleName__Module;
                         login.reload();
                     }
                 }
             });
         },
         disable: function ($switcher) {
-            var {switcher} = window[module_name+'Module'].tools,
-                {settings} = window[module_name+'Module'],
+            var {switcher} = __moduleName__Module.tools,
+                {settings} = __moduleName__Module,
                 switcherName = $switcher.prevObject[0].name;
 
             switch (switcherName) {
@@ -791,7 +790,7 @@ window[module_name+'Module'] = {
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
-                        var {popup} = window[module_name+'Module'].tools;
+                        var {popup} = __moduleName__Module.tools;
                         popup.set(result.content, 'disable');
                     }
                 }
@@ -803,14 +802,14 @@ window[module_name+'Module'] = {
             switcher: 'payplug_standard',
         },
         init: function () {
-            var {standard, deferred} = window[module_name+'Module'],
+            var {standard, deferred} = __moduleName__Module,
                 {switcher} = standard.props;
             $document.on('switchSelected', 'input[name=' + switcher + ']', deferred.check);
         }
     },
     installment: {
         props: {
-            identifier: module_name+'Installment',
+            identifier: '__moduleName__Installment',
             switcher: 'payplug_inst',
             query: null,
             error: null,
@@ -820,7 +819,7 @@ window[module_name+'Module'] = {
             }
         },
         init: function () {
-            var {installment, deferred} = window[module_name+'Module'],
+            var {installment, deferred} = __moduleName__Module,
                 {switcher} = installment.props;
             $document.on('change', 'input[name=payplug_inst_mode]', installment.select)
                 .on('keyup', 'input[name=payplug_inst_min_amount]', installment.check)
@@ -830,7 +829,7 @@ window[module_name+'Module'] = {
             event.preventDefault();
             event.stopPropagation();
 
-            var {installment} = window[module_name+'Module'],
+            var {installment} = __moduleName__Module,
                 {identifier} = installment.props;
 
             var inst = $('input[name=payplug_inst_mode]:checked').val();
@@ -839,7 +838,7 @@ window[module_name+'Module'] = {
             $('.' + identifier + '_schedule.-x' + inst).addClass('-select');
         },
         check: function (event) {
-            var {installment} = window[module_name+'Module'],
+            var {installment} = __moduleName__Module,
                 {identifier, limits} = installment.props,
                 amount = $(this).val(),
                 matches = amount.match(/^[0-9]+$/);
@@ -857,7 +856,7 @@ window[module_name+'Module'] = {
     },
     deferred: {
         props: {
-            identifier: module_name+'Deferred',
+            identifier: '__moduleName__Deferred',
             switcher: 'payplug_deferred',
             query: null,
             originalText: null,
@@ -868,7 +867,7 @@ window[module_name+'Module'] = {
             active: false,
         },
         init: function () {
-            var {deferred} = window[module_name+'Module'],
+            var {deferred} = __moduleName__Module,
                 {identifier, switcher} = deferred.props,
                 $selected = $('.' + identifier + ' select option:selected');
             $document.on('change', '.' + identifier + ' input[type=checkbox]', deferred.change)
@@ -880,7 +879,7 @@ window[module_name+'Module'] = {
             deferred.props.currentStateVal = $selected.val();
         },
         check: function () {
-            var {standard, installment, deferred}= window[module_name+'Module'];
+            var {standard, installment, deferred}= __moduleName__Module;
 
             if (!parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
                 && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())
@@ -889,7 +888,7 @@ window[module_name+'Module'] = {
             }
         },
         change: function (event) {
-            var {deferred} = window[module_name+'Module'],
+            var {deferred} = __moduleName__Module,
                 $checkbox = $(this),
                 checked = $checkbox.prop('checked');
             if (checked) {
@@ -900,20 +899,20 @@ window[module_name+'Module'] = {
             $('.' + deferred.props.identifier).find('select').trigger('change');
         },
         active: function () {
-            var {deferred} = window[module_name+'Module'],
+            var {deferred} = __moduleName__Module,
                 {identifier} = deferred.props;
             $('.' + identifier).find('select').attr('disabled', false);
             deferred.props.active = true;
         },
         deactive: function () {
-            var {deferred} = window[module_name+'Module'],
+            var {deferred} = __moduleName__Module,
                 {identifier} = deferred.props;
             $('.' + identifier).find('select').attr('disabled', true);
-            $('.' + identifier).find('.' + module_name + 'Deferred_warning').hide();
+            $('.' + identifier).find('.__moduleName__Deferred_warning').hide();
             deferred.props.active = false;
         },
         select: function () {
-            var {standard, installment, deferred} = window[module_name+'Module'],
+            var {standard, installment, deferred} = __moduleName__Module,
                 {identifier, switcher} = deferred.props,
                 $checkbox = $('.' + identifier).find('input[type=checkbox]'),
                 $select = $('.' + identifier).find('select'),
@@ -956,7 +955,7 @@ window[module_name+'Module'] = {
             }
         },
         unavailable: function () {
-            var {deferred, tools} = window[module_name+'Module'],
+            var {deferred, tools} = __moduleName__Module,
                 {switcher} = tools,
                 data = {
                     _ajax: 1,
@@ -999,7 +998,7 @@ window[module_name+'Module'] = {
     },
     bancontact: {
         props: {
-            identifier: module_name+'Bancontact',
+            identifier: '__moduleName__Bancontact',
             switcher: 'payplug_bancontact',
         },
         init: function() {}
@@ -1011,7 +1010,7 @@ window[module_name+'Module'] = {
         },
         loader: {
             props: {
-                identifer: module_name + 'Loader',
+                identifer: '__moduleName__Loader',
             },
             hide: function (context) {
                 var obj = this,
@@ -1032,7 +1031,7 @@ window[module_name+'Module'] = {
         },
         switcher: {
             props: {
-                identifier: module_name+'Switch'
+                identifier: '__moduleName__Switch'
             },
             init: function () {
                 var switcher = this,
@@ -1043,7 +1042,7 @@ window[module_name+'Module'] = {
             toggle: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     $switch = $(this),
                     is_right = $switch.is('.-right'),
                     is_format = $switch.is('.-format');
@@ -1063,7 +1062,7 @@ window[module_name+'Module'] = {
             select: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     {identifier} = switcher.props,
                     $label = $(this),
                     id = $label.attr('for').replace('_left', '').replace('_right', '').replace('_center', ''),
@@ -1084,32 +1083,32 @@ window[module_name+'Module'] = {
                     if (!$switch.is('.-left')) {
                         switcher.left($switch);
                         if ($tips) {
-                            $tips.find('.' + module_name + 'Tips_item.-left').show();
+                            $tips.find('.__moduleName__Tips_item.-left').show();
                         }
                     }
                 } else if (is_center) {
                     if (!$switch.is('.-center')) {
                         switcher.center($switch);
                         if ($tips) {
-                            $tips.find('.' + module_name + 'Tips_item.-center').show();
+                            $tips.find('.__moduleName__Tips_item.-center').show();
                         }
                     }
                 }
 
             },
             right: function (target, withoutEvent) {
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     {identifier} = switcher.props;
                 target.addClass('-right');
                 target.removeClass('-left');
                 target.removeClass('-center');
                 target.find('input').removeAttr('checked').prop('checked', false);
                 var name = target.find('input').eq(0).attr('name'),
-                    $tips = $('.' + module_name + 'Tips.-' + name);
+                    $tips = $('.__moduleName__Tips.-' + name);
 
                 if ($tips.length) {
-                    $('.' + module_name + 'Tips.-' + name + ' > .' + module_name + 'Tips_item').addClass('-hide');
-                    $('.' + module_name + 'Tips.-' + name + ' > .-right').removeClass('-hide');
+                    $('.__moduleName__Tips.-' + name + ' > .__moduleName__Tips_item').addClass('-hide');
+                    $('.__moduleName__Tips.-' + name + ' > .-right').removeClass('-hide');
                 }
 
                 var $selected = target.find('input').last();
@@ -1119,7 +1118,7 @@ window[module_name+'Module'] = {
                 }
             },
             left: function (target, withoutEvent) {
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     {identifier} = switcher.props;
                 target.removeClass('-right');
                 target.removeClass('-center');
@@ -1127,11 +1126,11 @@ window[module_name+'Module'] = {
                 target.find('input').removeAttr('checked').prop('checked', false);
 
                 var name = target.find('input').eq(0).attr('name'),
-                    $tips = $('.' + module_name + 'Tips.-' + name);
+                    $tips = $('.__moduleName__Tips.-' + name);
 
                 if ($tips.length) {
-                    $('.' + module_name + 'Tips.-' + name + ' > .' + module_name + 'Tips_item').addClass('-hide');
-                    $('.' + module_name + 'Tips.-' + name + ' > .-left').removeClass('-hide');
+                    $('.__moduleName__Tips.-' + name + ' > .__moduleName__Tips_item').addClass('-hide');
+                    $('.__moduleName__Tips.-' + name + ' > .-left').removeClass('-hide');
                 }
 
                 var $selected = target.find('input').first();
@@ -1141,7 +1140,7 @@ window[module_name+'Module'] = {
                 }
             },
             center: function (target, withoutEvent) {
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     {identifier} = switcher.props;
                 target.removeClass('-right');
                 target.removeClass('-left');
@@ -1149,11 +1148,11 @@ window[module_name+'Module'] = {
                 target.find('input').removeAttr('checked').prop('checked', false);
 
                 var name = target.find('input').eq(0).attr('name'),
-                    $tips = $('.' + module_name + 'Tips.-' + name);
+                    $tips = $('.__moduleName__Tips.-' + name);
 
                 if ($tips.length) {
-                    $('.' + module_name + 'Tips.-' + name + ' > .' + module_name + 'Tips_item').addClass('-hide');
-                    $('.' + module_name + 'Tips.-' + name + ' > .-center').removeClass('-hide');
+                    $('.__moduleName__Tips.-' + name + ' > .__moduleName__Tips_item').addClass('-hide');
+                    $('.__moduleName__Tips.-' + name + ' > .-center').removeClass('-hide');
                 }
 
                 var $selected = target.find('input').eq(1);
@@ -1163,26 +1162,26 @@ window[module_name+'Module'] = {
                 }
             },
             able: function (target) {
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     {identifier} = switcher.props;
                 target.removeClass('-disabled');
             },
             disable: function (target) {
-                var {switcher} = window[module_name+'Module'].tools,
+                var {switcher} = __moduleName__Module.tools,
                     {identifier} = switcher.props;
                 target.addClass('-disabled');
             },
         },
         popup: {
             props: {
-                identifier: module_name+'Popup',
+                identifier: '__moduleName__Popup',
             },
             init: function () {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props;
 
                 $document.on('click', '.' + identifier + '_close', popup.close)
-                    .on('click', '.' + identifier + ' .' + module_name + 'Button.-close', popup.close)
+                    .on('click', '.' + identifier + ' .__moduleName__Button.-close', popup.close)
                     .on('click', function (event) {
                         var $clicked = $(event.target);
                         if ($clicked.is('.' + identifier) && $('.' + identifier).is('.-open')) {
@@ -1191,7 +1190,7 @@ window[module_name+'Module'] = {
                     });
             },
             set: function (content, id) {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props;
 
                 if (!sanitizePopupHtml(content)) {
@@ -1205,7 +1204,7 @@ window[module_name+'Module'] = {
                 popup.open();
             },
             open: function () {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
 
@@ -1215,12 +1214,12 @@ window[module_name+'Module'] = {
                 }, 0);
             },
             close: function (event) {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
 
-                if ($(event.target).is('.' + identifier + '_close') && $popup.find('.' + module_name + 'Button.-close')) {
-                    $popup.find('.' + module_name + 'Button.-close').trigger('click');
+                if ($(event.target).is('.' + identifier + '_close') && $popup.find('.__moduleName__Button.-close')) {
+                    $popup.find('.__moduleName__Button.-close').trigger('click');
                 }
 
                 $popup.removeClass('-show');
@@ -1230,31 +1229,31 @@ window[module_name+'Module'] = {
                 }, 500);
             },
             create: function (id) {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props,
                     html = '<div class="' + identifier + '"' + (id ? ' data-e2e-popin="' + id + '"' : '') + '><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
                 $('body').append(html);
             },
             remove: function () {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props,
                     $popup = $('.' + identifier);
 
                 $popup.remove();
             },
             hydrate: function (content) {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props;
                 $('.' + identifier + '_content').html(content);
 
             },
             error: function (str) {
-                var {popup} = window[module_name+'Module'].tools,
+                var {popup} = __moduleName__Module.tools,
                     {identifier} = popup.props,
                     $error = '<div class="'+identifier+'_row">' +
                     '<p>' + str + '</p>' +
                     '<div class="'+identifier+'_footer -center">' +
-                    '<button type="button" class="'+module_name+'Button -green -close">Ok</button>' +
+                    '<button type="button" class="__moduleName__Button -green -close">Ok</button>' +
                     '</div>' +
                     '</div>';
                 popup.set($error, 'error');
@@ -1274,5 +1273,5 @@ window[module_name+'Module'] = {
 };
 
 $(document).ready(function () {
-    window[module_name+'Module'].init();
+    __moduleName__Module.init();
 });
