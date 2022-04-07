@@ -26,6 +26,7 @@
     {capture assign="generalSubscribe_content"}
         <p>{l s='general.subscribe.createAccountDescription' tags=['<strong>'] mod='payplug'}</p>
 
+        <div class="_buttons">
         {capture assign="generalSubscribe_createAccount"}
             {l s='general.subscribe.createAccount' mod='payplug'}
         {/capture}
@@ -43,6 +44,7 @@
             buttonName='showLogin'
             buttonStyle='tertiary'
             buttonText=$generalSubscribe_showLogin}
+        </div>
     {/capture}
     {assign var='generalSubscribe_className' value='generalBlock -subscribe -center'}
     {include file='./../atoms/block/block.tpl'
