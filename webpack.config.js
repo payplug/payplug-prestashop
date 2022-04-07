@@ -23,7 +23,7 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
-const TerserPlugin = require('terser-webpack-plugin');
+const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
 
@@ -37,17 +37,19 @@ const jsMoleculesFolder = 'js/components/molecules';
 const dirJsFinalPath = 'views/js/';
 const dirViewsFinalPath = 'views/';
 
-const PACKAGE = require('./package.json');
-const moduleVersion = PACKAGE.version;
+const congifuration = require('./composer.json');
+const moduleVersion = congifuration.version;
+const moduleName = congifuration.moduleName;
 
 let entryFiles = {};
 
-function _getAllFilesFromFolder(dir) {
+function _getAllFilesFromFolder(dir)
+{
     if (!fs.existsSync(dir_path + '/' + dir)) {
         return;
     }
 
-    fs.readdirSync(dir_path + '/' + dir).forEach(function(file) {
+    fs.readdirSync(dir_path + '/' + dir).forEach(function (file) {
         var wpFile = '../' + dirViewsFinalPath + dir + '/' + path.parse(file).name;
         file = dir_path + '/' + dir + '/' + file;
 
@@ -115,8 +117,8 @@ const loaders = [
 ];
 const optimization = {
     minimizer: [
-        new CssMinimizerPlugin(), // todo: uncomment for prod compilation
-        //new TerserPlugin(),
+    new CssMinimizerPlugin(), // todo: uncomment for prod compilation
+    //new TerserPlugin(),
     ],
     //minimize: true,
 };
@@ -125,7 +127,15 @@ const plugins = [
     new MiniCssExtractPlugin({
         filename: '[name].css',
         chunkFilename: '[id].css'
-    })
+    }),
+    new ReplaceInFileWebpackPlugin([{
+        dir: dirViewsFinalPath,
+        test: [/\.css$/, /\.js$/],
+        rules: [{
+            search: /__moduleName__/gi,
+            replace: moduleName
+        }]
+    }])
 ];
 module.exports = {
     mode: 'production',
@@ -142,7 +152,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-            },
+            }
         ],
     },
     optimization: optimization,
