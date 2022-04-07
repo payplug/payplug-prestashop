@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -22,16 +22,16 @@
  */
 
 /**
- * Check if prestashop Context
+ * Check if prestashop Context.
  */
-if (!defined('_PS_VERSION_')) {
+if (!\defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__) . '/vendor/autoload.php');
+require_once \dirname(__FILE__) . '/vendor/autoload.php';
 
-use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
 use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException;
+use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
 
 class PsPaylater extends PaymentModule
 {
@@ -39,9 +39,8 @@ class PsPaylater extends PaymentModule
     private $container;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @return void
      * @throws Exception
      */
     public function __construct()
@@ -79,6 +78,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @return string
+     *
      * @see Module::getContent()
      */
     public function getContent()
@@ -106,7 +106,7 @@ class PsPaylater extends PaymentModule
 
                     Media::addJsDef([
                         'contextPsAccounts' => $contextPsAccounts,
-                        'admin_iso_code' => $this->context->language->iso_code
+                        'admin_iso_code' => $this->context->language->iso_code,
                     ]);
 
                     // Retrieve Account CDN
@@ -121,23 +121,22 @@ class PsPaylater extends PaymentModule
             return (new \PayPlugModule\classes\AdminClass(
                 new \PayPlugModule\classes\DependenciesClass()
             ))->getContent();
-        } else {
-            $iso_code = Context::getContext()->language->iso_code;
-            if ($iso_code == 'en' || $iso_code == 'gb') {
-                $iso_code = 'en-gb';
-            }
-            $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
-            $this->context->smarty->assign('faq_url', $faq_url);
-
-            $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
-            $this->context->smarty->assign('url_logo', $logo_url);
-
-            $this->context->controller->addCSS(
-                __PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin-v'.$this->version.'.css'
-            );
-
-            return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
+        $iso_code = Context::getContext()->language->iso_code;
+        if ($iso_code == 'en' || $iso_code == 'gb') {
+            $iso_code = 'en-gb';
+        }
+        $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
+        $this->context->smarty->assign('faq_url', $faq_url);
+
+        $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
+        $this->context->smarty->assign('url_logo', $logo_url);
+
+        $this->context->controller->addCSS(
+            __PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin-v' . $this->version . '.css'
+        );
+
+        return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
     }
 
     /**
@@ -160,7 +159,6 @@ class PsPaylater extends PaymentModule
             'actionObjectOrderStateDeleteAfter',
             'actionUpdateLangAfter',
             'adminOrder',
-            'customerAccount',
             'displayAdminOrderMain',
             'displayBackOfficeFooter',
             'displayBeforeShoppingCartBlock',
@@ -187,7 +185,9 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
      * @param $params   $this->setDependencies();
+     *
      * @return mixed
      */
     public function hookActionAdminPerformanceControllerAfter($params)
@@ -200,7 +200,9 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
+     *
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionClearCompileCache($params)
@@ -213,6 +215,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionDeleteGDPRCustomer($params)
@@ -224,6 +227,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionExportGDPRData($params)
@@ -235,6 +239,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionOrderStatusUpdate($params)
@@ -246,6 +251,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionObjectOrderStateAddAfter($params)
@@ -284,6 +290,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionUpdateLangAfter($params)
@@ -295,7 +302,9 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     *
      * @param $params
+     *
      * @return mixed
      */
     public function hookAdminOrder($params)
@@ -307,17 +316,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
-     * @return mixed
-     */
-    public function hookCustomerAccount($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->customerAccount($params);
-        }
-    }
-
-    /**
-     * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayAdminOrderMain($params)
@@ -339,6 +338,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayBackOfficeFooter($params)
@@ -350,7 +350,9 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description Display Oney CTA on Shopping cart page
+     *
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayBeforeShoppingCartBlock($params)
@@ -372,6 +374,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayProductPriceBlock($params)
@@ -383,6 +386,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookHeader($params)
@@ -394,6 +398,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookPaymentOptions($params)
@@ -405,6 +410,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookPaymentReturn($params)
@@ -416,8 +422,11 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description Install plugin
+     *
      * @param bool $soft_install
+     *
      * @return bool
+     *
      * @see Module::install()
      */
     public function install($soft_install = false)
@@ -457,9 +466,10 @@ class PsPaylater extends PaymentModule
     }
 
     /**
-     * Retrieve service
+     * Retrieve service.
      *
      * todo: report service installation to bnpl.php
+     *
      * @param string $serviceName
      *
      * @return mixed
@@ -471,6 +481,7 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description Check if mobile is validated installation
+     *
      * @return bool
      */
     public function isValidInstallation()
@@ -478,27 +489,29 @@ class PsPaylater extends PaymentModule
         if (Validate::isLoadedObject($this)) {
             return Configuration::hasKey(Tools::strtoupper($this->name) . '_COMPANY_ID');
         }
+
         return true;
     }
 
     /**
      * @description test if php requiremnt is valid
+     *
      * @return array
      */
     public function isValidPHPVersion()
     {
         $php_min_version = 50600;
 
-        if (!defined('PHP_VERSION_ID')) {
-            $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+        if (!\defined('PHP_VERSION_ID')) {
+            $php_version = \explode('.', PHP_VERSION);
+            \define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
         }
 
         return PHP_VERSION_ID >= $php_min_version;
     }
 
     /**
-     * Run update module
+     * Run update module.
      */
     public function runUpgradeModule()
     {
@@ -521,7 +534,9 @@ class PsPaylater extends PaymentModule
 
     /**
      * @description Uninstall plugin
+     *
      * @return bool|mixed
+     *
      * @see Module::uninstall()
      */
     public function uninstall()
