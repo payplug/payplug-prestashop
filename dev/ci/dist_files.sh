@@ -32,12 +32,12 @@ for file in $distFile
     fi
   done
 
-echo -n "Copy var.less "
-  if [ -d "$modules" ]; then
-    cp -v $path/var.less $PWD/${modules}/dev/css/less/var.less
-  else
-    cp -v $path/var.less $PWD/dev/css/less/var.less
-  fi
+#echo -n "Copy var.less "
+#  if [ -d "$modules" ]; then
+#    cp -v $path/var.less $PWD/${modules}/dev/css/less/var.less
+#  else
+#    cp -v $path/var.less $PWD/dev/css/less/var.less
+#  fi
 
 
 echo "End script dist-files"

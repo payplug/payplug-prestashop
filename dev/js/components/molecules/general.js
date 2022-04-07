@@ -283,7 +283,7 @@ class General {
     }
 
     reloadFromContent(content) {
-        $('.'+module_name+'Configuration').replaceWith(content);
+        $('.__moduleName__Configuration').replaceWith(content);
         $(window).trigger('reloadEvent');
     }
 

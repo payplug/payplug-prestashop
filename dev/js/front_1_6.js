@@ -24,7 +24,7 @@
 // (function ($) {
 var $document,
     $window,
-    payplugModule = {
+    __moduleName__Module = {
         init: function () {
             $document.on('click', '.payplugCard_delete', function (event) {
                 event.preventDefault();
@@ -32,32 +32,32 @@ var $document,
                     id_payplug_card = $card.data('id_card'),
                     url = $(this).attr('href') + '&pc=' + id_payplug_card;
 
-                payplugModule.deleleCard(id_payplug_card, url);
+                __moduleName__Module.deleleCard(id_payplug_card, url);
             });
-            payplugModule.payment.init();
-            payplugModule.popup.init();
+            __moduleName__Module.payment.init();
+            __moduleName__Module.popup.init();
         },
         payment: {
             props: {
                 pending: false,
             },
             init: function () {
-                $document.on('click', '.payment_module a.payplug', payplugModule.payment.pay)
-                    .on('submit', '.payplugOneClick form', payplugModule.payment.oneclick);
+                $document.on('click', '.payment_module a.payplug', __moduleName__Module.payment.pay)
+                    .on('submit', '.payplugOneClick form', __moduleName__Module.payment.oneclick);
 
-                $(window).on('load', payplugModule.payment.clean)
-                    .on('load', payplugModule.payment.checkerrors)
-                    .on('load', payplugModule.payment.handleOPC);
+                $(window).on('load', __moduleName__Module.payment.clean)
+                    .on('load', __moduleName__Module.payment.checkerrors)
+                    .on('load', __moduleName__Module.payment.handleOPC);
 
                 if (typeof can_use_oney != 'undefined' && can_use_oney) {
-                    payplugModule.oney.init();
+                    __moduleName__Module.oney.init();
                 }
             },
             send: function (options) {
-                if(payplugModule.payment.props.pending) {
+                if(__moduleName__Module.payment.props.pending) {
                     return false;
                 }
-                payplugModule.payment.props.pending = true;
+                __moduleName__Module.payment.props.pending = true;
 
                 var default_options = {
                     id_card: 'new_card',
@@ -115,7 +115,7 @@ var $document,
                         }
                     },
                     error: function () {
-                        payplugModule.payment.props.pending = false;
+                        __moduleName__Module.payment.props.pending = false;
                     },
                     success: function (data) {
                         if (data.result) {
@@ -128,12 +128,12 @@ var $document,
                                 }
                                 var is_one_click = options['id_card'] != 'new_card';
                                 Payplug.showPayment(data.return_url, is_one_click);
-                                payplugModule.payment.props.pending = false;
+                                __moduleName__Module.payment.props.pending = false;
                             } else {
                                 window.location.href = data.return_url;
                             }
 
-                            payplugModule.oney.payment.form.close();
+                            __moduleName__Module.oney.payment.form.close();
                         } else if (typeof data.response != 'undefined') {
                             var $errorWrapper;
                             $('p.ppfail').hide();
@@ -174,7 +174,7 @@ var $document,
                                 }, delay
                             );
 
-                            payplugModule.payment.props.pending = false;
+                            __moduleName__Module.payment.props.pending = false;
                         }
                     }
                 });
@@ -194,7 +194,7 @@ var $document,
                     return false;
                 }
 
-                payplugModule.payment.send({id_card: 'new_card', is_inst: is_inst, is_bancontact: is_bancontact});
+                __moduleName__Module.payment.send({id_card: 'new_card', is_inst: is_inst, is_bancontact: is_bancontact});
 
                 return false;
             },
@@ -202,7 +202,7 @@ var $document,
                 event.preventDefault();
                 event.stopPropagation();
                 var idCard = $('input[name=payplug_card]:checked').val();
-                payplugModule.payment.send({id_card: idCard});
+                __moduleName__Module.payment.send({id_card: idCard});
             },
             clean: function () {
                 var $links = $('.payment_module a.payplug'),
@@ -230,7 +230,7 @@ var $document,
                     data: data,
                     success: function (data) {
                         if (data.result) {
-                            payplugModule.popup.set(data.result);
+                            __moduleName__Module.popup.set(data.result);
                         }
                     }
                 });
@@ -243,9 +243,9 @@ var $document,
                 var original = updatePaymentMethods;
                 updatePaymentMethods = function (json) {
                     original.call(this, json);
-                    payplugModule.payment.clean();
+                    __moduleName__Module.payment.clean();
                     if (typeof can_use_oney != 'undefined' && can_use_oney) {
-                        payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                        __moduleName__Module.oney.load(__moduleName__Module.oney.payment.props.open);
                     }
                 };
             },
@@ -293,14 +293,14 @@ var $document,
                 $(window).on('resize', oney.sizing).trigger('resize');
             },
             cleanQueries: function () {
-                for (i = 0; i < payplugModule.oney.props.queries.length; i++) {
-                    if (typeof payplugModule.oney.props.queries[i] != 'undefined')
-                        payplugModule.oney.props.queries[i].abort();
+                for (i = 0; i < __moduleName__Module.oney.props.queries.length; i++) {
+                    if (typeof __moduleName__Module.oney.props.queries[i] != 'undefined')
+                        __moduleName__Module.oney.props.queries[i].abort();
                 }
-                payplugModule.oney.props.queries = [];
+                __moduleName__Module.oney.props.queries = [];
             },
             load: function (with_schedule) {
-                var oney = payplugModule.oney,
+                var oney = __moduleName__Module.oney,
                     is_product = $('body').is('.product') || $('body').is('#product'),
                     data = {
                         _ajax: 1,
@@ -319,7 +319,7 @@ var $document,
                     data['id_product_attribute'] = $('#idCombination').val() ? parseInt($('#idCombination').val()) : 0;
                 }
 
-                payplugModule.oney.props.loaded = false;
+                __moduleName__Module.oney.props.loaded = false;
 
                 oney.popin.setLoader();
 
@@ -337,28 +337,28 @@ var $document,
                         $('.oneyOption_wrapper').removeClass('-loading');
                         if (response.result) {
                             if (typeof (response.popin) != 'undefined') {
-                                payplugModule.oney.popin.set(response.popin);
-                                payplugModule.oney.props.loaded = true;
+                                __moduleName__Module.oney.popin.set(response.popin);
+                                __moduleName__Module.oney.props.loaded = true;
                             }
                             if (typeof (response.payment) != 'undefined') {
-                                payplugModule.oney.payment.set(response.payment);
+                                __moduleName__Module.oney.payment.set(response.payment);
                             }
 
                             if (typeof response.error != 'undefined' && response.error) {
-                                payplugModule.oney.popin.disable();
+                                __moduleName__Module.oney.popin.disable();
                             } else {
-                                payplugModule.oney.popin.enable();
+                                __moduleName__Module.oney.popin.enable();
                             }
                         } else {
                             if (typeof response.popin != 'undefined') {
-                                payplugModule.oney.popin.set(response.popin);
+                                __moduleName__Module.oney.popin.set(response.popin);
                             } else if (typeof response.error != 'undefined') {
                                 var popin_error = '<span class="oneyPopin"><p class="oneyPopin_error">' + response.error + '</p></span>'
-                                payplugModule.oney.popin.set(popin_error);
+                                __moduleName__Module.oney.popin.set(popin_error);
                             }
 
                             if (typeof response.payment != 'undefined') {
-                                payplugModule.oney.payment.set(response.payment);
+                                __moduleName__Module.oney.payment.set(response.payment);
                             } else if (typeof response.error != 'undefined') {
                                 var payment_error = '<span class="oneyPayment_error">' + response.error + '</span>';
                                 $('.oneyPayment').addClass('-disabled').removeClass('-open');
@@ -370,8 +370,8 @@ var $document,
                                 }
                                 $('.oneyOption_wrapper').remove();
                             }
-                            payplugModule.oney.popin.disable();
-                            payplugModule.oney.props.loaded = true;
+                            __moduleName__Module.oney.popin.disable();
+                            __moduleName__Module.oney.props.loaded = true;
                         }
 
                         if ($('.oneyPayment .oneyRequired').length) {
@@ -419,9 +419,9 @@ var $document,
                     }
                     $('.oneyPopin').replaceWith(content).removeClass('-loading');
                     var $button = $('.oneyPopin_navigation button').eq(0);
-                    payplugModule.oney.popin.choose($button.data('type'));
+                    __moduleName__Module.oney.popin.choose($button.data('type'));
                     if (is_open) {
-                        setTimeout(payplugModule.oney.popin.open, 0);
+                        setTimeout(__moduleName__Module.oney.popin.open, 0);
                     }
                 },
                 setLoader: function () {
@@ -429,13 +429,13 @@ var $document,
                     if (!$(target).length) {
                         $('.oneyCta').append('<span class="oneyPopin" />');
                     }
-                    payplugModule.oney.loader.set(target);
+                    __moduleName__Module.oney.loader.set(target);
                     $(target).addClass('-loading');
                 },
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var oney = payplugModule.oney,
+                    var oney = __moduleName__Module.oney,
                         popin = oney.popin,
                         is_active = $('.oneyCta').is('.-open');
 
@@ -456,7 +456,7 @@ var $document,
                 disable: function () {
                     $('.oneyCta_button').addClass('-disabled');
                     $('.oneyPopin').addClass('-error');
-                    payplugModule.oney.payment.props.open = false;
+                    __moduleName__Module.oney.payment.props.open = false;
                 },
                 select: function (event) {
                     event.preventDefault();
@@ -469,7 +469,7 @@ var $document,
                         return false;
                     }
 
-                    payplugModule.oney.popin.choose($button.data('type'));
+                    __moduleName__Module.oney.popin.choose($button.data('type'));
                 },
                 choose: function (option) {
                     // nav
@@ -497,14 +497,14 @@ var $document,
                 hide: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    payplugModule.oney.popin.close();
+                    __moduleName__Module.oney.popin.close();
                 },
                 handleProductEvent: function () {
                     $document.on('click', '.product_quantity_down, .product_quantity_up, #attributes a', function () {
-                        return payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                        return __moduleName__Module.oney.load(__moduleName__Module.oney.payment.props.open);
                     });
                     $document.on('change', 'input[name=qty], #attributes', function () {
-                        return payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                        return __moduleName__Module.oney.load(__moduleName__Module.oney.payment.props.open);
                     });
                 },
                 handleCheckoutEvent: function () {
@@ -514,7 +514,7 @@ var $document,
                     var original = updateCartSummary;
                     updateCartSummary = function (json) {
                         original.call(this, json);
-                        payplugModule.oney.load(payplugModule.oney.payment.props.open);
+                        __moduleName__Module.oney.load(__moduleName__Module.oney.payment.props.open);
                     };
                 }
             },
@@ -583,21 +583,21 @@ var $document,
                         $option = $selected.parents('.oneyOption');
                     $option.addClass('-selected');
                     $('.oneyPayment_button').html($option.find('.oneyOption_title').text());
-                    payplugModule.oney.props.type = $selected.val();
+                    __moduleName__Module.oney.props.type = $selected.val();
                     if ($('.-show').length) {
-                        payplugModule.oney.payment.form.close();
+                        __moduleName__Module.oney.payment.form.close();
                     }
                 },
                 send: function (event) {
                     event.preventDefault();
 
                     if ($('.oneyRequired').length) {
-                        payplugModule.oney.payment.form.open();
+                        __moduleName__Module.oney.payment.form.open();
                     } else {
-                        payplugModule.payment.send({
+                        __moduleName__Module.payment.send({
                             id_card: 'new_card',
                             is_inst: null,
-                            is_oney: payplugModule.oney.props.type,
+                            is_oney: __moduleName__Module.oney.props.type,
                         });
                     }
                 },
@@ -610,8 +610,8 @@ var $document,
                         $('input[name="oney_type"]').eq(0).trigger('click');
                     }
 
-                    if (payplugModule.oney.payment.props.open) {
-                        setTimeout(payplugModule.oney.payment.open, 0);
+                    if (__moduleName__Module.oney.payment.props.open) {
+                        setTimeout(__moduleName__Module.oney.payment.open, 0);
                     }
 
                     $(window).trigger('resize');
@@ -624,14 +624,14 @@ var $document,
                         return false;
                     }
 
-                    var oney = payplugModule.oney,
+                    var oney = __moduleName__Module.oney,
                         payment = oney.payment;
 
                     if (!oney.props.loaded) {
                         oney.load(true);
                     }
 
-                    if (payplugModule.oney.payment.props.open) {
+                    if (__moduleName__Module.oney.payment.props.open) {
                         payment.close();
                     } else {
                         payment.open();
@@ -639,14 +639,14 @@ var $document,
                 },
                 open: function () {
                     $('.oneyPayment').addClass('-open');
-                    if (!payplugModule.oney.payment.props.open) {
-                        payplugModule.oney.payment.props.open = true;
+                    if (!__moduleName__Module.oney.payment.props.open) {
+                        __moduleName__Module.oney.payment.props.open = true;
                         var oney_position = parseInt($('.oneyPayment').offset().top) - 15;
                         $('html,body').stop().animate({'scrollTop': oney_position});
                     }
                 },
                 close: function () {
-                    payplugModule.oney.payment.props.open = false;
+                    __moduleName__Module.oney.payment.props.open = false;
                     $('.oneyPayment').removeClass('-open');
                 },
                 form: {
@@ -683,12 +683,12 @@ var $document,
                         });
                     },
                     close: function () {
-                        payplugModule.popup.close();
+                        __moduleName__Module.popup.close();
                         $('.oneyPayment_button').removeClass('-disabled').removeClass('-validate');
                         $('.oneyRequired_overlay').removeClass('-show');
                         setTimeout(function () {
                             $('.oneyRequired_overlay').addClass('-disabled');
-                            payplugModule.oney.payment.form.reset();
+                            __moduleName__Module.oney.payment.form.reset();
                         }, 0);
                     },
                     check: function () {
@@ -766,7 +766,7 @@ var $document,
                                         $('.oneyRequired_validation').addClass('-appear');
                                     });
                                     window.setTimeout(function () {
-                                        payplugModule.popup.close();
+                                        __moduleName__Module.popup.close();
                                     }, 5000);
                                 } else {
                                     var errors = '';
@@ -789,7 +789,7 @@ var $document,
                         event.stopPropagation();
 
                         var payment_data = {
-                                is_oney: payplugModule.oney.props.type,
+                                is_oney: __moduleName__Module.oney.props.type,
                                 oney_form: {}
                             },
                             $form = $('.oneyRequired'),
@@ -811,10 +811,10 @@ var $document,
 
 
                         if ($('.oneyRequired').parents('.payplugPopin').length) {
-                            return payplugModule.oney.payment.form.save(payment_data.oney_form);
+                            return __moduleName__Module.oney.payment.form.save(payment_data.oney_form);
                         }
 
-                        payplugModule.payment.send(payment_data);
+                        __moduleName__Module.payment.send(payment_data);
                     },
                 },
             },
@@ -850,7 +850,7 @@ var $document,
             },
             sizing: function () {
                 var container = $('.oneyPayment'),
-                    sizes = payplugModule.oney.props.sizes,
+                    sizes = __moduleName__Module.oney.props.sizes,
                     width = container.outerWidth(),
                     current = false;
 
@@ -881,7 +881,7 @@ var $document,
                     });
             },
             set: function (content) {
-                var popup = payplugModule.popup,
+                var popup = __moduleName__Module.popup,
                     props = popup.props;
                 if (!sanitizePopupHtml(content)) {
                     return;
@@ -895,7 +895,7 @@ var $document,
                 popup.open();
             },
             open: function () {
-                var props = payplugModule.popup.props;
+                var props = __moduleName__Module.popup.props;
                 var popin = $('.' + props.mainClass);
                 popin.addClass('-open');
                 window.setTimeout(function () {
@@ -903,7 +903,7 @@ var $document,
                 }, 0);
             },
             close: function () {
-                var props = payplugModule.popup.props;
+                var props = __moduleName__Module.popup.props;
                 var popin = $('.' + props.mainClass);
 
                 popin.removeClass('-show');
@@ -912,12 +912,12 @@ var $document,
                 }, 500);
             },
             create: function () {
-                var props = payplugModule.popup.props,
+                var props = __moduleName__Module.popup.props,
                     html = '<div class="' + props.mainClass + '"><button class="' + props.mainClass + '_close"></button><div class="' + props.mainClass + '_content"></div></div>';
                 $('body').append(html);
             },
             hydrate: function (content) {
-                var props = payplugModule.popup.props;
+                var props = __moduleName__Module.popup.props;
                 $('.' + props.mainClass + '_content').html(content);
             }
         }
@@ -925,7 +925,7 @@ var $document,
 $(document).ready(function () {
     $document = $(document);
     $window = $(window);
-    payplugModule.init();
+    __moduleName__Module.init();
 });
 
 // })(window.jQuery);

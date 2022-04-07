@@ -1,6 +1,6 @@
 class Description {
     props = {
-        'container': module_name + 'Configuration',
+        'container': '__moduleName__Configuration',
         'query': null,
         'data': {}
     };
