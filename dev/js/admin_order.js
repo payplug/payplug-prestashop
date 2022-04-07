@@ -19,26 +19,27 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-var $document, $window, payplug = {
+var $document, $window;
+window[module_name+'Module']= {
     init: function () {
         $document = $(document);
         $window = $(window);
 
-        for (const section in payplug) {
+        for (const section in this) {
             if (section != 'init') {
-                payplug[section]['init']();
+                this[section]['init']();
             }
         }
     },
     abort: {
         init: function () {
-            var {abort} = payplug;
+            var {abort} = window[module_name+'Module'];
             $document.on('click', 'input[name=submitPPAbort]', abort.call)
                 .on('click', 'button[name=confirmPayplugAbort]', abort.confirm);
         },
         call: function (event) {
             event.preventDefault();
-            var {popup} = payplug;
+            var {popup} = window[module_name+'Module'];
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
             var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
@@ -94,21 +95,24 @@ var $document, $window, payplug = {
     },
     refund: {
         init: function () {
-            var {refund} = payplug;
-            $document.on('click', 'input[name=submitPPRefund]', refund.call);
+            var {refund} = window[module_name+'Module'];
+            $document.on('click', 'input[name=submit' + module_name + 'Refund]', refund.call);
         },
-        call: function () {
+        call: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
             var url = $('input:hidden[name=admin_ajax_url]').val(),
                 data = {
-                _ajax: 1,
-                refund: 1,
-                amount: $('input[name=pp_amount2refund]').val(),
-                id_customer: $('input:hidden[name=id_customer]').val(),
-                pay_id: $('input:hidden[name=pay_id]').val(),
-                inst_id: $('input:hidden[name=inst_id]').val(),
-                id_order: $('input:hidden[name=id_order]').val(),
-                pay_mode: $('input:hidden[name=pay_mode]').val()
-            };
+                    _ajax: 1,
+                    refund: 1,
+                    amount: $('input[name=pp_amount2refund]').val(),
+                    id_customer: $('input:hidden[name=id_customer]').val(),
+                    pay_id: $('input:hidden[name=pay_id]').val(),
+                    inst_id: $('input:hidden[name=inst_id]').val(),
+                    id_order: $('input:hidden[name=id_order]').val(),
+                    pay_mode: $('input:hidden[name=pay_mode]').val()
+                };
 
             $('#pppanel form p.pperror').hide();
             $('#pppanel form p.ppsuccess').hide();
@@ -138,7 +142,7 @@ var $document, $window, payplug = {
                     console.log(jqXHR);
                     console.log(textStatus);
                     console.log(errorThrown);
-                    $('input[name=submitPPRefund]').prop("disabled", false);
+                    $('input[name=submit' + module_name + 'Refund]').prop("disabled", false);
                 },
                 success: function (result) {
                     if (result.status == 'error') {
@@ -146,7 +150,7 @@ var $document, $window, payplug = {
                             .removeClass('hide')
                             .show();
                     } else {
-                        $('.payplugOrder').replaceWith(result.template);
+                        $('.' + module_name + 'Order').replaceWith(result.template);
                         $('#pppanel form p.ppsuccess').html(result.message)
                             .removeClass('hide')
                             .show();
@@ -164,7 +168,7 @@ var $document, $window, payplug = {
             identifier: 'payplugPopup',
         },
         init: function () {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props;
 
             $document.on('click', '.' + identifier + '_close', popup.close)
@@ -177,7 +181,7 @@ var $document, $window, payplug = {
                 });
         },
         set: function (content) {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props;
             if (!sanitizePopupHtml(content)) {
                 return;
@@ -189,7 +193,7 @@ var $document, $window, payplug = {
             popup.open();
         },
         open: function () {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
@@ -199,7 +203,7 @@ var $document, $window, payplug = {
             }, 0);
         },
         close: function () {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
@@ -210,20 +214,20 @@ var $document, $window, payplug = {
             }, 500);
         },
         create: function () {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props,
                 html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
             $('body').append(html);
         },
         remove: function () {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
             $popup.remove();
         },
         hydrate: function (content) {
-            var {popup} = payplug,
+            var {popup} = window[module_name+'Module'],
                 {identifier} = popup.props;
             $('.' + identifier + '_content').html(content);
         },
@@ -249,7 +253,7 @@ $(document).ready(function () {
         e.preventDefault();
     });
 
-    payplug.init();
+    window[module_name+'Module'].init();
 });
 
 function callRefund() {
