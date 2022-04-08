@@ -26,13 +26,11 @@
     <div>
         {include file='./icon.tpl'
             iconName='check'
-            iconClassName='iris'
         }
     </div>
     <div>
         {include file='./icon.tpl'
             iconName='close'
-            iconClassName='error'
         }
     </div>
     <div>
@@ -58,7 +56,6 @@
     <div>
         {include file='./icon.tpl'
             iconName='error'
-            iconClassName='error'
         }
     </div>
 

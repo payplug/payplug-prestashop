@@ -431,6 +431,7 @@ class ConfigClass
 
     /**
      * Check various configurations
+     * @todo remove this function which is not used anymore in new BO
      *
      * @return string
      */
@@ -484,44 +485,51 @@ class ConfigClass
             $is_payplug_configured = false;
         }
 
-        $this->check_configuration = ['warning' => [], 'error' => [], 'success' => []];
+        $this->check_configuration = ['status' => []];
 
-        $curl_warning = $this->dependencies->l('payplug.checkConfiguration.curlExtension', 'configclass');
         if ($report['curl']['installed']) {
-            $this->check_configuration['success'][] .= $curl_warning;
+            $this->check_configuration['status']['curl'] = 'check';
         } else {
-            $this->check_configuration['error'][] .= $curl_warning;
+            $this->check_configuration['status']['curl'] = 'close';
         }
 
-        $php_warning = $this->dependencies->l('payplug.checkConfiguration.phpVersion', 'configclass');
         if ($report['php']['up2date']) {
-            $this->check_configuration['success'][] .= $php_warning;
+            $this->check_configuration['status']['php'] = 'check';
         } else {
-            $this->check_configuration['error'][] .= $php_warning;
+            $this->check_configuration['status']['php'] = 'close';
         }
 
-        $openssl_warning = $this->dependencies->l('payplug.checkConfiguration.openssl', 'configclass');
         if ($report['openssl']['installed'] && $report['openssl']['up2date']) {
-            $this->check_configuration['success'][] .= $openssl_warning;
+            $this->check_configuration['status']['ssl'] = 'check';
         } else {
-            $this->check_configuration['error'][] .= $openssl_warning;
+            $this->check_configuration['status']['ssl'] = 'close';
         }
 
-        $connexion_warning = $this->dependencies->l('payplug.checkConfiguration.payplugAccount', 'configclass');
-        if ($is_payplug_connected) {
-            $this->check_configuration['success'][] .= $connexion_warning;
-        } else {
-            $this->check_configuration['error'][] .= $connexion_warning;
-        }
-
-        $check_warning = $this->dependencies->l('payplug.checkConfiguration.issue', 'configclass');
         if ($is_payplug_configured) {
         } else {
             Configuration::get($this->dependencies->getConfigurationKey('show'), 0);
-            $this->check_configuration['warning'][] .= $check_warning;
+            $this->check_configuration['status']['check'] = 'check';
         }
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkState()
+    {
+        $report = self::checkRequirements();
+
+        if ($report['curl']['installed'] &&
+            $report['php']['up2date'] &&
+            $report['openssl']['installed'] &&
+            $report['openssl']['up2date']
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

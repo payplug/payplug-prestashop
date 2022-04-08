@@ -24,11 +24,13 @@
 <div class="payplugUIAccordion
     {if isset($accordionClassName) && $accordionClassName} {$accordionClassName|escape:'htmlall':'UTF-8'}{/if}">
     <input type="checkbox" id="{$accordionIdentifier|escape:'htmlall':'UTF-8'}"/>
-    {if isset($accordionLabel) && $accordionLabel}
+
         <label for="{$accordionIdentifier|escape:'htmlall':'UTF-8'}">
-            {$accordionLabel|escape:'htmlall':'UTF-8'}
+            {if isset($accordionLabel) && $accordionLabel}
+                {$accordionLabel|escape:'htmlall':'UTF-8'}
+            {/if}
         </label>
-    {/if}
+
     <div class="payplugUIAccordion_contentWrapper">
         <div class="payplugUIAccordion_content">
             {$accordionContent}

@@ -510,3 +510,10 @@ Consulta la nostra [2]pagina di supporto[/2] per ottenere una versione del modul
 <{pspaylater}prestashop>sandbox_841de40d60a8ce1a99fac5e2e41953a1;modal.sandbox.onboarding.processed.title;;Félicitations, votre dossier est accepté !;Congratulations, your application has been accepted!;Congratulations, your application has been accepted!;Congratulazioni, il tuo dossier è stato accettato!
 <{pspaylater}prestashop>sandbox_2ff56f53ba4da4e48c33e66e42577a7b;modal.sandbox.onboarding.processed.text;;"Vous pouvez désormais utiliser le mode LIVE  et encaisser des paiements dès maintenant.";You can now use the LIVE mode and collect payments.;You can now use the LIVE mode and collect payments.;Puoi utilizzare fin d’ora la modalità LIVE e iniziare a incassare i pagamenti.
 <{pspaylater}prestashop>configclass_b4bf3f83ac86dbe1e01346a2343a003b;payplug.submitSandbox.passwordError;;Le mot de passe saisi n'est pas valide.;The password you entered is invalid;The password you entered is invalid;La password inserita non é corretta
+<{pspaylater}prestashop>state_be7a246fa9d8f760560bd66dc728678a;state.block.title;;État;;;
+<{pspaylater}prestashop>state_38fb08d8fa55b1bea92ae70b46a4aed0;state.block.description;;Contrôlez votre environnement pour assurer le fonctionnement optimal du module.;;;
+<{pspaylater}prestashop>state_e490fd4ec7bea3938c7b65c0a172966c;state.block.textAlert;;La configuration requise pour utiliser le module PayPlug n'est pas satisfaite. Une fois les problèmes corrigés, actualisez la page ou cliquez sur vérifier.;;;
+<{pspaylater}prestashop>state_eca1b605d43b306cb467273d1a0712b0;state.block.stateButton;;Vérifier;;;
+<{pspaylater}prestashop>state_6f24d6e6607af9988f5db6ae4b7efbe4;state.block.stateCurl;;L'extension PHP cURL est installée et activée.;;;
+<{pspaylater}prestashop>state_da810a928c6dd6c728f77cb303208cb7;state.block.statePhp;;La version PHP de votre serveur doit être la version 5.6 au minimum.;;;
+<{pspaylater}prestashop>state_2a0b6680cbda364ef176a154fbb60e17;state.block.stateSsl;;Votre serveur doit disposer d'une version 1.0.1 ou supérieure d'OpenSSL.;;;

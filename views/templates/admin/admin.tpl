@@ -43,6 +43,9 @@
         {* paylater block*}
         {include file='./../api/molecules/paylater.tpl'}
 
+        {* etat block *}
+        {include file='./../api/molecules/state.tpl'}
+
         {include file='./panel/settings.tpl'}
     </div>
 
