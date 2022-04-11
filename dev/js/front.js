@@ -645,7 +645,7 @@ window[module_name+'Module'] = {
                 identifier = card.props.identifier;
 
             $document.on('click', '.' + identifier + '_delete', window[module_name+'Module'].card.delete)
-                .on('click', 'button[name="confirm_delete"]', window[module_name+'Module'].card.confirm);
+                .on('click', 'button[name="'+module_name+'ConfirmDelete"]', window[module_name+'Module'].card.confirm);
 
         },
         //display first pop to confirm card deletion
