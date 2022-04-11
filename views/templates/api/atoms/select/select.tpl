@@ -20,36 +20,48 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{if !isset($selectValue)}
-    {assign var='firstOptions' value=$selectOptions|reset}
-    {assign var='selectValue' value=$firstOptions.key}
-{/if}
+{if isset($selectOptions) && $selectOptions}
+    {assign var='defaultValue' value=false}
 
-<div class="payplugUISelect
-    {if isset($selectDisabled) && $selectDisabled} -disabled{/if}
-    {if isset($selectClassName) && $selectClassName} {$selectClassName|escape:'htmlall':'UTF-8'}{/if}"
+    {foreach $selectOptions as $option}
+        {if isset($option.selected) && $option.selected && !$defaultValue}
+            {assign var='defaultValue' value=$option.key}
+        {/if}
+    {/foreach}
+
+    {if !$defaultValue}
+        {assign var='firstOption' value=$selectOptions|reset}
+        {assign var='defaultValue' value=$firstOption.key}
+    {/if}
+
+    <div class="payplugUISelect
+        {if isset($selectDisabled) && $selectDisabled} -disabled{/if}
+        {if isset($selectClassName) && $selectClassName} {$selectClassName|escape:'htmlall':'UTF-8'}{/if}"
         {if isset($selectData) && $selectData} data-e2e-name="{$selectData|escape:'htmlall':'UTF-8'}"{/if}>
-    <div class="_current" {if !isset($selectDisabled) || !$selectDisabled} tabindex="1"{/if}>
-        {foreach $selectOptions as $option}
-            <div class="_value">
-                <input
-                        class="_input"
-                        type="radio"
-                        id="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
-                        value="{$option.key|escape:'htmlall':'UTF-8'}"
-                        name="{$selectName|escape:'htmlall':'UTF-8'}"
-                        {if $selectValue == $option.key} checked{/if}>
-                <p class="_text">{$option.value|escape:'htmlall':'UTF-8'}</p>
-            </div>
-        {/foreach}
-    </div>
-    <div class="_list">
-        <ul>
+        <div class="_current" {if !isset($selectDisabled) || !$selectDisabled} tabindex="1"{/if}>
             {foreach $selectOptions as $option}
-                <li>
-                    <label class="_option" for="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}" aria-hidden="aria-hidden">{$option.value|escape:'htmlall':'UTF-8'}</label>
-                </li>
+                <div class="_value">
+                    <input
+                            class="_input"
+                            type="radio"
+                            id="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
+                            value="{$option.key|escape:'htmlall':'UTF-8'}"
+                            name="{$selectName|escape:'htmlall':'UTF-8'}"
+                            {if $defaultValue == $option.key} checked{/if}>
+                    <span class="_text">{$option.value|escape:'htmlall':'UTF-8'}</span>
+                </div>
             {/foreach}
-        </ul>
+        </div>
+        <div class="_list">
+            <ul>
+                {foreach $selectOptions as $option}
+                    <li>
+                        <label class="_option"
+                               for="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
+                               aria-hidden="aria-hidden">{$option.value|escape:'htmlall':'UTF-8'}</label>
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
     </div>
-</div>
+{/if}

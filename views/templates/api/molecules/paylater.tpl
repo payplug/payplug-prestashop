@@ -83,5 +83,5 @@ blockTitle=$paylaterBlock_title
 blockDescription=$payLaterBlock_description
 blockContent=$paylaterBlock_content
 blockData='blockPaylater'
-blockDisabled=!$connected
+blockDisabled=!$connected || !$payplug_switch.show.checked
 blockClassName=$paylaterBlock_className}

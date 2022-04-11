@@ -197,7 +197,7 @@ class AdminClass
         }
 
         if (Tools::isSubmit('checkState')) {
-            $content = $this->dependencies->configClass->checkEtat();
+            $content = $this->dependencies->configClass->checkState();
             if ($content) {
                 die(json_encode(['content' => $content]));
             } else {
