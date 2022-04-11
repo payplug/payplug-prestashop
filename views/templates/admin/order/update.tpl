@@ -24,7 +24,7 @@
     <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="pay_id" value="{$pay_id|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
-    <input class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" type="submit" name="submitPPUpdate" value="{l s='Update' mod='payplug'}" >
+    <input class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" type="submit" name="{$module_name|escape:'htmlall':'UTF-8'}SubmitUpdate" value="{l s='Update' mod='payplug'}" >
     <p class="hide pperror"></p>
     <p class="hide ppsuccess"></p>
     <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
