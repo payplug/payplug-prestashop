@@ -34,7 +34,7 @@
 
         {if isset($with_yes_no_buttons) && $with_yes_no_buttons}
         <div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_footer">
-            <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Msg_button {$module_name|escape:'htmlall':'UTF-8'}Msg_confirmButton" name="confirm_delete">{l s='hook.partials.message.yes' mod='payplug'}</button>
+            <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Msg_button {$module_name|escape:'htmlall':'UTF-8'}Msg_confirmButton" name="{$module_name|escape:'htmlall':'UTF-8'}ConfirmDelete">{l s='hook.partials.message.yes' mod='payplug'}</button>
             <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Msg_button {$module_name|escape:'htmlall':'UTF-8'}Msg_declineButton">{l s='hook.partials.message.no' mod='payplug'}</button>
         </div>
         {/if}
