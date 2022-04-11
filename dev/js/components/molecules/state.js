@@ -10,11 +10,10 @@ class State {
 
     handleEvents() {
         $(document)
-            .on('click', 'button[name=stateButton]', this.checkEtat)
+            .on('click', 'button[name=stateButton]', this.checkState)
     }
 
-    checkEtat() {
-
+    checkState() {
         const queryData = {
             _ajax: 1,
             log: 1,

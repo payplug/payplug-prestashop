@@ -4,7 +4,6 @@
   background: #colorMap[white];
   position: relative;
   display: block;
-  width: 145px;
   height: 36px;
   margin: 0 auto;
   cursor: pointer;
@@ -22,7 +21,7 @@
 
       position: absolute;
       top: 50%;
-      left: calc(100% - 20px);
+      left: calc(100% - 23px);
 
       display: block;
       width: 12px;
@@ -61,6 +60,8 @@
   ._text {
     display: none;
     margin: 0;
+    color: #colorMap[fontMainDefault];
+    white-space: nowrap;
   }
 
   ._list {
@@ -96,7 +97,9 @@
     background: #colorMap[white];
     color: inherit;
     cursor: pointer;
+    font-weight: 400;
     z-index: 1;
+    font-weight: 400;
 
     &:hover {
       color: #colorMap[purple];
