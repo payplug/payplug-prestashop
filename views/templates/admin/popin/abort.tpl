@@ -25,5 +25,5 @@
 <p>{l s='Your customer won’t be charged on the due dates.' mod='payplug'}</p>
 <div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_footer">
     <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" name="confirmPayplugAbort">{l s='Suspend' mod='payplug'}</button>
+    <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" name="{$module_name|escape:'htmlall':'UTF-8'}ConfirmAbort">{l s='Suspend' mod='payplug'}</button>
 </div>
