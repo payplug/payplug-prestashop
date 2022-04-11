@@ -869,7 +869,7 @@ class HookClass
             $specific->displayHeader();
         }
 
-        if ((int) $this->tools->tool('getValue', 'lightbox') == 1) {
+        if ((int) $this->tools->tool('getValue', 'show_lightbox') == 1) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
                 return;
