@@ -351,6 +351,20 @@ class HookClass
         }
         if ($inst_id) {
             $payment_list = [];
+            if ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 1) {
+                $this->dependencies->apiClass->setSecretKey(
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey('testApiKey')
+                    )
+                );
+            } elseif ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 0) {
+                $this->dependencies->apiClass->setSecretKey(
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey('liveApiKey')
+                    )
+                );
+            }
+
             if (!$inst_id || empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
                 if ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 1) {
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
@@ -376,6 +390,7 @@ class HookClass
                     }
                 }
             }
+
 
             $pay_mode = $installment->is_live
                 ? $this->dependencies->l('hook.displayAdminOrderMain.live', 'hookclass')
@@ -490,6 +505,19 @@ class HookClass
             }
 
             $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            if ($sandbox) {
+                $this->dependencies->apiClass->setSecretKey(
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey('testApiKey')
+                    )
+                );
+            } else {
+                $this->dependencies->apiClass->setSecretKey(
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey('liveApiKey')
+                    )
+                );
+            }
 
             if (!$pay_id || empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
                 if ($sandbox) {
