@@ -21,19 +21,23 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use PayPlug\classes\PayPlugClass;
-
 class PayplugPaymentModuleFrontController extends ModuleFrontController
 {
+    private $dependencies;
+    private $logger;
+    private $paymentClass;
+    private $plugin;
+    private $toolsSpecific;
+
     public function postProcess()
     {
-        require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
+        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->paymentClass = $this->dependencies->paymentClass;
+        $this->plugin = $this->dependencies->getPlugin();
+        $this->logger = $this->plugin->getLogger();
+        $this->toolsSpecific = $this->plugin->getTools();
 
-        /** Call to payplug-php API */
-        require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugBackward.php');
-
-        $payplug = new PayPlugClass();
-        $payplug->apiClass->initializeApi();
+        $this->dependencies->apiClass->initializeApi();
 
         $context = Context::getContext();
 
@@ -52,7 +56,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             '_ajax' => 1
         ];
 
-        $payment_data = $payplug->preparePayment($options);
+        $payment_data = $this->paymentClass->preparePayment($options);
         $payment_data_16 = Tools::jsonDecode($payment_data, true);
 
         $page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
@@ -66,12 +70,12 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
             Tools::redirect($payment_data_16['return_url']);
         } elseif (!$payment_data['result']) {
             if (isset($payment_data['response']) && $payment_data['response']) {
-                $payplug->setPaymentErrorsCookie([$payment_data['response']]);
+                $this->paymentClass->setPaymentErrorsCookie([$payment_data['response']]);
             }
             Tools::redirect($error_url);
         } elseif (!$payment_data_16['result']) {
             if (isset($payment_data_16['response']) && $payment_data_16['response']) {
-                $payplug->setPaymentErrorsCookie([$payment_data_16['response']]);
+                $this->paymentClass->setPaymentErrorsCookie([$payment_data_16['response']]);
             }
             Tools::redirect($error_url);
         }

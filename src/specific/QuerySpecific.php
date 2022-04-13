@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\QueryInterface;
+use PayPlugModule\src\interfaces\QueryInterface;
 use Db;
 
 class QuerySpecific implements QueryInterface
@@ -77,5 +77,10 @@ class QuerySpecific implements QueryInterface
     public function getValue($id)
     {
         return $this->db->getValue($id);
+    }
+
+    public function escape($string, $htmlOK = false)
+    {
+        return $this->db->escape($string, $htmlOK);
     }
 }

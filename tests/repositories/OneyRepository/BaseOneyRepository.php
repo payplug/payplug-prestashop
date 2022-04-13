@@ -22,13 +22,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\OneyRepository;
+namespace PayPlugModule\tests\repositories\OneyRepository;
 
-use PayPlug\classes\AmountCurrencyClass;
-use PayPlug\src\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\RepositoryBase;
+use PayPlugModule\classes\AmountCurrencyClass;
+use PayPlugModule\src\entities\OneyEntity;
+use PayPlugModule\src\repositories\OneyRepository;
+use PayPlugModule\tests\mock\MockHelper;
+use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BaseOneyRepository extends RepositoryBase
 {
@@ -36,7 +36,6 @@ class BaseOneyRepository extends RepositoryBase
 
     protected $arrayCache;
     protected $arrayLogger;
-    protected $amountCurrencyClass;
 
     public function setUp()
     {
@@ -46,22 +45,21 @@ class BaseOneyRepository extends RepositoryBase
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->repo = \Mockery::mock(OneyRepository::class, [
-            $this->cache,
-            $this->logger,
             $this->address,
-            $this->cart,
+            $this->assign,
+            $this->cache,
             $this->carrier,
+            $this->cart,
             $this->config,
             $this->context,
             $this->country,
             $this->currency,
-            $this->tools,
-            $this->validate,
-            $this->oney,
+            $this->dependencies,
+            $this->logger,
             $this->myLogPhp,
-            $this->payplug,
-            $this->assign,
-            $this->amountCurrencyClass
+            $this->oney,
+            $this->tools,
+            $this->validate
         ])->makePartial();
 
         $this->arrayCache = [];

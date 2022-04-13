@@ -22,11 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\OneyRepository;
+namespace PayPlugModule\tests\repositories\OneyRepository;
 
-use PayPlug\tests\mock\CartMock;
-use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\ContextMock;
+use PayPlugModule\tests\mock\CartMock;
+use PayPlugModule\tests\mock\CarrierMock;
+use PayPlugModule\tests\mock\ContextMock;
 
 /**
  * @group unit
@@ -55,7 +55,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             ->with('PS_SHOP_NAME')
             ->andReturn('Payplug');
 
-        $this->payplug
+        $this->dependencies
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
                 if ($cent) {

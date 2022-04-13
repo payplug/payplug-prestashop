@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\src\specific\OrderStateSpecific;
+use PayPlugModule\src\specific\OrderStateSpecific;
 
 class OrderStateRepository extends Repository
 {
@@ -32,6 +32,9 @@ class OrderStateRepository extends Repository
 
     /** @var object */
     private $configuration;
+
+    /** @var object */
+    private $dependencies;
 
     /** @var object */
     private $language;
@@ -51,6 +54,7 @@ class OrderStateRepository extends Repository
     public function __construct(
         $configuration,
         $constant,
+        $dependencies,
         $language,
         $order_state_specific,
         $query,
@@ -60,6 +64,7 @@ class OrderStateRepository extends Repository
     ) {
         $this->configuration = $configuration;
         $this->constant = $constant;
+        $this->dependencies = $dependencies;
         $this->language = $language;
         $this->order_state_specific = $order_state_specific;
         $this->query = $query;
@@ -179,7 +184,7 @@ class OrderStateRepository extends Repository
         }
         $this->query
             ->delete()
-            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
             ->where('id_order_state = ' . (int)$id_order_state)
             -> build();
 
@@ -230,7 +235,9 @@ class OrderStateRepository extends Repository
             return false;
         }
 
-        return 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $name) . ($sandbox ? '_TEST' : '');
+        return $this->dependencies->concatenateModuleNameTo('ORDER_STATE_')
+                    . $this->tools->tool('strtoupper', $name)
+                    . ($sandbox ? '_TEST' : '');
     }
 
     public function getIdByDefinition($definition)
@@ -343,7 +350,7 @@ class OrderStateRepository extends Repository
             ->select()
             ->fields('DISTINCT `id_order_state`')
             ->from($this->constant->get('_DB_PREFIX_') . 'order_state_lang')
-            ->where('template = \'' . $template . '\'')
+            ->where('template = "' . $this->query->escape($template) . '"')
             ->limit(1, 1);
 
         return $this->query->build('unique_value');
@@ -354,7 +361,7 @@ class OrderStateRepository extends Repository
         $type = $this->query
             ->select()
             ->fields('type')
-            ->from(_DB_PREFIX_ . 'payplug_order_state')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
             ->where('id_order_state = ' . (int)$id_order_state)
             ->build('unique_value');
 
@@ -418,7 +425,7 @@ class OrderStateRepository extends Repository
         $date = date('Y-m-d');
         $this->query
             ->insert()
-            ->into(_DB_PREFIX_ . 'payplug_order_state')
+            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
             ->fields('id_order_state')->values(pSQL($id_order_state))
             ->fields('type')->values(pSQL($type))
             ->fields('date_add')->values($date)
@@ -432,9 +439,9 @@ class OrderStateRepository extends Repository
         $date = date('Y-m-d');
         $this->query
             ->update()
-            ->table(_DB_PREFIX_ . 'payplug_order_state')
-            ->set('type = \'' . $type . '\'')
-            ->set('date_upd = \'' . $date . '\'')
+            ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+            ->set('type = \'' . $this->query->escape($type) . '\'')
+            ->set('date_upd = \'' . $this->query->escape($date) . '\'')
             ->where('id_order_state = ' . (int)$id_order_state);
 
         return $this->query->build();

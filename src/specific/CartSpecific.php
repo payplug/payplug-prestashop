@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\CartInterface;
+use PayPlugModule\src\interfaces\CartInterface;
 use Cart;
 
 class CartSpecific implements CartInterface
@@ -63,5 +63,13 @@ class CartSpecific implements CartInterface
             return false;
         }
         return $cart->nbProducts();
+    }
+
+    public function isGuestCartByCartId($idCart = false)
+    {
+        if (!is_int($idCart)) {
+            return false;
+        }
+        return Cart::isGuestCartByCartId($idCart);
     }
 }

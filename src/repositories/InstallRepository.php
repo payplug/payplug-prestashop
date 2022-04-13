@@ -21,9 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\classes\ConfigClass;
+use PayPlugModule\classes\ConfigClass;
+use Db;
 
 class InstallRepository extends Repository
 {
@@ -35,6 +36,12 @@ class InstallRepository extends Repository
 
     /** @var object */
     protected $context;
+
+    /** @var object */
+    protected $dependencies;
+
+    /** @var array */
+    public $errors;
 
     /** @var object */
     public $log;
@@ -60,13 +67,11 @@ class InstallRepository extends Repository
     /** @var object */
     protected $validate;
 
-    /** @var object */
-    protected $payplug;
-
     public function __construct(
         $config,
         $constant,
         $context,
+        $dependencies,
         $order_state,
         $order_state_entity,
         $order_state_specific,
@@ -74,12 +79,12 @@ class InstallRepository extends Repository
         $sql,
         $tools,
         $validate,
-        $payplug,
         $mylogphp
     ) {
         $this->config = $config;
         $this->constant = $constant;
         $this->context = $context;
+        $this->dependencies = $dependencies;
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
         $this->order_state_specific = $order_state_specific;
@@ -87,7 +92,6 @@ class InstallRepository extends Repository
         $this->sql = $sql;
         $this->tools = $tools;
         $this->validate = $validate;
-        $this->payplug = $payplug;
         $this->log = $mylogphp;
 
         $this->setParams();
@@ -102,7 +106,8 @@ class InstallRepository extends Repository
 
         foreach ($order_states_list as $key => $state) {
             // Check live OrderState
-            $key_config_live = 'PAYPLUG_ORDER_STATE_' . $this->tools->tool('strtoupper', $key);
+            $key_config_live = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_')
+                . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = (int)$this->config->get($key_config_live);
             $order_state_live = $this->order_state_specific->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
@@ -166,6 +171,47 @@ class InstallRepository extends Repository
                 $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
             }
         }
+        // mapping of the native prestashop statuses
+        $prestashop_order_states = [
+            'PS_OS_PAYMENT' => 'paid',
+            'PS_OS_WS_PAYMENT' => 'nothing',
+            'PS_OS_OUTOFSTOCK_PAID' => 'paid',
+            'PS_OS_CANCELED' => 'cancelled',
+            'PS_OS_REFUND' => 'refund',
+            'PS_OS_ERROR' => 'error',
+            'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
+            'PS_OS_CHEQUE' => 'nothing',
+            'PS_OS_BANKWIRE' => 'nothing',
+            'PS_OS_COD_VALIDATION' =>'nothing',
+            'PS_OS_PREPARATION' =>'nothing',
+            'PS_OS_SHIPPING' =>'nothing',
+            'PS_OS_DELIVERED'=>'nothing',
+        ];
+        $date = date('Y-m-d');
+        $queries = [];
+        foreach ($prestashop_order_states as $key => $type) {
+            $id_order_state = $this->config->get($key);
+            $getTypeQuery = ' 
+                SELECT `type` 
+                FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
+                WHERE  `id_order_state` = ' . $id_order_state;
+            $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
+            if ($sqlGetType  && $sqlGetType  != $type) {
+                $queries[] = 'UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
+                                 SET `type` = ' . "'$type'" . ' 
+                                 WHERE  `id_order_state` = ' . $id_order_state;
+            } else {
+                $queries[] = 'INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
+                                (`id_order_state`, `type`, `date_add`, `date_upd`)
+                                VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
+            }
+        }
+        if ($queries) {
+            foreach ($queries as $sql) {
+                Db::getInstance()->execute($sql);
+                unset($sql);
+            }
+        }
 
         return true;
     }
@@ -176,57 +222,12 @@ class InstallRepository extends Repository
      */
     private function deleteConfig()
     {
-        return ($this->config->deleteByName('PAYPLUG_ALLOW_SAVE_CARD')
-            && $this->config->deleteByName('PAYPLUG_BANCONTACT')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ID')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ID_TEST')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_STATUS')
-            && $this->config->deleteByName('PAYPLUG_COMPANY_ISO')
-            && $this->config->deleteByName('PAYPLUG_CONFIGURATION_OK')
-            && $this->config->deleteByName('PAYPLUG_CURRENCIES')
-            && $this->config->deleteByName('PAYPLUG_DEBUG_MODE')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED_AUTO')
-            && $this->config->deleteByName('PAYPLUG_DEFERRED_STATE')
-            && $this->config->deleteByName('PAYPLUG_EMAIL')
-            && $this->config->deleteByName('PAYPLUG_EMBEDDED_MODE')
-            && $this->config->deleteByName('PAYPLUG_INST')
-            && $this->config->deleteByName('PAYPLUG_INST_MIN_AMOUNT')
-            && $this->config->deleteByName('PAYPLUG_INST_MODE')
-            && $this->config->deleteByName('PAYPLUG_KEEP_CARDS')
-            && $this->config->deleteByName('PAYPLUG_LIVE_API_KEY')
-            && $this->config->deleteByName('PAYPLUG_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_OFFER')
-            && $this->config->deleteByName('PAYPLUG_ONE_CLICK')
-            && $this->config->deleteByName('PAYPLUG_ONEY')
-            && $this->config->deleteByName('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            && $this->config->deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS')
-            && $this->config->deleteByName('PAYPLUG_ONEY_FEES')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_AUTH_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_CANCELLED')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_CANCELLED_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ERROR_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_EXP_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_ONEY_PG_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PAID_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_PENDING_TEST')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND')
-            && $this->config->deleteByName('PAYPLUG_ORDER_STATE_REFUND_TEST')
-            && $this->config->deleteByName('PAYPLUG_SANDBOX_MODE')
-            && $this->config->deleteByName('PAYPLUG_SHOW')
-            && $this->config->deleteByName('PAYPLUG_STANDARD')
-            && $this->config->deleteByName('PAYPLUG_TEST_API_KEY')
-        );
+        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
+            $this->config->deleteByName(
+                $this->dependencies->getConfigurationKey($key)
+            );
+        };
+        return true;
     }
 
     /**
@@ -240,7 +241,7 @@ class InstallRepository extends Repository
         $this->log->info('Starting to install again.');
 
         // check requirement
-        $report = ConfigClass::checkRequirements();
+        $report = $this->dependencies->configClass->checkRequirements();
         if (!$report['php']['up2date']) {
             return $this->setInstallError('Install failed: PHP Requirement.');
         }
@@ -277,7 +278,7 @@ class InstallRepository extends Repository
         }
 
         // Install tab
-        if (!$this->payplug->PrestashopSpecificObject->installTab()) {
+        if (!$this->dependencies->loadSpecificPresta()->installTab()) {
             return $this->setInstallError('Install failed: Install Tab');
         }
 
@@ -291,39 +292,27 @@ class InstallRepository extends Repository
      */
     public function setConfig()
     {
-        return ($this->config->updateValue('PAYPLUG_ALLOW_SAVE_CARD', 0)
-            && $this->config->updateValue('PAYPLUG_BANCONTACT', null)
-            && $this->config->updateValue('PAYPLUG_COMPANY_ID', null)
-            && $this->config->updateValue('PAYPLUG_COMPANY_STATUS', '')
-            && $this->config->updateValue('PAYPLUG_COMPANY_ISO', '')
-            && $this->config->updateValue('PAYPLUG_CURRENCIES', 'EUR')
-            && $this->config->updateValue('PAYPLUG_DEBUG_MODE', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_AUTO', 0)
-            && $this->config->updateValue('PAYPLUG_DEFERRED_STATE', 0)
-            && $this->config->updateValue('PAYPLUG_EMAIL', null)
-            && $this->config->updateValue('PAYPLUG_EMBEDDED_MODE', 'redirected')
-            && $this->config->updateValue('PAYPLUG_INST', null)
-            && $this->config->updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
-            && $this->config->updateValue('PAYPLUG_INST_MODE', 3)
-            && $this->config->updateValue('PAYPLUG_KEEP_CARDS', 0)
-            && $this->config->updateValue('PAYPLUG_LIVE_API_KEY', null)
-            && $this->config->updateValue('PAYPLUG_MAX_AMOUNTS', 'EUR:1000000')
-            && $this->config->updateValue('PAYPLUG_MIN_AMOUNTS', 'EUR:1')
-            && $this->config->updateValue('PAYPLUG_OFFER', '')
-            && $this->config->updateValue('PAYPLUG_ONE_CLICK', null)
-            && $this->config->updateValue('PAYPLUG_ONEY', null)
-            && $this->config->updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
-            && $this->config->updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:300000')
-            && $this->config->updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:10000')
-            && $this->config->updateValue('PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS', 'EUR:3000')
-            && $this->config->updateValue('PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS', 'EUR:100')
-            && $this->config->updateValue('PAYPLUG_ONEY_FEES', 1)
-            && $this->config->updateValue('PAYPLUG_SANDBOX_MODE', 1)
-            && $this->config->updateValue('PAYPLUG_SHOW', 0)
-            && $this->config->updateValue('PAYPLUG_STANDARD', 1)
-            && $this->config->updateValue('PAYPLUG_TEST_API_KEY', null)
-        );
+        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
+            if ($this->dependencies->getConfigurationKeyOption($key, 'setConf')) {
+                if ($key == 'oney' && $this->dependencies->name == 'pspaylater') {
+                    $this->config->updateValue(
+                        $this->dependencies->getConfigurationKey($key),
+                        1
+                    );
+                } elseif ($key == 'oneyOptimized' && $this->dependencies->name == 'pspaylater') {
+                    $this->config->updateValue(
+                        $this->dependencies->getConfigurationKey($key),
+                        1
+                    );
+                } else {
+                    $this->config->updateValue(
+                        $this->dependencies->getConfigurationKey($key),
+                        $this->dependencies->getConfigurationKeyOption($key, 'defaultValue')
+                    );
+                }
+            }
+        };
+        return true;
     }
 
     /**
@@ -334,7 +323,7 @@ class InstallRepository extends Repository
     public function setInstallError($error = '')
     {
         $this->log->error($error);
-        $this->payplug->_errors[] = $this->tools->tool('displayError', $error);
+        $this->errors[] = $this->tools->tool('displayError', $error);
 
         $this->log->info('Install failed.');
         $this->log->info('Install error: ' . $error);
@@ -357,7 +346,7 @@ class InstallRepository extends Repository
                 'logable' => true,
                 'send_email' => true,
                 'paid' => true,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -376,7 +365,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => true,
@@ -395,7 +384,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -414,7 +403,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -433,7 +422,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => true,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -452,7 +441,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => true,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -471,7 +460,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -490,7 +479,7 @@ class InstallRepository extends Repository
                 'logable' => false,
                 'send_email' => false,
                 'paid' => false,
-                'module_name' => 'payplug',
+                'module_name' => $this->dependencies->name,
                 'hidden' => false,
                 'delivery' => false,
                 'invoice' => false,
@@ -529,7 +518,7 @@ class InstallRepository extends Repository
         if (!$keep_cards) {
             $this->log->info('Saved cards will be deleted.');
 
-            if (!$this->payplug->uninstallCards()) {
+            if (!$this->dependencies->cardClass->uninstallCards()) {
                 return $this->setUninstallError('Unable to delete saved cards.');
             }
 
@@ -546,7 +535,7 @@ class InstallRepository extends Repository
             return $this->setUninstallError('Uninstall failed: sql.');
         }
 
-        if (!$this->payplug->PrestashopSpecificObject->uninstallTab()) {
+        if (!$this->dependencies->loadSpecificPresta()->uninstallTab()) {
             return $this->setUninstallError('Uninstall failed: tab.');
         }
 

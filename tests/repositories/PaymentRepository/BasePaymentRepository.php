@@ -22,14 +22,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\PaymentRepository;
+namespace PayPlugModule\tests\repositories\PaymentRepository;
 
 use Mockery;
 use Payplug\Payment;
-use PayPlug\src\entities\PaymentEntity;
-use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\tests\mock\MockHelper;
-use PayPlug\tests\repositories\RepositoryBase;
+use PayPlugModule\src\entities\PaymentEntity;
+use PayPlugModule\src\repositories\PaymentRepository;
+use PayPlugModule\tests\mock\MockHelper;
+use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BasePaymentRepository extends RepositoryBase
 {
@@ -48,9 +48,9 @@ class BasePaymentRepository extends RepositoryBase
         ]);
 
         $this->repo = \Mockery::mock(PaymentRepository::class, [
-            $this->payplug,
             $this->cart,
             $this->config,
+            $this->dependencies,
             $this->logger,
             $this->payment,
             $this->query,
@@ -62,9 +62,12 @@ class BasePaymentRepository extends RepositoryBase
 
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
 
-        $this->payplug
+        $this->dependencies->paymentClass
             ->shouldReceive('setPaymentErrorsCookie')
             ->andReturn(true);
+
+        $this->dependencies
+            ->shouldReceive('l');
 
         $this->constant
             ->shouldReceive('get')

@@ -21,10 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlugModule\src\interfaces;
 
 interface CountryInterface
 {
+    public function get($idCountry);
     public function getByIso($idCurrency);
     public function getCountry($idCountry);
     public function getNameById($param1, $param2);

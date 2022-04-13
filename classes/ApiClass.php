@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Authentication;
 use Configuration;
@@ -29,38 +29,40 @@ use Payplug\Core\HttpClient;
 use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
-use PayPlug\src\exceptions\BadParameterException;
-use PayPlug\src\repositories\PluginRepository;
+use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlugModule\src\repositories\PluginRepository;
 use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 
 class ApiClass
 {
-    /** var Plugin */
-    public $plugin;
-
-    /** var PayPlugClass */
-    public $payplug;
+    /** @var string */
+    private $api_url;
 
     /** @var string */
     public $current_api_key;
+
+    /** var DependenciesClass */
+    public $dependencies;
+
+    /** @var string */
+    private $portal_url;
 
     /**
      * @var mixed
      */
     private $site_url;
 
-    /** @var string */
-    private $api_url;
+    private $tools;
 
-    public function __construct($payplug)
+    public function __construct($dependencies)
     {
-        $this->payplug = $payplug;
-        $this->plugin = $payplug->getPlugin();
+        $this->dependencies = $dependencies;
         $this->checkEnvironment();
         $this->setEnvironment();
-        self::setSecretKey();
-        $this->current_api_key =  self::getCurrentApiKey();
+        $this->setSecretKey();
+        $this->current_api_key = $this->getCurrentApiKey();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->setUserAgent();
     }
@@ -72,7 +74,11 @@ class ApiClass
     {
         if (isset($_SERVER['SERVER_NAME'])
             && $_SERVER['SERVER_NAME'] == "localhost"
-            || preg_match("/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i", $_SERVER['SERVER_NAME'])) {
+            || preg_match(
+                "/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io)/i",
+                $_SERVER['SERVER_NAME']
+            )
+        ) {
             $dotenv = new Dotenv();
             $dotenvFile = dirname(dirname(dirname(__FILE__))) . "/payplugroutes/.env";
             if (file_exists($dotenvFile)) {
@@ -91,12 +97,12 @@ class ApiClass
      * @return bool
      * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
      */
-    public static function getAccountPermissions($api_key = null)
+    public function getAccountPermissions($api_key = null)
     {
         if ($api_key == null) {
-            $api_key = self::setAPIKey();
+            $api_key = $this->setAPIKey();
         }
-        return self::getAccount($api_key, false);
+        return $this->getAccount($api_key, false);
     }
 
     /**
@@ -107,31 +113,146 @@ class ApiClass
      * @return array | bool
      * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
      */
-    public static function getAccount($api_key, $sandbox = true)
+    public function getAccount($api_key, $sandbox = true)
     {
-        self::setSecretKey($api_key);
+        $this->setSecretKey($api_key);
         $response = \Payplug\Authentication::getAccount();
         $json_answer = $response['httpResponse'];
-        if ($permissions = self::treatAccountResponse($json_answer, $sandbox)) {
+        if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
         } else {
             return false;
         }
     }
+
     /**
-     * @description get publishable keys from payplug/payplug-php
+     * @description set publishable keys from payplug/payplug-php
      * @throws Payplug\Exception\ConfigurationNotSetException
      * @throws ConfigurationException
      */
-    public function getPublishableKeys()
+    public function setPublishableKeys()
     {
-        if ($this->current_api_key != null && $this->payplug->isValidFeature('feature_integrated')) {
-            if ($response = \Payplug\Authentication::getPublishableKeys()) {
-                return $response['httpResponse']['publishable_key'];
-            }
+        if (!isset($this->current_api_key)) {
+            return [
+                'result' => false,
+                ];
         }
-    }
+        $sandbox = Configuration::get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
+        $flag = true;
 
+        // Set the publishable for the given sandbox configuration
+        try {
+            $response = \Payplug\Authentication::getPublishableKeys();
+            $publishable_key = isset($response['httpResponse']['publishable_key'])
+            && $response['httpResponse']['publishable_key']
+                ? $response['httpResponse']['publishable_key']
+                : null;
+
+            if (!$publishable_key) {
+                Configuration::deleteByName(
+                    $this->dependencies->getConfigurationKey('publishableKey')
+                );
+                Configuration::deleteByName(
+                    $this->dependencies->getConfigurationKey('publishableKeyTest')
+                );
+                Configuration::updateValue(
+                    $this->dependencies->getConfigurationKey('embeddedMode'),
+                    'redirected'
+                );
+                return [
+                    'result' => false,
+                    'error' => [
+                        'name' => 'EMPTY_PUBLISHABLE_KEY',
+                        'message' => ''
+                    ]
+                ];
+            }
+
+            $flag = $flag
+                && Configuration::updateValue(
+                    $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : ''),
+                    $publishable_key
+                );
+        } catch (BadRequestException $e) {
+            return [
+                'result' => $flag,
+                'error' => [
+                    'name' => 'BAD_REQUEST_EXCEPTION',
+                    'message' => $e->getMessage()
+                ]
+            ];
+        }
+
+        if ($sandbox) {
+            $this->setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApikey')
+            ));
+        } else {
+            $this->setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('testApikey')
+            ));
+        }
+
+        // Set the publishable for the other sandbox configuration
+        try {
+            $response = \Payplug\Authentication::getPublishableKeys();
+            $publishable_key = isset($response['httpResponse']['publishable_key'])
+                && $response['httpResponse']['publishable_key']
+                    ? $response['httpResponse']['publishable_key']
+                    : null;
+
+            if (!$publishable_key) {
+                Configuration::deleteByName(
+                    $this->dependencies->getConfigurationKey('publishableKey')
+                );
+                Configuration::deleteByName(
+                    $this->dependencies->getConfigurationKey('publishableKeyTest')
+                );
+                Configuration::updateValue(
+                    $this->dependencies->getConfigurationKey('embeddedMode'),
+                    'redirected'
+                );
+                return [
+                    'result' => false,
+                    'error' => [
+                        'name' => 'EMPTY_PUBLISHABLE_KEY',
+                        'message' => ''
+                    ]
+                ];
+            }
+
+            $flag = $flag
+                && Configuration::updateValue(
+                    $this->dependencies->getConfigurationKey('publishableKey') . (!$sandbox ? '_TEST' : ''),
+                    $publishable_key
+                );
+        } catch (BadRequestException $e) {
+            return [
+                'result' => $flag,
+                'error' => [
+                    'name' => 'BAD_REQUEST_EXCEPTION',
+                    'message' => $e->getMessage()
+                ]
+            ];
+        }
+
+        if (!$sandbox) {
+            $this->setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApikey')
+            ));
+        } else {
+            $this->setSecretKey(Configuration::get(
+                $this->dependencies->getConfigurationKey('testApikey')
+            ));
+        }
+
+        return [
+            'result' => $flag,
+            'error' => []
+        ];
+    }
 
     /**
      * @description Read API response and return permissions
@@ -140,7 +261,7 @@ class ApiClass
      * @param bool $is_sandbox
      * @return array OR bool
      */
-    private static function treatAccountResponse($json_answer, $is_sandbox = true)
+    private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
         if ((isset($json_answer['object']) && $json_answer['object'] == 'error')
             || empty($json_answer)
@@ -151,12 +272,24 @@ class ApiClass
         $id = $json_answer['id'];
 
         $configuration = [
-            'currencies' => Configuration::get('PAYPLUG_CURRENCIES'),
-            'min_amounts' => Configuration::get('PAYPLUG_MIN_AMOUNTS'),
-            'max_amounts' => Configuration::get('PAYPLUG_MAX_AMOUNTS'),
-            'oney_allowed_countries' => Configuration::get('PAYPLUG_ONEY_ALLOWED_COUNTRIES'),
-            'oney_max_amounts' => Configuration::get('PAYPLUG_ONEY_MAX_AMOUNTS'),
-            'oney_min_amounts' => Configuration::get('PAYPLUG_ONEY_MIN_AMOUNTS'),
+            'currencies' => Configuration::get(
+                $this->dependencies->getConfigurationKey('currencies')
+            ),
+            'min_amounts' => Configuration::get(
+                $this->dependencies->getConfigurationKey('minAmounts')
+            ),
+            'max_amounts' => Configuration::get(
+                $this->dependencies->getConfigurationKey('maxAmounts')
+            ),
+            'oney_allowed_countries' => Configuration::get(
+                $this->dependencies->getConfigurationKey('oneyAllowedCountries')
+            ),
+            'oney_max_amounts' => Configuration::get(
+                $this->dependencies->getConfigurationKey('oneyMaxAmounts')
+            ),
+            'oney_min_amounts' => Configuration::get(
+                $this->dependencies->getConfigurationKey('oneyMinAmounts')
+            ),
         ];
 
         if (isset($json_answer['configuration'])) {
@@ -226,6 +359,25 @@ class ApiClass
             $can_use_bancontact = true;
         }
 
+        $onboardingOneyCompleted = false;
+        if (isset($json_answer['payment_methods']) && !empty(
+            Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
+            )
+        )) {
+            $oney_methods = [];
+            foreach ($json_answer['payment_methods'] as $key => $val) {
+                if ($this->tools->substr($key, 0, 5) == 'oney_') {
+                    $oney_methods[] = $val["enabled"];
+                }
+            }
+            foreach ($oney_methods as $value) {
+                if ($value == 'true') {
+                    $onboardingOneyCompleted = true;
+                }
+            }
+        }
+
         $permissions = [
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
@@ -233,6 +385,7 @@ class ApiClass
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_use_bancontact' => $can_use_bancontact,
+            'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ];
 
         // If sandbox mode active, no allowed countries sent
@@ -244,14 +397,38 @@ class ApiClass
         // Get company country
         $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
 
-        Configuration::updateValue('PAYPLUG_COMPANY_ID' . ($is_sandbox ? '_TEST' : ''), $id);
-        Configuration::updateValue('PAYPLUG_COMPANY_ISO', $company_iso);
-        Configuration::updateValue('PAYPLUG_CURRENCIES', implode(';', $configuration['currencies']));
-        Configuration::updateValue('PAYPLUG_MIN_AMOUNTS', $configuration['min_amounts']);
-        Configuration::updateValue('PAYPLUG_MAX_AMOUNTS', $configuration['max_amounts']);
-        Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', $configuration['oney_allowed_countries']);
-        Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', $configuration['oney_max_amounts']);
-        Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', $configuration['oney_min_amounts']);
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : ''),
+            $id
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('companyIso'),
+            $company_iso
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('currencies'),
+            implode(';', $configuration['currencies'])
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('minAmounts'),
+            $configuration['min_amounts']
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('maxAmounts'),
+            $configuration['max_amounts']
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('oneyAllowedCountries'),
+            $configuration['oney_allowed_countries']
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('oneyMaxAmounts'),
+            $configuration['oney_max_amounts']
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('oneyMinAmounts'),
+            $configuration['oney_min_amounts']
+        );
 
         return $permissions;
     }
@@ -259,12 +436,18 @@ class ApiClass
     /**
      * @return string
      */
-    public static function getCurrentApiKey()
+    public function getCurrentApiKey()
     {
-        if ((int)Configuration::get('PAYPLUG_SANDBOX_MODE') === 1) {
-            return Configuration::get('PAYPLUG_TEST_API_KEY');
+        if ((int)Configuration::get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        ) === 1) {
+            return Configuration::get(
+                $this->dependencies->getConfigurationKey('testApiKey')
+            );
         } else {
-            return Configuration::get('PAYPLUG_LIVE_API_KEY');
+            return Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
+            );
         }
     }
 
@@ -273,14 +456,20 @@ class ApiClass
      *
      * @return string
      */
-    public static function setAPIKey()
+    public function setAPIKey()
     {
-        $sandbox_mode = (int)Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $sandbox_mode = (int)Configuration::get(
+            $this->dependencies->getConfigurationKey('sandboxMode')
+        );
         $valid_key = null;
         if ($sandbox_mode) {
-            $valid_key = Configuration::get('PAYPLUG_TEST_API_KEY');
+            $valid_key = Configuration::get(
+                $this->dependencies->getConfigurationKey('testApiKey')
+            );
         } else {
-            $valid_key = Configuration::get('PAYPLUG_LIVE_API_KEY');
+            $valid_key = Configuration::get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
+            );
         }
 
         return $valid_key;
@@ -311,14 +500,20 @@ class ApiClass
                 $api_keys['live_key'] = $json_answer['secret_keys']['live'];
             }
         }
-        Configuration::updateValue('PAYPLUG_TEST_API_KEY', $api_keys['test_key']);
-        Configuration::updateValue('PAYPLUG_LIVE_API_KEY', $api_keys['live_key']);
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('testApiKey'),
+            $api_keys['test_key']
+        );
+        Configuration::updateValue(
+            $this->dependencies->getConfigurationKey('liveApiKey'),
+            $api_keys['live_key']
+        );
 
-        $is_sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $is_sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
         if ($is_sandbox) {
-            self::setSecretKey($api_keys['test_key']);
+            $this->setSecretKey($api_keys['test_key']);
         } else {
-            self::setSecretKey($api_keys['live_key']);
+            $this->setSecretKey($api_keys['live_key']);
         }
 
         return true;
@@ -342,6 +537,12 @@ class ApiClass
         } else {
             $this->site_url = 'https://www.payplug.com';
         }
+
+        if (isset($_SERVER['PAYPLUG_PORTAL_URL'])) {
+            $this->portal_url = $_SERVER['PAYPLUG_PORTAL_URL'];
+        } else {
+            $this->portal_url = 'https://portal.payplug.com';
+        }
     }
 
     /**
@@ -358,6 +559,7 @@ class ApiClass
         $this->api_url = $api_url;
         return $this;
     }
+
     /**
      * @description Set the current secret key used to interact with PayPlug API
      *
@@ -365,10 +567,10 @@ class ApiClass
      * @return Payplug\Payplug
      * @throws ConfigurationException
      */
-    public static function setSecretKey($token = false)
+    public function setSecretKey($token = false)
     {
-        if (!$token && self::getCurrentApiKey() != null) {
-            $token = self::getCurrentApiKey();
+        if (!$token && $this->getCurrentApiKey() != null) {
+            $token = $this->getCurrentApiKey();
         }
 
         if (!$token) {
@@ -390,8 +592,8 @@ class ApiClass
     {
         if ($this->current_api_key != null) {
             HttpClient::setDefaultUserAgentProduct(
-                'PayPlug-Prestashop',
-                $this->payplug->version,
+                $this->dependencies->name .'-Prestashop',
+                $this->dependencies->version,
                 'Prestashop/' . _PS_VERSION_
             );
         }
@@ -399,16 +601,17 @@ class ApiClass
 
     public function initializeApi($sandbox = null)
     {
-        if ($sandbox === null) {
+        if ($sandbox === null && $this->current_api_key) {
             $payplug_key = $this->current_api_key;
         } else {
-            $payplug_key = Configuration::get('PAYPLUG_' . ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY');
+            $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
+            $payplug_key = Configuration::get($this->dependencies->concatenateModuleNameTo($configuration_key));
         }
 
         try {
             \Payplug\Payplug::init([
                 'secretKey' => $payplug_key,
-                'apiVersion' => $this->plugin->getApiVersion()
+                'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
             ]);
 
             return $payplug_key;
@@ -440,7 +643,10 @@ class ApiClass
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->payplug->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
+            $errors[$error_key] = $this->dependencies->l(
+                'payplug.catchErrorsFromApi.transactionNotCompleted',
+                'apiclass'
+            );
             return $errors;
         }
 
@@ -453,7 +659,7 @@ class ApiClass
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
                         $errors[$error_key] =
-                            $this->payplug->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
+                            $this->dependencies->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
                     }
             }
         }
@@ -464,9 +670,11 @@ class ApiClass
     /**
      * @return bool
      */
-    public static function hasLiveKey()
+    public function hasLiveKey()
     {
-        return (bool)Configuration::get('PAYPLUG_LIVE_API_KEY');
+        return (bool)Configuration::get(
+            $this->dependencies->getConfigurationKey('liveApiKey')
+        );
     }
 
     /**
@@ -481,10 +689,20 @@ class ApiClass
     {
         try {
             $response = \Payplug\Authentication::getKeysByLogin($email, $password);
-
             $json_answer = $response['httpResponse'];
+
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                return true;
+                if ($this->dependencies->configClass->isValidFeature('feature_integrated') && (version_compare(
+                    _PS_VERSION_,
+                    '1.7',
+                    '>='
+                ))) {
+                    if ($this->setPublishableKeys()) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
             } else {
                 return false;
             }
@@ -508,5 +726,10 @@ class ApiClass
     public function getSiteUrl()
     {
         return $this->site_url;
+    }
+
+    public function getPortalUrl()
+    {
+        return $this->portal_url;
     }
 }

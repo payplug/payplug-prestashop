@@ -19,8 +19,8 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payment_module payplugPayment oneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
-    <button href="javascript:void(0);" class="oneyPayment_trigger">
+<div class="payment_module {$module_name|escape:'htmlall':'UTF-8'}Payment {$module_name|escape:'htmlall':'UTF-8'}OneyPayment{if !$payplug_oney_allowed} -disabled{/if}">
+    <button href="javascript:void(0);" class="{$module_name|escape:'htmlall':'UTF-8'}OneyPayment_trigger">
         {if isset($oney_image['optimized'])}
             {assign var=oney_logo value=$oney_image['optimized']}
         {else}
@@ -28,15 +28,15 @@
         {/if}
         <img src="{$oney_logo|escape:'htmlall':'UTF-8'}"
                      alt="{if isset($use_fees) && !$use_fees}{l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}{else}{l s='hook.oney.payment.paywithoney' mod='payplug'}{/if}"
-                    class="oneyLogo -optimized-16 {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
-        <span class="oneyPayment_label">
+                    class="{$module_name|escape:'htmlall':'UTF-8'}OneyLogo -optimized-16 {$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}"/>
+        <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyPayment_label">
             {if isset($use_fees) && !$use_fees}
                 {l s='hook.oney.payment.paywithoneywithoutfees' mod='payplug'}
             {else}
                 {l s='hook.oney.payment.paywithoney' mod='payplug'}
             {/if}
 
-            {if $payplug_oney_error}<span class="oneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
+            {if $payplug_oney_error}<span class="{$module_name|escape:'htmlall':'UTF-8'}OneyPayment_error">{$payplug_oney_error|escape:'htmlall':'UTF-8'}</span>{/if}
         </span>
     </button>
     {if $payplug_oney_allowed}

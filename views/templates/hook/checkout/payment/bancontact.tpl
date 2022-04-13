@@ -21,11 +21,11 @@
 *}
 <div class="row">
     <div class="col-xs-12">
-        <p class="payment_module payplugPayment">
+        <p class="payment_module {$module_name|escape:'htmlall':'UTF-8'}Payment">
             <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" class="{$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}" data-e2e-type="payment" data-e2e-method="bancontact">
                 <img class="payment_option_bancontact_payment_logo" src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}" />{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
             </a>
         </p>
-        <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
+        <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>

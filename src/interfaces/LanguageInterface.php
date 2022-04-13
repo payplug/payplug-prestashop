@@ -21,9 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlugModule\src\interfaces;
 
 interface LanguageInterface
 {
+    public function get($idLanguage);
     public function getLanguages($active);
 }

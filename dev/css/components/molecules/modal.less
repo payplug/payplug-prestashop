@@ -1,0 +1,78 @@
+.modal {
+  &Confirmation,
+  &Error {
+    ._body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      p {
+        margin: 0 0 24px;
+      }
+    }
+  }
+
+  &Checkonboarding {
+    .sandboxBody {
+      padding: 16px 0 0;
+
+      .payplugUI {
+        &Paragraph {
+          margin: 0 0 24px;
+
+          a {
+            &:link,
+            &:hover,
+            &:visited,
+            &:active {
+              color: #colorMap[fontSecondaryDefault];
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      &.-center {
+        padding: 16px 0;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+
+        .sandboxFooter {
+          .payplugUIButton {
+            max-width: 100%;
+          }
+        }
+      }
+    }
+    .sandboxFooter {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      padding: 16px 0 0;
+      margin: 0;
+
+      .payplugUIButton {
+        width: 150px;
+        max-width: calc(50% - 8px);
+      }
+    }
+
+    .sandboxError {
+      display: block;
+      color: #colorMap[error];
+      font-size: 12px;
+      margin: -20px 0 -2px;
+      line-height: 18px;
+
+      svg {
+        .transition(~"fill @{dur}");
+        fill: #colorMap[error];
+        vertical-align: middle;
+        max-height: 100%;
+      }
+    }
+  }
+}

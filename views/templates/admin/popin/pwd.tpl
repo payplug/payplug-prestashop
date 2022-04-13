@@ -22,8 +22,8 @@
 
 <p>{l s='Please enter your Payplug account password' mod='payplug'}</p>
 <input type="password" name="reload_password"/>
-<p class="payplugPopup_error"></p>
-<div class="payplugPopup_footer">
-    <button type="button" class="payplugButton -close">{l s='Cancel' mod='payplug'}</button>
-    <button type="button" class="payplugButton -green" name="password">{l s='Ok' mod='payplug'}</button>
+<p class="{$module_name|escape:'htmlall':'UTF-8'}Popup_error"></p>
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_footer">
+    <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -close">{l s='Cancel' mod='payplug'}</button>
+    <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" name="password">{l s='Ok' mod='payplug'}</button>
 </div>

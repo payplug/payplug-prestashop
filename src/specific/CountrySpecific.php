@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
-use PayPlug\src\interfaces\CountryInterface;
+use PayPlugModule\src\interfaces\CountryInterface;
 use Country;
 
 class CountrySpecific implements CountryInterface
@@ -31,6 +31,14 @@ class CountrySpecific implements CountryInterface
     public static function factory()
     {
         return new self();
+    }
+
+    public function get($idCountry = false)
+    {
+        if (!is_int($idCountry)) {
+            $idCountry = false;
+        }
+        return new Country($idCountry);
     }
 
     public function getByIso($idCurrency)

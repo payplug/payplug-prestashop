@@ -21,17 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
-class MediaClass extends \Payplug
+use Media;
+
+class MediaClass
 {
-    protected $context;
-    private $payplug;
+    private $dependencies;
+    private $context;
 
-    public function __construct($payplug)
+    public function __construct($dependencies)
     {
-        $this->payplug = $payplug;
-        $this->context = \Context::getContext();
+        $this->dependencies = $dependencies;
+
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
     }
 
     /**
@@ -85,7 +88,7 @@ class MediaClass extends \Payplug
             'with_yes_no_buttons' => $with_yes_no_buttons
         ]);
 
-        return $this->payplug->fetchTemplate('_partials/messages.tpl');
+        return $this->dependencies->configClass->fetchTemplate('_partials/messages.tpl');
     }
 
     /**
@@ -112,8 +115,12 @@ class MediaClass extends \Payplug
                 'one_click' => $args['standard'] && $args['one_click'],
                 'oney' => $args['oney'],
                 'bancontact' => $args['bancontact'],
-                'feature_bancontact' => $this->payplug->isValidFeature('feature_bancontact'),
-                'feature_integrated' => $this->payplug->isValidFeature('feature_integrated'),
+                'bancontact_feature' => $this->dependencies->configClass->isValidFeature('feature_bancontact'),
+                'integrated_feature' => $this->dependencies->configClass->isValidFeature('feature_integrated'),
+                'display_mode_feature' => $this->dependencies->configClass->isValidFeature('feature_display_mode'),
+                'standard_feature' => $this->dependencies->configClass->isValidFeature('feature_standard'),
+                'installment_feature' => $this->dependencies->configClass->isValidFeature('feature_installment'),
+                'deferred_feature' => $this->dependencies->configClass->isValidFeature('feature_deferred'),
                 'installment' => $args['installment'],
                 'deferred' => $args['deferred'],
                 'activate' => $args['activate'],
@@ -128,12 +135,12 @@ class MediaClass extends \Payplug
         switch ($type) {
             case 'pwd':
             case 'activate':
-                $title = $this->payplug->l('payplug.displayPopin.liveMode', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.liveMode', 'mediaclass');
                 break;
             case 'premium':
             case 'oneyPremium':
             case 'bancontactPremium':
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.enableFeature', 'mediaclass');
 
                 if ($type == 'oneyPremium') {
                     $link = 'https://portal.payplug.com/#/configuration/oney';
@@ -151,29 +158,28 @@ class MediaClass extends \Payplug
                 ]);
 
                 $type = 'premium';
-                $title = $this->payplug->l('payplug.displayPopin.enableFeature', 'mediaclass');
                 break;
             case 'confirm':
-                $title = $this->payplug->l('payplug.displayPopin.saveSettings', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.saveSettings', 'mediaclass');
                 break;
             case 'deactivate':
-                $title = $this->payplug->l('payplug.displayPopin.deactivate', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.deactivate', 'mediaclass');
                 break;
             case 'refund':
-                $title = $this->payplug->l('payplug.displayPopin.refund', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.refund', 'mediaclass');
                 break;
             case 'abort':
-                $title = $this->payplug->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
                 break;
             case 'deferred':
-                $title = $this->payplug->l('payplug.displayPopin.deferred', 'mediaclass');
+                $title = $this->dependencies->l('payplug.displayPopin.deferred', 'mediaclass');
                 break;
             default:
                 $title = '';
                 break;
         }
 
-        foreach ($this->payplug->features_json->features as $key => $value) {
+        foreach ($this->dependencies->configClass->features_json->features as $key => $value) {
             $this->context->smarty->assign([
                 $value => $value
             ]);
@@ -183,10 +189,11 @@ class MediaClass extends \Payplug
             'title' => $title,
             'type' => $type,
             'admin_ajax_url' => $admin_ajax_url,
-            'site_url' => $this->payplug->apiClass->getSiteUrl(),
+            'site_url' => $this->dependencies->apiClass->getSiteUrl(),
+            'portal_url' => $this->dependencies->apiClass->getPortalUrl(),
             'inst_id' => $inst_id,
         ]);
-        $this->html = $this->payplug->fetchTemplate('/views/templates/admin/popin.tpl');
+        $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
 
         die(json_encode(['content' => $this->html]));
     }
@@ -199,7 +206,7 @@ class MediaClass extends \Payplug
      */
     public function fetchTemplateRC($file)
     {
-        $output = $this->payplug->fetchTemplate($file);
+        $output = $this->dependencies->configClass->fetchTemplate($file);
         return $output;
     }
 
@@ -228,5 +235,14 @@ class MediaClass extends \Payplug
         }
 //        exit;
         return true;
+    }
+
+    public function getMediaPath($path = false)
+    {
+        if (!$path) {
+            return false;
+        }
+
+        return Media::getMediaPath($path);
     }
 }

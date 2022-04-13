@@ -20,38 +20,52 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<form class="payplugIntegratedPayment">
-    <div class="payplugIntegratedPayment_container -cardholder"></div>
-    <span class="payplugIntegratedPayment_error" id="errorCardHolder"></span>
+<form class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -cardHolder"></div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -cardHolder">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
 
-    <div class="payplugIntegratedPayment_container -scheme">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -scheme">
         <div>{l s='hook.integratedPayment.scheme' mod='payplug'}</div>
-        <div class="payplugIntegratedPayment_schemes">
-            <label class="payplugIntegratedPayment_scheme -visa">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_schemes">
+            <label class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_scheme -visa">
                 <input type="radio" name="schemeOptions" value="visa" />
                 <span></span>
             </label>
-            <label class="payplugIntegratedPayment_scheme -mastercard">
+            <label class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_scheme -mastercard">
                 <input type="radio" name="schemeOptions" value="mastercard" />
                 <span></span>
             </label>
-            <label class="payplugIntegratedPayment_scheme -cb">
+            <label class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_scheme -cb">
                 <input type="radio" name="schemeOptions" value="cb" />
                 <span></span>
             </label>
         </div>
     </div>
 
-    <div class="payplugIntegratedPayment_container -pan"></div>
-    <span class="payplugIntegratedPayment_error" id="errorCardPan"></span>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -pan"></div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -pan">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
 
-    <div class="payplugIntegratedPayment_container -exp"></div>
-    <div class="payplugIntegratedPayment_container -cvv"></div>
-    <span class="payplugIntegratedPayment_error -exp" id="errorCardExp"></span>
-    <span class="payplugIntegratedPayment_error -cvv" id="errorCardCvv"></span>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -exp"></div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -cvv"></div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -exp">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -cvv">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
+
 
     {if isset($is_one_click_activated) && $is_one_click_activated }
-        <div class="payplugIntegratedPayment_container -saveCard">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -saveCard">
             <label>
                 <input type="checkbox" name="savecard">
                 <span></span>
@@ -60,17 +74,30 @@
         </div>
     {/if}
 
-    <div class="payplugIntegratedPayment_error -payment"></div>
+    {if isset($is_deferred_activated) && $is_deferred_activated }
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -deferred">
+            {l s='hook.integratedPayment.deferred' mod='payplug'}
+        </div>
+    {/if}
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -fields">
+        {l s='hook.checkout.payment.integrated.fields.error' mod='payplug'}
+    </div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -payment">
+    </div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -api">
+        {l s='hook.header.integratedPayment.api.genericError' tags=['<br>'] mod='payplug'}
+    </div>
 </form>
 <script type="text/javascript">
     {literal}
-        var placeholderCardholder = '{/literal}{$placeholderCardholder|escape:'htmlall':'UTF-8'}{literal}';
-        var placeholderPan = '{/literal}{$placeholderPan|escape:'htmlall':'UTF-8'}{literal}';
-        var placeholderCvv = '{/literal}{$placeholderCvv|escape:'htmlall':'UTF-8'}{literal}';
-        var placeholderExp = '{/literal}{$placeholderExp|escape:'htmlall':'UTF-8'}{literal}';
+        var placeholderCardholder = '{/literal}{$placeholderCardholder|escape:'javascript':'UTF-8'}{literal}';
+        var placeholderPan = '{/literal}{$placeholderPan|escape:'javascript':'UTF-8'}{literal}';
+        var placeholderCvv = '{/literal}{$placeholderCvv|escape:'javascript':'UTF-8'}{literal}';
+        var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
         var loadIntegrated = function() {
             if (typeof payplug_utilities != 'undefined') {
-                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url|escape:'htmlall':'UTF-8'}{literal}', function() {
+                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
                     if(typeof payplugModule != 'undefined') {
                         payplugModule.integrated.init();
                     } else {

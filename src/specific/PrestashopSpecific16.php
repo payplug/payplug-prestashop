@@ -21,46 +21,53 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
 use Configuration;
 use Language;
 use Media;
+use PayPlugModule\classes\DependenciesClass;
 use Validate;
 use Tab;
 use Tools;
 
 class PrestashopSpecific16
 {
+    private $card;
+    private $config;
+    private $constant;
+    private $dependencies;
     private $oney;
-    private $payplug;
-    private $contextSpecific;
 
-    public function __construct($payplug)
+    public function __construct()
     {
-        $this->oney = $payplug->getPlugin()->getOney();
-        $this->payplug = $payplug;
-        $this->contextSpecific = (new ContextSpecific())->getContext();
+        $this->dependencies = new DependenciesClass();
+        $this->card = $this->dependencies->getPlugin()->getCard();
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
     }
 
 
     public function displayHeader()
     {
-        $this->payplug->mediaClass->addCSSRC(__PS_BASE_URI__ . 'modules/payplug/views/css/front_1_6.css');
-        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/front_1_6.js');
-        $this->payplug->mediaClass->addJsRC(__PS_BASE_URI__ . 'modules/payplug/views/js/utilities.js');
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addCSS($views_path . '/css/front_1_6-v'.$this->dependencies->version.'.css');
+        $this->context->controller->addJS($views_path . '/js/front_1_6-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
 
         Media::addJsDef([
-            'payplug_ajax_url' => $this->contextSpecific->link->getModuleLink('payplug', 'ajax', [], true),
+            'payplug_ajax_url' => $this->context->link->getModuleLink('payplug', 'ajax', [], true),
         ]);
-        $this->payplug->getPlugin()->getOney()->assignOneyJSVar();
+        $this->oney->assignOneyJSVar();
     }
 
     public function customerAccount()
     {
-        $payplug_icon_url = 'modules/payplug/views/img/logo26.png';
+        $payplug_icon_url = 'modules/' . $this->dependencies->name . '/views/img/logo26.png';
 
-        $this->contextSpecific->smarty->assign([
+        $this->context->smarty->assign([
             'payplug_icon_url' => $payplug_icon_url
         ]);
     }
@@ -71,10 +78,10 @@ class PrestashopSpecific16
         $payment_class = 'payplug';
         $optimized_class = '';
         $logo_class = 'paymentLogo';
-        $oneyOptimized = (bool)Configuration::get('PAYPLUG_ONEY_OPTIMIZED');
+        $oneyOptimized = (bool)$this->config->get('PAYPLUG_ONEY_OPTIMIZED');
         $error = false;
 
-        $current_lang = explode('-', $this->contextSpecific->language->language_code);
+        $current_lang = explode('-', $this->context->language->language_code);
         $current_lang = $current_lang[0];
         if (in_array($current_lang, ['it', 'en'], true)) {
             $img_lang = $current_lang;
@@ -82,7 +89,7 @@ class PrestashopSpecific16
             $img_lang = 'default';
         }
 
-        if (Configuration::get('PAYPLUG_ONEY')) {
+        if ($this->config->get('PAYPLUG_ONEY')) {
             // check if at least one carrier is available for this cart
             // get the available carrier
 
@@ -104,13 +111,13 @@ class PrestashopSpecific16
             }
 
             try {
-                $this->contextSpecific->smarty->assign([
+                $this->context->smarty->assign([
                     'payplug_module_dir' => _PS_MODULE_DIR_,
                     'payplug_oney' => true,
                     'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
-                    'payplug_oney_loading_msg' => $this->payplug->l('Loading')
+                    'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'prestashopspecific16')
                 ]);
             } catch (\Exception $e) {
                 var_dump($e);
@@ -118,14 +125,14 @@ class PrestashopSpecific16
             }
         }
 
-        $payplug_cards = $this->payplug->getPlugin()->getCard()->getByCustomer((int)$cart->id_customer, true);
+        $payplug_cards = $this->card->getByCustomer((int)$cart->id_customer, true);
         $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
 
         foreach ($payment_options as &$payment_option) {
             if ((isset($payment_option['name']))) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
-                if ((bool)Configuration::get('PAYPLUG_ONE_CLICK')
+                if ((bool)$this->config->get('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
                     && ($payment_method == 'standard')) {
                     continue;
@@ -156,7 +163,7 @@ class PrestashopSpecific16
                         $oneyImagex4 = '/views/img/oney/x4_with';
                         $oneyImage = '';
 
-                        $use_fees = (bool)Configuration::get('PAYPLUG_ONEY_FEES');
+                        $use_fees = (bool)$this->config->get('PAYPLUG_ONEY_FEES');
                         if (!$use_fees) {
                             $oneyImage .= 'out';
                         }
@@ -164,8 +171,8 @@ class PrestashopSpecific16
                         $oneyImage .= '_fees';
 
                         if (strpos($payment_option['type'], 'without_fees')) {
-                            $iso = Tools::strtoupper($this->contextSpecific->getContext()->language->iso_code);
-                            $merchant_company_iso = (string)Configuration::get('PAYPLUG_COMPANY_ISO');
+                            $iso = Tools::strtoupper($this->context->getContext()->language->iso_code);
+                            $merchant_company_iso = (string)$this->config->get('PAYPLUG_COMPANY_ISO');
                             if ($iso != 'IT' && $iso != 'FR') {
                                 $iso = $merchant_company_iso;
                             }
@@ -176,19 +183,19 @@ class PrestashopSpecific16
                         if ($error !== false) {
                             $oneyImage .= '_alt.svg';
                             $payment_option['logo'] = Media::getMediaPath(
-                                _PS_MODULE_DIR_ . $this->payplug->name . $oneyImageOptimized  . $oneyImage
+                                _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized  . $oneyImage
                             );
                         } else {
                             $oneyImage .= '.svg';
                             $payment_option['logo'] = [
                                 'optimized' => Media::getMediaPath(
-                                    _PS_MODULE_DIR_ . $this->payplug->name . $oneyImageOptimized  . $oneyImage
+                                    _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized  . $oneyImage
                                 ),
                                 'x3' => Media::getMediaPath(
-                                    _PS_MODULE_DIR_ . $this->payplug->name . $oneyImagex3 .$oneyImage
+                                    _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImagex3 .$oneyImage
                                 ),
                                 'x4' => Media::getMediaPath(
-                                    _PS_MODULE_DIR_ . $this->payplug->name  . $oneyImagex4 .$oneyImage
+                                    _PS_MODULE_DIR_ . $this->dependencies->name  . $oneyImagex4 .$oneyImage
                                 )
                             ];
                         }
@@ -202,14 +209,14 @@ class PrestashopSpecific16
                             $payment_options['standard']['logo'] :
                             $payment_option['logo'],
                         'payment_url' => $payment_option['payment_controller_url'],
-                        'tpl' => _PS_MODULE_DIR_ . 'payplug/views/templates/hook/checkout/payment/' .
+                        'tpl' => _PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/hook/checkout/payment/' .
                             $payment_option['tpl'],
                         'oney_error' => $payment_option['oney_error'],
                     ];
                 }
 
                 if (isset($payment_option['payment_controller_url'])) {
-                    $this->contextSpecific->smarty->assign([
+                    $this->context->smarty->assign([
                         'payplug_cards' => $payplug_cards,
                         'payment_controller_url' => $payment_option['payment_controller_url'],
                     ]);
@@ -236,6 +243,10 @@ class PrestashopSpecific16
     // todo: set Tab install process in a specific
     public function installTab()
     {
+        if ('payplug' != $this->dependencies->name) {
+            return true;
+        }
+
         $installed = true;
 
         if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
@@ -259,7 +270,7 @@ class PrestashopSpecific16
             }
 
             $tab->class_name = 'AdminPayPlugInstallment';
-            $tab->module = $this->payplug->name;
+            $tab->module = $this->dependencies->name;
             $tab->id_parent = $adminPayPlugId;
             $installed = $installed && $tab->save();
         }
@@ -270,6 +281,10 @@ class PrestashopSpecific16
     // todo: set Tab uninstall process in a specific
     public function uninstallTab()
     {
+        if ('payplug' != $this->dependencies->name) {
+            return true;
+        }
+
         $flag = true;
 
         $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
@@ -289,24 +304,24 @@ class PrestashopSpecific16
      */
     public function getOrdersByStateLink($order_state)
     {
-        if ($this->contextSpecific->cookie->__get('submitFilterorder')) {
-            $this->contextSpecific->cookie->__unset('submitFilterorder');
+        if ($this->context->cookie->__get('submitFilterorder')) {
+            $this->context->cookie->__unset('submitFilterorder');
         }
-        $this->contextSpecific->cookie->__set('submitFilterorder', 1);
+        $this->context->cookie->__set('submitFilterorder', 1);
 
-        if ($this->contextSpecific->cookie->__get('ordersorderFilter_os!id_order_state')) {
-            $this->contextSpecific->cookie->__unset('ordersorderFilter_os!id_order_state');
+        if ($this->context->cookie->__get('ordersorderFilter_os!id_order_state')) {
+            $this->context->cookie->__unset('ordersorderFilter_os!id_order_state');
         }
-        $this->contextSpecific->cookie->__set('ordersorderFilter_os!id_order_state', $order_state);
+        $this->context->cookie->__set('ordersorderFilter_os!id_order_state', $order_state);
 
-        if ($this->contextSpecific->cookie->__get('ordersorderFilter_a!date_add')) {
-            $this->contextSpecific->cookie->__unset('ordersorderFilter_a!date_add');
+        if ($this->context->cookie->__get('ordersorderFilter_a!date_add')) {
+            $this->context->cookie->__unset('ordersorderFilter_a!date_add');
         }
-        $this->contextSpecific->cookie->__set('ordersorderFilter_a!date_add', '["",""]');
+        $this->context->cookie->__set('ordersorderFilter_a!date_add', '["",""]');
 
-        $this->contextSpecific->cookie->write();
+        $this->context->cookie->write();
 
-        $link = $this->contextSpecific->link->getAdminLink('AdminOrders', true);
+        $link = $this->context->link->getAdminLink('AdminOrders', true);
         return $link;
     }
 }

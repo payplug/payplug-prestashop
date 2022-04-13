@@ -20,12 +20,12 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel-row separate_margin_block">
-    <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='admin.panel.setting.standard.label' mod='payplug'}</div>
-        <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.standard}</div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='admin.panel.setting.standard.label' mod='payplug'}</div>
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.standard}</div>
     </div>
-    <div class="payplugPanel">
-        <div class="payplugPanel_content">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
             <p>{l s='admin.panel.setting.standard.content' mod='payplug'}</p>
             {include file='./one_click.tpl'}
         </div>

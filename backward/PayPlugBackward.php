@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\backward;
+namespace PayPlugModule\backward;
 
 use Tools;
 use ValidateCore as Validate;

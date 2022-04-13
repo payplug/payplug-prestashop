@@ -1,0 +1,79 @@
+.payplugUIAlert {
+  .borderRadius(4px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  padding: 16px 24px 16px 72px;
+  margin: 0 auto 24px;
+  width: 100%;
+  min-height: 103px;
+  max-width: 1000px;
+
+
+  ._icon {
+    .transform(translateY(-50%));
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  ._title {
+    font-weight: 700;
+    margin: 0 0 10px;
+  }
+
+  ._content {
+    p {
+      font: inherit;
+      margin: 0;
+    }
+    a:link, a:hover, a:visited, a:active {
+      text-decoration: underline;
+      color: inherit;
+    }
+    button {
+      border: none;
+      background: none;
+      padding: 0;
+      margin: 0;
+      text-decoration: underline;
+    }
+  }
+
+  &.-success {
+    .border(#colorMap[accentuationSuccess500]);
+    background-color: #colorMap[accentuationSuccess50];
+    color: #colorMap[accentuationSuccess500];
+    ._icon {
+      svg {
+        fill: #colorMap[accentuationSuccess500];
+      }
+    }
+  }
+
+  &.-warning {
+    .border(#colorMap[accentuationAlert500]);
+    background-color: #colorMap[accentuationAlert50];
+    color: #colorMap[accentuationAlert500];
+    ._icon {
+      svg {
+        fill: #colorMap[accentuationAlert500];
+      }
+    }
+  }
+
+  &.-error {
+    .border(#colorMap[accentuationWarning500]);
+    background-color: #colorMap[accentuationWarning50];
+    color: #colorMap[accentuationWarning500];
+    ._icon {
+      svg {
+        fill: #colorMap[accentuationWarning500];
+      }
+    }
+  }
+}

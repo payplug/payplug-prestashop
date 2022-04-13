@@ -20,21 +20,21 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel-row separate_margin_block">
-    <div class="payplugPanel">
-        <div class="payplugPanel_label">{l s='Defer the payment capture' mod='payplug'}</div>
-        <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.deferred}</div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='Defer the payment capture' mod='payplug'}</div>
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.deferred}</div>
     </div>
-    <div class="payplugPanel">
-        <div class="payplugPanel_content">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
             <p>
                 {l s='admin.panel.settings.deferred.7days' mod='payplug'}
-                <a class="payplugLink" href="{$faq_links.deferred|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='admin.panel.settings.deffered.more' mod='payplug'}</a>
+                <a class="{$module_name|escape:'htmlall':'UTF-8'}Link" href="{$faq_links.deferred|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">{l s='admin.panel.settings.deffered.more' mod='payplug'}</a>
                 <br/>
-                <span class="payplugDeferred -example">{l s='admin.panel.settings.deferred.example' mod='payplug'}</span>
+                <span class="{$module_name|escape:'htmlall':'UTF-8'}Deferred -example">{l s='admin.panel.settings.deferred.example' mod='payplug'}</span>
             </p>
-            <div class="payplugTips -{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
-                <div class="payplugTips_item -left{if !$payplug_switch.deferred.checked} -hide{/if}">
-                    <div class="payplugDeferred">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Tips -{$payplug_switch.deferred.name|escape:'htmlall':'UTF-8'}">
+                <div class="{$module_name|escape:'htmlall':'UTF-8'}Tips_item -left{if !$payplug_switch.deferred.checked} -hide{/if}">
+                    <div class="{$module_name|escape:'htmlall':'UTF-8'}Deferred">
                         <label for="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}">
                             <input type="checkbox" name="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" value="1" id="{$payplug_switch.deferred_auto.name|escape:'htmlall':'UTF-8'}" {if $payplug_switch.deferred_auto.checked}checked="checked"{/if}>
                             {l s='admin.panel.settings.deferred.trigger' mod='payplug'}
@@ -46,8 +46,8 @@
                                 <option value="{$order_state.id_order_state|escape:'htmlall':'UTF-8'}"{if $deferred_state == $order_state.id_order_state} selected="selected"{/if}>{$order_state.name|escape:'htmlall':'UTF-8'}</option>
                             {/foreach}
                         </select>
-                            <span style="display: none;" data-e2e-error="deferred_state" class="payplugDeferred_error">{l s='admin.panel.settings.deferred.mustchoose' mod='payplug'}</span>
-                    <div style="display: none;" data-e2e-error="change_state" class="payplugDeferred_warning"><p>{l s='admin.panel.settings.deferred.warning' mod='payplug'}</p></div>
+                            <span style="display: none;" data-e2e-error="deferred_state" class="{$module_name|escape:'htmlall':'UTF-8'}Deferred_error">{l s='admin.panel.settings.deferred.mustchoose' mod='payplug'}</span>
+                    <div style="display: none;" data-e2e-error="change_state" class="{$module_name|escape:'htmlall':'UTF-8'}Deferred_warning"><p>{l s='admin.panel.settings.deferred.warning' mod='payplug'}</p></div>
                     </div>
                 </div>
             </div>

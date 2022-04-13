@@ -19,41 +19,41 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="payplugPanel">
-    <div class="payplugPanel_label">{l s='Email' mod='payplug'}</div>
-    <div class="payplugPanel_content">
-        <input type="text" name="PAYPLUG_EMAIL" placeholder="{l s='E-mail address' mod='payplug'}" value="{if isset($PAYPLUG_EMAIL)}{$PAYPLUG_EMAIL|escape:'htmlall':'UTF-8'}{/if}"/>
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='Email' mod='payplug'}</div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
+        <input type="text" name="payplug_email" placeholder="{l s='E-mail address' mod='payplug'}" value="{if isset($payplug_email)}{$payplug_email|escape:'htmlall':'UTF-8'}{/if}"/>
         <span class="input-error">
             <span class="error-email-input">{$p_error|escape:'htmlall':'UTF-8'}</span>
             <span id="error-email-regexp" class="hide">{l s='E-mail address is not valid.' mod='payplug'}</span>
         </span>
     </div>
 </div>
-<div class="payplugPanel">
-    <div class="payplugPanel_label">{l s='Password' mod='payplug'}</div>
-    <div class="payplugPanel_content">
-        <input type="password" name="PAYPLUG_PASSWORD" placeholder="{l s='Password' mod='payplug'}" value=""/>
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='Password' mod='payplug'}</div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
+        <input type="password" name="payplug_password" placeholder="{l s='Password' mod='payplug'}" value=""/>
         <span class="input-error">
             <span class="error-password-input">{$p_error|escape:'htmlall':'UTF-8'}</span>
             <span id="error-password-regexp" class="hide">{l s='Password must be a least 8 caracters long.' mod='payplug'}</span>
         </span>
     </div>
 </div>
-<div class="payplugPanel">
-    <div class="payplugPanel_content">
-        <a class="payplugLink" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" target="_blank" data-e2e-link="forgot_password">{l s='Forgot your password?' mod='payplug'}</a>
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
+        <a class="{$module_name|escape:'htmlall':'UTF-8'}Link" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/forgot_password" target="_blank" data-e2e-link="forgot_password">{l s='Forgot your password?' mod='payplug'}</a>
     </div>
 </div>
-<div class="payplugPanel">
-    <div class="payplugPanel_content">
-        <button type="button" class="payplugButton -green payplugLogin_login" data-e2e-type="button" data-e2e-action="login">{l s='Connect account' mod='payplug'}</button>
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
+        <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -green {$module_name|escape:'htmlall':'UTF-8'}Login_login" data-e2e-type="button" data-e2e-action="login">{l s='Connect account' mod='payplug'}</button>
     </div>
 </div>
-<div class="payplugPanel">
-    <div class="payplugPanel_content">
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
         <p>
             {l s='Don\'t have an account?' mod='payplug'}<br>
-            <a class="payplugLink" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" data-e2e-link="create_account" target="_blank">{l s='Sign up' mod='payplug'}</a>
+            <a class="{$module_name|escape:'htmlall':'UTF-8'}Link" href="{$site_url|escape:'htmlall':'UTF-8'}/portal/signup?origin=PrestashopV2Config" data-e2e-link="create_account" target="_blank">{l s='Sign up' mod='payplug'}</a>
         </p>
     </div>
 </div>

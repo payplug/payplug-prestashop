@@ -21,11 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlugModule\src\interfaces;
 
 interface CurrencyInterface
 {
     public static function factory();
+    public function get($idCurrency);
     public function getCurrency($idCurrency);
     public function getIdByIsoCode($isoCode);
 }

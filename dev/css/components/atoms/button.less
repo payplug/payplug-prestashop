@@ -1,0 +1,88 @@
+@import "../../less/include";
+
+.payplugUIButton {
+  // default
+  .transition(~"background @{dur}, color @{dur}");
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  @size: 14;
+  height: calc(40em / ~"@{size}");
+  padding: 0 calc(20em / ~"@{size}");
+
+  background: #colorMap[purple];
+  border-radius: 4px;
+  border: none;
+
+  .Inter(~"@{size}px", 600);
+  letter-spacing: calc(1em / ~"@{size}");
+  white-space: nowrap;
+  text-decoration: none;
+
+  &,
+  &:focus,
+  &:active {
+    color: #colorMap[white];
+    text-decoration: none;
+  }
+
+  &:hover,
+  &.-hover {
+    background: darken(#colorMap[purple], 10.5%);
+    color: #colorMap[white];
+  }
+
+  &.-disabled,
+  &[disabled="disabled"] {
+    opacity: .3;
+    cursor: default;
+    background: #colorMap[purple];
+  }
+
+  // secondary
+  &.-secondary {
+    .border(#colorMap[purple]);
+    background: #colorMap[white];
+
+    &,
+    &:focus,
+    &:active {
+      color: #colorMap[purple];
+    }
+
+    &:hover,
+    &.-hover {
+      background: #colorMap[purple];
+      color: #colorMap[white];
+    }
+
+    &.-disabled {
+      background: #colorMap[white];
+      color: #colorMap[purple];
+    }
+  }
+
+  // tertiary
+  &.-tertiary {
+    .border(#colorMap[border]);
+    background: #colorMap[white];
+
+    &,
+    &:focus,
+    &:active {
+      color: #colorMap[fontMainDefault];
+    }
+
+    &:hover,
+    &.-hover {
+      background: #colorMap[fontSecondary50];
+    }
+
+    &.-disabled {
+      background: #colorMap[white];
+    }
+  }
+}

@@ -22,7 +22,7 @@
 {if isset($payplug_cards) && $payplug_cards}
     <div class="row">
         <div class="col-xs-12">
-            <div class="payment_module payplugPayment payplugOneClick">
+            <div class="payment_module {$module_name|escape:'htmlall':'UTF-8'}Payment {$module_name|escape:'htmlall':'UTF-8'}OneClick">
                 <button>
                     <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'|replace:'none.png':'logos_schemes_default.png'}"
                          alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"/>
@@ -36,7 +36,7 @@
                             <label>
                                 <input data-e2e-type="payment" data-e2e-method="oneclick" type="radio" name="payplug_card" id="payplug_card_{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" value="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" {if $smarty.foreach.ppcards.first}checked="checked" {/if}/>
                                 {if $card.brand != 'none'}
-                                <img src="{$this_path|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.svg"/>
+                                <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/{$card.brand|escape:'htmlall':'UTF-8'|lower}.svg"/>
                                 <span>
                                     {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
                                     <span>{l s='Expiry date' mod='payplug'} {$card.expiry_date|escape:'htmlall':'UTF-8'}</span>
@@ -56,16 +56,16 @@
                         <span class="noimg">  {l s='Pay with a different card' mod='payplug'}</span>
                     </label>
 
-                    <div class="payplugOneClick_submit">
-                        <p class="payplugOneClick_message">
+                    <div class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_submit">
+                        <p class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_message">
                             {l s='Please wait...' mod='payplug'}
-                            <img class="payplugOneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif"/>
+                            <img class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif"/>
                         </p>
-                        <button class="payplugButton -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
+                        <button class="{$module_name|escape:'htmlall':'UTF-8'}Button -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
                     </div>
                 </form>
             </div>
-            <p class="payplugPayment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
+            <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
         </div>
     </div>
 {/if}

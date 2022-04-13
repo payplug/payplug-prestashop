@@ -1,0 +1,44 @@
+@{moduleClassName}Configuration .descriptionBlock {
+  background: #colorMap[darkBlue];
+  padding: 64px;
+  box-sizing: border-box;
+
+  ._header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0 40px;
+
+    ._logo {
+      svg {
+        display: block;
+      }
+    }
+
+    ._version {
+      margin-top: 12px;
+    }
+
+    ._descriptionVersion {
+      color: #colorMap[white];
+      opacity: 0.8;
+    }
+  }
+
+  ._descriptionTitle {
+    @size: 20;
+    color: #colorMap[white];
+    .Inter(~"@{size}px", 700);
+    letter-spacing: calc(-0.33em / ~"@{size}");
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.33px;
+    margin: 0 0 16px;
+  }
+
+  ._descriptionText {
+    color: #colorMap[white];
+    opacity: 0.8;
+    margin: 0px;
+  }
+}

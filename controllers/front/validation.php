@@ -21,15 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-//Inclusions
-require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
-require_once(_PS_MODULE_DIR_ . '../init.php');
-
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $validation = \PayPlug\classes\ConfigClass::setValidation();
+        $validation = \PayPlugModule\classes\ConfigClass::setValidation();
         $validation->treat();
     }
 }

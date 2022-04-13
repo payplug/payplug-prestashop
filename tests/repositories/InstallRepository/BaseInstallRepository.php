@@ -22,11 +22,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\InstallRepository;
+namespace PayPlugModule\tests\repositories\InstallRepository;
 
-use PayPlug\src\repositories\InstallRepository;
-use PayPlug\src\entities\OrderStateEntity;
-use PayPlug\tests\repositories\RepositoryBase;
+use PayPlugModule\classes\DependenciesClass;
+use PayPlugModule\src\repositories\InstallRepository;
+use PayPlugModule\src\entities\OrderStateEntity;
+use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BaseInstallRepository extends RepositoryBase
 {
@@ -46,6 +47,7 @@ class BaseInstallRepository extends RepositoryBase
             $this->config,
             $this->constant,
             $this->context,
+            $this->dependencies,
             $this->order_state,
             $this->order_state_entity,
             $this->order_state_specific,
@@ -53,7 +55,6 @@ class BaseInstallRepository extends RepositoryBase
             $this->sql,
             $this->tools,
             $this->validate,
-            $this->payplug,
             $this->myLogPhp
         ])
             ->shouldAllowMockingProtectedMethods()

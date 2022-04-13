@@ -1,0 +1,19 @@
+@import "../../less/include";
+
+.payplugUILink {
+  text-decoration: none;
+  color: #colorMap[purple];
+
+  &:hover,
+  &.-hover {
+    color: darken(#colorMap[purple], 10.5%);
+    text-decoration: none;
+  }
+
+  &.-disabled,
+  &[disabled="disabled"] {
+    opacity: .3;
+    cursor: default;
+    color: #colorMap[purple];
+  }
+}

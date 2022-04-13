@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\mock;
+namespace PayPlugModule\tests\mock;
 
 use Mockery;
 
@@ -156,5 +156,16 @@ class MockHelper extends Mockery
             ->shouldReceive('assign')
             ->andReturn(true);
         return $assign;
+    }
+
+    public static function createQueryMock($classPathname)
+    {
+        $query = self::createMockFactory($classPathname);
+        $query
+            ->shouldReceive('escape')
+            ->andReturnUsing(function ($string, $htmlOk = false) {
+                return $string;
+            });
+        return $query;
     }
 }

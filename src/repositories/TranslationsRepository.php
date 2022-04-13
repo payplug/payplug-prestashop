@@ -21,19 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
 class TranslationsRepository extends Repository
 {
-    protected $payplug;
-    protected $tools;
-
-    public function __construct($payplug, $tools)
-    {
-        $this->payplug = $payplug;
-        $this->tools = $tools;
-    }
-
     /**
      * @description
      * @return self
@@ -56,11 +47,11 @@ class TranslationsRepository extends Repository
 
         $translation = [
             // controllers/front/ajax.php
-            1 => $this->l('Empty payment data'),
-            2 => $this->l('At least one of the fields is not correctly completed.'),
-            3 => $this->l('Your information has been saved'),
-            4 => $this->l('An error occurred. Please retry in few seconds.'),
-            5 => $this->l('Oney is momentarily unavailable.'),
+            1 => $this->l('Empty payment data', 'translationsrepository'),
+            2 => $this->l('At least one of the fields is not correctly completed.', 'translationsrepository'),
+            3 => $this->l('Your information has been saved', 'translationsrepository'),
+            4 => $this->l('An error occurred. Please retry in few seconds.', 'translationsrepository'),
+            5 => $this->l('Oney is momentarily unavailable.', 'translationsrepository'),
         ];
 
         return $translation[$id];

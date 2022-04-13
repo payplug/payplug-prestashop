@@ -37,12 +37,12 @@
             </thead>
             <tbody>
             {foreach from=$payplug_cards item=card name=ppcards}
-                <tr class="payplugCard {if $smarty.foreach.ppcards.first}first_item{elseif $smarty.foreach.ppcards.last}last_item{else}item{/if} {if $smarty.foreach.ppcards.index % 2}alternate_item{/if}" data-id_card="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" data-e2e-card="item">
+                <tr class="{$module_name|escape:'htmlall':'UTF-8'}Card {if $smarty.foreach.ppcards.first}first_item{elseif $smarty.foreach.ppcards.last}last_item{else}item{/if} {if $smarty.foreach.ppcards.index % 2}alternate_item{/if}" data-id_card="{$card.id_payplug_card|escape:'htmlall':'UTF-8'}" data-e2e-card="item">
                     <td class="id_payplug_card bold">{$smarty.foreach.ppcards.index|escape:'htmlall':'UTF-8' +1}</td>
                     <td class="brand bold">{if $card.brand != 'none'}{$card.brand|escape:'htmlall':'UTF-8'}{else}{l s='card' mod='payplug'}{/if}</td>
                     <td class="last4 bold">**** **** **** {$card.last4|escape:'htmlall':'UTF-8'}</td>
                     <td class="expiry_date bold">{$card.expiry_date|escape:'htmlall':'UTF-8'}</td>
-                    <td class="delete bold"><a class="payplugCard_delete" href="{$payplug_delete_card_url|escape:'htmlall':'UTF-8'}" title="{l s='Delete' mod='payplug'}" data-e2e-card="delete">{l s='Delete' mod='payplug'}</a></td>
+                    <td class="delete bold"><a class="{$module_name|escape:'htmlall':'UTF-8'}Card_delete" href="{$payplug_delete_card_url|escape:'htmlall':'UTF-8'}" title="{l s='Delete' mod='payplug'}" data-e2e-card="delete">{l s='Delete' mod='payplug'}</a></td>
                 </tr>
             {/foreach}
             </tbody>

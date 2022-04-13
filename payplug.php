@@ -28,8 +28,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . 'payplug/vendor/autoload.php');
-require_once(_PS_MODULE_DIR_ . 'payplug/constants.php');
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
 class Payplug extends PaymentModule
 {
@@ -54,7 +53,6 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        // todo: automate module version in CI with constant value
         $this->version = '3.7.1';
 
         parent::__construct();
@@ -76,7 +74,7 @@ class Payplug extends PaymentModule
     public function disable($force_all = false)
     {
         if ($this->module) {
-            return $this->module->disable($force_all);
+            return parent::disable($force_all) && $this->payplug_dependencies->getDependency('configClass')->disable();
         }
     }
 
@@ -91,7 +89,7 @@ class Payplug extends PaymentModule
                 $this->install(true);
             }
 
-            return (new \PayPlug\classes\AdminClass())->getContent();
+            return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
             if ($iso_code == 'en' || $iso_code == 'gb') {
@@ -100,10 +98,10 @@ class Payplug extends PaymentModule
             $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
             $this->context->smarty->assign('faq_url', $faq_url);
 
-            $logo_url = __PS_BASE_URI__ . 'modules/payplug/views/img/logo_payplug.png';
+            $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
             $this->context->smarty->assign('url_logo', $logo_url);
 
-            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/payplug/views/css/admin.css');
+            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin-v'.$this->version.'.css');
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
@@ -157,7 +155,7 @@ class Payplug extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
-     * @param $params
+     * @param $params   $this->setDependencies();
      * @return mixed
      */
     public function hookActionAdminPerformanceControllerAfter($params)
@@ -292,7 +290,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayAdminOrderMain($params)
     {
-        if ($this->module) {
+        if ($this->module && $this->active) {
             return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }
@@ -441,7 +439,7 @@ class Payplug extends PaymentModule
     public function isValidInstallation()
     {
         if (Validate::isLoadedObject($this)) {
-            return Configuration::hasKey('PAYPLUG_COMPANY_ID');
+            return Configuration::hasKey(Tools::strtoupper($this->name) . '_COMPANY_ID');
         }
         return true;
     }
@@ -476,12 +474,12 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
     }
 
     private function setModule()
     {
-        $this->module = $this->payplug_dependencies->payplug;
+        $this->module = $this->payplug_dependencies->dependencies;
     }
 
     /**

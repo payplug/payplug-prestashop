@@ -1,0 +1,78 @@
+@import "../../less/include";
+
+.payplugUIIOptions {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+
+  label {
+    display: flex;
+    cursor: pointer;
+    max-width: 200px;
+    margin: 0;
+
+    &:hover,
+    &.-hover {
+      > span {
+        background: #colorMap[fontSecondary100];
+      }
+    }
+
+    > span {
+      .transition(~"background-color @{dur}, color @{dur}");
+      .border(#colorMap[fontMainDisabled]);
+      .borderRadius(4px);
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      color: #colorMap[fontMainDefault];
+      background: #colorMap[fontSecondary50];
+      padding: 7px 40px 7px 10px;
+      font-weight: normal;
+
+      > span {
+        font-size: 12px;
+        line-height: 1.5em;
+        display: block;
+        color: inherit;
+        margin: 6px 0 2px;
+      }
+    }
+
+    input[type="radio"] {
+      display: none;
+      &:checked {
+        ~ span {
+          background: #colorMap[radioButtonBackground] url(~"@{img_icons}check_24px.svg") no-repeat top 13px right 13px;
+          color: #colorMap[purple];
+
+          > span {
+            color: #colorMap[iris];
+          }
+        }
+      }
+    }
+
+    & + label {
+      margin: 0 0 0 8px;
+    }
+
+    &.-disabled {
+      cursor: default;
+
+      > span {
+        color: #colorMap[fontMainDefault];
+        background: #colorMap[fontSecondary50];
+        opacity: .3;
+      }
+
+      &:hover,
+      &.-hover {
+        div {
+          color: #colorMap[fontMainDefault];
+          background: #colorMap[fontSecondary50];
+        }
+      }
+    }
+  }
+}

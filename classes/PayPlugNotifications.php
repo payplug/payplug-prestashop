@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\classes;
+namespace PayPlugModule\classes;
 
 use Address;
 use Db;
@@ -46,7 +46,6 @@ use Validate;
  */
 class PayPlugNotifications
 {
-    private $amountCurrencyClass;
     public $api_key;
     public $cart = null;
     public $except;
@@ -59,15 +58,20 @@ class PayPlugNotifications
     public $lock_key = null;
     public $logger;
     public $order = null;
-    private $orderClass;
     public $order_states = [];
     public $payment = null;
-    public $payplug;
-    private $plugin;
     public $resource;
     public $resp;
     public $sandbox;
     public $type;
+
+    private $amountCurrencyClass;
+    private $apiClass;
+    private $dependencies;
+    private $orderClass;
+    private $paymentClass;
+    private $module;
+    private $plugin;
 
     public function __construct()
     {
@@ -199,9 +203,13 @@ class PayPlugNotifications
         try {
             $resource = json_decode($body);
             $this->api_key = (bool)$resource->is_live ?
-                Configuration::get('PAYPLUG_LIVE_API_KEY') :
-                Configuration::get('PAYPLUG_TEST_API_KEY');
-            ApiClass::setSecretKey($this->api_key);
+                Configuration::get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                ) :
+                Configuration::get(
+                    $this->dependencies->getConfigurationKey('testApiKey')
+                );
+            $this->apiClass->setSecretKey($this->api_key);
             $this->resource = \Payplug\Notification::treat($body);
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
         } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
@@ -297,20 +305,21 @@ class PayPlugNotifications
             }
         }
 
-        $module_name = $this->payplug->displayName;
+        $module_name = $this->module->displayName;
+
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                    $name = $this->payplug->l('Oney 3x', 'payplugnotifications');
+                    $name = $this->dependencies->l('Oney 3x', 'payplugnotifications');
                     break;
                 case 'oney_x4_with_fees':
-                    $name = $this->payplug->l('Oney 4x', 'payplugnotifications');
+                    $name = $this->dependencies->l('Oney 4x', 'payplugnotifications');
                     break;
                 case 'oney_x3_without_fees':
-                    $name = $this->payplug->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
+                    $name = $this->dependencies->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
                     break;
                 case 'oney_x4_without_fees':
-                    $name = $this->payplug->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
+                    $name = $this->dependencies->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
                     break;
                 default:
                     $name = $module_name;
@@ -318,7 +327,7 @@ class PayPlugNotifications
             }
             $module_name = $name;
         } elseif ($this->is_bancontact) {
-            $module_name = $this->payplug->l('notification.createOrder.bancontact', 'payplugnotifications');
+            $module_name = $this->dependencies->l('notification.createOrder.bancontact', 'payplugnotifications');
         }
 
         // Create Order
@@ -331,7 +340,7 @@ class PayPlugNotifications
             }
 
             $this->logger->addLog('Order create with amount:' . $amount);
-            $is_order_validated = $this->payplug->validateOrder(
+            $is_order_validated = $this->module->validateOrder(
                 $this->cart->id,
                 $order_state,
                 $amount,
@@ -353,7 +362,7 @@ class PayPlugNotifications
         $this->logger->addLog('Order validated.');
 
         // Then load it
-        $this->order = new Order($this->payplug->currentOrder);
+        $this->order = new Order($this->module->currentOrder);
         if (!Validate::isLoadedObject($this->order)) {
             $this->logger->addLog('Order cannot be loaded.', 'error');
             $this->exitProcess('Order cannot be loaded.', 500);
@@ -369,7 +378,7 @@ class PayPlugNotifications
             $data['metadata']['Order'] = $this->order->id;
             try {
                 $this->logger->addLog('Payment patched.', 'debug');
-                $this->payplug->patchPayment($this->payment->id, $data);
+                $this->paymentClass->patchPayment($this->payment->id, $data);
             } catch (Exception $exception) {
                 $this->logger->addLog(
                     'Payment cannot be patched: ' . $exception->getMessage(),
@@ -503,7 +512,7 @@ class PayPlugNotifications
         $this->logger->addLog('Refund ID : ' . $this->resource->id);
 
         try {
-            $this->payment = $this->payplug->retrievePayment($this->resource->payment_id);
+            $this->payment = $this->paymentClass->retrievePayment($this->resource->payment_id);
             $this->setOrderStates();
         } catch (Exception $exception) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $exception->getMessage(), 'error');
@@ -607,7 +616,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: processSaveCard');
         if ($this->canSaveCard()) {
             $this->logger->addLog('[Save Card] Saving card...');
-            $res_payplug_card = $this->plugin->getCard()->saveCard($this->payment);
+            $res_payplug_card = $this->dependencies->getPlugin()->getCard()->saveCard($this->payment);
 
             if (!$res_payplug_card) {
                 $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');
@@ -708,7 +717,7 @@ class PayPlugNotifications
         // Check if order amount is valid
         $is_valid_amount = (bool)$this->payment->is_paid;
         if ($this->is_installment) {
-            $is_valid_amount = (bool)AmountCurrencyClass::checkAmountPaidIsCorrect(
+            $is_valid_amount = $this->amountCurrencyClass->checkAmountPaidIsCorrect(
                 $this->payment->amount / 100,
                 $this->order
             );
@@ -717,8 +726,8 @@ class PayPlugNotifications
 
         if (!$is_valid_amount) {
             $message = new Message();
-            $msg = $this->payplug->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
-            $msg .= $this->payplug->l(' as the total value of the order', 'payplugnotifications');
+            $msg = $this->dependencies->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
+            $msg .= $this->dependencies->l(' as the total value of the order', 'payplugnotifications');
             $message->message = $msg;
             $message->id_order = $this->order->id;
             $message->id_cart = $this->order->id_cart;
@@ -793,7 +802,7 @@ class PayPlugNotifications
         $id_order_state = $this->order->current_state;
 
         // check current order state type to create if it's empty
-        $type = $this->plugin->getOrderState()->getType((int)$id_order_state);
+        $type = $this->dependencies->getPlugin()->getOrderState()->getType((int)$id_order_state);
         if ($type != $this->type) {
             $this->plugin->getOrderState()->setType((int)$id_order_state, $this->type);
         }
@@ -810,7 +819,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: processUpdateOrder');
 
-        $type = $this->plugin->getOrderState()->getType((int)$this->order->current_state);
+        $type = $this->dependencies->getPlugin()->getOrderState()->getType((int)$this->order->current_state);
 
         $this->logger->addLog('Current order state: ' . $this->order->current_state);
         $this->logger->addLog('Type: ' . $type);
@@ -828,8 +837,8 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setCartFromResource');
         if ($this->is_installment) {
             $sql = 'SELECT `id_cart` 
-                    FROM `' . _DB_PREFIX_ . 'payplug_payment` 
-                    WHERE `id_payment` = "' . $this->payment->installment_plan_id . '"';
+                    FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_payment` 
+                    WHERE `id_payment` = "' . pSQL($this->payment->installment_plan_id) . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
@@ -843,8 +852,8 @@ class PayPlugNotifications
             }
         } else {
             $sql = 'SELECT `id_cart` 
-                    FROM `' . _DB_PREFIX_ . 'payplug_payment` 
-                    WHERE `id_payment` = "' . $this->resource->id . '"';
+                    FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_payment` 
+                    WHERE `id_payment` = "' . pSQL($this->resource->id) . '"';
             $id_cart = Db::getInstance()->getValue($sql);
 
             if (!$id_cart) {
@@ -876,11 +885,13 @@ class PayPlugNotifications
         $this->flag = false;
         $this->except = null;
         $this->resp = [];
-        $this->orderClass = new OrderClass();
-        $this->payplug = new PayPlugClass();
-        $this->plugin = $this->payplug->getPlugin();
-        $this->amountCurrencyClass = $this->plugin->getAmountCurrencyClass();
-        $this->sandbox = Configuration::get('PAYPLUG_SANDBOX_MODE');
+        $this->dependencies = new DependenciesClass();
+        $this->apiClass = $this->dependencies->apiClass;
+        $this->orderClass =  $this->dependencies->orderClass;
+        $this->paymentClass =  $this->dependencies->paymentClass;
+        $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
+        $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $this->sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
 
         $this->setLogger();
         $this->getResource();
@@ -935,9 +946,9 @@ class PayPlugNotifications
      */
     public function setLogger()
     {
-        $this->logger = $this->plugin->getLogger();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->logger->addLog('Notification: setLogger');
-        $this->logger = $this->plugin->getLogger();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->logger->setParams(['process' => 'notification']);
     }
 
@@ -949,14 +960,30 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setOrderStates');
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
         $this->order_states = [
-            'pending' => Configuration::get('PAYPLUG_ORDER_STATE_PENDING' . $state_addons),
-            'paid' => Configuration::get('PAYPLUG_ORDER_STATE_PAID' . $state_addons),
-            'error' => Configuration::get('PAYPLUG_ORDER_STATE_ERROR' . $state_addons),
-            'auth' => Configuration::get('PAYPLUG_ORDER_STATE_AUTH' . $state_addons),
-            'expired' => Configuration::get('PAYPLUG_ORDER_STATE_EXP' . $state_addons),
-            'oney' => Configuration::get('PAYPLUG_ORDER_STATE_ONEY_PG' . $state_addons),
-            'cancelled' => Configuration::get('PAYPLUG_ORDER_STATE_CANCELED'),
-            'refund' => Configuration::get('PAYPLUG_ORDER_STATE_REFUND' . $state_addons)
+            'pending' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
+            ),
+            'paid' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+            ),
+            'error' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons
+            ),
+            'auth' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH') . $state_addons
+            ),
+            'expired' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_EXP') . $state_addons
+            ),
+            'oney' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG') . $state_addons
+            ),
+            'cancelled' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_CANCELED')
+            ),
+            'refund' => Configuration::get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
+            )
         ];
     }
 
@@ -966,19 +993,19 @@ class PayPlugNotifications
     private function setPayment()
     {
         $this->logger->addLog('Notification: setPayment');
-        if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
+        if (!$this->payment = $this->paymentClass->retrievePayment($this->resource->id)) {
             if ($this->sandbox) {
-                $this->payplug->apiClass->initializeApi(false);
-                if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
+                $this->apiClass->initializeApi(false);
+                if (!$this->payment = $this->paymentClass->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with LIVE API Key.', 'debug');
-                    $this->payplug->apiClass->initializeApi(true);
+                    $this->apiClass->initializeApi(true);
                     $this->payment = null;
                 }
             } else {
-                $this->payplug->apiClass->initializeApi(true);
-                if (!$this->payment = $this->payplug->retrievePayment($this->resource->id)) {
+                $this->apiClass->initializeApi(true);
+                if (!$this->payment = $this->paymentClass->retrievePayment($this->resource->id)) {
                     $this->logger->addLog('Can\'t retrieve payment with the TEST API Key.', 'debug');
-                    $this->payplug->apiClass->initializeApi(false);
+                    $this->apiClass->initializeApi(false);
                     $this->payment = null;
                 }
             }
@@ -1002,6 +1029,18 @@ class PayPlugNotifications
             $this->is_oney = in_array($this->payment->payment_method['type'], $oney_payment_methods);
         }
         $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok' : 'nok'));
+
+        // Define if payment is bancontact resource
+        if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
+            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+        }
+        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
+
+        // Define if payment is bancontact resource
+        if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
+            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+        }
+        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is bancontact resource
         if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {

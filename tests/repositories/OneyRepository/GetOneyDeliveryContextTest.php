@@ -22,11 +22,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\tests\repositories\OneyRepository;
+namespace PayPlugModule\tests\repositories\OneyRepository;
 
-use PayPlug\tests\mock\CartMock;
-use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\ContextMock;
+use PayPlugModule\tests\mock\CartMock;
+use PayPlugModule\tests\mock\CarrierMock;
+use PayPlugModule\tests\mock\ContextMock;
 
 /**
  * @group unit
@@ -44,6 +44,18 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
         $this->context
             ->shouldReceive('getContext')
             ->andReturn(ContextMock::get());
+
+        $this->config->shouldReceive('get')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'PS_CURRENCY_DEFAULT':
+                        return 1;
+                    case 'PS_SHOP_NAME':
+                        return 'Payplug';
+                    default:
+                        return true;
+                }
+            });
     }
 
     public function testGetContextFromVirtual()
@@ -52,10 +64,6 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
             ->andReturn(CartMock::get());
         $this->cart->shouldReceive('isVirtualCart')
             ->andReturn(true);
-
-        $this->config->shouldReceive('get')
-            ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug');
 
         $this->assertSame(
             [

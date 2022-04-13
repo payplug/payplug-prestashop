@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlugModule\src\interfaces;
 
 interface CartInterface
 {
@@ -29,4 +29,5 @@ interface CartInterface
     public function isVirtualCart($cart);
     public function getProducts($cart);
     public function nbProducts($cart);
+    public function isGuestCartByCartId($idCart);
 }

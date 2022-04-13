@@ -19,15 +19,15 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-<div class="panel payplugShow">
+<div class="panel {$module_name|escape:'htmlall':'UTF-8'}Show">
     <div class="panel-heading">{l s='Display to customers' mod='payplug'}</div>
     {if !$connected}
-        <p class="payplugAlert -warning">{l s='Before being able to display PayPlug to your customers you need to connect your PayPlug account below.' mod='payplug'}</p>
+        <p class="{$module_name|escape:'htmlall':'UTF-8'}Alert -warning">{l s='Before being able to display PayPlug to your customers you need to connect your PayPlug account below.' mod='payplug'}</p>
     {/if}
     <div class="panel-row">
-        <div class="payplugPanel">
-            <div class="payplugPanel_label">{l s='Show Payplug to my customers' mod='payplug'}</div>
-            <div class="payplugPanel_content">{include file='./settings/switch.tpl' switch=$payplug_switch.show}</div>
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='Show Payplug to my customers' mod='payplug'}</div>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">{include file='./settings/switch.tpl' switch=$payplug_switch.show}</div>
         </div>
     </div>
 </div>

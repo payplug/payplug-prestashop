@@ -20,9 +20,9 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="payplugPopin">
-    {if $title}<div class="payplugPopup_heading">{$title|escape:'htmlall':'UTF-8'}</div>{/if}
-    <div class="payplugPopup_row">
+<div class="{$module_name|escape:'htmlall':'UTF-8'}Popin">
+    {if $title}<div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_heading">{$title|escape:'htmlall':'UTF-8'}</div>{/if}
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_row">
         {include file='./popin/'|cat:$type|cat:'.tpl'}
     </div>
 </div>

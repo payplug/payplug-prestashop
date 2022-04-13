@@ -79,9 +79,9 @@
  * ->build()
  */
 
-namespace PayPlug\src\repositories;
+namespace PayPlugModule\src\repositories;
 
-use PayPlug\src\specific\QuerySpecific;
+use PayPlugModule\src\specific\QuerySpecific;
 
 class QueryRepository extends Repository
 {
@@ -468,5 +468,10 @@ class QueryRepository extends Repository
     public function __toString()
     {
         return $this->build();
+    }
+
+    public function escape($string, $htmlOK = false)
+    {
+        return $this->specific_class->escape($string, $htmlOK);
     }
 }

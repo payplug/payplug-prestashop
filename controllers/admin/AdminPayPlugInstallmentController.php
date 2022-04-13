@@ -26,16 +26,17 @@
  */
 
 require_once(_PS_MODULE_DIR_.'payplug/payplug.php');
+include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
 
 class AdminPayPlugInstallmentController extends ModuleAdminController
 {
-    private $payplug;
+    private $dependencies;
 
     public function __construct()
     {
-        $this->payplug = new \PayPlug\classes\PayPlugClass();
+        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
         $this->bootstrap = true;
-        $this->table = 'payplug_installment';
+        $this->table = $this->dependencies->name . '_installment';
         $this->id = 'id_payplug_installment';
         $this->lang = false;
         $this->addRowAction('view');
@@ -100,7 +101,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 'title' => $this->l('PayPlug payment status'),
                 'callback' => 'getPaymentStatusById',
                 'type' => 'select',
-                'list' => $this->payplug->payment_status,
+                'list' => $this->dependencies->configClass->getPaymentStatus(),
                 'filter_key' => 'a!status',
                 'filter_type' => 'int',
             ],
@@ -113,8 +114,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function getPaymentStatusById($id_status)
     {
-        $id_lang = $this->context->language->id;
-        return $this->payplug->getPaymentStatusById($id_status, $id_lang);
+        return $this->dependencies->paymentClass->getPaymentStatusById($id_status);
     }
 
     public static function setOrderCurrency($amount, $tr)
@@ -136,18 +136,13 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
     {
-        $req_order = '
-            SELECT DISTINCT pi.id_order
-            FROM `'._DB_PREFIX_.'payplug_installment` pi 
-            WHERE pi.id_payplug_installment = '.pSQL($id_payplug_installment);
-        $res_order = DB::getInstance()->getValue($req_order);
+        $sql = 'SELECT DISTINCT pi.id_order
+                FROM `'._DB_PREFIX_.$this->table.'`
+                WHERE `id_'.$this->dependencies->name.'_installment` = ' . (int)$id_payplug_installment;
 
-        if (!$res_order) {
-            return false;
-        } else {
-            return (int)$res_order;
-        }
+        return Db::getInstance()->getValue($sql);
     }
+
     public function postProcess()
     {
         if (Tools::isSubmit('viewpayplug_installment')) {

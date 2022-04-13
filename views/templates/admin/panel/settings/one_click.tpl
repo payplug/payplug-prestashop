@@ -20,16 +20,16 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <div class="panel-row separate_margin_block payplugTips -payplug_standard">
-    <div class="payplugTips_item -left {if !$payplug_switch.standard.checked} -hide{/if}">
-        <div class="payplugPanel">
-            <div class="payplugPanel_label">{l s='admin.panel.setting.oneclick.label' mod='payplug'}</div>
-            <div class="payplugPanel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}Tips_item -left {if !$payplug_switch.standard.checked} -hide{/if}">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_label">{l s='admin.panel.setting.oneclick.label' mod='payplug'}</div>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">{include file='./switch.tpl' switch=$payplug_switch.one_click}</div>
         </div>
-        <div class="payplugPanel">
-            <div class="payplugPanel_content">
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Panel_content">
                 <p>
                     {l s='admin.panel.setting.oneclick.content' mod='payplug'}
-                    <a class="payplugLink" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
+                    <a class="{$module_name|escape:'htmlall':'UTF-8'}Link" href="{$faq_links.one_click|escape:'htmlall':'UTF-8'}" data-e2e-link="faq" target="_blank">
                         {l s='admin.panel.setting.oneclick.link' mod='payplug'}
                     </a>
                 </p>

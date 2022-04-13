@@ -21,16 +21,24 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlugModule\src\specific;
 
 use Address;
-use PayPlug\src\interfaces\AddressInterface;
+use PayPlugModule\src\interfaces\AddressInterface;
 
 class AddressSpecific implements AddressInterface
 {
     public static function factory()
     {
         return new self();
+    }
+
+    public function get($idAddress = false)
+    {
+        if (!is_int($idAddress)) {
+            $idAddress = false;
+        }
+        return new Address($idAddress);
     }
 
     public function getAddress($idAddress)

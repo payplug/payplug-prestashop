@@ -1,0 +1,43 @@
+/* Payplug Admin Config */
+@{moduleClassName}Config {
+  position: relative;
+
+  &_item {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin: 0 !important;
+
+    &:before {
+      content: "";
+      height: 20px;
+      width: 20px;
+      margin: 0 4px 0 0;
+      background: transparent 50% no-repeat;
+    }
+
+    &.-error {
+      color: #colorMap[error];
+
+      &:before {
+        background-image: url(~"@{img_admin}icon-error.png")
+      }
+    }
+
+    &.-success {
+      color: #colorMap[module];
+
+      &:before {
+        background-image: url(~"@{img_admin}icon-success.png")
+      }
+    }
+
+    &.-warning {
+      color: #colorMap[warning];
+
+      &:before {
+        background-image: url(~"@{img_admin}icon-warn.png")
+      }
+    }
+  }
+}

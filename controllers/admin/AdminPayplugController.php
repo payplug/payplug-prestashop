@@ -21,8 +21,17 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
+include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
+
 class AdminPayplugController extends ModuleAdminController
 {
+    private $dependencies;
+
+    public function __construct()
+    {
+        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+    }
+
     public function initProcess()
     {
         parent::initProcess();
@@ -33,62 +42,71 @@ class AdminPayplugController extends ModuleAdminController
 
     public function getContent()
     {
-        $payplug = new \PayPlug\classes\PayPlugClass();
         if (Tools::getValue('_ajax') == 1) {
-            (new \PayPlug\classes\AdminClass())->adminAjaxController();
+            $this->dependencies->adminClass->adminAjaxController();
         }
 
         $this->postProcess();
 
         if (Tools::getValue('uninstall_config') == 1) {
-            return $this->getUninstallContent();
+            return $this->dependencies->configClass->getUninstallContent();
         }
 
         $this->html = '';
 
-        $payplug->configClass->checkConfiguration();
+        $this->dependencies->configClass->checkConfiguration();
 
-        $PAYPLUG_EMAIL = Configuration::get('PAYPLUG_EMAIL');
-        $PAYPLUG_TEST_API_KEY = Configuration::get('PAYPLUG_TEST_API_KEY');
-        $PAYPLUG_LIVE_API_KEY = Configuration::get('PAYPLUG_LIVE_API_KEY');
+        $payplug_email = Configuration::get(
+            $this->dependencies->getConfigurationKey('email')
+        );
+        $payplug_test_api_key = Configuration::get(
+            $this->dependencies->getConfigurationKey('testApiKey')
+        );
+        $payplug_live_api_key = Configuration::get(
+            $this->dependencies->getConfigurationKey('liveApiKey')
+        );
 
-        if (!empty($PAYPLUG_EMAIL) && (!empty($PAYPLUG_TEST_API_KEY) || !empty($PAYPLUG_LIVE_API_KEY))) {
+        if (!empty($payplug_email) && (!empty($payplug_test_api_key) || !empty($payplug_live_api_key))) {
             $connected = true;
         } else {
             $connected = false;
         }
 
-        if (count($payplug->validationErrors && !$connected)) {
+        if (count($this->dependencies->configClass->validationErrors && !$connected)) {
             $this->context->smarty->assign([
-                'validationErrors' => $payplug->validationErrors,
+                'validationErrors' => $this->dependencies->configClass->validationErrors,
             ]);
         }
 
         $p_error = '';
         if (!$connected) {
-            if (isset($this->validationErrors['username_password'])) {
-                $p_error .= $this->validationErrors['username_password'];
-            } elseif (isset($this->validationErrors['login'])) {
-                if (isset($this->validationErrors['username_password'])) {
+            if (isset($this->dependencies->configClass->validationErrors['username_password'])) {
+                $p_error .= $this->dependencies->configClass->validationErrors['username_password'];
+            } elseif (isset($this->dependencies->configClass->validationErrors['login'])) {
+                if (isset($this->dependencies->configClass->validationErrors['username_password'])) {
                     $p_error .= ' ';
                 }
-                $p_error .= $this->validationErrors['login'];
+                $p_error .= $this->dependencies->configClass->validationErrors['login'];
             }
             $this->context->smarty->assign([
                 'p_error' => $p_error,
             ]);
         } else {
             $this->context->smarty->assign([
-                'PAYPLUG_EMAIL' => $PAYPLUG_EMAIL,
+                'payplug_email' => $payplug_email,
             ]);
         }
 
-        $payplug->mediaClass->addJsRC(__PS_BASE_URI__.'modules/payplug/views/js/admin.js');
-        $payplug->mediaClass->addCSSRC(__PS_BASE_URI__.'modules/payplug/views/css/admin.css');
+        $this->context->controller->addJS(
+            __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/js/admin.js'
+        );
+        $this->context->controller->addCSS(
+            __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/css/admin-v'.$this->dependencies->version.'.css'
+        );
 
-        $payplug->configClass->assignContentVar();
+        $this->dependencies->configClass->assignContentVar();
 
-        $this->html .= $payplug->mediaClass->fetchTemplateRC('/views/templates/admin/admin.tpl');
+        $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
 
         return $this->html;
     }
