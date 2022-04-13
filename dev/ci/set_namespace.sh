@@ -14,4 +14,7 @@ git grep -rl 'class Payplug' ./controllers/front | xargs sed -i -e 's/class Payp
 echo "Remove temporay file";
 rm ./*.php-e ./*/*.php-e ./*/*/*.php-e ./*/*/*/*.php-e;
 
+commit_message="setPSPayLaterNamespace"
+git add . -A
+git commit -m "$commit_message"
 echo "End";
