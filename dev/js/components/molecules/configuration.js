@@ -6,7 +6,7 @@ class Configuration {
     };
 
     initialize() {
-        this.handleEvents();
+        configuration.handleEvents();
     }
 
     handleEvents() {
@@ -174,4 +174,4 @@ class Configuration {
 }
 
 const configuration = new Configuration();
-configuration.initialize();
+$(document).ready(configuration.initialize);

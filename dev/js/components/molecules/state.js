@@ -5,12 +5,12 @@ class State {
     };
 
     initialize() {
-        this.handleEvents();
+        state.handleEvents();
     }
 
     handleEvents() {
         $(document)
-            .on('click', 'button[name=stateButton]', this.checkState)
+            .on('click', 'button[name=stateButton]', state.checkState)
     }
 
     checkState() {
@@ -42,4 +42,4 @@ class State {
 }
 
 const state = new State();
-state.initialize();
+$(document).ready(state.initialize);
