@@ -611,7 +611,6 @@ class ConfigClass
     {
         $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
-
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
             $this->dependencies->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
@@ -628,7 +627,8 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
             $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
             $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
-            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact'
+            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact',
+            $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay'
         ];
 
         foreach ($configurationKeys as $key => $config) {
@@ -910,6 +910,7 @@ class ConfigClass
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
+            'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods()
         ]);
 
         return $this->html;
