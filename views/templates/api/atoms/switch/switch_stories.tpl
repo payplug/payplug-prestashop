@@ -26,14 +26,11 @@
     <div>
         <p class="_subtitle">Default</p>
         {include file='./switch.tpl'
-        switchEnabledLabel='On'
-        switchDisabledLabel='Off'
-        switchDataName='switchData'
-        switchValue='0'
-        switchName='test'
-        checked=true
-
-        }
+            switchEnabledLabel='On'
+            switchDisabledLabel='Off'
+            switchDataName='switchData'
+            switchName='test'
+            switchChecked=true}
 
     </div>
     <div>
@@ -42,7 +39,7 @@
         switchEnabledLabel='On'
         switchDisabledLabel='Off'
         switchDataName='switchData'
-        disabled=true
+        switchDisabled=true
         switchName='test'
         }
     </div>

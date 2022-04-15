@@ -37,10 +37,13 @@
             {include file='./../api/molecules/alert.tpl'}
         {/if}
 
-        {* Configuration saving button *}
+        {* Général block *}
         {include file='./../api/molecules/general.tpl'}
 
-        {* paylater block*}
+        {* Payment method block *}
+        {include file='./../api/molecules/paymentMethod.tpl'}
+
+        {* Paylater block*}
         {include file='./../api/molecules/paylater.tpl'}
 
         {* etat block *}

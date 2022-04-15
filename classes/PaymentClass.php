@@ -760,6 +760,56 @@ class PaymentClass
     }
 
     /**
+     * @description Get available method to confire the module
+     * @return array
+     */
+    public function getPaymentMethods()
+    {
+        $payment_methods = [];
+
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $faq_links = $this->dependencies->configClass->getFAQLinks($this->context->language->iso_code);
+
+        if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
+            $payment_methods['standard'] = [
+                "name" => $this->dependencies->l('payment.getPaymentMethod.standard.name', 'paymentclass'),
+                "image_url" => $views_path . 'img/svg/payment/standard.svg',
+                "description" => $this->dependencies->l('payment.getPaymentMethod.standard.description', 'paymentclass'),
+                "link" => '',
+                "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
+                "config_key" => $this->dependencies->getConfigurationKey('standard'),
+                "informations" => '',
+            ];
+        }
+
+        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+            $payment_methods['applepay'] = [
+                "name" => $this->dependencies->l('payment.getPaymentMethod.applepay.name', 'paymentclass'),
+                "image_url" => $views_path . 'img/svg/payment/applepay.svg',
+                "description" => $this->dependencies->l('payment.getPaymentMethod.applepay.description', 'paymentclass'),
+                "link" => '',
+                "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
+                "config_key" => $this->dependencies->getConfigurationKey('applepay'),
+                "informations" => '',
+            ];
+        }
+
+        if ($this->dependencies->configClass->isValidFeature('feature_bancontact')) {
+            $payment_methods['bancontact'] = [
+                "name" => $this->dependencies->l('payment.getPaymentMethod.bancontact.name', 'paymentclass'),
+                "image_url" => $views_path . 'img/svg/payment/bancontact.svg',
+                "description" => $this->dependencies->l('payment.getPaymentMethod.bancontact.description', 'paymentclass'),
+                "link" => $faq_links['bancontact'],
+                "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
+                "config_key" => $this->dependencies->getConfigurationKey('bancontact'),
+                "informations" => '',
+            ];
+        }
+
+        return $payment_methods;
+    }
+
+    /**
      * @description Check payment method for given cart object
      *
      * @param object Cart

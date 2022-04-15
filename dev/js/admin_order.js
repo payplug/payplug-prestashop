@@ -54,9 +54,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     popup.set(result.content);
@@ -81,9 +79,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (response) {
                     if (response.reload) {
@@ -131,9 +127,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result.status == 'error') {
@@ -200,9 +194,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                     $('input[name=submit' + module_name + 'Refund]').prop("disabled", false);
                 },
                 success: function (result) {
@@ -256,9 +248,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result.status == 'error') {

@@ -92,10 +92,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(admin_ajax_url);
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                     }
                 },
                 success: function (result) {
@@ -171,9 +168,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                     }
                 },
                 success: function (result) {
@@ -258,9 +253,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                         window[module_name+'Module'].tools.loader.hide($('.' + identifier));
                     }
                 },
@@ -327,9 +320,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                     }
                 },
                 success: function (result) {
@@ -382,9 +373,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                         window[module_name+'Module'].tools.loader.hide($('.' + identifier));
                     }
                 },
@@ -467,9 +456,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                         window[module_name+'Module'].tools.loader.hide($('.' + identifier));
                     }
                 },
@@ -516,9 +503,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                         window[module_name+'Module'].tools.loader.hide($('.' + identifier));
                     }
                 },
@@ -556,9 +541,7 @@ window[module_name+'Module'] = {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (typeof result.error != 'undefined' && result.error) {
@@ -597,9 +580,7 @@ window[module_name+'Module'] = {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
@@ -664,9 +645,7 @@ window[module_name+'Module'] = {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     for (permission in result) {
@@ -749,9 +728,7 @@ window[module_name+'Module'] = {
                             'Maybe you clicked too fast before scripts are fully loaded ' +
                             'or maybe you have a different back-office url than expected.' +
                             'You will find more explanation in JS console.');
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                     }
                 },
                 success: function (response) {
@@ -810,9 +787,7 @@ window[module_name+'Module'] = {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {
@@ -1011,9 +986,7 @@ window[module_name+'Module'] = {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (typeof result.content != 'undefined') {

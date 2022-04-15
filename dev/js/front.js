@@ -501,9 +501,7 @@ window[module_name+'Module'] = {
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         integrated.form.clearIntPayment();
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                     },
                     success: function (result) {
                         if (result && result.payment_id) {
@@ -563,9 +561,7 @@ window[module_name+'Module'] = {
                         pay_id: token,
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                         integrated.form.clearIntPayment();
                     },
                     success: function (data) {
@@ -676,9 +672,7 @@ window[module_name+'Module'] = {
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     alert('error CALL DELETE CARD');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result) {
