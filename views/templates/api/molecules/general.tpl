@@ -19,6 +19,13 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
+{if $connected && (!$ps_account || !$payplug_switch.show.checked)}
+    {assign var='generalDisabled' value=true}
+{else}
+    {assign var='generalDisabled' value=false}
+{/if}
+
 {if !$connected}
     {* Block general subscribe *}
     {capture assign="generalSubscribe_title"}{l s='general.subscribe.title' mod='payplug'}{/capture}
@@ -52,7 +59,7 @@
         blockDescription=$generalSubscribe_description
         blockContent=$generalSubscribe_content
         blockData='generalSubscribe'
-        blockDisabled=!$ps_account
+        blockDisabled=$generalDisabled
         blockClassName=$generalSubscribe_className}
 
     {* Block general login *}
@@ -112,6 +119,7 @@
         blockDescription=$generalLogin_description
         blockContent=$generalLogin_content
         blockData='generalLogin'
+        blockDisabled=$generalDisabled
         blockClassName=$generalLogin_className}
 {else}
     {* Block general logged *}
@@ -202,5 +210,6 @@
         blockDescription=$generalLogged_description
         blockContent=$generalLogged_content
         blockData='generalLogged'
+        blockDisabled=$generalDisabled
         blockClassName=$generalLogged_className}
 {/if}
