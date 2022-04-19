@@ -34,6 +34,9 @@ class Payplug extends PaymentModule
 {
     public $payplug_dependencies;
 
+    /** @var array */
+    public $adminControllers;
+
     /**
      * Constructor
      *
@@ -58,6 +61,25 @@ class Payplug extends PaymentModule
         parent::__construct();
 
         $this->module = false;
+        $this->controllers = [
+            'AdminPayPlug',
+            'AdminPayPlugInstallment'
+        ];
+        $this->adminControllers = [
+            [
+                'className' => 'AdminPayPlug'
+            ],
+            [
+                'className' => 'AdminPayPlugInstallment',
+                'parent' => 'AdminPayPlug',
+                'name' => [
+                    'en' => 'Installment Plans',
+                    'gb' => 'Installment Plans',
+                    'it' => 'Pagamenti frazionati',
+                    'fr' => 'Paiements en plusieurs fois'
+                ]
+            ]
+        ];
 
         if ($this->isValidPHPVersion()) {
             $this->setDependencies();
@@ -92,16 +114,13 @@ class Payplug extends PaymentModule
             return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
         } else {
             $iso_code = Context::getContext()->language->iso_code;
-            if ($iso_code == 'en' || $iso_code == 'gb') {
-                $iso_code = 'en-gb';
-            }
+            $iso_code = ($iso_code == 'en' || $iso_code == 'gb') ? 'en-gb' : $iso_code;
             $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
             $this->context->smarty->assign('faq_url', $faq_url);
 
-            $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
-            $this->context->smarty->assign('url_logo', $logo_url);
-
-            $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin-v'.$this->version.'.css');
+            $views_path = __PS_BASE_URI__ . 'modules/' . $this->name . '/views';
+            $this->context->smarty->assign('url_logo', $views_path . '/img/logo_payplug.png');
+            $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->version.'.css');
 
             return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
         }
