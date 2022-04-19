@@ -55,7 +55,7 @@ class OrderClass
             ->insert()
             ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
             ->fields('id_order')    ->values((int)$id_order)
-            ->fields('id_payment')  ->values($id_payment);
+            ->fields('id_payment')  ->values($this->query->escape($id_payment));
 
         return $this->query->build();
     }
@@ -78,7 +78,7 @@ class OrderClass
             ->select()
             ->fields('GROUP_CONCAT(id_order_state) as id_order_states')
             ->from($this->constant->get('_DB_PREFIX_') . 'order_state')
-            ->where('module_name = "' . $module . '"');
+            ->where('module_name = "' . $this->query->escape($module) . '"');
 
         return $this->query->build('unique_value');
     }
@@ -160,8 +160,8 @@ class OrderClass
                 'osl',
                 'osl.`id_order_state` = oh.`id_order_state`'
             )
-            ->where('oh.id_order = ' . $orderId)
-            ->where('osl.id_lang = ' . $this->context->language->id)
+            ->where('oh.id_order = ' . (int)$orderId)
+            ->where('osl.id_lang = ' . (int)$this->context->language->id)
             ->build();
 
         if (empty($order_history_states)) {

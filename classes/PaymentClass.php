@@ -575,7 +575,7 @@ class PaymentClass
             ->delete()
             ->from($this->constant->get(_DB_PREFIX_) . $this->dependencies->name . '_payment')
             ->where('id_cart = ' . (int)$cart_id)
-            ->where('id_payment = "' . $pay_id . '"');
+            ->where('id_payment = "' . $this->query->escape($pay_id) . '"');
 
         return $this->query->build();
     }
