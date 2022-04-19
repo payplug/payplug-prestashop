@@ -93,5 +93,5 @@
     blockDescription=$stateBlock_description
     blockContent=$stateBlock_content
     blockData='blockState'
-    blockDisabled=!$payplug_switch.show.checked
+    blockDisabled=!$connected || !$payplug_switch.show.checked
     blockClassName=$stateBlock_className}
