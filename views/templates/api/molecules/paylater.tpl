@@ -64,9 +64,9 @@
     ['value'=>"0", "dataName" =>'oneyWithoutFees' ,"text" => $oneyWithoutFeesTitle, "subText" => $oneyWithoutFeesDescription, className=>'_paylaterLabel']
     ]}
     {include file='./../atoms/options/options.tpl'
-    optionsSelected=$payplug_switch.oney_fees.checked
-    optionsClassName='_paylaterOptions'
-    optionsName=$payplug_switch.oney_fees.name}
+        optionsSelected=$payplug_switch.oney_fees.checked
+        optionsClassName='_paylaterOptions'
+        optionsName=$payplug_switch.oney_fees.name}
     {* Hide optimisedOption for pspaylater module *}
     {if $module_name=='pspaylater'}
         {include file='./../atoms/input/input.tpl'
@@ -79,9 +79,9 @@
 {assign var='paylaterBlock_className' value='paylaterBlock'}
 
 {include file='./../atoms/block/block.tpl'
-blockTitle=$paylaterBlock_title
-blockDescription=$payLaterBlock_description
-blockContent=$paylaterBlock_content
-blockData='blockPaylater'
-blockDisabled=!$connected || !$payplug_switch.show.checked
-blockClassName=$paylaterBlock_className}
+    blockTitle=$paylaterBlock_title
+    blockDescription=$payLaterBlock_description
+    blockContent=$paylaterBlock_content
+    blockData='blockPaylater'
+    blockDisabled=!$connected || !$payplug_switch.show.checked
+    blockClassName=$paylaterBlock_className}
