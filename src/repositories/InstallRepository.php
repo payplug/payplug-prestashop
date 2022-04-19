@@ -278,12 +278,17 @@ class InstallRepository extends Repository
         }
 
         // Install tab
-        if (!$this->dependencies->loadSpecificPresta()->installTab()) {
+        if (!$this->installTab()) {
             return $this->setInstallError('Install failed: Install Tab');
         }
 
         $this->log->info('Install successful.');
         return true;
+    }
+
+    public function installTab()
+    {
+        return $this->dependencies->loadSpecificPresta()->installTab();
     }
 
     /**

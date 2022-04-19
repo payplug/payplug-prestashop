@@ -55,13 +55,10 @@ class AdminClass
      */
     public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
-        $dependencies = new DependenciesClass();
         $context = (new ContextSpecific())->getContext();
 
         if ($controller_name == 'AdminModules') {
-            $admin_ajax_url = $context->link->getAdminLink($controller_name)
-                . '&configure=' . $dependencies->name .
-                '&tab_module=payments_gateways&module_name=' . $dependencies->name;
+            $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
         } elseif ($controller_name == 'AdminOrders') {
             $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
