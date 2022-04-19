@@ -31,6 +31,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'ID paiement fractionné';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Numéro d\'échéance';
+$_MODULE['<{payplug}prestashop>advanced_paylater_912c4c5bcef386d618d4069652369009'] = 'Paramètrages avancés';
 $_MODULE['<{payplug}prestashop>alert_eda33afc4c30ecdc0e6567f46326175f'] = 'Pendant l\'étude de votre dossier, vous pouvez utiliser le [1]mode TEST[/1] pour découvrir notre module.[2]  [3]Cliquez-ici[/3] pour passer au mode LIVE et encaisser les paiements de vos clients.';
 $_MODULE['<{payplug}prestashop>alert_f11a2c6bdb67fea2bbdbac1215a03361'] = 'Félicitations, votre compte est connecté !';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
@@ -345,7 +346,12 @@ $_MODULE['<{payplug}prestashop>paylater_88faf5140e46519b6202e754c59a3f73'] = 'Av
 $_MODULE['<{payplug}prestashop>paylater_a89597ac9fa68018f8edf15ca13dee0f'] = 'PayLater';
 $_MODULE['<{payplug}prestashop>paylater_b97ce6e200faff80eda5840137ec3323'] = 'Les frais sont répartis entre vous et vos clients. ';
 $_MODULE['<{payplug}prestashop>paylater_e6e132699f77505baebb35d39d2430a2'] = 'Les frais sont à votre charge.';
-$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Choisissez ci-dessous de prendre (ou non) l\'ensemble des frais à votre charge. [1]En savoir plus[/1].';
+$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l\'ensemble des frais à votre charge. [1]En savoir plus[/1].';
+$_MODULE['<{payplug}prestashop>paylater_optimised_28f76b909673cf25ce04d9b16b48f5f8'] = 'Afficher les échéanciers sur le checkout';
+$_MODULE['<{payplug}prestashop>paylater_optimised_d07fe2831e8dd5183515409dee999a59'] = 'Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois. [1]En savoir plus[/1].';
+$_MODULE['<{payplug}prestashop>paylater_thresholds_80142c6e69c0f9cbfb72359668d152d4'] = 'et';
+$_MODULE['<{payplug}prestashop>paylater_thresholds_afafab57d74470e88a32b75fbf7585c8'] = 'Personnalisez votre offre de paiement fractionné';
+$_MODULE['<{payplug}prestashop>paylater_thresholds_ef7c4029dae4055307a23b8ea0f301cd'] = 'Proposer le paiement fractionné garanti pour des montants entre';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Payer en 3x ou 4x sans frais avec Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Payer en 3x ou 4x par carte bancaire avec Oney';
