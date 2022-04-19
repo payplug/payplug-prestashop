@@ -74,6 +74,9 @@
         inputValue = '1'
         inputName = $payplug_switch.oney_optimized.name}
     {/if}
+    {* Advanced Paylater Settings *}
+
+    {include file='./advanced_paylater.tpl'}
 {/capture}
 
 {assign var='paylaterBlock_className' value='paylaterBlock'}

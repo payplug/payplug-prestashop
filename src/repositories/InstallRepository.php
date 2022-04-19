@@ -299,11 +299,6 @@ class InstallRepository extends Repository
                         $this->dependencies->getConfigurationKey($key),
                         1
                     );
-                } elseif ($key == 'oneyOptimized' && $this->dependencies->name == 'pspaylater') {
-                    $this->config->updateValue(
-                        $this->dependencies->getConfigurationKey($key),
-                        1
-                    );
                 } else {
                     $this->config->updateValue(
                         $this->dependencies->getConfigurationKey($key),
