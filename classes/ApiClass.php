@@ -42,6 +42,9 @@ class ApiClass
     /** @var string */
     public $current_api_key;
 
+    /** var Configuration */
+    public $config;
+
     /** var DependenciesClass */
     public $dependencies;
 
@@ -58,11 +61,13 @@ class ApiClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+
         $this->checkEnvironment();
         $this->setEnvironment();
         $this->setSecretKey();
         $this->current_api_key = $this->getCurrentApiKey();
-        $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->setUserAgent();
     }
@@ -137,7 +142,7 @@ class ApiClass
                 'result' => false,
                 ];
         }
-        $sandbox = Configuration::get(
+        $sandbox = $this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $flag = true;
@@ -186,12 +191,12 @@ class ApiClass
         }
 
         if ($sandbox) {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('liveApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
             ));
         } else {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('testApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('testApiKey')
             ));
         }
 
@@ -239,12 +244,12 @@ class ApiClass
         }
 
         if (!$sandbox) {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('liveApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
             ));
         } else {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('testApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('testApiKey')
             ));
         }
 
@@ -272,22 +277,22 @@ class ApiClass
         $id = $json_answer['id'];
 
         $configuration = [
-            'currencies' => Configuration::get(
+            'currencies' => $this->config->get(
                 $this->dependencies->getConfigurationKey('currencies')
             ),
-            'min_amounts' => Configuration::get(
+            'min_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('minAmounts')
             ),
-            'max_amounts' => Configuration::get(
+            'max_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('maxAmounts')
             ),
-            'oney_allowed_countries' => Configuration::get(
+            'oney_allowed_countries' => $this->config->get(
                 $this->dependencies->getConfigurationKey('oneyAllowedCountries')
             ),
-            'oney_max_amounts' => Configuration::get(
+            'oney_max_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('oneyMaxAmounts')
             ),
-            'oney_min_amounts' => Configuration::get(
+            'oney_min_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('oneyMinAmounts')
             ),
         ];
@@ -361,7 +366,7 @@ class ApiClass
 
         $onboardingOneyCompleted = false;
         if (isset($json_answer['payment_methods']) && !empty(
-            Configuration::get(
+            $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             )
         )) {
@@ -438,14 +443,14 @@ class ApiClass
      */
     public function getCurrentApiKey()
     {
-        if ((int)Configuration::get(
+        if ((int)$this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         ) === 1) {
-            return Configuration::get(
+            return $this->config->get(
                 $this->dependencies->getConfigurationKey('testApiKey')
             );
         } else {
-            return Configuration::get(
+            return $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             );
         }
@@ -458,16 +463,16 @@ class ApiClass
      */
     public function setAPIKey()
     {
-        $sandbox_mode = (int)Configuration::get(
+        $sandbox_mode = (int)$this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $valid_key = null;
         if ($sandbox_mode) {
-            $valid_key = Configuration::get(
+            $valid_key = $this->config->get(
                 $this->dependencies->getConfigurationKey('testApiKey')
             );
         } else {
-            $valid_key = Configuration::get(
+            $valid_key = $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             );
         }
@@ -509,7 +514,7 @@ class ApiClass
             $api_keys['live_key']
         );
 
-        $is_sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $is_sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
         if ($is_sandbox) {
             $this->setSecretKey($api_keys['test_key']);
         } else {
@@ -605,7 +610,7 @@ class ApiClass
             $payplug_key = $this->current_api_key;
         } else {
             $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
-            $payplug_key = Configuration::get($this->dependencies->concatenateModuleNameTo($configuration_key));
+            $payplug_key = $this->config->get($this->dependencies->concatenateModuleNameTo($configuration_key));
         }
 
         try {
@@ -672,7 +677,7 @@ class ApiClass
      */
     public function hasLiveKey()
     {
-        return (bool)Configuration::get(
+        return (bool)$this->config->get(
             $this->dependencies->getConfigurationKey('liveApiKey')
         );
     }
