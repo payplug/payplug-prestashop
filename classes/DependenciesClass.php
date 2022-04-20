@@ -382,8 +382,12 @@ class DependenciesClass
      * @param string $key
      * @return string
      */
-    public function getConfigurationKey($key)
+    public function getConfigurationKey($key = false)
     {
+        if (!isset($this->configurationKeys[$key]) || !$key || !is_string($key)) {
+            return false;
+        }
+
         return $this->concatenateModuleNameTo($this->configurationKeys[$key]['name']);
     }
 
