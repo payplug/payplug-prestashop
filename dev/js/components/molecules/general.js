@@ -5,21 +5,21 @@ class General {
     };
 
     initialize() {
-        this.handleEvents();
+        general.handleEvents();
     }
 
     handleEvents() {
         $(document)
-            .on('click', 'button[name=showLogin]', this.showLogin)
-            .on('click', 'button[name=hideLogin]', this.hideLogin)
-            .on('click', 'button[name=login]', this.login)
-            .on('click', 'input[name=payplug_sandbox]', this.handleSandbox)
-            .on('click', 'button[name=logout]', this.logout)
-            .on('click', 'button[name=closePopin]', this.closePopin)
-            .on('click', '.alertLiveButton', this.handleAlertLiveButton)
-            .on('click', 'button[name=submitSandbox]', this.submitSandbox)
-            .on('click', 'button[name=validateLive]', this.validateLive)
-            .on('click', 'input[name=modalTriggered]', this.handleModal)
+            .on('click', 'button[name=showLogin]', general.showLogin)
+            .on('click', 'button[name=hideLogin]', general.hideLogin)
+            .on('click', 'button[name=login]', general.login)
+            .on('click', 'input[name=payplug_sandbox]', general.handleSandbox)
+            .on('click', 'button[name=logout]', general.logout)
+            .on('click', 'button[name=closePopin]', general.closePopin)
+            .on('click', '.alertLiveButton', general.handleAlertLiveButton)
+            .on('click', 'button[name=submitSandbox]', general.submitSandbox)
+            .on('click', 'button[name=validateLive]', general.validateLive)
+            .on('click', 'input[name=modalTriggered]', general.handleModal)
     }
 
     handleAlertLiveButton(event) {
@@ -284,6 +284,7 @@ class General {
 
     reloadFromContent(content) {
         $('.'+module_name+'Configuration').replaceWith(content);
+        $(window).trigger('reloadEvent');
     }
 
     toggleDescription(event) {
@@ -299,4 +300,4 @@ class General {
 }
 
 const general = new General();
-general.initialize();
+$(document).ready(general.initialize);

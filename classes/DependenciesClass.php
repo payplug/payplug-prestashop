@@ -45,6 +45,11 @@ class DependenciesClass
             'defaultValue' => 0,
             'setConf' => 1
         ],
+        'applepay' => [
+            'name' => 'APPLEPAY',
+            'defaultValue' => null,
+            'setConf' => 1
+        ],
         'bancontact' => [
             'name' => 'BANCONTACT',
             'defaultValue' => null,

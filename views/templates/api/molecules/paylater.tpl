@@ -46,11 +46,10 @@
                 inputName = $payplug_switch.oney.name}
             {else}
                 {include file='./../atoms/switch/switch.tpl' switchEnabledLabel='On'
-                switchDisabledLabel='Off'
-                switchDataName='switchData'
-                switchValue='1'
-                checked=true
-                switchName=$payplug_switch.oney.name}
+                    switchDisabledLabel='Off'
+                    switchDataName='payplug_oney'
+                    switchChecked=$payplug_switch.oney.checked
+                    switchName=$payplug_switch.oney.name}
             {/if}
         </div>
     </div>
