@@ -1,15 +1,38 @@
 #!/bin/sh
 
-echo "Set namespance PayPlugModule to PayLaterModule";
+echo "Set namespace";
 
-#grep -rl `basename PayPlugModule` . ':!dev/ci/set_namespace.sh' | xargs sed -i -e 's/'`basename PayPlugModule`'/'`basename PayLaterModule`'/g';
-git grep -rl `basename PayPlugModule` . ':!dev/ci/set_namespace.sh' | xargs sed -i -e 's/'`basename PayPlugModule`'/'`basename PayLaterModule`'/g';
+mode="normal"
+namespace="PayPlug"
+newnamespace="PayLater"
+class="Payplug"
+newclass="PsPayLater"
+# Process all options supplied on the command line
+while getopts m: flag;
+do
+    case "${flag}" in
+        m) mode=${OPTARG};;
+        *) eval echo "Unrecognized arg \$${OPTARG}"; usage; exit ;;
+    esac
+done
+
+if  [ "$mode" = "reverse" ]; then
+  echo "Current mode is ${mode}, convert namespace back to Payplug"
+  namespace="PayLater"
+  newnamespace="PayPlug"
+  class="PsPayLater"
+  newclass="Payplug"
+else
+  if [ "$mode" = "normal" ]; then
+  echo "Default mode (${mode}), convert namespace to Paylater"
+  fi
+fi
+
+#grep -rl `basename PayPlugModule` . ':!dev/ci/set_namespace.sh' | xargs sed -i -e 's/'`basename PayPlugModule`'/'`basename PayPlugModule`'/g';
+git grep -rl `basename ${namespace}Module` . ':!dev/**' ':!*AdminPsPayLaterController.php' | xargs sed -i -e 's/'`basename ${namespace}Module`'/'`basename ${newnamespace}Module`'/g';
 
 #rename the front controllers files
-
-echo "Renaming the front controllers files to begin with bnpl"
-
-git grep -rl 'class Payplug' ./controllers/front | xargs sed -i -e 's/class Payplug/class PsPayLater/g';
+git grep -rl 'class '${class} ./controllers/front | xargs sed -i -e 's/class '${class}'/class '${newclass}'/g';
 
 echo "Remove temporay file";
 rm ./*.php-e ./*/*.php-e ./*/*/*.php-e ./*/*/*/*.php-e;
