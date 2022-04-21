@@ -1,11 +1,14 @@
 {capture assign="optimisedTitle"}{l s='paylater.block.optimisedTitle' mod='payplug'}{/capture}
+{capture assign=oneyFaqLink}{$faq_links.oney}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee{/capture}
+
 {capture assign='faq_oneyBlock'}
     {include file='./../atoms/link/link.tpl'
     linkText=''
-    linkHref=$faq_links.oney
+    linkHref=$oneyFaqLink
     linkData='faqOney'
     linkNoTag=true}
 {/capture}
+
 {capture assign="optimisedDescription"}{l s='paylater.block.optimisedDescription' tags=[$faq_oneyBlock] mod='payplug'}{/capture}
 <div class="optimisedImg" >
     {include file="./../_svg/optimised.tpl"}
