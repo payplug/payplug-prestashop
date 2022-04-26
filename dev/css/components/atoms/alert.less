@@ -1,4 +1,27 @@
 .payplugUIAlert {
+  input[name="alertTriggered"] {
+    display: none;
+    &:checked {
+      & ~ .-alert {
+        display: none;
+      }
+    }
+  }
+  ._close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+    width: 24px;
+
+    margin: 0;
+    cursor: pointer;
+    position: absolute;
+    top: 14px;
+    left: calc(100% - 33px);
+
+  }
+
   .borderRadius(4px);
 
   display: flex;
@@ -48,7 +71,7 @@
     .border(#colorMap[accentuationSuccess500]);
     background-color: #colorMap[accentuationSuccess50];
     color: #colorMap[accentuationSuccess500];
-    ._icon {
+    ._icon, ._close {
       svg {
         fill: #colorMap[accentuationSuccess500];
       }
@@ -59,7 +82,7 @@
     .border(#colorMap[accentuationAlert500]);
     background-color: #colorMap[accentuationAlert50];
     color: #colorMap[accentuationAlert500];
-    ._icon {
+    ._icon, ._close {
       svg {
         fill: #colorMap[accentuationAlert500];
       }
@@ -70,7 +93,7 @@
     .border(#colorMap[accentuationWarning500]);
     background-color: #colorMap[accentuationWarning50];
     color: #colorMap[accentuationWarning500];
-    ._icon {
+    ._icon, ._close {
       svg {
         fill: #colorMap[accentuationWarning500];
       }

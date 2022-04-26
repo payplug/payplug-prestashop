@@ -28,6 +28,7 @@
         {/capture}
         {include file='./alert.tpl'
             alertTitle='This is a sucess alert!'
+            alertIcon='check'
             alertContent=$alertContent}
     </div>
     <div>
@@ -37,6 +38,7 @@
         {/capture}
         {include file='./alert.tpl'
             alertType='warning'
+            alertIcon='lightbulb'
             alertTitle='This is a warning alert!'
             alertContent=$alertContent}
     </div>
@@ -48,15 +50,27 @@
         {/capture}
         {include file='./alert.tpl'
             alertType='error'
+            alertIcon='lock'
             alertTitle='This is a error alert!'
             alertContent=$alertContent}
+    </div>
+    <div>
+        {capture assign="alertContent"}
+            <p>No icon.</p>
+        {/capture}
+        {include file='./alert.tpl'
+        alertType='error'
+        alertTitle='This is a error alert!'
+        alertContent=$alertContent}
     </div>
     <div class="_props">
         <div>
             props :
             <ul>
                 <li>type: string (success:default|warning|error)</li>
+                <li>icon: string (optional) (all available icons: check|lightbulb|lock|timer...)</li>
                 <li>title: string (optional)</li>
+                <li>close: bool (optional)</li>
                 <li>content: html (mandatory)</li>
             </ul>
         </div>

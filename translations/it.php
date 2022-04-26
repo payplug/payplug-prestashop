@@ -270,6 +270,8 @@ $_MODULE['<{payplug}prestashop>messages_7c04ed9eccda2e75dcb57f352d878154'] = 'Ok
 $_MODULE['<{payplug}prestashop>messages_f8cae6f73b59cedacdccc952ee2118de'] = 'Si';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Carte registrate';
 $_MODULE['<{payplug}prestashop>my_account_9a5b5b8ce74c1f2f1cecbfd517fe1128'] = 'La tua versione Prestashop non é compatibile';
+$_MODULE['<{payplug}prestashop>onboardingalerts_eda33afc4c30ecdc0e6567f46326175f'] = 'Mentre il tuo dossier è in fase di elaborazione, puoi utilizzare la [1]modalità TEST[/1] per scoprire il nostro modulo.[2] [3]Clicca qui[/3] per passare alla modalità LIVE e iniziare ad incassare i pagamenti dei tuoi clienti.';
+$_MODULE['<{payplug}prestashop>onboardingalerts_f11a2c6bdb67fea2bbdbac1215a03361'] = 'Congratulazioni, il tuo account è già connesso!';
 $_MODULE['<{payplug}prestashop>one_click_09290bbf6b0598e60b97c3b1bd44161b'] = 'Permetti ai clienti di memorizzare le informazioni della loro carta di credito per ulteriori acquisti';
 $_MODULE['<{payplug}prestashop>one_click_25e8f2fd2871c8423bbe4e254066cd98'] = 'Si prega di attendere...';
 $_MODULE['<{payplug}prestashop>one_click_2f0d80d0c610b9d8b39016c3f999fd22'] = 'Pagamento con carta di credito';

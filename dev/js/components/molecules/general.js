@@ -20,6 +20,7 @@ class General {
             .on('click', 'button[name=submitSandbox]', general.submitSandbox)
             .on('click', 'button[name=validateLive]', general.validateLive)
             .on('click', 'input[name=modalTriggered]', general.handleModal)
+            .on('click', 'input[name=alertTriggered]', general.closeAlert)
     }
 
     handleAlertLiveButton(event) {
@@ -131,6 +132,16 @@ class General {
     closePopin(event) {
         const $container = $('.' + general.props.container);
         $container.find('input[name=modalTriggered]').prop('checked', false);
+    }
+
+    closeAlert(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const $icon = $(this);
+        if ($icon.closest('.payplugUIAlert').hasClass('-success')) {
+            general.setSandboxAllowed();
+        }
+        $icon.closest('.payplugUIAlert').remove();
     }
 
     hideLogin(event) {

@@ -61,12 +61,15 @@
     }
 
     .sandboxError {
-      display: block;
+      display: flex;
+      align-items: center;
       color: #colorMap[error];
       font-size: 12px;
-      margin: -20px 0 -2px;
+      margin: 4px 0 -2px;
       line-height: 18px;
-
+      .payplugUIIcon {
+        margin-right: 4px;
+      }
       svg {
         .transition(~"fill @{dur}");
         fill: #colorMap[error];
