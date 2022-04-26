@@ -33,9 +33,7 @@
         {include file='./../api/molecules/description.tpl'}
 
         {* Alert banner *}
-        {if $connected && !$verified || $connected && !$onboardingOneyCompleted}
-            {include file='./../api/molecules/alert.tpl'}
-        {/if}
+        {include file='./panel/alerts/onboardingalerts.tpl'}
 
         {* Général block *}
         {include file='./../api/molecules/general.tpl'}

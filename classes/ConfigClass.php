@@ -910,7 +910,8 @@ class ConfigClass
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
-            'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods()
+            'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods(),
+            'onBoardingCheck' => false
         ]);
 
         return $this->html;
@@ -1444,19 +1445,13 @@ class ConfigClass
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
-                $onboardingOneyCompleted = false;
-                $livepermissions = $this->getLivePermissions();
-                if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
-                    $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
-                }
-
+                $this->assignContentVar();
                 $this->context->smarty->assign([
-                    'isOnboardedCompleted' => $onboardingOneyCompleted
+                    'onBoardingCheck' => true
                 ]);
-                die(json_encode([
-                    'content' => false,
-                    'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/sandbox.tpl'),
-                ]));
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+                // On recharge l'admin avec le message de réussite ou d'erreur dans smarty
+                die(json_encode(['content' => $content]));
             } else {
                 $errorMessage = $this->dependencies->l('payplug.submitSandbox.passwordError', 'configclass');
                 $this->context->smarty->assign([
