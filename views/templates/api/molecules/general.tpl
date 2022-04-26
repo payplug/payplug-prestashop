@@ -37,9 +37,14 @@
         {capture assign="generalSubscribe_createAccount"}
             {l s='general.subscribe.createAccount' mod='payplug'}
         {/capture}
+        {if 'pspaylater' == $module_name}
+            {assign var='payplugRegistrationUrl' value=$portal_url|escape:'htmlall':'UTF-8'|cat:'/signup?sponsor=22101'}
+        {else}
+            {assign var='payplugRegistrationUrl' value=$portal_url|escape:'htmlall':'UTF-8'}
+        {/if}
         {include file='./../atoms/buttonLink/buttonLink.tpl'
             buttonLinkData='payplugRegistration'
-            buttonLinkHref=$portal_url|escape:'htmlall':'UTF-8'|cat:'/signup?sponsor=22101'
+            buttonLinkHref=$payplugRegistrationUrl
             buttonLinkName='createAccount'
             buttonLinkText=$generalSubscribe_createAccount}
 
@@ -53,7 +58,11 @@
             buttonText=$generalSubscribe_showLogin}
         </div>
     {/capture}
-    {assign var='generalSubscribe_className' value='generalBlock -subscribe -center'}
+    {if 'pspaylater' == $module_name}
+        {assign var='generalSubscribe_className' value='generalBlock -subscribe -center'}
+    {else}
+        {assign var='generalSubscribe_className' value='generalBlock -subscribe -center -hide'}
+    {/if}
     {include file='./../atoms/block/block.tpl'
         blockTitle=$generalSubscribe_title
         blockDescription=$generalSubscribe_description
@@ -113,7 +122,11 @@
             </div>
         </form>
     {/capture}
-    {assign var='generalLogin_className' value='generalBlock -login -hide'}
+    {if 'pspaylater' == $module_name}
+        {assign var='generalLogin_className' value='generalBlock -login -hide'}
+    {else}
+        {assign var='generalLogin_className' value='generalBlock -login'}
+    {/if}
     {include file='./../atoms/block/block.tpl'
         blockTitle=$generalLogin_title
         blockDescription=$generalLogin_description
