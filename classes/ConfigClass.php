@@ -537,9 +537,9 @@ class ConfigClass
                 $accountsFacade = $module->getService('ps_accounts.facade');
                 $accountsService = $accountsFacade->getPsAccountsService();
                 return $accountsService->isAccountLinked();
-            } catch (ModuleNotInstalledException $e) {
+            } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException $e) {
                 return false;
-            } catch (ModuleVersionException $e) {
+            } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException $e) {
                 return false;
             }
         } else {
