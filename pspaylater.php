@@ -56,7 +56,7 @@ class PsPaylater extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '0.1.0';
+        $this->version = '0.1.1';
 
         parent::__construct();
 
@@ -92,6 +92,9 @@ class PsPaylater extends PaymentModule
                 $dependencies = new \PayPlugModule\classes\DependenciesClass();
                 $logger = $dependencies->getPlugin()->getLogger();
 
+                Media::addJsDef([
+                    'admin_iso_code' => $this->context->language->iso_code,
+                ]);
                 try {
                     // Install service if not done
                     $this->getService('ps_accounts.installer')->install();
@@ -106,7 +109,6 @@ class PsPaylater extends PaymentModule
 
                     Media::addJsDef([
                         'contextPsAccounts' => $contextPsAccounts,
-                        'admin_iso_code' => $this->context->language->iso_code,
                     ]);
 
                     // Retrieve Account CDN
