@@ -73,12 +73,17 @@ class AdminPsPayLaterController extends ModuleAdminController
             $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->module->name);
 
             // update modal language
+            $languages = array('es','de','pt','nl');
+            $isoCode = $this->context->language->iso_code;
+            if (in_array($this->context->language->iso_code, $languages)) {
+                $isoCode='en';
+            }
             $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' .
-                $this->context->language->iso_code . '/link-shop';
+                $isoCode . '/link-shop';
 
             Media::addJsDef([
                 'contextPsAccounts' => $contextPsAccounts,
-                'admin_iso_code' => $this->context->language->iso_code,
+                'admin_iso_code' => $isoCode,
             ]);
 
             // Retrieve Account CDN
