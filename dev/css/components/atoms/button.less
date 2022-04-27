@@ -13,7 +13,7 @@
   height: calc(40em / ~"@{size}");
   padding: 0 calc(20em / ~"@{size}");
 
-  background: #colorMap[purple];
+  background: @color-primary;
   border-radius: 4px;
   border: none;
 
@@ -31,7 +31,8 @@
 
   &:hover,
   &.-hover {
-    background: darken(#colorMap[purple], 10.5%);
+    // primary 900
+    background: @color-primary-darken;
     color: #colorMap[white];
   }
 
@@ -39,35 +40,35 @@
   &[disabled="disabled"] {
     opacity: .3;
     cursor: default;
-    background: #colorMap[purple];
+    background: @color-primary;
   }
 
   // secondary
   &.-secondary {
-    .border(#colorMap[purple]);
+    .border(@color-primary);
     background: #colorMap[white];
 
     &,
     &:focus,
     &:active {
-      color: #colorMap[purple];
+      color: @color-primary;
     }
 
     &:hover,
     &.-hover {
-      background: #colorMap[purple];
+      background: @color-primary;
       color: #colorMap[white];
     }
 
     &.-disabled {
       background: #colorMap[white];
-      color: #colorMap[purple];
+      color: @color-primary;
     }
   }
 
   // tertiary
   &.-tertiary {
-    .border(#colorMap[border]);
+    .border(#colorMap[borderMain]);
     background: #colorMap[white];
 
     &,

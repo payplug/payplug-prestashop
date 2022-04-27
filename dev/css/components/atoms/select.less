@@ -28,11 +28,11 @@
       height: 8px;
 
       content: "";
-      -webkit-mask-image: url(~"@{img_icons}arrow_down.svg");
-      mask-image: url(~"@{img_icons}arrow_down.svg");
+      -webkit-mask-image: url(~"@{img-icons}arrow_down.svg");
+      mask-image: url(~"@{img-icons}arrow_down.svg");
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      background-color: #697180;
+      background-color: #colorMap[fontSecondaryDefault];
     }
 
     &:focus {
@@ -102,13 +102,17 @@
     font-weight: 400;
 
     &:hover {
-      color: #colorMap[purple];
-      background: #colorMap[purple50];
+      color: @color-primary;
+      // primary 50
+      background: @color-primary-lighten;
     }
   }
 
   &.-disabled {
-    opacity: .3;
     cursor: default;
+
+    ._current {
+      opacity: .3;
+    }
   }
 }

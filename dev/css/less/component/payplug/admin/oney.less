@@ -2,7 +2,7 @@
 .flex-container {
   display: flex;
   flex-wrap: wrap;
-  @media (@mobile) {
+  @media (@screen-mobile) {
     width: 250px;
   }
 
@@ -34,7 +34,8 @@
         }
 
         &:focus[type="text"] {
-          border: 2px dashed #00ab7a;
+          border: 2px dashed;
+          border-color: #colorMap[module];
         }
       }
 

@@ -15,7 +15,7 @@ views/css/*.css
 views/css/*.map
 views/js/*.js
 dev/ci/translations.csv
-dev/css/less/var.less
+dev/css/less/include.less
 dev/css/components/atoms/*.map
 dev/css/components/atoms/*.css
 dev/css/*.css
