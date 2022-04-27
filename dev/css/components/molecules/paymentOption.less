@@ -24,20 +24,20 @@
         display: block;
       }
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         display: none;
       }
     }
     ._text {
       ._title {
-        color: #colorMap[purple];
+        color: @color-primary;
         margin: 0;
       }
       p {
         margin: 0;
       }
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         margin: 0 0 0 24px;
       }
     }
@@ -46,7 +46,7 @@
       margin: 42px 0 0;
     }
 
-    @media (@mobile) {
+    @media (@screen-mobile) {
       margin: 0;
       & + .paymentOption {
         margin: 16px 0 0;

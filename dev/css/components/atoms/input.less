@@ -33,7 +33,7 @@
 
       &:focus,
       &:hover {
-        border-color: #colorMap[purple];
+        border-color: @color-primary;
       }
 
       &:focus-visible {
@@ -62,7 +62,7 @@
   &.-icon {
     position: relative;
     &:before {
-      background-color: #697180;
+      background-color: #colorMap[fontSecondaryDefault];
       content: "";
       display: block;
       position: absolute;
@@ -82,11 +82,11 @@
     }
     &Euro {
       &:before {
-        -webkit-mask-image: url(~"@{img_icons}euro_symbol.svg");
-        mask-image: url(~"@{img_icons}euro_symbol.svg");
+        -webkit-mask-image: url(~"@{img-icons}euro_symbol.svg");
+        mask-image: url(~"@{img-icons}euro_symbol.svg");
         -webkit-mask-repeat: no-repeat;
         mask-repeat: no-repeat;
-        background-color: #697180;
+        background-color: #colorMap[fontSecondaryDefault];
       }
     }
   }
@@ -97,7 +97,7 @@
       &[type=text],
       &[type=password],
       &[type=number] {
-        border-color: #colorMap[purple];
+        border-color: @color-primary;
       }
     }
   }
@@ -107,7 +107,7 @@
       &[type=text],
       &[type=password],
       &[type=number] {
-        border-color: #colorMap[red];
+        border-color: #colorMap[accentuationWarning];
       }
     }
   }

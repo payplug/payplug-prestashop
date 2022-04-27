@@ -28,7 +28,7 @@
 
   ._slider {
     -webkit-transition: 0.4s;
-    background-color: #697180;
+    background-color: #colorMap[fontSecondaryDefault];
     bottom: 0;
     cursor: pointer;
     left: 0;
@@ -59,7 +59,7 @@
     }
 
     &:checked + ._slider {
-      background-color: #colorMap[purple];
+      background-color: @color-primary;
 
       &:before {
         -ms-transform: translateX(16px);

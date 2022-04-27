@@ -52,7 +52,7 @@
 }
 
 #pppanel input[type="submit"].green-button {
-  background: #00ab7a;
+  background: #colorMap[module];
   color: #ffffff;
   border: none;
   /*margin: 15px 0 20px 0;*/
@@ -199,7 +199,8 @@ span.ppclose {
 #payplug_popin .green-button {
   float: right;
   color: #ffffff;
-  background: #00ab7a none repeat scroll 0 0;
+  background: none repeat scroll 0 0;
+  background-color: #colorMap[module];
   font-weight: 700;
 }
 
@@ -269,7 +270,7 @@ span.ppclose {
 }
 
 #payplug_popin a {
-  color: #00ab7a;
+  color: #colorMap[module];
 }
 
 #payplug_popin ul {
@@ -359,7 +360,7 @@ span.ppclose {
 }
 
 #pppanel .ppsuccess {
-  color: #00ab7a;
+  color: #colorMap[module];
   padding: 26px 0 0 10px;
   float: left;
   margin: 0;
@@ -404,7 +405,7 @@ span.ppclose {
 }
 
 #pppanel td.pp_success {
-  color: #00ab7a;
+  color: #colorMap[module];
   font-weight: bold;
 }
 
@@ -467,7 +468,7 @@ span.ppclose {
 }
 
 #pppanel .pp_success {
-  color: #00ab7a;
+  color: #colorMap[module];
   font-weight: bold;
 }
 
@@ -497,7 +498,7 @@ span.ppclose {
 
 .payplugOrder_delay {
   margin-left: 140px;
-  @media (@mobile) {
+  @media (@screen-mobile) {
     padding: 0;
   }
 }

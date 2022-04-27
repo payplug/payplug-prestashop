@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: flex-start;
 
-  .border(#colorMap[border]);
+  .border(#colorMap[borderMain]);
   position: relative;
   width: 100%;
   border-radius: 4px;
@@ -33,7 +33,7 @@
     width: 100%;
     padding: 30px 72px 30px 24px;
     margin: 0;
-    color: #colorMap[purple];
+    color: @color-primary;
 
     cursor: pointer;
 
@@ -50,11 +50,11 @@
       height: 8px;
 
       content: "";
-      -webkit-mask-image: url(~"@{img_icons}arrow_down.svg");
-      mask-image: url(~"@{img_icons}arrow_down.svg");
+      -webkit-mask-image: url(~"@{img-icons}arrow_down.svg");
+      mask-image: url(~"@{img-icons}arrow_down.svg");
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      background-color: #697180;
+      background-color: #colorMap[fontSecondaryDefault];
     }
   }
 

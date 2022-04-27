@@ -37,7 +37,7 @@
         flex-direction: row-reverse;
         width: 100%;
 
-        @media (@mobile) {
+        @media (@screen-mobile) {
           flex-direction: column-reverse;
         }
       }
@@ -52,7 +52,7 @@
     ._connexion {
       margin: 16px 0 12px 8px;
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         margin: 0 0 8px;
       }
     }
@@ -70,7 +70,7 @@
       max-width: 400px;
       padding: 16px 0 40px;
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         padding: 8px 0 32px;
       }
 
@@ -90,7 +90,7 @@
       &Portal {
         @size: 12;
         .Inter(~"@{size}px", 700);
-        color: #colorMap[purple];
+        color: @color-primary;
         letter-spacing: calc(1em / ~"@{size}");
 
         height: calc(36em / ~"@{size}");
@@ -102,7 +102,7 @@
           .buttonIcon {
             height: calc(18em / ~"@{size}");
             width: calc(18em / ~"@{size}");
-            fill: #colorMap[purple];
+            fill: @color-primary;
           }
         }
       }
@@ -111,8 +111,9 @@
         border: none;
 
         &:hover {
-          color: #colorMap[purple];
-          background: #colorMap[radioButtonBackground];
+          color: @color-primary;
+          // primary 50
+          background: @color-primary-lighten;
         }
       }
     }
@@ -124,7 +125,7 @@
       flex-wrap: wrap;
       margin: 0 0 36px;
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         flex-direction: column;
       }
 
@@ -139,13 +140,13 @@
         min-height: 40px;
         max-width: calc(100% - 232px);
 
-        @media (@mobile) {
+        @media (@screen-mobile) {
           max-width: 100%;
         }
       }
 
       &RadioButton {
-        @media (@mobile) {
+        @media (@screen-mobile) {
           margin: 8px 0 0;
         }
         div {
