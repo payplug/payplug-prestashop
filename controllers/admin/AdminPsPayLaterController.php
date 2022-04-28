@@ -75,18 +75,13 @@ class AdminPsPayLaterController extends ModuleAdminController
             $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->module->name);
 
             // update modal language
-            $languages = array('es','de','pt','nl');
+            $available_languages = ['es','de','pt','nl'];
             $isoCode = $this->context->language->iso_code;
-            if (in_array($this->context->language->iso_code, $languages)) {
-                $isoCode='en';
-            }
-            $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' .
-                $isoCode . '/link-shop';
+            $isoCode = in_array($isoCode, $available_languages) ? $isoCode : 'en';
+            $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' . $isoCode . '/link-shop';
 
-            Media::addJsDef([
-                'contextPsAccounts' => $contextPsAccounts,
-                'admin_iso_code' => $isoCode,
-            ]);
+            $this->context->smarty->assign(['iso_user' => $isoCode]);
+            Media::addJsDef(['contextPsAccounts' => $contextPsAccounts]);
 
             // Retrieve Account CDN
             $this->context->smarty->assign('urlAccountsCdn', $accountsService->getAccountsCdn());
