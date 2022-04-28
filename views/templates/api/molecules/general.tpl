@@ -20,12 +20,6 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{if $connected && (!$ps_account || !$payplug_switch.show.checked)}
-    {assign var='generalDisabled' value=true}
-{else}
-    {assign var='generalDisabled' value=false}
-{/if}
-
 {if !$connected}
     {* Block general subscribe *}
     {capture assign="generalSubscribe_title"}{l s='general.subscribe.title' mod='payplug'}{/capture}
@@ -68,7 +62,7 @@
         blockDescription=$generalSubscribe_description
         blockContent=$generalSubscribe_content
         blockData='generalSubscribe'
-        blockDisabled=$generalDisabled
+        blockDisabled=!$ps_account
         blockClassName=$generalSubscribe_className}
 
     {* Block general login *}
@@ -132,7 +126,7 @@
         blockDescription=$generalLogin_description
         blockContent=$generalLogin_content
         blockData='generalLogin'
-        blockDisabled=$generalDisabled
+        blockDisabled=!$ps_account
         blockClassName=$generalLogin_className}
 {else}
     {* Block general logged *}
@@ -223,6 +217,6 @@
         blockDescription=$generalLogged_description
         blockContent=$generalLogged_content
         blockData='generalLogged'
-        blockDisabled=$generalDisabled
+        blockDisabled=!$ps_account || !$payplug_switch.show.checked
         blockClassName=$generalLogged_className}
 {/if}
