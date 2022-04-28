@@ -138,9 +138,6 @@ class General {
         event.preventDefault();
         event.stopPropagation();
         const $icon = $(this);
-        if ($icon.closest('.payplugUIAlert').hasClass('-success')) {
-            general.setSandboxAllowed();
-        }
         $icon.closest('.payplugUIAlert').remove();
     }
 

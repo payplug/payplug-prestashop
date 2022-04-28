@@ -46,18 +46,21 @@
 
     {/if}
 
-    {assign "modeTestLink" "<a href='{$faq_links.sandbox|escape:'htmlall':'UTF-8'}' target='_blank' class='alertTestMode'>"}
-    {assign "sandboxLiveButton" "<button type='button' name='alertLiveButton' class='alertLiveButton'>"}
-    {capture assign="alertOnboardingTitle"}{l s='alert.onboarding.title' mod='pspaylater'}{/capture}
-    {capture assign="alertContent"}
-        {l s='alert.onboarding.content' tags=[$modeTestLink, '<br>', $sandboxLiveButton] mod='pspaylater'}
-    {/capture}
-    {include file='./../../../api/atoms/alert/alert.tpl'
-    alertType='warning'
-    alertIcon='lightbulb'
-    alertTitle=$alertOnboardingTitle
-    alertClassName='onboardingAlert'
-    alertContent=$alertContent}
+    {if !$onboardingOneyCompleted}
 
+        {assign "modeTestLink" "<a href='{$faq_links.sandbox|escape:'htmlall':'UTF-8'}' target='_blank' class='alertTestMode'>"}
+        {assign "sandboxLiveButton" "<button type='button' name='alertLiveButton' class='alertLiveButton'>"}
+        {capture assign="alertOnboardingTitle"}{l s='alert.onboarding.title' mod='pspaylater'}{/capture}
+        {capture assign="alertContent"}
+            {l s='alert.onboarding.content' tags=[$modeTestLink, '<br>', $sandboxLiveButton] mod='pspaylater'}
+        {/capture}
+        {include file='./../../../api/atoms/alert/alert.tpl'
+        alertType='warning'
+        alertIcon='lightbulb'
+        alertTitle=$alertOnboardingTitle
+        alertClassName='onboardingAlert'
+        alertContent=$alertContent}
+
+    {/if}
 
 {/if}
