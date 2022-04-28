@@ -20,25 +20,27 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{capture assign="paymentMethod_title"}{l s='paymentMethod.block.title' mod='payplug'}{/capture}
-{capture assign="paymentMethod_description"}{l s='paymentMethod.block.description' mod='payplug'}{/capture}
-{capture assign="paymentMethod_content"}
-    {foreach $payment_methods as $payment_method_name => $payment_method}
-        {include file='./paymentOption.tpl'
-            paymentOptionIdentifier = $payment_method_name
-            paymentOptionName = $payment_method.name
-            paymentOptionImage_url = $payment_method.image_url
-            paymentOptionDescription = $payment_method.description
-            paymentOptionLink = $payment_method.link
-            paymentOptionChecked = $payment_method.checked
-            paymentOptionInformations = $payment_method.informations
-    }
-    {/foreach}
-{/capture}
+{if isset($payment_methods) && $payment_methods}
+    {capture assign="paymentMethod_title"}{l s='paymentMethod.block.title' mod='payplug'}{/capture}
+    {capture assign="paymentMethod_description"}{l s='paymentMethod.block.description' mod='payplug'}{/capture}
+    {capture assign="paymentMethod_content"}
+        {foreach $payment_methods as $payment_method_name => $payment_method}
+            {include file='./paymentOption.tpl'
+                paymentOptionIdentifier = $payment_method_name
+                paymentOptionName = $payment_method.name
+                paymentOptionImage_url = $payment_method.image_url
+                paymentOptionDescription = $payment_method.description
+                paymentOptionLink = $payment_method.link
+                paymentOptionChecked = $payment_method.checked
+                paymentOptionInformations = $payment_method.informations
+        }
+        {/foreach}
+    {/capture}
 
-{include file='./../atoms/block/block.tpl'
-    blockTitle=$paymentMethod_title
-    blockDescription=$paymentMethod_description
-    blockContent=$paymentMethod_content
-    blockData='paymentMethodsBlock'
-    blockClassName='paymentMethodBlock'}
+    {include file='./../atoms/block/block.tpl'
+        blockTitle=$paymentMethod_title
+        blockDescription=$paymentMethod_description
+        blockContent=$paymentMethod_content
+        blockData='paymentMethodsBlock'
+        blockClassName='paymentMethodBlock'}
+{/if}
