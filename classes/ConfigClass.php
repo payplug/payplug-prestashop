@@ -751,12 +751,6 @@ class ConfigClass
             $connected = false;
         }
 
-        $onboardingOneyCompleted = false;
-        $livepermissions = $this->getLivePermissions();
-        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
-            $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
-        }
-
         if (count($this->validationErrors) && !$connected) {
             $this->context->smarty->assign([
                 'validationErrors' => $this->validationErrors,
@@ -909,7 +903,7 @@ class ConfigClass
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
-            'onboardingOneyCompleted' => $onboardingOneyCompleted,
+            'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
             'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods(),
             'onBoardingCheck' => false
         ]);
@@ -934,6 +928,21 @@ class ConfigClass
         }
         return $livepermissions;
     }
+
+    /**
+     * Is onboarding OneyCompleted
+     * @return bool
+     */
+    public function isOnboardingOneyCompleted()
+    {
+        $onboardingOneyCompleted = false;
+        $livepermissions = $this->getLivePermissions();
+        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
+            $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
+        }
+        return $onboardingOneyCompleted;
+    }
+
 
     /**
      * Get FAQ link for given iso lang
@@ -1445,6 +1454,9 @@ class ConfigClass
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
+                if ($this->isOnboardingOneyCompleted()) {
+                    Configuration::updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
+                }
                 $this->assignContentVar();
                 $this->context->smarty->assign([
                     'onBoardingCheck' => true
