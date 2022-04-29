@@ -31,6 +31,8 @@ class AdminPayplugController extends ModuleAdminController
 
     public function __construct()
     {
+        $this->bootstrap = true;
+
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
