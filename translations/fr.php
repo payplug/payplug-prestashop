@@ -32,12 +32,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca974
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Numéro d\'échéance';
 $_MODULE['<{payplug}prestashop>advanced_paylater_912c4c5bcef386d618d4069652369009'] = 'Paramètrages avancés';
-$_MODULE['<{payplug}prestashop>alert_eda33afc4c30ecdc0e6567f46326175f'] = 'Pendant l\'étude de votre dossier, vous pouvez utiliser le [1]mode TEST[/1] pour découvrir notre module.[2]  [3]Cliquez-ici[/3] pour passer au mode LIVE et encaisser les paiements de vos clients.';
-$_MODULE['<{payplug}prestashop>alert_f11a2c6bdb67fea2bbdbac1215a03361'] = 'Félicitations, votre compte est connecté !';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
-$_MODULE['<{payplug}prestashop>bancontact_4c72b15e8f81999a38e124f4a0a5423f'] = 'Activer les paiements Bancontact (BETA)';
-$_MODULE['<{payplug}prestashop>bancontact_617ecf9a36aeb297a68f7de6e7ae952b'] = 'Permettez à vos clients de payer avec leurs cartes Bancontact.';
-$_MODULE['<{payplug}prestashop>bancontact_75fa7991962288d53c2273e338dfbe1c'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Déclencher';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Carte supprimée avec succès.';
 $_MODULE['<{payplug}prestashop>cardrepository_d5639fea4548475adf16c77e4418a59d'] = 'Êtes-vous sûr de vouloir supprimer cette carte ?';
@@ -515,8 +510,6 @@ $_MODULE['<{payplug}prestashop>settings_fe4c6a5e7bd6793b37370e4e46daf998'] = 'Pa
 $_MODULE['<{payplug}prestashop>show_b987dc3f2a9c3202e15b0dbd03eb312e'] = 'Connectez-vous ci-dessous à votre compte PayPlug pour pouvoir afficher le module à vos clients.';
 $_MODULE['<{payplug}prestashop>show_c0a284b3959d1e187e9a7560c76161a5'] = 'Afficher le module PayPlug à mes clients';
 $_MODULE['<{payplug}prestashop>show_e205336b3b23c2fa65284333c5f0956f'] = 'Afficher';
-$_MODULE['<{payplug}prestashop>standard_28399047289b5edb68832944845c0894'] = 'Paiement par carte';
-$_MODULE['<{payplug}prestashop>standard_dfeb50d18bb38533e34a3ab9f636d797'] = 'Proposez le paiement par carte bancaire à vos clients.';
 $_MODULE['<{payplug}prestashop>state_2a0b6680cbda364ef176a154fbb60e17'] = 'Votre serveur doit disposer d\'une version 1.0.1 ou supérieure d\'OpenSSL.';
 $_MODULE['<{payplug}prestashop>state_38fb08d8fa55b1bea92ae70b46a4aed0'] = 'Contrôlez votre environnement pour assurer le fonctionnement optimal du module.';
 $_MODULE['<{payplug}prestashop>state_6f24d6e6607af9988f5db6ae4b7efbe4'] = 'L\'extension PHP cURL est installée et activée.';

@@ -41,6 +41,7 @@
         blockTitle=$paymentMethod_title
         blockDescription=$paymentMethod_description
         blockContent=$paymentMethod_content
+        blockDisabled=!$connected || !$payplug_switch.show.checked
         blockData='paymentMethodsBlock'
         blockClassName='paymentMethodBlock'}
 {/if}
