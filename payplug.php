@@ -111,19 +111,19 @@ class Payplug extends PaymentModule
                 $this->install(true);
             }
 
-            return (new \PayPlugModule\classes\AdminClass(new \PayPlugModule\classes\DependenciesClass()))->getContent();
-        } else {
-            $iso_code = Context::getContext()->language->iso_code;
-            $iso_code = ($iso_code == 'en' || $iso_code == 'gb') ? 'en-gb' : $iso_code;
-            $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
-            $this->context->smarty->assign('faq_url', $faq_url);
-
-            $views_path = __PS_BASE_URI__ . 'modules/' . $this->name . '/views';
-            $this->context->smarty->assign('url_logo', $views_path . '/img/logo_payplug.png');
-            $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->version.'.css');
-
-            return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminPayPlug'));
         }
+
+        $iso_code = Context::getContext()->language->iso_code;
+        $iso_code = ($iso_code == 'en' || $iso_code == 'gb') ? 'en-gb' : $iso_code;
+        $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
+        $this->context->smarty->assign('faq_url', $faq_url);
+
+        $views_path = __PS_BASE_URI__ . 'modules/' . $this->name . '/views';
+        $this->context->smarty->assign('url_logo', $views_path . '/img/logo_payplug.png');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->version.'.css');
+
+        return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
     }
 
     /**
