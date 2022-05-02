@@ -332,6 +332,7 @@ class DependenciesClass
         $this->amountCurrencyClass = $this->getPlugin()->getAmountCurrencyClass();
 
         $this->apiClass = new ApiClass($this);
+        $this->applePayClass = new ApplePayClass($this);
         $this->adminClass = new AdminClass($this);
         $this->cardClass = new CardClass($this);
         $this->cartClass = new CartClass($this);
