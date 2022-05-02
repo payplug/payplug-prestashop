@@ -75,9 +75,9 @@ class AdminPsPayLaterController extends ModuleAdminController
             $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->module->name);
 
             // update modal language
-            $available_languages = ['es','de','pt','nl'];
+            $languages = ['es','de','pt','nl'];
             $isoCode = $this->context->language->iso_code;
-            $isoCode = in_array($isoCode, $available_languages) ? $isoCode : 'en';
+            $isoCode = !in_array($isoCode, $languages) ? $isoCode : 'en';
             $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' . $isoCode . '/link-shop';
 
             $this->context->smarty->assign(['iso_user' => $isoCode]);
