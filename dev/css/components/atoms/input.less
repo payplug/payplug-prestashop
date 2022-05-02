@@ -62,22 +62,25 @@
   &.-icon {
     position: relative;
     &:before {
+      .transform(translateY(-50%));
       background-color: #colorMap[fontSecondaryDefault];
       content: "";
       display: block;
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 50%;
+      left: 4px;
       width: 24px;
       height: 24px;
-      z-index: 1;
+      z-index: 0;
+      mask-position: 50%;
+      -webkit-mask-position: 50%;
     }
     input {
       &[type=text],
       &[type=password],
       &[type=number] {
         padding-left: 28px;
-        z-index: 2;
+        z-index: 1;
       }
     }
     &Euro {
