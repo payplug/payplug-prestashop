@@ -992,6 +992,16 @@ class HookClass
             ]);
         }
 
+        if ($this->config->get(
+            $this->dependencies->getConfigurationKey('applepay')
+        )) {
+            $applePayPaymentRequest = $this->dependencies->applePayClass->getPaymentRequest(Dispatcher::getInstance()->getController());
+
+            Media::addJsDef([
+                'applePayPaymentRequest' => $applePayPaymentRequest,
+            ]);
+        }
+
         Media::addJsDef(
             [
                 $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
