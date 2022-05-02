@@ -1242,6 +1242,53 @@ class PaymentClass
             ];
         }
 
+        // Apple Pay payment
+        if ($options['applepay'] && $this->dependencies->configClass->isValidFeature('feature_applepay') && $this->getBrowser() == 'Safari') {
+            $paymentOption['applepay']['name'] = 'applepay';
+            $paymentOption['applepay']['inputs'] = [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int)$this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'applepay',
+                ],
+            ];
+            $paymentOption['applepay']['tpl'] = 'applepay.tpl';
+            $paymentOption['applepay']['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
+            $paymentOption['applepay']['callToActionText'] = $this->dependencies->l(
+                'payplug.getPaymentOptions.payWithApplePay',
+                'paymentclass'
+            );
+            $paymentOption['applepay']['extra_classes'] = 'payplug default';
+            $paymentOption['applepay']['payment_controller_url'] = $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => 'applepay']
+            );
+
+            /*$paymentOption['applepay']['logo'] = $this->dependencies->mediaClass->getMediaPath(
+                $this->constant->get('_PS_MODULE_DIR_')
+                . $this->dependencies->name . '/views/img/logos_schemes_'
+                . $this->dependencies->configClass->getImgLang() . '.svg'
+            );*/
+            $paymentOption['applepay']['moduleName'] = $this->dependencies->name;
+        }
+
+
         return $paymentOption;
     }
 
@@ -2101,5 +2148,32 @@ class PaymentClass
 
         $this->context->cookie->__set('payplug_errors', $value);
         return (bool)$this->context->cookie->__get('payplug_errors');
+    }
+
+    public function getBrowser()
+    {
+        $arr_browsers = ["Opera", "Edg", "Chrome", "Safari", "Firefox", "MSIE", "Trident"];
+        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $user_browser = '';
+
+        foreach ($arr_browsers as $browser) {
+            if (strpos($agent, $browser) !== false) {
+                $user_browser = $browser;
+                break;
+            }
+        }
+
+        switch ($user_browser) {
+            case 'MSIE':
+            case 'Trident':
+                $user_browser = 'Internet Explorer';
+                break;
+
+            case 'Edg':
+                $user_browser = 'Microsoft Edge';
+                break;
+        }
+
+        return $user_browser;
     }
 }
