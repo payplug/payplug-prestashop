@@ -375,6 +375,7 @@ class ConfigClass
             'deferred' => (int)Configuration::get($this->dependencies->getConfigurationKey('deferred')) === 1,
             'oney' => (int)Configuration::get($this->dependencies->getConfigurationKey('oney')) === 1,
             'bancontact' => (int)Configuration::get($this->dependencies->getConfigurationKey('bancontact')) === 1,
+            'applepay' => (int)Configuration::get($this->dependencies->getConfigurationKey('applepay')) === 1,
         ];
 
         if (Configuration::get($this->dependencies->getConfigurationKey('email')) === null
@@ -389,6 +390,7 @@ class ConfigClass
             $available_options['deferred'] = false;
             $available_options['oney'] = false;
             $available_options['bancontact'] = false;
+            $available_options['applepay'] = false;
         } else {
             if (!$permissions['use_live_mode']
                 || Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')) === null
@@ -410,6 +412,9 @@ class ConfigClass
             if (!$permissions['can_use_bancontact']) {
                 $available_options['bancontact'] = false;
             }
+            /*if (!$permissions['can_use_bancontact']) {
+                $available_options['applepay'] = false;
+            }*/
         }
 
         return $available_options;
@@ -739,7 +744,8 @@ class ConfigClass
             'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
             'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
             'oney_optimized' => Configuration::get($this->dependencies->getConfigurationKey('oneyOptimized')),
-            'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact'))
+            'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact')),
+            'applepay' => Configuration::get($this->dependencies->getConfigurationKey('applepay'))
         ];
 
         $connected = !empty($configurations['email'])
@@ -888,6 +894,7 @@ class ConfigClass
             'deferred_state' => $configurations['deferred_state'],
             'oney' => $configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
+            'applepay' => $this->isValidFeature('feature_applepay'),
             'integrated' => $this->isValidFeature('feature_integrated'),
             'display_mode_isActivated' => $this->isValidFeature('feature_display_mode'),
             'standard_isActivated' => $this->isValidFeature('feature_standard'),
@@ -1048,6 +1055,14 @@ class ConfigClass
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
+            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+        ];
+
+        $switch['applepay'] = [
+            'name' => 'payplug_applepay',
+            'active' => $connected,
+            'checked' => $configurations['applepay'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
