@@ -60,8 +60,7 @@ class PrestashopSpecific17
         $this->context->controller->addCSS($views_path . 'css/front-v'.$this->dependencies->version.'.css');
         $this->context->controller->addJS($views_path . 'js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . 'js/front-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addJS($views_path . 'js/applepay.js');
-
+        $this->context->controller->addJS($views_path . 'js/applepay-v'.$this->dependencies->version.'.js');
     }
 
     public function displayPaymentOption($payment_options)

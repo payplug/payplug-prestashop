@@ -23,6 +23,7 @@
 
 namespace PayPlugModule\classes;
 
+use Carrier;
 use Configuration;
 use Dispatcher;
 use Language;
@@ -851,6 +852,12 @@ class HookClass
      */
     public function displayExpressCheckout()
     {
+        if ($this->config->get(
+            $this->dependencies->getConfigurationKey('applepay')
+        )) {
+            return $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
+        }
+
         if (!$this->oney->isOneyAllowed() ||
             (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
             Configuration::get($this->dependencies->getConfigurationKey('companyIso'))
@@ -870,7 +877,7 @@ class HookClass
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
-        return$this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -995,59 +1002,12 @@ class HookClass
         if ($this->config->get(
             $this->dependencies->getConfigurationKey('applepay')
         )) {
-            /*echo "<pre>";
-            print_r($this->context->cart->getSummaryDetails());
-            echo "</pre>";
-            die;*/
+            $applePayPaymentRequest = $this->dependencies->applePayClass->getPaymentRequest(Dispatcher::getInstance()->getController());
 
-            $currency = $this->currency->getCurrency($this->context->cart->id_currency);
-            $summaryDetails = $this->context->cart->getSummaryDetails();
-
-            $applePayPaymentRequest = array(
-                'countryCode' => $this->context->country->iso_code,
-                'currencyCode' => $currency->iso_code,
-                'merchantCapabilities' => array(
-                    'supports3DS'
-                ),
-                'supportedNetworks' => array(
-                    'visa',
-                    'masterCard',
-                    'amex',
-                    'discover'
-                ),
-                /*'requiredShippingContactFields' => array(
-                    'postalAddress',
-                    'name',
-                    'phone',
-                    'email'
-                ),
-                'shippingType' => 'shipping',
-                'shippingMethods' => array(
-                    array(
-                        'label' => 'Free Shipping',
-                        'detail' => 'Arrives in 5 to 7 days',
-                        'amount' => '0.00',
-                        'identifier' => 'FreeShip'
-                    )
-                ),*/
-                'lineItems' => array(
-                    array(
-                        'label' => 'Products',
-                        'amount' => $summaryDetails['total_products_wt']
-                    ),
-                    array(
-                        'label' => 'Shipping',
-                        'amount' => $summaryDetails['total_shipping']
-                    )
-                ),
-                'total' => array(
-                    'label' => $this->context->shop->name,
-                    'type' => 'final',
-                    'amount' => $this->context->cart->getOrderTotal()
-                )
-            );
             Media::addJsDef([
                 'applePayPaymentRequest' => $applePayPaymentRequest,
+                'applePayAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepay', [], true),
+                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypayment', [], true),
             ]);
         }
 

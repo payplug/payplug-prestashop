@@ -1280,11 +1280,10 @@ class PaymentClass
                 ['type' => 'applepay']
             );
 
-            /*$paymentOption['applepay']['logo'] = $this->dependencies->mediaClass->getMediaPath(
+            $paymentOption['applepay']['logo'] = $this->dependencies->mediaClass->getMediaPath(
                 $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/logos_schemes_'
-                . $this->dependencies->configClass->getImgLang() . '.svg'
-            );*/
+                . $this->dependencies->name . '/views/img/svg/payment/apple_pay.svg'
+            );
             /*$paymentOption['applepay']['action'] = $this->context->link->getModuleLink(
                 $this->dependencies->name,
                 'dispatcher',
