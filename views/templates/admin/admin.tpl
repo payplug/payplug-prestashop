@@ -22,8 +22,10 @@
 
 <div class="{$module_name|escape:'htmlall':'UTF-8'}Configuration">
     <div class="{$module_name|escape:'htmlall':'UTF-8'}">
-        {* Banner *}
-        {include file='./../api/molecules/banner.tpl'}
+        {if 'pspaylater' == $module_name}
+            {* Banner *}
+            {include file='./../api/molecules/banner.tpl'}
+        {/if}
 
         {if isset($ps_account_isActivated) && $ps_account_isActivated}
             {include file='./panel/ps_account.tpl'}
