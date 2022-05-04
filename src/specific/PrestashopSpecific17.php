@@ -61,7 +61,7 @@ class PrestashopSpecific17
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
-            $this->context->controller->addJS($views_path . 'js/applepay'.$this->dependencies->version.'.js');
+            $this->context->controller->addJS($views_path . 'js/applepay-v'.$this->dependencies->version.'.js');
         }
     }
 
