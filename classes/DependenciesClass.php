@@ -337,6 +337,7 @@ class DependenciesClass
         $this->cardClass = new CardClass($this);
         $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);
+        $this->installmentClass = new InstallmentClass($this);
         $this->hookClass = new HookClass($this);
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass($this);

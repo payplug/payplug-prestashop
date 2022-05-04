@@ -29,6 +29,12 @@ use Payplug\Core\HttpClient;
 use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
+use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\NotFoundException;
+use Payplug\Exception\UndefinedAttributeException;
+use Payplug\Card;
+use Payplug\InstallmentPlan;
+use Payplug\Payment;
 use PayPlugModule\src\exceptions\BadParameterException;
 use PayPlugModule\src\repositories\PluginRepository;
 use Symfony\Component\Dotenv\Dotenv;
@@ -736,5 +742,363 @@ class ApiClass
     public function getPortalUrl()
     {
         return $this->portal_url;
+    }
+
+    /**
+     * @description Abort InstallmentPlan from api for given id
+     *
+     * @param false $inst_id
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function abortInstallment($inst_id = false)
+    {
+        if (!$inst_id || !is_string($inst_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $inst_id given'
+            ];
+        }
+
+        try {
+            $response = [
+                'result' => true,
+                'resource' => InstallmentPlan::abort($inst_id),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create InstallmentPlan from api for given attributes
+     *
+     * @param array $atttributes
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function createInstallment($atttributes = []) {
+        if (!$atttributes || !is_array($atttributes)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $atttributes given'
+            ];
+        }
+
+        try {
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => InstallmentPlan::create($atttributes)
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Retrieve InstallmentPlan from api for given id
+     *
+     * @param $inst_id
+     * @return array
+     */
+    public function retrieveInstallment($inst_id = false)
+    {
+        if (!$inst_id || !is_string($inst_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $inst_id given'
+            ];
+        }
+
+        try {
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => InstallmentPlan::retrieve($inst_id)
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (NotFoundException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (UndefinedAttributeException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Abort Payment from api for given id
+     *
+     * @param false $pay_id
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function abortPayment($pay_id = false){
+        if (!$pay_id|| !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        try {
+            $response = [
+                'result' => true,
+                'resource' => Payment::abort($pay_id),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Capture Payment from api for given id
+     *
+     * @param $pay_id
+     * @return array
+     */
+    public function capturePayment($pay_id = false) {
+        if (!$pay_id|| !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        try {
+            $response = [
+                'result' => true,
+                'resource' => Payment::capture($pay_id),
+                'code' => 200
+            ];
+         } catch (NotAllowedException $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        } catch (ForbiddenException $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create Payment from api for given attributes
+     *
+     * @param array $atttributes
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function createPayment($atttributes = []) {
+        if (!$atttributes || !is_array($atttributes)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $atttributes given'
+            ];
+        }
+
+        try {
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => Payment::create($atttributes)
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create Payment from api for given data
+     *
+     * @param false $pay_id
+     * @param array $data
+     * @return array
+     */
+    public function patchPayment($pay_id = false, $data = [])
+    {
+        if (!$pay_id || !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given'
+            ];
+        }
+
+        $retrieve = $this->retrievePayment($pay_id);
+        if (!$retrieve['result']) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Can\'t patch the payment: ' . $retrieve['message']
+            ];
+        }
+
+        $payment = $retrieve['resource'];
+
+        try {
+            $response = [
+                'result' => true,
+                'resource' => $payment->update($data),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Retrieve Payment from api for given id
+     *
+     * @param false $pay_id
+     * @return array
+     */
+    public function retrievePayment($pay_id = false)
+    {
+        if (!$pay_id || !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        try {
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => Payment::retrieve($pay_id)
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (NotFoundException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (UndefinedAttributeException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Delete Card from api for given id
+     *
+     * @param false $card_id
+     * @return array
+     */
+    public function deleteCard($card_id = false) {
+        if (!$card_id || !is_string($card_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $card_id given'
+            ];
+        }
+
+        try {
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => Card::delete($card_id)
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'code' => $e->getCode(),
+                'result' => true,
+                'message' => $e->getMessage()
+            ];
+        } catch (NotFoundException $e) {
+            $response = [
+                'code' => $e->getCode(),
+                'result' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
     }
 }

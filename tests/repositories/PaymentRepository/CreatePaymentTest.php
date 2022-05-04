@@ -104,10 +104,13 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'create' => PaymentMock::getStandard()
-            ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => PaymentMock::getStandard()
+            ]
+        ]);
 
         $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
         $this->assertSame(
@@ -129,10 +132,13 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'create' => $paymentTab
-            ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $apiPayment must be an object'
+            ]
+        ]);
 
         $this->assertSame(
             [
@@ -156,9 +162,13 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive(['create' => mt_rand()])
-            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400);
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 400,
+                'result' => false,
+                'message' => 'Bad request'
+            ]
+        ]);
 
         $this->assertSame(
             $this->repo->createPayment($paymentDetails)['response'],
@@ -182,10 +192,13 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'create' => $paymentMock,
-            ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => $paymentMock
+            ]
+        ]);
 
         $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
         $this->assertSame(
@@ -213,10 +226,14 @@ final class CreatePaymentTest extends BasePaymentRepository
                                 'get' => true
                             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                                'create' => $paymentMock,
-                            ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => $paymentMock
+            ]
+        ]);
+
         $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
         $this->assertSame(
             '[createPayment] Payment successfully created',

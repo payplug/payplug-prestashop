@@ -202,10 +202,12 @@ class HookClass
             $payment = new PPPayment($payment_method['id']);
         }
         if (!$payment->isPaid()) {
-            $payment->capture();
-            $payment->refresh();
-            if ($payment->resource->card->id !== null) {
-                $this->card->saveCard($payment->resource);
+            $capture = $this->dependencies->apiClass->capturePayment($payment->id);
+            if ($capture['result']) {
+                $payment = $capture['resource'];
+                if ($payment->card->id !== null) {
+                    $this->card->saveCard($payment);
+                }
             }
         }
     }
@@ -365,12 +367,15 @@ class HookClass
                 );
             }
 
-            if (!$inst_id || empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
+            if (!$inst_id
+                || empty($inst_id)
+                || !$installment = $this->dependencies->apiClass->retrieveInstallment($inst_id)) {
                 if ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 1) {
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
                         $this->dependencies->getConfigurationKey('liveApiKey')
                     ));
-                    if (empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
+                    if (empty($inst_id)
+                        || !$installment = $this->dependencies->apiClass->retrieveInstallment($inst_id)) {
                         $this->dependencies->apiClass->setSecretKey($this->config->get(
                             $this->dependencies->getConfigurationKey('testApiKey')
                         ));
@@ -381,7 +386,8 @@ class HookClass
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
                         $this->dependencies->getConfigurationKey('testApiKey')
                     ));
-                    if (empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
+                    if (empty($inst_id)
+                        || !$installment = $this->dependencies->apiClass->retrieveInstallment($inst_id)) {
                         $this->dependencies->apiClass->setSecretKey($this->config->get(
                             $this->dependencies->getConfigurationKey('liveApiKey')
                         ));
@@ -407,7 +413,7 @@ class HookClass
             foreach ($installment->schedule as $schedule) {
                 if ($schedule->payment_ids != null) {
                     foreach ($schedule->payment_ids as $pay_id) {
-                        $p = $this->dependencies->paymentClass->retrievePayment($pay_id);
+                        $p = $this->dependencies->apiClass->retrievePayment($pay_id);
                         $payment_list_new[] = $this->dependencies->paymentClass->buildPaymentDetails($p);
                         if ((int) $p->is_paid == 0) {
                             $amount_refunded_payplug += 0;
@@ -490,7 +496,7 @@ class HookClass
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
             );
 
-            InstallmentClass::updatePayplugInstallment($installment);
+            $this->dependencies->installmentClass->updatePayplugInstallment($installment);
         } else {
             if (!$pay_id = $this->dependencies->paymentClass->isTransactionPending($order->id_cart)) {
                 $pay_id = $this->dependencies->orderClass->getPayplugOrderPayment($order->id);
@@ -519,12 +525,12 @@ class HookClass
                 );
             }
 
-            if (!$pay_id || empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
+            if (!$pay_id || empty($pay_id) || !$payment = $this->dependencies->apiClass->retrievePayment($pay_id)) {
                 if ($sandbox) {
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
                         $this->dependencies->getConfigurationKey('liveApiKey')
                     ));
-                    if (empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
+                    if (empty($pay_id) || !$payment = $this->dependencies->apiClass->retrievePayment($pay_id)) {
                         $this->dependencies->apiClass->setSecretKey($this->config->get(
                             $this->dependencies->getConfigurationKey('testApiKey')
                         ));
@@ -535,7 +541,7 @@ class HookClass
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
                         $this->dependencies->getConfigurationKey('testApiKey')
                     ));
-                    if (empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
+                    if (empty($pay_id) || !$payment = $this->dependencies->apiClass->retrievePayment($pay_id)) {
                         $this->dependencies->apiClass->setSecretKey($this->config->get(
                             $this->dependencies->getConfigurationKey('liveApiKey')
                         ));

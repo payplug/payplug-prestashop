@@ -118,7 +118,7 @@ class RefundClass
         if ($pay_id == null) {
             if ($inst_id != null) {
                 try {
-                    $installment = InstallmentClass::retrieveInstallment($inst_id);
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
                     $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $installment->id);
                     if ($installment && isset($installment->schedule)) {
                         $total_amount = $amount;
@@ -127,7 +127,7 @@ class RefundClass
                         foreach ($installment->schedule as $schedule) {
                             if (!empty($schedule->payment_ids)) {
                                 foreach ($schedule->payment_ids as $p_id) {
-                                    $payment = $this->dependencies->paymentClass->retrievePayment($p_id);
+                                    $payment = $this->dependencies->apiClass->retrievePayment($p_id);
                                     $this->logger->addLog('[PayPlugClass - makeRefund()] '
                                         . 'Retrieve payment id: ' . $payment->id);
                                     if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
@@ -176,7 +176,7 @@ class RefundClass
                     $this->logger->addLog($error, 'error');
                     return ('error');
                 }
-                InstallmentClass::updatePayplugInstallment($installment);
+                $this->dependencies->installmentClass->updatePayplugInstallment($installment);
             } else {
                 return ('error');
             }
@@ -259,14 +259,14 @@ class RefundClass
             $reload = false;
 
             if ($inst_id != null) {
-                $installment = InstallmentClass::retrieveInstallment($inst_id);
+                $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
                 $amount_available = 0;
                 $amount_refunded_payplug = 0;
                 if (isset($installment->schedule)) {
                     foreach ($installment->schedule as $schedule) {
                         if (!empty($schedule->payment_ids)) {
                             foreach ($schedule->payment_ids as $p_id) {
-                                $payment = Payment::retrieve($p_id);
+                                $payment = $this->dependencies->apiClass->retrievePayment($p_id);
                                 if ($payment->is_paid && !$payment->is_refunded) {
                                     $amount_available += (int)($payment->amount - $payment->amount_refunded);
                                 }
@@ -318,8 +318,8 @@ class RefundClass
                     $reload = true;
                 }
             } else {
-                //TODO: call retrievePayment from PaymentClass
-                $payment = $this->dependencies->paymentClass->retrievePayment($refund->payment_id);
+                //TODO: call retrievePayment from apiClass
+                $payment = $this->dependencies->apiClass->retrievePayment($refund->payment_id);
 
                 if ((int)Tools::getValue('id_state') != 0) {
                     $new_state = (int)Tools::getValue('id_state');

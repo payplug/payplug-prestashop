@@ -272,26 +272,23 @@ class PaymentRepository extends Repository
         }
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
-            try {
-                if ($apiPayment = Payment::create($paymentDetails['paymentTab'])) {
-                    $this->paymentEntity->setApiPayment($apiPayment);
-                }
-            } catch (Exception $e) {
+            $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
+            if (!$payment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to create payment. Error: ' . $e->getMessage()
+                    '[createPayment] Exception. Unable to create payment. Error: ' . $payment['message']
                 );
             }
+            $this->paymentEntity->setApiPayment($payment['resource']);
         } else {
-            try {
-                $apiPayment = InstallmentPlan::create($paymentDetails['paymentTab']);
-                $this->paymentEntity->setApiPayment($apiPayment);
-            } catch (Exception $e) {
+            $installment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
+            if (!$installment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to installment plan. Error: ' . $e->getMessage()
+                    '[createPayment] Exception. Unable to create installment plan. Error: ' . $installment['message']
                 );
             }
+            $this->paymentEntity->setApiPayment($installment['resource']);
         }
 
         $this->apiPayment = $this->paymentEntity->getApiPayment();
@@ -658,7 +655,7 @@ class PaymentRepository extends Repository
         }
 
         if ($storedPayment['payment_method'] == 'installment') {
-            $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
+            $retrievedInstallment = $this->dependencies->apiClass->retrieveInstallment($storedPayment['id_payment']);
             $firstSchedule = $retrievedInstallment->schedule[0]->payment_ids;
             /*
              * Try to see if the first schedule was cancelled
@@ -673,7 +670,7 @@ class PaymentRepository extends Repository
             );
         }
 
-        $retrievedPayment = Payment::retrieve($storedPayment['id_payment']);
+        $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['id_payment']);
 
         if ($retrievedPayment->failure) {
             $payment = $this->createPayment($paymentDetails);

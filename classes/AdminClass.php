@@ -295,7 +295,7 @@ class AdminClass
 
         if ((int) Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
-            $payment = $this->dependencies->paymentClass->retrievePayment($pay_id);
+            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
             $id_order = Tools::getValue('id_order');
 
             if ((int) $payment->is_paid == 1) {
