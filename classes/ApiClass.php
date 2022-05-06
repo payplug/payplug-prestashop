@@ -23,20 +23,25 @@
 
 namespace PayPlugModule\classes;
 
-use Authentication;
 use Configuration;
+
+use Payplug\Authentication;
+use Payplug\Card;
+use Payplug\Core\APIRoutes;
 use Payplug\Core\HttpClient;
-use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\UndefinedAttributeException;
-use Payplug\Card;
 use Payplug\InstallmentPlan;
+use Payplug\OneySimulation;
 use Payplug\Payment;
+use Payplug\Payplug;
+use Payplug\Refund;
+
 use PayPlugModule\src\exceptions\BadParameterException;
-use PayPlugModule\src\repositories\PluginRepository;
+
 use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 
@@ -74,8 +79,6 @@ class ApiClass
         $this->setEnvironment();
         $this->setSecretKey();
         $this->current_api_key = $this->getCurrentApiKey();
-
-        $this->setUserAgent();
     }
 
     /**
@@ -97,7 +100,7 @@ class ApiClass
             }
         }
         if (isset($_ENV['API_BASE_URL'])) {
-            \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
+            APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
     }
 
@@ -127,7 +130,16 @@ class ApiClass
     public function getAccount($api_key, $sandbox = true)
     {
         $this->setSecretKey($api_key);
-        $response = \Payplug\Authentication::getAccount();
+
+        try {
+            $this->setUserAgent();
+            $response = Authentication::getAccount();
+        } catch (ConfigurationNotSetException $e) {
+            return false;
+        } catch (ConfigurationException $e) {
+            return false;
+        }
+
         $json_answer = $response['httpResponse'];
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
@@ -153,9 +165,11 @@ class ApiClass
         );
         $flag = true;
 
+        $this->setUserAgent();
+
         // Set the publishable for the given sandbox configuration
         try {
-            $response = \Payplug\Authentication::getPublishableKeys();
+            $response = Authentication::getPublishableKeys();
             $publishable_key = isset($response['httpResponse']['publishable_key'])
             && $response['httpResponse']['publishable_key']
                 ? $response['httpResponse']['publishable_key']
@@ -208,7 +222,7 @@ class ApiClass
 
         // Set the publishable for the other sandbox configuration
         try {
-            $response = \Payplug\Authentication::getPublishableKeys();
+            $response = Authentication::getPublishableKeys();
             $publishable_key = isset($response['httpResponse']['publishable_key'])
                 && $response['httpResponse']['publishable_key']
                     ? $response['httpResponse']['publishable_key']
@@ -588,9 +602,11 @@ class ApiClass
             return false;
         }
 
-        return \Payplug\Payplug::init([
+        $this->setUserAgent();
+
+        return Payplug::init([
             'secretKey' => $token,
-            'apiVersion' => '2019-08-06'
+            'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
         ]);
     }
 
@@ -619,17 +635,7 @@ class ApiClass
             $payplug_key = $this->config->get($this->dependencies->concatenateModuleNameTo($configuration_key));
         }
 
-        try {
-            \Payplug\Payplug::init([
-                'secretKey' => $payplug_key,
-                'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
-            ]);
-
-            return $payplug_key;
-        } catch (Exception $e) {
-            // todo: return error log
-            return false;
-        }
+        return $this->setSecretKey($payplug_key);
     }
 
     /**
@@ -699,7 +705,8 @@ class ApiClass
     public function login($email, $password)
     {
         try {
-            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+            $this->setUserAgent();
+            $response = Authentication::getKeysByLogin($email, $password);
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
@@ -762,6 +769,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'result' => true,
                 'resource' => InstallmentPlan::abort($inst_id),
@@ -795,6 +803,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'code' => 200,
                 'result' => true,
@@ -828,6 +837,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'code' => 200,
                 'result' => true,
@@ -873,6 +883,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'result' => true,
                 'resource' => Payment::abort($pay_id),
@@ -905,6 +916,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'result' => true,
                 'resource' => Payment::capture($pay_id),
@@ -950,6 +962,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'code' => 200,
                 'result' => true,
@@ -1003,9 +1016,54 @@ class ApiClass
         $payment = $retrieve['resource'];
 
         try {
+            $this->setUserAgent();
             $response = [
                 'result' => true,
                 'resource' => $payment->update($data),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Refund Payment from api
+     *
+     * @param false $pay_id
+     * @param array $data
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function refundPayment($pay_id = false, $data = [])
+    {
+        if (!$pay_id || !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given'
+            ];
+        }
+
+        try {
+            $this->setUserAgent();
+            $response = [
+                'result' => true,
+                'resource' => Refund::create($pay_id, $data),
                 'code' => 200
             ];
         } catch (Exception $e) {
@@ -1036,6 +1094,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'code' => 200,
                 'result' => true,
@@ -1080,6 +1139,7 @@ class ApiClass
         }
 
         try {
+            $this->setUserAgent();
             $response = [
                 'code' => 200,
                 'result' => true,
@@ -1095,6 +1155,33 @@ class ApiClass
             $response = [
                 'code' => $e->getCode(),
                 'result' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    public function getOneySimulations($data = []) {
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given'
+            ];
+        }
+
+        try {
+            $this->setUserAgent();
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'resource' => OneySimulation::getSimulations($data)
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
                 'message' => $e->getMessage()
             ];
         }

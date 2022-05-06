@@ -29,7 +29,6 @@ use Language;
 use Media;
 use Module;
 use OrderState;
-use Payplug\Exception\ConfigurationException;
 use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
@@ -196,10 +195,10 @@ class HookClass
         $cart = $this->cart->get((int) $order->id_cart);
         $payment_method = $this->dependencies->paymentClass->getPaymentMethodByCart($cart);
         if ($payment_method['type'] == 'installment') {
-            $installment = new PPPaymentInstallment($payment_method['id']);
+            $installment = new PPPaymentInstallment($payment_method['id'], $this->dependencies);
             $payment = $installment->getFirstPayment();
         } else {
-            $payment = new PPPayment($payment_method['id']);
+            $payment = new PPPayment($payment_method['id'], $this->dependencies);
         }
         if (!$payment->isPaid()) {
             $capture = $this->dependencies->apiClass->capturePayment($payment->id);
@@ -262,12 +261,7 @@ class HookClass
      * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
      *
      * @param $params
-     *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws ConfigurationException
-     *
-     * @return string
+     * @return false|string|void
      */
     public function adminOrder($params)
     {
@@ -311,7 +305,6 @@ class HookClass
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws ConfigurationException
      *
      * @return string
      */
@@ -475,7 +468,7 @@ class HookClass
                 'ongoing' :
                 ($installment->is_fully_paid ? 'paid' : 'suspended');
             $inst_aborted = !$installment->is_active;
-            $ppInstallment = new PPPaymentInstallment($installment->id);
+            $ppInstallment = new PPPaymentInstallment($installment->id, $this->dependencies);
             $instPaymentOne = $ppInstallment->getFirstPayment();
             $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
             $inst_paid = $installment->is_fully_paid;

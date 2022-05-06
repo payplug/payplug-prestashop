@@ -382,7 +382,7 @@ class PayPlugValidation
             );
 
             if ($this->type == 'installment') {
-                $installment = new PPPaymentInstallment($inst_id);
+                $installment = new PPPaymentInstallment($inst_id, $this->dependencies);
                 $first_payment = $installment->getFirstPayment();
                 if ($first_payment->isDeferred()) {
                     $order_state = $auth_state;

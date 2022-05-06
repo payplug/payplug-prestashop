@@ -40,6 +40,12 @@ use Shop;
 use Tools;
 use Validate;
 
+use Payplug\Notification;
+use Payplug\Exception\UnknownAPIResourceException;
+use Payplug\Resource\Payment;
+use Payplug\Resource\Refund;
+use Payplug\Resource\InstallmentPlan;
+
 /**
  * Class PayPlugNotifications
  * Use for treat notification from Payplug API
@@ -211,9 +217,9 @@ class PayPlugNotifications
                     $this->dependencies->getConfigurationKey('testApiKey')
                 );
             $this->apiClass->setSecretKey($this->api_key);
-            $this->resource = \Payplug\Notification::treat($body);
+            $this->resource = Notification::treat($body);
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
-        } catch (\Payplug\Exception\UnknownAPIResourceException $exception) {
+        } catch (UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
         }
     }
@@ -234,7 +240,7 @@ class PayPlugNotifications
         $is_paid = $this->resource->is_paid;
 
         if ($this->is_installment) {
-            $installment = new PPPaymentInstallment($this->resource->installment_plan_id);
+            $installment = new PPPaymentInstallment($this->resource->installment_plan_id, $this->dependencies);
             $first_payment = $installment->getFirstPayment();
             if ($first_payment->isDeferred()) {
                 $order_state = $this->order_states['auth'];
@@ -1072,11 +1078,11 @@ class PayPlugNotifications
 
         $this->logger->addLog('OK');
 
-        if ($this->resource instanceof \Payplug\Resource\Payment) {
+        if ($this->resource instanceof Payment) {
             $this->processPayment();
-        } elseif ($this->resource instanceof \Payplug\Resource\Refund) {
+        } elseif ($this->resource instanceof Refund) {
             $this->processRefund();
-        } elseif ($this->resource instanceof \Payplug\Resource\InstallmentPlan) {
+        } elseif ($this->resource instanceof InstallmentPlan) {
             $this->processInstallment();
         }
     }

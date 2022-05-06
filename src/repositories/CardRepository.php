@@ -24,8 +24,6 @@
 namespace PayPlugModule\src\repositories;
 
 use Exception;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\Exception\NotFoundException;
 use PayPlugModule\src\entities\CardEntity;
 
 class CardRepository extends Repository

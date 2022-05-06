@@ -24,9 +24,6 @@
 namespace PayPlugModule\classes;
 
 use Exception;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\InstallmentPlan;
-use Payplug\Payment;
 use Db;
 
 class InstallmentClass
@@ -112,7 +109,6 @@ class InstallmentClass
      * @param $installment
      * @param $order
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function addPayplugInstallment($installment, $order)
     {

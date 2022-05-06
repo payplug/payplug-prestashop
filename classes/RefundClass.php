@@ -29,12 +29,6 @@ use Exception;
 use Order;
 use OrderHistory;
 use OrderSlip;
-use Payplug\Exception\ConfigurationException;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\InstallmentPlan;
-use Payplug\Payment;
-use Payplug\Resource\Refund;
-use PayPlugModule\src\repositories\LoggerRepository;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use Tools;
@@ -98,15 +92,15 @@ class RefundClass
             return $amount_refunded_presta;
         }
     }
+
     /**
-     * Make a refund
+     * @description Make a refund
      * @param $pay_id
      * @param $amount
      * @param $metadata
      * @param string $pay_mode
      * @param null $inst_id
-     * @return Refund | string
-     * @throws ConfigurationException
+     * @return mixed|string
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -157,10 +151,9 @@ class RefundClass
                             return ('error');
                         }
                         if (!empty($refund_to_go)) {
-                            foreach ($refund_to_go as $refnd) {
-                                try {
-                                    $refund = Refund::create($refnd['id'], $refnd['data']);
-                                } catch (Exception $e) {
+                            foreach ($refund_to_go as $ref) {
+                                $response = $this->dependencies->apiClass->refundPayment($ref['id'], $ref['data']);
+                                if (!$response['result']) {
                                     return ('error');
                                 }
                             }
@@ -186,24 +179,19 @@ class RefundClass
                 'metadata' => $metadata
             ];
 
-            try {
-                $refund = Refund::create($pay_id, $data);
-            } catch (Exception $e) {
-                $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
-                $this->logger->addLog($error, 'error');
+            $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
+            if (!$response['result']) {
                 return 'error';
             }
         }
 
-        return $refund;
+        return $response['resource'];
     }
 
     /**
      * @description  Refund a payment
-     * @throws ConfigurationException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws ConfigurationNotSetException
      */
     public function refundPayment()
     {

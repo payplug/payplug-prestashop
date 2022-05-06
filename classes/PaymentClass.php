@@ -24,11 +24,6 @@
 namespace PayPlugModule\classes;
 
 use Media;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\Exception\NotFoundException;
-use Payplug\Exception\UndefinedAttributeException;
-use Payplug\InstallmentPlan;
-use Payplug\Resource\Payment;
 
 class PaymentClass
 {
@@ -81,9 +76,6 @@ class PaymentClass
 
     /**
      * @description Abort a payment
-     *
-     * @throws \Payplug\Exception\ConfigurationException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function abortPayment()
     {
@@ -1424,7 +1416,6 @@ class PaymentClass
      * @param string $payment_id
      * @param string $type default payment
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function isPaidPaymentMethod($payment_id, $type = 'payment')
     {

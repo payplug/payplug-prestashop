@@ -25,9 +25,6 @@ namespace PayPlugModule\src\repositories;
 
 use DateTime;
 use Exception;
-use Payplug;
-use Payplug\InstallmentPlan;
-use Payplug\Payment;
 
 class PaymentRepository extends Repository
 {
@@ -145,14 +142,7 @@ class PaymentRepository extends Repository
             ];
         } else {
             // Create payment or installment
-            try {
-                $createPayment = $this->createPayment($paymentDetails);
-            } catch (Payplug\Exception\ConfigurationNotSetException $e) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[checkHash -> createPayment] Error: ' . $e->getMessage()
-                );
-            }
+            $createPayment = $this->createPayment($paymentDetails);
 
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $paymentDetails = $createPayment['paymentDetails'];
@@ -622,7 +612,6 @@ class PaymentRepository extends Repository
      * bc if cancelled, to recreate another one
      * @param array $paymentDetails
      * @return array
-     * @throws Payplug\Exception\ConfigurationNotSetException
      */
     public function isValidApiPayment($paymentDetails)
     {
