@@ -34,6 +34,7 @@ use Validate;
 
 class PayPlugValidation
 {
+    public $apiClass;
     public $logger;
     public $paymentClass;
     public $debug;
@@ -51,8 +52,10 @@ class PayPlugValidation
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
+        $this->apiClass = $this->dependencies->apiClass;
         $this->orderClass = $this->dependencies->orderClass;
         $this->paymentClass = $this->dependencies->paymentClass;
+        $this->installmentClass = $this->dependencies->installmentClass;
         $this->debug = Configuration::get(
             $this->dependencies->getConfigurationKey('debugMode')
         );
@@ -100,7 +103,7 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
-            Tools::redirect($redirect_url_error);
+            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
         } elseif (!($ps = Tools::getValue('ps')) || $ps != 1) {
             if ($ps == 2) {
                 $this->logger->addLog('Order has been cancelled on PayPlug page');
@@ -111,7 +114,7 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
-            Tools::redirect($redirect_url_error);
+            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
         }
         //Treatment
         $this->logger->addLog('Cart ID : ' . (int)$cart_id);
@@ -124,7 +127,7 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
-            Tools::redirect($redirect_url_error);
+            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
         }
         $this->logger->addLog('Cart loaded.', 'error');
 
@@ -152,7 +155,7 @@ class PayPlugValidation
 
         $amount = 0;
         if (!$pay_id = $this->paymentClass->getPaymentByCart((int)$cart_id)) {
-            if (!$inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
+            if (!$inst_id = $this->installmentClass->getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Payment is not stored or is already consumed.');
                 $id_order = Order::getOrderByCartId($cart->id);
                 $customer = new Customer((int)$cart->id_customer);
@@ -165,13 +168,14 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 Tools::redirect($link_redirect);
-            } elseif ($inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
+            } elseif ($inst_id = $this->installmentClass->getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Installment is not consumed yet.');
                 $amount = 0;
                 $pay_id = false;
                 $this->type = 'installment';
                 try {
-                    $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                    $installment = $this->apiClass->retrieveInstallment($inst_id);
+                    $installment = $installment['resource'];
                     $this->api_key = (bool)$installment->is_live ?
                         Configuration::get(
                             $this->dependencies->getConfigurationKey('liveApiKey')
@@ -197,7 +201,7 @@ class PayPlugValidation
                         $this->paymentClass->setPaymentErrorsCookie([
                             $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                         ]);
-                        Tools::redirect($redirect_url_error);
+                        die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
                     }
                 } catch (Exception $e) {
                     $this->logger->addLog('Installment cannot be retrieved.', 'error');
@@ -209,13 +213,14 @@ class PayPlugValidation
                     $this->paymentClass->setPaymentErrorsCookie([
                         $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                     ]);
-                    Tools::redirect($redirect_url_error);
+                    die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
                 }
             }
         } else {
             $this->logger->addLog('Payment is not consumed yet.');
             try {
-                $payment = $this->paymentClass->retrievePayment($pay_id);
+                $payment = $this->apiClass->retrievePayment($pay_id);
+                $payment = $payment['resource'];
                 $this->api_key = (bool)$payment->is_live ?
                     Configuration::get(
                         $this->dependencies->getConfigurationKey('liveApiKey')
@@ -239,7 +244,7 @@ class PayPlugValidation
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
                     }
-                    Tools::redirect($redirect_url_error);
+                    die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
                 }
                 $is_paid = $payment->is_paid;
                 if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
@@ -279,7 +284,8 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                Tools::redirect($redirect_url_error);
+                dump($e->getMessage());
+                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
             }
 
             if (((isset($payment->save_card) && (int)$payment->save_card == 1))
@@ -334,7 +340,7 @@ class PayPlugValidation
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
-            Tools::redirect($redirect_url_error);
+            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
         }
 
         $this->logger->addLog('Total : ' . $amount);
@@ -379,7 +385,7 @@ class PayPlugValidation
             );
 
             if ($this->type == 'installment') {
-                $installment = new PPPaymentInstallment($inst_id);
+                $installment = new PPPaymentInstallment($inst_id, $this->dependencies);
                 $first_payment = $installment->getFirstPayment();
                 if ($first_payment->isDeferred()) {
                     $order_state = $auth_state;
@@ -507,7 +513,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                Tools::redirect($redirect_url_error);
+                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
             }
 
             $this->logger->addLog('Order validated');
@@ -517,13 +523,13 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-                $this->paymentClass->patchPayment($payment->id, $data);
+                $this->apiClass->patchPayment($payment->id, $data);
 
                 if (!$this->orderClass->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');
                 }
             } elseif ($this->type == 'installment') {
-                InstallmentClass::addPayplugInstallment($installment->resource, $order);
+                $this->installmentClass->addPayplugInstallment($installment->resource, $order);
             }
 
             // Add payment line
@@ -549,7 +555,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                Tools::redirect($redirect_url_error);
+                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
             } elseif (count($res_nb_orders) > 1) {
                 $this->logger->addLog(
                     'There is more than one order using id_cart ' . (int)$cart->id,
@@ -578,7 +584,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                Tools::redirect($redirect_url_error);
+                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
             } elseif (count($payments) > 1) {
                 $this->logger->addLog('There is more than one transaction using id_order ' . (int)$id_order, 'error');
             } else {

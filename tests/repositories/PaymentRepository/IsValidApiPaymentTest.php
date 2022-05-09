@@ -67,18 +67,36 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             ->shouldReceive([
                 'checkPaymentTable' => [
                     'payment_method' => 'standard',
-                    'id_payment' => 1
+                    'id_payment' => 1,
+                ],
+            ]);
+        $paymentDetails = [
+            'cartId' => 1,
+        ];
+
+        $this->config
+            ->shouldReceive([
+                                'get' => true
+                            ]);
+
+
+        $this->dependencies->apiClass
+            ->shouldReceive([
+                'retrievePayment' => [
+                    'code' => 200,
+                    'result' => true,
+                    'resource' => PaymentMock::getStandard()
                 ]
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'retrieve' => PaymentMock::getStandard()
-            ]);
 
         $this->assertSame(
-            $this->repo->isValidApiPayment(['cartId' => 1])['response'],
-            "Valid API payment/installment"
+            $this->repo->isValidApiPayment($paymentDetails),
+            [
+                'result' => true,
+                'paymentDetails' => $paymentDetails,
+                'response' => 'Valid API payment/installment'
+            ]
         );
     }
 

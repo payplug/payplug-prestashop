@@ -31,12 +31,7 @@ use libphonenumberlight;
 use Media;
 use Module;
 use PayPlugModule\backward\PayPlugBackward;
-use Payplug\Exception\BadRequestException;
-use Payplug\Exception\ConfigurationException;
-use Payplug\Exception\ConfigurationNotSetException;
 use PayPlugModule\src\repositories\LoggerRepository;
-use PayPlugModule\src\specific\ConstantSpecific;
-use PayPlugModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
@@ -766,14 +761,9 @@ class ConfigClass
         $api_class = $this->dependencies->apiClass;
         $valid_key = $api_class->setAPIKey();
         if (!empty($valid_key)) {
-            try {
-                $permissions = $this->dependencies->apiClass->getAccount($valid_key);
-            } catch (ConfigurationNotSetException $e) {
-//                @todo Add Log
-                die('ConfigurationNotSetException'.$e->getMessage());
-            } catch (ConfigurationException $e) {
-//                @todo Add Log
-                die('ConfigurationException'.$e->getMessage());
+            $permissions = $this->dependencies->apiClass->getAccount($valid_key);
+            if (!$permissions) {
+                die('An error occured while getting account');
             }
             $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
         } else {
@@ -925,15 +915,8 @@ class ConfigClass
     public function getLivePermissions()
     {
         $live_api_key = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
-        $livepermissions = [];
-        try {
-            $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
-        } catch (ConfigurationNotSetException $e) {
-//                @todo Add Log
-        } catch (ConfigurationException $e) {
-//                @todo Add Log
-        }
-        return $livepermissions;
+        $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
+        return $livepermissions ? $livepermissions : [];
     }
 
     /**
@@ -1389,7 +1372,6 @@ class ConfigClass
 
     /**
      * @description Process account submit
-     * @throws BadRequestException
      */
     public function submitAccount()
     {
@@ -1443,7 +1425,6 @@ class ConfigClass
 
     /**
      * @description Process password submit to access Live mode
-     * @throws BadRequestException
      */
     public function submitSandbox()
     {
@@ -1496,7 +1477,6 @@ class ConfigClass
 
     /**
      * @description Process check onBoarding is finished
-     * @throws BadRequestException
      */
     public function checkOnboarding()
     {

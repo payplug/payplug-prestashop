@@ -29,12 +29,6 @@ use Exception;
 use Order;
 use OrderHistory;
 use OrderSlip;
-use Payplug\Exception\ConfigurationException;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\InstallmentPlan;
-use Payplug\Payment;
-use Payplug\Resource\Refund;
-use PayPlugModule\src\repositories\LoggerRepository;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use Tools;
@@ -98,15 +92,15 @@ class RefundClass
             return $amount_refunded_presta;
         }
     }
+
     /**
-     * Make a refund
+     * @description Make a refund
      * @param $pay_id
      * @param $amount
      * @param $metadata
      * @param string $pay_mode
      * @param null $inst_id
-     * @return Refund | string
-     * @throws ConfigurationException
+     * @return mixed|string
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -118,7 +112,8 @@ class RefundClass
         if ($pay_id == null) {
             if ($inst_id != null) {
                 try {
-                    $installment = InstallmentClass::retrieveInstallment($inst_id);
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                    $installment = $installment['resource'];
                     $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $installment->id);
                     if ($installment && isset($installment->schedule)) {
                         $total_amount = $amount;
@@ -127,7 +122,8 @@ class RefundClass
                         foreach ($installment->schedule as $schedule) {
                             if (!empty($schedule->payment_ids)) {
                                 foreach ($schedule->payment_ids as $p_id) {
-                                    $payment = $this->dependencies->paymentClass->retrievePayment($p_id);
+                                    $payment = $this->dependencies->apiClass->retrievePayment($p_id);
+                                    $payment = $payment['resource'];
                                     $this->logger->addLog('[PayPlugClass - makeRefund()] '
                                         . 'Retrieve payment id: ' . $payment->id);
                                     if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
@@ -157,10 +153,9 @@ class RefundClass
                             return ('error');
                         }
                         if (!empty($refund_to_go)) {
-                            foreach ($refund_to_go as $refnd) {
-                                try {
-                                    $refund = Refund::create($refnd['id'], $refnd['data']);
-                                } catch (Exception $e) {
+                            foreach ($refund_to_go as $ref) {
+                                $response = $this->dependencies->apiClass->refundPayment($ref['id'], $ref['data']);
+                                if (!$response['result']) {
                                     return ('error');
                                 }
                             }
@@ -176,7 +171,7 @@ class RefundClass
                     $this->logger->addLog($error, 'error');
                     return ('error');
                 }
-                InstallmentClass::updatePayplugInstallment($installment);
+                $this->dependencies->installmentClass->updatePayplugInstallment($installment);
             } else {
                 return ('error');
             }
@@ -186,24 +181,19 @@ class RefundClass
                 'metadata' => $metadata
             ];
 
-            try {
-                $refund = Refund::create($pay_id, $data);
-            } catch (Exception $e) {
-                $error = 'error [PayPlugClass - makeRefund()]: ' . $e->getMessage();
-                $this->logger->addLog($error, 'error');
+            $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
+            if (!$response['result']) {
                 return 'error';
             }
         }
 
-        return $refund;
+        return $response['resource'];
     }
 
     /**
      * @description  Refund a payment
-     * @throws ConfigurationException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws ConfigurationNotSetException
      */
     public function refundPayment()
     {
@@ -259,14 +249,16 @@ class RefundClass
             $reload = false;
 
             if ($inst_id != null) {
-                $installment = InstallmentClass::retrieveInstallment($inst_id);
+                $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                $installment = $installment['resource'];
                 $amount_available = 0;
                 $amount_refunded_payplug = 0;
                 if (isset($installment->schedule)) {
                     foreach ($installment->schedule as $schedule) {
                         if (!empty($schedule->payment_ids)) {
                             foreach ($schedule->payment_ids as $p_id) {
-                                $payment = Payment::retrieve($p_id);
+                                $payment = $this->dependencies->apiClass->retrievePayment($p_id);
+                                $payment = $payment['resource'];
                                 if ($payment->is_paid && !$payment->is_refunded) {
                                     $amount_available += (int)($payment->amount - $payment->amount_refunded);
                                 }
@@ -318,8 +310,9 @@ class RefundClass
                     $reload = true;
                 }
             } else {
-                //TODO: call retrievePayment from PaymentClass
-                $payment = $this->dependencies->paymentClass->retrievePayment($refund->payment_id);
+                //TODO: call retrievePayment from apiClass
+                $payment = $this->dependencies->apiClass->retrievePayment($refund->payment_id);
+                $payment = $payment['resource'];
 
                 if ((int)Tools::getValue('id_state') != 0) {
                     $new_state = (int)Tools::getValue('id_state');
