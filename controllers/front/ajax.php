@@ -58,6 +58,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
         $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->apiClass = $this->dependencies->apiClass;
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
@@ -259,7 +260,15 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Retrieve payment
-                $payment = $this->paymentClass->retrievePayment($payment_id);
+                $payment = $this->apiClass->retrievePayment($payment_id);
+
+                if (!$payment['result']) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $payment['message']
+                    ]));
+                }
+                $payment = $payment['resource'];
 
                 // Check if payment has failure
                 if ($payment->failure != null) {

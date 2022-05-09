@@ -62,29 +62,42 @@ final class DeleteCardFromAPITest extends BaseCardRepository
         $this->assertFalse($this->repo->deleteCardFromAPI($id_card));
     }
 
-
     public function testWhenAPIThrowingConfigurationNotSetException()
     {
-        $this->card->shouldReceive('delete')
-            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occurred', 500);
+        $this->dependencies->apiClass->shouldReceive([
+            'deleteCard' => [
+                'code' => 500,
+                'result' => false,
+                'message' => 'An error occured'
+            ]
+        ]);
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));
     }
 
     public function testWhenAPIThrowingNotFoundException()
     {
-        $this->card->shouldReceive('delete')
-            ->andThrow('Payplug\Exception\NotFoundException', 'Card not found', 404);
+        $this->dependencies->apiClass->shouldReceive([
+            'deleteCard' => [
+                'code' => 404,
+                'result' => false,
+                'message' => 'Card not found'
+            ]
+        ]);
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));
     }
 
     public function testWhenAPIReturnError()
     {
-        $this->card->shouldReceive([
-            'delete' => [
-                'httpResponse' => [
-                    'object' => 'error'
+        $this->dependencies->apiClass->shouldReceive([
+            'deleteCard' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => [
+                    'httpResponse' => [
+                        'object' => 'error'
+                    ]
                 ]
             ]
         ]);
@@ -94,10 +107,14 @@ final class DeleteCardFromAPITest extends BaseCardRepository
 
     public function testWhenAPIReturnSuccess()
     {
-        $this->card->shouldReceive([
-            'delete' => [
-                'httpResponse' => [
-                    'object' => 'success'
+        $this->dependencies->apiClass->shouldReceive([
+            'deleteCard' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => [
+                    'httpResponse' => [
+                        'object' => 'success'
+                    ]
                 ]
             ]
         ]);

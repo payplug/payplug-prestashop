@@ -24,8 +24,6 @@
 namespace PayPlugModule\src\repositories;
 
 use Exception;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\Exception\NotFoundException;
 use PayPlugModule\src\entities\CardEntity;
 
 class CardRepository extends Repository
@@ -194,44 +192,25 @@ class CardRepository extends Repository
      * @param string $id_card
      * @return bool
      */
-    public function deleteCardFromAPI($id_card)
+    public function deleteCardFromAPI($id_card = '')
     {
-        if (!isset($id_card) ||
-            !is_string($id_card)
-        ) {
+        if (!$id_card || !is_string($id_card)) {
             $this->logger->addLog('Error:  Bad parameters were passed to [deleteCardFromAPI]'
                 . '$id_card: ' . json_encode($id_card));
             return false;
         }
 
-        try {
-            $response = \Payplug\Card::delete($id_card);
-            $json_answer = $response['httpResponse'];
-        } catch (ConfigurationNotSetException $exception) {
-            /*
-             * Disconnected merchant account (in config plugin page):
-             * Exception -> Can't connect to API
-             *
-             * No log needed, because we are uninstalling
-             * (return true, to continue uninstalling)
-             */
-            return true;
-        } catch (NotFoundException $exception) {
-            /*
-             * Exception-> Card not found in API
-             * Not "return false", but exception returned :-/
-             *
-             * No log needed, because we are uninstalling
-             * (return true, to continue uninstalling)
-             */
-            return true;
-        }
+        $delete = $this->dependencies->apiClass->deleteCard($id_card);
 
-        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
-            $this->logger->addLog('Error occured while deleting the card'
-                . $id_card . 'from the API [deleteCardFromAPI]', 'error');
-            $this->logger->addLog('JSON answer: ' . json_encode($json_answer));
-            return false;
+        if (200 == $delete['code']) {
+            $json_answer = $delete['resource']['httpResponse'];
+
+            if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+                $message_log = 'Error occured while deleting the card' . $id_card . 'from the API [deleteCardFromAPI]';
+                $this->logger->addLog($message_log, 'error');
+                $this->logger->addLog('JSON answer: ' . json_encode($json_answer));
+                return false;
+            }
         }
 
         return true;

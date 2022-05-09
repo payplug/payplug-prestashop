@@ -24,10 +24,6 @@
 namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\classes\ConfigClass;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\Exception\ConnectionException;
-use Payplug\Exception\HttpException;
-use Payplug\Exception\UnexpectedAPIResponseException;
 use PayPlugModule\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
@@ -139,9 +135,6 @@ class OneyRepository extends Repository
      * @return void
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
-     * @throws ConnectionException
-     * @throws HttpException
-     * @throws UnexpectedAPIResponseException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -647,9 +640,6 @@ class OneyRepository extends Repository
      * @return array
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
-     * @throws ConnectionException
-     * @throws HttpException
-     * @throws UnexpectedAPIResponseException
      */
     public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
@@ -714,9 +704,6 @@ class OneyRepository extends Repository
      * @return array
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
-     * @throws ConnectionException
-     * @throws HttpException
-     * @throws UnexpectedAPIResponseException
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -1053,9 +1040,6 @@ class OneyRepository extends Repository
      * @return array
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
-     * @throws ConnectionException
-     * @throws HttpException
-     * @throws UnexpectedAPIResponseException
      */
     public function getOneySimulations($amount, $country, $operation)
     {
@@ -1077,50 +1061,51 @@ class OneyRepository extends Repository
             return $tools->tool('jsonDecode', $cache['result']['cache_value'], true);
         }
 
-        try {
-            $data = [
-                'amount' => $amount,
-                'country' => $this->getOneyCountry($country),
-                'operations' => $operation,
-            ];
 
-            $simulations = \Payplug\OneySimulation::getSimulations($data);
+        $data = [
+            'amount' => $amount,
+            'country' => $this->getOneyCountry($country),
+            'operations' => $operation,
+        ];
+        $simulations = $this->dependencies->apiClass->getOneySimulations($data);
 
-            if (isset($simulations['object']) && $simulations['object'] == 'error') {
-                return [
-                    'result' => false,
-                    'error' => $simulations['message']
-                ];
-            } elseif ($simulations) {
-                ksort($simulations);
-                $to_cache = [
-                    'result' => true,
-                    'simulations' => $simulations
-                ];
-
-                // $cache_id = cache_key in db
-                // $to_cache = cache_value in db
-                if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
-                    $this->logger->setParams(['process' => '[Oney Repository] getOneySimulations']);
-                    $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
-                    $error_level = 'error';
-                    $this->logger->addLog($error_message, $error_level);
-                }
-            }
-
-            return [
-                'result' => true,
-                'simulations' => $simulations
-            ];
-        } catch (\Exception $exception) {
+        if (!$simulations['result']) {
             $this->logger->setParams(['process' => '[Oney Repository] OneySimulation::getSimulations']);
-            $this->logger->addLog($exception->getMessage(), 'error');
+            $this->logger->addLog($simulations['message'], 'error');
 
             return [
                 'result' => false,
-                'error' => $exception->__toString()
+                'error' => $simulations['message']
             ];
         }
+
+        $simulations = $simulations['resource'];
+        if (isset($simulations['object']) && $simulations['object'] == 'error') {
+            return [
+                'result' => false,
+                'error' => $simulations['message']
+            ];
+        } elseif ($simulations) {
+            ksort($simulations);
+            $to_cache = [
+                'result' => true,
+                'simulations' => $simulations
+            ];
+
+            // $cache_id = cache_key in db
+            // $to_cache = cache_value in db
+            if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
+                $this->logger->setParams(['process' => '[Oney Repository] getOneySimulations']);
+                $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
+                $error_level = 'error';
+                $this->logger->addLog($error_message, $error_level);
+            }
+        }
+
+        return [
+            'result' => true,
+            'simulations' => $simulations
+        ];
     }
 
     /**
