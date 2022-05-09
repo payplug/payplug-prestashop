@@ -107,6 +107,8 @@ class Payplug extends PaymentModule
     public function getContent()
     {
         if ($this->module) {
+//            Tools::redirectAdmin($this->context->link->getAdminLink('AdminPayplug'));
+
             if (!$this->isValidInstallation()) {
                 $this->install(true);
             }

@@ -25,9 +25,6 @@ namespace PayPlugModule\src\repositories;
 
 use DateTime;
 use Exception;
-use Payplug;
-use Payplug\InstallmentPlan;
-use Payplug\Payment;
 
 class PaymentRepository extends Repository
 {
@@ -145,14 +142,7 @@ class PaymentRepository extends Repository
             ];
         } else {
             // Create payment or installment
-            try {
-                $createPayment = $this->createPayment($paymentDetails);
-            } catch (Payplug\Exception\ConfigurationNotSetException $e) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[checkHash -> createPayment] Error: ' . $e->getMessage()
-                );
-            }
+            $createPayment = $this->createPayment($paymentDetails);
 
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $paymentDetails = $createPayment['paymentDetails'];
@@ -272,26 +262,24 @@ class PaymentRepository extends Repository
         }
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
-            try {
-                if ($apiPayment = Payment::create($paymentDetails['paymentTab'])) {
-                    $this->paymentEntity->setApiPayment($apiPayment);
-                }
-            } catch (Exception $e) {
+            $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
+            if (!$payment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to create payment. Error: ' . $e->getMessage()
+                    '[createPayment] Exception. Unable to create payment. Error: ' . $payment['message']
                 );
             }
+
+            $this->paymentEntity->setApiPayment($payment['resource']);
         } else {
-            try {
-                $apiPayment = InstallmentPlan::create($paymentDetails['paymentTab']);
-                $this->paymentEntity->setApiPayment($apiPayment);
-            } catch (Exception $e) {
+            $installment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
+            if (!$installment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to installment plan. Error: ' . $e->getMessage()
+                    '[createPayment] Exception. Unable to create installment plan. Error: ' . $installment['message']
                 );
             }
+            $this->paymentEntity->setApiPayment($installment['resource']);
         }
 
         $this->apiPayment = $this->paymentEntity->getApiPayment();
@@ -625,7 +613,6 @@ class PaymentRepository extends Repository
      * bc if cancelled, to recreate another one
      * @param array $paymentDetails
      * @return array
-     * @throws Payplug\Exception\ConfigurationNotSetException
      */
     public function isValidApiPayment($paymentDetails)
     {
@@ -658,8 +645,9 @@ class PaymentRepository extends Repository
         }
 
         if ($storedPayment['payment_method'] == 'installment') {
-            $retrievedInstallment = InstallmentPlan::retrieve($storedPayment['id_payment']);
-            $firstSchedule = $retrievedInstallment->schedule[0]->payment_ids;
+            $installment = $this->dependencies->apiClass->retrieveInstallment($storedPayment['id_payment']);
+            $installment = $installment['resource'];
+            $firstSchedule = $installment->schedule[0]->payment_ids;
             /*
              * Try to see if the first schedule was cancelled
              */
@@ -673,13 +661,11 @@ class PaymentRepository extends Repository
             );
         }
 
-        $retrievedPayment = Payment::retrieve($storedPayment['id_payment']);
-
-        if ($retrievedPayment->failure) {
+        $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['id_payment']);
+        if (!$retrievedPayment['result']) {
             $payment = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($payment['paymentDetails']);
         }
-
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,

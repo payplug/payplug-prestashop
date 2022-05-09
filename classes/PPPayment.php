@@ -29,31 +29,33 @@ if (!defined('_PS_VERSION_')) {
 
 class PPPayment
 {
+    public $dependencies;
     public $resource;
 
-    public function __construct($id = null)
+    public function __construct($id = null, $dependencies = null)
     {
-        if ($id != null) {
+        $this->dependencies = $dependencies;
+
+        if ($id) {
             $payment = $this->retrieve($id);
             $this->populateFromPayment($payment);
         } else {
-            $id = null;
             $this->resource = null;
         }
     }
 
     public function retrieve($id)
     {
-        try {
-            $payment = \Payplug\Payment::retrieve($id);
-        } catch (\Payplug\Exception $e) {
+        $payment = $this->dependencies->apiClass->retrievePayment($id);
+        if (!$payment['result']) {
             $data = [
                 'result' => false,
-                'response' => $e->__toString(),
+                'response' => $payment['message'],
             ];
             return $data;
         }
-        return $payment;
+
+        return $payment['resource'];
     }
 
     private function populateFromPayment($payment)
@@ -63,36 +65,7 @@ class PPPayment
 
     public function capture()
     {
-        try {
-            \Payplug\Payment::capture($this->resource->id);
-            $response = [
-                'code' => 200,
-                'message' => 'Amount successfully captured.',
-                'resource' => $this,
-            ];
-        } catch (Payplug\Exception\NotAllowedException $e) {
-            $httpResponse = json_decode($e->getHttpResponse());
-            $response = [
-                'code' => (int)$e->getCode(),
-                'message' => $httpResponse->message,
-                'resource' => $this,
-            ];
-        } catch (Payplug\Exception\ForbiddenException $e) {
-            $httpResponse = json_decode($e->getHttpResponse());
-            $response = [
-                'code' => (int)$e->getCode(),
-                'message' => $httpResponse->message,
-                'resource' => $this,
-            ];
-        } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
-            $httpResponse = json_decode($e->getHttpResponse());
-            $response = [
-                'code' => (int)$e->getCode(),
-                'message' => $httpResponse->message,
-                'resource' => $this,
-            ];
-        }
-        return $response;
+        return $this->dependencies->apiClass->capturePayment($this->resource->id);
     }
 
     public function isPaid()

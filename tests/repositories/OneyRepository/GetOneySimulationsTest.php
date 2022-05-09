@@ -125,8 +125,13 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 ]
             ]);
 
-        $this->oneyMock->shouldReceive('getSimulations')
-            ->andThrow('Payplug\Exception\HttpException', 'Forbidden method', 403);
+        $this->dependencies->apiClass->shouldReceive([
+            'getOneySimulations' => [
+                'code' => 403,
+                'result' => false,
+                'message' => 'Payplug\Exception\HttpException: [0]: Forbidden method; HTTP Response: 403'
+            ]
+        ]);
 
         $this->assertSame(
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation]),
@@ -153,13 +158,16 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 ]
             ]);
 
-        $this->oneyMock
-            ->shouldReceive([
-                'getSimulations' => [
+        $this->dependencies->apiClass->shouldReceive([
+            'getOneySimulations' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => [
                     'object' => 'error',
                     'message' => 'error while getting simulations'
                 ]
-            ]);
+            ]
+        ]);
 
         $this->assertSame(
             [
@@ -185,10 +193,13 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 'setCache' => false
             ]);
 
-        $this->oneyMock
-            ->shouldReceive([
-                'getSimulations' => $this->simulations
-            ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'getOneySimulations' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => $this->simulations
+            ]
+        ]);
 
         ksort($this->simulations);
 
@@ -217,10 +228,13 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 'setCache' => true
             ]);
 
-        $this->oneyMock
-            ->shouldReceive([
-                'getSimulations' => $this->simulations
-            ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'getOneySimulations' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => $this->simulations
+            ]
+        ]);
 
         ksort($this->simulations);
 

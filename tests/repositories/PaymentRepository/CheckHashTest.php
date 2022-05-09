@@ -129,33 +129,6 @@ final class CheckHashTest extends BasePaymentRepository
         );
     }
 
-    public function testWithCreatePaymentThrowingException()
-    {
-        $expected_error = [
-            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[checkHash -> createPayment] Error: An error occurred'
-        ];
-
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'cart_hash' => 'different_hash',
-                    'payment_method' => $this->paymentDetails['paymentMethod'],
-                ],
-                'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
-
-        $this->repo
-            ->shouldReceive('createPayment')
-            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'An error occurred', 500);
-
-        $this->assertSame(
-            $expected_error,
-            $this->repo->checkHash($this->paymentDetails)
-        );
-    }
-
     public function testWithInvalidCreatePayment()
     {
         $error_message = 'An error occurred in payment creation';

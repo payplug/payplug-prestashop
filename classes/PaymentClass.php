@@ -24,11 +24,6 @@
 namespace PayPlugModule\classes;
 
 use Media;
-use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\Exception\NotFoundException;
-use Payplug\Exception\UndefinedAttributeException;
-use Payplug\InstallmentPlan;
-use Payplug\Resource\Payment;
 
 class PaymentClass
 {
@@ -81,26 +76,20 @@ class PaymentClass
 
     /**
      * @description Abort a payment
-     *
-     * @throws \Payplug\Exception\ConfigurationException
-     * @throws \Payplug\Exception\ConfigurationNotSetException
      */
     public function abortPayment()
     {
         $inst_id = $this->tools->tool('getValue', 'inst_id');
         $id_order = $this->tools->tool('getValue', 'id_order');
 
-        try {
-            $abort = InstallmentPlan::abort($inst_id);
-        } catch (Exception $e) {
-            $sandbox = (bool)$this->config->get(
-                $this->dependencies->getConfigurationKey('sandboxMode')
-            );
+        $abort = $this->dependencies->apiClass->abortInstallment($inst_id);
+        if (!$abort['result']) {
+            $sandbox = (bool)$this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
             if ($sandbox) {
                 $this->dependencies->apiClass->setSecretKey($this->config->get(
                     $this->dependencies->getConfigurationKey('liveApiKey')
                 ));
-                $abort = InstallmentPlan::abort($inst_id);
+                $abort = $this->dependencies->apiClass->abortInstallment($inst_id);
                 $this->dependencies->apiClass->setSecretKey($this->config->get(
                     $this->dependencies->getConfigurationKey('testApiKey')
                 ));
@@ -108,20 +97,21 @@ class PaymentClass
                 $this->dependencies->apiClass->setSecretKey($this->config->get(
                     $this->dependencies->getConfigurationKey('testApiKey')
                 ));
-                $abort = InstallmentPlan::abort($inst_id);
+                $abort = $this->dependencies->apiClass->abortInstallment($inst_id);
                 $this->dependencies->apiClass->setSecretKey($this->config->get(
                     $this->dependencies->getConfigurationKey('liveApiKey')
                 ));
             }
         }
 
-        if ($abort == 'error') {
+        if (!$abort['result']) {
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->dependencies->l('payplug.abortPayment.cannotAbort', 'paymentclass')
             ]));
         } else {
-            $installment = InstallmentClass::retrieveInstallment($inst_id);
+            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+            $installment = $installment['resource'];
 
             if ($installment->is_live == 1) {
                 $new_state = (int)$this->config->get('PS_OS_CANCELED');
@@ -140,7 +130,7 @@ class PaymentClass
                     $order_history->addWithemail();
                 }
             }
-            InstallmentClass::updatePayplugInstallment($installment);
+            $this->dependencies->installmentClass->updatePayplugInstallment($installment);
             $reload = true;
 
             die(json_encode(['reload' => $reload]));
@@ -257,13 +247,14 @@ class PaymentClass
     {
         if (!is_object($payment)) {
             try {
-                $payment = Payment::retrieve($payment);
+                $payment = $this->dependencies->apiClass->retrievePayment($payment);
+                $payment = $payment['resource'];
             } catch (Exception $exception) {
                 return $exception;
             }
         }
 
-        $pay_status = self::getPaymentStatusByPayment($payment);
+        $pay_status = $this->getPaymentStatusByPayment($payment);
         $status_class = null;
         switch ($pay_status) {
             case 1: // not paid
@@ -504,61 +495,62 @@ class PaymentClass
         $this->logger->addLog('[Payplug] Start capture', 'notice');
         $pay_id = $this->tools->tool('getValue', 'pay_id');
         $id_order = $this->tools->tool('getValue', 'id_order');
-        $payment = new PPPayment($pay_id);
-        $capture = $payment->capture();
-        $payment->refresh();
-        if ($payment->resource->card->id !== null) {
-            $this->logger->addLog('Save the payment card', 'notice');
-            $this->card->saveCard($payment->resource);
-        }
-        if ($capture['code'] >= 300) {
-            $this->logger->addLog('Cannot capture this payment', 'notice');
+
+        $capture = $this->dependencies->apiClass->capturePayment($pay_id);
+        if (!$capture['result']) {
             die(json_encode([
                 'status' => 'error',
                 'data' => $this->dependencies->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
                 'message' => $capture['message'],
             ]));
-        } else {
-            $state_addons = ($payment->resource->is_live ? '' : '_TEST');
-            $new_state = (int)$this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-            );
+        }
 
-            $order = $this->order->get((int)$id_order);
-            if ($this->validate->validate('isLoadedObject', $order)) {
-                if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
-                    $this->logger->addLog('An error occured on lock creation', 'notice');
-                    die(json_encode([
-                        'status' => 'error',
-                        'data' => $this->dependencies->l('payplug.capturePayment.errorOccurred', 'paymentclass')
-                    ]));
-                }
+        $payment = $capture['resource'];
 
-                $order->setInvoice(true);
-                $current_state = (int)$order->getCurrentState();
-                $this->logger->addLog('Current order state: ' . $current_state, 'notice');
-                if ($current_state != 0 && $current_state != $new_state) {
-                    $order_history = $this->orderHistory->get();
-                    $order_history->id_order = (int)$order->id;
-                    $this->logger->addLog('New order state: ' . $new_state, 'notice');
-                    $order_history->changeIdOrderState($new_state, (int)$order->id);
-                    $order_history->addWithemail();
-                }
+        if ($payment->card->id !== null) {
+            $this->logger->addLog('Save the payment card', 'notice');
+            $this->card->saveCard($payment);
+        }
 
-                if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
-                    $this->logger->addLog('Lock cannot be deleted.', 'error');
-                } else {
-                    $this->logger->addLog('Lock deleted.', 'notice');
-                }
+        $state_addons = ($payment->is_live ? '' : '_TEST');
+        $new_state = (int)$this->config->get(
+            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+        );
+
+        $order = $this->order->get((int)$id_order);
+        if ($this->validate->validate('isLoadedObject', $order)) {
+            if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
+                $this->logger->addLog('An error occured on lock creation', 'notice');
+                die(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.capturePayment.errorOccurred', 'paymentclass')
+                ]));
             }
 
-            die(json_encode([
-                'status' => 'ok',
-                'data' => '',
-                'message' => $this->dependencies->l('payplug.capturePayment.captured.', 'paymentclass'),
-                'reload' => true,
-            ]));
+            $order->setInvoice(true);
+            $current_state = (int)$order->getCurrentState();
+            $this->logger->addLog('Current order state: ' . $current_state, 'notice');
+            if ($current_state != 0 && $current_state != $new_state) {
+                $order_history = $this->orderHistory->get();
+                $order_history->id_order = (int)$order->id;
+                $this->logger->addLog('New order state: ' . $new_state, 'notice');
+                $order_history->changeIdOrderState($new_state, (int)$order->id);
+                $order_history->addWithemail();
+            }
+
+            if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
+                $this->logger->addLog('Lock cannot be deleted.', 'error');
+            } else {
+                $this->logger->addLog('Lock deleted.', 'notice');
+            }
         }
+
+        die(json_encode([
+            'status' => 'ok',
+            'data' => '',
+            'message' => $this->dependencies->l('payplug.capturePayment.captured.', 'paymentclass'),
+            'reload' => true,
+        ]));
     }
 
     /**
@@ -825,7 +817,7 @@ class PaymentClass
             return false;
         }
 
-        $inst_id = InstallmentClass::getInstallmentByCart($cart->id);
+        $inst_id = $this->dependencies->installmentClass->getInstallmentByCart($cart->id);
         if ($inst_id) {
             return ['id' => $inst_id, 'type' => 'installment'];
         }
@@ -1310,7 +1302,7 @@ class PaymentClass
      * @param $payment
      * @return int
      */
-    public static function getPaymentStatusByPayment($payment)
+    public function getPaymentStatusByPayment($payment)
     {
 
         /*
@@ -1327,11 +1319,13 @@ class PaymentClass
             11 => 'abandoned',
         */
         if (!is_object($payment)) {
-            $payment = Payment::retrieve($payment);
+            $payment = $this->dependencies->apiClass->retrievePayment($payment);
+            $payment = $payment['resource'];
         }
 
         if ($payment->installment_plan_id !== null) {
-            $installment = InstallmentPlan::retrieve($payment->installment_plan_id);
+            $installment = $this->dependencies->apiClass->retrieveInstallment($payment->installment_plan_id);
+            $installment =  $installment['resource'];
         } else {
             $installment = null;
         }
@@ -1426,19 +1420,18 @@ class PaymentClass
      * @param string $payment_id
      * @param string $type default payment
      * @return bool
-     * @throws ConfigurationNotSetException
      */
     public function isPaidPaymentMethod($payment_id, $type = 'payment')
     {
         switch ($type) {
             case 'installment':
-                $installment = InstallmentPlan::retrieve($payment_id);
-                if ($installment && $installment->is_active) {
+                $installment = $this->dependencies->apiClass->retrieveInstallment($payment_id);
+                if (isset($installment['resource']) && $installment['resource']->is_active) {
                     $schedules = $installment->schedule;
                     foreach ($schedules as $schedule) {
                         foreach ($schedule->payment_ids as $pay_id) {
-                            $inst_payment = Payment::retrieve($pay_id);
-                            if ($inst_payment && $inst_payment->is_paid) {
+                            $inst_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                            if (isset($inst_payment['resource']) && $inst_payment['resource']->is_paid) {
                                 return true;
                             }
                         }
@@ -1447,8 +1440,8 @@ class PaymentClass
                 break;
             case 'payment':
             default:
-                $payment = Payment::retrieve($payment_id);
-                return $payment && $payment->is_paid;
+                $payment = $this->dependencies->apiClass->retrievePayment($payment_id);
+                return isset($payment['resource']) && $payment['resource']->is_paid;
         }
         return false;
     }
@@ -1501,33 +1494,6 @@ class PaymentClass
             ->where('id_cart = ' . (int)$id_cart)
             ->where('is_pending = 1')
             ->build('unique_value');
-    }
-
-    /**
-     * @description Send cURL request to PayPlug to patch a given payment
-     *
-     * @param String $pay_id
-     * @param Array $data
-     * @return Array
-     */
-    public function patchPayment($pay_id, $data)
-    {
-        $result = [
-            'status' => true,
-            'message' => null,
-        ];
-
-        try {
-            $payment = Payment::fromAttributes(['id' => $pay_id]);
-            $payment->update($data);
-        } catch (Exception $e) {
-            $result = [
-                'status' => false,
-                'message' => $e['message']
-            ];
-        }
-
-        return $result;
     }
 
     /**
@@ -2089,28 +2055,6 @@ class PaymentClass
             ->set('is_pending = 1')
             ->where('id_cart = ' . (int)$id_cart)
             ->build();
-    }
-
-    /**
-     * @description Retrieve payment informations
-     *
-     * @param string $pay_id
-     * @return bool|Payment|null
-     */
-    public function retrievePayment($pay_id)
-    {
-        try {
-            $payment = Payment::retrieve($pay_id);
-        } catch (ConfigurationNotSetException $e) {
-            return false;
-        } catch (NotFoundException $e) {
-            return false;
-        } catch (UndefinedAttributeException $e) {
-            return false;
-        }
-
-
-        return $payment;
     }
 
     /**
