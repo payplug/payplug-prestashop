@@ -407,7 +407,7 @@ class ConfigClass
             if (!$permissions['can_use_bancontact']) {
                 $available_options['bancontact'] = false;
             }
-            /*if (!$permissions['can_use_bancontact']) {
+            /*if (!$permissions['can_use_applepay']) {
                 $available_options['applepay'] = false;
             }*/
         }
