@@ -389,6 +389,12 @@ class ApiClass
             $can_use_bancontact = true;
         }
 
+        if (isset($json_answer['payment_methods']['apple_pay']['enabled'])) {
+            $can_use_applepay = $json_answer['payment_methods']['apple_pay']['enabled'];
+        } else {
+            $can_use_applepay = true;
+        }
+
         $onboardingOneyCompleted = false;
         if (isset($json_answer['payment_methods']) && !empty(
             $this->config->get(
@@ -415,6 +421,7 @@ class ApiClass
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_use_bancontact' => $can_use_bancontact,
+            'can_use_applepay' => $can_use_applepay,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ];
 
