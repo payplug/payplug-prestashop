@@ -268,6 +268,8 @@ $_MODULE['<{payplug}prestashop>messages_7c04ed9eccda2e75dcb57f352d878154'] = 'Ok
 $_MODULE['<{payplug}prestashop>messages_f8cae6f73b59cedacdccc952ee2118de'] = 'Yes';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Saved cards';
 $_MODULE['<{payplug}prestashop>my_account_9a5b5b8ce74c1f2f1cecbfd517fe1128'] = 'Your Prestashop version is not compatible';
+$_MODULE['<{payplug}prestashop>onboardingalerts_c19b9c2ed238d40663d1f02b63f6d3dd'] = 'For more information, please contact us at [1]support@payplug.com[/1]';
+$_MODULE['<{payplug}prestashop>onboardingalerts_e898d50eba8a11e990e6bc193ffff3f1'] = 'Your application is being processed';
 $_MODULE['<{payplug}prestashop>onboardingalerts_eda33afc4c30ecdc0e6567f46326175f'] = 'While your application is being reviewed, you can use the [1]TEST mode[/1] to discover our module.[2]  [3]Click here[/3] to switch to LIVE mode and collect payments from your customers.';
 $_MODULE['<{payplug}prestashop>onboardingalerts_f11a2c6bdb67fea2bbdbac1215a03361'] = 'Congratulations, your account is connected!';
 $_MODULE['<{payplug}prestashop>one_click_09290bbf6b0598e60b97c3b1bd44161b'] = 'Allow customers to save their credit card information for later purchases';
