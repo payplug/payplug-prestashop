@@ -66,6 +66,7 @@
         optionsSelected=$payplug_switch.oney_fees.checked
         optionsClassName='_paylaterOptions'
         optionsName=$payplug_switch.oney_fees.name}
+
     {* Hide optimisedOption for pspaylater module *}
     {if $module_name=='pspaylater'}
         {include file='./../atoms/input/input.tpl'
@@ -73,9 +74,9 @@
         inputValue = '1'
         inputName = $payplug_switch.oney_optimized.name}
     {/if}
-    {* Advanced Paylater Settings *}
 
-    {include file='./advanced_paylater.tpl'}
+    {* Advanced Paylater Settings *}
+    {include file='./paylater_advanced.tpl'}
 {/capture}
 
 {assign var='paylaterBlock_className' value='paylaterBlock'}
