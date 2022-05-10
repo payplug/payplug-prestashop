@@ -20,22 +20,17 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-
-<div class="payplugUIAccordion
-    {if isset($accordionClassName) && $accordionClassName} {$accordionClassName|escape:'htmlall':'UTF-8'}{/if}">
-    <input type="checkbox"
-           id="{$accordionIdentifier|escape:'htmlall':'UTF-8'}"
-            {if isset($accordionData) && $accordionData} data-e2e-name="{$accordionData|escape:'htmlall':'UTF-8'}"{/if}/>
-
-        <label for="{$accordionIdentifier|escape:'htmlall':'UTF-8'}">
-            {if isset($accordionLabel) && $accordionLabel}
-                {$accordionLabel|escape:'htmlall':'UTF-8'}
-            {/if}
-        </label>
-
-    <div class="payplugUIAccordion_contentWrapper">
-        <div class="payplugUIAccordion_content">
-            {$accordionContent}
+<div class="_paylaterAdvancedOption -{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}">
+    <div class="_img">
+        <img src="/modules/{$module_name}/views/img/svg/screen/paylater-{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}.svg" alt="">
+    </div>
+    <div class="_wrapper">
+        {include
+            file='./../atoms/title/title.tpl'
+            titleClassName='_title'
+            titleText=$paylaterAdvancedOptionTitle}
+        <div class="_content">
+            {$paylaterAdvancedOptionContent}
         </div>
     </div>
 </div>

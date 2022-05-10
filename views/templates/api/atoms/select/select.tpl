@@ -46,7 +46,8 @@
                             id="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
                             value="{$option.key|escape:'htmlall':'UTF-8'}"
                             name="{$selectName|escape:'htmlall':'UTF-8'}"
-                            {if $defaultValue == $option.key} checked{/if}>
+                            data-e2e-name="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
+                            {if $defaultValue == $option.key} checked="checked"{/if}>
                     <span class="_text">{$option.value|escape:'htmlall':'UTF-8'}</span>
                 </div>
             {/foreach}
