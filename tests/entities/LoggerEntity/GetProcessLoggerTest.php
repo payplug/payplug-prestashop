@@ -23,7 +23,7 @@
 
 
 
-use PayPlugModule\src\entities\LoggerEntity;
+use PayPlugModule\src\models\entities\LoggerEntity;
 use PHPUnit\Framework\TestCase;
 
 /**

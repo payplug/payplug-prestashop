@@ -21,35 +21,35 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\entities;
+namespace PayPlugModule\src\models\entities;
 
 use PayPlugModule\src\exceptions\BadParameterException;
 
-class OneyEntity
+class PaymentEntity
 {
-    /** @var array */
-    private $operations;
+    /** @var object */
+    private $apiPayment;
 
     /**
-     * @return array
+     * @return object
      */
-    public function getOperations()
+    public function getApiPayment()
     {
-        return $this->operations;
+        return $this->apiPayment;
     }
 
     /**
-     * @param array $operations
+     * @param $apiPayment
      * @return self
      * @throws BadParameterException
      */
-    public function setOperations($operations)
+    public function setApiPayment($apiPayment)
     {
-        if (!is_array($operations)) {
-            throw (new BadParameterException('Invalid argument, $operations must be an array'));
+        if (!is_object($apiPayment)) {
+            throw (new BadParameterException('Invalid argument, $apiPayment must be an object'));
         }
 
-        $this->operations = $operations;
+        $this->apiPayment = $apiPayment;
         return $this;
     }
 }

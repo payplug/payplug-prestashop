@@ -24,8 +24,9 @@
 namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\src\specific\OrderStateSpecific;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class OrderStateRepository extends Repository
+class OrderStateRepository extends BaseClass
 {
     /** @var object */
     protected $constant;
