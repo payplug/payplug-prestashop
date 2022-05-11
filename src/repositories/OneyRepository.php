@@ -26,8 +26,9 @@ namespace PayPlugModule\src\repositories;
 use PayPlugModule\classes\ConfigClass;
 use PayPlugModule\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class OneyRepository extends Repository
+class OneyRepository extends BaseClass
 {
     private $addressSpecific;
     private $amountCurrencyClass;

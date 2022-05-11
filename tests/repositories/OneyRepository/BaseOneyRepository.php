@@ -25,7 +25,7 @@
 namespace PayPlugModule\tests\repositories\OneyRepository;
 
 use PayPlugModule\classes\AmountCurrencyClass;
-use PayPlugModule\src\entities\OneyEntity;
+use PayPlugModule\src\models\entities\OneyEntity;
 use PayPlugModule\src\repositories\OneyRepository;
 use PayPlugModule\tests\mock\MockHelper;
 use PayPlugModule\tests\repositories\RepositoryBase;

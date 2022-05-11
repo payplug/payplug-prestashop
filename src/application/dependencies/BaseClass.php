@@ -21,35 +21,45 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\entities;
+namespace PayPlugModule\src\application\dependencies;
 
-use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlugModule\src\specific\TranslationSpecific;
 
-class OrderStateEntity
+class BaseClass
 {
-    /** @var array */
-    private $list;
+    private $entity;
+    protected $name;
+    protected $payplug;
 
-    /**
-     * @return object
-     */
-    public function getList()
+    public static function factory()
     {
-        return $this->list;
+        return new self();
     }
 
-    /**
-     * @param $apiPayment
-     * @return self
-     * @throws BadParameterException
-     */
-    public function setList($list)
+    public function setName()
     {
-        if (!is_array($list)) {
-            throw (new BadParameterException('Invalid argument, $list must be an array'));
-        }
-
-        $this->list = $list;
+        $this->name = (new \ReflectionClass($this))->getShortName();
         return $this;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        return $this;
+    }
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    public function l($string)
+    {
+        $this->setName();
+        return TranslationSpecific::translate($this->payplug, $string, $this->getName());
     }
 }

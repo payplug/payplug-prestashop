@@ -26,7 +26,7 @@ namespace PayPlugModule\tests\repositories\CardRepository;
 
 use Mockery;
 use Payplug\Payment;
-use PayPlugModule\src\entities\CardEntity;
+use PayPlugModule\src\models\entities\CardEntity;
 use PayPlugModule\src\repositories\CardRepository;
 use PayPlugModule\tests\mock\MockHelper;
 use PayPlugModule\tests\repositories\RepositoryBase;

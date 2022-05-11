@@ -25,8 +25,9 @@ namespace PayPlugModule\src\repositories;
 
 use DateTime;
 use Exception;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class PaymentRepository extends Repository
+class PaymentRepository extends BaseClass
 {
     protected $dependencies;
 

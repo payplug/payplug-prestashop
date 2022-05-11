@@ -24,9 +24,10 @@
 namespace PayPlugModule\src\repositories;
 
 use Exception;
-use PayPlugModule\src\entities\CardEntity;
+use PayPlugModule\src\models\entities\CardEntity;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class CardRepository extends Repository
+class CardRepository extends BaseClass
 {
     protected $dependencies;
 

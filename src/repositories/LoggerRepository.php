@@ -23,9 +23,10 @@
 
 namespace PayPlugModule\src\repositories;
 
-use PayPlugModule\src\entities\LoggerEntity;
+use PayPlugModule\src\models\entities\LoggerEntity;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class LoggerRepository extends Repository
+class LoggerRepository extends BaseClass
 {
     private $dependencies;
     private $loggerEntity;

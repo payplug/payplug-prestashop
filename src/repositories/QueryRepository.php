@@ -82,8 +82,9 @@
 namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\src\specific\QuerySpecific;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class QueryRepository extends Repository
+class QueryRepository extends BaseClass
 {
     protected $query = [
         'type' => [],
