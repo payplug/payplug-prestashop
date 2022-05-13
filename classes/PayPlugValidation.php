@@ -103,7 +103,7 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
-            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+            Tools::redirect($redirect_url_error);
         } elseif (!($ps = Tools::getValue('ps')) || $ps != 1) {
             if ($ps == 2) {
                 $this->logger->addLog('Order has been cancelled on PayPlug page');
@@ -114,7 +114,7 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
-            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+            Tools::redirect($redirect_url_error);
         }
         //Treatment
         $this->logger->addLog('Cart ID : ' . (int)$cart_id);
@@ -127,7 +127,7 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
             ]);
-            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+            Tools::redirect($redirect_url_error);
         }
         $this->logger->addLog('Cart loaded.', 'error');
 
@@ -201,7 +201,7 @@ class PayPlugValidation
                         $this->paymentClass->setPaymentErrorsCookie([
                             $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                         ]);
-                        die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                        Tools::redirect($redirect_url_error);
                     }
                 } catch (Exception $e) {
                     $this->logger->addLog('Installment cannot be retrieved.', 'error');
@@ -213,7 +213,7 @@ class PayPlugValidation
                     $this->paymentClass->setPaymentErrorsCookie([
                         $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                     ]);
-                    die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                    Tools::redirect($redirect_url_error);
                 }
             }
         } else {
@@ -244,7 +244,7 @@ class PayPlugValidation
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
                     }
-                    die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                    Tools::redirect($redirect_url_error);
                 }
                 $is_paid = $payment->is_paid;
                 if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
@@ -284,8 +284,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                dump($e->getMessage());
-                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                Tools::redirect($redirect_url_error);
             }
 
             if (((isset($payment->save_card) && (int)$payment->save_card == 1))
@@ -340,7 +339,7 @@ class PayPlugValidation
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
-            die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+            Tools::redirect($redirect_url_error);
         }
 
         $this->logger->addLog('Total : ' . $amount);
@@ -513,7 +512,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                Tools::redirect($redirect_url_error);
             }
 
             $this->logger->addLog('Order validated');
@@ -555,7 +554,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                Tools::redirect($redirect_url_error);
             } elseif (count($res_nb_orders) > 1) {
                 $this->logger->addLog(
                     'There is more than one order using id_cart ' . (int)$cart->id,
@@ -584,7 +583,7 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                 ]);
-                die(dump(__LINE__)); // Tools::redirect($redirect_url_error);
+                Tools::redirect($redirect_url_error);
             } elseif (count($payments) > 1) {
                 $this->logger->addLog('There is more than one transaction using id_order ' . (int)$id_order, 'error');
             } else {
