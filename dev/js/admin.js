@@ -937,7 +937,7 @@ var $document, $window, __moduleName__Module = {
             }
 
             if (deferred.props.loaded
-                && !parseInt($('input[name=' + standard.props.switcher + ']:checked').val())
+                && !parseInt($('input[name=payplug_standard]:checked').length)
                 && !parseInt($('input[name=' + installment.props.switcher + ']:checked').val())) {
                 return deferred.unavailable();
             } else {
