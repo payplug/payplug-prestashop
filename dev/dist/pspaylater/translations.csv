@@ -350,7 +350,7 @@ key;default;tags;fr;en;gb;it
 <{pspaylater}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc;hook.oney.payment.paywithoney;;"Payer en 3x ou 4x par carte bancaire avec Oney";"Pay by card in 3x or 4x with Oney";"Pay by card in 3x or 4x with Oney";"Pagamento in 3x o 4x con Carta di Credito con Oney"
 <{pspaylater}prestashop>paymentclass_078ed84f95595cd3a2d3e072e2a10d84;payplug.getPaymentOptions.errorOccurred;;"Une erreur est survenue";"An error has occurred";"An error has occurred";"C'è stato un errore"
 <{pspaylater}prestashop>paymentclass_07c1bd7ea24e42192f02d05ac779576d;payment.getPaymentMethod.applepay.name;;"Paiement Apple Pay";;;
-<{pspaylater}prestashop>paymentclass_07d7deb3039ff5ae3b7b45cff4a62a6e;payplug.getPaymentOptions.payWithApplePay;;;;;
+<{pspaylater}prestashop>paymentclass_07d7deb3039ff5ae3b7b45cff4a62a6e;payplug.getPaymentOptions.payWithApplePay;;"Payer avec Apple Pay";"Pay with Apple Pay";"Pay with Apple Pay";"Paga con Apple Pay"
 <{pspaylater}prestashop>paymentclass_1249590cfb27680c6f59bd041edd812d;payplug.abortPayment.cannotAbort;;"Le paiement fractionné ne peut pas être annulé.";"Cannot abort installment.";"Cannot abort installment.";"Impossibile interropere il pagamento frazionato."
 <{pspaylater}prestashop>paymentclass_17de4c685248dc4807a28e806605f580;payplug.getPaymentOptions.payWithOney;;"Payer en %sx par carte avec Oney";"Pay by card in %sx with Oney";"Pay by card in %sx with Oney";"Paga con la carta in %sx con Oney"
 <{pspaylater}prestashop>paymentclass_1a5ea175a58e46aec10650431fa85c8e;payplug.capturePayment.errorOccurred;;"Une erreur est survenue";"An error has occurred";"An error has occurred";"C'è stato un errore"
