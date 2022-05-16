@@ -353,6 +353,7 @@ $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Payer en 3x ou 4x par carte bancaire avec Oney';
 $_MODULE['<{payplug}prestashop>paymentclass_078ed84f95595cd3a2d3e072e2a10d84'] = 'Une erreur est survenue';
 $_MODULE['<{payplug}prestashop>paymentclass_07c1bd7ea24e42192f02d05ac779576d'] = 'Paiement Apple Pay';
+$_MODULE['<{payplug}prestashop>paymentclass_07d7deb3039ff5ae3b7b45cff4a62a6e'] = 'Payer avec Apple Pay';
 $_MODULE['<{payplug}prestashop>paymentclass_1249590cfb27680c6f59bd041edd812d'] = 'Le paiement fractionné ne peut pas être annulé.';
 $_MODULE['<{payplug}prestashop>paymentclass_17de4c685248dc4807a28e806605f580'] = 'Payer en %sx par carte avec Oney';
 $_MODULE['<{payplug}prestashop>paymentclass_1a5ea175a58e46aec10650431fa85c8e'] = 'Une erreur est survenue';

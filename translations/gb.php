@@ -352,6 +352,7 @@ $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Pay
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Pay by card in 3x or 4x with Oney';
 $_MODULE['<{payplug}prestashop>paymentclass_078ed84f95595cd3a2d3e072e2a10d84'] = 'An error has occurred';
+$_MODULE['<{payplug}prestashop>paymentclass_07d7deb3039ff5ae3b7b45cff4a62a6e'] = 'Pay with Apple Pay';
 $_MODULE['<{payplug}prestashop>paymentclass_1249590cfb27680c6f59bd041edd812d'] = 'Cannot abort installment.';
 $_MODULE['<{payplug}prestashop>paymentclass_17de4c685248dc4807a28e806605f580'] = 'Pay by card in %sx with Oney';
 $_MODULE['<{payplug}prestashop>paymentclass_1a5ea175a58e46aec10650431fa85c8e'] = 'An error has occurred';
