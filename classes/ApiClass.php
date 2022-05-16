@@ -60,11 +60,6 @@ class ApiClass
     /** var DependenciesClass */
     public $dependencies;
 
-    /**
-     * @var false|Payplug\Payplug
-     */
-    public $api;
-
     /** @var string */
     private $portal_url;
 
@@ -137,7 +132,6 @@ class ApiClass
         $this->setSecretKey($api_key);
 
         try {
-            $this->setUserAgent();
             $response = Authentication::getAccount();
         } catch (ConfigurationNotSetException $e) {
             return false;
@@ -170,7 +164,7 @@ class ApiClass
         );
         $flag = true;
 
-        $this->setUserAgent();
+        $this->setSecretKey();
 
         // Set the publishable for the given sandbox configuration
         try {
@@ -600,8 +594,8 @@ class ApiClass
     /**
      * @description Set the current secret key used to interact with PayPlug API
      *
-     * @param bool $token
-     * @return Payplug\Payplug
+     * @param false $token
+     * @return false|Payplug
      * @throws ConfigurationException
      */
     public function setSecretKey($token = false)
@@ -781,11 +775,11 @@ class ApiClass
         }
 
         try {
-            $this->api = $this->setSecretKey();
+            $api = $this->setSecretKey();
             $this->setUserAgent();
             $response = [
                 'result' => true,
-                'resource' => InstallmentPlan::abort($inst_id, $this->api),
+                'resource' => InstallmentPlan::abort($inst_id, $api),
                 'code' => 200
             ];
         } catch (Exception $e) {
@@ -808,7 +802,6 @@ class ApiClass
      */
     public function createInstallment($atttributes = [])
     {
-        $this->api = $this->setSecretKey();
         if (!$atttributes || !is_array($atttributes)) {
             return [
                 'code' => null,
@@ -818,11 +811,11 @@ class ApiClass
         }
 
         try {
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'code' => 200,
                 'result' => true,
-                'resource' => InstallmentPlan::create($atttributes)
+                'resource' => InstallmentPlan::create($atttributes, $api)
             ];
         } catch (Exception $e) {
             $response = [
@@ -853,12 +846,11 @@ class ApiClass
         }
 
         try {
-            $this->api = $this->setSecretKey();
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'code' => 200,
                 'result' => true,
-                'resource' => InstallmentPlan::retrieve($inst_id, $this->api)
+                'resource' => InstallmentPlan::retrieve($inst_id, $api)
             ];
         } catch (ConfigurationNotSetException $e) {
             $response = [
@@ -901,11 +893,10 @@ class ApiClass
         }
 
         try {
-            $this->api = $this->setSecretKey();
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'result' => true,
-                'resource' => Payment::abort($pay_id, $this->api),
+                'resource' => Payment::abort($pay_id, $api),
                 'code' => 200
             ];
         } catch (Exception $e) {
@@ -936,11 +927,10 @@ class ApiClass
         }
 
         try {
-            $this->api = $this->setSecretKey();
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'result' => true,
-                'resource' =>  Payment::capture($pay_id, $this->api),
+                'resource' =>  Payment::capture($pay_id, $api),
                 'code' => 200
             ];
         } catch (NotAllowedException $e) {
@@ -984,12 +974,11 @@ class ApiClass
         }
 
         try {
-            $this->api = $this->setSecretKey();
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'code' => 200,
                 'result' => true,
-                'resource' => Payment::create($atttributes, $this->api)
+                'resource' => Payment::create($atttributes, $api)
             ];
         } catch (Exception $e) {
             $response = [
@@ -1039,7 +1028,6 @@ class ApiClass
         $payment = $retrieve['resource'];
 
         try {
-            $this->setUserAgent();
             $response = [
                 'result' => true,
                 'resource' => $payment->update($data),
@@ -1083,10 +1071,10 @@ class ApiClass
         }
 
         try {
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'result' => true,
-                'resource' => Refund::create($pay_id, $data),
+                'resource' => Refund::create($pay_id, $data, $api),
                 'code' => 200
             ];
         } catch (Exception $e) {
@@ -1108,7 +1096,6 @@ class ApiClass
      */
     public function retrievePayment($pay_id = false)
     {
-        $this->api = $this->setSecretKey();
         if (!$pay_id || !is_string($pay_id)) {
             return [
                 'code' => null,
@@ -1118,11 +1105,11 @@ class ApiClass
         }
 
         try {
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'code' => 200,
                 'result' => true,
-                'resource' => Payment::retrieve($pay_id, $this->api)
+                'resource' => Payment::retrieve($pay_id, $api)
             ];
         } catch (ConfigurationNotSetException $e) {
             $response = [
@@ -1164,12 +1151,11 @@ class ApiClass
         }
 
         try {
-            $this->api = $this->setSecretKey();
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'code' => 200,
                 'result' => true,
-                'resource' => Card::delete($card_id, $this->api)
+                'resource' => Card::delete($card_id, $api)
             ];
         } catch (ConfigurationNotSetException $e) {
             $response = [
@@ -1199,11 +1185,11 @@ class ApiClass
         }
 
         try {
-            $this->setUserAgent();
+            $api = $this->setSecretKey();
             $response = [
                 'result' => true,
                 'code' => 200,
-                'resource' => OneySimulation::getSimulations($data)
+                'resource' => OneySimulation::getSimulations($data, $api)
             ];
         } catch (Exception $e) {
             $response = [
