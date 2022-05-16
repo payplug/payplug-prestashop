@@ -267,6 +267,8 @@ $_MODULE['<{payplug}prestashop>messages_7c04ed9eccda2e75dcb57f352d878154'] = 'Ok
 $_MODULE['<{payplug}prestashop>messages_f8cae6f73b59cedacdccc952ee2118de'] = 'Si';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Carte registrate';
 $_MODULE['<{payplug}prestashop>my_account_9a5b5b8ce74c1f2f1cecbfd517fe1128'] = 'La tua versione Prestashop non é compatibile';
+$_MODULE['<{payplug}prestashop>onboardingalerts_1b5e82b09a3e3f2c25e0175166bfd803'] = 'Congratulazioni, il tuo dossier è stato accettato!';
+$_MODULE['<{payplug}prestashop>onboardingalerts_7209991ca92aa4aff049dc104cf78808'] = 'Puoi utilizzare fin d\'ora la modalità LIVE e iniziare a incassare i pagamenti.';
 $_MODULE['<{payplug}prestashop>onboardingalerts_c19b9c2ed238d40663d1f02b63f6d3dd'] = 'Per ricevere ulteriori informazioni, contattaci al seguente indirizzo e-mail: [1]supporto@payplug.com[/1]';
 $_MODULE['<{payplug}prestashop>onboardingalerts_e898d50eba8a11e990e6bc193ffff3f1'] = 'Il tuo dossier è in fase di elaborazione.';
 $_MODULE['<{payplug}prestashop>onboardingalerts_eda33afc4c30ecdc0e6567f46326175f'] = 'Mentre il tuo dossier è in fase di elaborazione, puoi utilizzare la [1]modalità TEST[/1] per scoprire il nostro modulo.[2] [3]Clicca qui[/3] per passare alla modalità LIVE e iniziare ad incassare i pagamenti dei tuoi clienti.';
