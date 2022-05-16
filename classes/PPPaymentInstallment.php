@@ -41,6 +41,9 @@ class PPPaymentInstallment extends PPPayment
 
     public function retrieve($id)
     {
+        if (!$id) {
+            return false;
+        }
         $installment = $this->dependencies->apiClass->retrieveInstallment($id);
         if (!$installment['result']) {
             $data = [
@@ -51,10 +54,6 @@ class PPPaymentInstallment extends PPPayment
         }
 
         return $installment['resource'];
-
-        if (!$id) {
-            return false;
-        }
     }
 
     private function populateFromInstallment($installment)
