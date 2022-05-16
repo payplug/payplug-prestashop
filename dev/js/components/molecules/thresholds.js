@@ -27,8 +27,8 @@ class Thresholds {
             matches = val_min.match(/^[0-9]+$/),
             thresholdsErrorSpan = $('.thresholdError');
 
-        if ($('.thresholdStatement').hasClass('right')) {
-            $('.thresholdStatement').removeClass('right');
+        if ($('._statement').hasClass('-right')) {
+            $('._statement').removeClass('-right');
         }
         if (thresholds.props.limits.min > val_min || matches == null) {
             $('.minThreshold').addClass('-error');
@@ -56,25 +56,25 @@ class Thresholds {
             thresholdsErrorSpan = $('.thresholdError');
 
         if (thresholds.props.limits.max < val_max || matches == null) {
-            $('.thresholdStatement').addClass('right');
+            $('._statement').addClass('-right');
             $('.maxThreshold').addClass('-error');
             thresholdsErrorSpan.text(errorOneyThresholds.replace(/\\(.)/mg, "$1"));
             thresholdsErrorSpan.show();
             $('.thresholdErrorIcon').show();
         } else if (parseFloat(val_min) > val_max) {
-            $('.thresholdStatement').addClass('right');
+            $('._statement').addClass('-right');
             $('.maxThreshold').addClass('-error');
             thresholdsErrorSpan.text(errorOneyMax.replace(/\\(.)/mg, "$1"));
             thresholdsErrorSpan.show();
             $('.thresholdErrorIcon').show();
         } else if (val_max < thresholds.props.limits.min) {
-            $('.thresholdStatement').addClass('right');
+            $('._statement').addClass('-right');
             $('.maxThreshold').addClass('-error');
             thresholdsErrorSpan.text(errorOneyThresholds.replace(/\\(.)/mg, "$1"));
             thresholdsErrorSpan.show();
             $('.thresholdErrorIcon').show();
         } else {
-            $('.thresholdStatement').removeClass('right');
+            $('._statement').removeClass('-right');
             $('.maxThreshold').removeClass('-error');
             thresholdsErrorSpan.hide();
             $('.thresholdErrorIcon').hide();
