@@ -68,10 +68,9 @@ class General {
                 } else {
                     if (result.modal) {
                         if ($('.payplugUIModal').length) {
-                            $('.payplugUIModal').replaceWith(result.modal);
-                        } else {
-                            $container.append(result.modal);
+                            $container.find('.payplugUIModal').remove();
                         }
+                        $container.append(result.modal);
                         $container.find('input[name=modalTriggered]').trigger('click');
                     }
                 }
@@ -117,10 +116,9 @@ class General {
                     $button.removeClass('-disabled').removeAttr('disabled');
                     if (result.modal) {
                         if ($('.payplugUIModal').length) {
-                            $('.payplugUIModal').replaceWith(result.modal);
-                        } else {
-                            $container.append(result.modal);
+                            $container.find('.payplugUIModal').remove();
                         }
+                        $container.append(result.modal);
                         $container.find('input[name=modalTriggered]').trigger('click');
                     }
                 }
