@@ -1917,7 +1917,7 @@ class PaymentClass
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ConfigClass::isMobiledevice(),
             'cart' => $cart,
-            'cartId' => $payment_tab['metadata']['ID Cart'],
+            'cartId' => (int)$payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
             'oneyDetails' => isset($options['is_oney']) ? $options['is_oney'] : null
         ];
