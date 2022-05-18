@@ -773,6 +773,13 @@ class HookClass
             ]);
         }
 
+        $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
+        $this->dependencies->mediaClass->setMedia([
+            $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
+            $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
+            $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
+        ]);
+
         $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
 
         return $this->html;
