@@ -2,6 +2,7 @@
 
 namespace PayPlugModule\tests\mock;
 
+use Payplug\Resource\InstallmentPlan;
 use Payplug\Resource\Payment;
 
 class PaymentMock
@@ -33,15 +34,15 @@ class PaymentMock
         ]
     ];
 
-    public static function getStandard()
+    public static function getStandard($parameters = [])
     {
-        $resource = self::getDefault();
+        $resource = self::getDefault($parameters);
         return Payment::fromAttributes($resource);
     }
 
-    public static function getDefault()
+    public static function getDefault($parameters)
     {
-        return [
+        $defaultConfiguration = [
             'id' => 'pay_5ktNvd3BNCp6GPcqIZvY9j',
             'object' => 'payment',
             'is_live' => true,
@@ -118,13 +119,19 @@ class PaymentMock
                 'language' => 'fr',
                 'delivery_type' => 'BILLING'
             ],
-
         ];
+
+        if (!empty($parameters)) {
+            foreach ($parameters as $key => $value) {
+                $defaultConfiguration[$key] = $value;
+            }
+        }
+        return $defaultConfiguration;
     }
 
-    public static function getInstallment()
+    public static function getInstallment($parameters = [])
     {
-        $installment = [
+        $defaultInstallment = [
             'object' => 'installment_plan',
             'id' => 'inst_1gDmrsoMdIAJfV2MxzkBPX',
             'is_active' => true,
@@ -164,8 +171,7 @@ class PaymentMock
                 ]
             ],
             'is_live' => true,
-            'billing' =>
-                [
+            'billing' => [
                     'title' => null,
                     'first_name' => 'Cedric',
                     'last_name' => 'PayPlug',
@@ -199,6 +205,14 @@ class PaymentMock
                 'delivery_type' => 'BILLING'
             ]
         ];
+        if (!empty($parameters)) {
+            foreach ($parameters as $key => $value) {
+                $defaultInstallment[$key] = $value;
+            }
+        }
+
+        $resource = self::getDefault($defaultInstallment);
+        return InstallmentPlan::fromAttributes(self::$payment_parameters['oneclick']);
     }
 
     public static function getOneClick()

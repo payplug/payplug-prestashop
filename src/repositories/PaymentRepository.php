@@ -243,22 +243,54 @@ class PaymentRepository extends Repository
      * @param array $paymentDetails
      * @return array
      */
-    public function createPayment($paymentDetails)
+    public function createPayment($paymentDetails = [])
     {
-        if (!$paymentDetails
-            || !$paymentDetails['paymentTab']
-            || !$paymentDetails['paymentMethod']) {
+        if (!$paymentDetails || !is_array($paymentDetails)) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] $paymentDetails or paymentTab or paymentMethod is null'
+                '[createPayment] Invalid $paymentDetails given'
+            );
+        }
+
+        if (!isset($paymentDetails['paymentTab'])
+            || !is_array($paymentDetails['paymentTab'])
+            || empty($paymentDetails['paymentTab'])) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[createPayment] Invalid paymentTab given in $paymentDetails'
+            );
+        }
+
+        if (!isset($paymentDetails['paymentMethod']) || !is_string($paymentDetails['paymentMethod'])) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[createPayment] Invalid paymentMethod given in $paymentDetails'
+            );
+        }
+
+        if (!isset($paymentDetails['cartId']) || !is_int($paymentDetails['cartId'])) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[createPayment] Invalid cartId given in $paymentDetails'
             );
         }
 
         if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confSpecific->get('PAYPLUG_STANDARD')) {
             return $this->returnPaymentError(
                 ['name' => 'Configuration::get', 'value' => $this->confSpecific->get('PAYPLUG_STANDARD')],
-                '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
+                '[createPayment] Try to create standard payment with PAYPLUG_STANDARD disabled'
             );
+        }
+
+        // Before create a new payment, delete the previous one, if exists, to avoid double order creation
+        if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
+            $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
+            if (!$abort['result']) {
+                return $this->returnPaymentError(
+                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                    '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
+                );
+            }
         }
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
