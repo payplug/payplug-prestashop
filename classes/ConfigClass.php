@@ -803,6 +803,7 @@ class ConfigClass
         $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
+        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 

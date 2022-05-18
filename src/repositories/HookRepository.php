@@ -43,30 +43,6 @@ class HookRepository extends Repository
         $this->tools = $tools;
     }
 
-    public function actionAdminControllerSetMedia()
-    {
-        $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
-
-        Media::addJsDef([
-            'module_name' => $this->dependencies->name
-        ]);
-
-        if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
-            $this->dependencies->mediaClass->setMedia([
-                $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
-                $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
-                $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
-            ]);
-        } else {
-            $this->dependencies->mediaClass->setMedia([
-                $module_url . 'views/js/admin-v'.$this->dependencies->version.'.js',
-                $module_url . 'views/css/admin-v'.$this->dependencies->version.'.css',
-                $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
-                $module_url . 'views/js/components-v'.$this->dependencies->version.'.js',
-            ]);
-        }
-    }
-
     /**
      * @description This is a hook function that allows
      * creating a new type of the order state

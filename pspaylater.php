@@ -121,7 +121,6 @@ class PsPaylater extends PaymentModule
     private function getHookList()
     {
         return [
-            'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
             'actionCarrierUpdate',
@@ -159,16 +158,6 @@ class PsPaylater extends PaymentModule
     {
         if ($this->module) {
             return parent::disable($force_all) && $this->payplug_dependencies->getDependency('configClass')->disable();
-        }
-    }
-
-    /**
-     * @description To load admin and admin_order (js and css) in order details in PS 1.7.7.0
-     */
-    public function hookActionAdminControllerSetMedia()
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionAdminControllerSetMedia');
         }
     }
 
