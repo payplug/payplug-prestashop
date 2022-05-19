@@ -27,15 +27,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_8_0($object)
+function upgrade_module_0_3_0($object)
 {
     $flag = true;
-
-    // add  PAYPLUG_APPLEPAY to database
-    $flag = $flag && Configuration::updateValue(
-        'PAYPLUG_APPLEPAY',
-        null
-    );
 
     if (!$object->unregisterHook('actionAdminControllerSetMedia')) {
         $flag = false;
