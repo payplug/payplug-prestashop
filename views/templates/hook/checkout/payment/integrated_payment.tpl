@@ -96,19 +96,19 @@
         var placeholderCvv = '{/literal}{$placeholderCvv|escape:'javascript':'UTF-8'}{literal}';
         var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
         var loadIntegrated = function() {
-            if (typeof payplug_utilities != 'undefined') {
-                payplug_utilities.loadScript('{/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
-                    if(typeof payplugModule != 'undefined') {
-                        payplugModule.integrated.init();
+            if (typeof window['payplug_utilities'] != 'undefined') {
+                window['payplug_utilities'].loadScript('{/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
+                    if(typeof window['payplug_module'] != 'undefined') {
+                        window['payplug_module'].integrated.init();
                     } else {
-                        console.log('Type of payplugModule : ' + typeof payplugModule);
+                        console.log('Type of payplugModule : ' + typeof window['payplug_module']);
                     }
                 });
             } else {
-                console.log('Type of payplug_utilities : ' + typeof payplug_utilities);
+                console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
             }
         }
-        if (typeof payplug_utilities != 'undefined' && typeof payplugModule != 'undefined') {
+        if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplug_module'] != 'undefined') {
             loadIntegrated();
         } else {
             window.addEventListener("load", loadIntegrated);
