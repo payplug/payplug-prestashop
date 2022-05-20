@@ -104,7 +104,7 @@ build zip release:
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
-    - rm -r ./vendor
+    - rm -rf ./vendor
     - composer install --no-dev
     - rm webpack.config.js
     - ./dev/ci/secure_directories.sh
@@ -159,7 +159,8 @@ build zip pspaylater:
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
-    - rm -r ./vendor
+    - ls -als ./vendor
+    - rm -rf ./vendor
     - ./dev/ci/set_namespace.sh
     - ./dev/ci/set_translation.sh
     - composer install --no-dev
