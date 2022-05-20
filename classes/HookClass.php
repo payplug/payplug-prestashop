@@ -1008,6 +1008,8 @@ class HookClass
 
             Media::addJsDef([
                 'applePayPaymentRequest' => $applePayPaymentRequest,
+                'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaymerchantsession', [], true),
+                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypayment', [], true),
             ]);
         }
 
