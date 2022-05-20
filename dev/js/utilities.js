@@ -48,7 +48,6 @@ var payplug_utilities = {
         loadedScript: []
     },
     init: function(){
-
     },
     loadScript: function (url, callback) {
         // Check if already loaded
@@ -94,3 +93,5 @@ addLogger = function(message)
         }
     });
 };
+
+window['payplug_utilities'] = payplug_utilities;

@@ -557,20 +557,20 @@ class ApiClass
      */
     private function setEnvironment()
     {
-        if (isset($_SERVER['PAYPLUG_API_URL'])) {
-            $this->setApiUrl($_SERVER['PAYPLUG_API_URL']);
+        if (isset($_ENV['API_BASE_URL']) && !empty($_ENV['API_BASE_URL'])) {
+            $this->setApiUrl($_ENV['API_BASE_URL']);
         } else {
             $this->setApiUrl('https://api.payplug.com');
         }
 
-        if (isset($_SERVER['PAYPLUG_SITE_URL'])) {
-            $this->site_url = $_SERVER['PAYPLUG_SITE_URL'];
+        if (isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])) {
+            $this->site_url = $_ENV['PAYPLUG_SITE_URL'];
         } else {
             $this->site_url = 'https://www.payplug.com';
         }
 
-        if (isset($_SERVER['PAYPLUG_PORTAL_URL'])) {
-            $this->portal_url = $_SERVER['PAYPLUG_PORTAL_URL'];
+        if (isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty(['PAYPLUG_PORTAL_URL'])) {
+            $this->portal_url = $_ENV['PAYPLUG_PORTAL_URL'];
         } else {
             $this->portal_url = 'https://portal.payplug.com';
         }
