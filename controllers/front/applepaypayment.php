@@ -78,13 +78,17 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
             // Create order in BO
             $cart_amount = (float)$this->context->cart->getOrderTotal(true, Cart::BOTH);
 
+            $extra_vars = [
+                'transaction_id' => $id_payment
+            ];
+
             $validateOrder_result = $this->moduleInstance->validateOrder(
                 $this->context->cart->id,
                 Configuration::get('PAYPLUG_ORDER_STATE_PAID'),
                 $cart_amount,
                 'Apple Pay with ' . $this->dependencies->name,
                 false,
-                array(), //$extra_vars
+                $extra_vars,
                 (int)$this->context->cart->id_currency,
                 false,
                 $this->context->customer->secure_key
