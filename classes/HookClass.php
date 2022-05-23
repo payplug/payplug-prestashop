@@ -505,40 +505,18 @@ class HookClass
             }
 
             $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    )
-                );
-            } else {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    )
-                );
-            }
+            $mode = $sandbox ? 'test' : 'live';
             // If no payment id, return false
             if (!$pay_id || empty($pay_id)) {
                 return false;
             }
 
             // Get the Payment resource
-            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-
+            $payment = $this->dependencies->apiClass->retrievePayment($pay_id, $mode);
             // If No Payment resource, test the other live mode configuration
             if (!$payment['result']) {
-                if ($sandbox) {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ));
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                } else {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    ));
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                }
+                $mode = $sandbox ? 'live' : 'test';
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id, $mode);
             }
 
             // If we still don't have a valid Payment resource, return false
