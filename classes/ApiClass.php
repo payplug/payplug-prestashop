@@ -1089,12 +1089,13 @@ class ApiClass
     }
 
     /**
-     * @description Retrieve Payment from api for given id
+     * @description Retrieve Payment from api for given id and mode
      *
-     * @param false $pay_id
+     * @param $pay_id false
+     * @param $mode false
      * @return array
      */
-    public function retrievePayment($pay_id = false)
+    public function retrievePayment($pay_id = false, $mode = false)
     {
         if (!$pay_id || !is_string($pay_id)) {
             return [
@@ -1105,7 +1106,16 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$mode) {
+                $api = $this->setSecretKey();
+            } else {
+                $api =  $this->setSecretKey(
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey($mode.'ApiKey')
+                    )
+                );
+            }
+
             $response = [
                 'code' => 200,
                 'result' => true,
