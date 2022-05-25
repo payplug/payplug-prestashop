@@ -31,6 +31,7 @@ use Exception;
 use Order;
 use Tools;
 use Validate;
+use PayPlugModule\src\utilities\helpers\CurrencyHelper;
 
 class PayPlugValidation
 {
@@ -325,7 +326,7 @@ class PayPlugValidation
                 }
             }
         }
-        $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $amount = CurrencyHelper::convertAmount($amount, true);
 
         // Check if valid customer
         $customer = new Customer((int)$cart->id_customer);

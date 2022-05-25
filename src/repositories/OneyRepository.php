@@ -27,6 +27,7 @@ use PayPlugModule\classes\ConfigClass;
 use PayPlugModule\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlugModule\src\utilities\helpers\CurrencyHelper;
 
 class OneyRepository extends BaseClass
 {
@@ -495,24 +496,24 @@ class OneyRepository extends BaseClass
         $resource['title'] = sprintf($this->dependencies->l('Payment in %sx', 'oneyrepository'), $resource['split']);
 
         // format price
-        $total_cost = $this->dependencies->amountCurrencyClass->convertAmount($resource['total_cost'], true);
+        $total_cost = CurrencyHelper::convertAmount($resource['total_cost'], true);
         $resource['total_cost'] = [
             'amount' => number_format($total_cost, 2),
             'value' => $tools->tool('displayPrice', $total_cost),
         ];
         $down_payment_amount =
-            $this->dependencies->amountCurrencyClass->convertAmount($resource['down_payment_amount'], true);
+            CurrencyHelper::convertAmount($resource['down_payment_amount'], true);
         $resource['down_payment_amount'] = [
             'amount' => number_format($down_payment_amount, 2),
             'value' => $tools->tool('displayPrice', $down_payment_amount),
         ];
         foreach ($resource['installments'] as &$installment) {
-            $amount = $this->dependencies->amountCurrencyClass->convertAmount($installment['amount'], true);
+            $amount = CurrencyHelper::convertAmount($installment['amount'], true);
             $installment['amount'] = number_format($amount, 2);
             $installment['value'] = $tools->tool('displayPrice', $amount);
         }
 
-        $total_amount = $this->dependencies->amountCurrencyClass->convertAmount($total_amount, true);
+        $total_amount = CurrencyHelper::convertAmount($total_amount, true);
         $total_amount += $total_cost;
         $resource['total_amount'] = [
             'amount' => number_format($total_amount, 2),
@@ -611,7 +612,7 @@ class OneyRepository extends BaseClass
         $delivery_context = $this->getOneyDeliveryContext();
 
         foreach ($products as $product) {
-            $unit_price = $this->dependencies->amountCurrencyClass->convertAmount($product['price_wt']);
+            $unit_price = CurrencyHelper::convertAmount($product['price_wt']);
             $productName = (string)$product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
@@ -650,7 +651,7 @@ class OneyRepository extends BaseClass
             return $payment_list;
         }
 
-        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+        $amount = CurrencyHelper::convertAmount($amount);
 
         if (!$country) {
             $iso_code_list = $this->configurationSpecific->get(
@@ -1235,7 +1236,7 @@ class OneyRepository extends BaseClass
         $is_valid_amount = $this->isValidOneyAmount($amount);
         if (!$is_valid_amount['result']) {
             $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
-            $converted_amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+            $converted_amount = CurrencyHelper::convertAmount($amount);
             $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
 
             return ['result' => false, 'error_type' => $error_type, 'error' => $is_valid_amount['error']];
@@ -1285,7 +1286,7 @@ class OneyRepository extends BaseClass
     public function isValidOneyAmount($amount)
     {
         $limits = $this->getOneyPriceLimit();
-        $convert_amount = ($this->dependencies->amountCurrencyClass->convertAmount($amount)) / 100;
+        $convert_amount = (CurrencyHelper::convertAmount($amount)) / 100;
         if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
             return [
                 'result' => false,

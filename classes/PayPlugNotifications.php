@@ -39,6 +39,7 @@ use OrderHistory;
 use Shop;
 use Tools;
 use Validate;
+use PayPlugModule\src\utilities\helpers\CurrencyHelper;
 
 use Payplug\Notification;
 use Payplug\Exception\UnknownAPIResourceException;
@@ -274,7 +275,7 @@ class PayPlugNotifications
             'transaction_id' => $transaction_id
         ];
 
-        $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $amount = CurrencyHelper::convertAmount($amount, true);
 
         $currency = (int)$this->cart->id_currency;
         try {

@@ -90,57 +90,55 @@ class AmountCurrencyClass
         return is_numeric($amount);
     }
 
-    /**
-     * check if currency is allowed
-     *
-     * @param Cart $cart
-     * @return bool
-     */
-    public function checkCurrency($cart)
-    {
-        $currency_order = new Currency((int)($cart->id_currency));
-        if (!in_array(\Tools::strtoupper($currency_order->iso_code), $this->getSupportedCurrencies())) {
-            return false;
-        }
-        return true;
-    }
+//    /**
+//     * check if currency is allowed
+//     *
+//     * @param Cart $cart
+//     * @return bool
+//     */
+//    public function checkCurrency($cart)
+//    {
+//        $currency_order = new Currency((int)($cart->id_currency));
+//        if (!in_array(\Tools::strtoupper($currency_order->iso_code), $this->getSupportedCurrencies())) {
+//            return false;
+//        }
+//        return true;
+//    }
 
-    /**
-     * Format amount float to int or int to float
-     *
-     * @param $amount
-     * @param bool $to_cents
-     * @return float|int
-     */
-    public function convertAmount($amount, $to_cents = false)
-    {
-        if ($to_cents) {
-            return (float)($amount / 100);
-        } else {
-            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
-            return (int)($this->toolsSpecific->tool('ps_round', $amount));
-        }
-    }
+//    /**
+//     * Format amount float to int or int to float
+//     *
+//     * @param $amount
+//     * @param bool $to_cents
+//     * @return float|int
+//     */
+//    public function convertAmount($amount, $to_cents = false)
+//    {
+//        if ($to_cents) {
+//            return (float)($amount / 100);
+//        } else {
+//            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
+//            $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
+//            return (int)($this->toolsSpecific->tool('ps_round', $amount));
+//        }
+//    }
 
-    /**
-     * Get supported currencies
-     *
-     * @return array
-     */
-    private function getSupportedCurrencies()
-    {
-        $currencies = [];
-        foreach (explode(';', Configuration::get(
-            $this->dependencies->getConfigurationKey('minAmounts')
-        )) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $currencies[] = Tools::strtoupper($cur[1]);
-        }
-
-        return $currencies;
-    }
+//    /**
+//     * Get supported currencies
+//     *
+//     * @return array
+//     */
+//    private function getSupportedCurrencies($minAmountsConfig)
+//    {
+//        $currencies = [];
+//        foreach (explode(';', $minAmountsConfig) as $amount_cur) {
+//            $cur = [];
+//            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+//            $currencies[] = Tools::strtoupper($cur[1]);
+//        }
+//
+//        return $currencies;
+//    }
 
     /**
      * Get amounts with the right currency

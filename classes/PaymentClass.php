@@ -24,6 +24,7 @@
 namespace PayPlugModule\classes;
 
 use Media;
+use PayPlugModule\src\utilities\helpers\CurrencyHelper;
 
 class PaymentClass
 {
@@ -162,7 +163,11 @@ class PaymentClass
             $this->dependencies->getConfigurationKey('instMinAmount')
         );
 
-        if (!$this->dependencies->amountCurrencyClass->checkCurrency($cart) ||
+        $minAmountsConfig = $this->config->get(
+            $this->dependencies->getConfigurationKey('minAmounts')
+        );
+
+        if (!CurrencyHelper::checkCurrency($cart, $minAmountsConfig) ||
             !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return false;
         }
@@ -633,9 +638,13 @@ class PaymentClass
             'oney' => false,
         ];
 
+        $minAmountsConfig = $this->config->get(
+            $this->dependencies->getConfigurationKey('minAmounts')
+        );
+
         if (!$this->active ||
             !$this->config->get($this->dependencies->getConfigurationKey('show')) ||
-            !$this->dependencies->amountCurrencyClass->checkCurrency($cart) ||
+            !CurrencyHelper::checkCurrency($cart, $minAmountsConfig) ||
             !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return $options;
         }
@@ -1610,7 +1619,7 @@ class PaymentClass
 
         // Amount
         $amount = $cart->getOrderTotal(true);
-        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+        $amount = CurrencyHelper::convertAmount($amount);
         $current_amounts = $this->dependencies->amountCurrencyClass->getAmountsByCurrency($currency_iso_code);
         if ($amount < $current_amounts['min_amount'] || $amount > $current_amounts['max_amount']) {
             // todo: add error log

@@ -32,6 +32,7 @@ use Media;
 use Module;
 use PayPlugModule\backward\PayPlugBackward;
 use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlugModule\src\utilities\helpers\CurrencyHelper;
 use Tools;
 use Validate;
 
@@ -373,8 +374,12 @@ class ConfigClass
             'applepay' => (int)Configuration::get($this->dependencies->getConfigurationKey('applepay')) === 1,
         ];
 
+        $minAmountsConfig = Configuration::get(
+            $this->dependencies->getConfigurationKey('minAmounts')
+        );
+
         if (Configuration::get($this->dependencies->getConfigurationKey('email')) === null
-            || !$this->amountCurrencyClass->checkCurrency($cart)
+            || !CurrencyHelper::checkCurrency($cart, $minAmountsConfig)
             || !$this->amountCurrencyClass->checkAmount($cart)
         ) {
             $available_options['standard'] = false;
