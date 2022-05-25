@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="panel {$module_name|escape:'htmlall':'UTF-8'}_psaccount">
+<div class="{$module_name|escape:'htmlall':'UTF-8'}_psaccount">
     <prestashop-accounts></prestashop-accounts>
 </div>
 
