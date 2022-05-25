@@ -24,8 +24,9 @@
 namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class CacheRepository extends Repository
+class CacheRepository extends BaseClass
 {
     public $cacheEntity;
     private $query;

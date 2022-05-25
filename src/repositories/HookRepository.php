@@ -25,8 +25,9 @@ namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\classes\MediaClass;
 use Media;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class HookRepository extends Repository
+class HookRepository extends BaseClass
 {
     protected $constant;
     protected $dependencies;

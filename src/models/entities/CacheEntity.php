@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\entities;
+namespace PayPlugModule\src\models\entities;
 
 use PayPlugModule\src\exceptions\BadParameterException;
 

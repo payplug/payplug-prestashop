@@ -26,7 +26,7 @@ namespace PayPlugModule\tests\repositories\InstallRepository;
 
 use PayPlugModule\classes\DependenciesClass;
 use PayPlugModule\src\repositories\InstallRepository;
-use PayPlugModule\src\entities\OrderStateEntity;
+use PayPlugModule\src\models\entities\OrderStateEntity;
 use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BaseInstallRepository extends RepositoryBase

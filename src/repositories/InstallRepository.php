@@ -25,8 +25,9 @@ namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\classes\ConfigClass;
 use Db;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class InstallRepository extends Repository
+class InstallRepository extends BaseClass
 {
     /** @var object */
     protected $config;

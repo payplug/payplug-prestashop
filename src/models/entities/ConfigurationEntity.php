@@ -21,45 +21,21 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlugModule\src\models\entities;
 
-use PayPlugModule\src\specific\TranslationSpecific;
+use PayPlugModule\src\specific\ConfigurationSpecific;
 
-class Repository
+class ConfigurationEntity
 {
-    private $entity;
-    protected $name;
-    protected $payplug;
+    private $specific_class;
 
-    public static function factory()
+    public function __construct()
     {
-        return new self();
+        $this->specific_class = new ConfigurationSpecific();
     }
 
-    public function setName()
+    public function get($configuration_name)
     {
-        $this->name = (new \ReflectionClass($this))->getShortName();
-        return $this;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-    public function getEntity()
-    {
-        return $this->entity;
-    }
-
-    public function l($string)
-    {
-        $this->setName();
-        return TranslationSpecific::translate($this->payplug, $string, $this->getName());
+        return $this->specific_class->get($configuration_name);
     }
 }

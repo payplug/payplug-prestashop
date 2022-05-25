@@ -23,7 +23,9 @@
 
 namespace PayPlugModule\src\repositories;
 
-class TranslationsRepository extends Repository
+use PayPlugModule\src\application\dependencies\BaseClass;
+
+class TranslationsRepository extends BaseClass
 {
     /**
      * @description

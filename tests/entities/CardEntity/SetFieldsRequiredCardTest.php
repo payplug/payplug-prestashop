@@ -23,7 +23,7 @@
 
 
 
-use PayPlugModule\src\entities\CardEntity;
+use PayPlugModule\src\models\entities\CardEntity;
 use PayPlugModule\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
 
