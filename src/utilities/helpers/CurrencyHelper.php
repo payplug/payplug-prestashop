@@ -25,18 +25,23 @@ namespace PayPlugModule\src\utilities\helpers;
 
 use PayPlugModule\src\utilities\helpers\ToolsHelper;
 use PayPlugModule\src\specific\CurrencySpecific;
+use PayPlugModule\src\utilities\adapter\CurrencyAdapter;
 
 class CurrencyHelper
 {
     /**
-     * Format amount float to int or int to float
+     * @description Format amount float to int or int to float
      *
      * @param $amount
-     * @param bool $to_cents
+     * @param false $to_cents
      * @return float|int
      */
-    public static function convertAmount($amount, $to_cents = false)
+    public static function convertAmount($amount = false, $to_cents = false)
     {
+        if (!$amount || !is_numeric($amount)) {
+            return false;
+        }
+
         if ($to_cents) {
             return (float)($amount / 100);
         } else {
@@ -47,14 +52,19 @@ class CurrencyHelper
     }
 
     /**
-     * Get supported currencies
-     * @param array $minAmountsConfig
+     * @description Get supported currencies
      *
+     * @param $minAmountsConfig
      * @return array
      */
-    private static function getSupportedCurrencies($minAmountsConfig)
+    private static function getSupportedCurrencies($minAmountsConfig = '')
     {
         $currencies = [];
+
+        if (!$minAmountsConfig || !is_string($minAmountsConfig)) {
+            return $currencies;
+        }
+
         foreach (explode(';', $minAmountsConfig) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
@@ -65,21 +75,41 @@ class CurrencyHelper
     }
 
     /**
-     * check if currency is allowed
+     * @description Check if currency is allowed
      *
-     * @param Cart $cart
-     * @param array $minAmountsConfig
+     * @param object $cart
+     * @param string $minAmountsConfig
      * @return bool
      */
-    public static function checkCurrency($cart, $minAmountsConfig)
+    public static function checkCurrency($cart = false, $minAmountsConfig = '')
     {
-        $currency_order = CurrencySpecific::get((int)($cart->id_currency));
+        if (!is_object($cart) || !$cart->id) {
+            return false;
+        }
+
+        if (!$minAmountsConfig || !is_string($minAmountsConfig)) {
+            return false;
+        }
+
+        $currency_order = CurrencyAdapter::get((int)($cart->id_currency));
+        $currencies = self::getSupportedCurrencies($minAmountsConfig);
         if (!in_array(
             ToolsHelper::tool('strtoupper', $currency_order->iso_code),
-            self::getSupportedCurrencies($minAmountsConfig)
+            $currencies
         )) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @description Check if given amount is valid
+     *
+     * @param false $amount
+     * @return bool
+     */
+    public static function isValidAmount($amount = false)
+    {
+        return is_numeric($amount);
     }
 }

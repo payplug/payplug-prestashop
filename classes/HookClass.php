@@ -30,6 +30,7 @@ use Media;
 use Module;
 use OrderState;
 use Symfony\Component\Dotenv\Dotenv;
+use PayPlugModule\src\utilities\adapter\CurrencyAdapter;
 
 class HookClass
 {
@@ -456,7 +457,7 @@ class HookClass
                 }
             }
 
-            $id_currency = (int) $this->currency->getIdByIsoCode($installment->currency);
+            $id_currency = (int) CurrencyAdapter::getIdByIsoCode($installment->currency);
             $show_menu_installment = true;
             $inst_status = $installment->is_active ?
                 $this->dependencies->l('hook.displayAdminOrderMain.ongoing', 'hookclass') :
@@ -605,7 +606,7 @@ class HookClass
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
-            $id_currency = (int) $this->currency->getIdByIsoCode($payment->currency);
+            $id_currency = (int) CurrencyAdapter::getIdByIsoCode($payment->currency);
             $state_addons = (!$payment->is_live ? '_TEST' : '');
 
             $id_new_order_state = (int) $this->config->get(
@@ -806,6 +807,7 @@ class HookClass
             $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
             $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
         ]);
+
 
         $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
 
