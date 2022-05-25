@@ -2,11 +2,12 @@
 
 .payplugUILink {
   text-decoration: none;
-  color: #colorMap[purple];
+  color: @color-primary;
 
   &:hover,
   &.-hover {
-    color: darken(#colorMap[purple], 10.5%);
+    // primary 900
+    color: @color-primary-darken;
     text-decoration: none;
   }
 
@@ -14,6 +15,6 @@
   &[disabled="disabled"] {
     opacity: .3;
     cursor: default;
-    color: #colorMap[purple];
+    color: @color-primary;
   }
 }

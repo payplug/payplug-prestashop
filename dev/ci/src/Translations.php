@@ -2,9 +2,15 @@
 
 class Translations
 {
-    private $method;
     private $files;
+    private $method;
+    private $moduleName;
     private $trans;
+
+    public function __construct()
+    {
+        $this->moduleName = $this->getModuleName();
+    }
 
     /**
      * @description Get the only file who contain translation
@@ -146,7 +152,7 @@ class Translations
             $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
         } else {
             // In tpl file look for something that should contain mod='module_name' according to the documentation
-            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\'payplug\'\.*\}/U';
+            $regex = '/\{l\s*s=([\'\"])(.*[^\\\\])\1.*\s+(?:tags=\[(.*)]*\](.*)+)?mod=\'' . $this->moduleName . '\'\.*\}/U';
         }
 
         if (!is_array($regex)) {
@@ -187,7 +193,7 @@ class Translations
     {
         $array_files = [];
         $path = dirname(__FILE__) . '/../../../';
-        $this->getRecursiveFiles($path, $array_files, $this->getModuleName());
+        $this->getRecursiveFiles($path, $array_files, $this->moduleName);
         return $this->files = $array_files;
     }
 
@@ -239,7 +245,7 @@ class Translations
                     }
 
                     $md5_key = md5($key);
-                    $trans_key = '<{'. $this->getModuleName() .'}prestashop>';
+                    $trans_key = '<{'. $this->moduleName .'}prestashop>';
                     $trans_key .= strtolower($template_name) . '_' . $md5_key;
 
                     // to avoid duplicate entry

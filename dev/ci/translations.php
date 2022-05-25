@@ -6,6 +6,8 @@ $repo = new Translations();
 $translations = $repo->getTranslations();
 $moduleName = $repo->getModuleName();
 
+ksort($translations);
+
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
 $messages = [];

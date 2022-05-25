@@ -43,11 +43,27 @@
       display: none;
       &:checked {
         ~ span {
-          background: #colorMap[radioButtonBackground] url(~"@{img_icons}check_24px.svg") no-repeat top 13px right 13px;
-          color: #colorMap[purple];
+          .border(@color-primary);
+          background: @color-primary-lighten;
+          color: @color-primary;
+          position: relative;
+          &:before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 5px;
+            left: calc(100% - 30px);
+            width: 24px;
+            height: 24px;
+            -webkit-mask-image: url(~"@{img-icons}check.svg");
+            mask-image: url(~"@{img-icons}check.svg");
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            background-color: @color-primary;
+          }
 
           > span {
-            color: #colorMap[iris];
+            color: @color-tertiary;
           }
         }
       }

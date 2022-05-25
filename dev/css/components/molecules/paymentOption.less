@@ -1,0 +1,56 @@
+@import "../atoms/paragraph";
+
+.__moduleName__Configuration {
+  .paymentOption {
+    display: flex;
+    align-items: center;
+    margin: 16px 0 0;
+
+    ._logo {
+      .border(#colorMap[borderMain]);
+      .borderRadius(4px);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      height: 64px;
+      width: 64px;
+
+      padding: 6px;
+      margin: 0 24px;
+
+      img {
+        display: block;
+      }
+
+      @media (@screen-mobile) {
+        display: none;
+      }
+    }
+    ._text {
+      ._title {
+        color: @color-primary;
+        margin: 0;
+      }
+      p {
+        margin: 0;
+      }
+
+      @media (@screen-mobile) {
+        margin: 0 0 0 24px;
+      }
+    }
+
+    & + .paymentOption {
+      margin: 42px 0 0;
+    }
+
+    @media (@screen-mobile) {
+      margin: 0;
+      & + .paymentOption {
+        margin: 16px 0 0;
+      }
+    }
+  }
+}

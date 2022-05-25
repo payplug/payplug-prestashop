@@ -11,17 +11,17 @@
   }
 
   &.-icon {
-    .buttonIcon {
+    svg {
       .transition(~"fill @{dur}");
       fill: #colorMap[white];
-      margin: 0 8px 0 0;
+      margin: 5px 8px 0 0;
       width: 24px;
       height: 24px;
     }
 
     &.-hover,
     &:hover {
-      .buttonIcon {
+      svg {
         fill: #colorMap[white];
       }
     }
@@ -30,13 +30,13 @@
   // secondary
   &.-secondary {
     &.-icon {
-      .buttonIcon {
-        fill: #colorMap[purple];
+      svg {
+        fill: @color-primary;
       }
 
       &.-hover,
       &:hover {
-        .buttonIcon {
+        svg {
           fill: #colorMap[white];
         }
       }
@@ -51,13 +51,13 @@
     }
 
     &.-icon {
-      .buttonIcon {
+      svg {
         fill: #colorMap[fontMainDefault];
       }
 
       &.-hover,
       &:hover {
-        .buttonIcon {
+        svg {
           fill: #colorMap[fontMainDefault];
         }
       }

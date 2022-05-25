@@ -25,8 +25,7 @@ var allow_debug = true, debug = function (str) {
         console.log(str);
     }
 };
-var $document, $window;
-window[module_name+'Module'] = {
+var $document, $window, __moduleName__Module = {
     init: function () {
         this.card.init();
         this.order.init();
@@ -37,8 +36,8 @@ window[module_name+'Module'] = {
     order: {
         init: function () {
             // Styling
-            var $options = $('input[data-module-name="' + module_name + '"]');
-            $options.parents('.payment-option').addClass(module_name+'PaymentOption')
+            var $options = $('input[data-module-name="__moduleName__"]');
+            $options.parents('.payment-option').addClass('__moduleName__PaymentOption')
 
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
@@ -53,8 +52,8 @@ window[module_name+'Module'] = {
 
             this.checkErrors();
 
-            $document.on('click', '.' + module_name + 'Msg_button', window[module_name+'Module'].popup.close);
-            $document.on('click', '.' + module_name + 'Msg_declineButton', window[module_name+'Module'].popup.close);
+            $document.on('click', '.__moduleName__Msg_button', __moduleName__Module.popup.close);
+            $document.on('click', '.__moduleName__Msg_declineButton', __moduleName__Module.popup.close);
         },
         checkErrors: function () {
             if (typeof check_errors == 'undefined' || !check_errors) {
@@ -64,7 +63,7 @@ window[module_name+'Module'] = {
             var data = {_ajax: 1, getPaymentErrors: 1};
 
             $.ajax({
-                url: window[module_name+'_ajax_url'] + '?rand=' + new Date().getTime(),
+                url: window['__moduleName___ajax_url'] + '?rand=' + new Date().getTime(),
                 headers: {"cache-control": "no-cache"},
                 type: 'POST',
                 async: true,
@@ -73,10 +72,10 @@ window[module_name+'Module'] = {
                 data: data,
                 success: function (data) {
                     if (data.result) {
-                        window[module_name+'Module'].popup.set(data.template);
+                        __moduleName__Module.popup.set(data.template);
 
                         // Select Oney Option
-                        var $required = $('.' + window[module_name+'Module'].oney.required.props.identifier);
+                        var $required = $('.' + __moduleName__Module.oney.required.props.identifier);
                         if ($required.length) {
                             var oney_type = $required.data('oney_type'),
                                 paymentOption = $('input[value="' + oney_type + '"]')
@@ -93,7 +92,7 @@ window[module_name+'Module'] = {
     },
     integrated: {
         props: {
-            identifier: module_name + 'IntegratedPayment',
+            identifier: '__moduleName__IntegratedPayment',
             cartId: null,
             paymentId: null,
             paymentOptionId: null,
@@ -121,7 +120,7 @@ window[module_name+'Module'] = {
             submit: null,
         },
         init: function () {
-            var integrated = window[module_name+'Module'].integrated,
+            var integrated = __moduleName__Module.integrated,
                 $integratedForm = $('.' + integrated.props.identifier);
             if ($integratedForm.length) {
                 var $methodInput = document.querySelectorAll('input[name=method][value=integrated]').item(0).parentNode,
@@ -134,13 +133,13 @@ window[module_name+'Module'] = {
         },
         form: {
             init: function () {
-                var integrated = window[module_name+'Module'].integrated,
+                var integrated = __moduleName__Module.integrated,
                     payment_option_id = integrated.props.paymentOptionId;
 
                 $document.on('click', '#' + payment_option_id, integrated.form.set);
             },
             set: function () {
-                var integrated = window[module_name+'Module'].integrated;
+                var integrated = __moduleName__Module.integrated;
 
                 integrated.props.api = Payplug;
 
@@ -309,7 +308,7 @@ window[module_name+'Module'] = {
             updatePublishableKey: function () {
                 $.ajax({
                     type: 'POST',
-                    url: window[module_name+'_ajax_url'],
+                    url: window['__moduleName___ajax_url'],
                     dataType: 'json',
                     data: {
                         _ajax: 1,
@@ -318,13 +317,13 @@ window[module_name+'Module'] = {
                     success: function (data) {
                         if (data.result) {
                             payplug_publishable_key = data.key;
-                            window[module_name+'Module'].integrated.form.resetIntPayment();
+                            __moduleName__Module.integrated.form.resetIntPayment();
                         } else {
                             if (typeof data.redirectUrl != 'defined' && data.redirectUrl) {
                                 window.location.href = data.redirectUrl;
                             } else {
-                                window[module_name+'Module'].popup.set(integratedPaymentError);
-                                window[module_name+'Module'].integrated.form.clearIntPayment();
+                                __moduleName__Module.popup.set(integratedPaymentError);
+                                __moduleName__Module.integrated.form.clearIntPayment();
                                 return false;
                             }
                         }
@@ -333,7 +332,7 @@ window[module_name+'Module'] = {
             },
             field: {
                 init: function () {
-                    var integrated = window[module_name+'Module'].integrated,
+                    var integrated = __moduleName__Module.integrated,
                         field = integrated.form.field,
                         form = integrated.props.form;
 
@@ -400,7 +399,7 @@ window[module_name+'Module'] = {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
-                    var integrated = window[module_name+'Module'].integrated;
+                    var integrated = __moduleName__Module.integrated;
                     integrated.props.fieldsValid[type] = false;
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').removeClass('-hide');
                     $('.' + integrated.props.identifier + '_container.-' + type).addClass('-invalid');
@@ -409,7 +408,7 @@ window[module_name+'Module'] = {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
-                    var integrated = window[module_name+'Module'].integrated;
+                    var integrated = __moduleName__Module.integrated;
                     $('.' + integrated.props.identifier + '_container.-' + type).removeClass('-focus');
                     if ($('.' + integrated.props.identifier + '_container.-' + type).is('.integrated_payment_error')) {
                         integrated.form.field.error(type);
@@ -419,7 +418,7 @@ window[module_name+'Module'] = {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
-                    var integrated = window[module_name+'Module'].integrated;
+                    var integrated = __moduleName__Module.integrated;
                     $('.' + integrated.props.identifier + '_container.-' + type).addClass('-focus').removeClass('-invalid');
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.emptyField').addClass('-hide');
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
@@ -430,7 +429,7 @@ window[module_name+'Module'] = {
                     if (!type || typeof type == undefined) {
                         return false;
                     }
-                    var integrated = window[module_name+'Module'].integrated;
+                    var integrated = __moduleName__Module.integrated;
                     integrated.props.fieldsValid[type] = true;
                     $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
                     $('.' + integrated.props.identifier + '_container.-' + type + ' span.invalidField').removeClass('-invalid');
@@ -438,7 +437,7 @@ window[module_name+'Module'] = {
             },
             validateForm: function () {
                 // valide integrated payment form
-                var integrated = window[module_name+'Module'].integrated,
+                var integrated = __moduleName__Module.integrated,
                     has_error = false;
 
                 for (var key in integrated.props.fieldsEmpty) {
@@ -468,7 +467,7 @@ window[module_name+'Module'] = {
             },
             getIntPaymentId: function (event) {
                 //create integrated payment id
-                var integrated = window[module_name+'Module'].integrated;
+                var integrated = __moduleName__Module.integrated;
                 if (typeof event != 'undefined') {
                     event.preventDefault();
                     event.stopPropagation();
@@ -492,7 +491,7 @@ window[module_name+'Module'] = {
 
                 integrated.props.query = $.ajax({
                     type: 'POST',
-                    url: window[module_name+'_ajax_url'],
+                    url: window['__moduleName___ajax_url'],
                     dataType: 'json',
                     data: {
                         _ajax: 1,
@@ -501,9 +500,7 @@ window[module_name+'Module'] = {
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         integrated.form.clearIntPayment();
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                     },
                     success: function (result) {
                         if (result && result.payment_id) {
@@ -511,7 +508,7 @@ window[module_name+'Module'] = {
                             integrated.props.cart_id = result.cart_id;
                             integrated.form.submitIntPayment();
                         } else {
-                            window[module_name+'Module'].popup.set(integratedPaymentError);
+                            __moduleName__Module.popup.set(integratedPaymentError);
                             integrated.form.clearIntPayment();
                             return false;
                         }
@@ -521,7 +518,7 @@ window[module_name+'Module'] = {
             submitIntPayment: function () {
                 // create an integrated payment
 
-                var integrated = window[module_name+'Module'].integrated,
+                var integrated = __moduleName__Module.integrated,
                     paymentId = integrated.props.paymentId,
                     integratedPayment = integrated.props.integratedPayment,
                     integratedPaymentScheme = null;
@@ -544,9 +541,9 @@ window[module_name+'Module'] = {
                 integratedPayment.pay(paymentId, integratedPaymentScheme, {save_card: integrated.props.save_card});
             },
             confirmIntPayment: function (token) {
-                window[module_name+'Module'].tools.loadSpinner();
+                __moduleName__Module.tools.loadSpinner();
                 // confirm creation integrated paiement or show fail popup
-                var integrated = window[module_name+'Module'].integrated;
+                var integrated = __moduleName__Module.integrated;
                 if (integrated.props.query != null) {
                     integrated.props.query.abort();
                     integrated.props.query = null;
@@ -554,7 +551,7 @@ window[module_name+'Module'] = {
 
                 integrated.props.query = $.ajax({
                     type: 'POST',
-                    url: window[module_name+'_ajax_url'],
+                    url: window['__moduleName___ajax_url'],
                     dataType: 'json',
                     data: {
                         _ajax: 1,
@@ -563,13 +560,11 @@ window[module_name+'Module'] = {
                         pay_id: token,
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        console.log(jqXHR, textStatus, errorThrown);
                         integrated.form.clearIntPayment();
                     },
                     success: function (data) {
-                        window[module_name+'Module'].tools.removeSpinner();
+                        __moduleName__Module.tools.removeSpinner();
                         if (data.result) {
                             window.location.href = data.return_url;
                         } else {
@@ -584,7 +579,7 @@ window[module_name+'Module'] = {
             },
             clearIntPayment: function (clear) {
                 // confirm creation integrated paiement or show fail popup
-                var integrated = window[module_name+'Module'].integrated;
+                var integrated = __moduleName__Module.integrated;
                 integrated.props.submited = false;
 
                 if (clear) {
@@ -603,7 +598,7 @@ window[module_name+'Module'] = {
             },
             resetIntPayment: function () {
                 // confirm creation integrated paiement or show fail popup
-                var integrated = window[module_name+'Module'].integrated,
+                var integrated = __moduleName__Module.integrated,
                     $form = $('.' + integrated.props.identifier),
                     $cardHolder = $form.find('#cardholder'),
                     $pan = $form.find('#pan'),
@@ -636,34 +631,33 @@ window[module_name+'Module'] = {
     },
     card: {
         props: {
-            identifier: module_name + 'Card',
+            identifier: '__moduleName__Card',
             query: null,
             id_card: 0,
         },
         init: function () {
-            var card = window[module_name+'Module'].card,
+            var card = __moduleName__Module.card,
                 identifier = card.props.identifier;
 
-            $document.on('click', '.' + identifier + '_delete', window[module_name+'Module'].card.delete)
-                .on('click', 'button[name="'+module_name+'ConfirmDelete"]', window[module_name+'Module'].card.confirm);
-
+            $document.on('click', '.' + identifier + '_delete', __moduleName__Module.card.delete)
+                .on('click', 'button[name="__moduleName__ConfirmDelete"]', __moduleName__Module.card.confirm);
         },
         //display first pop to confirm card deletion
         delete: function (event) {
             event.preventDefault();
             event.stopPropagation();
             var $elem = $(this);
-            window[module_name+'Module'].card.props.id_card = $elem.data('id_card');
-            window[module_name+'Module'].popup.set(card_confirm_deleted_msg);
+            __moduleName__Module.card.props.id_card = $elem.data('id_card');
+            __moduleName__Module.popup.set(card_confirm_deleted_msg);
         },
         //display second popup to announce the card's deletion success
         confirm: function (event) {
 
             event.preventDefault();
             event.stopPropagation();
-            var id_card = window[module_name+'Module'].card.props.id_card,
-                url = window[module_name+'_delete_card_url'] + '&pc=' + id_card,
-                card = window[module_name+'Module'].card,
+            var id_card = __moduleName__Module.card.props.id_card,
+                url = window['__moduleName___delete_card_url'] + '&pc=' + id_card,
+                card = __moduleName__Module.card,
                 identifier = card.props.identifier;
 
             $.ajax({
@@ -676,14 +670,12 @@ window[module_name+'Module'] = {
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     alert('error CALL DELETE CARD');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result) {
                         $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
-                        window[module_name+'Module'].popup.setDeleteCardPopup(card_deleted_msg);
+                        __moduleName__Module.popup.setDeleteCardPopup(card_deleted_msg);
                     }
                 }
             });
@@ -698,18 +690,18 @@ window[module_name+'Module'] = {
             ]
         },
         clear: function () {
-            for (i = 0; i < window[module_name+'Module'].oney.props.queries.length; i++) {
-                if (typeof window[module_name+'Module'].oney.props.queries[i] != 'undefined') {
-                    window[module_name+'Module'].oney.props.queries[i].abort();
+            for (i = 0; i < __moduleName__Module.oney.props.queries.length; i++) {
+                if (typeof __moduleName__Module.oney.props.queries[i] != 'undefined') {
+                    __moduleName__Module.oney.props.queries[i].abort();
                 }
             }
-            window[module_name+'Module'].oney.props.queries = [];
+            __moduleName__Module.oney.props.queries = [];
         },
         init: function () {
-            if (typeof window[module_name+'_oney'] == 'undefined' || !window[module_name+'_oney']) {
+            if (typeof window['__moduleName___oney'] == 'undefined' || !window['__moduleName___oney']) {
                 return;
             }
-            var oney = window[module_name+'Module'].oney;
+            var oney = __moduleName__Module.oney;
 
             this.cta.init();
             this.required.init();
@@ -720,7 +712,7 @@ window[module_name+'Module'] = {
             prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
         },
         load: function (with_schedule) {
-            var oney = window[module_name+'Module'].oney,
+            var oney = __moduleName__Module.oney,
                 data = {
                     _ajax: 1,
                 };
@@ -748,7 +740,7 @@ window[module_name+'Module'] = {
             oney.cta.popin.reset();
 
             oney.props.query = $.ajax({
-                url: window[module_name+'_ajax_url'] + '?rand=' + new Date().getTime(),
+                url: window['__moduleName___ajax_url'] + '?rand=' + new Date().getTime(),
                 headers: {"cache-control": "no-cache"},
                 type: 'POST',
                 async: true,
@@ -782,7 +774,7 @@ window[module_name+'Module'] = {
         },
         loader: {
             props: {
-                identifier: module_name + 'OneyLoader',
+                identifier: '__moduleName__OneyLoader',
             },
             set: function (target) {
                 if (typeof target == 'undefined' || !target) {
@@ -790,14 +782,14 @@ window[module_name+'Module'] = {
                 }
                 var loader = '<span class="' + this.props.identifier + '">' +
                     '<span class="' + this.props.identifier + '_spinner"><span></span></span>' +
-                    '<span class="' + this.props.identifier + '_message">' + window[module_name+'_oney_loading_msg'] + ' <i>.</i><i>.</i><i>.</i></span>' +
+                    '<span class="' + this.props.identifier + '_message">' + window['__moduleName___oney_loading_msg'] + ' <i>.</i><i>.</i><i>.</i></span>' +
                     '</span>';
                 $(target).html(loader);
             },
         },
         cta: {
             props: {
-                identifier: module_name + 'OneyCta',
+                identifier: '__moduleName__OneyCta',
                 loaded: false
             },
             init: function () {
@@ -807,25 +799,25 @@ window[module_name+'Module'] = {
                 cta.popin.init();
             },
             enable: function () {
-                var popin = window[module_name+'Module'].oney.cta.popin.props.identifier,
-                    cta = window[module_name+'Module'].oney.cta.props.identifier;
+                var popin = __moduleName__Module.oney.cta.popin.props.identifier,
+                    cta = __moduleName__Module.oney.cta.props.identifier;
                 $('.' + cta + '_button').removeClass('-disabled');
                 $('.' + popin).removeClass('-error');
             },
             disable: function () {
-                var popin = window[module_name+'Module'].oney.cta.popin.props.identifier,
-                    cta = window[module_name+'Module'].oney.cta.props.identifier;
+                var popin = __moduleName__Module.oney.cta.popin.props.identifier,
+                    cta = __moduleName__Module.oney.cta.props.identifier;
                 $('.' + cta + '_button').addClass('-disabled');
                 $('.' + popin).addClass('-error');
             },
             popin: {
                 props: {
-                    identifier: module_name + 'OneyPopin',
+                    identifier: '__moduleName__OneyPopin',
                     open: false,
                     loaded: false,
                 },
                 init: function () {
-                    var oney = window[module_name+'Module'].oney,
+                    var oney = __moduleName__Module.oney,
                         cta = oney.cta,
                         popin = cta.popin;
 
@@ -840,7 +832,7 @@ window[module_name+'Module'] = {
                     popin.reset();
                 },
                 reset: function () {
-                    var oney = window[module_name+'Module'].oney,
+                    var oney = __moduleName__Module.oney,
                         cta = oney.cta,
                         popin = cta.popin;
                     if (!$('.' + popin.props.identifier).length) {
@@ -854,7 +846,7 @@ window[module_name+'Module'] = {
                         return false;
                     }
 
-                    var oney = window[module_name+'Module'].oney,
+                    var oney = __moduleName__Module.oney,
                         popin = oney.cta.popin,
                         identifier = popin.props.identifier,
                         open = popin.props.open;
@@ -879,10 +871,10 @@ window[module_name+'Module'] = {
                     if ($li.is('.selected')) {
                         return false;
                     }
-                    window[module_name+'Module'].oney.cta.popin.choose($button.data('type'));
+                    __moduleName__Module.oney.cta.popin.choose($button.data('type'));
                 },
                 choose: function (option) {
-                    var identifier = window[module_name+'Module'].oney.cta.popin.props.identifier;
+                    var identifier = __moduleName__Module.oney.cta.popin.props.identifier;
                     // nav
                     $('.' + identifier + '_navigation li').removeClass('selected');
                     $('.' + identifier + '_navigation button[data-type=' + option + ']').parent('li').addClass('selected');
@@ -894,7 +886,7 @@ window[module_name+'Module'] = {
                 toggle: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var popin = window[module_name+'Module'].oney.cta.popin;
+                    var popin = __moduleName__Module.oney.cta.popin;
 
                     var is_open = $('-open').length > 0;
                     if (is_open) {
@@ -904,7 +896,7 @@ window[module_name+'Module'] = {
                     }
                 },
                 check: function () {
-                    var oney = window[module_name+'Module'].oney,
+                    var oney = __moduleName__Module.oney,
                         popin = oney.cta.popin,
                         open = popin.props.open;
 
@@ -915,7 +907,7 @@ window[module_name+'Module'] = {
                     }
                 },
                 open: function () {
-                    var oney = window[module_name+'Module'].oney,
+                    var oney = __moduleName__Module.oney,
                         cta = oney.cta,
                         popin = cta.popin;
 
@@ -932,7 +924,7 @@ window[module_name+'Module'] = {
                     }, 0);
                 },
                 close: function () {
-                    var oney = window[module_name+'Module'].oney,
+                    var oney = __moduleName__Module.oney,
                         cta = oney.cta,
                         popin = cta.popin;
 
@@ -947,18 +939,18 @@ window[module_name+'Module'] = {
                 show: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    window[module_name+'Module'].oney.cta.popin.open();
+                    __moduleName__Module.oney.cta.popin.open();
                 },
                 hide: function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    window[module_name+'Module'].oney.cta.popin.close();
+                    __moduleName__Module.oney.cta.popin.close();
                 },
             }
         },
         required: {
             props: {
-                identifier: module_name + 'OneyRequired'
+                identifier: '__moduleName__OneyRequired'
             },
             init: function () {
                 var required = this,
@@ -969,7 +961,7 @@ window[module_name+'Module'] = {
                     .on('keyup focusout', '.' + identifier + ' input', required.check);
             },
             check: function () {
-                var required = window[module_name+'Module'].oney.required,
+                var required = __moduleName__Module.oney.required,
                     identifier = required.props.identifier,
                     is_valid = true,
                     $fields = $('.' + identifier + '_input');
@@ -1018,8 +1010,8 @@ window[module_name+'Module'] = {
             close: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                window[module_name+'Module'].oney.required.reset();
-                window[module_name+'Module'].popup.close();
+                __moduleName__Module.oney.required.reset();
+                __moduleName__Module.popup.close();
             },
             reset: function () {
                 var required = this,
@@ -1045,7 +1037,7 @@ window[module_name+'Module'] = {
                 $('.' + identifier + '_message').removeClass('-success').removeClass('-error');
 
                 $.ajax({
-                    url: window[module_name+'_ajax_url'] + '?rand=' + new Date().getTime(),
+                    url: window['__moduleName___ajax_url'] + '?rand=' + new Date().getTime(),
                     headers: {"cache-control": "no-cache"},
                     type: 'POST',
                     async: true,
@@ -1059,7 +1051,7 @@ window[module_name+'Module'] = {
                                 $('.' + identifier + '_validation').addClass('-appear');
                             });
                             window.setTimeout(function () {
-                                window[module_name+'Module'].popup.close();
+                                __moduleName__Module.popup.close();
                             }, 5000);
                         } else {
                             var errors = '';
@@ -1079,7 +1071,7 @@ window[module_name+'Module'] = {
                 event.stopPropagation();
 
                 var payment_data = {},
-                    $required = $('.' + module_name + 'OneyRequired'),
+                    $required = $('.__moduleName__OneyRequired'),
                     $fields = $required.find('input');
 
                 $fields.each(function () {
@@ -1094,13 +1086,13 @@ window[module_name+'Module'] = {
                     payment_data[name] = value;
                 });
 
-                return window[module_name+'Module'].oney.required.save(payment_data);
+                return __moduleName__Module.oney.required.save(payment_data);
             },
         },
     },
     popup: {
         props: {
-            identifier: module_name + 'Popin',
+            identifier: '__moduleName__Popin',
         },
         init: function () {
             var popup = this,
@@ -1115,7 +1107,7 @@ window[module_name+'Module'] = {
                 });
         },
         set: function (content) {
-            var popup = window[module_name+'Module'].popup,
+            var popup = __moduleName__Module.popup,
                 props = popup.props;
             if (!sanitizePopupHtml(content)) {
                 return;
@@ -1131,15 +1123,15 @@ window[module_name+'Module'] = {
 
         },
         setDeleteCardPopup: function (content) {
-            var popup = window[module_name+'Module'].popup,
+            var popup = __moduleName__Module.popup,
                 props = popup.props;
             popup.create();
             popup.hydrate(content);
             popup.open();
-            $document.on('click', 'button[name="card_deleted"]', window[module_name+'Module'].popup.close);
+            $document.on('click', 'button[name="card_deleted"]', __moduleName__Module.popup.close);
         },
         open: function () {
-            var props = window[module_name+'Module'].popup.props;
+            var props = __moduleName__Module.popup.props;
             var popin = $('.' + props.identifier);
             popin.addClass('-open');
             window.setTimeout(function () {
@@ -1147,7 +1139,7 @@ window[module_name+'Module'] = {
             }, 0);
         },
         close: function () {
-            var props = window[module_name+'Module'].popup.props;
+            var props = __moduleName__Module.popup.props;
             var popin = $('.' + props.identifier);
 
             popin.removeClass('-show');
@@ -1156,25 +1148,25 @@ window[module_name+'Module'] = {
 
         },
         remove: function () {
-            var {popup} = window[module_name+'Module'].tools,
+            var {popup} = __moduleName__Module.tools,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
             $popup.remove();
         },
         create: function () {
-            var props = window[module_name+'Module'].popup.props,
+            var props = __moduleName__Module.popup.props,
                 html = '<div class="' + props.identifier + '"><button class="' + props.identifier + '_close"></button><div class="' + props.identifier + '_content"></div></div>';
             $('body').append(html);
         },
         hydrate: function (content) {
-            var props = window[module_name+'Module'].popup.props;
+            var props = __moduleName__Module.popup.props;
             $('.' + props.identifier + '_content').html(content);
         }
     },
     tools: {
         loadSpinner: function () {
-            $('.' + module_name + 'IntegratedPayment').append('<div class="ipOverlay -disabled">');
+            $('.__moduleName__IntegratedPayment').append('<div class="ipOverlay -disabled">');
             html = '<div class="ipOverlay_inner" ><div class="ipOverlay__content"><span class="ipOverlay_spinner"></span</div></div>';
             $('.ipOverlay').append(html);
 
@@ -1190,5 +1182,5 @@ window[module_name+'Module'] = {
 $(document).ready(function () {
     $document = $(document);
     $window = $(window);
-    window[module_name+'Module'].init();
+    __moduleName__Module.init();
 });

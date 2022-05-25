@@ -50,6 +50,7 @@ class PrestashopSpecific17
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->oney = $this->dependencies->getPlugin()->getOney();
     }
 
@@ -59,6 +60,9 @@ class PrestashopSpecific17
         $this->context->controller->addCSS($views_path . '/css/front-v'.$this->dependencies->version.'.css');
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
+        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+            $this->context->controller->addJS($views_path . 'js/applepay-v'.$this->dependencies->version.'.js');
+        }
     }
 
     public function displayPaymentOption($payment_options)
@@ -147,17 +151,17 @@ class PrestashopSpecific17
         $integrated['tpl'] = 'integrated_payment.tpl';
         $integrated['extra_classes'] = 'payplug integrated';
         $this->context->smarty->assign([
-                'integrated_payment_js_url' => $integrated_payment_js_url,
-                'is_one_click_activated' => (bool)$this->config->get(
-                    $this->dependencies->getConfigurationKey('oneClick')
-                ),
-                'is_deferred_activated' => (bool)$this->config->get(
-                    $this->dependencies->getConfigurationKey('deferred')
-                ),
-                'placeholderCardholder' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopspecific17'),
-                'placeholderPan' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopspecific17'),
-                'placeholderExp' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopspecific17'),
-                'placeholderCvv' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopspecific17'),
+            'integrated_payment_js_url' => $integrated_payment_js_url,
+            'is_one_click_activated' => (bool)$this->config->get(
+                $this->dependencies->getConfigurationKey('oneClick')
+            ),
+            'is_deferred_activated' => (bool)$this->config->get(
+                $this->dependencies->getConfigurationKey('deferred')
+            ),
+            'placeholderCardholder' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopspecific17'),
+            'placeholderPan' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopspecific17'),
+            'placeholderExp' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopspecific17'),
+            'placeholderCvv' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopspecific17'),
         ]);
 
         $integrated['additionalInformation'] =
@@ -171,61 +175,43 @@ class PrestashopSpecific17
     // todo: set Tab install process in a specific
     public function installTab()
     {
-        if ('payplug' != $this->dependencies->name) {
-            return true;
-        }
-
         $installed = true;
-        $moduleName = $this->dependencies->name;
 
-        // Install tab AdminPayPlug
-        if (!Tab::getIdFromClassName('AdminPayPlug')) {
-            $translationsAdminPayPlug = [
-                'en' => 'PayPlug',
-                'gb' => 'PayPlug',
-                'it' => 'PayPlug',
-                'fr' => 'PayPlug'
-            ];
-            $tab = new Tab();
-            foreach (Language::getLanguages(false) as $language) {
-                $id_lang = (int)$language['id_lang'];
-                $iso_code = Tools::strtolower($language['iso_code']);
-                if (isset($translationsAdminPayPlug[$iso_code])) {
-                    $tab->name[$id_lang] = $translationsAdminPayPlug[$iso_code];
-                } else {
-                    $tab->name[$id_lang] = $translationsAdminPayPlug['en'];
+        if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
+            foreach ($this->module->adminControllers as $adminController) {
+                if (Tab::getIdFromClassName($adminController['className'])) {
+                    continue;
                 }
-            }
 
-            $tab->class_name = 'AdminPayPlug';
-            $tab->module = $moduleName;
+                $tab = new Tab();
 
-            $installed = $installed && $tab->save();
-        }
-
-        // Install tab AdminPayPlugInstallment
-        if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
-            $translationsAdminPayPlugInstallment = [
-                'en' => 'Installment Plans',
-                'gb' => 'Installment Plans',
-                'it' => 'Pagamenti frazionati',
-                'fr' => 'Paiements en plusieurs fois'
-            ];
-            $tab = new Tab();
-            foreach (Language::getLanguages(false) as $language) {
-                $id_lang = (int)$language['id_lang'];
-                $iso_code = Tools::strtolower($language['iso_code']);
-                if (isset($translationsAdminPayPlugInstallment[$iso_code])) {
-                    $tab->name[$id_lang] = $translationsAdminPayPlugInstallment[$iso_code];
+                if (isset($adminController['name'])) {
+                    foreach (Language::getLanguages(false) as $language) {
+                        $id_lang = (int)$language['id_lang'];
+                        $iso_code = Tools::strtolower($language['iso_code']);
+                        if (isset($adminController['name'][$iso_code])) {
+                            $tab->name[$id_lang] = $adminController['name'][$iso_code];
+                        } else {
+                            $tab->name[$id_lang] = $adminController['name']['en'];
+                        }
+                    }
                 } else {
-                    $tab->name[$id_lang] = $translationsAdminPayPlugInstallment['en'];
+                    $tab->name = array_fill_keys(Language::getIDs(false), $this->module->displayName);
                 }
-            }
-            $tab->class_name = 'AdminPayPlugInstallment';
-            $tab->module = $moduleName;
-            $tab->id_parent = Tab::getIdFromClassName('AdminPayPlug');
 
-            $installed = $installed && $tab->save();
+                if (isset($adminController['parent'])) {
+                    if (is_int($adminController['parent'])) {
+                        $tab->id_parent = $adminController['parent'];
+                    } else {
+                        $tab->id_parent = Tab::getIdFromClassName($adminController['parent']);
+                    }
+                }
+
+                $tab->class_name = $adminController['className'];
+                $tab->active = true;
+                $tab->module = $this->module->name;
+                $installed = $installed && $tab->add();
+            }
         }
 
         return $installed;
@@ -234,24 +220,16 @@ class PrestashopSpecific17
     // todo: set Tab uninstall process in a specific
     public function uninstallTab()
     {
-        if ('payplug' != $this->dependencies->name) {
-            return true;
-        }
-
         $flag = true;
 
-        $idTab = Tab::getIdFromClassName('AdminPayPlug');
-        if ($idTab) {
-            $tab = new Tab($idTab);
-            $flag = $flag && $tab->delete();
-            unset($idTab);
-        }
-
-        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
-        if ($idTab) {
-            $tab = new Tab($idTab);
-            $flag = $flag && $tab->delete();
-            unset($idTab);
+        if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
+            foreach ($this->module->adminControllers as $adminController) {
+                if ($idTab = Tab::getIdFromClassName($adminController['className'])) {
+                    $tab = new Tab($idTab);
+                    $flag = $flag && $tab->delete();
+                    unset($idTab);
+                }
+            }
         }
 
         return $flag;

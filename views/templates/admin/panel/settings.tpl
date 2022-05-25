@@ -42,13 +42,6 @@
         {/if}
 
         <div class="{$module_name|escape:'htmlall':'UTF-8'}Settings_advanced">
-            {if $standard_isActivated}
-                {include file='./settings/standard.tpl'}
-            {/if}
-
-            {if $bancontact}
-                {include file='./settings/bancontact.tpl'}
-            {/if}
             {if $installment_isActivated}
                 {include file='./settings/installment.tpl'}
             {/if}

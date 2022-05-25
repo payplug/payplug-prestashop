@@ -23,7 +23,7 @@
 <section>
     <p class="_title -sub">Select component</p>
     {assign var='selectOptions' value=[
-            ['key' => '0', 'value' => 'Option 1'],
+            ['key' => '0', 'value' => 'Option 1', 'selected' => true],
             ['key' => '1', 'value' => 'Option 2'],
             ['key' => '2', 'value' => 'Option 3']
         ]}
@@ -49,7 +49,6 @@
             props :
             <ul>
                 <li>name: string (mandatory)</li>
-                <li>value: string (optional)</li>
                 <li>options: collection (mandatory)</li>
             </ul>
         </div>
@@ -58,6 +57,7 @@
             <ul>
                 <li>key: string (mandatory)</li>
                 <li>value: string (mandatory)</li>
+                <li>selected: boolean (optional)</li>
             </ul>
         </div>
         <div>

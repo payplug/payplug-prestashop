@@ -19,8 +19,7 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-var $document, $window;
-window[module_name+'Module']= {
+var $document, $window, __moduleName__Module = {
     init: function () {
         $document = $(document);
         $window = $(window);
@@ -33,13 +32,13 @@ window[module_name+'Module']= {
     },
     abort: {
         init: function () {
-            var {abort} = window[module_name+'Module'];
-            $document.on('click', 'input[name='+module_name+'SubmitAbort]', abort.call)
-                .on('click', 'button[name='+module_name+'ConfirmAbort]', abort.confirm);
+            var {abort} = __moduleName__Module;
+            $document.on('click', 'input[name=__moduleName__SubmitAbort]', abort.call)
+                .on('click', 'button[name=__moduleName__ConfirmAbort]', abort.confirm);
         },
         call: function (event) {
             event.preventDefault();
-            var {popup} = window[module_name+'Module'];
+            var {popup} = __moduleName__Module;
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
             var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
@@ -54,9 +53,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     popup.set(result.content);
@@ -81,9 +78,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (response) {
                     if (response.reload) {
@@ -95,8 +90,8 @@ window[module_name+'Module']= {
     },
     capture: {
         init: function () {
-            var {capture} = window[module_name+'Module'];
-            $document.on('click', 'input[name=' + module_name + 'SubmitCapture]', capture.call);
+            var {capture} = __moduleName__Module;
+            $document.on('click', 'input[name=__moduleName__SubmitCapture]', capture.call);
         },
         call: function (event) {
             event.preventDefault();
@@ -117,11 +112,11 @@ window[module_name+'Module']= {
                 data: data,
                 beforeSend: function () {
                     $('.pp-capture .loader').show();
-                    $('input[name=' + module_name + 'SubmitCapture]').unbind('click');
+                    $('input[name=__moduleName__SubmitCapture]').unbind('click');
                 },
                 complete: function () {
                     $('.pp-capture .loader').hide();
-                    $('input[name=' + module_name + 'SubmitCapture]').bind('click', function (e) {
+                    $('input[name=__moduleName__SubmitCapture]').bind('click', function (e) {
                         e.preventDefault();
                         callCapture();
                     });
@@ -131,9 +126,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result.status == 'error') {
@@ -156,8 +149,8 @@ window[module_name+'Module']= {
     },
     refund: {
         init: function () {
-            var {refund} = window[module_name+'Module'];
-            $document.on('click', 'input[name=' + module_name + 'SubmitRefund]', refund.call);
+            var {refund} = __moduleName__Module;
+            $document.on('click', 'input[name=__moduleName__SubmitRefund]', refund.call);
         },
         call: function (event) {
             event.preventDefault();
@@ -200,10 +193,8 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
-                    $('input[name=submit' + module_name + 'Refund]').prop("disabled", false);
+                    console.log(jqXHR, textStatus, errorThrown);
+                    $('input[name=submit__moduleName__Refund]').prop("disabled", false);
                 },
                 success: function (result) {
                     if (result.status == 'error') {
@@ -211,7 +202,7 @@ window[module_name+'Module']= {
                             .removeClass('hide')
                             .show();
                     } else {
-                        $('.' + module_name + 'Order').replaceWith(result.template);
+                        $('.__moduleName__Order').replaceWith(result.template);
                         $('#pppanel form p.ppsuccess').html(result.message)
                             .removeClass('hide')
                             .show();
@@ -226,8 +217,8 @@ window[module_name+'Module']= {
     },
     update: {
         init: function () {
-            var {update} = window[module_name+'Module'];
-            $document.on('click', 'input[name=' + module_name + 'SubmitUpdate]', update.call);
+            var {update} = __moduleName__Module;
+            $document.on('click', 'input[name=__moduleName__SubmitUpdate]', update.call);
         },
         call: function (event) {
             event.preventDefault();
@@ -256,9 +247,7 @@ window[module_name+'Module']= {
                         'Maybe you clicked too fast before scripts are fully loaded ' +
                         'or maybe you have a different back-office url than expected.' +
                         'You will find more explanation in JS console.');
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result.status == 'error') {
@@ -281,10 +270,10 @@ window[module_name+'Module']= {
     },
     popup: {
         props: {
-            identifier: 'payplugPopup',
+            identifier: '__moduleName__Popup',
         },
         init: function () {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props;
 
             $document.on('click', '.' + identifier + '_close', popup.close)
@@ -297,7 +286,7 @@ window[module_name+'Module']= {
                 });
         },
         set: function (content) {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props;
             if (!sanitizePopupHtml(content)) {
                 return;
@@ -309,7 +298,7 @@ window[module_name+'Module']= {
             popup.open();
         },
         open: function () {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
@@ -319,7 +308,7 @@ window[module_name+'Module']= {
             }, 0);
         },
         close: function () {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
@@ -330,20 +319,20 @@ window[module_name+'Module']= {
             }, 500);
         },
         create: function () {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props,
                 html = '<div class="' + identifier + '"><button class="' + identifier + '_close"></button><div class="' + identifier + '_content"></div></div>';
             $('body').append(html);
         },
         remove: function () {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props,
                 $popup = $('.' + identifier);
 
             $popup.remove();
         },
         hydrate: function (content) {
-            var {popup} = window[module_name+'Module'],
+            var {popup} = __moduleName__Module,
                 {identifier} = popup.props;
             $('.' + identifier + '_content').html(content);
         },
@@ -360,5 +349,5 @@ $(document).ready(function () {
         e.preventDefault();
     });
 
-    window[module_name+'Module'].init();
+    __moduleName__Module.init();
 });

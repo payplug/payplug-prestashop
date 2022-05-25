@@ -24,7 +24,13 @@
         <i class="icon-money"></i> {l s='Payplug payment details' mod='payplug'}
     </h3>
     <div class="card-body">
-        <img class="logo" src="{$logo_url|escape:'htmlall':'UTF-8'}" width="79" height="28" />
+        <span class="logo">
+            <img src="{$logo_url.payplug|escape:'htmlall':'UTF-8'}" />
+            {if $module_name == 'pspaylater'}
+                <span></span>
+                <img src="{$logo_url.pspaylater|escape:'htmlall':'UTF-8'}" />
+            {/if}
+        </span>
         {if isset($undefined_history_states) && $undefined_history_states}
             {include file='./order_state.tpl'}
         {/if}

@@ -33,6 +33,18 @@
             {include file='./../atoms/paragraph/paragraph.tpl'
                 paragraphText=$description_descriptionVersion
                 paragraphClassName=$description_descriptionVersionClassName}
+
+            {capture assign="description_show_hidden"}{l s='description.show.hidden' mod='payplug'}{/capture}
+            {capture assign="description_show_visible"}{l s='description.show.visible' mod='payplug'}{/capture}
+            {assign var='descriptionShow' value=[
+                ['key' => '0', 'value' => $description_show_hidden, 'selected' => !$payplug_switch.show.checked],
+                ['key' => '1', 'value' => $description_show_visible, 'selected' => $payplug_switch.show.checked]
+            ]}
+            {include file='./../atoms/select/select.tpl'
+                selectClassName='_show'
+                selectName=$payplug_switch.show.name|escape:'htmlall':'UTF-8'
+                selectOptions=$descriptionShow
+                selectDisabled=!$ps_account || !$connected}
         </div>
     </div>
     {assign var='description_descriptionTitleClassName' value='_descriptionTitle'}
@@ -55,6 +67,6 @@
 {assign var='descriptionBlock_className' value='descriptionBlock'}
 
 {include file='./../atoms/block/block.tpl'
-blockContent=$descriptionBlock_content
-blockData='blockDescription'
-blockClassName=$descriptionBlock_className}
+    blockContent=$descriptionBlock_content
+    blockData='blockDescription'
+    blockClassName=$descriptionBlock_className}

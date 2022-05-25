@@ -1,5 +1,5 @@
 /* Payplug payment */
-@{moduleClassName}Payment {
+.__moduleName__Payment {
   a {
     background: #fbfbfb;
     padding-left: 15px !important;
@@ -11,7 +11,7 @@
       max-width: 200px;
       max-height: 30px;
 
-      @media (@tablet) {
+      @media (@screen-tablet) {
         display: none;
       }
       &.payment_option_bancontact_payment_logo {
@@ -38,7 +38,7 @@
     }
   }
 
-  @{moduleClassName}OneyLogo {
+  .__moduleName__OneyLogo {
     &.-withoutFees {
       max-height: 40px;
     }
@@ -48,13 +48,13 @@
       max-height: 60px;
     }
 
-    @media (@tablet) {
+    @media (@screen-tablet) {
       display: none;
     }
   }
 
   &_error {
-    color: @errorColor;
+    color: @color-error;
     font-size: 13px;
     font-weight: 400;
   }

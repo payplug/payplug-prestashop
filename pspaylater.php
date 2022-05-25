@@ -38,6 +38,9 @@ class PsPaylater extends PaymentModule
     public $payplug_dependencies;
     private $container;
 
+    /** @var array */
+    public $adminControllers;
+
     /**
      * Constructor.
      *
@@ -51,16 +54,25 @@ class PsPaylater extends PaymentModule
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('pspaylater.construct.description');
-        $this->displayName = $this->l('pspaylater.construct.displayName');
+        $this->displayName = 'PrestaShop Paylater with PayPlug and Oney';
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '0.1.1';
+        $this->version = '0.2.0';
 
         parent::__construct();
 
         $this->module = false;
+        $this->controllers = [
+            'AdminPsPayLater'
+        ];
+        $this->adminControllers = [
+            [
+                'className' => 'AdminPsPayLater',
+                'parent' => -1
+            ]
+        ];
 
         if ($this->isValidPHPVersion()) {
             $this->setDependencies();
@@ -88,55 +100,17 @@ class PsPaylater extends PaymentModule
                 $this->install(true);
             }
 
-            if ($this->payplug_dependencies->getDependency('configClass')->isValidFeature('feature_ps_account')) {
-                $dependencies = new \PayPlugModule\classes\DependenciesClass();
-                $logger = $dependencies->getPlugin()->getLogger();
-
-                Media::addJsDef([
-                    'admin_iso_code' => $this->context->language->iso_code,
-                ]);
-                try {
-                    // Install service if not done
-                    $this->getService('ps_accounts.installer')->install();
-
-                    // Account
-                    $accountsFacade = $this->getService('ps_accounts.facade');
-                    $accountsService = $accountsFacade->getPsAccountsService();
-                    $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->name);
-
-                    // update modal language
-                    $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' . $this->context->language->iso_code . '/link-shop';
-
-                    Media::addJsDef([
-                        'contextPsAccounts' => $contextPsAccounts,
-                    ]);
-
-                    // Retrieve Account CDN
-                    $this->context->smarty->assign('urlAccountsCdn', $accountsService->getAccountsCdn());
-                } catch (ModuleNotInstalledException $e) {
-                    $logger->addLog($e->getMessage(), 'error');
-                } catch (ModuleVersionException $e) {
-                    $logger->addLog($e->getMessage(), 'error');
-                }
-            }
-
-            return (new \PayPlugModule\classes\AdminClass(
-                new \PayPlugModule\classes\DependenciesClass()
-            ))->getContent();
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminPsPayLater'));
         }
+
         $iso_code = Context::getContext()->language->iso_code;
-        if ($iso_code == 'en' || $iso_code == 'gb') {
-            $iso_code = 'en-gb';
-        }
+        $iso_code = ($iso_code == 'en' || $iso_code == 'gb') ? 'en-gb' : $iso_code;
         $faq_url = 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021267140';
         $this->context->smarty->assign('faq_url', $faq_url);
 
-        $logo_url = __PS_BASE_URI__ . 'modules/' . $this->name . '/views/img/logo_payplug.png';
-        $this->context->smarty->assign('url_logo', $logo_url);
-
-        $this->context->controller->addCSS(
-            __PS_BASE_URI__ . 'modules/' . $this->name . '/views/css/admin-v' . $this->version . '.css'
-        );
+        $views_path = __PS_BASE_URI__ . 'modules/' . $this->name . '/views';
+        $this->context->smarty->assign('url_logo', $views_path . '/img/logo_payplug.png');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->version.'.css');
 
         return $this->display(__FILE__, '/views/templates/admin/php_version.tpl');
     }
@@ -173,6 +147,19 @@ class PsPaylater extends PaymentModule
             'paymentOptions',
             'registerGDPRConsent',
         ];
+    }
+
+    /**
+     * @param bool $force_all
+     * @return bool
+     * @see Module::disable()
+     *
+     */
+    public function disable($force_all = false)
+    {
+        if ($this->module) {
+            return parent::disable($force_all) && $this->payplug_dependencies->getDependency('configClass')->disable();
+        }
     }
 
     /**

@@ -35,9 +35,7 @@ function callInfoRefund(){
         data: data,
         error: function(jqXHR, textStatus, errorThrown) {
             alert('error CALL INFO REFUND');
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
+            console.log(jqXHR, textStatus, errorThrown);
         },
         success: function (result) {
             //html content

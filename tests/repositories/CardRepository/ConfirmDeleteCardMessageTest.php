@@ -28,7 +28,6 @@ namespace PayPlugModule\tests\repositories\CardRepository;
  * @group unit
  * @group repository
  * @group card_repository
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */

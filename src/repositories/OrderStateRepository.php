@@ -214,10 +214,10 @@ class OrderStateRepository extends Repository
                 ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
                 ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
                 ->where(
-                    'osl.`name` LIKE \'' . pSQL($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . pSQL($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . pSQL($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . pSQL($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
+                    'osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+                    OR osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
                 );
 
             if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
@@ -291,7 +291,7 @@ class OrderStateRepository extends Repository
             ->select()
             ->fields('osl.id_order_state')
             ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-            ->where('osl.name = \'' . pSQL($name) . '\'')
+            ->where('osl.name = \'' . $this->query->escape($name) . '\'')
             ->limit(1, 1);
 
         return $this->query->build('unique_value');
@@ -304,7 +304,7 @@ class OrderStateRepository extends Repository
             ->select()
             ->fields('os.id_order_state')
             ->from(_DB_PREFIX_ . 'order_state', 'os')
-            ->where('os.module_name = \'' . pSQL($module_name) . '\'')
+            ->where('os.module_name = \'' . $this->query->escape($module_name) . '\'')
             ->build();
 
         foreach ($res as $os) {
@@ -375,7 +375,7 @@ class OrderStateRepository extends Repository
             ->select()
             ->fields('o.current_state')
             ->from(_DB_PREFIX_ . 'orders', 'o')
-            ->where('o.module = \'' . pSQL($module_name) . '\'')
+            ->where('o.module = \'' . $this->query->escape($module_name) . '\'')
             ->groupBy('o.current_state')
             ->build();
 

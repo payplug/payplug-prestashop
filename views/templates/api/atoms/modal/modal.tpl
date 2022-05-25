@@ -27,7 +27,10 @@
         {if isset($modalClassName) && $modalClassName} {$modalClassName|escape:'htmlall':'UTF-8'}{/if}"
         {if isset($modalData) && $modalData} data-e2e-name="{$modalData|escape:'htmlall':'UTF-8'}"{/if}>
 
-        <label for="modalTriggered" class="_close" >{include file="../../_svg/icon-close.tpl"} </label>
+        <label for="modalTriggered" class="_close" >
+            {include file='./../icon/icon.tpl'
+            iconName='close'}
+        </label>
 
         {if isset($modalTitle) && $modalTitle}
             <div class="_header">

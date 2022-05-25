@@ -4,7 +4,6 @@
   background: #colorMap[white];
   position: relative;
   display: block;
-  width: 145px;
   height: 36px;
   margin: 0 auto;
   cursor: pointer;
@@ -22,15 +21,18 @@
 
       position: absolute;
       top: 50%;
-      left: calc(100% - 20px);
+      left: calc(100% - 23px);
 
       display: block;
       width: 12px;
       height: 8px;
 
       content: "";
-      background-size: 100%;
-      background-image: url(~"@{img_icons}keyboard_arrow_down_24px.svg");
+      -webkit-mask-image: url(~"@{img-icons}arrow_down.svg");
+      mask-image: url(~"@{img-icons}arrow_down.svg");
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      background-color: #colorMap[fontSecondaryDefault];
     }
 
     &:focus {
@@ -58,6 +60,8 @@
   ._text {
     display: none;
     margin: 0;
+    color: #colorMap[fontMainDefault];
+    white-space: nowrap;
   }
 
   ._list {
@@ -93,16 +97,22 @@
     background: #colorMap[white];
     color: inherit;
     cursor: pointer;
+    font-weight: 400;
     z-index: 1;
+    font-weight: 400;
 
     &:hover {
-      color: #colorMap[purple];
-      background: #colorMap[purple50];
+      color: @color-primary;
+      // primary 50
+      background: @color-primary-lighten;
     }
   }
 
   &.-disabled {
-    opacity: .3;
     cursor: default;
+
+    ._current {
+      opacity: .3;
+    }
   }
 }

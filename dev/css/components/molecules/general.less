@@ -37,8 +37,15 @@
         flex-direction: row-reverse;
         width: 100%;
 
-        @media (@mobile) {
+        @media (@screen-mobile) {
           flex-direction: column-reverse;
+        }
+
+        & + div {
+          margin: @margin-6 0 0;
+        }
+        & + div:last-child {
+          margin: 0;
         }
       }
     }
@@ -50,10 +57,10 @@
 
     ._subscribe,
     ._connexion {
-      margin: 16px 0 12px 8px;
+      margin: @margin-4 0 @margin-3 @margin-2;
 
-      @media (@mobile) {
-        margin: 0 0 8px;
+      @media (@screen-mobile) {
+        margin: 0 0 @margin-2;
       }
     }
 
@@ -68,10 +75,10 @@
     ._user {
       width: 100%;
       max-width: 400px;
-      padding: 16px 0 40px;
+      padding: @padding-4 0 @padding-10;
 
-      @media (@mobile) {
-        padding: 8px 0 32px;
+      @media (@screen-mobile) {
+        padding: @padding-2 0 @padding-8;
       }
 
       &Informations {
@@ -83,18 +90,18 @@
         justify-content: space-between;
         height: 36px;
         width: 100%;
-        padding: 0 12px;
-        margin: 0 0 8px;
+        padding: 0 @padding-3;
+        margin: 0 0 @margin-2;
       }
 
       &Portal {
         @size: 12;
         .Inter(~"@{size}px", 700);
-        color: #colorMap[purple];
+        color: @color-primary;
         letter-spacing: calc(1em / ~"@{size}");
 
         height: calc(36em / ~"@{size}");
-        padding: 0 ~"@{size}px";
+        padding: 0 @padding-3;
         background: #colorMap[backgroundGrey];
         justify-content: start;
 
@@ -102,7 +109,7 @@
           .buttonIcon {
             height: calc(18em / ~"@{size}");
             width: calc(18em / ~"@{size}");
-            fill: #colorMap[purple];
+            fill: @color-primary;
           }
         }
       }
@@ -111,8 +118,9 @@
         border: none;
 
         &:hover {
-          color: #colorMap[purple];
-          background: #colorMap[radioButtonBackground];
+          color: @color-primary;
+          // primary 50
+          background: @color-primary-lighten;
         }
       }
     }
@@ -122,9 +130,9 @@
       justify-content: space-between;
       align-items: start;
       flex-wrap: wrap;
-      margin: 0 0 36px;
+      margin: 0 0 @margin-9;
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         flex-direction: column;
       }
 
@@ -139,14 +147,14 @@
         min-height: 40px;
         max-width: calc(100% - 232px);
 
-        @media (@mobile) {
+        @media (@screen-mobile) {
           max-width: 100%;
         }
       }
 
       &RadioButton {
-        @media (@mobile) {
-          margin: 8px 0 0;
+        @media (@screen-mobile) {
+          margin: @margin-2 0 0;
         }
         div {
           min-width: 100px;

@@ -1,5 +1,5 @@
 /* Oney Form */
-@{moduleClassName}OneyRequired {
+.__moduleName__OneyRequired {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -10,7 +10,7 @@
     padding: 0;
     width: 100%;
 
-    @media (@mobile) {
+    @media (@screen-mobile) {
       width: calc(100vw - 30px);
       max-width: 100%;
     }
@@ -112,12 +112,12 @@
         max-width: 100%;
       }
 
-      @media (@mobile) {
+      @media (@screen-mobile) {
         max-width: 100%;
       }
 
-      @{moduleClassName}Popin & {
-        @media (@mobile) {
+      .__moduleName__Popin & {
+        @media (@screen-mobile) {
           padding: 16px 0 0;
         }
       }
@@ -142,7 +142,7 @@
         margin: 0 0 3px;
       }
 
-      & + @{moduleClassName}OneyRequired_group {
+      & + .__moduleName__OneyRequired_group {
         margin: 10px 0 0;
       }
     }

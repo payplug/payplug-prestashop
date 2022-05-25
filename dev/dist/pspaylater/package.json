@@ -1,6 +1,6 @@
 {
-  "name": "modules",
-  "version": "0.1.1",
+  "name": "pspaylater",
+  "version": "0.2.0",
   "description": "======================================== Prestashop paiement module using PayLater ========================================",
   "private": true,
   "directories": {
@@ -32,6 +32,7 @@
     "webpack-fix-style-only-entries": "^0.6.1"
   },
   "dependencies": {
+    "replace-in-file-webpack-plugin": "^1.0.6",
     "webpack-remove-empty-scripts": "^0.8.0-alpha"
   },
   "main": "index.js"

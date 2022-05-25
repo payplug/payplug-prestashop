@@ -41,6 +41,9 @@
     {* buttonLink stories *}
     {include file='./../api/atoms/buttonLink/buttonLink_stories.tpl'}
 
+    {* icons stories *}
+    {include file='./../api/atoms/icon/icon_stories.tpl'}
+
     {* Image stories *}
     {include file='./../api/atoms/image/image_stories.tpl'}
 
@@ -64,6 +67,9 @@
 
     {* select stories *}
     {include file='./../api/atoms/select/select_stories.tpl'}
+
+    {* text alert stories *}
+    {include file='./../api/atoms/textAlert/textAlert_stories.tpl'}
 
     {* title stories *}
     {include file='./../api/atoms/title/title_stories.tpl'}

@@ -104,10 +104,10 @@ build zip release:
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
-    - rm -r ./vendor
+    - rm -rf ./vendor
     - composer install --no-dev
     - rm webpack.config.js
-    - find ./vendor -type d -exec cp index.php {} \;
+    - ./dev/ci/secure_directories.sh
     - git status
     - ./dev/ci/assets_revision.sh -b payplug
     - mkdir payplug
@@ -159,11 +159,12 @@ build zip pspaylater:
     - php ./dev/ci/generate-version.php
     - php ./dev/ci/generate-upgrade.php
     - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
-    - rm -r ./vendor
+    - ls -als ./vendor
+    - rm -rf ./vendor
     - ./dev/ci/set_namespace.sh
     - ./dev/ci/set_translation.sh
     - composer install --no-dev
-    - find ./vendor -type d -exec cp index.php {} \;
+    - ./dev/ci/secure_directories.sh
     - git status
     - rm -rf views/build && mv views/build-bnpl views/build
     - ./dev/ci/assets_revision.sh -b pspaylater

@@ -34,6 +34,7 @@ use Validate;
 
 class PayPlugValidation
 {
+    public $apiClass;
     public $logger;
     public $paymentClass;
     public $debug;
@@ -51,8 +52,10 @@ class PayPlugValidation
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
+        $this->apiClass = $this->dependencies->apiClass;
         $this->orderClass = $this->dependencies->orderClass;
         $this->paymentClass = $this->dependencies->paymentClass;
+        $this->installmentClass = $this->dependencies->installmentClass;
         $this->debug = Configuration::get(
             $this->dependencies->getConfigurationKey('debugMode')
         );
@@ -152,7 +155,7 @@ class PayPlugValidation
 
         $amount = 0;
         if (!$pay_id = $this->paymentClass->getPaymentByCart((int)$cart_id)) {
-            if (!$inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
+            if (!$inst_id = $this->installmentClass->getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Payment is not stored or is already consumed.');
                 $id_order = Order::getOrderByCartId($cart->id);
                 $customer = new Customer((int)$cart->id_customer);
@@ -165,13 +168,14 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 Tools::redirect($link_redirect);
-            } elseif ($inst_id = InstallmentClass::getInstallmentByCart((int)$cart_id)) {
+            } elseif ($inst_id = $this->installmentClass->getInstallmentByCart((int)$cart_id)) {
                 $this->logger->addLog('Installment is not consumed yet.');
                 $amount = 0;
                 $pay_id = false;
                 $this->type = 'installment';
                 try {
-                    $installment = \Payplug\InstallmentPlan::retrieve($inst_id);
+                    $installment = $this->apiClass->retrieveInstallment($inst_id);
+                    $installment = $installment['resource'];
                     $this->api_key = (bool)$installment->is_live ?
                         Configuration::get(
                             $this->dependencies->getConfigurationKey('liveApiKey')
@@ -215,7 +219,8 @@ class PayPlugValidation
         } else {
             $this->logger->addLog('Payment is not consumed yet.');
             try {
-                $payment = $this->paymentClass->retrievePayment($pay_id);
+                $payment = $this->apiClass->retrievePayment($pay_id);
+                $payment = $payment['resource'];
                 $this->api_key = (bool)$payment->is_live ?
                     Configuration::get(
                         $this->dependencies->getConfigurationKey('liveApiKey')
@@ -379,7 +384,7 @@ class PayPlugValidation
             );
 
             if ($this->type == 'installment') {
-                $installment = new PPPaymentInstallment($inst_id);
+                $installment = new PPPaymentInstallment($inst_id, $this->dependencies);
                 $first_payment = $installment->getFirstPayment();
                 if ($first_payment->isDeferred()) {
                     $order_state = $auth_state;
@@ -517,13 +522,13 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-                $this->paymentClass->patchPayment($payment->id, $data);
+                $this->apiClass->patchPayment($payment->id, $data);
 
                 if (!$this->orderClass->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');
                 }
             } elseif ($this->type == 'installment') {
-                InstallmentClass::addPayplugInstallment($installment->resource, $order);
+                $this->installmentClass->addPayplugInstallment($installment->resource, $order);
             }
 
             // Add payment line

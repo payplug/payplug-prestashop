@@ -27,15 +27,19 @@
 <div class="payplugUIAlert -{$alertType|escape:'htmlall':'UTF-8'}
     {if isset($alertClassName) && $alertClassName} {$alertClassName|escape:'htmlall':'UTF-8'}{/if}"
     {if isset($alertData) && $alertData} data-e2e-name="{$alertData|escape:'htmlall':'UTF-8'}"{/if}>
-    <div class="_icon">
-        {if $alertType == 'success'}
-            {include file="../../_svg/icon-check.tpl"}
-        {elseif $alertType == 'warning'}
-            {include file="../../_svg/icon-lightbulb.tpl"}
-        {elseif $alertType == 'error'}
-            {include file="../../_svg/icon-lock.tpl"}
-        {/if}
-    </div>
+    {if isset($alertClose) && $alertClose}
+        <input type="checkbox" name="alertTriggered" id="alertTriggered" />
+        <label for="alertTriggered" class="_close" >
+            {include file='./../icon/icon.tpl'
+            iconName='close'}
+        </label>
+    {/if}
+    {if isset($alertIcon) && $alertIcon}
+        <div class="_icon">
+            {include file='./../icon/icon.tpl'
+            iconName=$alertIcon}
+        </div>
+    {/if}
     {if isset($alertTitle) && $alertTitle}
         <div class="_title">{$alertTitle|escape:'htmlall':'UTF-8'}</div>
     {/if}

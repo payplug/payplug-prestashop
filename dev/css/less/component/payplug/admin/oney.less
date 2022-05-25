@@ -2,12 +2,12 @@
 .flex-container {
   display: flex;
   flex-wrap: wrap;
-  @media (@mobile) {
+  @media (@screen-mobile) {
     width: 250px;
   }
 
 }
-@{moduleClassName}Oney {
+.__moduleName__Oney {
   &_error {
     display: none;
     color: #colorMap[error];
@@ -34,7 +34,8 @@
         }
 
         &:focus[type="text"] {
-          border: 2px dashed #00ab7a;
+          border: 2px dashed;
+          border-color: #colorMap[module];
         }
       }
 

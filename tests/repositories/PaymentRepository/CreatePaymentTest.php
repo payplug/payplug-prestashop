@@ -31,196 +31,343 @@ use PayPlugModule\tests\mock\PaymentMock;
  * @group repository
  * @group payment
  * @group payment_repository
+ * @group create_payment
  *
  * @runTestsInSeparateProcesses
  */
 final class CreatePaymentTest extends BasePaymentRepository
 {
-    /**
-     * Parameters to test method with empty $paiementDetails
-     *
-     * @return \Generator
-     */
+    private $paymentDetails;
+    private $payment;
+    private $installment;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->paymentDetails = [
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => 'standard',
+            'cartId' => 42,
+        ];
+        $this->payment = PaymentMock::getStandard();
+        $this->installment = PaymentMock::getInstallment();
+    }
+
     public function paymentDetailsParameters()
     {
-        yield [null, 'paymentDetails: null'];
-        yield [['paymentTab' => null], 'paymentDetails: {"paymentTab":null}'];
-        yield [
-            ['paymentTab' => ['field' => 'value'], 'paymentMethod' => null],
-            'paymentDetails: {"paymentTab":{"field":"value"},"paymentMethod":null}'
-        ];
+        // Invalid paymentTab, not empty array expected
+        yield [[
+            'paymentTab' => null,
+            'paymentMethod' => 'standard',
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => false,
+            'paymentMethod' => 'standard',
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => 42,
+            'paymentMethod' => 'standard',
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => 'wrong parameter',
+            'paymentMethod' => 'standard',
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => [],
+            'paymentMethod' => 'standard',
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+
+        // Invalid paymentMethod, string expected
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => null,
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => false,
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => 42,
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => ['key' => 'value'],
+            'cartId' => 42,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+
+        // Invalid cartId, int expected
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => 'standard',
+            'cartId' => null,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => 'standard',
+            'cartId' => false,
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => 'standard',
+            'cartId' => 'wrong parameter',
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
+        yield [[
+            'paymentTab' => ['key' => 'value'],
+            'paymentMethod' => 'standard',
+            'cartId' => ['key' => 'value'],
+        ], 'paymentDetails: Invalid paymentTab, not empty array expected'];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
-     *
      * @dataProvider paymentDetailsParameters
      * @param array $parameter
      * @param string $logMessage
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testMethodWithWrongParameters($parameters, $returnMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
+                'returnPaymentError' => $returnMessage
             ]);
 
         $this->assertSame(
-            $this->repo->createPayment($parameter),
-            $logMessage
+            $this->repo->createPayment($parameters),
+            $returnMessage
         );
     }
 
     public function testCreateWithInvalidConfig()
     {
-        $paymentDetails = [
-            'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard'
-        ];
-
         $this->config
             ->shouldReceive([
                 'get' => false
             ]);
 
         $this->assertSame(
-            $this->repo->createPayment($paymentDetails)['response'],
-            '[createPayment] Try to create standard  payment with PAYPLUG_STANDARD disabled'
+            $this->repo->createPayment($this->paymentDetails),
+            [
+                'result' => false,
+                'Configuration::get' => 'false',
+                'response' => '[createPayment] Try to create standard payment with PAYPLUG_STANDARD disabled'
+            ]
         );
     }
 
-    /**
-     * Test creation payment 'standard'
-     */
-    public function testCreatePaymentWithValidData()
+    public function testIfPaymentExistsAndCannotBeAborted()
     {
-        $paymentDetails = [
-            'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard'
-        ];
-
         $this->config
             ->shouldReceive([
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'create' => PaymentMock::getStandard()
-            ]);
+        $this->repo->shouldReceive([
+            'checkPaymentTable' => [
+                'id_payment' => 'pay_123456789',
+            ]
+        ]);
 
-        $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
+        $this->dependencies->apiClass->shouldReceive([
+            'abortPayment' => [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Payment cannot be aborted'
+            ]
+        ]);
+
         $this->assertSame(
-            $this->repo->createPayment($paymentDetails)['response'],
-            '[createPayment] Payment successfully created'
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[createPayment] Exception. Unable to abort payment. Error: Payment cannot be aborted'
+            ],
+            $this->repo->createPayment($this->paymentDetails)
         );
     }
 
-    public function testCreatePaymentWithInvalidData()
+    public function testPaymentCannotBeCreated()
     {
-        $paymentTab = mt_rand();
-        $paymentDetails = [
-            'paymentTab' => $paymentTab,
-            'paymentMethod' => 'standard'
-        ];
+        $this->config
+            ->shouldReceive([
+                'get' => true
+            ]);
+
+        $this->repo->shouldReceive([
+            'checkPaymentTable' => []
+        ]);
+
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Payment cannot be created'
+            ]
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[createPayment] Exception. Unable to create payment. Error: Payment cannot be created'
+            ],
+            $this->repo->createPayment($this->paymentDetails)
+        );
+    }
+
+    public function testInstallmentPlanCannotBeCreated()
+    {
+        $paymentDetails = $this->paymentDetails;
+        $paymentDetails['paymentMethod'] = 'installment';
 
         $this->config
             ->shouldReceive([
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'create' => $paymentTab
-            ]);
+        $this->repo->shouldReceive([
+            'checkPaymentTable' => []
+        ]);
+
+        $this->dependencies->apiClass->shouldReceive([
+            'createInstallment' => [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Installment plan cannot be created'
+            ]
+        ]);
 
         $this->assertSame(
             [
                 'result' => false,
                 'paymentDetails' => json_encode($paymentDetails),
-                'response' => '[createPayment] Exception. Unable to create payment. Error: Invalid argument, $apiPayment must be an object'
+                'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created'
             ],
             $this->repo->createPayment($paymentDetails)
         );
     }
 
-    public function testCreatePaymentThrowException()
+    // todo: create the payment mock with the failure to achieve this method
+    public function atestPaymentCreatedHasFailure()
     {
-        $paymentDetails = [
-            'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard'
-        ];
-
         $this->config
             ->shouldReceive([
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive(['create' => mt_rand()])
-            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400);
+        $this->repo->shouldReceive([
+            'checkPaymentTable' => []
+        ]);
+
+        $payment = $this->payment;
+        // next : create a payment mock with a failure or adapt current payment mock to give extra params
+
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 200,
+                'result' => true,
+                'message' => $this->payment
+            ]
+        ]);
 
         $this->assertSame(
-            $this->repo->createPayment($paymentDetails)['response'],
-            '[createPayment] Exception. Unable to create payment. Error: Bad request'
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created'
+            ],
+            $this->repo->createPayment($this->paymentDetails)
         );
     }
 
+    // todo: create testInstallmentPlanCreatedhasFailure method
+    // todo: create testNoResourceIDIsGiven method
+    // todo: create testNoPaymentReturnUrlIsSetted method
+
+    // todo: create testIfPaymentExistsAndCanBeAborted method
+    // todo: create testPaymentIsCreated method
+    // todo: create testInstallmentPlanIsCreated method
+
     public function testCreatePaymentWithEmptyReturnUrl()
     {
-        $paymentDetails = [
-            'paymentTab' => mt_rand(),
-            'paymentMethod' => 'standard',
-            'paymentReturnUrl' => null
-        ];
-
         $paymentMock = PaymentMock::getStandard();
+        // todo: we should mock the return of the who give back the payment resource and not set it like bellow
         $paymentMock->hosted_payment->return_url = null;
+
+        $paymentDetails = $this->paymentDetails;
+        $paymentDetails['paymentId'] = $paymentMock->id;
+        $paymentDetails['paymentReturnUrl'] = null;
 
         $this->config
             ->shouldReceive([
                 'get' => true
             ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                'create' => $paymentMock,
-            ]);
+        $this->repo->shouldReceive([
+            'checkPaymentTable' => []
+        ]);
 
-        $this->assertFalse($this->repo->createPayment($paymentDetails)['result']);
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => $paymentMock
+            ]
+        ]);
+
+        $this->assertFalse($this->repo->createPayment($this->paymentDetails)['result']);
         $this->assertSame(
-            $this->repo->createPayment($paymentDetails)['response'],
-            '[createPayment] payment return URL is null.'
+            $this->repo->createPayment($this->paymentDetails),
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($paymentDetails),
+                'response' => "[createPayment] payment return URL is null.",
+            ]
         );
     }
 
     public function testCreateIntegratedPaymentReturnUrl()
     {
-        $paymentDetails = [
-            'paymentMethod' => 'standard',
-            'paymentTab'=> [
-                'hosted_payment' =>
-                    ['return_url' => mt_rand(),
-                    ],
-            ],
-            'paymentReturnUrl' => null,
-        ];
-        $paymentDetails['paymentTab']['integration'] = 'INTEGRATED_PAYMENT';
         $paymentMock = PaymentMock::getStandard();
-        $paymentMock->hosted_payment->return_url = null;
+
+        $paymentDetails = $this->paymentDetails;
+        $paymentDetails['paymentId'] = $paymentMock->id;
+        $paymentDetails['paymentReturnUrl'] = $paymentMock->hosted_payment->return_url;
+        $paymentDetails['isPaid'] = false;
+        $paymentDetails['paymentUrl'] = $paymentMock->hosted_payment->payment_url;
+
         $this->config
             ->shouldReceive([
-                                'get' => true
-                            ]);
+                'get' => true
+            ]);
 
-        $this->paymentApi
-            ->shouldReceive([
-                                'create' => $paymentMock,
-                            ]);
-        $this->assertTrue($this->repo->createPayment($paymentDetails)['result']);
+        $this->repo->shouldReceive([
+            'checkPaymentTable' => []
+        ]);
+
+        $this->dependencies->apiClass->shouldReceive([
+            'createPayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => $paymentMock
+            ]
+        ]);
+
         $this->assertSame(
-            '[createPayment] Payment successfully created',
-            $this->repo->createPayment($paymentDetails)['response']
+            $this->repo->createPayment($this->paymentDetails),
+            [
+                'result' => true,
+                'paymentDetails' => $paymentDetails,
+                'response' => "[createPayment] Payment successfully created",
+            ]
         );
     }
 }

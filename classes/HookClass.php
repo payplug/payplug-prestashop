@@ -29,7 +29,6 @@ use Language;
 use Media;
 use Module;
 use OrderState;
-use Payplug\Exception\ConfigurationException;
 use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
@@ -196,16 +195,18 @@ class HookClass
         $cart = $this->cart->get((int) $order->id_cart);
         $payment_method = $this->dependencies->paymentClass->getPaymentMethodByCart($cart);
         if ($payment_method['type'] == 'installment') {
-            $installment = new PPPaymentInstallment($payment_method['id']);
+            $installment = new PPPaymentInstallment($payment_method['id'], $this->dependencies);
             $payment = $installment->getFirstPayment();
         } else {
-            $payment = new PPPayment($payment_method['id']);
+            $payment = new PPPayment($payment_method['id'], $this->dependencies);
         }
         if (!$payment->isPaid()) {
-            $payment->capture();
-            $payment->refresh();
-            if ($payment->resource->card->id !== null) {
-                $this->card->saveCard($payment->resource);
+            $capture = $this->dependencies->apiClass->capturePayment($payment->id);
+            if ($capture['result']) {
+                $payment = $capture['resource'];
+                if ($payment->card->id !== null) {
+                    $this->card->saveCard($payment);
+                }
             }
         }
     }
@@ -260,12 +261,7 @@ class HookClass
      * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
      *
      * @param $params
-     *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws ConfigurationException
-     *
-     * @return string
+     * @return false|string|void
      */
     public function adminOrder($params)
     {
@@ -309,7 +305,6 @@ class HookClass
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws ConfigurationException
      *
      * @return string
      */
@@ -351,13 +346,15 @@ class HookClass
         }
         if ($inst_id) {
             $payment_list = [];
-            if ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 1) {
+
+            $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            if ($sandbox) {
                 $this->dependencies->apiClass->setSecretKey(
                     $this->config->get(
                         $this->dependencies->getConfigurationKey('testApiKey')
                     )
                 );
-            } elseif ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 0) {
+            } else {
                 $this->dependencies->apiClass->setSecretKey(
                     $this->config->get(
                         $this->dependencies->getConfigurationKey('liveApiKey')
@@ -365,32 +362,34 @@ class HookClass
                 );
             }
 
-            if (!$inst_id || empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
-                if ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 1) {
+            // If no installment plan id, return false
+            if (!$inst_id || empty($inst_id)) {
+                return false;
+            }
+
+            // Get the installment plan resource
+            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+
+            // If No installment paln resource, test the other live mode configuration
+            if (!$installment['result']) {
+                if ($sandbox) {
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
                         $this->dependencies->getConfigurationKey('liveApiKey')
                     ));
-                    if (empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
-                        $this->dependencies->apiClass->setSecretKey($this->config->get(
-                            $this->dependencies->getConfigurationKey('testApiKey')
-                        ));
-
-                        return false;
-                    }
-                } elseif ($this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 0) {
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                } else {
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
                         $this->dependencies->getConfigurationKey('testApiKey')
                     ));
-                    if (empty($inst_id) || !$installment = InstallmentClass::retrieveInstallment($inst_id)) {
-                        $this->dependencies->apiClass->setSecretKey($this->config->get(
-                            $this->dependencies->getConfigurationKey('liveApiKey')
-                        ));
-
-                        return false;
-                    }
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
                 }
             }
 
+            // If we still don't have a valid Installment plan resource, return false
+            if (!$installment['result']) {
+                return false;
+            }
+            $installment = $installment['resource'];
 
             $pay_mode = $installment->is_live
                 ? $this->dependencies->l('hook.displayAdminOrderMain.live', 'hookclass')
@@ -407,7 +406,8 @@ class HookClass
             foreach ($installment->schedule as $schedule) {
                 if ($schedule->payment_ids != null) {
                     foreach ($schedule->payment_ids as $pay_id) {
-                        $p = $this->dependencies->paymentClass->retrievePayment($pay_id);
+                        $p = $this->dependencies->apiClass->retrievePayment($pay_id);
+                        $p = $p['resource'];
                         $payment_list_new[] = $this->dependencies->paymentClass->buildPaymentDetails($p);
                         if ((int) $p->is_paid == 0) {
                             $amount_refunded_payplug += 0;
@@ -469,7 +469,7 @@ class HookClass
                 'ongoing' :
                 ($installment->is_fully_paid ? 'paid' : 'suspended');
             $inst_aborted = !$installment->is_active;
-            $ppInstallment = new PPPaymentInstallment($installment->id);
+            $ppInstallment = new PPPaymentInstallment($installment->id, $this->dependencies);
             $instPaymentOne = $ppInstallment->getFirstPayment();
             $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
             $inst_paid = $installment->is_fully_paid;
@@ -490,7 +490,7 @@ class HookClass
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
             );
 
-            InstallmentClass::updatePayplugInstallment($installment);
+            $this->dependencies->installmentClass->updatePayplugInstallment($installment);
         } else {
             if (!$pay_id = $this->dependencies->paymentClass->isTransactionPending($order->id_cart)) {
                 $pay_id = $this->dependencies->orderClass->getPayplugOrderPayment($order->id);
@@ -505,45 +505,25 @@ class HookClass
             }
 
             $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    )
-                );
-            } else {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    )
-                );
+            $mode = $sandbox ? 'test' : 'live';
+            // If no payment id, return false
+            if (!$pay_id || empty($pay_id)) {
+                return false;
             }
 
-            if (!$pay_id || empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
-                if ($sandbox) {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ));
-                    if (empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
-                        $this->dependencies->apiClass->setSecretKey($this->config->get(
-                            $this->dependencies->getConfigurationKey('testApiKey')
-                        ));
-
-                        return false;
-                    }
-                } else {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    ));
-                    if (empty($pay_id) || !$payment = $this->dependencies->paymentClass->retrievePayment($pay_id)) {
-                        $this->dependencies->apiClass->setSecretKey($this->config->get(
-                            $this->dependencies->getConfigurationKey('liveApiKey')
-                        ));
-
-                        return false;
-                    }
-                }
+            // Get the Payment resource
+            $payment = $this->dependencies->apiClass->retrievePayment($pay_id, $mode);
+            // If No Payment resource, test the other live mode configuration
+            if (!$payment['result']) {
+                $mode = $sandbox ? 'live' : 'test';
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id, $mode);
             }
+
+            // If we still don't have a valid Payment resource, return false
+            if (!$payment['result']) {
+                return false;
+            }
+            $payment = $payment['resource'];
 
             // check if order is from oney payment
             $oney_payment_method = [
@@ -749,9 +729,13 @@ class HookClass
             ]);
         }
 
+        $views_path = __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/';
         $display_single_payment = $show_menu_payment;
         $this->assign->assign([
-            'logo_url' => __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/logo_payplug.png',
+            'logo_url' => [
+                'payplug' => $views_path . 'img/payplug.svg',
+                'pspaylater' => $views_path . 'img/pspaylater.svg',
+            ],
             'admin_ajax_url' => $admin_ajax_url,
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
@@ -985,6 +969,16 @@ class HookClass
                 'payplug_publishable_key' => Configuration::get(
                     $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : '')
                 ),
+            ]);
+        }
+
+        if ($this->config->get(
+            $this->dependencies->getConfigurationKey('applepay')
+        )) {
+            $applePayPaymentRequest = $this->dependencies->applePayClass->getPaymentRequest(Dispatcher::getInstance()->getController());
+
+            Media::addJsDef([
+                'applePayPaymentRequest' => $applePayPaymentRequest,
             ]);
         }
 

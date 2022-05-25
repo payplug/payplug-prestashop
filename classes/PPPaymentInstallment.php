@@ -29,13 +29,13 @@ if (!defined('_PS_VERSION_')) {
 
 class PPPaymentInstallment extends PPPayment
 {
-    public function __construct($id = null)
+    public function __construct($id = null, $dependencies = null)
     {
-        if ($id != null) {
+        $this->dependencies = $dependencies;
+
+        if ($id) {
             $payment = $this->retrieve($id);
             $this->populateFromInstallment($payment);
-        } else {
-            $id = null;
         }
     }
 
@@ -44,17 +44,16 @@ class PPPaymentInstallment extends PPPayment
         if (!$id) {
             return false;
         }
-
-        try {
-            $payment = \Payplug\InstallmentPlan::retrieve($id);
-        } catch (\Payplug\Exception $e) {
+        $installment = $this->dependencies->apiClass->retrieveInstallment($id);
+        if (!$installment['result']) {
             $data = [
                 'result' => false,
-                'response' => $e->__toString(),
+                'response' => $installment['message'],
             ];
             return $data;
         }
-        return $payment;
+
+        return $installment['resource'];
     }
 
     private function populateFromInstallment($installment)
@@ -85,7 +84,7 @@ class PPPaymentInstallment extends PPPayment
     {
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
-            $payment = new PPPayment($payment_list[0]['pay_id']);
+            $payment = new PPPayment($payment_list[0]['pay_id'], $this->dependencies);
             return $payment;
         }
     }
@@ -94,7 +93,7 @@ class PPPaymentInstallment extends PPPayment
     {
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
-            $payment = new PPPayment($payment_list[0]['pay_id']);
+            $payment = new PPPayment($payment_list[0]['pay_id'], $this->dependencies);
             return $payment->isDeferred();
         }
         return false;

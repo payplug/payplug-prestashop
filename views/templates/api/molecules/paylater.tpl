@@ -46,11 +46,10 @@
                 inputName = $payplug_switch.oney.name}
             {else}
                 {include file='./../atoms/switch/switch.tpl' switchEnabledLabel='On'
-                switchDisabledLabel='Off'
-                switchDataName='switchData'
-                switchValue='1'
-                checked=true
-                switchName=$payplug_switch.oney.name}
+                    switchDisabledLabel='Off'
+                    switchDataName='payplug_oney'
+                    switchChecked=$payplug_switch.oney.checked
+                    switchName=$payplug_switch.oney.name}
             {/if}
         </div>
     </div>
@@ -64,9 +63,10 @@
     ['value'=>"0", "dataName" =>'oneyWithoutFees' ,"text" => $oneyWithoutFeesTitle, "subText" => $oneyWithoutFeesDescription, className=>'_paylaterLabel']
     ]}
     {include file='./../atoms/options/options.tpl'
-    optionsSelected=$payplug_switch.oney_fees.checked
-    optionsClassName='_paylaterOptions'
-    optionsName=$payplug_switch.oney_fees.name}
+        optionsSelected=$payplug_switch.oney_fees.checked
+        optionsClassName='_paylaterOptions'
+        optionsName=$payplug_switch.oney_fees.name}
+
     {* Hide optimisedOption for pspaylater module *}
     {if $module_name=='pspaylater'}
         {include file='./../atoms/input/input.tpl'
@@ -74,14 +74,17 @@
         inputValue = '1'
         inputName = $payplug_switch.oney_optimized.name}
     {/if}
+
+    {* Advanced Paylater Settings *}
+    {include file='./paylater_advanced.tpl'}
 {/capture}
 
 {assign var='paylaterBlock_className' value='paylaterBlock'}
 
 {include file='./../atoms/block/block.tpl'
-blockTitle=$paylaterBlock_title
-blockDescription=$payLaterBlock_description
-blockContent=$paylaterBlock_content
-blockData='blockPaylater'
-blockDisabled=!$connected
-blockClassName=$paylaterBlock_className}
+    blockTitle=$paylaterBlock_title
+    blockDescription=$payLaterBlock_description
+    blockContent=$paylaterBlock_content
+    blockData='blockPaylater'
+    blockDisabled=!$connected || !$payplug_switch.show.checked
+    blockClassName=$paylaterBlock_className}

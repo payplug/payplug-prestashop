@@ -1,5 +1,5 @@
 /* Payplug message */
-@{moduleClassName}Msg {
+.__moduleName__Msg {
   &_wrapper {
     display: flex;
     justify-content: center;
@@ -10,9 +10,9 @@
   &_error {
     color: #colorMap[error];
     text-align: center;
-    @media (@mobile) {
+    @media (@screen-mobile) {
       // todo: we should use a modifier
-      @{moduleClassName}Popin & {
+      .__moduleName__Popin & {
         width: calc(100vw - 30px);
         max-width: 100%;
       }

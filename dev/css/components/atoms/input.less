@@ -13,26 +13,6 @@
     color: #colorMap[fontMainDefault];
   }
 
-  &.-icon {
-    input {
-      background-size: 8px;
-      background-repeat: no-repeat;
-      background-position: 12px 12px;
-
-      &[type=text],
-      &[type=password],
-      &[type=number] {
-        padding-left: 28px;
-      }
-    }
-  }
-
-  &.-iconEuro {
-    input {
-      background-image: url(~"@{img_icons}euro_symbol_24px.svg");
-    }
-  }
-
   input {
     &[type=text],
     &[type=password],
@@ -54,7 +34,7 @@
 
       &:focus,
       &:hover {
-        border-color: #colorMap[purple];
+        border-color: @color-primary;
       }
 
       &:focus-visible {
@@ -80,13 +60,48 @@
     }
   }
 
+  &.-icon {
+    position: relative;
+    &:before {
+      .transform(translateY(-50%));
+      background-color: #colorMap[fontSecondaryDefault];
+      content: "";
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      z-index: 0;
+      mask-position: 50%;
+      -webkit-mask-position: 50%;
+    }
+    input {
+      &[type=text],
+      &[type=password],
+      &[type=number] {
+        padding-left: 28px;
+        z-index: 1;
+      }
+    }
+    &Euro {
+      &:before {
+        -webkit-mask-image: url(~"@{img-icons}euro_symbol.svg");
+        mask-image: url(~"@{img-icons}euro_symbol.svg");
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        background-color: #colorMap[fontSecondaryDefault];
+      }
+    }
+  }
+
   &.-focus,
   &.-hover {
     input {
       &[type=text],
       &[type=password],
       &[type=number] {
-        border-color: #colorMap[purple];
+        border-color: @color-primary;
       }
     }
   }
@@ -96,7 +111,7 @@
       &[type=text],
       &[type=password],
       &[type=number] {
-        border-color: #colorMap[red];
+        border-color: #colorMap[accentuationWarning];
       }
     }
   }

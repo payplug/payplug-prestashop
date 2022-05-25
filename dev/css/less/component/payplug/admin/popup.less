@@ -1,5 +1,5 @@
 /* Payplug Admin Popup */
-@{moduleClassName}Popup {
+.__moduleName__Popup {
   .transform(translate(-50%, -50%));
   .transition(opacity @dur);
   opacity: 0;
@@ -10,7 +10,7 @@
   max-width: 80vw;
   z-index: 5004;
 
-  @media (@mobile) {
+  @media (@screen-mobile) {
     max-width: 98vw;
   }
 
@@ -34,7 +34,7 @@
     overflow-y: auto;
     padding: 0;
 
-    @media (@mobile) {
+    @media (@screen-mobile) {
       max-height: 98vh;
     }
   }

@@ -55,13 +55,17 @@ class AdminClass
      */
     public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
-        $dependencies = new DependenciesClass();
         $context = (new ContextSpecific())->getContext();
-
+        $dependencies = new DependenciesClass();
         if ($controller_name == 'AdminModules') {
-            $admin_ajax_url = $context->link->getAdminLink($controller_name)
-                . '&configure=' . $dependencies->name .
-                '&tab_module=payments_gateways&module_name=' . $dependencies->name;
+            switch ($dependencies->name) {
+                case 'pspaylater':
+                    $admin_ajax_url = $context->link->getAdminLink('AdminPsPayLater');
+                    break;
+                case 'payplug':
+                    $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
+                    break;
+            }
         } elseif ($controller_name == 'AdminOrders') {
             $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
@@ -196,6 +200,15 @@ class AdminClass
             $this->dependencies->configClass->checkOnboarding();
         }
 
+        if (Tools::isSubmit('checkState')) {
+            $content = $this->dependencies->configClass->checkState();
+            if ($content) {
+                die(json_encode(['content' => $content]));
+            } else {
+                die(json_encode(['content' => false]));
+            }
+        }
+
         if (Tools::getValue('submitPwd')) {
             $password = Tools::getValue('password');
             if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
@@ -257,6 +270,7 @@ class AdminClass
                 'payplug_one_click' => $permissions['can_save_cards'],
                 'payplug_oney' => $permissions['can_use_oney'],
                 'payplug_bancontact' => $permissions['can_use_bancontact'],
+                'payplug_applepay' => $permissions['can_use_applepay'],
                 'payplug_inst' => $permissions['can_create_installment_plan'],
                 'payplug_deferred' => $permissions['can_create_deferred_payment'],
             ];
@@ -282,7 +296,9 @@ class AdminClass
 
         if ((int) Tools::getValue('update') == 1) {
             $pay_id = Tools::getValue('pay_id');
-            $payment = $this->dependencies->paymentClass->retrievePayment($pay_id);
+            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            $payment = $payment['resource'];
+
             $id_order = Tools::getValue('id_order');
 
             if ((int) $payment->is_paid == 1) {

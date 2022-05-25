@@ -16,11 +16,11 @@
   overflow: hidden;
   background: #colorMap[white];
 
-  @media (@mobile) {
+  @media (@screen-mobile) {
     padding: 24px;
   }
 
-  ._title {
+  > ._title {
     @size: 20;
     .Inter(~"@{size}px", 700);
     letter-spacing: calc(-0.33em / ~"@{size}");
@@ -37,7 +37,7 @@
       display: block;
       width: 40px;
       height: 5px;
-      background: #colorMap[fontMainDefault];
+      background: @color-border-title;
     }
   }
 
@@ -45,7 +45,7 @@
     margin: 0 0 24px;
   }
 
-  ._content {
+  > ._content {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -62,7 +62,7 @@
       height: 100%;
       @bg: #colorMap[white];
       background: fade(@bg, 70%);
-      z-index: 1;
+      z-index: 99;
       border-radius: inherit;
     }
   }

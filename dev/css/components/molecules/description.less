@@ -1,44 +1,54 @@
-@{moduleClassName}Configuration .descriptionBlock {
-  background: #colorMap[darkBlue];
-  padding: 64px;
-  box-sizing: border-box;
+.__moduleName__Configuration {
+  .descriptionBlock {
+    background: @color-secondary;
+    padding: 64px;
+    box-sizing: border-box;
 
-  ._header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 0 40px;
+    ._header {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 0 40px;
 
-    ._logo {
-      svg {
-        display: block;
+      ._logo {
+        svg {
+          display: block;
+        }
+      }
+
+      ._version {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        height: 36px;
+
+        > p {
+          color: #colorMap[white];
+          opacity: 0.8;
+          margin: 0 36px 0 0;
+        }
+      }
+
+      ._show {
+        width: 155px;
       }
     }
 
-    ._version {
-      margin-top: 12px;
+    ._descriptionTitle {
+      @size: 20;
+      color: #colorMap[white];
+      .Inter(~"@{size}px", 700);
+      letter-spacing: calc(-0.33em / ~"@{size}");
+      line-height: 30px;
+      display: flex;
+      align-items: center;
+      letter-spacing: -0.33px;
+      margin: 0 0 16px;
     }
 
-    ._descriptionVersion {
+    ._descriptionText {
       color: #colorMap[white];
       opacity: 0.8;
+      margin: 0px;
     }
-  }
-
-  ._descriptionTitle {
-    @size: 20;
-    color: #colorMap[white];
-    .Inter(~"@{size}px", 700);
-    letter-spacing: calc(-0.33em / ~"@{size}");
-    line-height: 30px;
-    display: flex;
-    align-items: center;
-    letter-spacing: -0.33px;
-    margin: 0 0 16px;
-  }
-
-  ._descriptionText {
-    color: #colorMap[white];
-    opacity: 0.8;
-    margin: 0px;
   }
 }

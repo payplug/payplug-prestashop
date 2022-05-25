@@ -21,7 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
+require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
+
+use PayPlugModule\classes\DependenciesClass;
 
 class AdminPayplugController extends ModuleAdminController
 {
@@ -29,90 +31,31 @@ class AdminPayplugController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->bootstrap = true;
+
+        parent::__construct();
+
+        $this->dependencies = new DependenciesClass();
     }
 
-    public function initProcess()
+    /**
+     * Initialize the content by adding Boostrap and loading the TPL
+     *
+     * @return void
+     */
+    public function initContent()
     {
-        parent::initProcess();
-        if ($this->display == null) {
-            $this->display = 'edit';
-        }
-    }
-
-    public function getContent()
-    {
-        if (Tools::getValue('_ajax') == 1) {
+        if (Tools::getValue('_ajax')) {
             $this->dependencies->adminClass->adminAjaxController();
         }
 
-        $this->postProcess();
-
-        if (Tools::getValue('uninstall_config') == 1) {
-            return $this->dependencies->configClass->getUninstallContent();
-        }
-
-        $this->html = '';
-
-        $this->dependencies->configClass->checkConfiguration();
-
-        $payplug_email = Configuration::get(
-            $this->dependencies->getConfigurationKey('email')
-        );
-        $payplug_test_api_key = Configuration::get(
-            $this->dependencies->getConfigurationKey('testApiKey')
-        );
-        $payplug_live_api_key = Configuration::get(
-            $this->dependencies->getConfigurationKey('liveApiKey')
-        );
-
-        if (!empty($payplug_email) && (!empty($payplug_test_api_key) || !empty($payplug_live_api_key))) {
-            $connected = true;
-        } else {
-            $connected = false;
-        }
-
-        if (count($this->dependencies->configClass->validationErrors && !$connected)) {
-            $this->context->smarty->assign([
-                'validationErrors' => $this->dependencies->configClass->validationErrors,
-            ]);
-        }
-
-        $p_error = '';
-        if (!$connected) {
-            if (isset($this->dependencies->configClass->validationErrors['username_password'])) {
-                $p_error .= $this->dependencies->configClass->validationErrors['username_password'];
-            } elseif (isset($this->dependencies->configClass->validationErrors['login'])) {
-                if (isset($this->dependencies->configClass->validationErrors['username_password'])) {
-                    $p_error .= ' ';
-                }
-                $p_error .= $this->dependencies->configClass->validationErrors['login'];
-            }
-            $this->context->smarty->assign([
-                'p_error' => $p_error,
-            ]);
-        } else {
-            $this->context->smarty->assign([
-                'payplug_email' => $payplug_email,
-            ]);
-        }
-
-        $this->context->controller->addJS(
-            __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/js/admin.js'
-        );
-        $this->context->controller->addCSS(
-            __PS_BASE_URI__.'modules/' . $this->dependencies->name . '/views/css/admin-v'.$this->dependencies->version.'.css'
-        );
-
+        $this->dependencies->configClass->postProcess();
         $this->dependencies->configClass->assignContentVar();
 
-        $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
+        $this->context->smarty->assign([
+            'module_name' => $this->dependencies->name
+        ]);
 
-        return $this->html;
-    }
-
-    public function renderForm()
-    {
-        return $this->getContent();
+        $this->setTemplate('admin.tpl');
     }
 }

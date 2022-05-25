@@ -22,8 +22,10 @@
 
 <div class="{$module_name|escape:'htmlall':'UTF-8'}Configuration">
     <div class="{$module_name|escape:'htmlall':'UTF-8'}">
-        {* Banner *}
-        {include file='./../api/molecules/banner.tpl'}
+        {if 'pspaylater' == $module_name}
+            {* Banner *}
+            {include file='./../api/molecules/banner.tpl'}
+        {/if}
 
         {if isset($ps_account_isActivated) && $ps_account_isActivated}
             {include file='./panel/ps_account.tpl'}
@@ -33,15 +35,19 @@
         {include file='./../api/molecules/description.tpl'}
 
         {* Alert banner *}
-        {if $connected && !$verified || $connected && !$onboardingOneyCompleted}
-            {include file='./../api/molecules/alert.tpl'}
-        {/if}
+        {include file='./panel/alerts/onboardingalerts.tpl'}
 
-        {* Configuration saving button *}
+        {* Général block *}
         {include file='./../api/molecules/general.tpl'}
 
-        {* paylater block*}
+        {* Payment method block *}
+        {include file='./../api/molecules/paymentMethod.tpl'}
+
+        {* Paylater block*}
         {include file='./../api/molecules/paylater.tpl'}
+
+        {* etat block *}
+        {include file='./../api/molecules/state.tpl'}
 
         {include file='./panel/settings.tpl'}
     </div>

@@ -1,12 +1,12 @@
 class Configuration {
     props = {
-        'container': module_name + 'Configuration',
+        'container': '__moduleName__Configuration',
         'query': null,
         'data': {}
     };
 
     initialize() {
-        this.handleEvents();
+        configuration.handleEvents();
     }
 
     handleEvents() {
@@ -67,6 +67,9 @@ class Configuration {
         const $container = $('.' + configuration.props.container);
         $container.find('input[name=modalTriggered]').prop('checked', false);
     }
+    closeAlert() {
+        $('.payplugUIAlert').filter('.-error').remove();
+    }
 
     showError() {
         const $container = $('.' + configuration.props.container);
@@ -122,6 +125,8 @@ class Configuration {
         event.preventDefault();
         event.stopPropagation();
 
+        configuration.closeAlert();
+
         const currentConfiguration = configuration.get();
 
         if($.isEmptyObject(currentConfiguration)) {
@@ -174,4 +179,4 @@ class Configuration {
 }
 
 const configuration = new Configuration();
-configuration.initialize();
+$(document).ready(configuration.initialize);

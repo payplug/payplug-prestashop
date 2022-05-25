@@ -45,6 +45,11 @@ class DependenciesClass
             'defaultValue' => 0,
             'setConf' => 1
         ],
+        'applepay' => [
+            'name' => 'APPLEPAY',
+            'defaultValue' => null,
+            'setConf' => 1
+        ],
         'bancontact' => [
             'name' => 'BANCONTACT',
             'defaultValue' => null,
@@ -327,10 +332,12 @@ class DependenciesClass
         $this->amountCurrencyClass = $this->getPlugin()->getAmountCurrencyClass();
 
         $this->apiClass = new ApiClass($this);
+        $this->applePayClass = new ApplePayClass($this);
         $this->adminClass = new AdminClass($this);
         $this->cardClass = new CardClass($this);
         $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);
+        $this->installmentClass = new InstallmentClass($this);
         $this->hookClass = new HookClass($this);
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass($this);
@@ -377,8 +384,12 @@ class DependenciesClass
      * @param string $key
      * @return string
      */
-    public function getConfigurationKey($key)
+    public function getConfigurationKey($key = false)
     {
+        if (!isset($this->configurationKeys[$key]) || !$key || !is_string($key)) {
+            return false;
+        }
+
         return $this->concatenateModuleNameTo($this->configurationKeys[$key]['name']);
     }
 

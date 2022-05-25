@@ -32,11 +32,11 @@ for file in $distFile
     fi
   done
 
-echo -n "Copy var.less "
+echo -n "Copy include.less "
   if [ -d "$modules" ]; then
-    cp -v $path/var.less $PWD/${modules}/dev/css/less/var.less
+    cp -v $path/include.less $PWD/${modules}/dev/css/less/include.less
   else
-    cp -v $path/var.less $PWD/dev/css/less/var.less
+    cp -v $path/include.less $PWD/dev/css/less/include.less
   fi
 
 

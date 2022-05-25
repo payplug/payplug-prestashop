@@ -6,12 +6,12 @@
   justify-content: center;
   align-items: flex-start;
 
-  .border(#colorMap[border]);
+  .border(#colorMap[borderMain]);
   position: relative;
   width: 100%;
   border-radius: 4px;
 
-  input {
+  > input {
     display: none;
 
     &:checked {
@@ -27,13 +27,13 @@
     }
   }
 
-  label {
+  > label {
     position: relative;
     display: block;
     width: 100%;
     padding: 30px 72px 30px 24px;
     margin: 0;
-    color: #colorMap[purple];
+    color: @color-primary;
 
     cursor: pointer;
 
@@ -50,8 +50,11 @@
       height: 8px;
 
       content: "";
-      background-size: 100%;
-      background-image: url(~"@{img_icons}keyboard_arrow_down_24px.svg");
+      -webkit-mask-image: url(~"@{img-icons}arrow_down.svg");
+      mask-image: url(~"@{img-icons}arrow_down.svg");
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      background-color: #colorMap[fontSecondaryDefault];
     }
   }
 
@@ -61,6 +64,7 @@
       max-height: 0;
       overflow: hidden;
       transition: all .35s;
+      max-width: 100%;
     }
 
     padding: 0 0 30px;

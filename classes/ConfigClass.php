@@ -31,12 +31,7 @@ use libphonenumberlight;
 use Media;
 use Module;
 use PayPlugModule\backward\PayPlugBackward;
-use Payplug\Exception\BadRequestException;
-use Payplug\Exception\ConfigurationException;
-use Payplug\Exception\ConfigurationNotSetException;
 use PayPlugModule\src\repositories\LoggerRepository;
-use PayPlugModule\src\specific\ConstantSpecific;
-use PayPlugModule\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
@@ -375,6 +370,7 @@ class ConfigClass
             'deferred' => (int)Configuration::get($this->dependencies->getConfigurationKey('deferred')) === 1,
             'oney' => (int)Configuration::get($this->dependencies->getConfigurationKey('oney')) === 1,
             'bancontact' => (int)Configuration::get($this->dependencies->getConfigurationKey('bancontact')) === 1,
+            'applepay' => (int)Configuration::get($this->dependencies->getConfigurationKey('applepay')) === 1,
         ];
 
         if (Configuration::get($this->dependencies->getConfigurationKey('email')) === null
@@ -389,6 +385,7 @@ class ConfigClass
             $available_options['deferred'] = false;
             $available_options['oney'] = false;
             $available_options['bancontact'] = false;
+            $available_options['applepay'] = false;
         } else {
             if (!$permissions['use_live_mode']
                 || Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')) === null
@@ -410,6 +407,9 @@ class ConfigClass
             if (!$permissions['can_use_bancontact']) {
                 $available_options['bancontact'] = false;
             }
+            /*if (!$permissions['can_use_applepay']) {
+                $available_options['applepay'] = false;
+            }*/
         }
 
         return $available_options;
@@ -431,6 +431,7 @@ class ConfigClass
 
     /**
      * Check various configurations
+     * @todo remove this function which is not used anymore in new BO
      *
      * @return string
      */
@@ -484,44 +485,51 @@ class ConfigClass
             $is_payplug_configured = false;
         }
 
-        $this->check_configuration = ['warning' => [], 'error' => [], 'success' => []];
+        $this->check_configuration = ['status' => []];
 
-        $curl_warning = $this->dependencies->l('payplug.checkConfiguration.curlExtension', 'configclass');
         if ($report['curl']['installed']) {
-            $this->check_configuration['success'][] .= $curl_warning;
+            $this->check_configuration['status']['curl'] = 'check';
         } else {
-            $this->check_configuration['error'][] .= $curl_warning;
+            $this->check_configuration['status']['curl'] = 'close';
         }
 
-        $php_warning = $this->dependencies->l('payplug.checkConfiguration.phpVersion', 'configclass');
         if ($report['php']['up2date']) {
-            $this->check_configuration['success'][] .= $php_warning;
+            $this->check_configuration['status']['php'] = 'check';
         } else {
-            $this->check_configuration['error'][] .= $php_warning;
+            $this->check_configuration['status']['php'] = 'close';
         }
 
-        $openssl_warning = $this->dependencies->l('payplug.checkConfiguration.openssl', 'configclass');
         if ($report['openssl']['installed'] && $report['openssl']['up2date']) {
-            $this->check_configuration['success'][] .= $openssl_warning;
+            $this->check_configuration['status']['ssl'] = 'check';
         } else {
-            $this->check_configuration['error'][] .= $openssl_warning;
+            $this->check_configuration['status']['ssl'] = 'close';
         }
 
-        $connexion_warning = $this->dependencies->l('payplug.checkConfiguration.payplugAccount', 'configclass');
-        if ($is_payplug_connected) {
-            $this->check_configuration['success'][] .= $connexion_warning;
-        } else {
-            $this->check_configuration['error'][] .= $connexion_warning;
-        }
-
-        $check_warning = $this->dependencies->l('payplug.checkConfiguration.issue', 'configclass');
         if ($is_payplug_configured) {
         } else {
             Configuration::get($this->dependencies->getConfigurationKey('show'), 0);
-            $this->check_configuration['warning'][] .= $check_warning;
+            $this->check_configuration['status']['check'] = 'check';
         }
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkState()
+    {
+        $report = self::checkRequirements();
+
+        if ($report['curl']['installed'] &&
+            $report['php']['up2date'] &&
+            $report['openssl']['installed'] &&
+            $report['openssl']['up2date']
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -603,7 +611,6 @@ class ConfigClass
     {
         $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
-
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
             $this->dependencies->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
@@ -620,7 +627,8 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
             $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
             $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
-            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact'
+            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact',
+            $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay'
         ];
 
         foreach ($configurationKeys as $key => $config) {
@@ -731,7 +739,8 @@ class ConfigClass
             'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
             'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
             'oney_optimized' => Configuration::get($this->dependencies->getConfigurationKey('oneyOptimized')),
-            'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact'))
+            'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact')),
+            'applepay' => Configuration::get($this->dependencies->getConfigurationKey('applepay'))
         ];
 
         $connected = !empty($configurations['email'])
@@ -743,12 +752,6 @@ class ConfigClass
             $connected = false;
         }
 
-        $onboardingOneyCompleted = false;
-        $livepermissions = $this->getLivePermissions();
-        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
-            $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
-        }
-
         if (count($this->validationErrors) && !$connected) {
             $this->context->smarty->assign([
                 'validationErrors' => $this->validationErrors,
@@ -758,14 +761,9 @@ class ConfigClass
         $api_class = $this->dependencies->apiClass;
         $valid_key = $api_class->setAPIKey();
         if (!empty($valid_key)) {
-            try {
-                $permissions = $this->dependencies->apiClass->getAccount($valid_key);
-            } catch (ConfigurationNotSetException $e) {
-//                @todo Add Log
-                die('ConfigurationNotSetException'.$e->getMessage());
-            } catch (ConfigurationException $e) {
-//                @todo Add Log
-                die('ConfigurationException'.$e->getMessage());
+            $permissions = $this->dependencies->apiClass->getAccount($valid_key);
+            if (!$permissions) {
+                die('An error occured while getting account');
             }
             $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
         } else {
@@ -886,6 +884,7 @@ class ConfigClass
             'deferred_state' => $configurations['deferred_state'],
             'oney' => $configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
+            'applepay' => $this->isValidFeature('feature_applepay'),
             'integrated' => $this->isValidFeature('feature_integrated'),
             'display_mode_isActivated' => $this->isValidFeature('feature_display_mode'),
             'standard_isActivated' => $this->isValidFeature('feature_standard'),
@@ -901,7 +900,9 @@ class ConfigClass
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
-            'onboardingOneyCompleted' => $onboardingOneyCompleted,
+            'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
+            'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods(),
+            'onBoardingCheck' => false
         ]);
 
         return $this->html;
@@ -914,16 +915,24 @@ class ConfigClass
     public function getLivePermissions()
     {
         $live_api_key = Configuration::get($this->dependencies->getConfigurationKey('liveApiKey'));
-        $livepermissions = [];
-        try {
-            $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
-        } catch (ConfigurationNotSetException $e) {
-//                @todo Add Log
-        } catch (ConfigurationException $e) {
-//                @todo Add Log
-        }
-        return $livepermissions;
+        $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
+        return $livepermissions ? $livepermissions : [];
     }
+
+    /**
+     * Is onboarding OneyCompleted
+     * @return bool
+     */
+    public function isOnboardingOneyCompleted()
+    {
+        $onboardingOneyCompleted = false;
+        $livepermissions = $this->getLivePermissions();
+        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
+            $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
+        }
+        return $onboardingOneyCompleted;
+    }
+
 
     /**
      * Get FAQ link for given iso lang
@@ -1029,6 +1038,14 @@ class ConfigClass
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
+            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+        ];
+
+        $switch['applepay'] = [
+            'name' => 'payplug_applepay',
+            'active' => $connected,
+            'checked' => $configurations['applepay'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
@@ -1355,7 +1372,6 @@ class ConfigClass
 
     /**
      * @description Process account submit
-     * @throws BadRequestException
      */
     public function submitAccount()
     {
@@ -1409,7 +1425,6 @@ class ConfigClass
 
     /**
      * @description Process password submit to access Live mode
-     * @throws BadRequestException
      */
     public function submitSandbox()
     {
@@ -1435,19 +1450,16 @@ class ConfigClass
             ]));
         } elseif ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
-                $onboardingOneyCompleted = false;
-                $livepermissions = $this->getLivePermissions();
-                if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
-                    $onboardingOneyCompleted = (bool)$livepermissions['onboardingOneyCompleted'];
+                if ($this->isOnboardingOneyCompleted()) {
+                    Configuration::updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
                 }
-
+                $this->assignContentVar();
                 $this->context->smarty->assign([
-                    'isOnboardedCompleted' => $onboardingOneyCompleted
+                    'onBoardingCheck' => true
                 ]);
-                die(json_encode([
-                    'content' => false,
-                    'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/sandbox.tpl'),
-                ]));
+                $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
+                // On recharge l'admin avec le message de réussite ou d'erreur dans smarty
+                die(json_encode(['content' => $content]));
             } else {
                 $errorMessage = $this->dependencies->l('payplug.submitSandbox.passwordError', 'configclass');
                 $this->context->smarty->assign([
@@ -1465,7 +1477,6 @@ class ConfigClass
 
     /**
      * @description Process check onBoarding is finished
-     * @throws BadRequestException
      */
     public function checkOnboarding()
     {

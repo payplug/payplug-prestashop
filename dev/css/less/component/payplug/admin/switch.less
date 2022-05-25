@@ -1,5 +1,5 @@
 /* Payplug Admin Switch */
-@{moduleClassName}Switch {
+.__moduleName__Switch {
   .borderRadius(.25em);
   .boxShadow(rgba(0, 0, 0, .15) 0 1px 4px 1px inset);
   background: rgba(0, 0, 0, .1);
@@ -55,7 +55,7 @@
   }
 
   &.-right {
-    @{moduleClassName}Switch_label {
+    .__moduleName__Switch_label {
       &.-left {
         color: inherit;
       }
@@ -134,9 +134,10 @@
 
     input:checked + label {
       transition: background 300ms linear;
-      background: #00ab7a;
+      background: #colorMap[module];
       border-radius: 0.25em;
-      border: 1px solid #00ab7a;
+      border: 1px solid;
+      border-color: #colorMap[module];
     }
 
     &_label {
@@ -176,7 +177,7 @@
     }
 
     &.-center {
-      @{moduleClassName}Switch_label {
+      .__moduleName__Switch_label {
         &.-left, &.-right {
           color: inherit;
         }
@@ -192,7 +193,7 @@
     }
 
     &.-right {
-      @{moduleClassName}Switch_label {
+      .__moduleName__Switch_label {
         &.-left,
         &.-center {
           color: inherit;

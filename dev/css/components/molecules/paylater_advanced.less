@@ -1,0 +1,82 @@
+.__moduleName__Configuration {
+  ._paylaterAdvanced {
+    margin: 36px 0 0;
+
+    &Option {
+      padding: 12px 0;
+      display: flex;
+
+      ._img {
+        width: 200px;
+
+        @media (@screen-mobile) {
+          display: none;
+        }
+      }
+      ._wrapper {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        width: calc(100% - 200px);
+        padding: 0 0 0 40px;
+
+        @media (@screen-mobile) {
+          padding: 0;
+          width: 100%;
+        }
+      }
+      ._content {
+        display: flex;
+      }
+
+      &.-thresholds {
+        ._content {
+          flex-direction: column;
+        }
+        ._inputs {
+          display: flex;
+          align-items: center;
+          p {
+            margin: 0 16px;
+          }
+        }
+        ._statement {
+          padding: 2px 0 0;
+          width: 100%;
+          display: flex;
+          color: #colorMap[accentuationWarning500];
+          font-size: 14px;
+
+          .thresholdErrorIcon {
+            display: none;
+            margin-right: 5.67px;
+
+            svg {
+              fill: #colorMap[accentuationWarning500];
+              width: 20px;
+              height: 20px;
+            }
+          }
+
+          &.-right {
+            padding: 2px 0 0 195px;
+          }
+        }
+        .payplugUIInput {
+          width: 150px;
+          max-width: 45%;
+          margin: 0;
+        }
+      }
+      &.-optimized {
+        ._content {
+          justify-content: space-between;
+
+          p {
+            max-width: calc(100% - 145px);
+          }
+        }
+      }
+    }
+  }
+}

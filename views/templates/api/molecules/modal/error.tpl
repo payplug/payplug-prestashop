@@ -21,7 +21,7 @@
 *}
 
 {capture assign="modalContent"}
-    <p>{$errorMessage}</p>
+    <p>{$errorMessage|escape:'htmlall':'UTF-8'}</p>
     {capture assign="popinErrorSubmit"}{l s='popin.error.submit' mod='payplug'}{/capture}
     {include file='./../../atoms/button/button.tpl'
         buttonData='closePopin'

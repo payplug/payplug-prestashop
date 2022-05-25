@@ -23,14 +23,26 @@
 
 namespace PayPlugModule\classes;
 
-use Authentication;
 use Configuration;
+use Exception;
+
+use Payplug\Authentication;
+use Payplug\Card;
+use Payplug\Core\APIRoutes;
 use Payplug\Core\HttpClient;
-use Payplug;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
+use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\NotFoundException;
+use Payplug\Exception\UndefinedAttributeException;
+use Payplug\InstallmentPlan;
+use Payplug\OneySimulation;
+use Payplug\Payment;
+use Payplug\Payplug;
+use Payplug\Refund;
+
 use PayPlugModule\src\exceptions\BadParameterException;
-use PayPlugModule\src\repositories\PluginRepository;
+
 use Symfony\Component\Dotenv\Dotenv;
 use Tools;
 
@@ -41,6 +53,9 @@ class ApiClass
 
     /** @var string */
     public $current_api_key;
+
+    /** var Configuration */
+    public $config;
 
     /** var DependenciesClass */
     public $dependencies;
@@ -58,13 +73,12 @@ class ApiClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->checkEnvironment();
-        $this->setEnvironment();
-        $this->setSecretKey();
-        $this->current_api_key = $this->getCurrentApiKey();
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
-        $this->setUserAgent();
+        $this->checkEnvironment();
+        $this->setEnvironment();
+        $this->current_api_key = $this->getCurrentApiKey();
     }
 
     /**
@@ -86,7 +100,7 @@ class ApiClass
             }
         }
         if (isset($_ENV['API_BASE_URL'])) {
-            \Payplug\Core\APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
+            APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
     }
 
@@ -116,7 +130,15 @@ class ApiClass
     public function getAccount($api_key, $sandbox = true)
     {
         $this->setSecretKey($api_key);
-        $response = \Payplug\Authentication::getAccount();
+
+        try {
+            $response = Authentication::getAccount();
+        } catch (ConfigurationNotSetException $e) {
+            return false;
+        } catch (ConfigurationException $e) {
+            return false;
+        }
+
         $json_answer = $response['httpResponse'];
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
@@ -137,14 +159,16 @@ class ApiClass
                 'result' => false,
                 ];
         }
-        $sandbox = Configuration::get(
+        $sandbox = $this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $flag = true;
 
+        $this->setSecretKey();
+
         // Set the publishable for the given sandbox configuration
         try {
-            $response = \Payplug\Authentication::getPublishableKeys();
+            $response = Authentication::getPublishableKeys();
             $publishable_key = isset($response['httpResponse']['publishable_key'])
             && $response['httpResponse']['publishable_key']
                 ? $response['httpResponse']['publishable_key']
@@ -186,18 +210,18 @@ class ApiClass
         }
 
         if ($sandbox) {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('liveApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
             ));
         } else {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('testApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('testApiKey')
             ));
         }
 
         // Set the publishable for the other sandbox configuration
         try {
-            $response = \Payplug\Authentication::getPublishableKeys();
+            $response = Authentication::getPublishableKeys();
             $publishable_key = isset($response['httpResponse']['publishable_key'])
                 && $response['httpResponse']['publishable_key']
                     ? $response['httpResponse']['publishable_key']
@@ -239,12 +263,12 @@ class ApiClass
         }
 
         if (!$sandbox) {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('liveApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('liveApiKey')
             ));
         } else {
-            $this->setSecretKey(Configuration::get(
-                $this->dependencies->getConfigurationKey('testApikey')
+            $this->setSecretKey($this->config->get(
+                $this->dependencies->getConfigurationKey('testApiKey')
             ));
         }
 
@@ -272,22 +296,22 @@ class ApiClass
         $id = $json_answer['id'];
 
         $configuration = [
-            'currencies' => Configuration::get(
+            'currencies' => $this->config->get(
                 $this->dependencies->getConfigurationKey('currencies')
             ),
-            'min_amounts' => Configuration::get(
+            'min_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('minAmounts')
             ),
-            'max_amounts' => Configuration::get(
+            'max_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('maxAmounts')
             ),
-            'oney_allowed_countries' => Configuration::get(
+            'oney_allowed_countries' => $this->config->get(
                 $this->dependencies->getConfigurationKey('oneyAllowedCountries')
             ),
-            'oney_max_amounts' => Configuration::get(
+            'oney_max_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('oneyMaxAmounts')
             ),
-            'oney_min_amounts' => Configuration::get(
+            'oney_min_amounts' => $this->config->get(
                 $this->dependencies->getConfigurationKey('oneyMinAmounts')
             ),
         ];
@@ -359,9 +383,15 @@ class ApiClass
             $can_use_bancontact = true;
         }
 
+        if (isset($json_answer['payment_methods']['apple_pay']['enabled'])) {
+            $can_use_applepay = $json_answer['payment_methods']['apple_pay']['enabled'];
+        } else {
+            $can_use_applepay = true;
+        }
+
         $onboardingOneyCompleted = false;
         if (isset($json_answer['payment_methods']) && !empty(
-            Configuration::get(
+            $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             )
         )) {
@@ -385,6 +415,7 @@ class ApiClass
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_use_bancontact' => $can_use_bancontact,
+            'can_use_applepay' => $can_use_applepay,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ];
 
@@ -438,14 +469,14 @@ class ApiClass
      */
     public function getCurrentApiKey()
     {
-        if ((int)Configuration::get(
+        if ((int)$this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         ) === 1) {
-            return Configuration::get(
+            return $this->config->get(
                 $this->dependencies->getConfigurationKey('testApiKey')
             );
         } else {
-            return Configuration::get(
+            return $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             );
         }
@@ -458,16 +489,16 @@ class ApiClass
      */
     public function setAPIKey()
     {
-        $sandbox_mode = (int)Configuration::get(
+        $sandbox_mode = (int)$this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $valid_key = null;
         if ($sandbox_mode) {
-            $valid_key = Configuration::get(
+            $valid_key = $this->config->get(
                 $this->dependencies->getConfigurationKey('testApiKey')
             );
         } else {
-            $valid_key = Configuration::get(
+            $valid_key = $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             );
         }
@@ -509,7 +540,7 @@ class ApiClass
             $api_keys['live_key']
         );
 
-        $is_sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $is_sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
         if ($is_sandbox) {
             $this->setSecretKey($api_keys['test_key']);
         } else {
@@ -563,8 +594,8 @@ class ApiClass
     /**
      * @description Set the current secret key used to interact with PayPlug API
      *
-     * @param bool $token
-     * @return Payplug\Payplug
+     * @param false $token
+     * @return false|Payplug
      * @throws ConfigurationException
      */
     public function setSecretKey($token = false)
@@ -577,9 +608,11 @@ class ApiClass
             return false;
         }
 
-        return \Payplug\Payplug::init([
+        $this->setUserAgent();
+
+        return Payplug::init([
             'secretKey' => $token,
-            'apiVersion' => '2019-08-06'
+            'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
         ]);
     }
 
@@ -605,20 +638,10 @@ class ApiClass
             $payplug_key = $this->current_api_key;
         } else {
             $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
-            $payplug_key = Configuration::get($this->dependencies->concatenateModuleNameTo($configuration_key));
+            $payplug_key = $this->config->get($this->dependencies->concatenateModuleNameTo($configuration_key));
         }
 
-        try {
-            \Payplug\Payplug::init([
-                'secretKey' => $payplug_key,
-                'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
-            ]);
-
-            return $payplug_key;
-        } catch (Exception $e) {
-            // todo: return error log
-            return false;
-        }
+        return $this->setSecretKey($payplug_key);
     }
 
     /**
@@ -672,7 +695,7 @@ class ApiClass
      */
     public function hasLiveKey()
     {
-        return (bool)Configuration::get(
+        return (bool)$this->config->get(
             $this->dependencies->getConfigurationKey('liveApiKey')
         );
     }
@@ -688,7 +711,8 @@ class ApiClass
     public function login($email, $password)
     {
         try {
-            $response = \Payplug\Authentication::getKeysByLogin($email, $password);
+            $this->setUserAgent();
+            $response = Authentication::getKeysByLogin($email, $password);
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
@@ -731,5 +755,460 @@ class ApiClass
     public function getPortalUrl()
     {
         return $this->portal_url;
+    }
+
+    /**
+     * @description Abort InstallmentPlan from api for given id
+     *
+     * @param false $inst_id
+     * @return array
+     *
+     */
+    public function abortInstallment($inst_id = false)
+    {
+        if (!$inst_id || !is_string($inst_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $inst_id given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $this->setUserAgent();
+            $response = [
+                'result' => true,
+                'resource' => InstallmentPlan::abort($inst_id, $api),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create InstallmentPlan from api for given attributes
+     *
+     * @param array $atttributes
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function createInstallment($atttributes = [])
+    {
+        if (!$atttributes || !is_array($atttributes)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $atttributes given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => InstallmentPlan::create($atttributes, $api)
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Retrieve InstallmentPlan from api for given id
+     *
+     * @param $inst_id
+     * @return array
+     *
+     */
+    public function retrieveInstallment($inst_id = false)
+    {
+        if (!$inst_id || !is_string($inst_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $inst_id given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => InstallmentPlan::retrieve($inst_id, $api)
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (NotFoundException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (UndefinedAttributeException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Abort Payment from api for given id
+     *
+     * @param false $pay_id
+     * @return array
+     * @throws Exception
+     */
+    public function abortPayment($pay_id = false)
+    {
+        if (!$pay_id|| !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'result' => true,
+                'resource' => Payment::abort($pay_id, $api),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Capture Payment from api for given id
+     *
+     * @param $pay_id
+     * @return array
+     */
+    public function capturePayment($pay_id = false)
+    {
+        if (!$pay_id|| !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'result' => true,
+                'resource' =>  Payment::capture($pay_id, $api),
+                'code' => 200
+            ];
+        } catch (NotAllowedException $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        } catch (ForbiddenException $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create Payment from api for given attributes
+     *
+     * @param array $atttributes
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function createPayment($atttributes = [])
+    {
+        if (!$atttributes || !is_array($atttributes)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $atttributes given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => Payment::create($atttributes, $api)
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create Payment from api for given data
+     *
+     * @param false $pay_id
+     * @param array $data
+     * @return array
+     */
+    public function patchPayment($pay_id = false, $data = [])
+    {
+        if (!$pay_id || !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given'
+            ];
+        }
+
+        $retrieve = $this->retrievePayment($pay_id);
+        if (!$retrieve['result']) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Can\'t patch the payment: ' . $retrieve['message']
+            ];
+        }
+
+        $payment = $retrieve['resource'];
+
+        try {
+            $response = [
+                'result' => true,
+                'resource' => $payment->update($data),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Refund Payment from api
+     *
+     * @param false $pay_id
+     * @param array $data
+     * @return array
+     * @throws ConfigurationNotSetException
+     */
+    public function refundPayment($pay_id = false, $data = [])
+    {
+        if (!$pay_id || !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'result' => true,
+                'resource' => Refund::create($pay_id, $data, $api),
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Retrieve Payment from api for given id and mode
+     *
+     * @param $pay_id false
+     * @param $mode false
+     * @return array
+     */
+    public function retrievePayment($pay_id = false, $mode = false)
+    {
+        if (!$pay_id || !is_string($pay_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $pay_id given'
+            ];
+        }
+
+        try {
+            if (!$mode) {
+                $api = $this->setSecretKey();
+            } else {
+                $api =  $this->setSecretKey(
+                    $this->config->get(
+                        $this->dependencies->getConfigurationKey($mode.'ApiKey')
+                    )
+                );
+            }
+
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => Payment::retrieve($pay_id, $api)
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (NotFoundException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        } catch (UndefinedAttributeException $e) {
+            $response = [
+                'code' => (int)$e->getCode(),
+                'result' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Delete Card from api for given id
+     *
+     * @param false $card_id
+     * @return array
+     */
+    public function deleteCard($card_id = false)
+    {
+        if (!$card_id || !is_string($card_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $card_id given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'code' => 200,
+                'result' => true,
+                'resource' => Card::delete($card_id, $api)
+            ];
+        } catch (ConfigurationNotSetException $e) {
+            $response = [
+                'code' => $e->getCode(),
+                'result' => true,
+                'message' => $e->getMessage()
+            ];
+        } catch (NotFoundException $e) {
+            $response = [
+                'code' => $e->getCode(),
+                'result' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
+    }
+
+    public function getOneySimulations($data = [])
+    {
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given'
+            ];
+        }
+
+        try {
+            $api = $this->setSecretKey();
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'resource' => OneySimulation::getSimulations($data, $api)
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int)$e->getCode(),
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $response;
     }
 }

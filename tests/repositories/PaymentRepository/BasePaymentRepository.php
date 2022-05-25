@@ -33,14 +33,14 @@ use PayPlugModule\tests\repositories\RepositoryBase;
 
 class BasePaymentRepository extends RepositoryBase
 {
-    protected $payment;
+    protected $paymentEntity;
     protected $paymentApi;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->payment = $this->payment ? $this->payment : new PaymentEntity();
+        $this->paymentEntity = $this->paymentEntity ? $this->paymentEntity : new PaymentEntity();
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->logger->shouldReceive([
@@ -52,7 +52,7 @@ class BasePaymentRepository extends RepositoryBase
             $this->config,
             $this->dependencies,
             $this->logger,
-            $this->payment,
+            $this->paymentEntity,
             $this->query,
             $this->constant
         ])->makePartial();

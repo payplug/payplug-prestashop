@@ -278,12 +278,17 @@ class InstallRepository extends Repository
         }
 
         // Install tab
-        if (!$this->dependencies->loadSpecificPresta()->installTab()) {
+        if (!$this->installTab()) {
             return $this->setInstallError('Install failed: Install Tab');
         }
 
         $this->log->info('Install successful.');
         return true;
+    }
+
+    public function installTab()
+    {
+        return $this->dependencies->loadSpecificPresta()->installTab();
     }
 
     /**
@@ -295,11 +300,6 @@ class InstallRepository extends Repository
         foreach (array_keys($this->dependencies->configurationKeys) as $key) {
             if ($this->dependencies->getConfigurationKeyOption($key, 'setConf')) {
                 if ($key == 'oney' && $this->dependencies->name == 'pspaylater') {
-                    $this->config->updateValue(
-                        $this->dependencies->getConfigurationKey($key),
-                        1
-                    );
-                } elseif ($key == 'oneyOptimized' && $this->dependencies->name == 'pspaylater') {
                     $this->config->updateValue(
                         $this->dependencies->getConfigurationKey($key),
                         1
