@@ -5,6 +5,7 @@
     display: flex;
     align-items: center;
     margin: 16px 0 0;
+    flex-wrap: wrap;
 
     ._logo {
       .border(#colorMap[borderMain]);
@@ -18,7 +19,7 @@
       width: 64px;
 
       padding: 6px;
-      margin: 0 24px;
+      margin: 0 0 0 24px;
 
       img {
         display: block;
@@ -28,11 +29,16 @@
         display: none;
       }
     }
+
     ._text {
+      margin: 0 0 0 24px;
+      max-width: calc(100% - 60px);
+
       ._title {
-        color: @color-primary;
+        color: @color-border-title;
         margin: 0;
       }
+
       p {
         margin: 0;
       }
@@ -42,8 +48,37 @@
       }
     }
 
+    ._informations {
+      display: none;
+      width: 100%;
+      padding: 24px 0 0;
+      
+      &.-show {
+        display: block;
+      }
+    }
+
     & + .paymentOption {
       margin: 42px 0 0;
+    }
+
+    &.-payplug_oney {
+      margin: 0;
+
+      &.-pspaylater {
+        .payplugUISwitch {
+          display: none;
+        }
+
+        ._text {
+          margin: 0;
+          max-width: 100%;
+        }
+
+        ._title {
+          margin: 0 0 8px;
+        }
+      }
     }
 
     @media (@screen-mobile) {

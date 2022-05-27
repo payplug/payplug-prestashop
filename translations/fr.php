@@ -335,7 +335,7 @@ $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'La ca
 $_MODULE['<{payplug}prestashop>order_state_87b9c32cfe0d587a0a635bc846380859'] = 'Attention, le statut de commande [1]%s[/1] n\'est pas configuré pour être interprété par le module PayPlug. Pour que vos paiements associés au module soient parfaitement traités, nous vous conseillons d\'éditer la [2]Configuration avec le module PayPlug[/2] depuis vos paramètres de commande en cliquant [3]ICI[/3].';
 $_MODULE['<{payplug}prestashop>order_state_da2fde2b954058fb173a89c89416e4e4'] = 'Si vous souhaitez avoir plus d\'informations, vous pouvez consultez notre FAQ en cliquant [1]ICI[/1].';
 $_MODULE['<{payplug}prestashop>paylater_0f6ba158a6c94cb2beb80d802f0cc9dc'] = 'Sélectionnez vos préférences de paramétrage du PayLater pour afficher le 3x 4x Oney sur votre boutique.';
-$_MODULE['<{payplug}prestashop>paylater_8034690a81787782c699be7078f5e19d'] = 'Paiements 3x 4x Oney';
+$_MODULE['<{payplug}prestashop>paylater_8034690a81787782c699be7078f5e19d'] = 'Paiements 3x 4x via Oney';
 $_MODULE['<{payplug}prestashop>paylater_851b0aeddc3b21f358b122f0181e51d7'] = 'Sans frais';
 $_MODULE['<{payplug}prestashop>paylater_88faf5140e46519b6202e754c59a3f73'] = 'Avec frais';
 $_MODULE['<{payplug}prestashop>paylater_a89597ac9fa68018f8edf15ca13dee0f'] = 'PayLater';
@@ -347,7 +347,7 @@ $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Proposer le paiement fractionné garanti pour des montants entre';
 $_MODULE['<{payplug}prestashop>paylater_b97ce6e200faff80eda5840137ec3323'] = 'Les frais sont répartis entre vous et vos clients. ';
 $_MODULE['<{payplug}prestashop>paylater_e6e132699f77505baebb35d39d2430a2'] = 'Les frais sont à votre charge.';
-$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l\'ensemble des frais à votre charge. [1]En savoir plus[/1].';
+$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l\'ensemble des frais à votre charge.';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Payer en 3x ou 4x sans frais avec Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Payer en 3x ou 4x par carte bancaire avec Oney';
