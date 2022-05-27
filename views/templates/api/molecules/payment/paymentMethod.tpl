@@ -32,12 +32,11 @@
                 paymentOptionDescription = $payment_method.description
                 paymentOptionLink = $payment_method.link
                 paymentOptionChecked = $payment_method.checked
-                paymentOptionInformations = $payment_method.informations
-        }
+                paymentOptionInformations = $payment_method.informations}
         {/foreach}
     {/capture}
 
-    {include file='./../atoms/block/block.tpl'
+    {include file='./../../atoms/block/block.tpl'
         blockTitle=$paymentMethod_title
         blockDescription=$paymentMethod_description
         blockContent=$paymentMethod_content

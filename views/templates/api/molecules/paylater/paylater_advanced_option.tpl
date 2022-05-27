@@ -26,7 +26,7 @@
     </div>
     <div class="_wrapper">
         {include
-            file='./../atoms/title/title.tpl'
+            file='./../../atoms/title/title.tpl'
             titleClassName='_title'
             titleText=$paylaterAdvancedOptionTitle}
         <div class="_content">
