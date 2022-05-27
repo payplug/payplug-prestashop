@@ -134,6 +134,7 @@ class Payplug extends PaymentModule
     private function getHookList()
     {
         return [
+            'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
             'actionCarrierUpdate',
@@ -161,6 +162,16 @@ class Payplug extends PaymentModule
             'paymentOptions',
             'registerGDPRConsent',
         ];
+    }
+
+    /**
+     * Load asset on the back office
+     */
+    public function hookActionAdminControllerSetMedia()
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->hookClass->actionAdminControllerSetMedia();
+        }
     }
 
     /**

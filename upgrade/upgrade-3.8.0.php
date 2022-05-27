@@ -37,9 +37,5 @@ function upgrade_module_3_8_0($object)
         null
     );
 
-    if (!$object->unregisterHook('actionAdminControllerSetMedia')) {
-        $flag = false;
-    }
-
     return $flag;
 }
