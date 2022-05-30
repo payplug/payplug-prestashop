@@ -138,27 +138,6 @@ class MediaClass
                 $title = $this->dependencies->l('payplug.displayPopin.liveMode', 'mediaclass');
                 break;
             case 'premium':
-            case 'oneyPremium':
-            case 'bancontactPremium':
-                $title = $this->dependencies->l('payplug.displayPopin.enableFeature', 'mediaclass');
-
-                if ($type == 'oneyPremium') {
-                    $link = 'https://portal.payplug.com/#/configuration/oney';
-                } elseif ($type == 'bancontactPremium') {
-                    $link = 'mailto:support@payplug.com';
-                } else {
-                    $link = 'https://www.payplug.com/contact';
-                }
-
-                $this->context->smarty->assign([
-                    'premiumContent' => [
-                        'use' => $type,
-                        'link' => $link
-                    ]
-                ]);
-
-                $type = 'premium';
-                break;
             case 'confirm':
                 $title = $this->dependencies->l('payplug.displayPopin.saveSettings', 'mediaclass');
                 break;
@@ -193,6 +172,7 @@ class MediaClass
             'portal_url' => $this->dependencies->apiClass->getPortalUrl(),
             'inst_id' => $inst_id,
         ]);
+
         $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
 
         die(json_encode(['content' => $this->html]));
