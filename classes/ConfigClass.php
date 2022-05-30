@@ -767,15 +767,14 @@ class ConfigClass
             }
             $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
         } else {
-            $verified = false;
             $premium = false;
         }
         if (!empty($configurations['live_api_key'])) {
-            $verified = true;
+            $permissions = $this->dependencies->apiClass->getAccount($configurations['live_api_key']);
+            $verified = !empty($permissions) ? $permissions['is_live'] : false;
         } else {
             $verified = false;
         }
-
         $is_active = (bool)$configurations['show'];
 
         $this->dependencies->apiClass->getSiteUrl();
