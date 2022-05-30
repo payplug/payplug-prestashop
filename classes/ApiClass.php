@@ -409,6 +409,7 @@ class ApiClass
         }
 
         $permissions = [
+            'is_live' => $json_answer['is_live'],
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],

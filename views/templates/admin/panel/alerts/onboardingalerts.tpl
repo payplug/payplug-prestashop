@@ -20,7 +20,7 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{if $connected && (!$verified || !$onboardingOneyCompleted || $onBoardingCheck) }
+{if $connected && (!$verified || ('pspaylater' == $module_name && !$onboardingOneyCompleted) || $onBoardingCheck) }
     {if isset($onBoardingCheck) && $onBoardingCheck == true}
         {if $onboardingOneyCompleted == true}
             {capture assign="alertOnboardingCompletedTitle"}{l s='alert.onboarding.completed.title' mod='payplug'}{/capture}
@@ -43,7 +43,7 @@
             alertContent=$alertOnboardingCompletedContent}
     {/if}
 
-    {if !$onboardingOneyCompleted}
+    {if !$onboardingOneyCompleted || ('payplug' == $module_name && !$verified)}
 
         {assign "modeTestLink" "<a href='{$faq_links.sandbox|escape:'htmlall':'UTF-8'}' target='_blank' class='alertTestMode'>"}
         {assign "sandboxLiveButton" "<button type='button' name='alertLiveButton' class='alertLiveButton'>"}
