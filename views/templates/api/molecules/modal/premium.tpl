@@ -40,7 +40,7 @@
         {capture assign='premiumText'}
             {l s='admin.popin.premium.activateFeatureBancontact' tags=[$premiumLink] mod='payplug'}
         {/capture}
-    {elseif 'appelpayPremium' == $premiumContent.type}
+    {elseif 'applepayPremium' == $premiumContent.type}
         {capture assign='premiumText'}
             {l s='admin.popin.premium.activateFeatureApplePay' tags=[$premiumLink] mod='payplug'}
         {/capture}
