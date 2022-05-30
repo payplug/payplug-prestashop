@@ -133,6 +133,7 @@ class PaymentMethod {
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const sandBoxValue = parseInt($sandbox.val());
         paymentMethod.toggleBancontact(sandBoxValue);
+        paymentMethod.toggleApplePay(sandBoxValue);
     }
 
     toggleBancontact(hide) {
@@ -142,6 +143,17 @@ class PaymentMethod {
                 $container.find('.-bancontact').hide();
             } else {
                 $container.find('.-bancontact').show();
+            }
+        }
+    }
+
+    toggleApplePay(hide) {
+        const $container = $('.' + paymentMethod.props.container);
+        if ($container.find('.-applepay').length){
+            if (hide) {
+                $container.find('.-applepay').hide();
+            } else {
+                $container.find('.-applepay').show();
             }
         }
     }
