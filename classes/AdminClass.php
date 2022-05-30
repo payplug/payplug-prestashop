@@ -153,6 +153,32 @@ class AdminClass
                     }
                 }
             }
+            if (Tools::getValue('permissionsModal')) {
+                if (Tools::getValue('type') == 'oneyPremium') {
+                    $link = 'https://portal.payplug.com/#/configuration/oney';
+                } elseif (Tools::getValue('type') == 'bancontactPremium' || (Tools::getValue(
+                    'type'
+                ) == 'applepayPremium')) {
+                    $link = 'mailto:support@payplug.com';
+                } else {
+                    $link = 'https://www.payplug.com/contact';
+                }
+                $title = $this->dependencies->l('payplug.adminAjaxController.enableFeature', 'adminclass');
+                $this->assign->assign(
+                    [
+                        'premiumContent' => [
+                            'link' => $link,
+                            'type' => Tools::getValue('type'),
+                            'title' => $title,
+                        ]
+                    ]
+                );
+                $htmlPopin = $this->dependencies->configClass->fetchTemplate(
+                    '/views/templates/api/molecules/modal/premium.tpl'
+                );
+                die(json_encode(['content' => $htmlPopin]));
+            }
+
             $this->dependencies->mediaClass->displayPopin(Tools::getValue('type'), $args);
         }
 
