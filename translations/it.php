@@ -345,7 +345,7 @@ $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Proporre pagamenti rateali garantiti per importi compresi tra';
 $_MODULE['<{payplug}prestashop>paylater_b97ce6e200faff80eda5840137ec3323'] = 'Le spese sono ripartite tra te e i tuoi clienti.';
 $_MODULE['<{payplug}prestashop>paylater_e6e132699f77505baebb35d39d2430a2'] = 'Le spese sono a tuo carico.';
-$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'I tuoi clienti possono scegliere di pagare gli ordini in 3 o 4 rate. Scegli qui sotto se vuoi prendere a tuo carico tutti i costi (o meno). [1]Per saperne di più.[/1]';
+$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'I tuoi clienti possono scegliere di pagare gli ordini in 3 o 4 rate. Scegli qui sotto se vuoi prendere a tuo carico tutti i costi (o meno).';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Pagamento in 3x o 4x senza nessuna commissione con Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = 'Scopri di più';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Pagamento in 3x o 4x con Carta di Credito con Oney';

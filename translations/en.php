@@ -345,7 +345,7 @@ $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Offer guaranteed split payments for amounts between';
 $_MODULE['<{payplug}prestashop>paylater_b97ce6e200faff80eda5840137ec3323'] = 'The fees are split between you and your customers.';
 $_MODULE['<{payplug}prestashop>paylater_e6e132699f77505baebb35d39d2430a2'] = 'You pay the fees';
-$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose below whether or not you want to pay all the fees. [1] Learn more.[/1]';
+$_MODULE['<{payplug}prestashop>paylater_f08c5ba187e37ffd894a6a930c55c9d3'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose below whether or not you want to pay all the fees.';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Pay by card in 3x or 4x without fees with Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';
 $_MODULE['<{payplug}prestashop>payment_f5de21827565ba3b76d5c56da1f603dc'] = 'Pay by card in 3x or 4x with Oney';

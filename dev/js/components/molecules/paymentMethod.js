@@ -8,17 +8,50 @@ class PaymentMethod {
     initialize() {
         paymentMethod.handleEvents();
         $(window).trigger('reloadEvent');
+        paymentMethod.checkPaymentOptionInformation();
     }
 
     handleEvents() {
         $(document)
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
+            .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOptionInformation)
+            .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
             .on('click', 'input[name=payplug_bancontact]', paymentMethod.checkPremium)
             .on('click', 'input[name=payplug_applepay]', paymentMethod.checkPremium)
-            .on('click', 'input[name=payplug_oney]', paymentMethod.checkPremium)
+            .on('click', 'input[name=payplug_oney]', paymentMethod.checkPremium);
         $(window)
             .on('reloadEvent', paymentMethod.handleSandbox);
     }
+
+    checkPaymentOptionInformation() {
+        const $paymentOptions = $('.paymentOption');
+
+        $paymentOptions.map((k,v) => {
+            const $option = $(v);
+            paymentMethod.tooglePaymentOptionInformation($option);
+        })
+    }
+
+    handlePaymentOptionInformation(event) {
+        const $paymentOption = $(event.target).parents('.paymentOption');
+        paymentMethod.tooglePaymentOptionInformation($paymentOption);
+    }
+
+    tooglePaymentOptionInformation($paymentOption) {
+        if (!$paymentOption.length) {
+            return;
+        }
+
+        const $switch = $paymentOption.find('.paymentOption_switch');
+        const checked = $switch.find('input').prop('checked');
+
+        if (checked) {
+            $paymentOption.find('._informations').addClass('-show');
+        } else {
+            $paymentOption.find('._informations').removeClass('-show');
+        }
+    }
+
 
     checkPremium(event) {
         event.preventDefault();

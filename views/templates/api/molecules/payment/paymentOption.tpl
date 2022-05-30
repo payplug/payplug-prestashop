@@ -20,18 +20,23 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="paymentOption -{$paymentOptionIdentifier|escape:'htmlall':'UTF-8'}">
+<div class="paymentOption
+    -{$paymentOptionIdentifier|escape:'htmlall':'UTF-8'}
+    {if isset($paymentOptionClassName) && $paymentOptionClassName} -{$paymentOptionClassName}{/if}">
     {include
-        file='./../atoms/switch/switch.tpl'
+        file='./../../atoms/switch/switch.tpl'
+        switchClassName='paymentOption_switch'
         switchDataName='paymentMethod_'|cat:$paymentOptionIdentifier|escape:'htmlall':'UTF-8'
         switchName='payplug_'|cat:$paymentOptionIdentifier|escape:'htmlall':'UTF-8'
         switchChecked=$paymentOptionChecked}
-    <div class="_logo">
-        <img src="{$paymentOptionImage_url|escape:'htmlall':'UTF-8'}">
-    </div>
+    {if isset($paymentOptionImage_url) && $paymentOptionImage_url}
+        <div class="_logo">
+            <img src="{$paymentOptionImage_url|escape:'htmlall':'UTF-8'}">
+        </div>
+    {/if}
     <div class="_text">
         {include
-            file='./../atoms/title/title.tpl'
+            file='./../../atoms/title/title.tpl'
             titleClassName='_title'
             titleText=$paymentOptionName|escape:'htmlall':'UTF-8'}
         <p>
@@ -39,7 +44,7 @@
             {if isset($paymentOptionLink) && $paymentOptionLink}
                 {capture assign="paymentOptionLinkText"}{l s='paymentOption.link.text' mod='payplug'}{/capture}
                 {include
-                    file='./../atoms/link/link.tpl'
+                    file='./../../atoms/link/link.tpl'
                     linkText=$paymentOptionLinkText|escape:'htmlall':'UTF-8'
                     linkHref=$paymentOptionLink|escape:'htmlall':'UTF-8'
                     linkTarget='_blank'
