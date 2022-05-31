@@ -23,7 +23,7 @@
 {capture assign="descriptionBlock_content"}
     <div class="_header">
         <div class="_logo">
-            {include file="../_svg/logo-pspaylater.tpl"}
+            {include file="./../../../img/svg/logo-{$module_name|escape:'htmlall':'UTF-8'}.svg"}
         </div>
         <div class="_version">
             {assign var='description_descriptionVersionClassName' value='_descriptionVersion'}
