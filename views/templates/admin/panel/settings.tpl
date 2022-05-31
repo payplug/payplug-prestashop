@@ -34,13 +34,6 @@
             </div>
         {/if}
 
-        {if $display_mode_isActivated && ($standard_isActivated || $installment_isActivated)}
-            {include file='./settings/embedded.tpl'}
-            <div class="{$module_name|escape:'htmlall':'UTF-8'}Settings_separator">
-                <p><strong>{l s='Advanced settings' mod='payplug'}</strong></p>
-            </div>
-        {/if}
-
         <div class="{$module_name|escape:'htmlall':'UTF-8'}Settings_advanced">
             {if $installment_isActivated}
                 {include file='./settings/installment.tpl'}

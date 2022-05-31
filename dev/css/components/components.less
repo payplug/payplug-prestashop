@@ -38,7 +38,7 @@
     }
 
     ._props {
-      .border(#colorMap[borderMain]);
+      .border(@color-border);
       .borderRadius(4px);
       align-items: stretch;
       margin: 30px 0 0;
@@ -51,13 +51,13 @@
         .Roboto(13px, 500);
 
         & + div {
-          .border(#colorMap[borderMain], l);
+          .border(@color-border, l);
         }
       }
     }
 
     & + section {
-      .border(#colorMap[borderMain], t);
+      .border(@color-border, t);
       padding: 36px 0;
     }
   }
