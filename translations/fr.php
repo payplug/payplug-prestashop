@@ -33,6 +33,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca974
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Numéro d\'échéance';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
+$_MODULE['<{payplug}prestashop>applepaypayment_e701d7f2ca4166bb62a874fedae78be6'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Déclencher';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Carte supprimée avec succès.';
 $_MODULE['<{payplug}prestashop>cardrepository_d5639fea4548475adf16c77e4418a59d'] = 'Êtes-vous sûr de vouloir supprimer cette carte ?';
@@ -131,7 +132,7 @@ $_MODULE['<{payplug}prestashop>deferred_f0e9528cdbef74b2eafcdc12f9ee1c7d'] = 'Ok
 $_MODULE['<{payplug}prestashop>description_97d8479aa4a771591914a2e17f0e124e'] = 'Module visible';
 $_MODULE['<{payplug}prestashop>description_c0a9e4b2ba3ce9cefff26bea167b7f35'] = 'La solution de paiement qui augmente vos ventes.';
 $_MODULE['<{payplug}prestashop>description_c66d3a6a296e99339c13743b134b881d'] = 'Module masqué';
-$_MODULE['<{payplug}prestashop>description_f8214d19a4ea7d8f68de53d1216d74a9'] = 'PayPlug, c’est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main.';
+$_MODULE['<{payplug}prestashop>description_f8214d19a4ea7d8f68de53d1216d74a9'] = 'PayPlug, c\'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main.';
 $_MODULE['<{payplug}prestashop>detail_1751f25e086816ff3f16ece383bf6748'] = 'Coût du financement :';
 $_MODULE['<{payplug}prestashop>detail_1ede4116fd872e9e0f5a98d7336c85f2'] = 'Mensualité n°2 :';
 $_MODULE['<{payplug}prestashop>detail_37eb93e05c9251e795a791aa443a89d1'] = 'Premier apport :';
