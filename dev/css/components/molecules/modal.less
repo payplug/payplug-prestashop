@@ -31,7 +31,7 @@
             &:hover,
             &:visited,
             &:active {
-              color: #colorMap[fontSecondaryDefault];
+              color: @color-text-secondary;
               text-decoration: underline;
             }
           }
@@ -71,7 +71,7 @@
     ._error {
       display: flex;
       align-items: center;
-      color: #colorMap[error];
+      color: @color-error;
       font-size: 12px;
       margin: @margin-1 0 -2px;
       line-height: 18px;
@@ -80,7 +80,7 @@
       }
       svg {
         .transition(~"fill @{dur}");
-        fill: #colorMap[error];
+        fill: @color-error;
         vertical-align: middle;
         max-height: 100%;
       }

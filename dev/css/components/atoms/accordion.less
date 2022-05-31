@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: flex-start;
 
-  .border(#colorMap[borderMain]);
+  .border(@color-border);
   position: relative;
   width: 100%;
   border-radius: 4px;
@@ -54,7 +54,7 @@
       mask-image: url(~"@{img-icons}arrow_down.svg");
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      background-color: #colorMap[fontSecondaryDefault];
+      background-color: @color-text-secondary;
     }
   }
 

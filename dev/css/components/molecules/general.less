@@ -66,7 +66,7 @@
 
     ._forgotPassword {
       font-size: 13px;
-      color: #colorMap[fontSecondaryDefault];
+      color: @color-text-secondary;
       margin: 0 0 -2px;
     }
   }
@@ -82,7 +82,7 @@
       }
 
       &Informations {
-        .border(#colorMap[borderMain]);
+        .border(@color-border);
         border-radius: 4px;
 
         display: flex;
@@ -102,7 +102,7 @@
 
         height: calc(36em / ~"@{size}");
         padding: 0 @padding-3;
-        background: #colorMap[backgroundGrey];
+        background: @color-background;
         justify-content: start;
 
         &.-icon {

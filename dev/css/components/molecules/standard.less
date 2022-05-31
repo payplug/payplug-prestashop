@@ -1,0 +1,30 @@
+.__moduleName__Configuration {
+  .standardPayment {
+    &Option {
+      &s {
+        .border(@color-border, l);
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 0 @padding-6;
+      }
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      ._text {
+        margin: 0;
+        max-width: calc(100% - 340px);
+
+        ._title {
+          color: @color-text-main;
+          margin: 0 0 10px;
+        }
+      }
+
+      & + .standardPaymentOption {
+        margin: @margin-6 0 0;
+      }
+    }
+  }
+}
