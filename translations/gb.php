@@ -33,6 +33,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca974
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Customer';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Installment payment #';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'The transaction was not completed and your card was not charged.';
+$_MODULE['<{payplug}prestashop>applepaypayment_e701d7f2ca4166bb62a874fedae78be6'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Capture';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Card successfully deleted.';
 $_MODULE['<{payplug}prestashop>cardrepository_d5639fea4548475adf16c77e4418a59d'] = 'Are you sure you want to delete this card?';
