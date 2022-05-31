@@ -761,6 +761,7 @@ class PaymentClass
 
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $faq_links = $this->dependencies->configClass->getFAQLinks($this->context->language->iso_code);
+        $this->assign->assign(['faq_links' => $faq_links]);
 
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
             $payment_methods['standard'] = [
@@ -770,7 +771,7 @@ class PaymentClass
                 "link" => '',
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
                 "config_key" => $this->dependencies->getConfigurationKey('standard'),
-                "informations" => '',
+                "informations" => $this->dependencies->configClass->fetchTemplate('/views/templates/api/molecules/standard/standard.tpl'),
             ];
         }
 

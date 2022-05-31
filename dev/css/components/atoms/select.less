@@ -1,5 +1,5 @@
 .payplugUISelect {
-  .border(#colorMap[borderMain]);
+  .border(@color-border);
   .borderRadius(4px);
   background: #colorMap[white];
   position: relative;
@@ -32,7 +32,7 @@
       mask-image: url(~"@{img-icons}arrow_down.svg");
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      background-color: #colorMap[fontSecondaryDefault];
+      background-color: @color-text-secondary;
     }
 
     &:focus {
@@ -60,7 +60,7 @@
   ._text {
     display: none;
     margin: 0;
-    color: #colorMap[fontMainDefault];
+    color: @color-text-main;
     white-space: nowrap;
   }
 
@@ -78,7 +78,7 @@
     z-index: 999;
 
     ul {
-      .border(#colorMap[borderMain], rbl);
+      .border(@color-border, rbl);
       .borderRadius(0 0 4px 4px);
       background: #colorMap[white];
       list-style: none;
