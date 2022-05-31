@@ -52,12 +52,11 @@ class PaymentMethod {
         }
     }
 
-
     checkPremium(event) {
         event.preventDefault();
         event.stopPropagation();
         const $button = $(this);
-        const paymentMethodName = $button.attr('name')
+        const paymentMethodName = $button.attr('name');
         const queryData = {
             _ajax: 1,
             checkPremium: 1
@@ -81,12 +80,15 @@ class PaymentMethod {
             success: function (result) {
                 if (result[paymentMethodName]===false){
                     paymentMethod.handleSPaymentMethod(paymentMethodName);
+                } else {
+                    if ($('input[name=' + paymentMethodName + ']').prop("checked") === false) {
+                        $('input[name=' + paymentMethodName + ']').prop("checked", true);
+                    } else {
+                        $('input[name=' + paymentMethodName + ']').prop("checked", false);
+                    }
                 }
-
             }
         });
-
-
     }
 
     handleSPaymentMethod(paymentMethodName) {
@@ -122,8 +124,6 @@ class PaymentMethod {
                         $container.append(result.content);
                     }
                     $container.find('input[name=modalTriggered]').trigger('click');
-
-
                 }
             }
         });
@@ -175,7 +175,6 @@ class PaymentMethod {
         }
         return checkpremium;
     }
-
 }
 
 const paymentMethod = new PaymentMethod();
