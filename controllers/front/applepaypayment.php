@@ -54,7 +54,7 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
 
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
-        $errors = array($this->dependencies->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'));
+        $errors = array($this->dependencies->l('payplug.applepayPayment.transactionNotCompleted', 'paymentclass'));
 
         try {
             // Patch Payment
