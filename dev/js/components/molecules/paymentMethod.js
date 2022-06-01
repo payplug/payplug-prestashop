@@ -7,18 +7,14 @@ class PaymentMethod {
 
     initialize() {
         paymentMethod.handleEvents();
-        $(window).trigger('reloadEvent');
+        paymentMethod.handleSandbox();
         paymentMethod.checkPaymentOptionInformation();
     }
 
     handleEvents() {
         $(document)
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
-            .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOptionInformation)
-            .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
-            .on('click', 'input[name=payplug_bancontact]', paymentMethod.checkPremium)
-            .on('click', 'input[name=payplug_applepay]', paymentMethod.checkPremium)
-            .on('click', 'input[name=payplug_oney]', paymentMethod.checkPremium);
+            .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption);
         $(window)
             .on('reloadEvent', paymentMethod.handleSandbox);
     }
@@ -26,23 +22,29 @@ class PaymentMethod {
     checkPaymentOptionInformation() {
         const $paymentOptions = $('.paymentOption');
 
-        $paymentOptions.map((k,v) => {
-            const $option = $(v);
-            paymentMethod.tooglePaymentOptionInformation($option);
+        $paymentOptions.map((k, v) => {
+            const $switch = $(v).find('.paymentOption_switch');
+            paymentMethod.tooglePaymentOptionInformation($switch);
         })
     }
 
-    handlePaymentOptionInformation(event) {
-        const $paymentOption = $(event.target).parents('.paymentOption');
-        paymentMethod.tooglePaymentOptionInformation($paymentOption);
+    handlePaymentOption(event) {
+        const $switch = $(event.target).parents('.paymentOption_switch');
+        paymentMethod.tooglePaymentOptionInformation($switch);
+
+        if ($switch.is('.-premium')) {
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
+        }
     }
 
-    tooglePaymentOptionInformation($paymentOption) {
-        if (!$paymentOption.length) {
+    tooglePaymentOptionInformation($switch) {
+        if (!$switch.length) {
             return;
         }
 
-        const $switch = $paymentOption.find('.paymentOption_switch');
+        const $paymentOption = $switch.parents('.paymentOption');
         const checked = $switch.find('input').prop('checked');
 
         if (checked) {
@@ -52,19 +54,23 @@ class PaymentMethod {
         }
     }
 
-    checkPremium(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const $button = $(this);
-        const paymentMethodName = $button.attr('name');
+    checkPremium($switch) {
+        const checked = $switch.find('input').prop('checked');
+        if (!checked) {
+            return;
+        }
+
+        const paymentMethodName = $switch.find('input').attr('name');
         const queryData = {
             _ajax: 1,
             checkPremium: 1
         };
+
         if (paymentMethod.props.query != null) {
             paymentMethod.props.query.abort();
             paymentMethod.props.query = null;
         }
+
         paymentMethod.props.query = $.ajax({
             type: 'POST',
             url: admin_ajax_url,
@@ -78,22 +84,21 @@ class PaymentMethod {
                 console.log(jqXHR, textStatus, errorThrown);
             },
             success: function (result) {
-                if (result[paymentMethodName]===false){
-                    paymentMethod.handleSPaymentMethod(paymentMethodName);
-                } else {
-                    if ($('input[name=' + paymentMethodName + ']').prop("checked") === false) {
-                        $('input[name=' + paymentMethodName + ']').prop("checked", true);
-                    } else {
-                        $('input[name=' + paymentMethodName + ']').prop("checked", false);
-                    }
+                if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
+                    paymentMethod.handlePaymentMethod(paymentMethodName);
                 }
             }
         });
     }
 
-    handleSPaymentMethod(paymentMethodName) {
+    handlePaymentMethod(paymentMethodName) {
         const $container = $('.' + paymentMethod.props.container);
-        $('input[name=' + paymentMethodName + ']').prop("checked", false);
+        const $input = $('input[name=' + paymentMethodName + ']');
+        const $switch = $input.parents('.payplugUISwitch');
+
+        $input.prop('checked', false);
+        paymentMethod.tooglePaymentOptionInformation($switch);
+
         const queryData = {
             _ajax: 1,
             popin: 1,
