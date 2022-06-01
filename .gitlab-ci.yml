@@ -12,6 +12,8 @@ stages:
   - build
   - asset-bnpl
   - build-bnpl
+  - asset-applepay
+  - build-applepay
   - releasy-release
 
 php cs fixer:
@@ -181,3 +183,56 @@ build zip pspaylater:
     paths:
       - pspaylater_$CI_COMMIT_REF_NAME.zip
       - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
+
+assets compile and revision for applepay:
+  image: node:16
+  stage: asset-applepay
+  before_script:
+    - ./dev/ci/dist_files.sh -b payplug
+    - npm --version
+    - npm init -y
+    - npm install --save-dev webpack
+  script:
+    - npm run build
+    - ./dev/ci/set_licenses.sh -b payplug
+    - echo "Moving file in build dir"
+    - mkdir ./views/build-applepay
+    - mkdir ./views/build-applepay/css
+    - mkdir ./views/build-applepay/js
+    - mv ./views/css/*.css ./views/build-applepay/css
+    - cp ./views/templates/index.php ./views/build-applepay/css
+    - mv ./views/js/* ./views/build-applepay/js
+    - ls -l ./views/build-applepay/css/*.css
+    - ls -l ./views/build-applepay/css/*.php
+    - ls -l ./views/build-applepay/js/*.js
+  artifacts:
+    paths:
+      - views/build-applepay/*
+    expire_in: 1 day
+
+build zip applepay:
+  image: composer:1.9
+  stage: build-applepay
+  before_script:
+    - ./dev/ci/dist_files.sh -b payplug
+    - php ./dev/ci/generate-version.php
+    - php ./dev/ci/generate-upgrade.php
+    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
+    - rm -r ./vendor
+    - composer install --no-dev
+    - rm webpack.config.js
+    - ./dev/ci/secure_directories.sh
+    - git status
+    - ./dev/ci/assets_revision.sh -b payplug
+    - mkdir payplug
+    - php ./dev/ci/import-translations.php
+    - ./dev/ci/copy_translations.sh
+  script:
+    - shopt -s extglob
+    - mv !(payplug|composer.json) payplug
+    - cp composer.json ./payplug
+    - sed -i 's/api.payplug.com/api.omicron.notpayplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
+    - composer archive --file payplug_applepay_omicron_$CI_COMMIT_REF_NAME --format zip
+  artifacts:
+    paths:
+      - payplug_applepay_omicron_$CI_COMMIT_REF_NAME.zip
