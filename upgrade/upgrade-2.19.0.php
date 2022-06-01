@@ -65,7 +65,7 @@ function upgrade_module_2_19_0($object)
     }
 
     $object->uninstallTab();
-    $object->uninstallModuleTab('AdminPayplug');
+    $object->uninstallModuleTab('AdminPayPlug');
     if (!$object->installTab()) {
         $flag = false;
     }
