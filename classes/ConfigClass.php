@@ -38,6 +38,7 @@ use Validate;
 class ConfigClass
 {
     public $amountCurrencyClass;
+    public $configurations;
     public $email;
     public $features_json;
     public $logger;
@@ -720,7 +721,7 @@ class ConfigClass
 
         $this->checkConfiguration();
 
-        $configurations = [
+        $this->configurations = [
             'show' => Configuration::get($this->dependencies->getConfigurationKey('show')),
             'email' => Configuration::get($this->dependencies->getConfigurationKey('email')),
             'sandbox_mode' => Configuration::get($this->dependencies->getConfigurationKey('sandboxMode')),
@@ -743,8 +744,8 @@ class ConfigClass
             'applepay' => Configuration::get($this->dependencies->getConfigurationKey('applepay'))
         ];
 
-        $connected = !empty($configurations['email'])
-            && (!empty($configurations['test_api_key']) || !empty($configurations['live_api_key']));
+        $connected = !empty($this->configurations['email'])
+            && (!empty($this->configurations['test_api_key']) || !empty($this->configurations['live_api_key']));
 
         $psAccountConnected = $this->checkPsAccount();
         if ($connected && !$psAccountConnected) {
@@ -769,13 +770,13 @@ class ConfigClass
         } else {
             $premium = false;
         }
-        if (!empty($configurations['live_api_key'])) {
-            $permissions = $this->dependencies->apiClass->getAccount($configurations['live_api_key']);
+        if (!empty($this->configurations['live_api_key'])) {
+            $permissions = $this->dependencies->apiClass->getAccount($this->configurations['live_api_key']);
             $verified = !empty($permissions) ? $permissions['is_live'] : false;
         } else {
             $verified = false;
         }
-        $is_active = (bool)$configurations['show'];
+        $is_active = (bool)$this->configurations['show'];
 
         $this->dependencies->apiClass->getSiteUrl();
 
@@ -794,7 +795,7 @@ class ConfigClass
             ]);
         } else {
             $this->context->smarty->assign([
-                'payplug_email' => $configurations['email'],
+                'payplug_email' => $this->configurations['email'],
             ]);
         }
 
@@ -821,7 +822,9 @@ class ConfigClass
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment';
         $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
-        $faq_links = $this->getFAQLinks($this->context->language->iso_code);
+        $this->configurations['installments_panel_url'] = $installments_panel_url;
+
+        $this->configurations['faq_links'] = $this->getFAQLinks($this->context->language->iso_code);
         $amounts = $this->oney->getOneyPriceLimit(false);
         $customAmounts = $this->oney->getOneyPriceLimit(true);
         $oney_min_amounts = ($amounts['min'] / 100);
@@ -836,12 +839,12 @@ class ConfigClass
             && $this->isValidFeature('feature_standard')
             && Configuration::get(
                 $this->dependencies->getConfigurationKey('publishableKey')
-                . ($configurations['sandbox_mode'] ? '_TEST' : '')
+                . ($this->configurations['sandbox_mode'] ? '_TEST' : '')
             )
         ) {
-            $specific->assignSwitchConfiguration($configurations);
+            $specific->assignSwitchConfiguration($this->configurations);
         } else {
-            $this->assignSwitchConfiguration($configurations);
+            $this->assignSwitchConfiguration($this->configurations);
         }
 
         Media::addJsDef(
@@ -870,19 +873,18 @@ class ConfigClass
             'is_active' => $is_active,
             'site_url' => $this->dependencies->apiClass->getSiteUrl(),
             'portal_url' => $this->dependencies->apiClass->getPortalUrl(),
-            'sandbox_mode' => $configurations['sandbox_mode'],
-            'embedded_mode' => $configurations['embedded_mode'],
-            'one_click' => $configurations['one_click'],
-            'standard' => $configurations['standard'],
-            'inst' => $configurations['inst'],
-            'inst_mode' => $configurations['inst_mode'],
-            'inst_min_amount' => $configurations['inst_min_amount'],
-            'show' => $configurations['show'],
-            'debug_mode' => $configurations['debug_mode'],
-            'deferred' => $configurations['deferred'],
-            'deferred_auto' => $configurations['deferred_auto'],
-            'deferred_state' => $configurations['deferred_state'],
-            'oney' => $configurations['oney'],
+            'sandbox_mode' => $this->configurations['sandbox_mode'],
+            'embedded_mode' => $this->configurations['embedded_mode'],
+            'one_click' => $this->configurations['one_click'],
+            'standard' => $this->configurations['standard'],
+            'inst' => $this->configurations['inst'],
+            'inst_min_amount' => $this->configurations['inst_min_amount'],
+            'show' => $this->configurations['show'],
+            'debug_mode' => $this->configurations['debug_mode'],
+            'deferred' => $this->configurations['deferred'],
+            'deferred_auto' => $this->configurations['deferred_auto'],
+            'deferred_state' => $this->configurations['deferred_state'],
+            'oney' => $this->configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
             'applepay' => $this->isValidFeature('feature_applepay'),
             'integrated' => $this->isValidFeature('feature_integrated'),
@@ -892,13 +894,11 @@ class ConfigClass
             'deferred_isActivated' => $this->isValidFeature('feature_deferred'),
             'ps_account_isActivated' => $this->isValidFeature('feature_ps_account'),
             'login_infos' => $login_infos,
-            'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->dependencies->orderClass->getOrderStates(),
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
             'oney_custom_max_amounts' => $oney_custom_max_amounts,
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
-            'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
             'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
             'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods(),

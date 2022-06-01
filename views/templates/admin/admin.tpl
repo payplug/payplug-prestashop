@@ -49,7 +49,7 @@
         {* etat block *}
         {include file='./../api/molecules/state.tpl'}
 
-        {include file='./panel/settings.tpl'}
+{*        {include file='./panel/settings.tpl'}*}
     </div>
 
     {* Configuration footer *}

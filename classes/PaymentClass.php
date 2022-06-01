@@ -760,8 +760,53 @@ class PaymentClass
         $payment_methods = [];
 
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $faq_links = $this->dependencies->configClass->getFAQLinks($this->context->language->iso_code);
-        $this->assign->assign(['faq_links' => $faq_links]);
+        $faq_links = $this->dependencies->configClass->configurations['faq_links'];
+
+        $order_states = $this->dependencies->orderClass->getOrderStates();
+        $deferred_state = $this->dependencies->configClass->configurations['deferred_state'];
+        $order_states_values = [];
+        foreach ($order_states as $key => $value) {
+            $checked = $value['id_order_state'] === $deferred_state ? 'true' : 'false';
+            $escapedValue = $value['name'];
+            $order_states_values[] = [
+                'key' => $key,
+                'value' => $escapedValue,
+                'selected' => $checked,
+                ];
+        }
+
+        $embedded_mode_values = [
+            [
+                'value' => 'integrated',
+                'dataName' => 'embeddedModeIntegrated',
+                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.integrated', 'paymentclass')
+            ],
+            [
+            'value' => 'popup',
+            'dataName' => 'embeddedModePopup',
+            'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.popup', 'paymentclass')
+            ],
+            [
+            'value' => 'redirected',
+            'dataName' => 'embeddedModeRedirected',
+            'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.redirected', 'paymentclass')
+            ]
+        ];
+
+        if (!$this->dependencies->configClass->isValidFeature('feature_integrated')) {
+            array_shift($embedded_mode_values);
+        }
+
+        $this->assign->assign([
+            'faq_links' => $faq_links,
+            'installments_panel_url' => $this->dependencies->configClass->configurations['installments_panel_url'],
+            'inst_mode' => $this->dependencies->configClass->configurations['inst_mode'],
+            'inst_min_amount' => $this->dependencies->configClass->configurations['inst_min_amount'],
+            'order_states_values' => $order_states_values,
+            'installment_isActivated' => $this->dependencies->configClass->isValidFeature('feature_installment'),
+            'deferred_isActivated' => $this->dependencies->configClass->isValidFeature('feature_deferred'),
+            'embedded_mode_values' => $embedded_mode_values,
+        ]);
 
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
             $payment_methods['standard'] = [
