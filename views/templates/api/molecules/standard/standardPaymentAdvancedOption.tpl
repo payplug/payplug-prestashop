@@ -20,15 +20,17 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<a class="payplugUILink
-    {if isset($linkClassName) && $linkClassName} {$linkClassName|escape:'htmlall':'UTF-8'}{/if}
-    {if isset($linkDisabled) && $linkDisabled} -disabled{/if}"
-    {if isset($linkHref) && $linkHref} href="{$linkHref|escape:'htmlall':'UTF-8'}"{/if}
-    target="{if isset($linkTarget) && $linkTarget}{$linkTarget|escape:'htmlall':'UTF-8'}{else}_blank{/if}"
-    title="{$linkText|escape:'htmlall':'UTF-8'}"
-    {if isset($linkData) && $linkData} data-e2e-name="{$linkData|escape:'htmlall':'UTF-8'}"{/if}
-{if isset($linkDisabled) && $linkDisabled} disabled="disabled"{/if}>
-    {$linkText|escape:'UTF-8'}
-{if !isset($linkNoTag) || !$linkNoTag}
-    </a>
-{/if}
+<div class="_standardAdvancedOption -{$standardAdvancedOptionClassName|escape:'htmlall':'UTF-8'}">
+    <div class="_wrapper">
+        <div class="_header">
+        {include
+            file='./../../atoms/title/title.tpl'
+            titleClassName='_title'
+            titleText=$standardAdvancedOptionTitle}
+        {$standardAdvancedOptionSwitch}
+        </div>
+        <div class="_content">
+            {$standardAdvancedOptionContent}
+        </div>
+    </div>
+</div>

@@ -32,7 +32,6 @@
 
     ._text {
       margin: 0 0 0 @margin-6;
-      max-width: calc(100% - 60px);
 
       ._title {
         color: @color-border-title;
@@ -55,6 +54,68 @@
       
       &.-show {
         display: block;
+      }
+
+      .standardPaymentAdvanced {
+        margin: 40px 0 0 0;
+        ._standardAdvancedOption {
+          flex-direction: column;
+          ._header {
+            display: flex;
+            justify-content: space-between;
+            ._title {
+              max-width: calc(100% - 60px);
+              margin: 0 0 19px 0;
+            }
+          }
+          .payplugUITextAlert {
+            margin-top: 24px;
+            text-align: center;
+          }
+          &.-installment {
+            ._content {
+              ._inputs {
+                display: flex;
+                align-items: self-end;
+                .payplugUISelect {
+                  &.installments_panel_select {
+                    width: 120px;
+                    margin: 0 10px;
+                  }
+                  ._text {
+                    margin: 0;
+                  }
+                }
+                .payplugUIInput {
+                  &.maxThreshold {
+                    width: 120px;
+                    margin: 0 10px;
+                  }
+                }
+              }
+            }
+          }
+          &.-deferred {
+            .payplugUISelect{
+              &.deferred_panel_select {
+                ._current {
+                  &:focus {
+                    & + ._list {
+                      max-height: 150px;
+                      overflow: scroll;
+                    }
+                  }
+                }
+                ._list {
+                  scrollbar-width: none;
+                }
+                ._list::-webkit-scrollbar {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
       }
     }
 
