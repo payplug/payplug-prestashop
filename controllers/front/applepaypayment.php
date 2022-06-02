@@ -70,6 +70,7 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
             $data = array(
                 'apple_pay' => $apple_pay
             );
+
             $update = $payment['resource']->update($data);
 
             if ($update->is_paid !== true) {
