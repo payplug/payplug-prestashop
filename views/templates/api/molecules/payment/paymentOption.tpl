@@ -23,9 +23,14 @@
 <div class="paymentOption
     -{$paymentOptionIdentifier|escape:'htmlall':'UTF-8'}
     {if isset($paymentOptionClassName) && $paymentOptionClassName} -{$paymentOptionClassName}{/if}">
+    {if 'standard' == $paymentOptionIdentifier}
+        {assign var="paymentOptionClassName" value='paymentOption_switch'}
+    {else}
+        {assign var="paymentOptionClassName" value='paymentOption_switch -premium'}
+    {/if}
     {include
         file='./../../atoms/switch/switch.tpl'
-        switchClassName='paymentOption_switch'
+        switchClassName=$paymentOptionClassName
         switchDataName='paymentMethod_'|cat:$paymentOptionIdentifier|escape:'htmlall':'UTF-8'
         switchName='payplug_'|cat:$paymentOptionIdentifier|escape:'htmlall':'UTF-8'
         switchChecked=$paymentOptionChecked}
