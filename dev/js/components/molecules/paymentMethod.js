@@ -14,9 +14,17 @@ class PaymentMethod {
     handleEvents() {
         $(document)
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
-            .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption);
+            .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption)
+            .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission);
         $(window)
-            .on('reloadEvent', paymentMethod.handleSandbox);
+            .on('reloadEvent', paymentMethod.initialize);
+    }
+
+    handleOneClickPermission(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const $switch = $(event.target).parents('.oneClickSwitch');
+        paymentMethod.checkPremium($switch);
     }
 
     checkPaymentOptionInformation() {

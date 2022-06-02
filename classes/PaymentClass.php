@@ -780,7 +780,7 @@ class PaymentClass
                 "name" => $this->dependencies->l('payment.getPaymentMethod.applepay.name', 'paymentclass'),
                 "image_url" => $views_path . 'img/svg/payment/applepay.svg',
                 "description" => $this->dependencies->l('payment.getPaymentMethod.applepay.description', 'paymentclass'),
-                "link" => '',
+                "link" => $faq_links['applepay'],
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
                 "config_key" => $this->dependencies->getConfigurationKey('applepay'),
                 "informations" => '',
