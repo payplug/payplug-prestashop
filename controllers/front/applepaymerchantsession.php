@@ -74,7 +74,14 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
             'amount' => Tools::ps_round($this->context->cart->getOrderTotal()*100),
             'currency' => $currency->iso_code,
             'payment_method' => 'apple_pay',
-            'domain_name' => $this->context->shop->domain_ssl,
+            'payment_context' => array(
+                'apple_pay' => array(
+                    'domain_name' => $this->context->shop->domain_ssl,
+                    'application_data' => base64_encode(json_encode(array(
+                        'apple_pay_domain' => $this->context->shop->domain_ssl
+                    )))
+                )
+            ),
             'billing' => array(
                 'title' => $gender->name,
                 'first_name' => $billingAddress->firstname,
@@ -83,7 +90,7 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
                 'address1' => $billingAddress->address1 . ' ' . $billingAddress->address2,
                 'postcode' => $billingAddress->postcode,
                 'city' => $billingAddress->city,
-                'country' => $billingAddressCountry->iso_code,
+                'country' => $billingAddressCountry->iso_code
             ),
             'shipping' => array(
                 'title' => $gender->name,
@@ -93,7 +100,7 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
                 'address1' => $shippingAddress->address1 . ' ' . $shippingAddress->address2,
                 'postcode' => $shippingAddress->postcode,
                 'city' => $shippingAddress->city,
-                'country' => $shippingAddressCountry->iso_code,
+                'country' => $shippingAddressCountry->iso_code
             )
         );
 
