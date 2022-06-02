@@ -141,8 +141,6 @@ class ApiClass
 
         $json_answer = $response['httpResponse'];
 
-//        die(dump($json_answer));
-
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
         } else {
