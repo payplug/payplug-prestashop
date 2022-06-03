@@ -237,12 +237,14 @@ class General {
                 $button.addClass('-disabled').attr('disabled', 'disabled');
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                alert('An error occurred while trying to checking your premium status. ' +
-                    'Maybe you clicked too fast before scripts are fully loaded ' +
-                    'or maybe you have a different back-office url than expected.' +
-                    'You will find more explanation in JS console.');
-                console.log(jqXHR, textStatus, errorThrown);
-                $button.addClass('-disabled').attr('disabled', 'disabled');
+                if (errorThrown != 'abort') {
+                    alert('An error occurred while trying to checking your premium status. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR, textStatus, errorThrown);
+                    $button.addClass('-disabled').attr('disabled', 'disabled');
+                }
             },
             success: function (result) {
                 if (result.content) {
