@@ -22,7 +22,7 @@
 
 <div class="_paylaterAdvancedOption -{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}">
     <div class="_img">
-        <img src="/modules/{$module_name}/views/img/svg/screen/paylater-{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}.svg" alt="">
+        <img src="/modules/{$module_name}/views/img/svg/screen/{$module_name}-{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}.svg" alt="">
     </div>
     <div class="_wrapper">
         {include
