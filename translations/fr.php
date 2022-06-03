@@ -33,6 +33,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca974
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Numéro d\'échéance';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
+$_MODULE['<{payplug}prestashop>applepaymerchantsession_faa979ca8256d337b5b5e047cdc9e8cf'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
 $_MODULE['<{payplug}prestashop>applepaypayment_e701d7f2ca4166bb62a874fedae78be6'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Déclencher';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Carte supprimée avec succès.';
@@ -509,7 +510,6 @@ $_MODULE['<{payplug}prestashop>settings_94cb47d890cbd4a457ea57dd1ccbfaa8'] = 'Vo
 $_MODULE['<{payplug}prestashop>settings_ab066b3292d8ab61ef3b5c77169cdd19'] = 'Plus d\'information';
 $_MODULE['<{payplug}prestashop>settings_d28bd7a206f65da8676098b46b803cf0'] = 'Vous pouvez effectuer des transactions en mode TEST.';
 $_MODULE['<{payplug}prestashop>settings_ed6f7aca7887a927b9ed3d62aa347a86'] = 'PARAMÈTRES';
-$_MODULE['<{payplug}prestashop>settings_fe4c6a5e7bd6793b37370e4e46daf998'] = 'Paramètres avancés';
 $_MODULE['<{payplug}prestashop>show_b987dc3f2a9c3202e15b0dbd03eb312e'] = 'Connectez-vous ci-dessous à votre compte PayPlug pour pouvoir afficher le module à vos clients.';
 $_MODULE['<{payplug}prestashop>show_c0a284b3959d1e187e9a7560c76161a5'] = 'Afficher le module PayPlug à mes clients';
 $_MODULE['<{payplug}prestashop>show_e205336b3b23c2fa65284333c5f0956f'] = 'Afficher';

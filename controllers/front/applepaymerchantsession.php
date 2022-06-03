@@ -30,6 +30,7 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
     private $configurationSpecific;
     private $dependencies;
     private $logger;
+    private $paymentClass;
     private $plugin;
 
     /**
@@ -46,6 +47,7 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
         $this->configurationSpecific = $this->plugin->getConfiguration();
+        $this->paymentClass = $this->dependencies->paymentClass;
 
         if ($this->context->cart->id_address_delivery == $this->context->cart->id_address_invoice) {
             $address = new Address($this->context->cart->id_address_delivery);
@@ -95,13 +97,16 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
             )
         );
 
+        $errors = array($this->dependencies->l('payplug.applepayMerchantSession.transactionNotCompleted', 'paymentclass'));
+
         try {
             $createPayment = $this->dependencies->apiClass->createPayment($request_datas);
 
             die(json_encode([
                 'result' => true,
                 'apiResponse' => $createPayment['resource']->payment_method,
-                'idPayment' => $createPayment['resource']->id
+                'idPayment' => $createPayment['resource']->id,
+                'template' => $this->paymentClass->displayPaymentErrors($errors)
             ]));
         } catch (Exception $e) {
             die(json_encode([
