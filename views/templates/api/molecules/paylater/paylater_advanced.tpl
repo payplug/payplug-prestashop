@@ -77,13 +77,11 @@
     {assign var='paylaterAdvancedOptions' value=[
         [
             'className' => 'thresholds',
-            'img' => './../../../../img/svg/screen/paylater-thresholds.svg',
             'title' => $thresholdsTitle,
             'content' => $thresholdsContent
         ],
         [
             'className' => 'optimized',
-            'img' => './../../../../img/svg/screen/paylater-optimized.svg',
             'title' => $optimizedTitle,
             'content' => $optimizedContent
         ]
@@ -91,7 +89,6 @@
     {foreach $paylaterAdvancedOptions as $paylaterAdvancedOption}
         {include file='./paylater_advanced_option.tpl'
             paylaterAdvancedOptionClassName=$paylaterAdvancedOption.className
-            paylaterAdvancedOptionImg=$paylaterAdvancedOption.img
             paylaterAdvancedOptionTitle=$paylaterAdvancedOption.title
             paylaterAdvancedOptionContent=$paylaterAdvancedOption.content}
     {/foreach}
