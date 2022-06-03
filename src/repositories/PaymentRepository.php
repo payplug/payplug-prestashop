@@ -285,12 +285,17 @@ class PaymentRepository extends BaseClass
 
         // Before create a new payment, delete the previous one, if exists, to avoid double order creation
         if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
-            $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
-            if (!$abort['result']) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
-                );
+            $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
+            if ($payment['result'] && !$payment['resource']->failure) {
+                $this->logger->addLog('Payment already exists: ' . $apiPayment['id_payment'] . ', so we delete it before create a new one');
+                $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
+                if (!$abort['result']) {
+                    return $this->returnPaymentError(
+                        ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                        '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
+                    );
+                }
+                $this->logger->addLog('Payment aborted.');
             }
         }
 
@@ -695,10 +700,15 @@ class PaymentRepository extends BaseClass
         }
 
         $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['id_payment']);
-        if (!$retrievedPayment['result']) {
+        if (!$retrievedPayment['result']
+            || (
+                isset($retrievedPayment['resource']->failure->code)
+                && 'canceled' == $retrievedPayment['resource']->failure->code
+            )) {
             $payment = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($payment['paymentDetails']);
         }
+
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
