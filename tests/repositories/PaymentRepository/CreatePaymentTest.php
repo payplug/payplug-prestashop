@@ -177,6 +177,11 @@ final class CreatePaymentTest extends BasePaymentRepository
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
+            'retrievePayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => PaymentMock::getStandard()
+            ],
             'abortPayment' => [
                 'code' => 500,
                 'result' => false,

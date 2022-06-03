@@ -10,7 +10,6 @@ class Description {
     }
 
     handleEvents() {
-        console.log('handleEvents');
         $(document)
             .on('change', 'input[name=payplug_show]', this.triggerShow)
             .on('click', '._list', function(event){

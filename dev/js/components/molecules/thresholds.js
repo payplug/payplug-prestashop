@@ -1,5 +1,4 @@
 class Thresholds {
-
     props = {
         'container': 'advancedPaylater',
         'limits': {
@@ -7,7 +6,6 @@ class Thresholds {
             max: (typeof oney_max_amounts == 'undefined') ? 0 : oney_max_amounts,
         },
         'query': null,
-
     };
 
 

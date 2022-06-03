@@ -7,8 +7,7 @@ class PaymentMethod {
 
     initialize() {
         paymentMethod.handleEvents();
-        paymentMethod.handleSandbox();
-        paymentMethod.checkPaymentOptionInformation();
+        paymentMethod.handleReloadContent();
     }
 
     handleEvents() {
@@ -17,7 +16,12 @@ class PaymentMethod {
             .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption)
             .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission);
         $(window)
-            .on('reloadEvent', paymentMethod.initialize);
+            .on('reloadEvent', paymentMethod.handleReloadContent);
+    }
+
+    handleReloadContent() {
+        paymentMethod.handleSandbox();
+        paymentMethod.checkPaymentOptionInformation();
     }
 
     handleOneClickPermission(event) {
@@ -166,7 +170,7 @@ class PaymentMethod {
 
     toggleApplePay(hide) {
         const $container = $('.' + paymentMethod.props.container);
-        if ($container.find('.-applepay').length){
+        if ($container.find('.-applepay').length) {
             if (hide) {
                 $container.find('.-applepay').hide();
             } else {
