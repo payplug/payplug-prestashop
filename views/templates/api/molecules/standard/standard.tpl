@@ -19,26 +19,9 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-
 <div class="standardPaymentOptions">
     {capture assign="embeddedModeAction"}
-        {assign var=items value=[
-            [
-                'value' => 'integrated',
-                'dataName' => 'embeddedModeIntegrated',
-                'text' => {l s='standard.embeddedMode.integrated' mod='payplug'}
-            ],
-            [
-                'value' => 'popup',
-                'dataName' => 'embeddedModePopup',
-                'text' => {l s='standard.embeddedMode.popup' mod='payplug'}
-            ],
-            [
-                'value' => 'redirected',
-                'dataName' => 'embeddedModeRedirected',
-                'text' => {l s='standard.embeddedMode.redirected' mod='payplug'}
-            ]
-        ]}
+        {assign var=items value=$embedded_mode_values}
         {include file='./../../atoms/options/options.tpl'
             optionsClassName='_sandboxRadioButton'
             optionsSelected=$payplug_switch.embedded.checked
@@ -77,3 +60,8 @@
             standardPaymentOptionAction=$standardPaymentOption.action}
     {/foreach}
 </div>
+
+{if $installment_isActivated || $deferred_isActivated}
+    {* Advanced Standard Settings (deferred & installments) *}
+    {include file='./standardPaymentAdvanced.tpl'}
+{/if}
