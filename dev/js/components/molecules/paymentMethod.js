@@ -38,12 +38,15 @@ class PaymentMethod {
 
     handlePaymentOption(event) {
         const $switch = $(event.target).parents('.paymentOption_switch');
-        paymentMethod.tooglePaymentOptionInformation($switch);
+        const $sandbox = $('input[name=payplug_sandbox]:checked');
+        const isSandBox = parseInt($sandbox.val());
 
-        if ($switch.is('.-premium')) {
+        if (!isSandBox && $switch.is('.-premium')) {
             event.preventDefault();
             event.stopPropagation();
             paymentMethod.checkPremium($switch);
+        } else {
+            paymentMethod.checkPaymentOptionInformation();
         }
     }
 
@@ -65,6 +68,7 @@ class PaymentMethod {
     checkPremium($switch) {
         const checked = $switch.find('input').prop('checked');
         if (!checked) {
+            paymentMethod.checkPaymentOptionInformation();
             return;
         }
 
@@ -96,6 +100,8 @@ class PaymentMethod {
             success: function (result) {
                 if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
                     paymentMethod.handlePaymentMethod(paymentMethodName);
+                } else {
+                    paymentMethod.checkPaymentOptionInformation();
                 }
             }
         });
@@ -142,6 +148,7 @@ class PaymentMethod {
                     }
                     $container.find('input[name=modalTriggered]').trigger('click');
                 }
+                paymentMethod.checkPaymentOptionInformation();
             }
         });
     }
