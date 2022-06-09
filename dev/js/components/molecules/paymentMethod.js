@@ -15,7 +15,8 @@ class PaymentMethod {
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
             .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption)
             .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission)
-            .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission);
+            .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission)
+            .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
         $(window)
             .on('reloadEvent', paymentMethod.handleReloadContent);
     }
@@ -37,6 +38,28 @@ class PaymentMethod {
         } else {
             $select.addClass('-disabled')
                 .find('._current').removeAttr('tabindex');
+        }
+
+        if (!parseInt($sandbox.val())) {
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
+        }
+    }
+
+    handleInstallmentPermission(event) {
+        const $input = $(event.target),
+            $switch = $input.parents('.installmentSwitch'),
+            $sandbox = $('input[name=payplug_sandbox]:checked'),
+            $select = $('.payplugUISelect.installmentMode'),
+            $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
+
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+            $inputMode.prop('disabled', false);
+        } else {
+            $select.addClass('-disabled')
+            $inputMode.prop('disabled', true);
         }
 
         if (!parseInt($sandbox.val())) {

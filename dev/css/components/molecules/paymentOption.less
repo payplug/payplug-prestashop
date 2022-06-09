@@ -78,16 +78,41 @@
               ._inputs {
                 display: flex;
                 align-items: self-end;
-                .payplugUISelect {
-                  &.installments_panel_select {
+                flex-wrap: wrap;
+                margin-bottom: 10px;
+                p {
+                  white-space: nowrap;
+                }
+                .payplugUISelect, .payplugUIInput {
+                  &.installmentMode, &.installmentMinAmount {
                     width: 120px;
                     margin: 0 10px;
+                  }
+                  ._text {
+                    margin: 0;
                   }
                 }
                 .payplugUIInput {
                   &.maxThreshold {
                     width: 120px;
                     margin: 0 10px;
+                  }
+                }
+              }
+              ._statement {
+                padding: 2px 0 0;
+                width: 100%;
+                display: flex;
+                color: @color-warning;
+                font-size: 14px;
+                .installmentErrorIcon {
+                  display: none;
+                  margin-right: 5.67px;
+
+                  svg {
+                    fill: @color-warning;
+                    width: 20px;
+                    height: 20px;
                   }
                 }
               }
