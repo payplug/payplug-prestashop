@@ -14,7 +14,8 @@ class PaymentMethod {
         $(document)
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
             .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption)
-            .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission);
+            .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission)
+            .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission);
         $(window)
             .on('reloadEvent', paymentMethod.handleReloadContent);
     }
@@ -24,11 +25,37 @@ class PaymentMethod {
         paymentMethod.checkPaymentOptionInformation();
     }
 
+    handleDeferredPermission(event) {
+        const $input = $(event.target),
+            $switch = $input.parents('.deferredSwitch'),
+            $sandbox = $('input[name=payplug_sandbox]:checked'),
+            $select = $('.payplugUISelect.-deferredState');
+
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+                .find('._current').attr('tabindex','1');
+        } else {
+            $select.addClass('-disabled')
+                .find('._current').removeAttr('tabindex');
+        }
+
+        if (!parseInt($sandbox.val())) {
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
+        }
+    }
+
     handleOneClickPermission(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const $switch = $(event.target).parents('.oneClickSwitch');
-        paymentMethod.checkPremium($switch);
+        const $switch = $(event.target).parents('.oneClickSwitch'),
+            $sandbox = $('input[name=payplug_sandbox]:checked'),
+            isSandBox = parseInt($sandbox.val());
+
+        if (!isSandBox) {
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
+        }
     }
 
     checkPaymentOptionInformation() {

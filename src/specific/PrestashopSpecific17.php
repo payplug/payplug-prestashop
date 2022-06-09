@@ -350,14 +350,6 @@ class PrestashopSpecific17
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
         ];
 
-        $switch['deferred_auto'] = [
-            'name' => 'payplug_deferred_auto',
-            'active' => $connected,
-            'checked' => $configurations['deferred_auto'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
-        ];
-
         $this->context->smarty->assign([
             'payplug_switch' => $switch
         ]);

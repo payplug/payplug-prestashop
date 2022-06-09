@@ -189,8 +189,7 @@ class AdminClass
                 )) {
                 $id_order_state = Tools::getValue('payplug_deferred_state');
                 $order_state = new OrderState($id_order_state, $this->context->language->id);
-                if (Tools::getValue('payplug_deferred')
-                    && Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                if (Tools::getValue('payplug_deferred')) {
                     $this->context->smarty->assign([
                         'updated_deferred_state' => true,
                         'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),

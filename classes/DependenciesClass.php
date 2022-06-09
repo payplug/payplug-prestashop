@@ -85,11 +85,6 @@ class DependenciesClass
             'defaultValue' => 0,
             'setConf' => 1
         ],
-        'deferredAuto' => [
-            'name' => 'DEFERRED_AUTO',
-            'defaultValue' => 0,
-            'setConf' => 1
-        ],
         'deferredState' => [
             'name' => 'DEFERRED_STATE',
             'defaultValue' => 0,

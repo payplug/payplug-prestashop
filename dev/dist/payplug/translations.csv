@@ -353,9 +353,10 @@ key;default;tags;fr;en;gb;it
 <{payplug}prestashop>paymentclass_078ed84f95595cd3a2d3e072e2a10d84;payplug.getPaymentOptions.errorOccurred;;"Une erreur est survenue";"An error has occurred";"An error has occurred";"C'è stato un errore"
 <{payplug}prestashop>paymentclass_07c1bd7ea24e42192f02d05ac779576d;payment.getPaymentMethod.applepay.name;;"Paiement Apple Pay";"Apple Pay payment";"Apple Pay payment";"Pagamento Apple Pay"
 <{payplug}prestashop>paymentclass_07d7deb3039ff5ae3b7b45cff4a62a6e;payplug.getPaymentOptions.payWithApplePay;;"Payer avec Apple Pay";"Pay with Apple Pay";"Pay with Apple Pay";"Paga con Apple Pay"
-<{payplug}prestashop>paymentclass_1053fa2bd6a8bf68f2a959c2dabca9d4;payment.getPaymentMethod.embeddedMode.integrated;;"intégré";;;
+<{payplug}prestashop>paymentclass_0d510541ab5dd28d46b8b9a004f31333;payment.getPaymentMethod.deferred.capture.state;;Capture automatique au statut : %s;;;
+<{payplug}prestashop>paymentclass_1053fa2bd6a8bf68f2a959c2dabca9d4;payment.getPaymentMethod.embeddedMode.integrated;;intégré;;;
 <{payplug}prestashop>paymentclass_1249590cfb27680c6f59bd041edd812d;payplug.abortPayment.cannotAbort;;"Le paiement fractionné ne peut pas être annulé.";"Cannot abort installment.";"Cannot abort installment.";"Impossibile interropere il pagamento frazionato."
-<{payplug}prestashop>paymentclass_161d4ffa7573ab94df1ca05d6e39b7ad;payment.getPaymentMethod.embeddedMode.redirected;;"redirigé";;;
+<{payplug}prestashop>paymentclass_161d4ffa7573ab94df1ca05d6e39b7ad;payment.getPaymentMethod.embeddedMode.redirected;;redirigé;;;
 <{payplug}prestashop>paymentclass_17de4c685248dc4807a28e806605f580;payplug.getPaymentOptions.payWithOney;;"Payer en %sx par carte avec Oney";"Pay by card in %sx with Oney";"Pay by card in %sx with Oney";"Paga con la carta in %sx con Oney"
 <{payplug}prestashop>paymentclass_1a5ea175a58e46aec10650431fa85c8e;payplug.capturePayment.errorOccurred;;"Une erreur est survenue";"An error has occurred";"An error has occurred";"C'è stato un errore"
 <{payplug}prestashop>paymentclass_311ed00278a7081d7ad64d730e9f4a37;payplug.capturePayment.cannotCapture;;"Le paiement ne peut pas être capturé.";"Cannot capture this payment.";"Cannot capture this payment.";"Il pagamento non può essere recuperato."
@@ -370,6 +371,7 @@ key;default;tags;fr;en;gb;it
 <{payplug}prestashop>paymentclass_7faae00658a5f76ad9cc9bc9a4c1ab42;payplug.adminAjaxController.card;;Carte;Card;Card;Carta
 <{payplug}prestashop>paymentclass_800b738633beef31d5fe349094cb5af8;payment.getPaymentMethod.bancontact.name;;"Paiement Bancontact";"Bancontact payment";"Bancontact payment";"Pagamento Bancontact"
 <{payplug}prestashop>paymentclass_83e60fba69554a5f829488f69458de48;payplug.getPaymentOptions.payCreditCard;;"Payer par carte bancaire";"Pay with a credit card";"Pay with a credit card";"Pagamento con carta di credito"
+<{payplug}prestashop>paymentclass_8a95e1ff3bfb0cce01ba1985d736a3da;payment.getPaymentMethod.deferred.capture.default;;Capture manuelle;;;
 <{payplug}prestashop>paymentclass_8cbbefbbc036d56175fa34cc4ed2fdf4;payplug.getPaymentOptions.invalidAddresses;;"Indisponible pour le pays spécifié";"Unavailable for the specified country";"Unavailable for the specified country";"Non disponibile per il paese specificato"
 <{payplug}prestashop>paymentclass_953960de2084aeb568cf3e15a1292adb;payplug.getPaymentOptions.card;;Carte;Card;Card;Carta
 <{payplug}prestashop>paymentclass_9bf217744be4e0ee492005a526bc6953;payplug.buildPaymentDetails.oneyX4WithoutFees;;"Oney 4x sans frais";"Oney 4x without fees";"Oney 4x without fees";"Oney 4x senza spese"
@@ -390,7 +392,7 @@ key;default;tags;fr;en;gb;it
 <{payplug}prestashop>paymentclass_f4696d6a0444803c87f011ef1b61d6b6;payment.getPaymentMethod.applepay.description;;"Afficher le bouton de paiement Apple Pay sur votre boutique.";"Display the Apple Pay payment button on your store.";"Display the Apple Pay payment button on your store.";"Visualizza il pulsante di pagamento Apple Pay sul tuo negozio"
 <{payplug}prestashop>paymentclass_f59c945d932b249cb6f66ab244377e43;payplug.buildPaymentDetails.oneyX3WithoutFees;;"Oney 3x sans frais";"Oney 3x without fees";"Oney 3x without fees";"Oney 3x senza spese"
 <{payplug}prestashop>paymentclass_f8519a87542797a26e116bd8fc3c4970;payplug.buildPaymentDetails.oneyX4WithFees;;"Oney 4x";"Oney 4x";"Oney 4x";"Oney 4x"
-<{payplug}prestashop>paymentclass_f8a017001ba759f405e385bf230f1ad2;payment.getPaymentMethod.embeddedMode.popup;;"popup";;;
+<{payplug}prestashop>paymentclass_f8a017001ba759f405e385bf230f1ad2;payment.getPaymentMethod.embeddedMode.popup;;popup;;;
 <{payplug}prestashop>paymentclass_fbc949dd4d0920fc2a222c6398c28f9d;payment.getPaymentMethod.bancontact.description;;"Permettez à vos clients de payer avec leurs cartes Bancontact.";"Allow your customers to pay with their Bancontact card.";"Allow your customers to pay with their Bancontact card.";"Permetti ai tuoi clienti di pagare con la loro carta Bancontact."
 <{payplug}prestashop>paymentmethod_053e0c671684e3765b340a91eb1671f7;paymentMethod.block.description;;"Choisissez les moyens de paiement que vous souhaitez proposer à vos clients.";"Choose the payment methods you wish to offer your customers.";"Choose the payment methods you wish to offer your customers.";"Scegli i metodi di pagamento che desideri offrire ai tuoi clienti."
 <{payplug}prestashop>paymentmethod_a9fda105749c2b452535c73006f7df07;paymentMethod.block.title;;"Moyens de paiement";"Payment methods";"Payment methods";"Metodi di pagamento"
