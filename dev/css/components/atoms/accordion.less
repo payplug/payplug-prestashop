@@ -22,7 +22,7 @@
       }
 
       ~ div {
-        max-height: 100vh;
+        display: block;
       }
     }
   }
@@ -60,10 +60,9 @@
 
   &_content {
     &Wrapper {
+      display: none;
+      display: block;
       padding: 0 24px;
-      max-height: 0;
-      overflow: hidden;
-      transition: all .35s;
       max-width: 100%;
     }
 

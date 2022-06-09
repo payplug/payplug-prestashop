@@ -58,6 +58,7 @@
                 <li>key: string (mandatory)</li>
                 <li>value: string (mandatory)</li>
                 <li>selected: boolean (optional)</li>
+                <li>scrollbar: boolean (optional)</li>
             </ul>
         </div>
         <div>

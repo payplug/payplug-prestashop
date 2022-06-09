@@ -613,7 +613,6 @@ class ConfigClass
         $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
-            $this->dependencies->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
             $this->dependencies->getConfigurationKey('show') => 'payplug_show',
             $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded',
@@ -735,7 +734,6 @@ class ConfigClass
             'live_api_key' => Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')),
             'debug_mode' => Configuration::get($this->dependencies->getConfigurationKey('debugMode')),
             'deferred' => Configuration::get($this->dependencies->getConfigurationKey('deferred')),
-            'deferred_auto' => Configuration::get($this->dependencies->getConfigurationKey('deferredAuto')),
             'deferred_state' => Configuration::get($this->dependencies->getConfigurationKey('deferredState')),
             'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
             'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
@@ -882,7 +880,6 @@ class ConfigClass
             'show' => $this->configurations['show'],
             'debug_mode' => $this->configurations['debug_mode'],
             'deferred' => $this->configurations['deferred'],
-            'deferred_auto' => $this->configurations['deferred_auto'],
             'deferred_state' => $this->configurations['deferred_state'],
             'oney' => $this->configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
@@ -1063,14 +1060,6 @@ class ConfigClass
             'name' => 'payplug_deferred',
             'active' => $connected,
             'checked' => $configurations['deferred'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
-        ];
-
-        $switch['deferred_auto'] = [
-            'name' => 'payplug_deferred_auto',
-            'active' => $connected,
-            'checked' => $configurations['deferred_auto'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
