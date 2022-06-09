@@ -854,7 +854,7 @@ class ConfigClass
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass')),
+                    $this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),
