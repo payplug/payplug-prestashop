@@ -30,7 +30,7 @@
       }
     }
 
-    ._text {
+    & > ._text {
       margin: 0 0 0 @margin-6;
 
       ._title {
@@ -82,35 +82,12 @@
                     width: 120px;
                     margin: 0 10px;
                   }
-                  ._text {
-                    margin: 0;
-                  }
                 }
                 .payplugUIInput {
                   &.maxThreshold {
                     width: 120px;
                     margin: 0 10px;
                   }
-                }
-              }
-            }
-          }
-          &.-deferred {
-            .payplugUISelect{
-              &.deferred_panel_select {
-                ._current {
-                  &:focus {
-                    & + ._list {
-                      max-height: 150px;
-                      overflow: scroll;
-                    }
-                  }
-                }
-                ._list {
-                  scrollbar-width: none;
-                }
-                ._list::-webkit-scrollbar {
-                  display: none;
                 }
               }
             }

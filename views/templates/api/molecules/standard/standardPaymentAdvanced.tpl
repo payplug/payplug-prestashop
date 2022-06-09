@@ -88,84 +88,70 @@
                 {capture assign=installmentFaqLink}{$faq_links.installments}{/capture}
                 {capture assign=installmentFaqLinkText}{l s='standard.block.installment.faq.link.text' mod='payplug'}{/capture}
                 {include file='./../../atoms/link/link.tpl'
-                linkText=$installmentFaqLinkText|escape:'htmlall':'UTF-8'
-                linkHref=$installmentFaqLink|escape:'htmlall':'UTF-8'
-                linkTarget='_blank'
-                linkData='data-faqInstallmentLink'}
+                    linkText=$installmentFaqLinkText|escape:'htmlall':'UTF-8'
+                    linkHref=$installmentFaqLink|escape:'htmlall':'UTF-8'
+                    linkTarget='_blank'
+                    linkData='data-faqInstallmentLink'}
             {/if}
         </p>
         {capture assign="installmentAlertText"}{l s='standard.block.installmentAlertContent' tags=['<br>'] mod='payplug'}{/capture}
         {include file='./../../atoms/textAlert/textAlert.tpl'
-        textAlertType='warning'
-        textAlertText=$installmentAlertText}
+            textAlertType='warning'
+            textAlertText=$installmentAlertText}
     {/capture}
 
-    {* Deferred Block *}
-
-    {* Deferred Title *}
-    {capture assign="deferredTitle"}{l s='standard.block.deferredTitle' mod='payplug'}{/capture}
     {* Deferred Switch *}
     {capture assign="deferredSwitch"}
         {include file='./../../atoms/switch/switch.tpl'
-        switchEnabledLabel='On'
-        switchDisabledLabel='Off'
-        switchDataName='deferredSwitch'
-        switchChecked=$payplug_switch.deferred.checked
-        switchClassName="deferredSwitch"
-        switchName='deferredSwitch'}
+            switchEnabledLabel='On'
+            switchDisabledLabel='Off'
+            switchDataName='deferredSwitch'
+            switchChecked=$payplug_switch.deferred.checked
+            switchClassName="deferredSwitch"
+            switchName=$payplug_switch.deferred.name}
     {/capture}
 
     {* Deferred Content *}
     {capture assign="deferredContent"}
-        <p>{l s='standard.block.deferred.description' mod='payplug'}
+        <p>
+            {l s='standard.block.deferred.description' mod='payplug'}
             {if isset($faq_links.deferred) && $faq_links.deferred}
-                {capture assign=deferredFaqLink}{$faq_links.deferred}{/capture}
-                {capture assign=deferredFaqLinkText}{l s='standard.block.deferred.faq.link.text' mod='payplug'}{/capture}
                 {include file='./../../atoms/link/link.tpl'
-                linkText=$deferredFaqLinkText|escape:'htmlall':'UTF-8'
-                linkHref=$deferredFaqLink|escape:'htmlall':'UTF-8'
-                linkTarget='_blank'
-                linkData='data-faqdeferredLink'}
+                    linkText={l s='standard.block.deferred.faq.link.text' mod='payplug'}
+                    linkHref=$faq_links.deferred
+                    linkTarget='_blank'
+                    linkData='data-faqdeferredLink'}
             {/if}
         </p>
-
         <div class="_inputs">
             <p>{l s='standard.block.deferredBeforeText' mod='payplug'}</p>
-
-            {assign var='deferredSelect' value=$order_states_values}
             {include file='./../../atoms/select/select.tpl'
-            selectClassName='deferred_panel_select'
-            selectName='deferred_panel_select'
-            selectOptions=$deferredSelect}
+                selectClassName='-deferredState'
+                selectName='payplug_deferred_state'
+                selectData='deferredSelect'
+                selectScrollbar=true
+                selectOptions=$order_states_values}
         </div>
-
-        {capture assign="deferredAlertText"}{l s='standard.block.deferredAlertContent' mod='payplug'}{/capture}
         {include file='./../../atoms/textAlert/textAlert.tpl'
-        textAlertType='warning'
-        textAlertText=$deferredAlertText}
+            textAlertType='warning'
+            textAlertText={l s='standard.block.deferredAlertContent' mod='payplug'}
+        }
     {/capture}
 
-    {assign var='standardAdvancedOptions' value=[
-    [
-    'className' => 'installment',
-    'title' => $installmentTitle,
-    'switch' => $installmentSwitch,
-    'content' => $installmentContent
-    ],
-    [
-    'className' => 'deferred',
-    'title' => $deferredTitle,
-    'switch' => $deferredSwitch,
-    'content' => $deferredContent
-    ]
-    ]}
-    {foreach $standardAdvancedOptions as $standardAdvancedOption}
+    {if $installment_isActivated }
         {include file='./standardPaymentAdvancedOption.tpl'
-        standardAdvancedOptionClassName=$standardAdvancedOption.className
-        standardAdvancedOptionTitle=$standardAdvancedOption.title
-        standardAdvancedOptionSwitch=$standardAdvancedOption.switch
-        standardAdvancedOptionContent=$standardAdvancedOption.content}
-    {/foreach}
+            standardAdvancedOptionClassName='installment'
+            standardAdvancedOptionTitle=$installmentTitle
+            standardAdvancedOptionSwitch=$installmentSwitch
+            standardAdvancedOptionContent=$installmentContent}
+    {/if}
+    {if $deferred_isActivated }
+        {include file='./standardPaymentAdvancedOption.tpl'
+            standardAdvancedOptionClassName='deferred'
+            standardAdvancedOptionTitle={l s='standard.block.deferredTitle' mod='payplug'}
+            standardAdvancedOptionSwitch=$deferredSwitch
+            standardAdvancedOptionContent=$deferredContent}
+    {/if}
 {/capture}
 
 {include file='./../../atoms/accordion/accordion.tpl'
