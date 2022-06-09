@@ -102,6 +102,28 @@ class PaymentMethod {
         }
     }
 
+    handleInstallmentPermission(event) {
+        const $input = $(event.target),
+            $switch = $input.parents('.installmentSwitch'),
+            $sandbox = $('input[name=payplug_sandbox]:checked'),
+            $select = $('.payplugUISelect.installmentMode'),
+            $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
+
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+            $inputMode.prop('disabled', false);
+        } else {
+            $select.addClass('-disabled')
+            $inputMode.prop('disabled', true);
+        }
+
+        if (!parseInt($sandbox.val())) {
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
+        }
+    }
+
     handleOneClickPermission(event) {
         const $switch = $(event.target).parents('.oneClickSwitch'),
             $sandbox = $('input[name=payplug_sandbox]:checked'),
