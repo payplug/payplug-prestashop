@@ -3,10 +3,18 @@
 require_once(dirname(__FILE__) . '/src/Translations.php');
 
 $repo = new Translations();
-$translations = $repo->getTranslations();
 $moduleName = $repo->getModuleName();
 
+if ('payplug' != $moduleName) {
+    $script = shell_exec('sh ./dev/ci/set_translation.sh');
+}
+
+$translations = $repo->getTranslations();
 ksort($translations);
+
+if ('payplug' != $moduleName) {
+    $script = shell_exec('sh ./dev/ci/set_translation.sh -m reverse');
+}
 
 $missing_translations = [];
 $available_languages = ['fr', 'en', 'gb', 'it'];
