@@ -111,6 +111,13 @@ class PaymentClass
             ]));
         } else {
             $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+            if (!$installment['result']) {
+                die(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.abortPayment.cannotAbort', 'paymentclass')
+                ]));
+            }
+
             $installment = $installment['resource'];
 
             if ($installment->is_live == 1) {
@@ -246,12 +253,11 @@ class PaymentClass
     public function buildPaymentDetails($payment)
     {
         if (!is_object($payment)) {
-            try {
-                $payment = $this->dependencies->apiClass->retrievePayment($payment);
-                $payment = $payment['resource'];
-            } catch (Exception $exception) {
-                return $exception;
+            $payment = $this->dependencies->apiClass->retrievePayment($payment);
+            if (!$payment['result']) {
+                return $payment['message'];
             }
+            $payment = $payment['resource'];
         }
 
         $pay_status = $this->getPaymentStatusByPayment($payment);
@@ -1374,11 +1380,18 @@ class PaymentClass
         */
         if (!is_object($payment)) {
             $payment = $this->dependencies->apiClass->retrievePayment($payment);
+            if (!$payment['result']) {
+                return false;
+            }
             $payment = $payment['resource'];
         }
 
         if ($payment->installment_plan_id !== null) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($payment->installment_plan_id);
+            if (!$installment['result']) {
+                return false;
+            }
+
             $installment = $installment['resource'];
         } else {
             $installment = null;
@@ -1480,12 +1493,12 @@ class PaymentClass
         switch ($type) {
             case 'installment':
                 $installment = $this->dependencies->apiClass->retrieveInstallment($payment_id);
-                if (isset($installment['resource']) && $installment['resource']->is_active) {
-                    $schedules = $installment->schedule;
+                if ($installment['result'] && $installment['resource']->is_active) {
+                    $schedules = $installment['resource']->schedule;
                     foreach ($schedules as $schedule) {
                         foreach ($schedule->payment_ids as $pay_id) {
                             $inst_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                            if (isset($inst_payment['resource']) && $inst_payment['resource']->is_paid) {
+                            if ($inst_payment['result'] && $inst_payment['resource']->is_paid) {
                                 return true;
                             }
                         }
@@ -1495,7 +1508,7 @@ class PaymentClass
             case 'payment':
             default:
                 $payment = $this->dependencies->apiClass->retrievePayment($payment_id);
-                return isset($payment['resource']) && $payment['resource']->is_paid;
+                return $payment['result'] && $payment['resource']->is_paid;
         }
         return false;
     }

@@ -104,31 +104,23 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
             )
         );
 
-        try {
-            $this->logger->addLog('Create payment with datas', 'info');
-            $createPayment = $this->dependencies->apiClass->createPayment($request_datas);
+        $this->logger->addLog('Create payment with datas', 'info');
+        $createPayment = $this->dependencies->apiClass->createPayment($request_datas);
 
-            if ($createPayment['code'] != 200) {
-                $this->logger->addLog('Error during payment creation', 'error');
-                die(json_encode([
-                    'result' => false,
-                    'error_message' => 'Error during payment creation'
-                ]));
-            }
-
-            $this->logger->addLog('Ressource ID : ' . Tools::jsonEncode($createPayment['resource']->id), 'info');
-
-            die(json_encode([
-                'result' => true,
-                'apiResponse' => $createPayment['resource']->payment_method,
-                'idPayment' => $createPayment['resource']->id
-            ]));
-        } catch (Exception $e) {
-            $this->logger->addLog($e, 'error');
+        if (!$createPayment['result']) {
+            $this->logger->addLog('Error during payment creation', 'error');
             die(json_encode([
                 'result' => false,
-                'error_message' => $e
+                'error_message' => 'Error during payment creation'
             ]));
         }
+
+        $this->logger->addLog('Ressource ID : ' . Tools::jsonEncode($createPayment['resource']->id), 'info');
+
+        die(json_encode([
+            'result' => true,
+            'apiResponse' => $createPayment['resource']->payment_method,
+            'idPayment' => $createPayment['resource']->id
+        ]));
     }
 }

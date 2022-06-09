@@ -250,6 +250,11 @@ class PayPlugNotifications
 
             $amount = 0;
             $installment = $this->apiClass->retrieveInstallment($this->resource->installment_plan_id);
+            if (!$installment['result']) {
+                $this->logger->addLog('Can\'t retrieve installment: ' . $installment['message']);
+                $this->exitProcess('Can\'t retrieve installment: ' . $installment['message']);
+            }
+
             $installment = $installment['resource'];
             foreach ($installment->schedule as $schedule) {
                 $amount += (int)$schedule->amount;
@@ -384,16 +389,14 @@ class PayPlugNotifications
             $data = [];
             $data['metadata'] = $this->payment->metadata;
             $data['metadata']['Order'] = $this->order->id;
-            try {
-                $this->logger->addLog('Payment patched.', 'debug');
-                $this->apiClass->patchPayment($this->payment->id, $data);
-            } catch (Exception $exception) {
-                $this->logger->addLog(
-                    'Payment cannot be patched: ' . $exception->getMessage(),
-                    'error'
-                );
-                $this->exitProcess($exception->getMessage(), 500);
+
+            $patchPayment = $this->apiClass->patchPayment($this->payment->id, $data);
+            if (!$patchPayment['result']) {
+                $this->logger->addLog('Payment cannot be patched: ' . $patchPayment['message'], 'error');
+                $this->exitProcess($patchPayment['message'], 500);
             }
+
+            $this->logger->addLog('Payment patched.', 'debug');
 
             if (!$this->orderClass->addPayplugOrderPayment($this->order->id, $this->payment->id)) {
                 $this->logger->addLog(
@@ -529,6 +532,11 @@ class PayPlugNotifications
 
         if ($this->payment->installment_plan_id) {
             $installment = $this->apiClass->retrieveInstallment($this->payment->installment_plan_id);
+            if (!$installment['result']) {
+                $this->logger->addLog('Installment cannot be retrieved: ' . $installment['message'], 'error');
+                $this->exitProcess($installment['message'], 500);
+            }
+
             $installment = $installment['resource'];
             $meta = $installment->metadata;
         } else {
