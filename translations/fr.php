@@ -60,6 +60,7 @@ $_MODULE['<{payplug}prestashop>cards_list_807bcef3f33f11623310535338ef7afc'] = '
 $_MODULE['<{payplug}prestashop>cards_list_95b16127e70e8a90220404fb48343182'] = 'Date d\'expiration';
 $_MODULE['<{payplug}prestashop>cards_list_c7d4153f748ba1dd21ae002c37c00906'] = 'Masque';
 $_MODULE['<{payplug}prestashop>cards_list_f2a6c498fb90ee345d997f888fce3b18'] = 'Supprimer';
+$_MODULE['<{payplug}prestashop>configclass_0075d40d4d975a871ab6fe5d4b1891bc'] = 'Le montant doit être supérieur à 4€ et inférieur à 20000€.';
 $_MODULE['<{payplug}prestashop>configclass_07b724fa5d5c3eca8a51696d412acece'] = 'Oney: ';
 $_MODULE['<{payplug}prestashop>configclass_0c8d9f2cbab52f173e62830b23e2c4f0'] = 'remboursé partiellement';
 $_MODULE['<{payplug}prestashop>configclass_178a1778e1eae5441f2dd79bacd94900'] = 'autorisation expirée';
