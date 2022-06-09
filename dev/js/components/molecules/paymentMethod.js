@@ -81,6 +81,27 @@ class PaymentMethod {
         paymentMethod.handleInstallment(event);
     }
 
+    handleDeferredPermission(event) {
+        const $input = $(event.target),
+            $switch = $input.parents('.deferredSwitch'),
+            $sandbox = $('input[name=payplug_sandbox]:checked'),
+            $select = $('.payplugUISelect.-deferredState');
+
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+                .find('._current').attr('tabindex','1');
+        } else {
+            $select.addClass('-disabled')
+                .find('._current').removeAttr('tabindex');
+        }
+
+        if (!parseInt($sandbox.val())) {
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
+        }
+    }
+
     handleOneClickPermission(event) {
         const $switch = $(event.target).parents('.oneClickSwitch'),
             $sandbox = $('input[name=payplug_sandbox]:checked'),
