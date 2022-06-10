@@ -337,6 +337,7 @@ $_MODULE['<{payplug}prestashop>order_7dc6df1573a0a85fc5de252401098d0c'] = 'Déta
 $_MODULE['<{payplug}prestashop>order_8d49a0528d1f5a7d4283cc00f9a08f4b'] = 'La capture de ce paiement est autorisée avant le %s. Après cette date, vous ne pourrez plus être payé.';
 $_MODULE['<{payplug}prestashop>order_state_87b9c32cfe0d587a0a635bc846380859'] = 'Attention, le statut de commande [1]%s[/1] n\'est pas configuré pour être interprété par le module PayPlug. Pour que vos paiements associés au module soient parfaitement traités, nous vous conseillons d\'éditer la [2]Configuration avec le module PayPlug[/2] depuis vos paramètres de commande en cliquant [3]ICI[/3].';
 $_MODULE['<{payplug}prestashop>order_state_da2fde2b954058fb173a89c89416e4e4'] = 'Si vous souhaitez avoir plus d\'informations, vous pouvez consultez notre FAQ en cliquant [1]ICI[/1].';
+$_MODULE['<{payplug}prestashop>orderstate_ca8fc3f6d9cd3f36974d728bb0995e1c'] = 'Attention : les commandes en différé qui sont actuellement au statut "%s" devront être capturées manuellement.';
 $_MODULE['<{payplug}prestashop>paylater_0f6ba158a6c94cb2beb80d802f0cc9dc'] = 'Sélectionnez vos préférences de paramétrage du PayLater pour afficher le 3x 4x Oney sur votre boutique.';
 $_MODULE['<{payplug}prestashop>paylater_8034690a81787782c699be7078f5e19d'] = 'Paiements 3x 4x via Oney';
 $_MODULE['<{payplug}prestashop>paylater_851b0aeddc3b21f358b122f0181e51d7'] = 'Sans frais';
@@ -538,7 +539,6 @@ $_MODULE['<{payplug}prestashop>standardpaymentadvanced_99aa040819d91707e0916a547
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_c02b7c5e43cd79432e8efcd896dd513c'] = 'Différer le déclenchement du paiement';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_e2804ca427b823e6bce40f7c9e4e5081'] = 'Paramétrages avancés';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_f3f6dacbd2271bb462f6462c2c31aa7b'] = 'Proposez à vos clients de régler leurs commandes en';
-$_MODULE['<{payplug}prestashop>standardpaymentadvanced_fdee4ec6d9cba9b70cf281f6d2490477'] = 'Attention : les commandes en différé qui sont actuellement au statut "Expédié" devront être capturées manuellement.';
 $_MODULE['<{payplug}prestashop>standardpaymentoption_b373361c851eddd07156d93d12537ac4'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>state_2a0b6680cbda364ef176a154fbb60e17'] = 'Votre serveur doit disposer d\'une version 1.0.1 ou supérieure d\'OpenSSL.';
 $_MODULE['<{payplug}prestashop>state_38fb08d8fa55b1bea92ae70b46a4aed0'] = 'Contrôlez votre environnement pour assurer le fonctionnement optimal du module.';

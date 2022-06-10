@@ -15,18 +15,18 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - 2022 PayPlug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\interfaces;
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
 
-interface OrderStateInterface
-{
-    public function delete();
-    public function get($id, $idLang);
-    public static function getOrderState($id);
-    public function softDelete();
-}
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+header("Location: ../../../../");
+exit;
