@@ -33,6 +33,21 @@ class Installments {
         }
     }
 
+    handleInstallment(event) {
+        const $input = $(event.target),
+            $select = $('.payplugUISelect.installmentMode'),
+            $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
+
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+                .find('._current').attr('tabindex', '1');
+            $inputMode.prop('disabled', false);
+        } else {
+            $select.addClass('-disabled')
+                .find('._current').removeAttr('tabindex');
+            $inputMode.prop('disabled', true);
+        }
+    }
 }
 
 const installments = new Installments();

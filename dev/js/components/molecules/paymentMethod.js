@@ -84,16 +84,7 @@ class PaymentMethod {
     handleDeferredPermission(event) {
         const $input = $(event.target),
             $switch = $input.parents('.deferredSwitch'),
-            $sandbox = $('input[name=payplug_sandbox]:checked'),
-            $select = $('.payplugUISelect.-deferredState');
-
-        if ($input.prop('checked')) {
-            $select.removeClass('-disabled')
-                .find('._current').attr('tabindex','1');
-        } else {
-            $select.addClass('-disabled')
-                .find('._current').removeAttr('tabindex');
-        }
+            $sandbox = $('input[name=payplug_sandbox]:checked');
 
         if (!parseInt($sandbox.val())) {
             event.preventDefault();
@@ -105,17 +96,7 @@ class PaymentMethod {
     handleInstallmentPermission(event) {
         const $input = $(event.target),
             $switch = $input.parents('.installmentSwitch'),
-            $sandbox = $('input[name=payplug_sandbox]:checked'),
-            $select = $('.payplugUISelect.installmentMode'),
-            $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
-
-        if ($input.prop('checked')) {
-            $select.removeClass('-disabled')
-            $inputMode.prop('disabled', false);
-        } else {
-            $select.addClass('-disabled')
-            $inputMode.prop('disabled', true);
-        }
+            $sandbox = $('input[name=payplug_sandbox]:checked');
 
         if (!parseInt($sandbox.val())) {
             event.preventDefault();
