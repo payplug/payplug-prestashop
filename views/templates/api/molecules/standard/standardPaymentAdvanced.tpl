@@ -75,7 +75,6 @@
             iconClassName='installmentErrorIcon'}
             <span class="installmentError" data-e2e-name="installment_amount_error"></span>
         </div>
-
         <p>
             {l s='standard.block.installment.description' mod='payplug'}
             {if isset($installments_panel_url) && $installments_panel_url}
@@ -129,16 +128,12 @@
         <div class="_inputs">
             <p>{l s='standard.block.deferredBeforeText' mod='payplug'}</p>
             {include file='./../../atoms/select/select.tpl'
-                selectClassName='-deferredState'
+                selectClassName='-deferred'
                 selectName='payplug_deferred_state'
                 selectData='deferredSelect'
                 selectScrollbar=true
                 selectOptions=$order_states_values}
         </div>
-        {include file='./../../atoms/textAlert/textAlert.tpl'
-            textAlertType='warning'
-            textAlertText={l s='standard.block.deferredAlertContent' mod='payplug'}
-        }
     {/capture}
 
     {if $installment_isActivated }

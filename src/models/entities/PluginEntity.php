@@ -103,6 +103,9 @@ class PluginEntity
     private $order_state;
 
     /** @var object */
+    private $order_state_specific;
+
+    /** @var object */
     private $payment;
 
     /** @var object */
@@ -408,6 +411,14 @@ class PluginEntity
     public function getOrderState()
     {
         return $this->order_state;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderStateSpecific()
+    {
+        return $this->order_state_specific;
     }
 
     /**
@@ -769,6 +780,22 @@ class PluginEntity
         }
 
         $this->order_state = $order_state;
+        return $this;
+    }
+
+    /**
+     * @param object $order_state
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setOrderStateSpecific($order_state_specific)
+    {
+        if (!is_object($order_state_specific)) {
+            $error_msg = 'Invalid argument, $order_state_specific must be an OrderStateSpecific';
+            throw (new BadParameterException($error_msg));
+        }
+
+        $this->order_state_specific = $order_state_specific;
         return $this;
     }
 
