@@ -155,6 +155,7 @@ class PluginInit extends BaseClass
             ->setOrder($this->order)
             ->setOrderHistory($this->order_history)
             ->setOrderState($this->order_state)
+            ->setOrderStateSpecific($this->order_state_specific)
             ->setQuery($this->query)
             ->setSql($this->sql)
             ->setTools($this->tools)
