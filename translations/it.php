@@ -60,6 +60,7 @@ $_MODULE['<{payplug}prestashop>cards_list_807bcef3f33f11623310535338ef7afc'] = '
 $_MODULE['<{payplug}prestashop>cards_list_95b16127e70e8a90220404fb48343182'] = 'Data di scadenza';
 $_MODULE['<{payplug}prestashop>cards_list_c7d4153f748ba1dd21ae002c37c00906'] = 'Le ultime 4 cifre della carta';
 $_MODULE['<{payplug}prestashop>cards_list_f2a6c498fb90ee345d997f888fce3b18'] = 'Elimina';
+$_MODULE['<{payplug}prestashop>configclass_0075d40d4d975a871ab6fe5d4b1891bc'] = 'Il totale deve essere superiore a 4€ ed inferiore a 20000€.';
 $_MODULE['<{payplug}prestashop>configclass_07b724fa5d5c3eca8a51696d412acece'] = 'Oney:';
 $_MODULE['<{payplug}prestashop>configclass_0c8d9f2cbab52f173e62830b23e2c4f0'] = 'rimborsato parzialmente';
 $_MODULE['<{payplug}prestashop>configclass_178a1778e1eae5441f2dd79bacd94900'] = 'autorizzazione scaduta';

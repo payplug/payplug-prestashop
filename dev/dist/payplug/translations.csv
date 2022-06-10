@@ -57,6 +57,7 @@ key;default;tags;fr;en;gb;it
 <{payplug}prestashop>cards_list_95b16127e70e8a90220404fb48343182;"Expiry date";;"Date d'expiration";"Expiry date";"Expiry date";"Data di scadenza"
 <{payplug}prestashop>cards_list_c7d4153f748ba1dd21ae002c37c00906;"Card mask";;Masque;"Card mask";"Card mask";"Le ultime 4 cifre della carta"
 <{payplug}prestashop>cards_list_f2a6c498fb90ee345d997f888fce3b18;Delete;;Supprimer;Delete;Delete;Elimina
+<{payplug}prestashop>configclass_0075d40d4d975a871ab6fe5d4b1891bc;config.assignContentVar.installment.amountError;;Le montant doit être supérieur à 4€ et inférieur à 20000€.;Amount must be greater than 4€ and lower than 20000€.;Amount must be greater than 4€ and lower than 20000€.;Il totale deve essere superiore a 4€ ed inferiore a 20000€.
 <{payplug}prestashop>configclass_07b724fa5d5c3eca8a51696d412acece;payplug.assignContentVar.oney;;"Oney: ";"Oney: ";"Oney: ";Oney:
 <{payplug}prestashop>configclass_0c8d9f2cbab52f173e62830b23e2c4f0;payplug.setConfigurationProperties.partiallyRefunded;;"remboursé partiellement";"partially refunded";"partially refunded";"rimborsato parzialmente"
 <{payplug}prestashop>configclass_178a1778e1eae5441f2dd79bacd94900;payplug.setConfigurationProperties.authorizationExpired;;"autorisation expirée";"authorization expired";"authorization expired";"autorizzazione scaduta"

@@ -36,7 +36,7 @@
         switchDataName='installmentSwitch'
         switchChecked=$payplug_switch.installment.checked
         switchClassName="installmentSwitch"
-        switchName='installmentSwitch'}
+        switchName='payplug_inst'}
     {/capture}
 
     {* Installment Content *}
@@ -47,30 +47,33 @@
             {capture assign="threetimes"}{l s='standard.block.installments.3times' mod='payplug'}{/capture}
             {capture assign="fourtimes"}{l s='standard.block.installments.4times' mod='payplug'}{/capture}
             {assign var='installmentsSelect' value=[
-                ['key' => '0', 'value' => {$twotimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 2)],
-                ['key' => '1', 'value' => {$threetimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 3)],
-                ['key' => '2', 'value' => {$fourtimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 4)]
+                ['key' => 0, 'value' => {$twotimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 0)],
+                ['key' => 1, 'value' => {$threetimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 1)],
+                ['key' => 2, 'value' => {$fourtimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 2)]
             ]}
             {include file='./../../atoms/select/select.tpl'
-            selectClassName='installments_panel_select'
-            selectName='installments_panel_select'
-            selectOptions=$installmentsSelect}
+            selectDisabled=!$payplug_switch.installment.checked
+            selectClassName='installmentMode'
+            selectName='payplug_inst_mode'
+            selectOptions=$installmentsSelect
+            selectData='installment_mode_select'}
             <p>{l s='standard.block.installmentBetweenText' mod='payplug'}</p>
             {include file='./../../atoms/input/input.tpl'
+            inputDisabled=!$payplug_switch.installment.checked
             inputType='number'
             inputMin=4
             inputMax=20000
             inputValue=$inst_min_amount|escape:'htmlall':'UTF-8'
             inputIcon='Euro'
-            inputClassName='maxThreshold'
-            inputName='payplug_oney_custom_max_amounts'
-            inputData='oneyThresholdMax'}
+            inputClassName='installmentMinAmount'
+            inputName='payplug_inst_min_amount'
+            inputData='installmentMinAmount'}
         </div>
         <div class="_statement">
             {include file='./../../atoms/icon/icon.tpl'
             iconName='error'
             iconClassName='installmentErrorIcon'}
-            <span class="installmentError" data-e2e-error="installmentError"></span>
+            <span class="installmentError" data-e2e-name="installment_amount_error"></span>
         </div>
 
         <p>
