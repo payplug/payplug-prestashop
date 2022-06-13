@@ -22,11 +22,9 @@
 
 
 <div class="payplugUIAccordion
-    {if isset($accordionClassName) && $accordionClassName} {$accordionClassName|escape:'htmlall':'UTF-8'}{/if}">
-    <input type="checkbox"
-           id="{$accordionIdentifier|escape:'htmlall':'UTF-8'}"
-            {if isset($accordionData) && $accordionData} data-e2e-name="{$accordionData|escape:'htmlall':'UTF-8'}"{/if}/>
-
+    {if isset($accordionClassName) && $accordionClassName} {$accordionClassName|escape:'htmlall':'UTF-8'}{/if}"
+    {if isset($accordionData) && $accordionData} data-e2e-name="{$accordionData|escape:'htmlall':'UTF-8'}"{/if}>
+    <input type="checkbox" id="{$accordionIdentifier|escape:'htmlall':'UTF-8'}"/>
         <label for="{$accordionIdentifier|escape:'htmlall':'UTF-8'}">
             {if isset($accordionLabel) && $accordionLabel}
                 {$accordionLabel|escape:'htmlall':'UTF-8'}
