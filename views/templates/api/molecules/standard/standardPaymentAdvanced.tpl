@@ -128,6 +128,7 @@
         <div class="_inputs">
             <p>{l s='standard.block.deferredBeforeText' mod='payplug'}</p>
             {include file='./../../atoms/select/select.tpl'
+                selectDisabled=!$payplug_switch.deferred.checked
                 selectClassName='-deferred'
                 selectName='payplug_deferred_state'
                 selectData='deferredSelect'
