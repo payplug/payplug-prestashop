@@ -25,7 +25,7 @@
     {if isset($linkDisabled) && $linkDisabled} -disabled{/if}"
     {if isset($linkHref) && $linkHref} href="{$linkHref|escape:'htmlall':'UTF-8'}"{/if}
     target="{if isset($linkTarget) && $linkTarget}{$linkTarget|escape:'htmlall':'UTF-8'}{else}_blank{/if}"
-    title="{$linkText|escape:'htmlall':'UTF-8'}"
+    title="{$linkText|escape:'UTF-8'}"
     {if isset($linkData) && $linkData} data-e2e-name="{$linkData|escape:'htmlall':'UTF-8'}"{/if}
 {if isset($linkDisabled) && $linkDisabled} disabled="disabled"{/if}>
     {$linkText|escape:'UTF-8'}
