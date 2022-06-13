@@ -534,7 +534,7 @@ Consulta la nostra [2]pagina di supporto[/2] per ottenere una versione del modul
 <{payplug}prestashop>standardpaymentadvanced_7825bc98696486af6852228549e334ef;standard.block.installmentTitle;;"Activer les paiements fractionnés non garantis";;;
 <{payplug}prestashop>standardpaymentadvanced_7ac9f4061a79d200e09c0073443f1a6f;standard.block.installment.description;;"Vous pourrez consulter toutes vos échéances de paiement (passées et à venir) dans ce ";;;
 <{payplug}prestashop>standardpaymentadvanced_7d5e5a1f875e63545d906f11c97576d2;standard.block.installmentBetweenText;;"à partir de";;;
-<{payplug}prestashop>standardpaymentadvanced_8c949eba12b33c9313376ca61e346af7;standard.block.deferred.description;;"Différer le déclenchement du paiement";;;
+<{payplug}prestashop>standardpaymentadvanced_8c949eba12b33c9313376ca61e346af7;standard.block.deferred.description;;"Vous disposez d'un délai de 7 jours maximum pour capturer le paiement (à compter de la date d'autorisation).";;;
 <{payplug}prestashop>standardpaymentadvanced_99aa040819d91707e0916a547fd4c1c6;standard.block.deferredBeforeText;;"Comment souhaitez vous déclencher la capture du paiement :";;;
 <{payplug}prestashop>standardpaymentadvanced_c02b7c5e43cd79432e8efcd896dd513c;standard.block.deferredTitle;;"Différer le déclenchement du paiement";;;
 <{payplug}prestashop>standardpaymentadvanced_e2804ca427b823e6bce40f7c9e4e5081;standard.block.accordionTitle;;"Paramétrages avancés";;;

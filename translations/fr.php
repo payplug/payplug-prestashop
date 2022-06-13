@@ -534,7 +534,7 @@ $_MODULE['<{payplug}prestashop>standardpaymentadvanced_71ca5b1eeb26e7d6d5d28281c
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_7825bc98696486af6852228549e334ef'] = 'Activer les paiements fractionnés non garantis';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_7ac9f4061a79d200e09c0073443f1a6f'] = 'Vous pourrez consulter toutes vos échéances de paiement (passées et à venir) dans ce ';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_7d5e5a1f875e63545d906f11c97576d2'] = 'à partir de';
-$_MODULE['<{payplug}prestashop>standardpaymentadvanced_8c949eba12b33c9313376ca61e346af7'] = 'Différer le déclenchement du paiement';
+$_MODULE['<{payplug}prestashop>standardpaymentadvanced_8c949eba12b33c9313376ca61e346af7'] = 'Vous disposez d\'un délai de 7 jours maximum pour capturer le paiement (à compter de la date d\'autorisation).';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_99aa040819d91707e0916a547fd4c1c6'] = 'Comment souhaitez vous déclencher la capture du paiement :';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_c02b7c5e43cd79432e8efcd896dd513c'] = 'Différer le déclenchement du paiement';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_e2804ca427b823e6bce40f7c9e4e5081'] = 'Paramétrages avancés';
