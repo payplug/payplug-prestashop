@@ -47,9 +47,9 @@
             {capture assign="threetimes"}{l s='standard.block.installments.3times' mod='payplug'}{/capture}
             {capture assign="fourtimes"}{l s='standard.block.installments.4times' mod='payplug'}{/capture}
             {assign var='installmentsSelect' value=[
-                ['key' => 0, 'value' => {$twotimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 0)],
-                ['key' => 1, 'value' => {$threetimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 1)],
-                ['key' => 2, 'value' => {$fourtimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 2)]
+                ['key' => 2, 'value' => {$twotimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 2)],
+                ['key' => 3, 'value' => {$threetimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 3)],
+                ['key' => 4, 'value' => {$fourtimes}|escape:'htmlall':'UTF-8', 'selected' => ($inst_mode == 4)]
             ]}
             {include file='./../../atoms/select/select.tpl'
             selectDisabled=!$payplug_switch.installment.checked

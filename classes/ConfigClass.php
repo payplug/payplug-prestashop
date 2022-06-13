@@ -651,7 +651,8 @@ class ConfigClass
                     case 'payplug_inst_mode':
                         if ((int)Tools::getValue('payplug_inst') === 1) {
                             if (((int)Tools::getValue('payplug_inst_min_amount') >= 4)
-                                && ((int)Tools::getValue('payplug_inst_mode') < 3)) {
+                                && ((int)Tools::getValue('payplug_inst_mode') < 5)
+                            && ((int)Tools::getValue('payplug_inst_mode') > 1)) {
                                 Configuration::updateValue($key, $value);
                             }
                         }
