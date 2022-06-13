@@ -650,7 +650,10 @@ class ConfigClass
                     case 'payplug_inst_min_amount':
                     case 'payplug_inst_mode':
                         if ((int)Tools::getValue('payplug_inst') === 1) {
-                            Configuration::updateValue($key, $value);
+                            if (((int)Tools::getValue('payplug_inst_min_amount') >= 4)
+                                && ((int)Tools::getValue('payplug_inst_mode') < 3)) {
+                                Configuration::updateValue($key, $value);
+                            }
                         }
                         break;
                     case 'payplug_oney_custom_max_amounts':
