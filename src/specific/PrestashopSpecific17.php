@@ -83,12 +83,17 @@ class PrestashopSpecific17
             if (isset($payment_option['expiry_date_card'])) {
                 $payment_option['callToActionText'] .= ' - '. $payment_option['expiry_date_card'];
             }
+
             $paymentOption
                 ->setLogo($payment_option['logo'])
                 ->setCallToActionText($payment_option['callToActionText'])
-                ->setAction($payment_option['action'])
                 ->setModuleName($payment_option['moduleName'])
                 ->setInputs($payment_option['inputs']);
+
+            // No action for Apple Pay payments
+            if (array_key_exists('action', $payment_option)) {
+                $paymentOption->setAction($payment_option['action']);
+            }
 
             // load oney schedule on e page loading
             if ($payment_method == 'oney' && $payment_option['is_optimized']) {
