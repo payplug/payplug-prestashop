@@ -29,6 +29,7 @@ class AdminPsPayLaterController extends ModuleAdminController
 {
     private $dependencies;
     private $logger;
+    public $module;
 
     public function __construct()
     {
@@ -38,6 +39,7 @@ class AdminPsPayLaterController extends ModuleAdminController
 
         $this->dependencies = new DependenciesClass();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
+        $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
     }
 
     /**
@@ -50,8 +52,10 @@ class AdminPsPayLaterController extends ModuleAdminController
         if (Tools::getValue('_ajax')) {
             $this->dependencies->adminClass->adminAjaxController();
         }
+        if ($this->module->name == 'pspaylater') {
+            $this->setPsAccount();
+        }
 
-        $this->setPsAccount();
 
         $this->dependencies->configClass->postProcess();
         $this->dependencies->configClass->assignContentVar();
