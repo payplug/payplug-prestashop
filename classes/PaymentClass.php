@@ -1815,10 +1815,10 @@ class PaymentClass
             'allow_save_card' => $allow_save_card
         ];
 
-        if (!$options['is_deferred'] && !$options['is_oney']) {
-            $payment_tab['amount'] = $amount;
-        } else {
+        if ($options['is_deferred'] || $options['is_oney'] && !$options['is_installment']) {
             $payment_tab['authorized_amount'] = $amount;
+        } else {
+            $payment_tab['amount'] = $amount;
         }
 
         // check payment tab from current payment method
@@ -1835,12 +1835,7 @@ class PaymentClass
                 if ($i == 0) {
                     $schedule[$i]['date'] = 'TODAY';
                     $int_part = (int)($amount / $config['inst_mode']);
-                    if ($options['is_deferred']) {
-                        $schedule[$i]['authorized_amount'] = (int)($int_part +
-                            ($amount - ($int_part * $config['inst_mode'])));
-                    } else {
-                        $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
-                    }
+                    $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
                 } else {
                     $delay = $i * 30;
                     $schedule[$i]['date'] = date('Y-m-d', strtotime("+ $delay days"));
