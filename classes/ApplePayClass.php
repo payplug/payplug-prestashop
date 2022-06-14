@@ -100,7 +100,10 @@ class ApplePayClass
                 'label' => $this->context->shop->name,
                 'type' => 'final',
                 'amount' => $this->context->cart->getOrderTotal()
-            )
+            ),
+            'applicationData' => base64_encode(json_encode(array(
+                'apple_pay_domain' => $this->context->shop->domain_ssl
+            )))
         );
 
         $applePayPaymentRequest = array_merge($applePayPaymentRequest, $additionalPaymentRequestDatas);
