@@ -34,7 +34,8 @@
                     linkText=$standardPaymentOptionLinkText|escape:'htmlall':'UTF-8'
                     linkHref=$standardPaymentOptionLink|escape:'htmlall':'UTF-8'
                     linkTarget='_blank'
-                    linkData='data-link'}
+                    linkData='data-link'
+                }
             {/if}
         </p>
     </div>
