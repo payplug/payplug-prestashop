@@ -24,8 +24,8 @@ class General {
     }
 
     handleAlertLiveButton(event) {
-            event.preventDefault();
-            event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
         const $sandbox = $('input[name="payplug_sandbox"][value="0"]');
         if ($sandbox.data('notallowed')) {
@@ -44,13 +44,12 @@ class General {
     }
 
     checkOnboarding() {
-        const $container = $('.' + general.props.container);
-
-        const queryData = {
-            _ajax: 1,
-            log: 1,
-            checkOnboarding: 1
-        };
+        const $container = $('.' + general.props.container),
+            queryData = {
+                _ajax: 1,
+                log: 1,
+                checkOnboarding: 1
+            };
 
         if (general.props.query != null) {
             general.props.query.abort();
@@ -72,6 +71,9 @@ class General {
                         }
                         $container.append(result.modal);
                         $container.find('input[name=modalTriggered]').trigger('click');
+
+                        // hide applepay & bancontact feature
+                        $('.paymentOption.-bancontact, .paymentOption.-applepay').hide();
                     }
                 }
             }
@@ -283,7 +285,6 @@ class General {
         if (!sandBoxValue && $sandbox.data('notallowed')) {
             event.preventDefault();
             event.stopPropagation();
-
             return general.checkOnboarding();
         }
 
