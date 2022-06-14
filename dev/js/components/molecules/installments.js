@@ -42,11 +42,15 @@ class Installments {
         if ($input.prop('checked')) {
             $select.removeClass('-disabled')
                 .find('._current').attr('tabindex', '1');
-            $inputMode.prop('disabled', false);
+            $inputMode.prop('disabled', false)
+                .parents('.payplugUIInput')
+                .removeClass('-disabled');
         } else {
             $select.addClass('-disabled')
                 .find('._current').removeAttr('tabindex');
-            $inputMode.prop('disabled', true);
+            $inputMode.prop('disabled', true)
+                .parents('.payplugUIInput')
+                .addClass('-disabled');
         }
     }
 }

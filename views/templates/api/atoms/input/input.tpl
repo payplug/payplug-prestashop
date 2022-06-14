@@ -26,7 +26,8 @@
 
 <div class="payplugUIInput
     {if isset($inputClassName) && $inputClassName} {$inputClassName|escape:'htmlall':'UTF-8'}{/if}
-    {if isset($inputIcon) && $inputIcon} -icon -icon{$inputIcon|escape:'htmlall':'UTF-8'}{/if}">
+    {if isset($inputIcon) && $inputIcon} -icon -icon{$inputIcon|escape:'htmlall':'UTF-8'}{/if}
+    {if isset($inputDisabled) && $inputDisabled} -disabled{/if}">
     {if isset($inputLabel) && $inputLabel}
         <label for="{$inputName|escape:'htmlall':'UTF-8'}">{$inputLabel|escape:'htmlall':'UTF-8'}</label>
     {/if}
