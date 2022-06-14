@@ -578,7 +578,7 @@ class HookClass
 
             $single_payment = $this->dependencies->paymentClass->buildPaymentDetails($payment);
 
-            if ($single_payment['type'] == 'apple_pay') {
+            if (isset($single_payment['type']) && $single_payment['type'] == 'apple_pay') {
                 $single_payment['type'] = 'Apple Pay';
             }
 
