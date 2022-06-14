@@ -162,9 +162,14 @@ class PaymentMethod {
     handleSandbox() {
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const sandBoxValue = parseInt($sandbox.val());
+
+        if ($sandbox.data('notallowed')) {
+            return;
+        }
+
+        paymentMethod.getPermissions(sandBoxValue, false);
         paymentMethod.toggleBancontact(sandBoxValue);
         paymentMethod.toggleApplePay(sandBoxValue);
-        paymentMethod.getPermissions(sandBoxValue, false);
     }
 
     getPermissions(sandBoxValue, switchToggle, paymentMethodName = '') {

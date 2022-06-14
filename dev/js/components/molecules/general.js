@@ -71,9 +71,6 @@ class General {
                         }
                         $container.append(result.modal);
                         $container.find('input[name=modalTriggered]').trigger('click');
-
-                        // hide applepay & bancontact feature
-                        $('.paymentOption.-bancontact, .paymentOption.-applepay').hide();
                     }
                 }
             }
