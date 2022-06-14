@@ -43,6 +43,7 @@
             'description' => {l s='standard.embeddedMode.description' mod='payplug'},
             'link' => $faq_links.support,
             'action' => $embeddedModeAction
+
         ],
         [
             'title' => {l s='standard.oneClick.title' mod='payplug'},
@@ -51,13 +52,13 @@
             'action' => $oneClickAction
         ]
     ]}
-
     {foreach $standardPaymentOptions as $standardPaymentOption}
         {include file='./standardPaymentOption.tpl'
             standardPaymentOptionTitle=$standardPaymentOption.title
             standardPaymentOptionDescription=$standardPaymentOption.description
             standardPaymentOptionLink=$standardPaymentOption.link
-            standardPaymentOptionAction=$standardPaymentOption.action}
+            standardPaymentOptionAction=$standardPaymentOption.action
+            }
     {/foreach}
 </div>
 

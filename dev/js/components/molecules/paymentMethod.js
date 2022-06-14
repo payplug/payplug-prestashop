@@ -89,7 +89,6 @@ class PaymentMethod {
         if (!$switch.length) {
             return;
         }
-
         const $paymentOption = $switch.parents('.paymentOption');
         const checked = $switch.find('input').prop('checked');
 
@@ -101,6 +100,8 @@ class PaymentMethod {
     }
 
     checkPremium($switch) {
+
+        const $sandbox = $('input[name=payplug_sandbox]:checked');
         const checked = $switch.find('input').prop('checked');
         if (!checked) {
             paymentMethod.checkPaymentOptionInformation();
@@ -108,38 +109,8 @@ class PaymentMethod {
         }
 
         const paymentMethodName = $switch.find('input').attr('name');
-        const queryData = {
-            _ajax: 1,
-            checkPremium: 1
-        };
+        paymentMethod.getPermissions($sandbox, true, paymentMethodName);
 
-        if (paymentMethod.props.query != null) {
-            paymentMethod.props.query.abort();
-            paymentMethod.props.query = null;
-        }
-
-        paymentMethod.props.query = $.ajax({
-            type: 'POST',
-            url: admin_ajax_url,
-            dataType: 'json',
-            data: queryData,
-            error: function (jqXHR, textStatus, errorThrown) {
-                if (errorThrown != 'abort') {
-                    alert('An error occurred while trying to checking your premium status. ' +
-                        'Maybe you clicked too fast before scripts are fully loaded ' +
-                        'or maybe you have a different back-office url than expected.' +
-                        'You will find more explanation in JS console.');
-                    console.log(jqXHR, textStatus, errorThrown);
-                }
-            },
-            success: function (result) {
-                if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
-                    paymentMethod.handlePaymentMethod(paymentMethodName);
-                } else {
-                    paymentMethod.checkPaymentOptionInformation();
-                }
-            }
-        });
     }
 
     handlePaymentMethod(paymentMethodName) {
@@ -193,6 +164,60 @@ class PaymentMethod {
         const sandBoxValue = parseInt($sandbox.val());
         paymentMethod.toggleBancontact(sandBoxValue);
         paymentMethod.toggleApplePay(sandBoxValue);
+        paymentMethod.getPermissions(sandBoxValue, false);
+    }
+
+    getPermissions(sandBoxValue, switchToggle, paymentMethodName = '') {
+        const queryData = {
+            _ajax: 1,
+            checkPremium: 1
+        };
+
+        if (paymentMethod.props.query != null) {
+            paymentMethod.props.query.abort();
+            paymentMethod.props.query = null;
+        }
+
+        paymentMethod.props.query = $.ajax({
+            type: 'POST',
+            url: admin_ajax_url,
+            dataType: 'json',
+            data: queryData,
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (errorThrown !== 'abort') {
+                    alert('An error occurred while trying to checking your premium status. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR, textStatus, errorThrown);
+                }
+            },
+            success: function (result) {
+                if (typeof result != 'undefined') {
+                    if (switchToggle) {
+                        if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
+                            paymentMethod.handlePaymentMethod(paymentMethodName);
+                        } else {
+                            paymentMethod.checkPaymentOptionInformation();
+                        }
+                        return result;
+                    } else {
+                        paymentMethod.paymentMethodToggle(result, sandBoxValue);
+                    }
+                }
+            }
+        });
+    }
+
+    paymentMethodToggle(permissions, sandBoxValue) {
+        if (!sandBoxValue) {
+            $.map(permissions, function (value, index) {
+                if (index !== 'payplug_sandbox' && !value) {
+                    $('input[name=' + index + ']:checked').trigger('click');
+                }
+            });
+        }
+
     }
 
     toggleBancontact(hide) {
