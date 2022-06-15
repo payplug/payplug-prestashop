@@ -87,8 +87,6 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $card_deleted_msg = $this->dependencies->mediaClass->displayMessages([$msg], true, false);
         Media::addJsDef(
             [
-                'card_confirm_deleted_msg' => $popup_confirm_delete_message,
-                'card_deleted_msg' => $card_deleted_msg,
                 $this->dependencies->name . '_delete_card_url' => $payplug_delete_card_url
             ]
         );
@@ -99,6 +97,13 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             ]);
             $this->setTemplate('customer/cards_1_6.tpl');
         } else {
+            Media::addJsDef(
+                [
+                    'card_confirm_deleted_msg' => $popup_confirm_delete_message,
+                    'card_deleted_msg' => $card_deleted_msg
+                ]
+            );
+
             $tpl = 'module:' . $this->dependencies->name . '/views/templates/front/customer/cards_list.tpl';
             $this->setTemplate($tpl);
         }
