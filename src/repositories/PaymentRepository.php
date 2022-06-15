@@ -558,7 +558,10 @@ class PaymentRepository extends BaseClass
                     : $paymentDetails['paymentReturnUrl'];
                 $paymentReturnUrl = [
                     'result' => 'new_card',
-                    'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
+                    'embedded' =>
+                        $paymentDetails['isEmbedded']
+                        && !$paymentDetails['isMobileDevice']
+                        && $paymentDetails['paymentMethod'] !== 'bancontact',
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
