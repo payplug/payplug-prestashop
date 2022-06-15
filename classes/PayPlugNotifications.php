@@ -108,7 +108,7 @@ class PayPlugNotifications
      */
     private function checkIsValidPaymentResource()
     {
-        if (!$this->payment->is_paid && !$this->is_deferred && !$this->is_bancontact) {
+        if (!$this->payment->is_paid && !$this->is_deferred && !$this->is_bancontact && !$this->is_oney) {
             $this->logger->addLog('The transaction is not paid yet.');
             $this->logger->addLog('No action will be done.');
             $this->exitProcess('The transaction is not paid.');
