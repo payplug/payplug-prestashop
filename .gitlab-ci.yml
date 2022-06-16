@@ -233,7 +233,7 @@ build zip applepay:
     - mv !(payplug|composer.json) payplug
     - cp composer.json ./payplug
     - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file payplug_applepay_qa_$CI_COMMIT_REF_NAME --format zip
+    - composer archive --file payplug_applepay_api_qa_$CI_COMMIT_REF_NAME --format zip
   artifacts:
     paths:
-      - payplug_applepay_qa_$CI_COMMIT_REF_NAME.zip
+      - payplug_applepay_api_qa_$CI_COMMIT_REF_NAME.zip
