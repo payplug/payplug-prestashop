@@ -4,7 +4,6 @@
         "feature_display_mode",
         "feature_standard",
         "feature_installment",
-        "feature_deferred",
-        "feature_applepay"
+        "feature_deferred"
     ]
 }
