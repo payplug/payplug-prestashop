@@ -706,7 +706,7 @@ class PaymentRepository extends BaseClass
         if (!$retrievedPayment['result']
             || (
                 isset($retrievedPayment['resource']->failure->code)
-                && 'canceled' == $retrievedPayment['resource']->failure->code
+                && $retrievedPayment['resource']->failure->code
             )) {
             $payment = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($payment['paymentDetails']);
