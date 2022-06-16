@@ -96,7 +96,6 @@ class PaymentMethod {
     }
 
     checkPremium($switch) {
-
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const checked = $switch.find('input').prop('checked');
         if (!checked) {
@@ -104,9 +103,18 @@ class PaymentMethod {
             return;
         }
 
+        if (typeof $switch.find('input').attr('disabled') != 'undefined') {
+            return;
+        }
+
+        $('.paymentOption_switch').each(function() {
+            if ($(this).find('input').attr('name') != $switch.find('input').attr('name') && checked === true) {
+                $(this).find('input').attr('disabled', 'disabled');
+            }
+        });
+
         const paymentMethodName = $switch.find('input').attr('name');
         paymentMethod.getPermissions($sandbox, true, paymentMethodName);
-
     }
 
     handlePaymentMethod(paymentMethodName) {
@@ -187,6 +195,7 @@ class PaymentMethod {
                         'You will find more explanation in JS console.');
                     console.log(jqXHR, textStatus, errorThrown);
                 }
+                $('.paymentOption_switch input').removeAttr('disabled');
             },
             success: function (result) {
                 if (typeof result != 'undefined') {
@@ -196,6 +205,7 @@ class PaymentMethod {
                         } else {
                             paymentMethod.checkPaymentOptionInformation();
                         }
+                        $('.paymentOption_switch input').removeAttr('disabled');
                         return result;
                     } else {
                         paymentMethod.paymentMethodToggle(result, sandBoxValue);
