@@ -13,6 +13,4 @@ for folder in $folderList
     find ./${folder} -type d -not -path "*.github*" -exec cp -v ./dev/ci/.htaccess {} \;
   done
 
-
-
 echo "All directories secured"
