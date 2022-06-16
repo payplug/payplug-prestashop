@@ -1018,6 +1018,8 @@ class PayPlugNotifications
             $this->logger->addLog('Can\'t retrieve payment with pay id: ' . $this->resource->id, 'debug');
             $this->apiClass->initializeApi((bool)$this->sandbox);
             $this->payment = null;
+        } else {
+            $this->payment = $payment['resource'];
         }
     }
 
