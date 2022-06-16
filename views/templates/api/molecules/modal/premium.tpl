@@ -29,7 +29,7 @@
         linkNoTag=true}
     {/capture}
 
-    {capture assign='fetureUnaivailable'}
+    {capture assign='featureUnavailable'}
         {l s='admin.popin.premium.featureUnavailable' mod='payplug'}
     {/capture}
     {if 'oneyPremium' == $premiumContent.type}
@@ -49,7 +49,7 @@
             {l s='admin.popin.premium.activateFeature' tags=[$premiumLink] mod='payplug'}
         {/capture}
     {/if}
-    {capture assign="popinFeatureActivationText"}{$fetureUnaivailable}{$premiumText}{/capture}
+    {capture assign="popinFeatureActivationText"}{$featureUnavailable}{$premiumText}{/capture}
     {include file='./../../atoms/paragraph/paragraph.tpl'
     paragraphText=$popinFeatureActivationText}
 
