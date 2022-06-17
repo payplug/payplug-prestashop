@@ -291,7 +291,7 @@ class PaymentRepository extends BaseClass
                 $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
                 if (!$abort['result']) {
                     return $this->returnPaymentError(
-                        ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                        ['name' => 'paymentId', 'value' => $apiPayment['id_payment']],
                         '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
                     );
                 }
