@@ -5,6 +5,8 @@ export folderList="src vendor log controllers"
 for folder in $folderList
   do
     if [ "$folder" = "vendor" ]; then
+      echo "removing hidden directories"
+      find ./vendor -name '.*' ! -name '.' ! -name '..' -exec rm -rf {} \;
       echo "copying index.php recursively into vendor folders"
       find ./vendor -type d -exec cp index.php {} \;
     fi
