@@ -192,7 +192,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->assertSame(
             [
                 'result' => false,
-                'paymentDetails' => json_encode($this->paymentDetails),
+                'paymentId' => json_encode('pay_123456789'),
                 'response' => '[createPayment] Exception. Unable to abort payment. Error: Payment cannot be aborted'
             ],
             $this->repo->createPayment($this->paymentDetails)
