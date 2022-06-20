@@ -397,7 +397,7 @@ $_MODULE['<{payplug}prestashop>paymentclass_f124ae13259b9d4edece5b54993512d4'] =
 $_MODULE['<{payplug}prestashop>paymentclass_f4696d6a0444803c87f011ef1b61d6b6'] = 'Visualizza il pulsante di pagamento Apple Pay sul tuo negozio';
 $_MODULE['<{payplug}prestashop>paymentclass_f59c945d932b249cb6f66ab244377e43'] = 'Oney 3x senza spese';
 $_MODULE['<{payplug}prestashop>paymentclass_f8519a87542797a26e116bd8fc3c4970'] = 'Oney 4x';
-$_MODULE['<{payplug}prestashop>paymentclass_f8a017001ba759f405e385bf230f1ad2'] = 'pop up';
+$_MODULE['<{payplug}prestashop>paymentclass_f8a017001ba759f405e385bf230f1ad2'] = 'pop-up';
 $_MODULE['<{payplug}prestashop>paymentclass_fbc949dd4d0920fc2a222c6398c28f9d'] = 'Permetti ai tuoi clienti di pagare con la loro carta Bancontact.';
 $_MODULE['<{payplug}prestashop>paymentmethod_053e0c671684e3765b340a91eb1671f7'] = 'Scegli i metodi di pagamento che desideri offrire ai tuoi clienti.';
 $_MODULE['<{payplug}prestashop>paymentmethod_a9fda105749c2b452535c73006f7df07'] = 'Metodi di pagamento';
@@ -530,7 +530,7 @@ $_MODULE['<{payplug}prestashop>standardpaymentadvanced_21e6d9b7af2258cad65d95031
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_23bcbb2a687bb4e3d16b2801e7cc2b18'] = 'in 4 rate';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_3b91bf7d81bf96bdd803278921169828'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_576cd1e22917fbd74b9099cef1af9a79'] = 'Per saperne di più.';
-$_MODULE['<{payplug}prestashop>standardpaymentadvanced_71ca5b1eeb26e7d6d5d28281c5bd717e'] = 'in 3 rate';
+$_MODULE['<{payplug}prestashop>standardpaymentadvanced_71ca5b1eeb26e7d6d5d28281c5bd717e'] = '3 rate';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_7825bc98696486af6852228549e334ef'] = 'Attiva i pagamenti rateali non garantiti';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_7ac9f4061a79d200e09c0073443f1a6f'] = 'È possibile visualizzare tutte le scadenze di pagamento (passate e future) in questo';
 $_MODULE['<{payplug}prestashop>standardpaymentadvanced_7d5e5a1f875e63545d906f11c97576d2'] = 'a partire da';
