@@ -173,6 +173,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->repo->shouldReceive([
             'checkPaymentTable' => [
                 'id_payment' => 'pay_123456789',
+                'payment_method' => 'standard',
             ]
         ]);
 
