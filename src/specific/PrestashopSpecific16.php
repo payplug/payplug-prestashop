@@ -249,6 +249,35 @@ class PrestashopSpecific16
 
         $installed = true;
 
+        if (!Tab::getIdFromClassName('AdminPayPlug')) {
+            $translations = [
+                'en' => 'Payplug',
+                'gb' => 'Payplug',
+                'it' => 'Payplug',
+                'fr' => 'Payplug'
+            ];
+
+            $tab = new Tab();
+            foreach (Language::getLanguages(false) as $language) {
+                $iso_code = Tools::strtolower($language['iso_code']);
+                if (isset($translations[$iso_code])) {
+                    $tab->name[(int)$language['id_lang']] = $translations[$iso_code];
+                } else {
+                    $tab->name[(int)$language['id_lang']] = $translations['en'];
+                }
+            }
+
+            $tab->class_name = 'AdminPayPlug';
+            $tab->module = $this->dependencies->name;
+            $tab->id_parent = 0;
+            $tab->active = false;
+            $installed = $tab->save();
+        }
+
+        if (!$installed) {
+            return false;
+        }
+
         if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
             $translations = [
                 'en' => 'Installment Plans',
@@ -286,6 +315,17 @@ class PrestashopSpecific16
         }
 
         $flag = true;
+
+        $idTab = Tab::getIdFromClassName('AdminPayPlug');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $flag = $flag && $tab->delete();
+            unset($idTab);
+        }
+
+        if (!$flag) {
+            return false;
+        }
 
         $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
         if ($idTab) {
