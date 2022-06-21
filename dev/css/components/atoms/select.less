@@ -79,9 +79,31 @@
       top: calc(100% - 2px);
       left: 50%;
       width: calc(100% + 2px);
-      padding: 0 @padding-1 0 0;
+      padding: 0;
       z-index: 999;
       max-height: 0;
+
+      &.-scrollbar {
+        padding: 0 @padding-1 0 0;
+
+        ._list {
+          overflow-y: scroll;
+          &::-webkit-scrollbar-track {
+            background-color: transparent;
+          }
+
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            .borderRadius(10px);
+            background: @color-primary;
+            position: relative;
+            right: 4px;
+          }
+        }
+      }
     }
 
     max-height: 250px;
@@ -94,24 +116,6 @@
 
     > span {
       min-height: 40px;
-    }
-
-    &.-scrollbar {
-      overflow-y: scroll;
-      &::-webkit-scrollbar-track {
-        background-color: transparent;
-      }
-
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        .borderRadius(10px);
-        background: @color-primary;
-        position: relative;
-        right: 4px;
-      }
     }
   }
 
@@ -129,6 +133,7 @@
     z-index: 1;
     font-weight: 400;
     color: @color-text-main;
+    white-space: nowrap;
 
     &:hover {
       color: @color-primary;

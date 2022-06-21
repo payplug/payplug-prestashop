@@ -82,11 +82,14 @@
                 margin-bottom: 10px;
                 p {
                   white-space: nowrap;
+                  margin-right: 10px;
                 }
-                .payplugUISelect, .payplugUIInput {
-                  &.installmentMode, &.installmentMinAmount {
-                    width: 120px;
-                    margin: 0 10px;
+                .payplugUISelect,
+                .payplugUIInput {
+                  &.installmentMode,
+                  &.installmentMinAmount {
+                    min-width: 120px;
+                    margin: 0 10px 0 0;
                   }
                   ._text {
                     margin: 0;
