@@ -52,8 +52,8 @@
                 </div>
             {/foreach}
         </div>
-        <div class="_listWrapper">
-            <div class="_list{if isset($selectScrollbar) && $selectScrollbar} -scrollbar{/if}">
+        <div class="_listWrapper{if isset($selectScrollbar) && $selectScrollbar} -scrollbar{/if}">
+            <div class="_list">
                 <ul>
                     {foreach $selectOptions as $option}
                         <li>
