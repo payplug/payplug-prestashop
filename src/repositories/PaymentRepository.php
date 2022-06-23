@@ -73,7 +73,7 @@ class PaymentRepository extends BaseClass
             || !is_object($paymentDetails['cart'])
         ) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => 'No payment details nor cart'],
                 '[getHashedCart] $paymentDetails or cart is null, or $paymentDetails is not an array'
             );
         }
@@ -124,7 +124,7 @@ class PaymentRepository extends BaseClass
             || !$paymentDetails['cartId']
         ) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => 'No payment details nor cart ID'],
                 '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array'
             );
         }
@@ -148,6 +148,7 @@ class PaymentRepository extends BaseClass
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $paymentDetails = $createPayment['paymentDetails'];
             } elseif (!$createPayment['result']) {
+                unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     $createPayment['response']
