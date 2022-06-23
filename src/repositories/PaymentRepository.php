@@ -248,7 +248,7 @@ class PaymentRepository extends BaseClass
     {
         if (!$paymentDetails || !is_array($paymentDetails)) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => 'No payment details'],
                 '[createPayment] Invalid $paymentDetails given'
             );
         }
@@ -263,6 +263,7 @@ class PaymentRepository extends BaseClass
         }
 
         if (!isset($paymentDetails['paymentMethod']) || !is_string($paymentDetails['paymentMethod'])) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] Invalid paymentMethod given in $paymentDetails'
@@ -270,6 +271,7 @@ class PaymentRepository extends BaseClass
         }
 
         if (!isset($paymentDetails['cartId']) || !is_int($paymentDetails['cartId'])) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] Invalid cartId given in $paymentDetails'
@@ -306,6 +308,7 @@ class PaymentRepository extends BaseClass
         if ($paymentDetails['paymentMethod'] !== 'installment') {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
             if (!$payment['result']) {
+                unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create payment. Error: ' . $payment['message']
@@ -316,6 +319,7 @@ class PaymentRepository extends BaseClass
         } else {
             $installment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
             if (!$installment['result']) {
+                unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create installment plan. Error: ' . $installment['message']
@@ -339,6 +343,7 @@ class PaymentRepository extends BaseClass
         }
 
         if (!$paymentDetails['paymentId']) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment ' . (string)$paymentDetails['paymentMethod'] . '] The payment id is null.'
@@ -352,6 +357,7 @@ class PaymentRepository extends BaseClass
         }
 
         if (!$paymentDetails['paymentReturnUrl']) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] payment return URL is null.'
