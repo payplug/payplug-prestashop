@@ -815,8 +815,10 @@ class ConfigClass
             'error_installment' => $this->dependencies->l('payplug.assignContentVar.installment', 'configclass'),
             'error_deferred' => $this->dependencies->l('payplug.assignContentVar.deferred', 'configclass'),
             'error_oney' => $this->dependencies->l('payplug.assignContentVar.oney', 'configclass'),
-            'errorOneyMax' => $this->dependencies->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass'),
-            'errorOneyMin' => $this->dependencies->l('config.assignContentVar.oney.thresholdsMinError', 'configclass'),
+            'errorOneyMax' =>
+                addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass')),
+            'errorOneyMin' =>
+                addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMinError', 'configclass')),
         ]);
 
         $login_infos = [];
@@ -852,7 +854,7 @@ class ConfigClass
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    $this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
+                    addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass')),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),
