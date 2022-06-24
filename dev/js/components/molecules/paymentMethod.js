@@ -18,6 +18,7 @@ class PaymentMethod {
             .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission)
             .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission)
             .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
+
         $(window)
             .on('reloadEvent', paymentMethod.initialize);
     }
@@ -31,6 +32,19 @@ class PaymentMethod {
             event.preventDefault();
             event.stopPropagation();
             paymentMethod.checkPremium($switch);
+        }
+        paymentMethod.toggleDeferredState(event);
+    }
+    toggleDeferredState(event) {
+        const $input = $(event.target),
+            $select = $('.payplugUISelect.-deferred');
+
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+                .find('._current').attr('tabindex', '1');
+        } else {
+            $select.addClass('-disabled')
+                .find('._current').removeAttr('tabindex');
         }
     }
 
@@ -53,6 +67,7 @@ class PaymentMethod {
                 .addClass('-disabled');
         }
     }
+
     handleInstallmentPermission(event) {
         const $input = $(event.target),
             $switch = $input.parents('.installmentSwitch'),
@@ -173,6 +188,9 @@ class PaymentMethod {
                 if (result.content) {
                     if (paymentMethodName==='payplug_inst'){
                         paymentMethod.handleInstallment(event);
+                    }
+                    if(paymentMethodName==='payplug_deferred'){
+                        paymentMethod.toggleDeferredState(event);
                     }
                     if ($('.payplugUIModal').length) {
                         $('.payplugUIModal').replaceWith(result.content);
