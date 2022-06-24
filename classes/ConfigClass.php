@@ -1131,6 +1131,11 @@ class ConfigClass
         try {
             $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
+
+            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
+                return false;
+            }
+
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, [1, 2], true));
         } catch (libphonenumberlight\NumberParseException $e) {
