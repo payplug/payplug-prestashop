@@ -1815,7 +1815,8 @@ class PaymentClass
             'allow_save_card' => $allow_save_card
         ];
 
-        if ($options['is_deferred'] || $options['is_oney'] && !$options['is_installment']) {
+        $can_deferred_payment = !$options['is_installment'] && !$options['is_bancontact'];
+        if (($options['is_deferred'] || $options['is_oney']) && $can_deferred_payment) {
             $payment_tab['authorized_amount'] = $amount;
         } else {
             $payment_tab['amount'] = $amount;
