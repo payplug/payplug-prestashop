@@ -33,8 +33,6 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca974
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Cliente';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Rata #';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>applepaymerchantsession_faa979ca8256d337b5b5e047cdc9e8cf'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
-$_MODULE['<{payplug}prestashop>applepaypayment_e701d7f2ca4166bb62a874fedae78be6'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Catturare';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Carta eliminata con successo.';
 $_MODULE['<{payplug}prestashop>cardrepository_d5639fea4548475adf16c77e4418a59d'] = 'Desideri cancellare questa carta?';
@@ -447,6 +445,7 @@ $_MODULE['<{payplug}prestashop>prestashopspecific16_16bfbf9c462762cf1cba4134ec53
 $_MODULE['<{payplug}prestashop>prestashopspecific17_17d93e30f1d51a1503112fdb50da7040'] = '123';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_2a5975d8242f4df9ec544829413f263f'] = 'Numero di carta';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_48d38db0f3027cbc9846143c4ccdbbb7'] = 'pop up';
+$_MODULE['<{payplug}prestashop>prestashopspecific17_4f55d6ca3d4fdefa6352a3dd259fdb70'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_5c8c18e98173556b72b7967275b7167e'] = 'no';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_6b467547a155f666a7ec0f1b4ccee833'] = 'MM/AA';
 $_MODULE['<{payplug}prestashop>prestashopspecific17_85910e0691a4205f890425497a1fc893'] = 'test';

@@ -54,8 +54,6 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
 
         $order_confirmation_url = 'index.php?controller=order-confirmation&';
 
-        $errors = array($this->dependencies->l('payplug.applepayPayment.transactionNotCompleted', 'applepaypayment'));
-
         try {
             // Patch Payment
             $token = Tools::getValue('token');
@@ -76,8 +74,7 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
             if ($update->is_paid !== true) {
                 $this->logger->addLog($update->failure->message);
                 die(json_encode([
-                    'result' => false,
-                    'template' => $this->paymentClass->displayPaymentErrors($errors)
+                    'result' => false
                 ]));
             }
 
@@ -115,8 +112,7 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
             $this->logger->addLog('Front controller applepaypayment : ' . $e);
             die(json_encode([
-                'result' => false,
-                'template' => $this->paymentClass->displayPaymentErrors($errors)
+                'result' => false
             ]));
         }
     }

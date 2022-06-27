@@ -52,6 +52,7 @@ class PrestashopSpecific17
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->paymentClass = $this->dependencies->paymentClass;
     }
 
     public function displayHeader()
@@ -61,6 +62,16 @@ class PrestashopSpecific17
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+            Media::addJsDef(
+                [
+                    $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
+                        array(
+                            $this->dependencies->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopspecific17')
+                        )
+                    )
+                ]
+            );
+
             $this->context->controller->addJS($views_path . 'js/applepay-v'.$this->dependencies->version.'.js');
         }
     }

@@ -104,16 +104,13 @@ class PayplugApplepaymerchantsessionModuleFrontController extends ModuleFrontCon
             )
         );
 
-        $errors = array($this->dependencies->l('payplug.applepayMerchantSession.transactionNotCompleted', 'applepaymerchantsession'));
-
         try {
             $createPayment = $this->dependencies->apiClass->createPayment($request_datas);
 
             die(json_encode([
                 'result' => true,
                 'apiResponse' => $createPayment['resource']->payment_method,
-                'idPayment' => $createPayment['resource']->id,
-                'template' => $this->paymentClass->displayPaymentErrors($errors)
+                'idPayment' => $createPayment['resource']->id
             ]));
         } catch (Exception $e) {
             die(json_encode([
