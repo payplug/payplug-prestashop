@@ -904,7 +904,10 @@ class HookClass
             $specific->displayHeader();
         }
 
-        if ((int) $this->tools->tool('getValue', 'show_lightbox') == 1) {
+        $is_lightbox =  'popup' == $this->config->get(
+            $this->dependencies->getConfigurationKey('embeddedMode')
+        ) && $this->tools->tool('getValue', 'popup');
+        if ($is_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
                 return;

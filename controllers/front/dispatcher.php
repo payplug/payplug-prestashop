@@ -97,7 +97,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 }
             } else {
                 // else reload the page with lightbox arg
-                $return_url = 'index.php?controller=order&step=3&show_lightbox=1'
+                $return_url = 'index.php?controller=order&step=3&popup=1'
                     . ($is_installment ? '&inst=1' : '')
                     . ($is_one_click ? '&pc=' . $id_card : '')
                     . '&def=' . (int)Tools::getValue('def');
