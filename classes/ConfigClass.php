@@ -963,7 +963,7 @@ class ConfigClass
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
             'support' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
-            'applepay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5002748721948',
+            'applepay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5149384347292',
         ];
     }
 
