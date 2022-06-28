@@ -189,7 +189,11 @@
             {include file='./../atoms/paragraph/paragraph.tpl'
                 paragraphText=$generalLogged_liveDescription
                 paragraphClassName=$generalLogged_sandBoxLiveClassName}
-
+            {if 'pspaylater' == $module_name}
+                {assign var=allowLiveSwitch value=!$onboardingOneyCompleted}
+            {else}
+                {assign var=allowLiveSwitch value=!$verified}
+            {/if}
             {assign var=items value=[
                 [
                     'value' => 1,
@@ -202,7 +206,7 @@
                     "dataName" =>"sandboxLive",
                     "text" => $payplug_switch.sandbox.label_right|capitalize|escape:'htmlall':'UTF-8',
                     'disabled' => !$payplug_switch.sandbox.active,
-                    'notallowed' => !$onboardingOneyCompleted
+                    'notallowed' => $allowLiveSwitch
                 ]
             ]}
             {include file='./../atoms/options/options.tpl'

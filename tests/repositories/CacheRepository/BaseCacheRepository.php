@@ -24,7 +24,7 @@
 
 namespace PayPlugModule\tests\repositories\CacheRepository;
 
-use PayPlugModule\src\entities\CardEntity;
+use PayPlugModule\src\models\entities\CardEntity;
 use PayPlugModule\src\repositories\CacheRepository;
 use PayPlugModule\tests\mock\MockHelper;
 use PayPlugModule\tests\repositories\RepositoryBase;

@@ -27,7 +27,7 @@
     {capture assign="thresholdsContent"}
         <p>{l s='paylater.block.thresholdsDescription' mod='payplug'}</p>
         <div class="_inputs">
-            {include file='./../atoms/input/input.tpl'
+            {include file='./../../atoms/input/input.tpl'
                 inputType='number'
                 inputMin='100'
                 inputPlaceholder='100'
@@ -37,7 +37,7 @@
                 inputName='payplug_oney_custom_min_amounts'
                 inputData='oneyThresholdMin'}
             <p>{l s='paylater.block.thresholdsBetweenText' mod='payplug'}</p>
-            {include file='./../atoms/input/input.tpl'
+            {include file='./../../atoms/input/input.tpl'
                 inputType='number'
                 inputPlaceholder='3000'
                 inputValue=$oney_custom_max_amounts
@@ -47,7 +47,7 @@
                 inputData='oneyThresholdMax'}
         </div>
         <div class="_statement">
-            {include file='./../atoms/icon/icon.tpl'
+            {include file='./../../atoms/icon/icon.tpl'
             iconName='error'
             iconClassName='thresholdErrorIcon'}
             <span class="thresholdError" data-e2e-error="oneyThresholdError"></span>
@@ -58,14 +58,14 @@
     {capture assign="optimizedContent"}
         {capture assign='faq_oneyBlock'}
             {capture assign=oneyFaqLink}{$faq_links.oney}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee{/capture}
-            {include file='./../atoms/link/link.tpl'
+            {include file='./../../atoms/link/link.tpl'
                 linkText=''
                 linkHref=$oneyFaqLink
                 linkData='faqOney'
                 linkNoTag=true}
         {/capture}
         <p>{l s='paylater.block.optimizedDescription' tags=[$faq_oneyBlock] mod='payplug'}</p>
-        {include file='./../atoms/switch/switch.tpl'
+        {include file='./../../atoms/switch/switch.tpl'
             switchEnabledLabel='On'
             switchDisabledLabel='Off'
             switchDataName='optimizedSwitch'
@@ -77,13 +77,11 @@
     {assign var='paylaterAdvancedOptions' value=[
         [
             'className' => 'thresholds',
-            'img' => './../../../img/svg/screen/paylater-thresholds.svg',
             'title' => $thresholdsTitle,
             'content' => $thresholdsContent
         ],
         [
             'className' => 'optimized',
-            'img' => './../../../img/svg/screen/paylater-optimized.svg',
             'title' => $optimizedTitle,
             'content' => $optimizedContent
         ]
@@ -91,12 +89,11 @@
     {foreach $paylaterAdvancedOptions as $paylaterAdvancedOption}
         {include file='./paylater_advanced_option.tpl'
             paylaterAdvancedOptionClassName=$paylaterAdvancedOption.className
-            paylaterAdvancedOptionImg=$paylaterAdvancedOption.img
             paylaterAdvancedOptionTitle=$paylaterAdvancedOption.title
             paylaterAdvancedOptionContent=$paylaterAdvancedOption.content}
     {/foreach}
 {/capture}
-{include file='./../atoms/accordion/accordion.tpl'
+{include file='./../../atoms/accordion/accordion.tpl'
     accordionIdentifier='payplugUIAccordion.identifier'
     accordionClassName='_paylaterAdvanced'
     accordionData='oneyAdvancedSettings'

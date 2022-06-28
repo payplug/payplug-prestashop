@@ -20,7 +20,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 var $document, $window;
-window[module_name+'Module'] = {
+window[module_name+'ModuleApplePay'] = {
     init: function () {
         $('apple-pay-button').click(function() {
             // Define ApplePayPaymentRequest
@@ -29,45 +29,102 @@ window[module_name+'Module'] = {
             // Create ApplePaySession
             const session = new ApplePaySession(3, request);
 
-            session.onvalidatemerchant = async event => {
-                // Call your own server to request a new merchant session.
-                const merchantSession = await validateMerchant();
-                session.completeMerchantValidation(merchantSession);
-            };
+            $.ajax({
+                method: "POST",
+                url: applePayMerchantSessionAjaxURL,
+            })
+                .success(function (datas) {
+                    var datas = JSON.parse(datas);
+                    if (datas.result === false) {
+                        console.log(datas.error_message);
+                    }
 
-            session.onpaymentmethodselected = event => {
-                // Define ApplePayPaymentMethodUpdate based on the selected payment method.
-                // No updates or errors are needed, pass an empty object.
-                const update = {};
-                session.completePaymentMethodSelection(update);
-            };
+                    try {
+                        var merchant_session_object = datas.apiResponse.merchant_session;
+                        var id_payment = datas.idPayment;
+                    } catch (error) {
+                        console.error(error);
+                        payplugModule.popup.set(payplug_transaction_error_message);
+                        return
+                    }
 
-            session.onshippingmethodselected = event => {
-                // Define ApplePayShippingMethodUpdate based on the selected shipping method.
-                // No updates or errors are needed, pass an empty object.
-                const update = {};
-                session.completeShippingMethodSelection(update);
-            };
+                    session.onvalidatemerchant = async event => {
+                        try {
+                            session.completeMerchantValidation(datas.apiResponse.merchant_session);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    };
 
-            session.onshippingcontactselected = event => {
-                // Define ApplePayShippingContactUpdate based on the selected shipping contact.
-                const update = {};
-                session.completeShippingContactSelection(update);
-            };
+                    /*session.onpaymentmethodselected = event => {
+                        // Define ApplePayPaymentMethodUpdate based on the selected payment method.
+                        // No updates or errors are needed, pass an empty object.
+                        const update = {};
+                        session.completePaymentMethodSelection(update);
+                    };*/
 
-            session.onpaymentauthorized = event => {
-                // Define ApplePayPaymentAuthorizationResult
-                const result = {
-                    "status": ApplePaySession.STATUS_SUCCESS
-                };
-                session.completePayment(result);
-            };
+                    session.onshippingmethodselected = event => {
+                        // Define ApplePayShippingMethodUpdate based on the selected shipping method.
+                        // No updates or errors are needed, pass an empty object.
+                        const update = {};
+                        session.completeShippingMethodSelection(update);
+                    };
 
-            session.oncancel = event => {
-                // Payment cancelled by WebKit
-            };
+                    session.onshippingcontactselected = event => {
+                        // Define ApplePayShippingContactUpdate based on the selected shipping contact.
+                        const update = {};
+                        session.completeShippingContactSelection(update);
+                    };
 
-            session.begin();
+                    session.onpaymentauthorized = event => {
+                        // Define ApplePayPaymentAuthorizationResult
+                        $.ajax({
+                            method: "POST",
+                            url: applePayPaymentAjaxURL,
+                            data: {
+                                token: event.payment.token,
+                                id_payment: id_payment
+                            }
+                        })
+                            .success(function (datas) {
+                                var datas = JSON.parse(datas);
+                                var apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
+
+                                if (datas.result !== true) {
+                                    apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+                                }
+
+                                const result = {
+                                    "status": apple_pay_Session_status
+                                };
+
+                                session.completePayment(result);
+
+                                if (datas.result === true) {
+                                    window.location.replace(datas.link_redirect);
+                                } else {
+                                    payplugModule.popup.set(payplug_transaction_error_message);
+                                }
+                            })
+                            .error(function () {
+                                payplugModule.popup.set(payplug_transaction_error_message);
+                            })
+                    };
+
+                    session.oncancel = event => {
+                        // Payment cancelled by WebKit
+                        console.log('payment cancel');
+                    };
+
+                    session.begin();
+                })
+                .error(function () {
+                    payplugModule.popup.set(payplug_transaction_error_message);
+                })
         })
     }
 };
+
+$(document).ready(function () {
+    window[module_name+'ModuleApplePay'].init();
+});

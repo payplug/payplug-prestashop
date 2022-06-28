@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 use PayPlugModule\classes\DependenciesClass;
 
-class AdminPayplugController extends ModuleAdminController
+class AdminPayPlugController extends ModuleAdminController
 {
     private $dependencies;
 
@@ -45,6 +45,8 @@ class AdminPayplugController extends ModuleAdminController
      */
     public function initContent()
     {
+        parent::initContent();
+
         if (Tools::getValue('_ajax')) {
             $this->dependencies->adminClass->adminAjaxController();
         }
@@ -56,6 +58,14 @@ class AdminPayplugController extends ModuleAdminController
             'module_name' => $this->dependencies->name
         ]);
 
-        $this->setTemplate('admin.tpl');
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            $content =  $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->dependencies->name.'/views/templates/admin/admin.tpl');
+
+            $this->context->smarty->assign([
+                'content' => $this->content . $content
+            ]);
+        } else {
+            $this->setTemplate('admin.tpl');
+        }
     }
 }

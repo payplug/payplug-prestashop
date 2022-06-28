@@ -33,6 +33,7 @@ use Validate;
 class AdminClass
 {
     private $assign;
+    private $context;
     private $dependencies;
     private $config;
     private $html = '';
@@ -42,6 +43,7 @@ class AdminClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
@@ -63,7 +65,7 @@ class AdminClass
                     $admin_ajax_url = $context->link->getAdminLink('AdminPsPayLater');
                     break;
                 case 'payplug':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
+                    $admin_ajax_url = $context->link->getAdminLink('AdminPayPlug');
                     break;
             }
         } elseif ($controller_name == 'AdminOrders') {
@@ -103,7 +105,7 @@ class AdminClass
      */
     public function getContent()
     {
-        if (Tools::getValue('_ajax')) {
+        if ($this->tools->tool('getValue', '_ajax')) {
             $this->adminAjaxController();
         }
 
@@ -126,13 +128,13 @@ class AdminClass
      */
     public function adminAjaxController()
     {
-        if (!Tools::getValue('_ajax', false)) {
+        if (!$this->tools->tool('getValue', '_ajax', false)) {
             return;
         }
 
-        if (Tools::getValue('popin')) {
+        if ($this->tools->tool('getValue', 'popin')) {
             $args = null;
-            if (Tools::getValue('type') == 'confirm') {
+            if ($this->tools->tool('getValue', 'type') == 'confirm') {
                 $keys = [
                     'activate',
                     'sandbox',
@@ -147,32 +149,57 @@ class AdminClass
                 $args = [];
                 foreach ($keys as $key) {
                     if ($key !== 'embedded') {
-                        $args[$key] = (int) Tools::getValue($key);
+                        $args[$key] = (int)Tools::getValue($key);
                     } else {
-                        $args[$key] = (string) Tools::getValue($key);
+                        $args[$key] = (string)Tools::getValue($key);
                     }
                 }
             }
-            $this->dependencies->mediaClass->displayPopin(Tools::getValue('type'), $args);
+            if ($this->tools->tool('getValue', 'permissionsModal')) {
+                if ($this->tools->tool('getValue', 'type') == 'oneyPremium') {
+                    $link = 'https://portal.payplug.com/#/configuration/oney';
+                } elseif ($this->tools->tool('getValue', 'type') == 'bancontactPremium' || (Tools::getValue(
+                    'type'
+                ) == 'applepayPremium')) {
+                    $link = 'mailto:support@payplug.com';
+                } else {
+                    $link = 'https://www.payplug.com/contact';
+                }
+                $title = $this->dependencies->l('payplug.adminAjaxController.enableFeature', 'adminclass');
+                $this->assign->assign(
+                    [
+                        'premiumContent' => [
+                            'link' => $link,
+                            'type' => $this->tools->tool('getValue', 'type'),
+                            'title' => $title,
+                        ]
+                    ]
+                );
+                $htmlPopin = $this->dependencies->configClass->fetchTemplate(
+                    '/views/templates/api/molecules/modal/premium.tpl'
+                );
+                die(json_encode(['content' => $htmlPopin]));
+            }
+
+            $this->dependencies->mediaClass->displayPopin($this->tools->tool('getValue', 'type'), $args);
         }
 
-        if (Tools::getValue('submitSettings')) {
-            if (Tools::getValue('payplug_deferred_state')
-                && Tools::getValue('payplug_deferred_state') != $this->config->get(
+        if ($this->tools->tool('getValue', 'submitSettings')) {
+            if ($this->tools->tool('getValue', 'payplug_deferred_state')
+                && $this->tools->tool('getValue', 'payplug_deferred_state') != $this->config->get(
                     $this->dependencies->getConfigurationKey('deferredState')
                 )) {
-                $id_order_state = Tools::getValue('payplug_deferred_state');
+                $id_order_state = $this->tools->tool('getValue', 'payplug_deferred_state');
                 $order_state = new OrderState($id_order_state, $this->context->language->id);
-                if (Tools::getValue('payplug_deferred')
-                    && Tools::getValue('payplug_deferred') != 0 && Tools::getValue('payplug_deferred_auto') != 0) {
+                if ($this->tools->tool('getValue', 'payplug_deferred')) {
                     $this->context->smarty->assign([
                         'updated_deferred_state' => true,
-                        'updated_deferred_state_id' => Tools::getValue('payplug_deferred_state'),
+                        'updated_deferred_state_id' => $this->tools->tool('getValue', 'payplug_deferred_state'),
                         'updated_deferred_state_name' => $order_state->name,
                         'admin_orders_link' => $this->dependencies->configClass
                             ->getSpecificPrestaClasse()
                             ->getOrdersByStateLink(
-                                Tools::getValue('payplug_deferred_state')
+                                $this->tools->tool('getValue', 'payplug_deferred_state')
                             ),
                     ]);
                 }
@@ -209,8 +236,8 @@ class AdminClass
             }
         }
 
-        if (Tools::getValue('submitPwd')) {
-            $password = Tools::getValue('password');
+        if ($this->tools->tool('getValue', 'submitPwd')) {
+            $password = $this->tools->tool('getValue', 'password');
             if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
                 die(json_encode([
                     'content' => null,
@@ -225,7 +252,7 @@ class AdminClass
                 $api_key = $this->config->get(
                     $this->dependencies->getConfigurationKey('liveApiKey')
                 );
-                if ((bool) $api_key) {
+                if ((bool)$api_key) {
                     $this->config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
                     $this->dependencies->configClass->assignContentVar();
                     $content = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/admin.tpl');
@@ -248,21 +275,21 @@ class AdminClass
             $this->submitPopinPwd($password);
         }
 
-        if (Tools::getValue('submit') == 'submitPopin_abort') {
+        if ($this->tools->tool('getValue', 'submit') == 'submitPopin_abort') {
             $this->dependencies->paymentClass->abortPayment();
         }
 
-        if ((int) Tools::getValue('check') == 1) {
+        if ((int)$this->tools->tool('getValue', 'check') == 1) {
             $content = $this->dependencies->configClass->getCheckFieldset();
             die(json_encode(['content' => $content]));
         }
 
-        if ((int) Tools::getValue('log') == 1) {
+        if ((int)$this->tools->tool('getValue', 'log') == 1) {
             $content = $this->getLogin();
             die(json_encode(['content' => $content]));
         }
 
-        if ((int) Tools::getValue('checkPremium') == 1) {
+        if ((int)$this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
             $return = [
@@ -277,59 +304,59 @@ class AdminClass
             die(json_encode($return));
         }
 
-        if (Tools::getValue('has_live_key')) {
+        if ($this->tools->tool('getValue', 'has_live_key')) {
             die(json_encode(['result' => $this->dependencies->apiClass->hasLiveKey()]));
         }
 
-        if ((int) Tools::getValue('refund') == 1) {
+        if ((int)$this->tools->tool('getValue', 'refund') == 1) {
             $this->dependencies->refundClass->refundPayment();
         }
 
-        if ((int) Tools::getValue('capture') == 1) {
+        if ((int)$this->tools->tool('getValue', 'capture') == 1) {
             $this->dependencies->paymentClass->capturePayment();
         }
 
-        if ((int) Tools::getValue('popinRefund') == 1) {
+        if ((int)$this->tools->tool('getValue', 'popinRefund') == 1) {
             $popin = $this->dependencies->mediaClass->displayPopin('refund');
             die(json_encode(['content' => $popin]));
         }
 
-        if ((int) Tools::getValue('update') == 1) {
-            $pay_id = Tools::getValue('pay_id');
+        if ((int)$this->tools->tool('getValue', 'update') == 1) {
+            $pay_id = $this->tools->tool('getValue', 'pay_id');
             $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
             $payment = $payment['resource'];
 
-            $id_order = Tools::getValue('id_order');
+            $id_order = $this->tools->tool('getValue', 'id_order');
 
-            if ((int) $payment->is_paid == 1) {
+            if ((int)$payment->is_paid == 1) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int) $this->config->get(
+                    $new_state = (int)$this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID')
                     );
                 } else {
-                    $new_state = (int) $this->config->get(
+                    $new_state = (int)$this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID_TEST')
                     );
                 }
-            } elseif ((int) $payment->is_paid == 0) {
+            } elseif ((int)$payment->is_paid == 0) {
                 if ($payment->is_live == 1) {
-                    $new_state = (int) $this->config->get(
+                    $new_state = (int)$this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR')
                     );
                 } else {
-                    $new_state = (int) $this->config->get(
+                    $new_state = (int)$this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR_TEST')
                     );
                 }
             }
 
-            $order = new Order((int) $id_order);
+            $order = new Order((int)$id_order);
             if (Validate::isLoadedObject($order)) {
-                $current_state = (int) $order->getCurrentState();
+                $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
                     $history = new OrderHistory();
-                    $history->id_order = (int) $order->id;
-                    $history->changeIdOrderState($new_state, (int) $order->id);
+                    $history->id_order = (int)$order->id;
+                    $history->changeIdOrderState($new_state, (int)$order->id);
                     $history->addWithemail();
                 }
             }
@@ -357,7 +384,7 @@ class AdminClass
         if ($this->tools->tool('getValue', 'save')) {
             $connected = $this->config->get($this->dependencies->getConfigurationKey('email'))
                 && ($this->config->get($this->dependencies->getConfigurationKey('testApiKey'))
-                || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')));
+                    || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')));
 
             if ($connected) {
                 $this->dependencies->configClass->saveConfiguration();
@@ -377,6 +404,27 @@ class AdminClass
                 'modal' => $this->dependencies->configClass->fetchTemplate($tpl),
                 'result' => false
             ]));
+        }
+
+        if ($this->tools->tool('getValue', 'alert')) {
+            switch ($this->tools->tool('getValue', 'type')) {
+                case 'orderState':
+                    $idOrderState = $this->tools->tool('getValue', 'idOrderState');
+                    $order_state_specific = $this->dependencies->getPlugin()->getOrderStateSpecific();
+                    $order_state = $order_state_specific->get($idOrderState, $this->context->language->id);
+                    if ($order_state->id) {
+                        $this->assign->assign([
+                            'orderStateName' => $order_state->name,
+                        ]);
+                        $tpl = '/views/templates/api/molecules/alert/orderState.tpl';
+                        die(json_encode([
+                            'alert' => $this->dependencies->configClass->fetchTemplate($tpl),
+                        ]));
+                    }
+                    die(json_encode([
+                        'alert' => false,
+                    ]));
+            }
         }
     }
 

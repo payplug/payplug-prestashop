@@ -54,7 +54,7 @@
 
 <ul class="footer_links clearfix">
     <li>
-        <a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+        <a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}">
             <span><i class="icon-chevron-left"></i> {l s='Back to Your Account' mod='payplug'}</span>
         </a>
     </li>

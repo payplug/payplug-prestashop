@@ -35,7 +35,7 @@
     margin: auto;
 
     .borderRadius(4px);
-    .border(#colorMap[borderMain]);
+    .border(@color-border);
     background: #colorMap[white];
 
     padding: 8px;
@@ -48,7 +48,7 @@
     height: 100%;
     cursor: pointer;
     svg {
-      fill: #colorMap[fontMainDefault];
+      fill: @color-text-main;
     }
     &:hover {
       svg {

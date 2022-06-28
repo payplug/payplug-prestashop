@@ -52,6 +52,7 @@ class PrestashopSpecific17
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->paymentClass = $this->dependencies->paymentClass;
     }
 
     public function displayHeader()
@@ -61,6 +62,16 @@ class PrestashopSpecific17
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+            Media::addJsDef(
+                [
+                    $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
+                        array(
+                            $this->dependencies->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopspecific17')
+                        )
+                    )
+                ]
+            );
+
             $this->context->controller->addJS($views_path . 'js/applepay-v'.$this->dependencies->version.'.js');
         }
     }
@@ -83,12 +94,17 @@ class PrestashopSpecific17
             if (isset($payment_option['expiry_date_card'])) {
                 $payment_option['callToActionText'] .= ' - '. $payment_option['expiry_date_card'];
             }
+
             $paymentOption
                 ->setLogo($payment_option['logo'])
                 ->setCallToActionText($payment_option['callToActionText'])
-                ->setAction($payment_option['action'])
                 ->setModuleName($payment_option['moduleName'])
                 ->setInputs($payment_option['inputs']);
+
+            // No action for Apple Pay payments
+            if (array_key_exists('action', $payment_option)) {
+                $paymentOption->setAction($payment_option['action']);
+            }
 
             // load oney schedule on e page loading
             if ($payment_method == 'oney' && $payment_option['is_optimized']) {
@@ -346,14 +362,6 @@ class PrestashopSpecific17
             'name' => 'payplug_deferred',
             'active' => $connected,
             'checked' => $configurations['deferred'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
-        ];
-
-        $switch['deferred_auto'] = [
-            'name' => 'payplug_deferred_auto',
-            'active' => $connected,
-            'checked' => $configurations['deferred_auto'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopspecific17'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopspecific17'),
         ];

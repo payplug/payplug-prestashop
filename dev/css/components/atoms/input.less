@@ -5,12 +5,11 @@
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: flex-start;
-  margin: 0 0 24px;
 
   label {
     font-weight: 700;
     margin: 0 0 4px;
-    color: #colorMap[fontMainDefault];
+    color: @color-text-main;
   }
 
   input {
@@ -28,7 +27,7 @@
       cursor: pointer;
 
       &::placeholder {
-        color: fade(#colorMap[fontMainDefault], 80%);
+        color: fade(@color-text-main, 80%);
         opacity: 1;
       }
 
@@ -46,10 +45,12 @@
       }
 
       &:disabled {
-        background-color: #colorMap[backgroundGrey];
+        background-color: @color-background;
+        color: @color-text-disable;
+        cursor: default;
 
         &::placeholder {
-          color: #colorMap[fontMainDisabled];
+          color: @color-text-disable;
           opacity: 1;
         }
 
@@ -62,9 +63,10 @@
 
   &.-icon {
     position: relative;
+
     &:before {
       .transform(translateY(-50%));
-      background-color: #colorMap[fontSecondaryDefault];
+      background-color: @color-text-secondary;
       content: "";
       display: block;
       position: absolute;
@@ -76,6 +78,7 @@
       mask-position: 50%;
       -webkit-mask-position: 50%;
     }
+
     input {
       &[type=text],
       &[type=password],
@@ -84,13 +87,20 @@
         z-index: 1;
       }
     }
+
     &Euro {
       &:before {
         -webkit-mask-image: url(~"@{img-icons}euro_symbol.svg");
         mask-image: url(~"@{img-icons}euro_symbol.svg");
         -webkit-mask-repeat: no-repeat;
         mask-repeat: no-repeat;
-        background-color: #colorMap[fontSecondaryDefault];
+      }
+    }
+
+    &.-disabled {
+      &:before {
+        z-index: 2;
+        background-color: @color-text-disable;
       }
     }
   }
@@ -111,7 +121,7 @@
       &[type=text],
       &[type=password],
       &[type=number] {
-        border-color: #colorMap[accentuationWarning];
+        border-color: @color-warning;
       }
     }
   }

@@ -21,35 +21,21 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\entities;
+namespace PayPlugModule\src\models\entities;
 
-use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlugModule\src\specific\ConfigurationSpecific;
 
-class OrderStateEntity
+class ConfigurationEntity
 {
-    /** @var array */
-    private $list;
+    private $specific_class;
 
-    /**
-     * @return object
-     */
-    public function getList()
+    public function __construct()
     {
-        return $this->list;
+        $this->specific_class = new ConfigurationSpecific();
     }
 
-    /**
-     * @param $apiPayment
-     * @return self
-     * @throws BadParameterException
-     */
-    public function setList($list)
+    public function get($configuration_name)
     {
-        if (!is_array($list)) {
-            throw (new BadParameterException('Invalid argument, $list must be an array'));
-        }
-
-        $this->list = $list;
-        return $this;
+        return $this->specific_class->get($configuration_name);
     }
 }

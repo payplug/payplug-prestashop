@@ -32,11 +32,11 @@
                     {include file="./detail.tpl" oney_payment_option=$oney_payment_option}
                 </div>
             {/if}
-            <div class="oneyOption_radio"><input data-e2e-type="payment" data-e2e-method="{$oney_type|escape:'htmlall':'UTF-8'}" type="radio" name="oney_type" value="{$oney_type|escape:'htmlall':'UTF-8'}"></div>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption_radio"><input data-e2e-type="payment" data-e2e-method="{$oney_type|escape:'htmlall':'UTF-8'}" type="radio" name="oney_type" value="{$oney_type|escape:'htmlall':'UTF-8'}"></div>
         </label>
     {/foreach}
 {else}
-    <span class="oneyError">
+    <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyError">
         {l s='hook.oney.payment.options.unavailable' mod='payplug'}
     </span>
 {/if}

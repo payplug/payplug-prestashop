@@ -38,6 +38,7 @@ use Validate;
 class ConfigClass
 {
     public $amountCurrencyClass;
+    public $configurations;
     public $email;
     public $features_json;
     public $logger;
@@ -612,7 +613,6 @@ class ConfigClass
         $limit_oney = $this->oney->getOneyPriceLimit(false);
         $configurationKeys = [
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
-            $this->dependencies->getConfigurationKey('deferredAuto') => 'payplug_deferred_auto',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
             $this->dependencies->getConfigurationKey('show') => 'payplug_show',
             $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded',
@@ -650,7 +650,11 @@ class ConfigClass
                     case 'payplug_inst_min_amount':
                     case 'payplug_inst_mode':
                         if ((int)Tools::getValue('payplug_inst') === 1) {
-                            Configuration::updateValue($key, $value);
+                            if (((int)Tools::getValue('payplug_inst_min_amount') >= 4)
+                                && ((int)Tools::getValue('payplug_inst_mode') < 5)
+                            && ((int)Tools::getValue('payplug_inst_mode') > 1)) {
+                                Configuration::updateValue($key, $value);
+                            }
                         }
                         break;
                     case 'payplug_oney_custom_max_amounts':
@@ -720,7 +724,7 @@ class ConfigClass
 
         $this->checkConfiguration();
 
-        $configurations = [
+        $this->configurations = [
             'show' => Configuration::get($this->dependencies->getConfigurationKey('show')),
             'email' => Configuration::get($this->dependencies->getConfigurationKey('email')),
             'sandbox_mode' => Configuration::get($this->dependencies->getConfigurationKey('sandboxMode')),
@@ -734,7 +738,6 @@ class ConfigClass
             'live_api_key' => Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')),
             'debug_mode' => Configuration::get($this->dependencies->getConfigurationKey('debugMode')),
             'deferred' => Configuration::get($this->dependencies->getConfigurationKey('deferred')),
-            'deferred_auto' => Configuration::get($this->dependencies->getConfigurationKey('deferredAuto')),
             'deferred_state' => Configuration::get($this->dependencies->getConfigurationKey('deferredState')),
             'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
             'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
@@ -743,8 +746,8 @@ class ConfigClass
             'applepay' => Configuration::get($this->dependencies->getConfigurationKey('applepay'))
         ];
 
-        $connected = !empty($configurations['email'])
-            && (!empty($configurations['test_api_key']) || !empty($configurations['live_api_key']));
+        $connected = !empty($this->configurations['email'])
+            && (!empty($this->configurations['test_api_key']) || !empty($this->configurations['live_api_key']));
 
         $psAccountConnected = $this->checkPsAccount();
         if ($connected && !$psAccountConnected) {
@@ -767,16 +770,15 @@ class ConfigClass
             }
             $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
         } else {
-            $verified = false;
             $premium = false;
         }
-        if (!empty($configurations['live_api_key'])) {
-            $verified = true;
+        if (!empty($this->configurations['live_api_key'])) {
+            $permissions = $this->dependencies->apiClass->getAccount($this->configurations['live_api_key']);
+            $verified = !empty($permissions) ? $permissions['is_live'] : false;
         } else {
             $verified = false;
         }
-
-        $is_active = (bool)$configurations['show'];
+        $is_active = (bool)$this->configurations['show'];
 
         $this->dependencies->apiClass->getSiteUrl();
 
@@ -795,7 +797,7 @@ class ConfigClass
             ]);
         } else {
             $this->context->smarty->assign([
-                'payplug_email' => $configurations['email'],
+                'payplug_email' => $this->configurations['email'],
             ]);
         }
 
@@ -803,6 +805,7 @@ class ConfigClass
         $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
+        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
 
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
@@ -812,8 +815,10 @@ class ConfigClass
             'error_installment' => $this->dependencies->l('payplug.assignContentVar.installment', 'configclass'),
             'error_deferred' => $this->dependencies->l('payplug.assignContentVar.deferred', 'configclass'),
             'error_oney' => $this->dependencies->l('payplug.assignContentVar.oney', 'configclass'),
-            'errorOneyMax' => addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass')),
-            'errorOneyMin' => addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMinError', 'configclass')),
+            'errorOneyMax' =>
+                addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMaxError', 'configclass')),
+            'errorOneyMin' =>
+                addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsMinError', 'configclass')),
         ]);
 
         $login_infos = [];
@@ -821,7 +826,9 @@ class ConfigClass
         $installments_panel_url = 'index.php?controller=AdminPayPlugInstallment';
         $installments_panel_url .= '&token=' . Tools::getAdminTokenLite('AdminPayPlugInstallment');
 
-        $faq_links = $this->getFAQLinks($this->context->language->iso_code);
+        $this->configurations['installments_panel_url'] = $installments_panel_url;
+
+        $this->configurations['faq_links'] = $this->getFAQLinks($this->context->language->iso_code);
         $amounts = $this->oney->getOneyPriceLimit(false);
         $customAmounts = $this->oney->getOneyPriceLimit(true);
         $oney_min_amounts = ($amounts['min'] / 100);
@@ -836,12 +843,12 @@ class ConfigClass
             && $this->isValidFeature('feature_standard')
             && Configuration::get(
                 $this->dependencies->getConfigurationKey('publishableKey')
-                . ($configurations['sandbox_mode'] ? '_TEST' : '')
+                . ($this->configurations['sandbox_mode'] ? '_TEST' : '')
             )
         ) {
-            $specific->assignSwitchConfiguration($configurations);
+            $specific->assignSwitchConfiguration($this->configurations);
         } else {
-            $this->assignSwitchConfiguration($configurations);
+            $this->assignSwitchConfiguration($this->configurations);
         }
 
         Media::addJsDef(
@@ -853,6 +860,7 @@ class ConfigClass
                 ),
                 'oney_max_amounts' => $oney_max_amounts,
                 'oney_min_amounts' => $oney_min_amounts,
+                'errorInstallmentAmount' => $this->dependencies->l('config.assignContentVar.installment.amountError', 'configclass'),
             ]
         );
 
@@ -870,19 +878,17 @@ class ConfigClass
             'is_active' => $is_active,
             'site_url' => $this->dependencies->apiClass->getSiteUrl(),
             'portal_url' => $this->dependencies->apiClass->getPortalUrl(),
-            'sandbox_mode' => $configurations['sandbox_mode'],
-            'embedded_mode' => $configurations['embedded_mode'],
-            'one_click' => $configurations['one_click'],
-            'standard' => $configurations['standard'],
-            'inst' => $configurations['inst'],
-            'inst_mode' => $configurations['inst_mode'],
-            'inst_min_amount' => $configurations['inst_min_amount'],
-            'show' => $configurations['show'],
-            'debug_mode' => $configurations['debug_mode'],
-            'deferred' => $configurations['deferred'],
-            'deferred_auto' => $configurations['deferred_auto'],
-            'deferred_state' => $configurations['deferred_state'],
-            'oney' => $configurations['oney'],
+            'sandbox_mode' => $this->configurations['sandbox_mode'],
+            'embedded_mode' => $this->configurations['embedded_mode'],
+            'one_click' => $this->configurations['one_click'],
+            'standard' => $this->configurations['standard'],
+            'inst' => $this->configurations['inst'],
+            'inst_min_amount' => $this->configurations['inst_min_amount'],
+            'show' => $this->configurations['show'],
+            'debug_mode' => $this->configurations['debug_mode'],
+            'deferred' => $this->configurations['deferred'],
+            'deferred_state' => $this->configurations['deferred_state'],
+            'oney' => $this->configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
             'applepay' => $this->isValidFeature('feature_applepay'),
             'integrated' => $this->isValidFeature('feature_integrated'),
@@ -892,13 +898,11 @@ class ConfigClass
             'deferred_isActivated' => $this->isValidFeature('feature_deferred'),
             'ps_account_isActivated' => $this->isValidFeature('feature_ps_account'),
             'login_infos' => $login_infos,
-            'installments_panel_url' => $installments_panel_url,
             'order_states' => $this->dependencies->orderClass->getOrderStates(),
             'oney_min_amounts' => $oney_min_amounts,
             'oney_max_amounts' => $oney_max_amounts,
             'oney_custom_max_amounts' => $oney_custom_max_amounts,
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
-            'faq_links' => $faq_links,
             'iso' => $this->context->language->iso_code,
             'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
             'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods(),
@@ -959,6 +963,7 @@ class ConfigClass
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
             'support' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
+            'applepay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5149384347292',
         ];
     }
 
@@ -1066,14 +1071,6 @@ class ConfigClass
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];
 
-        $switch['deferred_auto'] = [
-            'name' => 'payplug_deferred_auto',
-            'active' => $connected,
-            'checked' => $configurations['deferred_auto'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
-        ];
-
         $this->context->smarty->assign([
             'payplug_switch' => $switch
         ]);
@@ -1134,6 +1131,11 @@ class ConfigClass
         try {
             $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
+
+            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
+                return false;
+            }
+
             $is_mobile = $phone_util->getNumberType($parsed);
             return (bool)(in_array($is_mobile, [1, 2], true));
         } catch (libphonenumberlight\NumberParseException $e) {

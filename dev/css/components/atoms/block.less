@@ -1,7 +1,7 @@
 @import "../../less/include";
 
 .payplugUiBlock {
-  .border(#colorMap[borderMain]);
+  .border(@color-border);
   .borderRadius(4px);
 
   display: flex;
@@ -13,7 +13,6 @@
   position: relative;
   padding: 40px 64px;
   margin: 0 auto 24px;
-  overflow: hidden;
   background: #colorMap[white];
 
   @media (@screen-mobile) {
@@ -25,7 +24,7 @@
     .Inter(~"@{size}px", 700);
     letter-spacing: calc(-0.33em / ~"@{size}");
     line-height: calc(29em/~"@{size}");
-    color: #colorMap[fontMainDefault];
+    color: @color-text-main;
     position: relative;
     margin: 0 0 21px;
 

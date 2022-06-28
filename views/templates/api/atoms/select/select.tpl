@@ -52,16 +52,18 @@
                 </div>
             {/foreach}
         </div>
-        <div class="_list">
-            <ul>
-                {foreach $selectOptions as $option}
-                    <li>
-                        <label class="_option"
-                               for="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
-                               aria-hidden="aria-hidden">{$option.value|escape:'htmlall':'UTF-8'}</label>
-                    </li>
-                {/foreach}
-            </ul>
+        <div class="_listWrapper{if isset($selectScrollbar) && $selectScrollbar} -scrollbar{/if}">
+            <div class="_list">
+                <ul>
+                    {foreach $selectOptions as $option}
+                        <li>
+                            <label class="_option"
+                                   for="{$selectName|escape:'htmlall':'UTF-8'}-{$option.key|escape:'htmlall':'UTF-8'}"
+                                   aria-hidden="aria-hidden">{$option.value|escape:'htmlall':'UTF-8'}</label>
+                        </li>
+                    {/foreach}
+                </ul>
+            </div>
         </div>
     </div>
 {/if}

@@ -38,6 +38,7 @@ use PayPlugModule\tests\mock\PaymentMock;
 final class CreatePaymentTest extends BasePaymentRepository
 {
     private $paymentDetails;
+    private $truncatedPaymentDetails;
     private $payment;
     private $installment;
 
@@ -50,6 +51,7 @@ final class CreatePaymentTest extends BasePaymentRepository
             'paymentMethod' => 'standard',
             'cartId' => 42,
         ];
+
         $this->payment = PaymentMock::getStandard();
         $this->installment = PaymentMock::getInstallment();
     }
@@ -173,10 +175,16 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->repo->shouldReceive([
             'checkPaymentTable' => [
                 'id_payment' => 'pay_123456789',
+                'payment_method' => 'standard',
             ]
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
+            'retrievePayment' => [
+                'code' => 200,
+                'result' => true,
+                'resource' => PaymentMock::getStandard()
+            ],
             'abortPayment' => [
                 'code' => 500,
                 'result' => false,
@@ -187,7 +195,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->assertSame(
             [
                 'result' => false,
-                'paymentDetails' => json_encode($this->paymentDetails),
+                'paymentId' => json_encode('pay_123456789'),
                 'response' => '[createPayment] Exception. Unable to abort payment. Error: Payment cannot be aborted'
             ],
             $this->repo->createPayment($this->paymentDetails)
@@ -213,10 +221,12 @@ final class CreatePaymentTest extends BasePaymentRepository
             ]
         ]);
 
+        $this->truncatedPaymentDetails = array_diff_key($this->paymentDetails, array_flip(['paymentTab']));
+
         $this->assertSame(
             [
                 'result' => false,
-                'paymentDetails' => json_encode($this->paymentDetails),
+                'paymentDetails' => json_encode($this->truncatedPaymentDetails),
                 'response' => '[createPayment] Exception. Unable to create payment. Error: Payment cannot be created'
             ],
             $this->repo->createPayment($this->paymentDetails)
@@ -245,10 +255,12 @@ final class CreatePaymentTest extends BasePaymentRepository
             ]
         ]);
 
+        $this->truncatedPaymentDetails = array_diff_key($paymentDetails, array_flip(['paymentTab']));
+
         $this->assertSame(
             [
                 'result' => false,
-                'paymentDetails' => json_encode($paymentDetails),
+                'paymentDetails' => json_encode($this->truncatedPaymentDetails),
                 'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created'
             ],
             $this->repo->createPayment($paymentDetails)
@@ -323,12 +335,14 @@ final class CreatePaymentTest extends BasePaymentRepository
             ]
         ]);
 
+        $this->truncatedPaymentDetails = array_diff_key($paymentDetails, array_flip(['paymentTab']));
+
         $this->assertFalse($this->repo->createPayment($this->paymentDetails)['result']);
         $this->assertSame(
             $this->repo->createPayment($this->paymentDetails),
             [
                 'result' => false,
-                'paymentDetails' => json_encode($paymentDetails),
+                'paymentDetails' => json_encode($this->truncatedPaymentDetails),
                 'response' => "[createPayment] payment return URL is null.",
             ]
         );

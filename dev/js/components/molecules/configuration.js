@@ -59,7 +59,6 @@ class Configuration {
             }
             data[$item.attr('name')] = parseInt($item.val());
         });
-
         return hasErrors ? {} : data;
     }
 

@@ -31,11 +31,25 @@ function upgrade_module_3_8_0($object)
 {
     $flag = true;
 
+    if (!$object->payplug_dependencies->getDependency('install')->installTab()) {
+        return false;
+    }
+
     // add  PAYPLUG_APPLEPAY to database
     $flag = $flag && Configuration::updateValue(
         'PAYPLUG_APPLEPAY',
         null
     );
+
+    $auto_capture = Configuration::get('PAYPLUG_DEFERRED_AUTO');
+    $deferred_state = Configuration::get('PAYPLUG_DEFERRED_STATE');
+
+    if (!$auto_capture && !$deferred_state) {
+        // if auto capture for deferred payment is disable AND a state is set in the configuration
+        // then we reset the deferred state
+        $flag = $flag && Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0);
+    }
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO');
 
     return $flag;
 }

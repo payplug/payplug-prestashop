@@ -14,21 +14,22 @@
     &:hover,
     &.-hover {
       > span {
-        background: #colorMap[fontSecondary100];
+        background: @color-text-secondary-light;
       }
     }
 
     > span {
       .transition(~"background-color @{dur}, color @{dur}");
-      .border(#colorMap[fontMainDisabled]);
+      .border(@color-text-disable);
       .borderRadius(4px);
       display: block;
       box-sizing: border-box;
       width: 100%;
-      color: #colorMap[fontMainDefault];
-      background: #colorMap[fontSecondary50];
+      color: @color-text-main;
+      background: @color-text-secondary-lighten;
       padding: 7px 40px 7px 10px;
       font-weight: normal;
+      white-space: nowrap;
 
       > span {
         font-size: 12px;
@@ -77,16 +78,16 @@
       cursor: default;
 
       > span {
-        color: #colorMap[fontMainDefault];
-        background: #colorMap[fontSecondary50];
+        color: @color-text-main;
+        background: @color-text-secondary-lighten;
         opacity: .3;
       }
 
       &:hover,
       &.-hover {
         div {
-          color: #colorMap[fontMainDefault];
-          background: #colorMap[fontSecondary50];
+          color: @color-text-main;
+          background: @color-text-secondary-lighten;
         }
       }
     }

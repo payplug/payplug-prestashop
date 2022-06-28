@@ -24,8 +24,8 @@ class General {
     }
 
     handleAlertLiveButton(event) {
-            event.preventDefault();
-            event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
         const $sandbox = $('input[name="payplug_sandbox"][value="0"]');
         if ($sandbox.data('notallowed')) {
@@ -44,13 +44,12 @@ class General {
     }
 
     checkOnboarding() {
-        const $container = $('.' + general.props.container);
-
-        const queryData = {
-            _ajax: 1,
-            log: 1,
-            checkOnboarding: 1
-        };
+        const $container = $('.' + general.props.container),
+            queryData = {
+                _ajax: 1,
+                log: 1,
+                checkOnboarding: 1
+            };
 
         if (general.props.query != null) {
             general.props.query.abort();
@@ -72,6 +71,9 @@ class General {
                         }
                         $container.append(result.modal);
                         $container.find('input[name=modalTriggered]').trigger('click');
+
+                        // hide applepay & bancontact feature
+                        $('.paymentOption.-bancontact, .paymentOption.-applepay').hide();
                     }
                 }
             }
@@ -237,12 +239,14 @@ class General {
                 $button.addClass('-disabled').attr('disabled', 'disabled');
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                alert('An error occurred while trying to checking your premium status. ' +
-                    'Maybe you clicked too fast before scripts are fully loaded ' +
-                    'or maybe you have a different back-office url than expected.' +
-                    'You will find more explanation in JS console.');
-                console.log(jqXHR, textStatus, errorThrown);
-                $button.addClass('-disabled').attr('disabled', 'disabled');
+                if (errorThrown != 'abort') {
+                    alert('An error occurred while trying to checking your premium status. ' +
+                        'Maybe you clicked too fast before scripts are fully loaded ' +
+                        'or maybe you have a different back-office url than expected.' +
+                        'You will find more explanation in JS console.');
+                    console.log(jqXHR, textStatus, errorThrown);
+                    $button.addClass('-disabled').attr('disabled', 'disabled');
+                }
             },
             success: function (result) {
                 if (result.content) {
@@ -281,7 +285,6 @@ class General {
         if (!sandBoxValue && $sandbox.data('notallowed')) {
             event.preventDefault();
             event.stopPropagation();
-
             return general.checkOnboarding();
         }
 

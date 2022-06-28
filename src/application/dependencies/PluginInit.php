@@ -21,17 +21,32 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlugModule\src\application\dependencies;
 
 use PayPlugModule\classes\ConfigClass;
 use PayPlugModule\classes\AmountCurrencyClass;
 use PayPlugModule\classes\MyLogPHP;
 
-use PayPlugModule\src\entities\CacheEntity;
-use PayPlugModule\src\entities\OneyEntity;
-use PayPlugModule\src\entities\PaymentEntity;
-use PayPlugModule\src\entities\PluginEntity;
-use PayPlugModule\src\entities\OrderStateEntity;
+use PayPlugModule\src\application\dependencies\BaseClass;
+
+use PayPlugModule\src\repositories\CacheRepository;
+use PayPlugModule\src\repositories\CardRepository;
+use PayPlugModule\src\repositories\HookRepository;
+use PayPlugModule\src\repositories\InstallRepository;
+use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlugModule\src\repositories\OneyRepository;
+use PayPlugModule\src\repositories\OrderStateRepository;
+use PayPlugModule\src\repositories\PaymentRepository;
+use PayPlugModule\src\repositories\QueryRepository;
+use PayPlugModule\src\repositories\SQLtableRepository;
+use PayPlugModule\src\repositories\TranslationsRepository;
+
+
+use PayPlugModule\src\models\entities\CacheEntity;
+use PayPlugModule\src\models\entities\OneyEntity;
+use PayPlugModule\src\models\entities\PaymentEntity;
+use PayPlugModule\src\models\entities\PluginEntity;
+use PayPlugModule\src\models\entities\OrderStateEntity;
 
 use PayPlugModule\src\specific\AddressSpecific;
 use PayPlugModule\src\specific\AssignSpecific;
@@ -53,7 +68,7 @@ use PayPlugModule\src\specific\ShopSpecific;
 use PayPlugModule\src\specific\ToolsSpecific;
 use PayPlugModule\src\specific\ValidateSpecific;
 
-class PluginRepository extends Repository
+class PluginInit extends BaseClass
 {
     protected $dependencies;
 
@@ -140,6 +155,7 @@ class PluginRepository extends Repository
             ->setOrder($this->order)
             ->setOrderHistory($this->order_history)
             ->setOrderState($this->order_state)
+            ->setOrderStateSpecific($this->order_state_specific)
             ->setQuery($this->query)
             ->setSql($this->sql)
             ->setTools($this->tools)

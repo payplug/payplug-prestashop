@@ -52,26 +52,26 @@ class PaymentClass
     {
         $this->dependencies = $dependencies;
 
-        $this->address =        $this->dependencies->getPlugin()->getAddress();
-        $this->assign =         $this->dependencies->getPlugin()->getAssign();
-        $this->card =           $this->dependencies->getPlugin()->getCard();
-        $this->cart =           $this->dependencies->getPlugin()->getCart();
-        $this->config =         $this->dependencies->getPlugin()->getConfiguration();
-        $this->constant =       $this->dependencies->getPlugin()->getConstant();
-        $this->context =        $this->dependencies->getPlugin()->getContext()->get();
-        $this->country =        $this->dependencies->getPlugin()->getCountry();
-        $this->currency =       $this->dependencies->getPlugin()->getCurrency();
-        $this->customer =       $this->dependencies->getPlugin()->getCustomer();
-        $this->language =       $this->dependencies->getPlugin()->getLanguage();
-        $this->logger =         $this->dependencies->getPlugin()->getLogger();
-        $this->module =         $this->dependencies->getPlugin()->getModule();
-        $this->oney =           $this->dependencies->getPlugin()->getOney();
-        $this->order =          $this->dependencies->getPlugin()->getOrder();
-        $this->orderHistory =   $this->dependencies->getPlugin()->getOrderHistory();
-        $this->payment =        $this->dependencies->getPlugin()->getPayment();
-        $this->query =          $this->dependencies->getPlugin()->getQuery();
-        $this->tools =          $this->dependencies->getPlugin()->getTools();
-        $this->validate =       $this->dependencies->getPlugin()->getValidate();
+        $this->address = $this->dependencies->getPlugin()->getAddress();
+        $this->assign = $this->dependencies->getPlugin()->getAssign();
+        $this->card = $this->dependencies->getPlugin()->getCard();
+        $this->cart = $this->dependencies->getPlugin()->getCart();
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->country = $this->dependencies->getPlugin()->getCountry();
+        $this->currency = $this->dependencies->getPlugin()->getCurrency();
+        $this->customer = $this->dependencies->getPlugin()->getCustomer();
+        $this->language = $this->dependencies->getPlugin()->getLanguage();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
+        $this->module = $this->dependencies->getPlugin()->getModule();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->order = $this->dependencies->getPlugin()->getOrder();
+        $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
+        $this->payment = $this->dependencies->getPlugin()->getPayment();
+        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+        $this->validate = $this->dependencies->getPlugin()->getValidate();
     }
 
     /**
@@ -418,7 +418,6 @@ class PaymentClass
         }
 
 
-
         if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
@@ -760,7 +759,63 @@ class PaymentClass
         $payment_methods = [];
 
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $faq_links = $this->dependencies->configClass->getFAQLinks($this->context->language->iso_code);
+        $faq_links = $this->dependencies->configClass->configurations['faq_links'];
+
+        $order_states = $this->dependencies->orderClass->getOrderStates();
+        $deferred_state = $this->dependencies->configClass->configurations['deferred_state'];
+
+        $order_states_values = [
+            0 => [
+                'key' => 0,
+                'value' => $this->dependencies->l('payment.getPaymentMethod.deferred.capture.default', 'paymentclass'),
+                'selected' => (int)$deferred_state ? false : true,
+            ]
+        ];
+        foreach ($order_states as $order_state) {
+            $order_states_values[$order_state['id_order_state']] = [
+                'key' => $order_state['id_order_state'],
+                'value' => sprintf(
+                    $this->dependencies->l('payment.getPaymentMethod.deferred.capture.state', 'paymentclass'),
+                    $order_state['name']
+                ),
+                'selected' => $order_state['id_order_state'] == $deferred_state ? true : false,
+            ];
+        }
+
+        ksort($order_states_values);
+
+        $embedded_mode_values = [
+            [
+                'value' => 'integrated',
+                'dataName' => 'embeddedModeIntegrated',
+                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.integrated', 'paymentclass')
+            ],
+            [
+                'value' => 'popup',
+                'dataName' => 'embeddedModePopup',
+                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.popup', 'paymentclass')
+            ],
+            [
+                'value' => 'redirected',
+                'dataName' => 'embeddedModeRedirected',
+                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.redirected', 'paymentclass')
+            ]
+        ];
+
+        if (!$this->dependencies->configClass->isValidFeature('feature_integrated')) {
+            array_shift($embedded_mode_values);
+        }
+
+        $this->assign->assign([
+            'faq_links' => $faq_links,
+            'installments_panel_url' => $this->dependencies->configClass->configurations['installments_panel_url'],
+            'inst_mode' => $this->dependencies->configClass->configurations['inst_mode'],
+            'inst_min_amount' => $this->dependencies->configClass->configurations['inst_min_amount'],
+            'order_states_values' => $order_states_values,
+            'installment_isActivated' => $this->dependencies->configClass->isValidFeature('feature_installment'),
+            'deferred_isActivated' => $this->dependencies->configClass->isValidFeature('feature_deferred'),
+            'embedded_mode_values' => $embedded_mode_values,
+        ]);
 
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
             $payment_methods['standard'] = [
@@ -770,7 +825,7 @@ class PaymentClass
                 "link" => '',
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
                 "config_key" => $this->dependencies->getConfigurationKey('standard'),
-                "informations" => '',
+                "informations" => $this->dependencies->configClass->fetchTemplate('/views/templates/api/molecules/standard/standard.tpl'),
             ];
         }
 
@@ -779,7 +834,7 @@ class PaymentClass
                 "name" => $this->dependencies->l('payment.getPaymentMethod.applepay.name', 'paymentclass'),
                 "image_url" => $views_path . 'img/svg/payment/applepay.svg',
                 "description" => $this->dependencies->l('payment.getPaymentMethod.applepay.description', 'paymentclass'),
-                "link" => '',
+                "link" => $faq_links['applepay'],
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
                 "config_key" => $this->dependencies->getConfigurationKey('applepay'),
                 "informations" => '',
@@ -891,17 +946,17 @@ class PaymentClass
                         );
                     $paymentOption[$payment_key]['logo'] =
                         $card['brand'] != 'none' ?
-                        $this
-                            ->dependencies
-                            ->mediaClass
-                            ->getMediaPath(
-                                $this
-                                    ->constant
-                                    ->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/views/img/' . $this
-                                    ->tools
-                                    ->tool('strtolower', $card['brand']) . '.svg'
-                            )
-                        : '';
+                            $this
+                                ->dependencies
+                                ->mediaClass
+                                ->getMediaPath(
+                                    $this
+                                        ->constant
+                                        ->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/views/img/' . $this
+                                        ->tools
+                                        ->tool('strtolower', $card['brand']) . '.svg'
+                                )
+                            : '';
                     $paymentOption[$payment_key]['callToActionText'] = $brand .
                         ' **** **** **** ' . $card['last4'];
                     $paymentOption[$payment_key]['expiry_date_card'] =
@@ -1324,7 +1379,7 @@ class PaymentClass
 
         if ($payment->installment_plan_id !== null) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($payment->installment_plan_id);
-            $installment =  $installment['resource'];
+            $installment = $installment['resource'];
         } else {
             $installment = null;
         }
@@ -1520,7 +1575,7 @@ class PaymentClass
             'is_installment' => false,
             'is_deferred' => false,
             'is_oney' => false,
-            'is_integrated' =>false,
+            'is_integrated' => false,
             'is_bancontact' => false
         ];
 
@@ -1693,7 +1748,7 @@ class PaymentClass
             'country' => $billing_iso,
             'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
         ];
-        $billing['company_name'] = empty($billing['company_name']) || ! $billing['company_name']
+        $billing['company_name'] = empty($billing['company_name']) || !$billing['company_name']
             ? $billing['first_name'] . ' ' . $billing['last_name']
             : $billing['company_name'];
         $billing['mobile_phone_number'] = $billing['mobile_phone_number']
@@ -1729,7 +1784,7 @@ class PaymentClass
             'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
             'delivery_type' => $delivery_type,
         ];
-        $shipping['company_name'] = empty($shipping['company_name']) || ! $shipping['company_name']
+        $shipping['company_name'] = empty($shipping['company_name']) || !$shipping['company_name']
             ? $shipping['first_name'] . ' ' . $shipping['last_name']
             : $shipping['company_name'];
         $shipping['mobile_phone_number'] = $shipping['mobile_phone_number']
@@ -1760,10 +1815,11 @@ class PaymentClass
             'allow_save_card' => $allow_save_card
         ];
 
-        if (!$options['is_deferred'] && !$options['is_oney']) {
-            $payment_tab['amount'] = $amount;
-        } else {
+        $can_deferred_payment = !$options['is_installment'] && !$options['is_bancontact'];
+        if (($options['is_deferred'] || $options['is_oney']) && $can_deferred_payment) {
             $payment_tab['authorized_amount'] = $amount;
+        } else {
+            $payment_tab['amount'] = $amount;
         }
 
         // check payment tab from current payment method
@@ -1780,12 +1836,7 @@ class PaymentClass
                 if ($i == 0) {
                     $schedule[$i]['date'] = 'TODAY';
                     $int_part = (int)($amount / $config['inst_mode']);
-                    if ($options['is_deferred']) {
-                        $schedule[$i]['authorized_amount'] = (int)($int_part +
-                            ($amount - ($int_part * $config['inst_mode'])));
-                    } else {
-                        $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
-                    }
+                    $schedule[$i]['amount'] = (int)($int_part + ($amount - ($int_part * $config['inst_mode'])));
                 } else {
                     $delay = $i * 30;
                     $schedule[$i]['date'] = date('Y-m-d', strtotime("+ $delay days"));

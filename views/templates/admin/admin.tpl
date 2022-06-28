@@ -41,15 +41,15 @@
         {include file='./../api/molecules/general.tpl'}
 
         {* Payment method block *}
-        {include file='./../api/molecules/paymentMethod.tpl'}
+        {include file='./../api/molecules/payment/paymentMethod.tpl'}
 
         {* Paylater block*}
-        {include file='./../api/molecules/paylater.tpl'}
+        {include file='./../api/molecules/paylater/paylater.tpl'}
 
         {* etat block *}
         {include file='./../api/molecules/state.tpl'}
 
-        {include file='./panel/settings.tpl'}
+{*        {include file='./panel/settings.tpl'}*}
     </div>
 
     {* Configuration footer *}

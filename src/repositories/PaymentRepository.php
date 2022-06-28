@@ -25,8 +25,9 @@ namespace PayPlugModule\src\repositories;
 
 use DateTime;
 use Exception;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class PaymentRepository extends Repository
+class PaymentRepository extends BaseClass
 {
     protected $dependencies;
 
@@ -72,7 +73,7 @@ class PaymentRepository extends Repository
             || !is_object($paymentDetails['cart'])
         ) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => 'No payment details nor cart'],
                 '[getHashedCart] $paymentDetails or cart is null, or $paymentDetails is not an array'
             );
         }
@@ -123,7 +124,7 @@ class PaymentRepository extends Repository
             || !$paymentDetails['cartId']
         ) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => 'No payment details nor cart ID'],
                 '[checkHash] $paymentDetails or cartId is null, or $paymentDetails is not an array'
             );
         }
@@ -147,6 +148,7 @@ class PaymentRepository extends Repository
             if ($createPayment['result'] && $createPayment['paymentDetails']) {
                 $paymentDetails = $createPayment['paymentDetails'];
             } elseif (!$createPayment['result']) {
+                unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     $createPayment['response']
@@ -247,7 +249,7 @@ class PaymentRepository extends Repository
     {
         if (!$paymentDetails || !is_array($paymentDetails)) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                ['name' => 'paymentDetails', 'value' => 'No payment details'],
                 '[createPayment] Invalid $paymentDetails given'
             );
         }
@@ -262,6 +264,7 @@ class PaymentRepository extends Repository
         }
 
         if (!isset($paymentDetails['paymentMethod']) || !is_string($paymentDetails['paymentMethod'])) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] Invalid paymentMethod given in $paymentDetails'
@@ -269,6 +272,7 @@ class PaymentRepository extends Repository
         }
 
         if (!isset($paymentDetails['cartId']) || !is_int($paymentDetails['cartId'])) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] Invalid cartId given in $paymentDetails'
@@ -282,20 +286,30 @@ class PaymentRepository extends Repository
             );
         }
 
-        // Before create a new payment, delete the previous one, if exists, to avoid double order creation
+        // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
+        // to avoid double order creation
         if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
-            $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
-            if (!$abort['result']) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
-                );
+            if (!in_array($apiPayment['payment_method'], ['oneclick', 'bancontact', 'applepay', 'oney'])) {
+                $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
+                if ($payment['result'] && !$payment['resource']->failure) {
+                    $this->logger->addLog('Payment already exists: ' . $apiPayment['id_payment'] . ', so we delete it before create a new one');
+                    $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
+                    if (!$abort['result']) {
+                        return $this->returnPaymentError(
+                            ['name' => 'paymentId', 'value' => $apiPayment['id_payment']],
+                            '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
+                        );
+                    }
+
+                    $this->logger->addLog('Payment aborted.');
+                }
             }
         }
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
             if (!$payment['result']) {
+                unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create payment. Error: ' . $payment['message']
@@ -306,6 +320,7 @@ class PaymentRepository extends Repository
         } else {
             $installment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
             if (!$installment['result']) {
+                unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create installment plan. Error: ' . $installment['message']
@@ -329,6 +344,7 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentId']) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment ' . (string)$paymentDetails['paymentMethod'] . '] The payment id is null.'
@@ -342,6 +358,7 @@ class PaymentRepository extends Repository
         }
 
         if (!$paymentDetails['paymentReturnUrl']) {
+            unset($paymentDetails['paymentTab']);
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[createPayment] payment return URL is null.'
@@ -552,7 +569,10 @@ class PaymentRepository extends Repository
                     : $paymentDetails['paymentReturnUrl'];
                 $paymentReturnUrl = [
                     'result' => 'new_card',
-                    'embedded' => $paymentDetails['isEmbedded'] && !$paymentDetails['isMobileDevice'],
+                    'embedded' =>
+                        $paymentDetails['isEmbedded']
+                        && !$paymentDetails['isMobileDevice']
+                        && $paymentDetails['paymentMethod'] !== 'bancontact',
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
@@ -694,10 +714,15 @@ class PaymentRepository extends Repository
         }
 
         $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['id_payment']);
-        if (!$retrievedPayment['result']) {
+        if (!$retrievedPayment['result']
+            || (
+                isset($retrievedPayment['resource']->failure->code)
+                && $retrievedPayment['resource']->failure->code
+            )) {
             $payment = $this->createPayment($paymentDetails);
             return $this->updatePaymentTable($payment['paymentDetails']);
         }
+
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,

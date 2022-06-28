@@ -41,23 +41,23 @@
     </button>
     {if $payplug_oney_allowed}
         {if isset($oney_payment_options) && $oney_payment_options}
-            <div class="oneyOption_wrapper">
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption_wrapper">
                 {include file="./options.tpl" oney_image=$oney_image}
             </div>
             {if isset($oney_required_fields)}
                 {include file="./../required.tpl" oney_required_fields=$oney_required_fields}
             {/if}
-            <div class="oneyPayment_cta">
-                <button class="oneyPayment_button"></button>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyPayment_cta">
+                <button class="{$module_name|escape:'htmlall':'UTF-8'}OneyPayment_button"></button>
                 {if $lang_iso == 'it' && $merchant_company_iso == 'IT'}
                     <a href="https://www.payplug.com/hubfs/ONEY/payplug-italy{if isset($use_fees) && !$use_fees}-no-fees{/if}.pdf" target="_blank">{l s='hook.oney.payment.cgv' mod='payplug'}</a>
                 {/if}
             </div>
         {else}
-            <div class="oneyOption_wrapper -loading">
-                <span class="oneyLoader">
-                    <span class="oneyLoader_spinner"><span></span></span>
-                    <span class="oneyLoader_message">{$payplug_oney_loading_msg|escape:'htmlall':'UTF-8'} <i>.</i><i>.</i><i>.</i></span>
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption_wrapper -loading">
+                <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyLoader">
+                    <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyLoader_spinner"><span></span></span>
+                    <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyLoader_message">{$payplug_oney_loading_msg|escape:'htmlall':'UTF-8'} <i>.</i><i>.</i><i>.</i></span>
                 </span>
             </div>
         {/if}

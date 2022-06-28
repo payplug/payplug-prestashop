@@ -23,7 +23,7 @@
 
   ._modal {
     .transform(translate(-50%, -50%));
-    .border(#colorMap[fontMainDisabled]);
+    .border(@color-text-disable);
     .borderRadius(4px);
     display: none;
     position: fixed;
@@ -54,7 +54,7 @@
 
       svg {
         .transition(~"fill @{dur}");
-        fill: #colorMap[fontMainDefault];
+        fill: @color-text-main;
       }
 
       &:hover {
@@ -64,7 +64,7 @@
       }
     }
     ._header {
-      .border(#colorMap[fontSecondary50], b);
+      .border(@color-text-secondary-lighten, b);
       font-weight: 700;
       margin: 0 0 24px;
       padding: 0 0 16px;

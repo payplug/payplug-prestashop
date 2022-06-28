@@ -20,6 +20,8 @@
     position: absolute;
     top: 0;
     margin: 0;
+    font-weight: 400;
+
     &::before {
       content: attr(data-disable-text);
     }
@@ -28,7 +30,7 @@
 
   ._slider {
     -webkit-transition: 0.4s;
-    background-color: #colorMap[fontSecondaryDefault];
+    background-color: @color-text-secondary;
     bottom: 0;
     cursor: pointer;
     left: 0;
@@ -54,7 +56,7 @@
 
   input {
     &:disabled + ._slider {
-      background-color: #colorMap[fontMainDisabled];
+      background-color: @color-text-disable;
       cursor: not-allowed;
     }
 

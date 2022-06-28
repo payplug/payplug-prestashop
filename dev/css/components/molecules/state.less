@@ -1,6 +1,11 @@
 .__moduleName__Configuration .stateBlock {
 
   min-height: 150px;
+  padding: 40px 64px 0;
+
+  ._description {
+    margin: 0 0 40px;
+  }
 
   .payplugUIAccordion {
     &_contentWrapper {
@@ -39,6 +44,7 @@
         width: 100%;
         padding: 40px 40px 32px 40px;
         background-color: rgba(215,216,217,0.2);
+        margin-bottom: 34px;
 
         button {
           font-weight: 100;
@@ -55,9 +61,9 @@
           .indicator {
             display: flex;
             flex-wrap: nowrap;
-            padding: 10px 0;
+            padding: 3px 0 0;
             .closeClass > svg {
-              fill: #colorMap[accentuationWarning500];
+              fill: @color-warning;
             }
             .checkClass > svg {
               fill: @color-primary;

@@ -1,5 +1,5 @@
 .payplugUISelect {
-  .border(#colorMap[borderMain]);
+  .border(@color-border);
   .borderRadius(4px);
   background: #colorMap[white];
   position: relative;
@@ -32,15 +32,18 @@
       mask-image: url(~"@{img-icons}arrow_down.svg");
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      background-color: #colorMap[fontSecondaryDefault];
+      background-color: @color-text-secondary;
     }
 
     &:focus {
       &:after {
         .transform(translateY(-50%) rotate(-180deg));
       }
-      & + ._list {
+      & + ._listWrapper {
+        .border(@color-border, rbl);
+        display: block;
         max-height: 100vh;
+        padding: 4px 4px 4px 0;
       }
     }
   }
@@ -60,29 +63,59 @@
   ._text {
     display: none;
     margin: 0;
-    color: #colorMap[fontMainDefault];
+    color: @color-text-main;
     white-space: nowrap;
   }
 
   ._list {
-    .transition(~"max-height @{dur}");
-    .transform(translateX(-50%));
-    overflow: hidden;
-    max-height: 0;
+    &Wrapper {
+      .transform(translateX(-50%));
+      .borderRadius(0 0 4px 4px);
+      .border(@color-border, rl);
+      .transition(~"max-height @{dur}");
+      background: #colorMap[white];
+      overflow: hidden;
+      position: absolute;
+      top: calc(100% - 2px);
+      left: 50%;
+      width: calc(100% + 2px);
+      padding: 0;
+      z-index: 999;
+      max-height: 0;
 
-    position: absolute;
-    top: calc(100% - 2px);
-    left: 50%;
+      &.-scrollbar {
+        padding: 0 @padding-1 0 0;
 
-    width: calc(100% + 2px);
-    z-index: 999;
+        ._list {
+          overflow-y: scroll;
+          &::-webkit-scrollbar-track {
+            background-color: transparent;
+          }
+
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            .borderRadius(10px);
+            background: @color-primary;
+            position: relative;
+            right: 4px;
+          }
+        }
+      }
+    }
+
+    max-height: 250px;
 
     ul {
-      .border(#colorMap[borderMain], rbl);
-      .borderRadius(0 0 4px 4px);
-      background: #colorMap[white];
       list-style: none;
       padding: 0;
+      margin: 0;
+    }
+
+    > span {
+      min-height: 40px;
     }
   }
 
@@ -100,6 +133,8 @@
     font-weight: 400;
     z-index: 1;
     font-weight: 400;
+    color: @color-text-main;
+    white-space: nowrap;
 
     &:hover {
       color: @color-primary;

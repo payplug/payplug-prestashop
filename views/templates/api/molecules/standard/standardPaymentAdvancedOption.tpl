@@ -20,17 +20,17 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-<div class="_paylaterAdvancedOption -{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}">
-    <div class="_img">
-        <img src="/modules/{$module_name}/views/img/svg/screen/paylater-{$paylaterAdvancedOptionClassName|escape:'htmlall':'UTF-8'}.svg" alt="">
-    </div>
+<div class="_standardAdvancedOption -{$standardAdvancedOptionClassName|escape:'htmlall':'UTF-8'}">
     <div class="_wrapper">
+        <div class="_header">
         {include
-            file='./../atoms/title/title.tpl'
+            file='./../../atoms/title/title.tpl'
             titleClassName='_title'
-            titleText=$paylaterAdvancedOptionTitle}
+            titleText=$standardAdvancedOptionTitle}
+        {$standardAdvancedOptionSwitch}
+        </div>
         <div class="_content">
-            {$paylaterAdvancedOptionContent}
+            {$standardAdvancedOptionContent}
         </div>
     </div>
 </div>

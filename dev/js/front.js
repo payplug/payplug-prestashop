@@ -1184,3 +1184,6 @@ $(document).ready(function () {
     $window = $(window);
     __moduleName__Module.init();
 });
+
+
+window['__moduleName__Module'] = __moduleName__Module;

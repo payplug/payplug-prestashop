@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: flex-start;
 
-  .border(#colorMap[borderMain]);
+  .border(@color-border);
   position: relative;
   width: 100%;
   border-radius: 4px;
@@ -22,7 +22,7 @@
       }
 
       ~ div {
-        max-height: 100vh;
+        display: block;
       }
     }
   }
@@ -54,16 +54,14 @@
       mask-image: url(~"@{img-icons}arrow_down.svg");
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      background-color: #colorMap[fontSecondaryDefault];
+      background-color: @color-text-secondary;
     }
   }
 
   &_content {
     &Wrapper {
+      display: none;
       padding: 0 24px;
-      max-height: 0;
-      overflow: hidden;
-      transition: all .35s;
       max-width: 100%;
     }
 

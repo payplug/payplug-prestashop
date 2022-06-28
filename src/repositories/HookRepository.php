@@ -25,8 +25,9 @@ namespace PayPlugModule\src\repositories;
 
 use PayPlugModule\classes\MediaClass;
 use Media;
+use PayPlugModule\src\application\dependencies\BaseClass;
 
-class HookRepository extends Repository
+class HookRepository extends BaseClass
 {
     protected $constant;
     protected $dependencies;
@@ -41,30 +42,6 @@ class HookRepository extends Repository
         $this->constant = $constant;
         $this->context = $context;
         $this->tools = $tools;
-    }
-
-    public function actionAdminControllerSetMedia()
-    {
-        $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
-
-        Media::addJsDef([
-            'module_name' => $this->dependencies->name
-        ]);
-
-        if ($this->context->getContext()->controller->controller_name == 'AdminOrders') {
-            $this->dependencies->mediaClass->setMedia([
-                $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
-                $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
-                $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
-            ]);
-        } else {
-            $this->dependencies->mediaClass->setMedia([
-                $module_url . 'views/js/admin-v'.$this->dependencies->version.'.js',
-                $module_url . 'views/css/admin-v'.$this->dependencies->version.'.css',
-                $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
-                $module_url . 'views/js/components-v'.$this->dependencies->version.'.js',
-            ]);
-        }
     }
 
     /**

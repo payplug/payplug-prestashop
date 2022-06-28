@@ -51,7 +51,7 @@
                             </label>
                         {/if}
                     {/foreach}
-                    <label class="oneClickPayment_card">
+                    <label class="{$module_name|escape:'htmlall':'UTF-8'}OneClickPayment_card">
                         <input type="radio" name="payplug_card" id="payplug_card_new" value="new_card" />
                         <span class="noimg">  {l s='Pay with a different card' mod='payplug'}</span>
                     </label>

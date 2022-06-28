@@ -21,45 +21,35 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlugModule\src\models\entities;
 
-use PayPlugModule\src\specific\TranslationSpecific;
+use PayPlugModule\src\exceptions\BadParameterException;
 
-class Repository
+class PaymentEntity
 {
-    private $entity;
-    protected $name;
-    protected $payplug;
+    /** @var object */
+    private $apiPayment;
 
-    public static function factory()
+    /**
+     * @return object
+     */
+    public function getApiPayment()
     {
-        return new self();
+        return $this->apiPayment;
     }
 
-    public function setName()
+    /**
+     * @param $apiPayment
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setApiPayment($apiPayment)
     {
-        $this->name = (new \ReflectionClass($this))->getShortName();
+        if (!is_object($apiPayment)) {
+            throw (new BadParameterException('Invalid argument, $apiPayment must be an object'));
+        }
+
+        $this->apiPayment = $apiPayment;
         return $this;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-    public function getEntity()
-    {
-        return $this->entity;
-    }
-
-    public function l($string)
-    {
-        $this->setName();
-        return TranslationSpecific::translate($this->payplug, $string, $this->getName());
     }
 }

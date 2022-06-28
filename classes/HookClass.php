@@ -28,7 +28,9 @@ use Dispatcher;
 use Language;
 use Media;
 use Module;
+use Order;
 use OrderState;
+use Tools;
 use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
@@ -575,6 +577,11 @@ class HookClass
             }
 
             $single_payment = $this->dependencies->paymentClass->buildPaymentDetails($payment);
+
+            if (isset($single_payment['type']) && $single_payment['type'] == 'apple_pay') {
+                $single_payment['type'] = 'Apple Pay';
+            }
+
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
@@ -778,6 +785,22 @@ class HookClass
         return $this->html;
     }
 
+    public function actionAdminControllerSetMedia()
+    {
+        if (Dispatcher::getInstance()->getController() == 'AdminOrders' && Tools::getValue('id_order')) {
+            $order = new Order(Tools::getValue('id_order'));
+
+            if ($order->module == $this->dependencies->name) {
+                $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
+                $this->dependencies->mediaClass->setMedia([
+                    $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
+                    $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
+                    $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
+                ]);
+            }
+        }
+    }
+
     /**
      * @return string
      */
@@ -881,7 +904,10 @@ class HookClass
             $specific->displayHeader();
         }
 
-        if ((int) $this->tools->tool('getValue', 'show_lightbox') == 1) {
+        $is_lightbox =  'popup' == $this->config->get(
+            $this->dependencies->getConfigurationKey('embeddedMode')
+        ) && $this->tools->tool('getValue', 'popup');
+        if ($is_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
                 return;
@@ -979,6 +1005,8 @@ class HookClass
 
             Media::addJsDef([
                 'applePayPaymentRequest' => $applePayPaymentRequest,
+                'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaymerchantsession', [], true),
+                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypayment', [], true),
             ]);
         }
 
